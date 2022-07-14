@@ -1,0 +1,66 @@
+<div class="row">
+<div class="col-12">
+    <div class="row">
+        <div class="col-12">
+            <h4 class="text-center">Edit Instance</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+
+            <form>
+                <div class="card p-4">
+                    <div class="row">
+                        <div class="col-4">
+                            <label for="name"> Name </label>
+                            <input type="text" [(ngModel)]="instanceToEdit.name" name="name" class="form-control" value="{{instanceToEdit.name}}" required />
+                        </div>
+                        <div class="col-4">
+                            <label for="username"> Username </label>
+                            <input type="text" name="username" value="{{instanceToEdit.username}}" class="form-control"
+                                placeholder="Instance Username" required />
+                        </div>
+                        <div class="col-4">
+                            <label for="password"> Password </label>
+                            <input type="text" name="password" value="{{instanceToEdit.password}}" class="form-control"
+                                placeholder="Instance Password" required />
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-6">
+                            <label for="url"> URL </label>
+                            <input type="url" name="url" value="{{instanceToEdit.url}}" class="form-control"
+                                placeholder="https://www.your-instance.db" required />
+                        </div>
+                        <div class="col-2">
+                            <label for="port"> Port number </label>
+                            <input type="number" name="port" value="{{instanceToEdit.port}}" min="0" class="form-control"
+                                placeholder="443" required />
+                        </div>
+                        <div class="col-2">
+                            <label for="active"> Activate </label><br>
+                            <input type="checkbox" name="active" value="{{instanceToEdit.active}}" class="form-control-checkbox"
+                                required />
+
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-10 float-end">
+                                    <button (click)="onNoClick()" class="btn btn-outline-danger float-end"> Close </button>
+                                </div>
+                                <div class="col-2 float-end">
+                                    <button type="submit" [mat-dialog-close]="instanceToEdit" cdkFocusInitial class="btn btn-outline-success float-end"> Save </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+</div>

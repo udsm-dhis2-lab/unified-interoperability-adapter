@@ -1,0 +1,37 @@
+<mat-drawer-container class="sidenav-container" [hasBackdrop]="false">
+    <mat-drawer #drawer [mode]="'side'" class="sidenav-drawer">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" routerLink="/instances">Instances </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/sources">Sources</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " routerLink="/datasets">Datasets</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " routerLink="/mapping">Mappings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" routerLink="/reports">Reports</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " routerLink="/logs">Logs</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link " routerLink="/settings">Settings</a>
+            </li>
+        </ul>
+    </mat-drawer>
+    <mat-drawer-content>
+        <button mat-raised-button *ngIf="!showSidenav" (click)="drawer.toggle(); changeIcon()">
+             >
+        </button>
+        <button mat-raised-button *ngIf="showSidenav" (click)="drawer.toggle(); changeIcon()" [innerHTML]="back">
+        </button>
+        <!-- Body of the app -->
+        <app-body></app-body>
+        <!-- End boddy of the app -->
+    </mat-drawer-content>
+</mat-drawer-container>

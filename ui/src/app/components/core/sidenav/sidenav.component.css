@@ -1,0 +1,33 @@
+.sidenav-container {
+    background-color: #fff;
+    height: 93vh;
+}
+
+.sidenav-drawer {
+    width: 10vw;
+    background-color: grey ;
+    /* background-color: #188cd9 ; */
+    height: 100%;
+    opacity: 0.9;
+}
+
+.sidenav-drawer ul {
+    margin: 3vw 0 0 2.5vw;
+}
+
+.sidenav-drawer ul li {
+    margin: 0 0 1vh;
+    
+}
+
+.sidenav-drawer ul li a {
+    color: #fff;
+}
+
+mat-drawer-content button {
+    background-color: grey;
+    color: #fff;
+    font-size: 25px;
+    height: 60px;
+    border-radius: 50%;
+}

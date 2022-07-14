@@ -1,0 +1,68 @@
+<div class="row">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-9">
+                <div class="mb-3">
+                    <h3 class="text-"> Instances </h3>
+                </div>
+            </div>
+            <div class="col-3">
+                <div>
+                    <app-button [ngStyle]="{
+                        'padding': '90px',
+                        'margin': '0 0 0 -0vw'
+                    }" 
+                    backgroundColor="{{ showAddInstanceForm ? 'red' : 'transparent' }}"
+                    fontColor="{{ showAddInstanceForm ? 'white' : 'green' }}"
+                    borderColor="{{ showAddInstanceForm ? 'red' : 'green' }}" text="{{ showAddInstanceForm ? 'Hide Form' : 'Add Instance' }}"
+                    (btnClick)="onToggle()">
+                    </app-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <app-add-instance (onAddInstance)="addInstance($event)"></app-add-instance>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Instance Name</th>
+                            <th>URL</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody *ngFor="let instance of instances; odd as isOdd">
+                        <tr [ngClass]="{ 'table-success': instance.active, 'table-secondary': isOdd }" (dblclick)="activateInstance(instance)">
+                            <td>{{ instance.name }}</td>
+                            <td>{{ instance.url }}</td>
+                            <td>{{ instance.username }}</td>
+                            <td>{{ instance.password }}</td>
+                            <td>
+                                <div class="buttons">
+                                    <a class="btn btn-outline-primary ml-2" (click)="openDialog(instance)">
+                                        <fa-icon [icon]="faEdit"></fa-icon>
+                                    </a>
+                                    <!-- <button mat-button (click)="openDialog()">Open dialog</button> -->
+
+                                    <a class="btn btn-outline-danger" (click)="onDelete(instance)">
+                                        <fa-icon [icon]="faTrash"></fa-icon>
+                                    </a>
+                                    
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
