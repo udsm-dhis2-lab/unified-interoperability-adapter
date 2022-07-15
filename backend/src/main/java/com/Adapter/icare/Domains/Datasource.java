@@ -31,6 +31,23 @@ public class Datasource implements Serializable{
     private String url;
     private String username;
     private String password;
+    private String type;
+
+    public enum Type{
+        mysql("mysql"),
+        postgresql("postgreql"),
+        oracle("oracle");
+
+        String value;
+
+        Type(String value){
+            this.value = value;
+        }
+
+        public String getValue(){
+            return value;
+        }
+    }
     
 
     
