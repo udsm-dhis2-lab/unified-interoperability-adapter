@@ -44,8 +44,8 @@
                         </tr>
                     </thead>
                     <tbody *ngFor="let source of sources;  odd as isOdd">
-                        <tr [ngClass]="{ 'table-success': source.active, 'table-secondary': isOdd }"  (dblclick)="activateSource(source)">
-                            <td>{{ source.name }}</td>
+                        <tr [ngClass]="{'table-secondary': isOdd }">
+                            <td>{{ source.type }}</td>
                             <td>{{ source.url }}</td>
                             <td>{{ source.username }}</td>
                             <td>{{ source.password }}</td>

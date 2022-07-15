@@ -4,8 +4,8 @@
             <div class="col-11">
                 <h4 class="text-center">Add Select Query</h4>
             </div>
-            <div class="col-1 float-end" (click)="onNoClick()">
-                <fa-icon [icon]="faTimes"></fa-icon>
+            <div class="col-1 float-end">
+                <fa-icon [icon]="faTimes" (click)="onNoClick()"></fa-icon>
             </div>
         </div>
         <div class="row">
@@ -25,7 +25,7 @@
                                     <mat-select [(ngModel)]="data.source" name="source" (selectionChange)="data.query">
                                         <mat-option> </mat-option>
                                         <mat-option *ngFor="let source of data.sources" [value]="source" >
-                                            {{source.name}}
+                                            {{source.type}}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>

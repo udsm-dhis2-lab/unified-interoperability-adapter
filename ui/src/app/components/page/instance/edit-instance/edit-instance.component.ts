@@ -35,12 +35,9 @@ export class EditInstanceComponent {
   onSaveInstance(instance: InstanceInterface): void {
     let editedInstance = {
       id: instance.id,
-      name: instance.name,
       username: instance.username,
       password: instance.password,
-      url: instance.url,
-      port: instance.port,
-      active: instance.active,
+      url: instance.url
     }
     console.log("On Save ", editedInstance);
   }

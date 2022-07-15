@@ -10,7 +10,7 @@ import { Subscription } from 'rxjs';
 })
 export class AddSourceComponent implements OnInit {
 
-  name: string = "";
+  type: string = "";
   username: string = "";
   password: string = "";
   url: string = "";
@@ -30,22 +30,18 @@ export class AddSourceComponent implements OnInit {
 
   onSubmit(){
     const newSource = {
-      name: this.name,
+      type: this.type,
       username: this.username,
       password: this.password,
-      url: this.url,
-      active: this.active,
-      port: this.port
+      url: this.url
     }
 
     this.onAddSource.emit(newSource);
 
-    this.name = '';
+    this.type = '';
     this.username = '';
     this.password = '';
     this.url = '';
-    this.active = false;
-    this.port = 0;
   }
 
 }

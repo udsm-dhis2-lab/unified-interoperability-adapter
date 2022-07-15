@@ -1,21 +1,17 @@
 export interface SourceInterface {
     id?: number;
-    name: string;
+    type: string;
     url: string;
-    port?: number;
     username: string;
     password: string;
-    active?: boolean;
 }
 
 export interface InstanceInterface {
     id?: number;
-    name: string;
+    // name: string;
     url: string;
-    port?: number;
     username: string;
     password: string;
-    active: boolean;
 }
 
 export interface DatasetInterface {

@@ -30,8 +30,6 @@ export class AddQueryComponent implements OnInit {
   }
 
   onNoClick(): void {
-    this.query = undefined;
-    console.log("Closed");
     this.dialogRef.close();
   }
 

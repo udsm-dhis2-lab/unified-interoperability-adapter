@@ -6,7 +6,7 @@
             <mat-select [(ngModel)]="instance" name="instance" (selectionChange)="filterDatasets()">
                 <mat-option></mat-option>
                 <mat-option *ngFor="let instance of instances" [value]="instance">
-                    {{instance.name}}
+                    {{instance.url}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
