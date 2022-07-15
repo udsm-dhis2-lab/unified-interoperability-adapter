@@ -6,36 +6,28 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
+            <div class="col-8 offset-2">
 
                 <form>
                     <div class="card p-4">
                         <div class="row">
-                            <div class="col-4">
-                                <label for="name"> Name </label>
-                                <input type="text" name="name" [(ngModel)]="sourceToEdit.name" class="form-control" value="{{sourceToEdit.name}}" required />
+                            <div class="col-6">
+                                <label for="name"> Type </label>
+                                <input type="text" name="name" [(ngModel)]="sourceToEdit.type" class="form-control" value="{{sourceToEdit.type}}" required />
                             </div>
-                            <div class="col-4">
-                                <label for="username"> Username </label>
-                                <input type="text" name="username" [(ngModel)]="sourceToEdit.username" class="form-control" value="{{ sourceToEdit.username  }}" required />
-                            </div>
-                            <div class="col-4">
-                                <label for="password"> Password </label>
-                                <input type="text" name="password" [(ngModel)]="sourceToEdit.password" class="form-control" value="{{ sourceToEdit.password  }}" required />
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-4">
+                            <div class="col-6">
                                 <label for="url"> URL </label>
                                 <input type="url" name="url" [(ngModel)]="sourceToEdit.url" class="form-control" value="{{ sourceToEdit.url  }}" required />
                             </div>
-                            <div class="col-4">
-                                <label for="port"> Port number </label>
-                                <input type="number" name="port" [(ngModel)]="sourceToEdit.port" min="0" class="form-control" value="{{ sourceToEdit.port  }}" required />
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-6">
+                                <label for="username"> Username </label>
+                                <input type="text" name="username" [(ngModel)]="sourceToEdit.username" class="form-control" value="{{ sourceToEdit.username  }}" required />
                             </div>
-                            <div class="col-4">
-                                <label for="active"> Activate </label><br>
-                                <input type="checkbox" name="active" [(ngModel)]="sourceToEdit.active" class="form-control-checkbox" value="{{ sourceToEdit.active  }}" required />
+                            <div class="col-6">
+                                <label for="password"> Password </label>
+                                <input type="text" name="password" [(ngModel)]="sourceToEdit.password" class="form-control" value="{{ sourceToEdit.password  }}" required />
                             </div>
                         </div>
                         <div class="row mt-3">

@@ -185,7 +185,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         // console.log("Results: ", result);
           this.source = result.source;
           this.query = result.query;
-          console.log("Source: "+this.source?.name + " Query:" + this.query + ' Dataset: ' + this.dataset?.name+ ' Element ID: ' + result.elementId)
+          console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.name+ ' Element ID: ' + result.elementId)
           this.addDataValueFetch(this.source?.id, this.query, this.dataset?.id, result.elementId);
       } 
       else{

@@ -48,10 +48,10 @@ export class SourcesComponent implements OnInit {
     this.router?.navigate(['/sources']);
   }
 
-  activateSource(source: SourceInterface) {
-    source.active = !source.active;
-    this.sourcesService.updateSourceActivate(source).subscribe();
-  } 
+  // activateSource(source: SourceInterface) {
+  //   source.active = !source.active;
+  //   this.sourcesService.updateSourceActivate(source).subscribe();
+  // } 
 
   addSource(source: SourceInterface){
     this.sourcesService.addSource(source).subscribe((source) => (this.sources?.push(source)));
@@ -63,7 +63,7 @@ export class SourcesComponent implements OnInit {
       data: sourceToEdit
     });
 
-    console.log("Opened: "+sourceToEdit.name);
+    console.log("Opened: "+sourceToEdit.type);
 
     dialogRef?.afterClosed().subscribe(result => {
       if(result){

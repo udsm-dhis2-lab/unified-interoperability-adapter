@@ -10,12 +10,10 @@ import { SourceInterface } from 'src/app/resources/interfaces';
 export class EditSourceComponent implements OnInit {
 
   id: number | undefined;
-  name: string | undefined;
+  type: string | undefined;
   username: string | undefined;
   password: string | undefined;
   url: string | undefined;
-  port: number | undefined;
-  active: string | undefined;
 
 
   constructor(
@@ -35,13 +33,10 @@ export class EditSourceComponent implements OnInit {
 
   onSaveInstance(source: SourceInterface): void {
     let editedInstance = {
-      id: source.id,
-      name: source.name,
+      type: source.type,
       username: source.username,
       password: source.password,
-      url: source.url,
-      port: source.port,
-      active: source.active,
+      url: source.url
     }
     console.log("On Save ", editedInstance);
   }

@@ -25,7 +25,7 @@
                                     <mat-select [(ngModel)]="data.source" name="source" (selectionChange)="data.query">
                                         <mat-option> </mat-option>
                                         <mat-option *ngFor="let source of data.sources" [value]="source" >
-                                            {{source.name}}
+                                            {{source.type}}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
