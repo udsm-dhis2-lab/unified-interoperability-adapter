@@ -26,6 +26,9 @@ public class Instances implements Serializable {
     private String url;
     private String username;
     private String password;
+    private String name;
+
+
     
 
     
