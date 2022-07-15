@@ -6,31 +6,31 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-12">
+        <div class="col-10 offset-2">
 
             <form>
                 <div class="card p-4">
                     <div class="row">
-                        <div class="col-4">
+                        <div class="col-6">
                             <label for="name"> Name </label>
                             <input type="text" [(ngModel)]="instanceToEdit.id" name="name" class="form-control" value="{{instanceToEdit.id}}" required />
                         </div>
-                        <div class="col-4">
-                            <label for="username"> Username </label>
-                            <input type="text" name="username" value="{{instanceToEdit.username}}" class="form-control"
-                                placeholder="Instance Username" required />
-                        </div>
-                        <div class="col-4">
-                            <label for="password"> Password </label>
-                            <input type="text" name="password" value="{{instanceToEdit.password}}" class="form-control"
-                                placeholder="Instance Password" required />
+                        <div class="col-6">
+                            <label for="url"> URL </label>
+                            <input type="url" name="url" value="{{instanceToEdit.url}}" class="form-control"
+                            placeholder="https://www.your-instance.db" required />
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-6">
-                            <label for="url"> URL </label>
-                            <input type="url" name="url" value="{{instanceToEdit.url}}" class="form-control"
-                                placeholder="https://www.your-instance.db" required />
+                            <label for="username"> Username </label>
+                            <input type="text" name="username" value="{{instanceToEdit.username}}" class="form-control"
+                                placeholder="Instance Username" required />
+                        </div>
+                        <div class="col-6">
+                            <label for="password"> Password </label>
+                            <input type="text" name="password" value="{{instanceToEdit.password}}" class="form-control"
+                                placeholder="Instance Password" required />
                         </div>
                     </div>
                     <div class="row mt-3">
