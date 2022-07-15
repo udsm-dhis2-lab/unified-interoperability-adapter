@@ -41,7 +41,7 @@
                     </thead>
                     <tbody *ngFor="let instance of instances; odd as isOdd">
                         <tr [ngClass]="{ 'table-secondary': isOdd }" >
-                            <td>{{ instance.id }}</td>
+                            <td>{{ instance.name }}</td>
                             <td>{{ instance.url }}</td>
                             <td>{{ instance.username }}</td>
                             <td>{{ instance.password }}</td>

@@ -21,7 +21,9 @@ export class AddInstanceComponent implements OnInit {
   @Output() onAddInstance: EventEmitter<InstanceInterface> = new EventEmitter();
   
   constructor(private uiService?: UiService) {
-    this.subscription = this.uiService?.onToggleAddInstanceForm().subscribe((value) => (this.showAddInstanceForm = value));
+    this.subscription = this.uiService?.onToggleAddInstanceForm().subscribe(
+      (value: boolean) => (this.showAddInstanceForm = value)
+    );
    }
 
   ngOnInit(): void {
@@ -29,6 +31,7 @@ export class AddInstanceComponent implements OnInit {
 
   onSubmit(){
     const newInstance = {
+      name: this.name,
       username: this.username,
       password: this.password,
       url: this.url
