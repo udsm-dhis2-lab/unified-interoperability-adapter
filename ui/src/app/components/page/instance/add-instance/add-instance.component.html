@@ -6,7 +6,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12">
+            <div class="col-8 offset-2">
 
                 <form action="" (ngSubmit)="onSubmit()">
                     <div class="card p-4">
@@ -16,38 +16,27 @@
                                 <input type="text" name="name" [(ngModel)]="name" class="form-control"
                                     placeholder="instance name" required />
                             </div>
-                            <div class="col-4">
+                            <div class="col-8">
+                                <label for="url"> URL </label>
+                                <input type="url" name="url" [(ngModel)]="url" class="form-control"
+                                placeholder="https://www.your-instance.db" required />
+                            </div>
+                        </div>
+                        <div class="row mt-5">
+                            <div class="col-6">
                                 <label for="username"> Username </label>
                                 <input type="text" name="username" [(ngModel)]="username" class="form-control"
                                     placeholder="Instance Username" required />
                             </div>
-                            <div class="col-4">
+                            <div class="col-6">
                                 <label for="password"> Password </label>
                                 <input type="text" name="password" [(ngModel)]="password" class="form-control"
                                     placeholder="Instance Password" required />
                             </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-6">
-                                <label for="url"> URL </label>
-                                <input type="url" name="url" [(ngModel)]="url" class="form-control"
-                                    placeholder="https://www.your-instance.db" required />
-                            </div>
-                            <div class="col-2">
-                                <label for="port"> Port number </label>
-                                <input type="number" name="port" [(ngModel)]="port" min="0" class="form-control"
-                                    placeholder="443" required />
-                            </div>
-                            <div class="col-2">
-                                <label for="active"> Activate </label><br>
-                                <input type="checkbox" name="active" [(ngModel)]="active" class="form-control-checkbox"
-                                    required />
-                                
-                            </div>
-                        </div>
+                        </div> <br>
                         <div class="row mt-3">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-outline-primary float-end"> Save </button>
+                                <button type="submit" class="btn btn-outline-success btn-block"> Save </button>
                             </div>
                         </div>
                     </div>

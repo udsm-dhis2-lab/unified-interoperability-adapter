@@ -13,7 +13,7 @@
                     <div class="row">
                         <div class="col-4">
                             <label for="name"> Name </label>
-                            <input type="text" [(ngModel)]="instanceToEdit.name" name="name" class="form-control" value="{{instanceToEdit.name}}" required />
+                            <input type="text" [(ngModel)]="instanceToEdit.id" name="name" class="form-control" value="{{instanceToEdit.id}}" required />
                         </div>
                         <div class="col-4">
                             <label for="username"> Username </label>
@@ -31,17 +31,6 @@
                             <label for="url"> URL </label>
                             <input type="url" name="url" value="{{instanceToEdit.url}}" class="form-control"
                                 placeholder="https://www.your-instance.db" required />
-                        </div>
-                        <div class="col-2">
-                            <label for="port"> Port number </label>
-                            <input type="number" name="port" value="{{instanceToEdit.port}}" min="0" class="form-control"
-                                placeholder="443" required />
-                        </div>
-                        <div class="col-2">
-                            <label for="active"> Activate </label><br>
-                            <input type="checkbox" name="active" value="{{instanceToEdit.active}}" class="form-control-checkbox"
-                                required />
-
                         </div>
                     </div>
                     <div class="row mt-3">

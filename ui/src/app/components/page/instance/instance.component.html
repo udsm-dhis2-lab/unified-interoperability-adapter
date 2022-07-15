@@ -40,8 +40,8 @@
                         </tr>
                     </thead>
                     <tbody *ngFor="let instance of instances; odd as isOdd">
-                        <tr [ngClass]="{ 'table-success': instance.active, 'table-secondary': isOdd }" (dblclick)="activateInstance(instance)">
-                            <td>{{ instance.name }}</td>
+                        <tr [ngClass]="{ 'table-secondary': isOdd }" >
+                            <td>{{ instance.id }}</td>
                             <td>{{ instance.url }}</td>
                             <td>{{ instance.username }}</td>
                             <td>{{ instance.password }}</td>

@@ -15,7 +15,8 @@ const httpOptions = {
 })
 export class InstancesService {
 
-  private apiUrl = 'http://localhost:5000/instances';
+  // private apiUrl = 'http://localhost:5000/instances';
+  private apiUrl = 'http://localhost:8081/api/v1/instance';
 
   constructor(private httpClient: HttpClient) {}
 
@@ -39,6 +40,7 @@ export class InstancesService {
   }
 
   addInstance(instance: InstanceInterface): Observable<InstanceInterface> {
+    console.log("Payload: ",instance)
     return this.httpClient.post<InstanceInterface>(this.apiUrl, instance, httpOptions);
   }
 

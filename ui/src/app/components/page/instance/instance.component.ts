@@ -50,12 +50,12 @@ export class InstanceComponent implements OnInit {
     this.router?.navigate(['/instances']);
   }
 
-  activateInstance(instance: InstanceInterface) {
-    instance.active = !instance.active;
-    this.instancesService.updateInstanceActivate(instance).subscribe();
-  } 
+  // activateInstance(instance: InstanceInterface) {
+  //   instance.active = !instance.active;
+  //   this.instancesService.updateInstanceActivate(instance).subscribe();
+  // } 
 
-  addInstance(instance: InstanceInterface){
+  addInstance(instance: InstanceInterface): void{
     this.instancesService.addInstance(instance).subscribe((instance) => (this.instances?.push(instance)));
     
   }
@@ -67,7 +67,7 @@ export class InstanceComponent implements OnInit {
       data: instanceToEdit
     });
 
-    console.log("Opened: "+instanceToEdit.name);
+    console.log("Opened: "+instanceToEdit.url);
 
     dialogRef?.afterClosed().subscribe(result => {
       if(result){

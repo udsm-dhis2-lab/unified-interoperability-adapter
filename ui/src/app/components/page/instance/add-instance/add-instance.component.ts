@@ -14,8 +14,6 @@ export class AddInstanceComponent implements OnInit {
   username: string = "";
   password: string = "";
   url: string = "";
-  active: boolean = false;
-  port!: number ;
 
   showAddInstanceForm: boolean = false;
   subscription: Subscription | undefined;
@@ -31,12 +29,9 @@ export class AddInstanceComponent implements OnInit {
 
   onSubmit(){
     const newInstance = {
-      name: this.name,
       username: this.username,
       password: this.password,
-      url: this.url,
-      port: this.port,
-      active: this.active
+      url: this.url
     }
 
     this.onAddInstance.emit(newInstance);
@@ -45,8 +40,6 @@ export class AddInstanceComponent implements OnInit {
     this.username = '';
     this.password = '';
     this.url = '';
-    this.active = false;
-    this.port = 0;
   }
 
 

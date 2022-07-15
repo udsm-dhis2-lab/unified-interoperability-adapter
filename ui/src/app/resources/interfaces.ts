@@ -10,12 +10,10 @@ export interface SourceInterface {
 
 export interface InstanceInterface {
     id?: number;
-    name: string;
+    // name: string;
     url: string;
-    port?: number;
     username: string;
     password: string;
-    active: boolean;
 }
 
 export interface DatasetInterface {

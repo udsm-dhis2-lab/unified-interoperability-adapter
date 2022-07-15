@@ -3,3 +3,6 @@ input[type="checkbox"] {
     height: 2vh;
     width: 2vw
 }
+.btn-block {
+    width: 100%;
+}
