@@ -43,7 +43,6 @@ public class DatasourceController {
     }
 
     @PutMapping
-    
     public Datasource updateDatasource(@RequestBody Datasource datasource) {
          return datasourceService.updateDatasource(datasource);
     }

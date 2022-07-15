@@ -31,8 +31,6 @@ public class DataSetElementsService {
         String categoryOptionCombo = dataSetElements.getCategoryOptionCombo();
         String dataset = dataSetElements.getDatasets().getId();
 
-        
-
         return dataSetElementsRepository.searchExistingDataSetElements(dataElement,categoryOptionCombo,dataset);
     }
 
