@@ -36,13 +36,13 @@ public class InstancesController {
         instanceService.AddNewInstance(instances);
     }
 
-    @DeleteMapping("/deleteInstances/{instanceId}")
+    @DeleteMapping("/{instanceId}")
     public void deleteInstance(@PathVariable("instanceId") Long instanceId){
         instanceService.deleteInstance(instanceId);
 
     }
 
-    @PutMapping("/updateInstances/{instanceId}")
+    @PutMapping("/{instanceId}")
     public void updateInstances(@PathVariable("instanceId") Long instanceId,@RequestParam(required = false) String url){
         instanceService.updateInstances(instanceId,url);
     }
