@@ -8,7 +8,7 @@ export interface SourceInterface {
 
 export interface InstanceInterface {
     id?: number;
-    // name: string;
+    name: string;
     url: string;
     username: string;
     password: string;

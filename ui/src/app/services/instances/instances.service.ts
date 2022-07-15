@@ -35,7 +35,7 @@ export class InstancesService {
   }
 
   updateInstanceActivate(instance: InstanceInterface): Observable<InstanceInterface> {
-    const url = `${this.apiUrl}/${instance.id}`;
+    const url = `${this.apiUrl}`;
     return this.httpClient.put<InstanceInterface>(url, instance, httpOptions);
   }
 
