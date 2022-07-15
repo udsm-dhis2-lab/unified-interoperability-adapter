@@ -1,16 +1,11 @@
 package com.Adapter.icare.Domains;
 
 import java.io.Serializable;
-
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +30,7 @@ public class Datasource implements Serializable{
 
     public enum Type{
         mysql("mysql"),
-        postgresql("postgreql"),
+        postgres("postgres"),
         oracle("oracle");
 
         String value;
