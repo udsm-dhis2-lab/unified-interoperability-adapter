@@ -1,0 +1,60 @@
+<div class="row">
+    <div class="col-12">
+        <div class="row">
+            <div class="col-12">
+                <h4 class="text-center">Edit Source</h4>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+
+                <form>
+                    <div class="card p-4">
+                        <div class="row">
+                            <div class="col-4">
+                                <label for="name"> Name </label>
+                                <input type="text" name="name" [(ngModel)]="sourceToEdit.name" class="form-control" value="{{sourceToEdit.name}}" required />
+                            </div>
+                            <div class="col-4">
+                                <label for="username"> Username </label>
+                                <input type="text" name="username" [(ngModel)]="sourceToEdit.username" class="form-control" value="{{ sourceToEdit.username  }}" required />
+                            </div>
+                            <div class="col-4">
+                                <label for="password"> Password </label>
+                                <input type="text" name="password" [(ngModel)]="sourceToEdit.password" class="form-control" value="{{ sourceToEdit.password  }}" required />
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-4">
+                                <label for="url"> URL </label>
+                                <input type="url" name="url" [(ngModel)]="sourceToEdit.url" class="form-control" value="{{ sourceToEdit.url  }}" required />
+                            </div>
+                            <div class="col-4">
+                                <label for="port"> Port number </label>
+                                <input type="number" name="port" [(ngModel)]="sourceToEdit.port" min="0" class="form-control" value="{{ sourceToEdit.port  }}" required />
+                            </div>
+                            <div class="col-4">
+                                <label for="active"> Activate </label><br>
+                                <input type="checkbox" name="active" [(ngModel)]="sourceToEdit.active" class="form-control-checkbox" value="{{ sourceToEdit.active  }}" required />
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="row">
+                                    <div class="col-10 float-end">
+                                        <button (click)="onNoClick()" class="btn btn-outline-danger float-end"> Close </button>
+                                    </div>
+                                    <div class="col-2 float-end">
+                                        <button type="submit" [mat-dialog-close]="sourceToEdit" cdkFocusInitial
+                                            class="btn btn-outline-success float-end"> Save </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>

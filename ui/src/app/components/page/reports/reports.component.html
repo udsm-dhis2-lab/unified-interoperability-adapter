@@ -1,0 +1,56 @@
+<div class="row">
+    <div class="col-12">
+        <div class="row">
+            
+            <div class="col-12">
+                <div class="mb-3">
+                    <h3 class="text-"> Reports</h3>
+                </div>
+            </div>
+        </div>
+        <form action="row">
+            <div class="form-group row">
+                <div class="col-3 ">
+                    <label for="instance">Instance:</label>
+                    <input class="form-control" list="instances" type="text" name="instance">
+
+                    <datalist id="instances">
+                        <option >DHIS2 Morogoro</option>
+                        <option >DHIS2 Dar es Salaam</option>
+                        <option >DHIS2 Mbeya</option>
+                        <option >DHIS2 Rukwa</option>
+                        <option >DHIS2 Tanga</option>
+                    </datalist>
+                </div>
+                <div class="col-3">
+                    <label for="">Dataset:</label>
+                    <input class="form-control" list="datasets" type="text" name="dataset">
+
+                    <datalist id="datasets">
+                        <option >OPD Malaria</option>
+                        <option >OPD Typhoid</option>
+                        <option >OPD Chickenpox</option>
+                        <option >OPD Viral Infection</option>
+                        <option >OPD Malnutrition</option>
+                    </datalist>
+                </div>
+                <div class="col-3">
+                    <label for="">Period:</label>
+                    <input class="form-control" type="date" name="date">
+                </div>
+                <div class="col-3 mt-4">
+                    <app-button 
+                        [ngStyle]="{
+                            'padding': '90px',
+                            'margin': '20px 0 0 -2vw'
+                        }" 
+                        backgroundColor="transparent" 
+                        fontColor="green" 
+                        borderColor="green" 
+                        text="View Report">
+                    </app-button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

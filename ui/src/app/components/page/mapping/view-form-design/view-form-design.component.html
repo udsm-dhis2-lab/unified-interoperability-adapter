@@ -1,0 +1,14 @@
+<div class="row" *ngIf="dataset">
+    <!-- <div class="col-12">
+        <div class="row">
+            <div class="col-8">
+                <h3>Form Design for {{ dataset?.name  }}</h3>
+            </div>
+            
+        </div>
+    </div> -->
+    <!-- <div [innerHTML]="dataset.formDesign"></div> -->
+    <app-custom-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset?.formDesign"
+        [dataSetDataValues]="{}" [sources]="sources" [dataset]="dataset"  (dataValueUpdate)="changesOnDataValue($event)">
+    </app-custom-form>
+</div>

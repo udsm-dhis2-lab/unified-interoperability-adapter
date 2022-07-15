@@ -1,0 +1,13 @@
+nav{
+    background-color: #188cd9 !important;
+    color: #fff !important;
+}
+
+nav a {
+    color: #fff;
+}
+
+nav div ul li a {
+    color: #fff !important;
+}
+   

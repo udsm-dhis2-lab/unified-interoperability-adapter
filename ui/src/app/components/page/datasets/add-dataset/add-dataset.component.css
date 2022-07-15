@@ -1,0 +1,11 @@
+input[type="checkbox"] {
+    margin: 1vh 0 0 0;
+    height: 2vh;
+    width: 2vw
+}
+
+.mat-dropdown {
+    width: 100%;
+    position: relative;
+    bottom: -1vh;
+}
