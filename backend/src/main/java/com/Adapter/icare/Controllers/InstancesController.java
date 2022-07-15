@@ -32,8 +32,8 @@ public class InstancesController {
     }
 
     @PostMapping
-    public void addInstances(@RequestBody Instances instances){
-        instanceService.AddNewInstance(instances);
+    public Instances addInstances(@RequestBody Instances instances){
+        return instanceService.AddNewInstance(instances);
     }
 
     @DeleteMapping("/{instanceId}")
@@ -42,8 +42,8 @@ public class InstancesController {
 
     }
 
-    @PutMapping("/{instanceId}")
-    public void updateInstances(@PathVariable("instanceId") Long instanceId,@RequestParam(required = false) String url){
-        instanceService.updateInstances(instanceId,url);
+    @PutMapping
+    public void updateInstances(@RequestBody Instances instances){
+        instanceService.updateInstances(instances);
     }
 }

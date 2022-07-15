@@ -21,9 +21,9 @@ public class InstanceService {
 
     }
 
-    public void AddNewInstance(Instances instances) {
+    public Instances AddNewInstance(Instances instances) {
 
-        instancesRepository.save(instances);
+        return instancesRepository.save(instances);
     }
 
     public void deleteInstance(Long instanceId) {
@@ -35,10 +35,9 @@ public class InstanceService {
         instancesRepository.deleteById(instanceId);
     }
 
-    public void updateInstances(Long instanceId, String url) {
+    public void updateInstances(Instances instances) {
 
-        Optional<Instances> instance = instancesRepository.findById(instanceId);
-        instance.get().setUrl(url);
+        instancesRepository.save(instances);
     }
 
 
