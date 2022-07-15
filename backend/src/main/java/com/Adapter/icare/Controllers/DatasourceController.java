@@ -32,18 +32,19 @@ public class DatasourceController {
     }
 
     @PostMapping
-    public void addDatasource(@RequestBody Datasource datasource) {
-        datasourceService.AddNewDataSource(datasource);
+    public Datasource addDatasource(@RequestBody Datasource datasource) {
+        return datasourceService.AddNewDataSource(datasource);
     }
 
-    @DeleteMapping("/deleteDatasource/{datasourceId}")
+    @DeleteMapping("/{datasourceId}")
     public void deleteDatasource(@PathVariable("datasourceId") Long datasourceId) {
         datasourceService.deleteDatasource(datasourceId);
 
     }
 
-    @PutMapping("/updateDatasource/{datasourceId}")
-    public void updateDatasource(@PathVariable("datasourceId") Long instanceId,@RequestParam(required = false) String url) {
-        datasourceService.updateDatasource(instanceId, url);
+    @PutMapping
+    
+    public Datasource updateDatasource(@RequestBody Datasource datasource) {
+         return datasourceService.updateDatasource(datasource);
     }
 }

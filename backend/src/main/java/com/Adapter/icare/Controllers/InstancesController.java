@@ -43,7 +43,7 @@ public class InstancesController {
     }
 
     @PutMapping
-    public void updateInstances(@RequestBody Instances instances){
-        instanceService.updateInstances(instances);
+    public Instances updateInstances(@RequestBody Instances instances){
+        return instanceService.updateInstances(instances);
     }
 }

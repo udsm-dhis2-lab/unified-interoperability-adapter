@@ -35,9 +35,9 @@ public class InstanceService {
         instancesRepository.deleteById(instanceId);
     }
 
-    public void updateInstances(Instances instances) {
+    public Instances updateInstances(Instances instances) {
 
-        instancesRepository.save(instances);
+        return instancesRepository.save(instances);
     }
 
 

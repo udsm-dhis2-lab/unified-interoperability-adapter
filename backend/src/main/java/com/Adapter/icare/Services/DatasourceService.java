@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.Adapter.icare.Domains.Datasource;
+import com.Adapter.icare.Domains.Datasource.Type;
 import com.Adapter.icare.Repository.DatasourceRepository;
 
 @Service
@@ -22,11 +23,26 @@ public class DatasourceService {
     public List<Datasource> getDatasources() {
         return datasourceRepository.findAll();
     }
+
+    public boolean databaseTypeExists(String databaseType){
+
+        for (Type t : Type.values()) {
+            if (t.name().equals(databaseType)) {
+                return true;
+            }
+        }
+        return false;
+    }
         
 
-    public void AddNewDataSource(Datasource datasource) {
+    public Datasource AddNewDataSource(Datasource datasource) {
 
-        datasourceRepository.save(datasource);
+        boolean db = databaseTypeExists(datasource.getType());
+        if(!db){
+            throw new IllegalStateException("The database type is invalid");
+        }
+
+        return datasourceRepository.save(datasource);
     }
 
     public void deleteDatasource(Long datasourceId) {
@@ -37,7 +53,14 @@ public class DatasourceService {
         datasourceRepository.deleteById(datasourceId);
     }
 
-    public void updateDatasource(Long instanceId, String url) {
+    public Datasource updateDatasource(Datasource datasource) {
+        
+        boolean db = databaseTypeExists(datasource.getType());
+        if (!db) {
+            throw new IllegalStateException("The database type is invalid");
+        }
+
+        return datasourceRepository.save(datasource);
     }
     
 }
