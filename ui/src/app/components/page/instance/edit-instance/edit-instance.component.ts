@@ -34,7 +34,7 @@ export class EditInstanceComponent {
 
   onSaveInstance(instance: InstanceInterface): void {
     let editedInstance = {
-      id: instance.id,
+      name: instance.name,
       username: instance.username,
       password: instance.password,
       url: instance.url
