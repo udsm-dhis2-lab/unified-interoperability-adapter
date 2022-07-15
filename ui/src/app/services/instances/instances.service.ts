@@ -16,7 +16,7 @@ const httpOptions = {
 export class InstancesService {
 
   // private apiUrl = 'http://localhost:5000/instances';
-  private apiUrl = 'http://localhost:8081/api/v1/instance';
+  private apiUrl = 'http://localhost:4200/api/v1/instance';
 
   constructor(private httpClient: HttpClient) {}
 
