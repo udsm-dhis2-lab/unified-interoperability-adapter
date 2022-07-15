@@ -1,9 +1,8 @@
 package com.Adapter.icare.Services;
 
 import java.util.List;
-
+import java.util.Optional;
 import org.springframework.stereotype.Service;
-
 import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Repository.InstancesRepository;
 
@@ -16,8 +15,6 @@ public class InstanceService {
         this.instancesRepository = instancesRepository;
     }
 
-    
-    
     public List<Instances> getInstances(){
 
        return instancesRepository.findAll();
@@ -40,8 +37,8 @@ public class InstanceService {
 
     public void updateInstances(Long instanceId, String url) {
 
-        //Instances instance = instancesRepository.getById(instanceId);
-        //instance.setUrl(url);
+        Optional<Instances> instance = instancesRepository.findById(instanceId);
+        instance.get().setUrl(url);
     }
 
 

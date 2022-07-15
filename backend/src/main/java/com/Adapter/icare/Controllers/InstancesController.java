@@ -21,8 +21,7 @@ import com.Adapter.icare.Services.InstanceService;
 public class InstancesController {
     
     private final InstanceService instanceService;
-
-    @Autowired
+    
     public InstancesController(InstanceService instanceService) {
         this.instanceService = instanceService;
     }
