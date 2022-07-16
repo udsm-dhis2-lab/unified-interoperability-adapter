@@ -1,5 +1,6 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { Data } from '@angular/router';
 import { DatasetInterface, InstanceDatasetsInterface, InstanceInterface, SourceInterface } from 'src/app/resources/interfaces';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
@@ -85,8 +86,12 @@ export class MappingComponent implements OnInit {
     }
   }
 
-  checkDataset(){
-    this.dataset = this.dataset
+  checkDataset(dataset: DatasetInterface){
+    this.dataset = dataset
+    console.log(this.dataset);
+  }
+  changesOnDataValue(e: Event){
+    console.log(e)
   }
 
 }

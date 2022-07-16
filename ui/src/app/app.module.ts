@@ -27,12 +27,11 @@ import { appRoutes } from './routes';
 import { AddInstanceComponent } from './components/page/instance/add-instance/add-instance.component';
 import { DatasetsComponent } from './components/page/datasets/datasets.component';
 import { AddDatasetComponent } from './components/page/datasets/add-dataset/add-dataset.component';
-import { ViewFormDesignComponent } from './components/page/mapping/view-form-design/view-form-design.component';
 import { SidenavComponent } from './components/core/sidenav/sidenav.component';
 import { EditInstanceComponent } from './components/page/instance/edit-instance/edit-instance.component';
 import { EditSourceComponent } from './components/page/sources/edit-source/edit-source.component';
-import { AddQueryComponent } from './components/page/mapping/view-form-design/custom-form/add-query/add-query.component';
-import { CustomFormComponent } from './components/page/mapping/view-form-design/custom-form/custom-form.component';
+import { AddQueryComponent } from './components/page/mapping/custom-form/add-query/add-query.component';
+import { CustomFormComponent } from './components/page/mapping/custom-form/custom-form.component';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 
@@ -54,7 +53,6 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
     AddInstanceComponent,
     DatasetsComponent,
     AddDatasetComponent,
-    ViewFormDesignComponent,
     SidenavComponent,
     EditInstanceComponent,
     EditSourceComponent,

@@ -1,9 +1,9 @@
 export interface SourceInterface {
     id?: number;
-    type: string;
-    url: string;
-    username: string;
-    password: string;
+    type?: string;
+    url?: string;
+    username?: string;
+    password?: string;
 }
 
 export interface InstanceInterface {
@@ -20,7 +20,7 @@ export interface DatasetInterface {
     instances: {
         id?: number;
     } 
-    formDesign?: string;
+    formdesignCode?: Text;
 }
 
 export interface InstanceDatasetsInterface {
@@ -31,12 +31,16 @@ export interface InstanceDatasetsInterface {
 }
 
 export interface DataValueFetchInterface{
-    dataElementCombo?: string;
-    query?: string;
-    dataset: {
+    dataElementCategoryOptionCombo?: string;
+    sqlQuery?: string;
+    datasets: {
         id?: string;
     };
-    source: {
+    datasource: {
         id?: number;
+        type?: string;
+        url?: string;
+        username?: string;
+        password?: string;
     };
 }
