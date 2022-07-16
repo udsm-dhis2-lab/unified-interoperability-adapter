@@ -14,13 +14,14 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class InstanceDatasetsService {
-  private apiUrl = 'http://localhost:5000/instancedatasets';
+  private apiUrl = 'http://localhost:4200/api/v1/datasets';
 
   constructor(private httpClient: HttpClient) {}
 
   //Using Observables to create a service instance
-  getInstanceDatasets(): Observable<InstanceDatasetsInterface[]> {
-    return this.httpClient.get<InstanceDatasetsInterface[]>(this.apiUrl)
+  getInstanceDatasets(instanceId: number): Observable<InstanceDatasetsInterface[]> {
+    let url = `${this.apiUrl}/remote/${instanceId}`;
+    return this.httpClient.get<InstanceDatasetsInterface[]>(url);
   }
 
   deleteInstanceDataset(instanceDataset: InstanceDatasetsInterface): Observable<InstanceDatasetsInterface> {

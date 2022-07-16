@@ -16,15 +16,17 @@ export interface InstanceInterface {
 
 export interface DatasetInterface {
     id?: string;
-    name: string;
-    instanceId?: number;
+    displayName: string;
+    instances: {
+        id?: number;
+    } 
     formDesign?: string;
 }
 
 export interface InstanceDatasetsInterface {
     id?: string;
-    name: string;
-    instanceUrl: string;
+    displayName: string;
+    instanceId: string;
     formDesign?: string;
 }
 

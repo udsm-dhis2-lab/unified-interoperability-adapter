@@ -23,26 +23,22 @@
                     </div>
                 </div>
         
-                <div class="row mt-5">
+                <div class="row mt-2">
                     <div class="col-12">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Dataset name</th>
-                                    <th>Instance </th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody *ngFor="let instanceDataset of instanceDatasets; odd as isOdd">
                                 <tr [ngClass]="{'table-secondary': isOdd }">
                                     <td>{{ instanceDataset.id }}</td>
-                                    <td>{{ instanceDataset.name }}</td>
-                                    <td>{{ instanceDataset.instanceUrl }}</td>
+                                    <td>{{ instanceDataset.displayName }}</td>
                                     <td>
                                         <div class="buttons">
-                                            
-
                                             <a class="btn btn-outline-success" (click)="addDataset(instanceDataset)" *ngIf="!datasetExisting(instanceDataset)">
                                                 <fa-icon [icon]="faAdd"></fa-icon>
                                             </a>

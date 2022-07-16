@@ -12,24 +12,21 @@
                 <div class="row">
                     <div class="col-6">
                         <label for="name"> Name </label>
-                        <input type="text" [(ngModel)]="instanceToEdit.name" name="name" class="form-control" value="{{instanceToEdit.name}}" required />
+                        <input type="text" [(ngModel)]="instanceToEdit.name" name="name" class="form-control" value="{{instanceToEdit.name }}" required />
                     </div>
                     <div class="col-6">
                         <label for="url"> URL </label>
-                        <input type="url" name="url" value="{{instanceToEdit.url}}" class="form-control"
-                        placeholder="https://www.your-instance.db" required />
+                        <input type="url" [(ngModel)]="instanceToEdit.url" name="url" value="{{instanceToEdit.url}}" class="form-control" required />
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-6">
                         <label for="username"> Username </label>
-                        <input type="text" name="username" value="{{instanceToEdit.username}}" class="form-control"
-                            placeholder="Instance Username" required />
+                        <input type="text" [(ngModel)]="instanceToEdit.username" name="username" value="{{instanceToEdit.username}}" class="form-control" required />
                     </div>
                     <div class="col-6">
                         <label for="password"> Password </label>
-                        <input type="text" name="password" value="{{instanceToEdit.password}}" class="form-control"
-                            placeholder="Instance Password" required />
+                        <input type="password" [(ngModel)]="instanceToEdit.password" name="password" value="{{instanceToEdit.password}}" class="form-control" required />
                     </div>
                 </div>
                 <div class="row mt-3">

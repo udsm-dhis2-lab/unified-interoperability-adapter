@@ -15,9 +15,6 @@ export class EditInstanceComponent {
   username: string | undefined;
   password: string | undefined;
   url: string | undefined;
-  port: number | undefined;
-  active: string | undefined;
-
   
 
   constructor(

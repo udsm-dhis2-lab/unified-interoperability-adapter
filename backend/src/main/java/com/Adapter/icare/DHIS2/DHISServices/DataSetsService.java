@@ -85,7 +85,7 @@ public class DataSetsService {
 
 
             for (Object ab : js) {
-                //System.out.println(ab);
+                System.out.println(ab);
 
                 JSONObject ourDsObject = new JSONObject(ab.toString());
 
@@ -151,7 +151,7 @@ public class DataSetsService {
             JSONObject jsObject = new JSONObject(responseContent.toString());
             String js = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
             datasets.setFormdesignCode(js);
-            //System.out.println(js);
+            System.out.println(js);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
