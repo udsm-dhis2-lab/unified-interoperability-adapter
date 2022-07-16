@@ -1,5 +1,5 @@
-import { DataValueFetchService } from './../../../../../services/dataValueFetch/data-value-fetch.service';
-import { DatasetInterface, DataValueFetchInterface } from './../../../../../resources/interfaces';
+import { DataValueFetchService } from './../../../../services/dataValueFetch/data-value-fetch.service';
+import { DatasetInterface, DataValueFetchInterface } from './../../../../resources/interfaces';
 import {
   Component,
   OnInit,
@@ -41,7 +41,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   source: SourceInterface | undefined;
   query: string | undefined;
   dataValueFetchs: DataValueFetchInterface[] | undefined;
-  dataValueFetch: DataValueFetchInterface | undefined;
+  dataValueFetch: any;
   
   constructor(
     private dataValueFetchService: DataValueFetchService,
@@ -76,7 +76,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     try {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
-        this.dataSetFormDesign
+        this.dataSetFormDesign.formdesignCode
       );
     } catch (e) {
       // console.log(JSON.stringify(e));
@@ -85,24 +85,28 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.setScriptsOnHtmlContent(
-      this.getScriptsContents(this.dataSetFormDesign)
+      this.getScriptsContents(this.dataSetFormDesign.formdesignCode)
     );
-    this.getEnabledInputTagsOnHtmlContent(this.sources, this, this.dataSetFormDesign)
+    this.getEnabledInputTagsOnHtmlContent(this.sources, this, this.dataSetFormDesign.formdesignCode)
+    // console.log("Dataset We need: ",this.dataset)
   }
 
   getScriptsContents(html: any) {
-    const matchedScriptArray = html.match(
-      /<script[^>]*>([\w|\W]*)<\/script>/im
-    );
-    const scripts =
-      matchedScriptArray && matchedScriptArray.length > 0
-        ? matchedScriptArray[0]
-            .replace(/(<([^>]+)>)/gi, ':separator:')
-            .split(':separator:')
-            .filter((content: any) => content.length > 0)
-        : [];
-
-    return _.filter(scripts, (scriptContent: string) => scriptContent !== '');
+    if (html){
+      const matchedScriptArray = html.match(
+        /<script[^>]*>([\w|\W]*)<\/script>/im
+      );
+      const scripts =
+        matchedScriptArray && matchedScriptArray.length > 0
+          ? matchedScriptArray[0]
+              .replace(/(<([^>]+)>)/gi, ':separator:')
+              .split(':separator:')
+              .filter((content: any) => content.length > 0)
+          : [];
+  
+      return _.filter(scripts, (scriptContent: string) => scriptContent !== '');
+    }
+    return undefined;
   }
 
   setScriptsOnHtmlContent(scriptsContentsArray: any) {
@@ -169,11 +173,24 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     })
   }
 
+  
   openDialog(sourcesToChoose: SourceInterface[], elementId: string): void {
     
+    const dataValueFetchObject = {
+        dataElementCategoryOptionCombo: elementId,
+        sqlQuery: undefined,
+        datasets: {
+            id: this.dataset?.id,
+        },
+        datasource: {
+            id: undefined,
+        },
+      }  
+    this.dataValueFetchService.getSingleDataValueFetch(dataValueFetchObject).subscribe((dataValueFetch) => (this.dataValueFetch = dataValueFetch));
+      console.log("Data Value Fetching", this.dataValueFetch)
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
-      disableClose: true,
+      // disableClose: true,
       width: '25%',
       data: { sources: sourcesToChoose, query: this.query, source: this.source, elementId: elementId } 
     });
@@ -187,6 +204,8 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
           this.query = result.query;
           console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.displayName+ ' Element ID: ' + result.elementId)
           this.addDataValueFetch(this.source?.id, this.query, this.dataset?.id, result.elementId);
+          this.source = undefined;
+          this.query = undefined;
       } 
       else{
         console.log("No data found");
@@ -198,17 +217,17 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   addDataValueFetch(dataSource?: number, query?: string, dataset?: string,  elementCombo?: string){
     
     const dataValueFetchObject = {
-        dataElementCombo: elementCombo,
-        query: query,
-        dataset: {
+        dataElementCategoryOptionCombo: elementCombo,
+        sqlQuery: query,
+        datasets: {
             id: dataset,
         },
-        source: {
+        datasource: {
             id: dataSource,
         },
       }  
-
     this.dataValueFetchService.addDataValueFetch(dataValueFetchObject).subscribe((dataValueFetch) => (this.dataValueFetchs?.push(dataValueFetch)));
+
   }
 
 }

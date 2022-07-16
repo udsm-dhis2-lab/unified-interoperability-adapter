@@ -56,7 +56,7 @@ export class InstanceComponent implements OnInit {
   // } 
 
   addInstance(instance: InstanceInterface): void{
-    this.instancesService.addInstance(instance).subscribe((instance) => (this.instances?.push(instance)));
+    this.instancesService.addInstance(instance).subscribe((instance) => {this.instances = [...this.instances!, instance];});
     
   }
 

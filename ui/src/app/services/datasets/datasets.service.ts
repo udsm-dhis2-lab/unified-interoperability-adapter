@@ -24,6 +24,11 @@ export class DatasetsService {
     return this.httpClient.get<DatasetInterface[]>(this.apiUrl)
   }
 
+  getSingleDatasets(dataset: DatasetInterface): Observable<DatasetInterface> {
+    let url = this.apiUrl + "/single?datasetId="+dataset.id;
+    return this.httpClient.get<DatasetInterface>(url);
+  }
+
   deleteDataset(dataset: DatasetInterface): Observable<DatasetInterface> {
     const url = `${this.apiUrl}/${dataset.id}`;
     return this.httpClient.delete<DatasetInterface>(url);

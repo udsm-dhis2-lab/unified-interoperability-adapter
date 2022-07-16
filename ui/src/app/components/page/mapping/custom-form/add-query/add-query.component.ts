@@ -1,3 +1,4 @@
+import { DataValueFetchService } from './../../../../../services/dataValueFetch/data-value-fetch.service';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SourceInterface } from 'src/app/resources/interfaces';
@@ -24,9 +25,11 @@ export class AddQueryComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<AddQueryComponent>,
     @Inject(MAT_DIALOG_DATA) public data: QueryData,
+    private dataValueFetchService?: DataValueFetchService
   ) { }
 
   ngOnInit(): void {
+    console.log(this.data);
   }
 
   onNoClick(): void {
@@ -42,7 +45,18 @@ export class AddQueryComponent implements OnInit {
   }
 
   onTest(){
-    this.showTestResults = true;
+    const dataValueFetchObject = {
+        dataElementCategoryOptionCombo: undefined,
+        sqlQuery: this.data.query,
+        datasets: {
+            id: undefined,
+        },
+        datasource: {
+            id: this.data.source?.id,
+        },
+      }  
+      // console.log("Data for testing:", dataValueFetchObject)
+    this.dataValueFetchService?.testDataValueFetchQuery(dataValueFetchObject).subscribe()
   }
 
 }

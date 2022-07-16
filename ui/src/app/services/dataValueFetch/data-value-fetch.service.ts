@@ -15,7 +15,7 @@ const httpOptions = {
 })
 export class DataValueFetchService {
 
-  private apiUrl = 'http://localhost:5000/dataValueFetchs';
+  private apiUrl = 'http://localhost:4200/api/v1/datasetElements';
 
   constructor(private httpClient: HttpClient) {}
 
@@ -25,16 +25,24 @@ export class DataValueFetchService {
   }
 
   deleteDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
-    const url = `${this.apiUrl}/${dataValueFetch.dataElementCombo}`;
+    const url = `${this.apiUrl}/${dataValueFetch.dataElementCategoryOptionCombo}`;
     return this.httpClient.delete<DataValueFetchInterface>(url);
   }
   
   getSingleDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
-    const url = `${this.apiUrl}/`;
-    return this.httpClient.get<DataValueFetchInterface>(url);
+    const url = `${this.apiUrl}/searchDataSetElements`;
+    return this.httpClient.post<DataValueFetchInterface>(url, dataValueFetch, httpOptions);
   }
 
   addDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
+    console.log(dataValueFetch);
     return this.httpClient.post<DataValueFetchInterface>(this.apiUrl, dataValueFetch, httpOptions);
   }
+  
+  testDataValueFetchQuery(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
+    let url = `${this.apiUrl}/testQuery`;
+    return this.httpClient.post<DataValueFetchInterface>(url, dataValueFetch, httpOptions);
+  }
+
+  
 }
