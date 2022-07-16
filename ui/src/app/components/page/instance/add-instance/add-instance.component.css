@@ -11,3 +11,9 @@ input[type="checkbox"] {
 .btn-block {
     width: 100%;
 }
+.form-control {
+    border-bottom: 1px solid;
+    border-top: 0px none;
+    border-left: 0px none;
+    border-right: 0px none;
+}

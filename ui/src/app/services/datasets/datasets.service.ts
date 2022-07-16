@@ -15,7 +15,7 @@ const httpOptions = {
 export class DatasetsService {
 
 
-  private apiUrl = 'http://localhost:5000/datasets';
+  private apiUrl = 'http://localhost:4200/api/v1/datasets';
 
   constructor(private httpClient: HttpClient) {}
 
@@ -30,6 +30,7 @@ export class DatasetsService {
   }
 
   addDataset(dataset: DatasetInterface): Observable<DatasetInterface> {
+    console.log("New dataset:  ",dataset);
     return this.httpClient.post<DatasetInterface>(this.apiUrl, dataset, httpOptions);
   }
 

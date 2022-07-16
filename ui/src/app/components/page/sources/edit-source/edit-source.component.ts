@@ -32,13 +32,13 @@ export class EditSourceComponent implements OnInit {
   }
 
   onSaveInstance(source: SourceInterface): void {
-    let editedInstance = {
+    let editedSource = {
       type: source.type,
       username: source.username,
       password: source.password,
       url: source.url
     }
-    console.log("On Save ", editedInstance);
+    console.log("On Save ", editedSource);
   }
 }
 

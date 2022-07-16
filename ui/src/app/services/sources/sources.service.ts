@@ -16,7 +16,7 @@ const httpOptions = {
 })
 export class SourcesService {
 
-  private apiUrl = 'http://localhost:5000/sources';
+  private apiUrl = 'http://localhost:4200/api/v1/datasource';
 
   constructor(private httpClient: HttpClient) { }
 
@@ -33,7 +33,7 @@ export class SourcesService {
   }
 
   updateSourceActivate(source: SourceInterface): Observable<SourceInterface> {
-    const url = `${this.apiUrl}/${source.id}`;
+    const url = `${this.apiUrl}`;
     return this.httpClient.put<SourceInterface>(url, source, httpOptions);
   }
 

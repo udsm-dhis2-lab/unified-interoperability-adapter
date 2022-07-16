@@ -22,7 +22,7 @@
                         <mat-select [(ngModel)]="instance" name="instance" (selectionChange)="filterDatasets()">
                             <mat-option></mat-option>
                             <mat-option *ngFor="let instance of instances" [value]="instance">
-                                {{instance.url}}
+                                {{instance.name}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -33,7 +33,7 @@
                         <mat-select [(ngModel)]="dataset" name="dataset" (selectionChange)="checkDataset()">
                             <mat-option></mat-option>
                             <mat-option *ngFor="let dataset of datasets" [value]="dataset">
-                                {{dataset.name}}
+                                {{dataset.displayName}}
                             </mat-option>
                         </mat-select>
                     </mat-form-field>

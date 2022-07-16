@@ -34,7 +34,7 @@ export class InstancesService {
     return this.httpClient.delete<InstanceInterface>(url);
   }
 
-  updateInstanceActivate(instance: InstanceInterface): Observable<InstanceInterface> {
+  updateInstance(instance: InstanceInterface): Observable<InstanceInterface> {
     const url = `${this.apiUrl}`;
     return this.httpClient.put<InstanceInterface>(url, instance, httpOptions);
   }

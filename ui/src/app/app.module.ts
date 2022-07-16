@@ -33,6 +33,7 @@ import { EditInstanceComponent } from './components/page/instance/edit-instance/
 import { EditSourceComponent } from './components/page/sources/edit-source/edit-source.component';
 import { AddQueryComponent } from './components/page/mapping/view-form-design/custom-form/add-query/add-query.component';
 import { CustomFormComponent } from './components/page/mapping/view-form-design/custom-form/custom-form.component';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 
 
@@ -74,7 +75,10 @@ import { CustomFormComponent } from './components/page/mapping/view-form-design/
 
     RouterModule.forRoot(appRoutes, { enableTracing: true })
   ],
-  providers: [MappingComponent],
+  providers: [
+    MappingComponent,
+    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'fill'}}
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

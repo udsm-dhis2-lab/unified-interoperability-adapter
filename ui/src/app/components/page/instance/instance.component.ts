@@ -73,7 +73,7 @@ export class InstanceComponent implements OnInit {
       if(result){
         console.log("Results: ", result);
           this.instance = result;
-          this.instancesService.updateInstanceActivate(this.instance!).subscribe();
+          this.instancesService.updateInstance(this.instance!).subscribe();
           this.router?.navigate(['/instances']);
       } 
       else{

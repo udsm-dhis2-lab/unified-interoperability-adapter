@@ -49,14 +49,14 @@ export class MappingComponent implements OnInit {
 
 
   onChange(){
-    console.log(this.dataset?.name);
+    console.log(this.dataset?.displayName);
   }
 
   onSubmit(){
       const dataSetToView = {
         id: this.dataset?.id,
         instanceId: this.instance?.id,
-        name: this.dataset?.name
+        name: this.dataset?.displayName
     }
 
     this.onViewDataset.emit(this.dataset)
@@ -76,7 +76,7 @@ export class MappingComponent implements OnInit {
   public filterDatasets(){
     
     if(this.instance){
-      this.datasetsService.getDatasets().subscribe((datasets) => (this.datasets = datasets.filter(d => d.instanceId === this.instance!.id)));
+      this.datasetsService.getDatasets().subscribe((datasets) => (this.datasets = datasets.filter(d => d.instances.id === this.instance!.id)));
       this.dataset = undefined;
     }
     else{

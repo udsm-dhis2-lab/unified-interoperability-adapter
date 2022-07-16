@@ -58,12 +58,14 @@ export class DatasetsComponent implements OnInit {
   }
 
   addDataset(instanceDataset: InstanceDatasetsInterface){
-    let instance: InstanceInterface = this.instances.filter(i => i.url === instanceDataset.instanceUrl)[0];
+    // let instance: InstanceInterface = this.instances.filter(i => i.url === instanceDataset.instanceId)[0];
     
     const datasetObject = {
       id: instanceDataset.id,
-      name: instanceDataset.name,
-      instanceId: instance.id,
+      displayName: instanceDataset.displayName,
+      instances: {
+        id: this.instance.id
+      },
       formDesign: instanceDataset.formDesign
     }
 
@@ -72,10 +74,12 @@ export class DatasetsComponent implements OnInit {
   }
 
   filterDatasets(instance: InstanceInterface){
-    this.instanceDatasetsService.getInstanceDatasets().subscribe((instanceDatasets) => (this.instanceDatasets = instanceDatasets.filter(d => d.instanceUrl === instance.url)));
+    this.instanceDatasetsService.getInstanceDatasets(instance.id!).subscribe((instanceDatasets) => (this.instanceDatasets = instanceDatasets));
+    this.instance = instance
     if(!instance){
       this.instanceDatasets = undefined;    
     }
+
 
   }
 
