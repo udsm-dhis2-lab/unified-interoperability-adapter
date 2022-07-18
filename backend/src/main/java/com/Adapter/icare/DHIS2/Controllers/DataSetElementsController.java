@@ -57,7 +57,7 @@ public class DataSetElementsController {
     }
 
     @PostMapping("/testQuery")
-    public void testQuery(@RequestBody DataSetElements dataSetElements) throws SQLException{
+    public DataSetElements testQuery(@RequestBody DataSetElements dataSetElements) throws SQLException{
 
        Long dataSourceId = dataSetElements.getDatasource().getId();
        Optional<Datasource> datasource = datasourceRepository.findById(dataSourceId);
@@ -68,7 +68,7 @@ public class DataSetElementsController {
        Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
        con.prepareStatement(query).executeQuery();
 
-        
+       return dataSetElements;   
     }
 
     @PostMapping("/searchDataSetElements")
