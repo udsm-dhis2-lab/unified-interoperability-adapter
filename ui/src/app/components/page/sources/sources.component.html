@@ -38,8 +38,6 @@
                         <tr>
                             <th>Database Type</th>
                             <th>URL</th>
-                            <th>Username</th>
-                            <th>Password</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -47,8 +45,6 @@
                         <tr [ngClass]="{'table-secondary': isOdd }">
                             <td>{{ source.type }}</td>
                             <td>{{ source.url }}</td>
-                            <td>{{ source.username }}</td>
-                            <td>{{ source.password }}</td>
                             <td>
                                 <div class="buttons">
                                     <a class="btn btn-outline-primary ml-2" (click)="openDialog(source)">

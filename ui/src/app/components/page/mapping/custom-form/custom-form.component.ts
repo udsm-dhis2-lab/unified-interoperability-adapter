@@ -16,6 +16,7 @@ import { SourceInterface } from 'src/app/resources/interfaces';
 import { AddQueryComponent } from './add-query/add-query.component';
 import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-custom-form',
@@ -49,6 +50,8 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     private sanitizer?: DomSanitizer, 
     private elementRef?: ElementRef,
     public dialog?: MatDialog,
+    private router?: Router,
+    private route?: ActivatedRoute
   ) 
   {
     this.entryFormStatusColors = {
@@ -205,10 +208,10 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         console.log('Data Value Fetching 1: ', this.dataValueFetch);
       });
 
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     console.log('Data Value Fetching 2: ', this.dataValueFetch);
-      
+   
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
       // disableClose: true,
@@ -226,19 +229,24 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
 
     dialogRef?.afterClosed().subscribe(result => {
       if(result){
-        // console.log("Results: ", result);
           this.source = result.source;
           this.query = result.query;
-          console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.displayName+ ' Element ID: ' + result.elementId)
+          // console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.displayName+ ' Element ID: ' + result.elementId)
           this.addDataValueFetch(this.source?.id, this.query, this.dataset?.id, result.elementId, result.id);
+          
       } 
       else{
-        console.log("No data found");
+        console.log("No data found");  
+        this.source = undefined;
+        this.query = undefined;
         
       }  
 
-      this.source = undefined;
-      this.query = undefined;
+      this.router!.routeReuseStrategy.shouldReuseRoute = () => false;
+      this.router!.onSameUrlNavigation = 'reload';
+      // this.router!.navigate(['/'], {
+      //   relativeTo: this.route
+      // })
 
     });
   }
