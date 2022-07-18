@@ -1,0 +1,8 @@
+.custom-entry-form {
+  padding: 10px;
+}
+
+.disabled-input-box {
+  pointer-events: none;
+  background-color: #ededed;
+}

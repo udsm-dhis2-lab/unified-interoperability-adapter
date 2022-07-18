@@ -32,6 +32,7 @@ import { EditInstanceComponent } from './components/page/instance/edit-instance/
 import { EditSourceComponent } from './components/page/sources/edit-source/edit-source.component';
 import { AddQueryComponent } from './components/page/mapping/custom-form/add-query/add-query.component';
 import { CustomFormComponent } from './components/page/mapping/custom-form/custom-form.component';
+import { DatasetViewFormComponent } from './components/page/reports/dataset-view-form/dataset-view-form.component';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 
@@ -57,7 +58,8 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
     EditInstanceComponent,
     EditSourceComponent,
     CustomFormComponent,
-    AddQueryComponent
+    AddQueryComponent,
+    DatasetViewFormComponent,
   ],
   imports: [
     BrowserModule,
@@ -67,16 +69,19 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
     FormsModule,
     MatCheckboxModule,
     MatButtonModule,
-    MatSidenavModule,    
+    MatSidenavModule,
     MatSelectModule,
     MatDialogModule,
 
-    RouterModule.forRoot(appRoutes, { enableTracing: true })
+    RouterModule.forRoot(appRoutes, { enableTracing: true }),
   ],
   providers: [
     MappingComponent,
-    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'fill'}}
+    {
+      provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
+      useValue: { appearance: 'fill' },
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
