@@ -15,6 +15,7 @@ import { onFormReady, onDataValueChange } from 'src/app/Helpers/form.helper';
 import { SourceInterface } from 'src/app/resources/interfaces';
 import { AddQueryComponent } from './add-query/add-query.component';
 import { MatDialog } from '@angular/material/dialog';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-custom-form',
@@ -88,6 +89,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       this.getScriptsContents(this.dataSetFormDesign.formdesignCode)
     );
     this.getEnabledInputTagsOnHtmlContent(this.sources, this, this.dataSetFormDesign.formdesignCode)
+    
     // console.log("Dataset We need: ",this.dataset)
   }
 
@@ -166,7 +168,15 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     //Always disable input tags
     let inputElements = formDesign.getElementsByTagName('input');
 
-    document.addEventListener('dblclick', function(event: any) {
+
+
+
+    //Trying to get data existing after double clicking 
+    
+
+    //end
+
+    document.addEventListener('click', async function(event: any) {
       if(event.target.name === 'entryfield'){
         thisComponent?.openDialog(sources!, event.target.id);
       }
@@ -174,28 +184,45 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   }
 
   
-  openDialog(sourcesToChoose: SourceInterface[], elementId: string): void {
-    
+  async openDialog(sourcesToChoose: SourceInterface[], elementId: string): Promise<any> {
+      
     const dataValueFetchObject = {
-        dataElementCategoryOptionCombo: elementId,
-        sqlQuery: undefined,
-        datasets: {
-            id: this.dataset?.id,
-        },
-        datasource: {
-            id: undefined,
-        },
-      }  
-    this.dataValueFetchService.getSingleDataValueFetch(dataValueFetchObject).subscribe((dataValueFetch) => (this.dataValueFetch = dataValueFetch));
-      console.log("Data Value Fetching", this.dataValueFetch)
+      dataElementCategoryOptionCombo: elementId,
+      sqlQuery: undefined,
+      datasets: {
+        id: this?.dataset?.id,
+      },
+      datasource: {
+        id: undefined,
+      },
+    };
+
+   this?.dataValueFetchService
+      .getSingleDataValueFetch(dataValueFetchObject)
+      .subscribe((dataValueFetch) => {
+        this.dataValueFetch = dataValueFetch;
+
+        console.log('Data Value Fetching 1: ', this.dataValueFetch);
+      });
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    console.log('Data Value Fetching 2: ', this.dataValueFetch);
+      
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
       // disableClose: true,
-      width: '25%',
-      data: { sources: sourcesToChoose, query: this.query, source: this.source, elementId: elementId } 
+      width: '50%',
+      data: {
+        sources: sourcesToChoose,
+        query: this.dataValueFetch?.sqlQuery,
+        source: this.dataValueFetch?.datasource,
+        elementId: elementId,
+        id: this.dataValueFetch?.id
+      },
     });
 
-    console.log("Opened: "+ sourcesToChoose);
+    // console.log("Opened: "+ this.dataValueFetch);
 
     dialogRef?.afterClosed().subscribe(result => {
       if(result){
@@ -203,20 +230,23 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
           this.source = result.source;
           this.query = result.query;
           console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.displayName+ ' Element ID: ' + result.elementId)
-          this.addDataValueFetch(this.source?.id, this.query, this.dataset?.id, result.elementId);
-          this.source = undefined;
-          this.query = undefined;
+          this.addDataValueFetch(this.source?.id, this.query, this.dataset?.id, result.elementId, result.id);
       } 
       else{
         console.log("No data found");
+        
       }  
+
+      this.source = undefined;
+      this.query = undefined;
 
     });
   }
 
-  addDataValueFetch(dataSource?: number, query?: string, dataset?: string,  elementCombo?: string){
+  addDataValueFetch(dataSource?: number, query?: string, dataset?: string,  elementCombo?: string, id?: any){
     
     const dataValueFetchObject = {
+        id: id,
         dataElementCategoryOptionCombo: elementCombo,
         sqlQuery: query,
         datasets: {

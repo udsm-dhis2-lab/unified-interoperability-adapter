@@ -29,7 +29,7 @@ export class AddQueryComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data);
+    console.log("Initial source value: ",this.data.source);
   }
 
   onNoClick(): void {
@@ -57,6 +57,7 @@ export class AddQueryComponent implements OnInit {
       }  
       // console.log("Data for testing:", dataValueFetchObject)
     this.dataValueFetchService?.testDataValueFetchQuery(dataValueFetchObject).subscribe()
+    this.showTestResults = true;
   }
 
 }
