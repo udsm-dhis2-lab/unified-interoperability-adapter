@@ -40,10 +40,10 @@
                                     <td>
                                         <div class="buttons">
                                             <a class="btn btn-outline-success" (click)="addDataset(instanceDataset)" *ngIf="!datasetExisting(instanceDataset)">
-                                                <fa-icon [icon]="faAdd"></fa-icon>
+                                                <fa-icon [icon]="faCheck"></fa-icon>
                                             </a>
                                             <a class="btn btn-outline-danger" (click)="onDelete(instanceDataset)" *ngIf="datasetExisting(instanceDataset)">
-                                                <fa-icon [icon]="faSubtract"></fa-icon> 
+                                                <fa-icon [icon]="faMultiply"></fa-icon> 
                                             </a>
                                         </div>
                                     </td>
