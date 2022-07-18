@@ -216,7 +216,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       data: {
         sources: sourcesToChoose,
         query: this.dataValueFetch?.sqlQuery,
-        source: this.dataValueFetch?.datasource.id,
+        source: this.dataValueFetch?.datasource,
         elementId: elementId,
         id: this.dataValueFetch?.id
       },
