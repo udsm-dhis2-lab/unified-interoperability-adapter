@@ -37,18 +37,17 @@ public class DatasourceService {
             throw new IllegalStateException("The database type is invalid");
         }
         
+        String url = datasource.getUrl();            
+        
         switch (datasource.getType()) {
             case "postgres":
-                String postgresurl = datasource.getUrl();            
-                datasource.setType("jdbc:postgres://"+postgresurl);
+                datasource.setUrl("jdbc:postgres://"+url);
                 break;
             case "mysql":
-                String mysqlurl = datasource.getUrl();            
-                datasource.setType("jdbc:mysql://"+mysqlurl);
+                datasource.setUrl("jdbc:mysql://"+url);
                 break;
             case "oracle":
-                String oracleurl = datasource.getUrl();
-                datasource.setType("jdbc:oracle:thin:@//"+oracleurl);
+                datasource.setUrl("jdbc:oracle:thin:@//"+url);
                 break;
             default:
                 break;
