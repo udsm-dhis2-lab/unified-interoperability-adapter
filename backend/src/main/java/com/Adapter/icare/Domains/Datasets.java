@@ -23,6 +23,7 @@ public class Datasets implements Serializable {
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
     private String displayName;
+    private String periodType;
 
     @Lob
     private String FormdesignCode;

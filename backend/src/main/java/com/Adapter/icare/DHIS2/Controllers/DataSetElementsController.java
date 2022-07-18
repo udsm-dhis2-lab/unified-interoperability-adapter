@@ -4,9 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Optional;
-
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +28,7 @@ public class DataSetElementsController {
     }
 
     @PostMapping
-    public void addDataSetElements(@RequestBody DataSetElements dataSetElements) throws SQLException {
+    public DataSetElements addDataSetElements(@RequestBody DataSetElements dataSetElements) throws SQLException {
 
         //Manipulating the received request
         String dataElementsCategoryOptionCombString = dataSetElements.getDataElementCategoryOptionCombo();
@@ -50,25 +48,28 @@ public class DataSetElementsController {
         Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName,dataSourcePassword);
         ResultSet rs = con.prepareStatement(SqlQuery).executeQuery();
          while (rs.next()) {
-            dataSetElementsService.addDataSetElements(dataSetElements);
-            
+            dataSetElementsService.addDataSetElements(dataSetElements);     
         } 
-        
+
+        return dataSetElements;    
     }
 
     @PostMapping("/testQuery")
-    public void testQuery(@RequestBody DataSetElements dataSetElements) throws SQLException{
+    public DataSetElements testQuery(@RequestBody DataSetElements dataSetElements) throws SQLException{
 
        Long dataSourceId = dataSetElements.getDatasource().getId();
        Optional<Datasource> datasource = datasourceRepository.findById(dataSourceId);
-       String query = dataSetElements.getSqlQuery();
        String dataSourceUrl = datasource.get().getUrl();
        String dataSourcePassword = datasource.get().getPassword();
        String dataSourceUserName = datasource.get().getUsername();
+       String query = dataSetElements.getSqlQuery();
+
+       //Query manipulation
+
        Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
        con.prepareStatement(query).executeQuery();
 
-        
+       return dataSetElements;   
     }
 
     @PostMapping("/searchDataSetElements")
