@@ -57,6 +57,7 @@ export class AddQueryComponent implements OnInit {
       }  
       // console.log("Data for testing:", dataValueFetchObject)
     this.dataValueFetchService?.testDataValueFetchQuery(dataValueFetchObject).subscribe()
+    this.showTestResults = true;
   }
 
 }

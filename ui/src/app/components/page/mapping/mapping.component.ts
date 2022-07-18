@@ -38,6 +38,7 @@ export class MappingComponent implements OnInit {
     ) { }
 
   ngOnInit(): void {
+    
     this.sourcesService.getSources().subscribe((sources) => (this.sources = sources));
 
     this.instancesService.getInstances().subscribe((instances) => (this.instances = instances));   
