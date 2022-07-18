@@ -48,7 +48,7 @@ public class DatasourceService {
                 break;
             case "oracle":
                 String oracleurl = datasource.getUrl();
-                datasource.setType("jdbc:oracle:thin:@//" + oracleurl);
+                datasource.setType("jdbc:oracle:thin:@//"+oracleurl);
                 break;
             default:
                 break;

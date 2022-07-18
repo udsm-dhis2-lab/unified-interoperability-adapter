@@ -10,25 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.tools.JavaFileObject;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-import com.Adapter.icare.Constants.DHISConstants;
 import com.Adapter.icare.DHIS2.DHISDomains.RemoteDatasets;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetsRepository;
 import com.Adapter.icare.Domains.Datasets;
 import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Repository.InstancesRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import net.bytebuddy.utility.dispatcher.JavaDispatcher.Instance;
+
 
 @Service
 public class DataSetsService {
@@ -130,7 +121,7 @@ public class DataSetsService {
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
 
-            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=dataEntryForm[htmlCode]"));
+            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=periodType,dataEntryForm[htmlCode]"));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -149,9 +140,12 @@ public class DataSetsService {
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
-            String js = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
-            datasets.setFormdesignCode(js);
-            System.out.println(js);
+            String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
+            String periodType = jsObject.getString("periodType");
+
+            datasets.setFormdesignCode(htmlForm);
+            datasets.setPeriodType(periodType);
+            //System.out.println(js);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
