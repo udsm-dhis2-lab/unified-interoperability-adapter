@@ -1,16 +1,11 @@
 package com.Adapter.icare.Domains;
 
-import java.io.Serializable;
-
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
 import org.springframework.data.annotation.Transient;
 
 import lombok.AllArgsConstructor;
