@@ -130,7 +130,7 @@ public class DataSetsService {
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
 
-            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=dataEntryForm[htmlCode]"));
+            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=periodType,dataEntryForm[htmlCode]"));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -149,9 +149,12 @@ public class DataSetsService {
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
-            String js = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
-            datasets.setFormdesignCode(js);
-            System.out.println(js);
+            String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
+            String periodType = jsObject.getString("periodType");
+
+            datasets.setFormdesignCode(htmlForm);
+            datasets.setPeriodType(periodType);
+            //System.out.println(js);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());

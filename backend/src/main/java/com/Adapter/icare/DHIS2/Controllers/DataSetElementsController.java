@@ -30,7 +30,7 @@ public class DataSetElementsController {
     }
 
     @PostMapping
-    public void addDataSetElements(@RequestBody DataSetElements dataSetElements) throws SQLException {
+    public DataSetElements addDataSetElements(@RequestBody DataSetElements dataSetElements) throws SQLException {
 
         //Manipulating the received request
         String dataElementsCategoryOptionCombString = dataSetElements.getDataElementCategoryOptionCombo();
@@ -50,10 +50,10 @@ public class DataSetElementsController {
         Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName,dataSourcePassword);
         ResultSet rs = con.prepareStatement(SqlQuery).executeQuery();
          while (rs.next()) {
-            dataSetElementsService.addDataSetElements(dataSetElements);
-            
+            dataSetElementsService.addDataSetElements(dataSetElements);     
         } 
-        
+
+        return dataSetElements;    
     }
 
     @PostMapping("/testQuery")
