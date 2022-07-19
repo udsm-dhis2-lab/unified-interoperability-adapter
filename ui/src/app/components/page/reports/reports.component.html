@@ -11,34 +11,36 @@
         <form action="row">
             <div class="form-group row">
                 <div class="col-3 ">
-                    <label for="instance">Instance:</label>
-                    <input class="form-control" list="instances" type="text" name="instance">
-
-                    <datalist id="instances">
-                        <option >DHIS2 Morogoro</option>
-                        <option >DHIS2 Dar es Salaam</option>
-                        <option >DHIS2 Mbeya</option>
-                        <option >DHIS2 Rukwa</option>
-                        <option >DHIS2 Tanga</option>
-                    </datalist>
+                    <mat-form-field class="mt-control">
+                        <mat-label>Instance: </mat-label>
+                        <mat-select [(ngModel)]="instance" name="instance" (selectionChange)="filterDatasets()">
+                            <mat-option></mat-option>
+                            <mat-option *ngFor="let instance of instances" [value]="instance">
+                                {{instance.name}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
                 <div class="col-3">
-                    <label for="">Dataset:</label>
-                    <input class="form-control" list="datasets" type="text" name="dataset">
-
-                    <datalist id="datasets">
-                        <option >OPD Malaria</option>
-                        <option >OPD Typhoid</option>
-                        <option >OPD Chickenpox</option>
-                        <option >OPD Viral Infection</option>
-                        <option >OPD Malnutrition</option>
-                    </datalist>
+                    <mat-form-field class="mt-control">
+                        <mat-label>Linked Datasets: </mat-label>
+                        <mat-select [(ngModel)]="dataset" name="dataset" (selectionChange)="checkDataset(dataset!)">
+                            <mat-option></mat-option>
+                            <mat-option *ngFor="let dataset of datasets" [value]="dataset">
+                                {{dataset.displayName}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
-                <div class="col-3">
-                    <label for="">Period:</label>
+                <div class="col-2">
+                    <label for="">Period From:</label>
                     <input class="form-control" type="date" name="date">
                 </div>
-                <div class="col-3 mt-4">
+                <div class="col-2">
+                    <label for="">Period To:</label>
+                    <input class="form-control" type="date" name="date">
+                </div>
+                <div class="col-2 mt-4">
                     <app-button 
                         [ngStyle]="{
                             'padding': '90px',
@@ -52,5 +54,13 @@
                 </div>
             </div>
         </form>
+        <div class="row mt-5" *ngIf="dataset?.formdesignCode"> 
+            <div class="col-12">
+                <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
+                <app-dataset-view-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset"
+                    [dataSetDataValues]="{}" [dataset]="dataset">
+                </app-dataset-view-form>
+            </div>
+        </div>
     </div>
 </div>

@@ -69,6 +69,7 @@ public class DataSetElementsController {
 
        Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
        ResultSet rs = con.prepareStatement(newQuery).executeQuery();
+
        rs.next();
        return rs.getString(1);   
     }

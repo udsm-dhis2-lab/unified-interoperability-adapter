@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { faAdd, faEdit, faSubtract, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faCancel, faCheck, faEdit, faMultiply, faSubtract, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { DatasetInterface, InstanceInterface, InstanceDatasetsInterface } from 'src/app/resources/interfaces';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
@@ -25,6 +25,9 @@ export class DatasetsComponent implements OnInit {
   faTrash = faTrash;
   faAdd = faAdd;
   faSubtract = faSubtract;
+  faCheck = faCheck;
+  faCancel = faCancel;
+  faMultiply = faMultiply;
 
   constructor(
       private datasetsService: DatasetsService, 

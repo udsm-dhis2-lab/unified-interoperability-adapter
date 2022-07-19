@@ -17,6 +17,7 @@ export class AddQueryComponent implements OnInit {
   showTestResults: boolean = false;
   message: string | undefined;
   messageType: string | undefined;
+  testValue: string | undefined;
 
 
 
@@ -29,7 +30,7 @@ export class AddQueryComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data);
+    console.log("Initial source value: ",this.data.source);
   }
 
   onNoClick(): void {
@@ -44,7 +45,7 @@ export class AddQueryComponent implements OnInit {
     
   }
 
-  onTest(){
+  async onTest(){
     const dataValueFetchObject = {
         dataElementCategoryOptionCombo: undefined,
         sqlQuery: this.data.query,
@@ -56,13 +57,17 @@ export class AddQueryComponent implements OnInit {
         },
       }  
       // console.log("Data for testing:", dataValueFetchObject)
-    this.dataValueFetchService?.testDataValueFetchQuery(dataValueFetchObject).subscribe()
+    this.dataValueFetchService?.testDataValueFetchQuery(dataValueFetchObject).subscribe((value) => (this.testValue = value))
+    
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    console.log("Data for testing:", this.testValue);
+    this.showTestResults = true;
   }
 
 }
 
 export interface QueryData {
-  sources: SourceInterface[];
-  source: SourceInterface;
-  query: string;
+  sources?: SourceInterface[];
+  source?: SourceInterface;
+  query?: string;
 }

@@ -38,6 +38,7 @@ export class MappingComponent implements OnInit {
     ) { }
 
   ngOnInit(): void {
+    
     this.sourcesService.getSources().subscribe((sources) => (this.sources = sources));
 
     this.instancesService.getInstances().subscribe((instances) => (this.instances = instances));   
@@ -90,6 +91,7 @@ export class MappingComponent implements OnInit {
     this.dataset = dataset
     console.log(this.dataset);
   }
+  
   changesOnDataValue(e: Event){
     console.log(e)
   }

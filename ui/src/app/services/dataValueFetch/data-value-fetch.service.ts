@@ -39,9 +39,9 @@ export class DataValueFetchService {
     return this.httpClient.post<DataValueFetchInterface>(this.apiUrl, dataValueFetch, httpOptions);
   }
   
-  testDataValueFetchQuery(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
+  testDataValueFetchQuery(dataValueFetch: DataValueFetchInterface): Observable<string> {
     let url = `${this.apiUrl}/testQuery`;
-    return this.httpClient.post<DataValueFetchInterface>(url, dataValueFetch, httpOptions);
+    return this.httpClient.post<string>(url, dataValueFetch, httpOptions);
   }
 
   

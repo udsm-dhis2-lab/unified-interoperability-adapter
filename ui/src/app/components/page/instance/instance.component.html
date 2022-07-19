@@ -34,8 +34,6 @@
                         <tr>
                             <th>Instance Name</th>
                             <th>URL</th>
-                            <th>Username</th>
-                            <th>Password</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -43,8 +41,6 @@
                         <tr [ngClass]="{ 'table-secondary': isOdd }" >
                             <td>{{ instance.name }}</td>
                             <td>{{ instance.url }}</td>
-                            <td>{{ instance.username }}</td>
-                            <td>{{ instance.password }}</td>
                             <td>
                                 <div class="buttons">
                                     <a class="btn btn-outline-primary ml-2" (click)="openDialog(instance)">
