@@ -5,11 +5,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatButtonModule} from '@angular/material/button';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatDialogModule} from '@angular/material/dialog';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/core/header/header.component';
@@ -35,7 +30,8 @@ import { CustomFormComponent } from './components/page/mapping/custom-form/custo
 import { DatasetViewFormComponent } from './components/page/reports/dataset-view-form/dataset-view-form.component';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
-
+import { NgxDhis2PeriodFilterModule } from '@iapps/ngx-dhis2-period-filter';
+import { SharedModule } from './shared/shared.modules';
 
 @NgModule({
   declarations: [
@@ -67,12 +63,8 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
     FontAwesomeModule,
     HttpClientModule,
     FormsModule,
-    MatCheckboxModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatDialogModule,
-
+    NgxDhis2PeriodFilterModule,
+    SharedModule,
     RouterModule.forRoot(appRoutes, { enableTracing: true }),
   ],
   providers: [
