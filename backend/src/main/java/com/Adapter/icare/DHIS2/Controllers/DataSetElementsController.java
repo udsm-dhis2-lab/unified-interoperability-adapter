@@ -65,9 +65,11 @@ public class DataSetElementsController {
        String query = dataSetElements.getSqlQuery();
 
        //Query manipulation
+       String newQuery = query.replaceAll("\\$","").replaceAll("\\{","'").replaceAll("\\}","'");
 
        Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
-       ResultSet rs = con.prepareStatement(query).executeQuery();
+       ResultSet rs = con.prepareStatement(newQuery).executeQuery();
+
        rs.next();
        return rs.getString(1);   
     }
