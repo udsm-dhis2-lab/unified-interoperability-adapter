@@ -22,9 +22,9 @@
                             <div class="col-12">
                                 <mat-form-field class="mt-control">
                                     <mat-label>Choose a Source: </mat-label>
-                                    <mat-select [(ngModel)]="data.source" name="source" (selectionChange)="data.source">
+                                    <mat-select  [(ngModel)]="data.source" name="source">
                                         <mat-option> </mat-option>
-                                        <mat-option *ngFor="let source of data.sources" [value]="data.source" >
+                                        <mat-option *ngFor="let source of data.sources" [value]="source" >
                                             {{source.type}}
                                         </mat-option>
                                     </mat-select>
@@ -33,8 +33,21 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-12">
-                                <label for="query">Type Query </label>
+                                <label for="query">Type Query: </label>
                                 <textarea type="textarea" [(ngModel)]="data.query" name="query" [value]="query"  class="form-control" placeholder="SELECT * FROM [table name] WHERE [table name.field] like [condition]" required ></textarea>
+                            </div> 
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <mat-form-field class="mt-control">
+                                <mat-label>Period (For testing only): </mat-label>
+                                <mat-select [(ngModel)]="periodValue" name="period">
+                                    <mat-option> </mat-option>
+                                    <mat-option *ngFor="let period of periods" [value]="period.value">
+                                        {{ period.name }}
+                                    </mat-option>
+                                </mat-select>
+                                </mat-form-field>
                             </div> 
                         </div>
 

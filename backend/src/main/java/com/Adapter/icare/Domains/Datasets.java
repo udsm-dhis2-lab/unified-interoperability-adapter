@@ -26,7 +26,7 @@ public class Datasets implements Serializable {
     private String periodType;
 
     @Lob
-    private String FormDesignCode;
+    private String formDesignCode;
     
     @ManyToOne
     private Instances instances;

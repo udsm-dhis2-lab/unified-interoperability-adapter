@@ -32,7 +32,10 @@ export class InstanceComponent implements OnInit {
     public dialog?: MatDialog
   ) 
   { 
-    this.subscription = this.uiService?.onToggleAddInstanceForm().subscribe((value) => (this.showAddInstanceForm = value));
+    this.subscription = this.uiService?.onToggleAddInstanceForm().subscribe({
+      next: (value) => (this.showAddInstanceForm = value),
+      error: (e) => console.log(e.message)
+    });
   }
 
   ngOnInit(): void {

@@ -1,3 +1,4 @@
+import { PeriodFilter } from './../../../../Helpers/period-filter';
 import { DataValueFetchService } from './../../../../services/dataValueFetch/data-value-fetch.service';
 import {
   DatasetInterface,
@@ -47,6 +48,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   query: string | undefined;
   dataValueFetchs: DataValueFetchInterface[] | undefined;
   dataValueFetch: any;
+  period: any;
 
   /**For period filter */
   periodObject: any;
@@ -71,7 +73,8 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     private elementRef?: ElementRef,
     public dialog?: MatDialog,
     private router?: Router,
-    private route?: ActivatedRoute
+    private route?: ActivatedRoute,
+    private periodFilter?: PeriodFilter
   ) {
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
@@ -99,7 +102,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     try {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
-        this.dataSetFormDesign.formdesignCode
+        this.dataSetFormDesign
       );
     } catch (e) {
       // console.log(JSON.stringify(e));
@@ -112,12 +115,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.setScriptsOnHtmlContent(
-      this.getScriptsContents(this.dataSetFormDesign.formdesignCode)
-    );
-    this.getEnabledInputTagsOnHtmlContent(
-      this.sources,
-      this,
-      this.dataSetFormDesign.formdesignCode
+      this.getScriptsContents(this.dataSetFormDesign)
     );
 
     // console.log("Dataset We need: ",this.dataset)
@@ -157,64 +155,21 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         this.entryFormStatusColors,
         this.isDataEntryLevel,
         scriptsContentsArray,
-        function (
-          entryFormType: any,
-          entryFormStatusColors: any,
-          isDataEntryLevel: any
-        ) {
-          // Listen for change event
-          document.addEventListener(
-            'change',
-            function (event: any) {
-              // If the clicked element doesn't have the right selector, bail
-              console.log('Event: ', event);
-              if (
-                event.target.matches(
-                  '.entryfield, .entryselect, .entrytrueonly, .entryfileresource'
-                )
-              ) {
-                onDataValueChange(
-                  event.target,
-                  entryFormType,
-                  entryFormStatusColors
-                );
-              }
-              event.preventDefault();
-            },
-            false
-          );
-
-          // Embed inline javascripts
-          // const scriptsContents = `
-          // try {${scriptsContentsArray.join('')}} catch(e) { console.log(e);}`;
-          // const script = document.createElement('script');
-          // script.type = 'text/javascript';
-          // script.innerHTML = scriptsContents;
-          // document.getElementById('_custom_entry_form')!.appendChild(script);
-        }
+        this.getEnabledInputTagsOnHtmlContent()
       );
     }
   }
 
+  eventPopupListener = (event: any) => {
+    event.preventDefault();
+    if (event.target.name === 'entryfield') {
+      this?.openDialog(this.sources!, event.target.id);
+    }
+  };
+
   getEnabledInputTagsOnHtmlContent(
-    sources?: SourceInterface[],
-    thisComponent?: CustomFormComponent,
-    html?: string
   ) {
-    let parser = new DOMParser();
-    const formDesign = parser.parseFromString(html!, 'text/html');
-    //Always disable input tags
-    let inputElements = formDesign.getElementsByTagName('input');
-
-    //Trying to get data existing after double clicking
-
-    //end
-
-    document.addEventListener('click', async function (event: any) {
-      if (event.target.name === 'entryfield') {
-        thisComponent?.openDialog(sources!, event.target.id);
-      }
-    });
+    document.addEventListener('click', this.eventPopupListener);
   }
 
   async openDialog(
@@ -236,13 +191,12 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       .getSingleDataValueFetch(dataValueFetchObject)
       .subscribe((dataValueFetch) => {
         this.dataValueFetch = dataValueFetch;
-
-        console.log('Data Value Fetching 1: ', this.dataValueFetch);
+        // console.log('Data Value Fetching 1: ', this.dataValueFetch);
       });
 
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    console.log('Data Value Fetching 2: ', this.dataValueFetch);
+    // console.log('Data Value Fetching 2: ', this.dataValueFetch);
 
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
@@ -254,9 +208,11 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         source: this.dataValueFetch?.datasource,
         elementId: elementId,
         id: this.dataValueFetch?.id,
+        dataset: this.dataset,
       },
     });
 
+    document.removeEventListener('click', this.eventPopupListener);
     // console.log("Opened: "+ this.dataValueFetch);
 
     dialogRef?.afterClosed().subscribe((result) => {
@@ -276,6 +232,8 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         this.source = undefined;
         this.query = undefined;
       }
+
+      document.addEventListener('click', this.eventPopupListener);
 
       this.router!.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router!.onSameUrlNavigation = 'reload';

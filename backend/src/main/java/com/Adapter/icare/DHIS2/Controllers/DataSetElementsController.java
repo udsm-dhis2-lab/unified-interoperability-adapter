@@ -48,9 +48,10 @@ public class DataSetElementsController {
         Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName,dataSourcePassword);
         ResultSet rs = con.prepareStatement(SqlQuery).executeQuery();
          while (rs.next()) {
-            dataSetElementsService.addDataSetElements(dataSetElements);     
         } 
-
+        
+        dataSetElementsService.addDataSetElements(dataSetElements);     
+        
         return dataSetElements;    
     }
 

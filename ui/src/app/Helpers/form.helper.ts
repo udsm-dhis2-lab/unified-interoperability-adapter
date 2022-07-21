@@ -80,12 +80,7 @@ export function onFormReady(
         : [];
 
     const dataElementId = formType === 'event' ? splitedId[1] : splitedId[0];
-    const optionComboId =
-      formType === 'event'
-        ? 'dataElement'
-        : formType === 'tracker'
-        ? 'trackedEntityAttribute'
-        : splitedId[1];
+    const optionComboId = formType === 'event'?'dataElement':formType ==='tracker'?'trackedEntityAttribute':splitedId[1];
 
     // Get data element details
     const dataElementDetails = _.find(dataElements, ['id', dataElementId]);
@@ -144,7 +139,7 @@ export function onFormReady(
     }
   });
 
-  formReady(formType, entryFormStatusColors, scriptsContentsArray);
+  // formReady(formType, entryFormStatusColors, scriptsContentsArray);
 }
 
 export function onDataValueChange(

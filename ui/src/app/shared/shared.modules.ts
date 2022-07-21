@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { NgxDhis2PeriodFilterModule } from '@iapps/ngx-dhis2-period-filter';
 
 @NgModule({
   declarations: [],
@@ -33,6 +34,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatNativeDateModule,
     MatButtonToggleModule,
     DragDropModule,
+    NgxDhis2PeriodFilterModule,
   ],
   exports: [
     MatButtonModule,
@@ -50,6 +52,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     MatNativeDateModule,
     MatButtonToggleModule,
     DragDropModule,
+    NgxDhis2PeriodFilterModule,
   ],
 })
 export class SharedModule {}

@@ -1,8 +1,12 @@
-import { DatasetInterface, InstanceInterface } from './../../../resources/interfaces';
+import { DatasetInterface, InstanceInterface, PeriodInterface } from './../../../resources/interfaces';
 import { Component, OnInit } from '@angular/core';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
 import { InstancesService } from 'src/app/services/instances/instances.service';
+import { PeriodFilter } from 'src/app/Helpers/period-filter';
+import { ReportsService } from 'src/app/services/reports/reports.service';
+import { map } from 'lodash';
+import { subscribeOn } from 'rxjs';
 
 @Component({
   selector: 'app-reports',
@@ -16,10 +20,18 @@ export class ReportsComponent implements OnInit {
   instance: InstanceInterface | undefined;
   dataset: DatasetInterface | undefined;
 
+  periods?: PeriodInterface[];
+  periodValue: any;
+  period?: any;
+  viewDatasetReport: boolean = false;
+  datasetValues: any;
+
   constructor(
     private datasetsService: DatasetsService,
     private instanceDatasetsService: InstanceDatasetsService,
-    private instancesService: InstancesService
+    private instancesService: InstancesService,
+    private reportsService: ReportsService,
+    private periodFilter?: PeriodFilter
   ) {}
 
   ngOnInit(): void {
@@ -33,6 +45,7 @@ export class ReportsComponent implements OnInit {
   }
 
   public filterDatasets() {
+    this.viewDatasetReport = false;
     if (this.instance) {
       this.datasetsService
         .getDatasets()
@@ -49,8 +62,55 @@ export class ReportsComponent implements OnInit {
     }
   }
 
+
   checkDataset(dataset: DatasetInterface) {
+    this.viewDatasetReport = false;
     this.dataset = dataset;
-    console.log(this.dataset);
+    this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!);
   }
+
+  async viewReport(){
+    this.period = this.periodFilter?.calculateDates(this.dataset?.periodType!, this.periodValue);
+    console.log(this.period)
+
+    let dataViewReport = {
+      periodStart: this.period.firstDate,
+      periodEnd: this.period.lastDate,
+      datasetId: this.dataset?.id,
+    }
+    console.log(this.periodValue)
+    if (this.dataset && this.periodValue >= 0  && this.instance){
+      // this.reportsService
+      //   .viewReport(dataViewReport)
+      //   .subscribe(
+      //     (data: any) =>
+      //       console.log(data)
+      //   );
+      // this.viewDatasetReport = true;
+      let datasetValues;
+      this.reportsService.viewReport(dataViewReport).subscribe(
+        (data) =>
+          (datasetValues = data.map((value: any) => {
+            return {
+              id: value.dataElementCategoryCombo,
+              val: value.value,
+              com: 'false',
+            }
+            ;
+          }))
+      );
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      this.datasetValues  = {
+        dataValues: datasetValues
+      }
+      this.viewDatasetReport = true;
+    }
+    // console.log(dataViewReport)
+
+  }
+
 }
+
+

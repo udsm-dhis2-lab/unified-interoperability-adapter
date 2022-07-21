@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, enableProdMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
@@ -32,6 +32,8 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
 import { NgxDhis2PeriodFilterModule } from '@iapps/ngx-dhis2-period-filter';
 import { SharedModule } from './shared/shared.modules';
+import { NgxDhis2HttpClientModule } from '@iapps/ngx-dhis2-http-client';
+import { PeriodFilter } from './Helpers/period-filter';
 
 @NgModule({
   declarations: [
@@ -53,19 +55,30 @@ import { SharedModule } from './shared/shared.modules';
     SidenavComponent,
     EditInstanceComponent,
     EditSourceComponent,
-    CustomFormComponent,
     AddQueryComponent,
+    CustomFormComponent,
     DatasetViewFormComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    FontAwesomeModule,
+    RouterModule,
     HttpClientModule,
+    FontAwesomeModule,
     FormsModule,
-    NgxDhis2PeriodFilterModule,
     SharedModule,
     RouterModule.forRoot(appRoutes, { enableTracing: true }),
+    NgxDhis2HttpClientModule.forRoot({
+      namespace: 'iapps',
+      version: 1,
+      models: {
+        users: 'id',
+        organisationUnitLevels: 'id,level',
+        organisationUnits: 'id,name,level',
+        organisationUnitGroups: 'id',
+        dataStore_scorecards: 'id',
+      },
+    }),
   ],
   providers: [
     MappingComponent,
@@ -73,6 +86,7 @@ import { SharedModule } from './shared/shared.modules';
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'fill' },
     },
+    PeriodFilter,
   ],
   bootstrap: [AppComponent],
 })
