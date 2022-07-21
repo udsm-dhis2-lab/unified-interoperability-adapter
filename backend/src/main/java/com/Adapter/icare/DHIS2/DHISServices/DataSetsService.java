@@ -83,29 +83,20 @@ public class DataSetsService {
                 Map<String, Object> remoteDataSetMap = new HashMap<String, Object>();
                 remoteDataSetMap.put("id", ourDsObject.getString("id"));
                 remoteDataSetMap.put("displayName", ourDsObject.getString("displayName"));
-
                 RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
-
                 remoteDataSetsList.add(remoteDataSetToAdd);
 
             }
-
-            //System.out.println(remoteDataSetsList);
-
-
-             //remoteDataSetsList = objectMapper.readValue(js, new TypeReference<List<RemoteDatasets>>() {
-            //});
-
             
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        
+
         return remoteDataSetsList;
         
     }
 
-    public void AddDataSets(Datasets datasets) {
+    public Datasets AddDataSets(Datasets datasets) {
 
         //Inserting the HTML CODE
         URL url;
@@ -143,7 +134,7 @@ public class DataSetsService {
             String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
             String periodType = jsObject.getString("periodType");
 
-            datasets.setFormdesignCode(htmlForm);
+            datasets.setFormDesignCode(htmlForm);
             datasets.setPeriodType(periodType);
             //System.out.println(js);
 
@@ -151,12 +142,20 @@ public class DataSetsService {
             System.out.println(e.getMessage());
         }
         
-        dataSetsRepository.save(datasets);
-
+        return dataSetsRepository.save(datasets);
     }
 
     public Optional<Datasets> GetSingleDataSet(String datasetId) {
         return dataSetsRepository.findById(datasetId);
+    }
+
+    public void deleteDataSets(String datasetId)  {
+
+        boolean exists = dataSetsRepository.existsById(datasetId);
+        if (!exists) {
+            throw new IllegalStateException("The instance with id " + datasetId + " does not exist");
+        }
+        dataSetsRepository.deleteById(datasetId);
     }
     
 }

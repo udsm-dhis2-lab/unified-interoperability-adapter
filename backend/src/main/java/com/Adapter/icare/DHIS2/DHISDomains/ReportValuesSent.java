@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ReportValuesSent {
-    private String dataSetID;
+    private String datasetId;
     private String periodStart;
     private String periodEnd;
 }

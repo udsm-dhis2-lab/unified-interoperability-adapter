@@ -19,7 +19,7 @@ public class ReportsService {
 
     public List<DataSetElements> SearchDataSetElementsPerDataSet(ReportValuesSent reportValuesSent) {
         
-        String dsId = reportValuesSent.getDataSetID();
+        String dsId = reportValuesSent.getDatasetId();
         return dataSetElementsRepository.searchExistingDataSetElementsPerDataSet(dsId);
     }
     
