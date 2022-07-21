@@ -34,6 +34,10 @@ public class DataSetElements {
 
     @Transient
     private String dataElementCategoryOptionCombo;
+    @Transient
+    private String periodStart;
+    @Transient  
+    private String periodEnd;
 
     
     

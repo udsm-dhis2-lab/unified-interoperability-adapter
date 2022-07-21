@@ -12,5 +12,8 @@ public interface DataSetElementsRepository extends JpaRepository<DataSetElements
 
     @Query(value = "SELECT * FROM data_set_elements dse WHERE dse.datasets_id=:dataset", nativeQuery = true)
     List<DataSetElements> searchExistingDataSetElementsPerDataSet(String dataset);
+
+    @Query(value = "COUNT(*) FROM data_set_elements dse WHERE dse.datasets_id=:datasetId", nativeQuery = true)
+    Integer CountExistingDataSetsInDataSetElements(String datasetId);
     
 }
