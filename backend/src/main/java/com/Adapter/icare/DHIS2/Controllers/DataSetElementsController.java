@@ -43,10 +43,14 @@ public class DataSetElementsController {
         String dataSourceUrl = datasource.get().getUrl();
         String dataSourcePassword = datasource.get().getPassword();
         String dataSourceUserName = datasource.get().getUsername();
+
+        // Query manipulation
+        String newQuery = SqlQuery.replaceAll("\\$\\{period-start\\}","1900-01-01").replaceAll("\\$\\{period-end\\}",
+                "5000-01-01");
         
         // connect to database
         Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName,dataSourcePassword);
-        ResultSet rs = con.prepareStatement(SqlQuery).executeQuery();
+        ResultSet rs = con.prepareStatement(newQuery).executeQuery();
          while (rs.next()) {
         } 
         
@@ -64,9 +68,12 @@ public class DataSetElementsController {
        String dataSourcePassword = datasource.get().getPassword();
        String dataSourceUserName = datasource.get().getUsername();
        String query = dataSetElements.getSqlQuery();
+       String periodStart = dataSetElements.getPeriodStart();
+       String periodEnd = dataSetElements.getPeriodEnd();
 
        //Query manipulation
-       String newQuery = query.replaceAll("\\$","").replaceAll("\\{","'").replaceAll("\\}","'");
+       String newQuery = query.replaceAll("\\$\\{period-start\\}", periodStart).replaceAll("\\$\\{period-end\\}",
+               periodEnd);
 
        Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
        ResultSet rs = con.prepareStatement(newQuery).executeQuery();
