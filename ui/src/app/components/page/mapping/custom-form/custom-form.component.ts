@@ -155,9 +155,14 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         this.entryFormStatusColors,
         this.isDataEntryLevel,
         scriptsContentsArray,
+        false,
         this.getEnabledInputTagsOnHtmlContent()
       );
     }
+  }
+
+  getEnabledInputTagsOnHtmlContent() {
+    document.addEventListener('click', this.eventPopupListener, true);
   }
 
   eventPopupListener = (event: any) => {
@@ -166,11 +171,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       this?.openDialog(this.sources!, event.target.id);
     }
   };
-
-  getEnabledInputTagsOnHtmlContent(
-  ) {
-    document.addEventListener('click', this.eventPopupListener);
-  }
 
   async openDialog(
     sourcesToChoose: SourceInterface[],
@@ -212,7 +212,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       },
     });
 
-    document.removeEventListener('click', this.eventPopupListener);
     // console.log("Opened: "+ this.dataValueFetch);
 
     dialogRef?.afterClosed().subscribe((result) => {
@@ -233,7 +232,8 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         this.query = undefined;
       }
 
-      document.addEventListener('click', this.eventPopupListener);
+      // document.addEventListener('click', ()=>{});
+      //  document.removeEventListener('click', this.eventPopupListener);
 
       this.router!.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router!.onSameUrlNavigation = 'reload';
