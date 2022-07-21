@@ -59,7 +59,6 @@ public class ReportsController {
             //Adding to a list
             dvslist.add(new DataValueSets(dataElementCatCombo,queryResult));    
         }
-
         return dvslist;
     }
 
