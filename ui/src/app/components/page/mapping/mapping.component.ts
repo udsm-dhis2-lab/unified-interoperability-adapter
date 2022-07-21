@@ -89,7 +89,6 @@ export class MappingComponent implements OnInit {
 
   checkDataset(dataset: DatasetInterface){
     this.dataset = dataset
-    console.log(this.dataset);
   }
   
   changesOnDataValue(e: Event){
@@ -97,3 +96,5 @@ export class MappingComponent implements OnInit {
   }
 
 }
+
+

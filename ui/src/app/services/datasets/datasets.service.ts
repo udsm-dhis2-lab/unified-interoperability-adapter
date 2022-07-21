@@ -15,7 +15,7 @@ const httpOptions = {
 export class DatasetsService {
 
 
-  private apiUrl = 'http://localhost:4200/api/v1/datasets';
+  private apiUrl = '/api/v1/datasets';
 
   constructor(private httpClient: HttpClient) {}
 

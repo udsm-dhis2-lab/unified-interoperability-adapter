@@ -1,15 +1,10 @@
-import { NgModule } from '@angular/core';
+import { NgModule, enableProdMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import {MatButtonModule} from '@angular/material/button';
-import {MatSidenavModule} from '@angular/material/sidenav';
-import {MatDialogModule} from '@angular/material/dialog';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/core/header/header.component';
@@ -35,7 +30,10 @@ import { CustomFormComponent } from './components/page/mapping/custom-form/custo
 import { DatasetViewFormComponent } from './components/page/reports/dataset-view-form/dataset-view-form.component';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 
-
+import { NgxDhis2PeriodFilterModule } from '@iapps/ngx-dhis2-period-filter';
+import { SharedModule } from './shared/shared.modules';
+import { NgxDhis2HttpClientModule } from '@iapps/ngx-dhis2-http-client';
+import { PeriodFilter } from './Helpers/period-filter';
 
 @NgModule({
   declarations: [
@@ -57,23 +55,30 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
     SidenavComponent,
     EditInstanceComponent,
     EditSourceComponent,
-    CustomFormComponent,
     AddQueryComponent,
+    CustomFormComponent,
     DatasetViewFormComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    FontAwesomeModule,
+    RouterModule,
     HttpClientModule,
+    FontAwesomeModule,
     FormsModule,
-    MatCheckboxModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatDialogModule,
-
+    SharedModule,
     RouterModule.forRoot(appRoutes, { enableTracing: true }),
+    NgxDhis2HttpClientModule.forRoot({
+      namespace: 'iapps',
+      version: 1,
+      models: {
+        users: 'id',
+        organisationUnitLevels: 'id,level',
+        organisationUnits: 'id,name,level',
+        organisationUnitGroups: 'id',
+        dataStore_scorecards: 'id',
+      },
+    }),
   ],
   providers: [
     MappingComponent,
@@ -81,6 +86,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'fill' },
     },
+    PeriodFilter,
   ],
   bootstrap: [AppComponent],
 })

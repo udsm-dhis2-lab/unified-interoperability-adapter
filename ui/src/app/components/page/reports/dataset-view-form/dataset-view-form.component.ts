@@ -31,6 +31,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
 
   @Input() entryFormType: string;
   @Input() dataset: DatasetInterface | undefined;
+  @Input() datasetValues: any[] | undefined;
 
   @Output() dataValueUpdate: EventEmitter<any> = new EventEmitter<any>();
 
@@ -43,12 +44,8 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   dataValueFetch: any;
 
   constructor(
-    private dataValueFetchService: DataValueFetchService,
     private sanitizer?: DomSanitizer,
-    private elementRef?: ElementRef,
     public dialog?: MatDialog,
-    private router?: Router,
-    private route?: ActivatedRoute
   ) {
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
@@ -60,23 +57,12 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
 
     this.entryFormType = 'aggregate';
 
-    // document.body.addEventListener(
-    //   'dataValueUpdate',
-    //   (e: CustomEvent) => {
-    //     e.stopPropagation();
-    //     const dataValueObject = e.detail;
-    //     if (dataValueObject) {
-    //       this.dataValueUpdate.emit(dataValueObject);
-    //     }
-    //   },
-    //   false
-    // );
   }
 
   ngOnInit() {
     try {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
-        this.dataSetFormDesign.formdesignCode
+        this.dataSetFormDesign
       );
     } catch (e) {
       // console.log(JSON.stringify(e));
@@ -84,11 +70,9 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    
     this.setScriptsOnHtmlContent(
-      this.getScriptsContents(this.dataSetFormDesign.formdesignCode)
-    );
-    this.getEnabledInputTagsOnHtmlContent(
-      this.dataSetFormDesign.formdesignCode
+      this.getScriptsContents(this.dataSetFormDesign)
     );
 
     // console.log("Dataset We need: ",this.dataset)
@@ -121,67 +105,19 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     );
 
     if (!this.hasScriptSet) {
+      console.log("Data set Values: ",dataElements)
       onFormReady(
         this.entryFormType,
         dataElements,
-        this.dataSetDataValues,
+        this.datasetValues,
         this.entryFormStatusColors,
         this.isDataEntryLevel,
         scriptsContentsArray,
-        function (
-          entryFormType: any,
-          entryFormStatusColors: any,
-          isDataEntryLevel: any
-        ) {
-          // Listen for change event
-          document.addEventListener(
-            'change',
-            function (event: any) {
-              // If the clicked element doesn't have the right selector, bail
-              console.log('Event: ', event);
-              if (
-                event.target.matches(
-                  '.entryfield, .entryselect, .entrytrueonly, .entryfileresource'
-                )
-              ) {
-                onDataValueChange(
-                  event.target,
-                  entryFormType,
-                  entryFormStatusColors
-                );
-              }
-              event.preventDefault();
-            },
-            false
-          );
-
-          // Embed inline javascripts
-          // const scriptsContents = `
-          // try {${scriptsContentsArray.join('')}} catch(e) { console.log(e);}`;
-          // const script = document.createElement('script');
-          // script.type = 'text/javascript';
-          // script.innerHTML = scriptsContents;
-          // document.getElementById('_custom_entry_form')!.appendChild(script);
+        true,
+        () => {
         }
       );
     }
-  }
-
-  getEnabledInputTagsOnHtmlContent(html?: string) {
-    let parser = new DOMParser();
-    const formDesign = parser.parseFromString(html!, 'text/html');
-    //Always disable input tags
-    let inputElements = formDesign.getElementsByTagName('input');
-
-    //Trying to get data existing after double clicking
-
-    //end
-
-    this.router!.routeReuseStrategy.shouldReuseRoute = () => false;
-    this.router!.onSameUrlNavigation = 'reload';
-    // this.router!.navigate(['/'], {
-    //   relativeTo: this.route
-    // })
   }
 }
 

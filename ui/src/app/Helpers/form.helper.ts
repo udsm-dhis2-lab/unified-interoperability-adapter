@@ -1,3 +1,5 @@
+import { map } from 'rxjs';
+import { Data } from '@angular/router';
 import * as _ from 'lodash';
 
 function getSanitizedValue(value: any, type: any) {
@@ -54,6 +56,7 @@ export function onFormReady(
   entryFormStatusColors: any,
   isDataEntryLevel: any,
   scriptsContentsArray: any,
+  forReporting: boolean,
   formReady: any
 ) {
   // Find table elements and set bootstrap classes
@@ -134,17 +137,29 @@ export function onFormReady(
           inputElement.value = dataElementValue;
         } else {
           inputElement.setAttribute('class', 'entryfield form-control');
-          inputElement.value = dataElementValue;
+          if (forReporting) {
+            inputElement.setAttribute('disabled', forReporting);
+          }
         }
       }
     } else {
       inputElement.setAttribute('type', 'number'); // by default if no valuetype make input type number
       inputElement.setAttribute('class', 'entryfield form-control text-center');
-      inputElement.value = dataElementValue;
+      if(forReporting){
+        inputElement.setAttribute('disabled', forReporting);
+      }
     }
   });
 
-  formReady(formType, entryFormStatusColors, scriptsContentsArray);
+  //Set values if any
+  if(forReporting){
+    dataValues.dataValues.map((dataValue: any) => {
+      let element = document.getElementById(dataValue.id);
+      element?.setAttribute('value', dataValue.val);
+    });
+  }
+
+  // formReady(formType, entryFormStatusColors, scriptsContentsArray);
 }
 
 export function onDataValueChange(

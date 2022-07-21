@@ -51,9 +51,9 @@ public class DataSetElementsController {
         // connect to database
         Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName,dataSourcePassword);
         ResultSet rs = con.prepareStatement(newQuery).executeQuery();
-         while (rs.next()) {
-            dataSetElementsService.addDataSetElements(dataSetElements);     
-        } 
+        while (rs.next()) {
+        dataSetElementsService.addDataSetElements(dataSetElements);     
+        }
         return dataSetElements;    
     }
 

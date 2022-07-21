@@ -20,7 +20,8 @@ export interface DatasetInterface {
     instances: {
         id?: number;
     } 
-    formdesignCode?: Text;
+    formDesignCode?: string;
+    periodType?: string;
 }
 
 export interface InstanceDatasetsInterface {
@@ -43,4 +44,8 @@ export interface DataValueFetchInterface{
         username?: string;
         password?: string;
     };
+}
+export interface PeriodInterface {
+  name: string;
+  value: number;
 }

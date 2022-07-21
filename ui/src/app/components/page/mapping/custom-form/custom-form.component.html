@@ -1,3 +1,4 @@
+
 <div class="custom-entry-form" id="_custom_entry_form">
   <div class="row">
     <div class="col-12">
@@ -7,7 +8,18 @@
 </div>
 
 <div *ngIf="!(presetValuesSections || dataSetDataValues || dataSetFormDesign)">
-  To view Preset Values Data Entry Forms 1. Drill Down the Orgunit component (on the left) to Facility Level 2. The
-  selected
-  Facility Level will be highlighted
+  To view Preset Values Data Entry Forms 1. Drill Down the Orgunit component (on
+  the left) to Facility Level 2. The selected Facility Level will be highlighted
 </div>
+
+
+
+
+
+
+<!-- <div>
+  <ngx-dhis2-period-filter [selectedPeriods]="selectedPeriodItems" [periodFilterConfig]="periodFilterConfig"
+    [selectedPeriodFilterType]="'Range'" (update)="onPeriodUpdate($event, 'UPDATE')"
+    (change)="onPeriodUpdate($event, 'CHANGE')" (close)="onPeriodUpdate($event, 'CLOSE')">
+  </ngx-dhis2-period-filter>
+</div> -->

@@ -32,15 +32,18 @@
                         </mat-select>
                     </mat-form-field>
                 </div>
-                <div class="col-2">
-                    <label for="">Period From:</label>
-                    <input class="form-control" type="date" name="date">
+                <div class="col-3">
+                    <mat-form-field class="mt-control">
+                        <mat-label>Period: </mat-label>
+                        <mat-select [(ngModel)]="periodValue" name="period" (selectionChange)="viewDatasetReport = false">
+                            <mat-option> </mat-option>
+                            <mat-option *ngFor="let period of periods" [value]="period.value">
+                                {{ period.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
-                <div class="col-2">
-                    <label for="">Period To:</label>
-                    <input class="form-control" type="date" name="date">
-                </div>
-                <div class="col-2 mt-4">
+                <div class="col-3 mt-4">
                     <app-button 
                         [ngStyle]="{
                             'padding': '90px',
@@ -49,16 +52,14 @@
                         backgroundColor="transparent" 
                         fontColor="green" 
                         borderColor="green" 
-                        text="View Report">
+                        text="View Report" (click)="viewReport()">
                     </app-button>
                 </div>
             </div>
         </form>
-        <div class="row mt-5" *ngIf="dataset?.formdesignCode"> 
+        <div class="row mt-5" *ngIf="viewDatasetReport"> 
             <div class="col-12">
-                <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
-                <app-dataset-view-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset"
-                    [dataSetDataValues]="{}" [dataset]="dataset">
+                <app-dataset-view-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset?.formDesignCode" [dataSetDataValues]="{}" [dataset]="dataset" [datasetValues]="datasetValues">
                 </app-dataset-view-form>
             </div>
         </div>

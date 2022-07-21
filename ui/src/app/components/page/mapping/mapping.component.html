@@ -57,11 +57,11 @@
         
         
 
-        <div class="row mt-5" *ngIf="dataset?.formdesignCode">
+        <div class="row mt-5" *ngIf="dataset?.formDesignCode">
             
             <div class="col-12">
                 <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
-                <app-custom-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset"
+                <app-custom-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset?.formDesignCode"
                     [dataSetDataValues]="{}" [sources]="sources" [dataset]="dataset" (dataValueUpdate)="changesOnDataValue($event)">
                 </app-custom-form>
             </div>

@@ -1,5 +1,9 @@
+import { PeriodFilter } from './../../../../Helpers/period-filter';
 import { DataValueFetchService } from './../../../../services/dataValueFetch/data-value-fetch.service';
-import { DatasetInterface, DataValueFetchInterface } from './../../../../resources/interfaces';
+import {
+  DatasetInterface,
+  DataValueFetchInterface,
+} from './../../../../resources/interfaces';
 import {
   Component,
   OnInit,
@@ -29,9 +33,9 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   @Input() dataSetDataValues: any;
 
   @Input() isDataEntryLevel: any;
-  
+
   @Input() entryFormType: string;
-  
+
   @Input() sources: SourceInterface[] | undefined;
   @Input() dataset: DatasetInterface | undefined;
 
@@ -44,16 +48,34 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   query: string | undefined;
   dataValueFetchs: DataValueFetchInterface[] | undefined;
   dataValueFetch: any;
-  
+  period: any;
+
+  /**For period filter */
+  periodObject: any;
+  periodFilterConfig: any = {
+    singleSelection: true,
+    emitOnSelection: true,
+    childrenPeriodSortOrder: 'ASC',
+    allowDateRangeSelection: true,
+    allowRelativePeriodSelection: true,
+    allowFixedPeriodSelection: true,
+    hideActionButtons: true,
+    contentHeight: '300px',
+  };
+  selectedPeriodItems: any[] = [];
+  /**
+   * End of period filter
+   */
+
   constructor(
     private dataValueFetchService: DataValueFetchService,
-    private sanitizer?: DomSanitizer, 
+    private sanitizer?: DomSanitizer,
     private elementRef?: ElementRef,
     public dialog?: MatDialog,
     private router?: Router,
-    private route?: ActivatedRoute
-  ) 
-  {
+    private route?: ActivatedRoute,
+    private periodFilter?: PeriodFilter
+  ) {
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
       WAIT: '#fffe8c',
@@ -80,24 +102,27 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   ngOnInit() {
     try {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
-        this.dataSetFormDesign.formdesignCode
+        this.dataSetFormDesign
       );
     } catch (e) {
       // console.log(JSON.stringify(e));
     }
   }
 
+  onPeriodUpdate(periodObject: any, action: string): void {
+    this.periodObject = periodObject;
+  }
+
   ngAfterViewInit() {
     this.setScriptsOnHtmlContent(
-      this.getScriptsContents(this.dataSetFormDesign.formdesignCode)
+      this.getScriptsContents(this.dataSetFormDesign)
     );
-    this.getEnabledInputTagsOnHtmlContent(this.sources, this, this.dataSetFormDesign.formdesignCode)
-    
+
     // console.log("Dataset We need: ",this.dataset)
   }
 
   getScriptsContents(html: any) {
-    if (html){
+    if (html) {
       const matchedScriptArray = html.match(
         /<script[^>]*>([\w|\W]*)<\/script>/im
       );
@@ -108,7 +133,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
               .split(':separator:')
               .filter((content: any) => content.length > 0)
           : [];
-  
+
       return _.filter(scripts, (scriptContent: string) => scriptContent !== '');
     }
     return undefined;
@@ -130,65 +155,27 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         this.entryFormStatusColors,
         this.isDataEntryLevel,
         scriptsContentsArray,
-        function (entryFormType: any, entryFormStatusColors: any, isDataEntryLevel: any) {
-          // Listen for change event
-          document.addEventListener(
-            'change',
-            function (event: any) {
-              // If the clicked element doesn't have the right selector, bail
-              console.log("Event: ",event);
-              if (
-                event.target.matches(
-                  '.entryfield, .entryselect, .entrytrueonly, .entryfileresource'
-                )
-              ) {
-                onDataValueChange(
-                  event.target,
-                  entryFormType,
-                  entryFormStatusColors
-                );
-              }
-              event.preventDefault();
-            },
-            false
-          );
-
-          // Embed inline javascripts
-          // const scriptsContents = `
-          // try {${scriptsContentsArray.join('')}} catch(e) { console.log(e);}`;
-          // const script = document.createElement('script');
-          // script.type = 'text/javascript';
-          // script.innerHTML = scriptsContents;
-          // document.getElementById('_custom_entry_form')!.appendChild(script);
-        }
+        false,
+        this.getEnabledInputTagsOnHtmlContent()
       );
     }
   }
 
-  getEnabledInputTagsOnHtmlContent(sources?: SourceInterface[], thisComponent?: CustomFormComponent, html?: string){
-    let parser = new DOMParser();
-    const formDesign = parser.parseFromString(html!, 'text/html');
-    //Always disable input tags
-    let inputElements = formDesign.getElementsByTagName('input');
-
-
-
-
-    //Trying to get data existing after double clicking 
-    
-
-    //end
-
-    document.addEventListener('click', async function(event: any) {
-      if(event.target.name === 'entryfield'){
-        thisComponent?.openDialog(sources!, event.target.id);
-      }
-    })
+  getEnabledInputTagsOnHtmlContent() {
+    document.addEventListener('click', this.eventPopupListener, true);
   }
 
-  
-  async openDialog(sourcesToChoose: SourceInterface[], elementId: string): Promise<any> {
-      
+  eventPopupListener = (event: any) => {
+    event.preventDefault();
+    if (event.target.name === 'entryfield') {
+      this?.openDialog(this.sources!, event.target.id);
+    }
+  };
+
+  async openDialog(
+    sourcesToChoose: SourceInterface[],
+    elementId: string
+  ): Promise<any> {
     const dataValueFetchObject = {
       dataElementCategoryOptionCombo: elementId,
       sqlQuery: undefined,
@@ -200,18 +187,17 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       },
     };
 
-   this?.dataValueFetchService
+    this?.dataValueFetchService
       .getSingleDataValueFetch(dataValueFetchObject)
       .subscribe((dataValueFetch) => {
         this.dataValueFetch = dataValueFetch;
-
-        console.log('Data Value Fetching 1: ', this.dataValueFetch);
+        // console.log('Data Value Fetching 1: ', this.dataValueFetch);
       });
 
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    console.log('Data Value Fetching 2: ', this.dataValueFetch);
-   
+    // console.log('Data Value Fetching 2: ', this.dataValueFetch);
+
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
       // disableClose: true,
@@ -221,51 +207,64 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         query: this.dataValueFetch?.sqlQuery,
         source: this.dataValueFetch?.datasource,
         elementId: elementId,
-        id: this.dataValueFetch?.id
+        id: this.dataValueFetch?.id,
+        dataset: this.dataset,
       },
     });
 
     // console.log("Opened: "+ this.dataValueFetch);
 
-    dialogRef?.afterClosed().subscribe(result => {
-      if(result){
-          this.source = result.source;
-          this.query = result.query;
-          // console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.displayName+ ' Element ID: ' + result.elementId)
-          this.addDataValueFetch(this.source?.id, this.query, this.dataset?.id, result.elementId, result.id);
-          
-      } 
-      else{
-        console.log("No data found");  
+    dialogRef?.afterClosed().subscribe((result) => {
+      if (result) {
+        this.source = result.source;
+        this.query = result.query;
+        // console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.displayName+ ' Element ID: ' + result.elementId)
+        this.addDataValueFetch(
+          this.source?.id,
+          this.query,
+          this.dataset?.id,
+          result.elementId,
+          result.id
+        );
+      } else {
+        console.log('No data found');
         this.source = undefined;
         this.query = undefined;
-        
-      }  
+      }
+
+      // document.addEventListener('click', ()=>{});
+      //  document.removeEventListener('click', this.eventPopupListener);
 
       this.router!.routeReuseStrategy.shouldReuseRoute = () => false;
       this.router!.onSameUrlNavigation = 'reload';
       // this.router!.navigate(['/'], {
       //   relativeTo: this.route
       // })
-
     });
   }
 
-  addDataValueFetch(dataSource?: number, query?: string, dataset?: string,  elementCombo?: string, id?: any){
-    
+  addDataValueFetch(
+    dataSource?: number,
+    query?: string,
+    dataset?: string,
+    elementCombo?: string,
+    id?: any
+  ) {
     const dataValueFetchObject = {
-        id: id,
-        dataElementCategoryOptionCombo: elementCombo,
-        sqlQuery: query,
-        datasets: {
-            id: dataset,
-        },
-        datasource: {
-            id: dataSource,
-        },
-      }  
-    this.dataValueFetchService.addDataValueFetch(dataValueFetchObject).subscribe((dataValueFetch) => (this.dataValueFetchs?.push(dataValueFetch)));
-
+      id: id,
+      dataElementCategoryOptionCombo: elementCombo,
+      sqlQuery: query,
+      datasets: {
+        id: dataset,
+      },
+      datasource: {
+        id: dataSource,
+      },
+    };
+    this.dataValueFetchService
+      .addDataValueFetch(dataValueFetchObject)
+      .subscribe((dataValueFetch) =>
+        this.dataValueFetchs?.push(dataValueFetch)
+      );
   }
-
 }
