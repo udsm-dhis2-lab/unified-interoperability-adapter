@@ -107,7 +107,7 @@ export class ReportsComponent implements OnInit {
       }
       this.viewDatasetReport = true;
     }
-    // console.log(dataViewReport)
+    console.log(this.datasetValues);
 
   }
 

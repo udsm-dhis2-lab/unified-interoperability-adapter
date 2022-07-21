@@ -44,11 +44,8 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   dataValueFetch: any;
 
   constructor(
-    private dataValueFetchService: DataValueFetchService,
     private sanitizer?: DomSanitizer,
     public dialog?: MatDialog,
-    private router?: Router,
-    private route?: ActivatedRoute
   ) {
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
@@ -60,17 +57,6 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
 
     this.entryFormType = 'aggregate';
 
-    // document.body.addEventListener(
-    //   'dataValueUpdate',
-    //   (e: CustomEvent) => {
-    //     e.stopPropagation();
-    //     const dataValueObject = e.detail;
-    //     if (dataValueObject) {
-    //       this.dataValueUpdate.emit(dataValueObject);
-    //     }
-    //   },
-    //   false
-    // );
   }
 
   ngOnInit() {
@@ -127,40 +113,11 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
         this.entryFormStatusColors,
         this.isDataEntryLevel,
         scriptsContentsArray,
-        // this.getEnabledInputTagsOnHtmlContent(
-        //   this.dataSetFormDesign
-        // )
+        true,
         () => {
         }
       );
     }
   }
-  // getEnabledInputTagsOnHtmlContent(html?: string) {
-  //   let parser = new DOMParser();
-  //   const formDesign = parser.parseFromString(html!, 'text/html');
-   
-  //   //Always disable input tags
-  //   let inputElementsNodes = formDesign.getElementsByName('entryfield');
-  //   const inputElements = Array.from(inputElementsNodes);
-   
-  //   for(let inputElement of inputElements){
-  //     this.datasetValues?.some(
-  //       (object) => {
-  //         if(inputElement.getAttribute('id') === object.dataElementCategoryCombo){
-  //           (inputElement as HTMLInputElement).setAttribute("value", `${object.val}`);
-  //         }
-  //       }
-  //     );
-      
-  //     // console.log((inputElement as HTMLInputElement).value);
-  //   }
-  
-
-  // //   this.router!.routeReuseStrategy.shouldReuseRoute = () => false;
-  // //   this.router!.onSameUrlNavigation = 'reload';
-  // //   // this.router!.navigate(['/'], {
-  // //   //   relativeTo: this.route
-  // //   // })
-  // }
 }
 

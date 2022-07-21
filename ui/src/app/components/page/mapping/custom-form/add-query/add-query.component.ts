@@ -56,7 +56,7 @@ export class AddQueryComponent implements OnInit {
     );
     const dataValueFetchObject = {
       dataElementCategoryOptionCombo: undefined,
-      SqlQuery: this.data.query,
+      sqlQuery: this.data.query,
       datasets: {
         id: undefined,
       },
@@ -69,7 +69,10 @@ export class AddQueryComponent implements OnInit {
 
 
     // console.log('Data for testing:', dates);
-    this.dataValueFetchService?.testDataValueFetchQuery(dataValueFetchObject).subscribe((value) => (this.testValue = value));
+    this.dataValueFetchService?.testDataValueFetchQuery(dataValueFetchObject).subscribe({
+      next: (value) => (this.testValue = value),
+      error: (err) => console.log("error occured")
+    });
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
