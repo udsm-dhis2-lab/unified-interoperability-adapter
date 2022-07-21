@@ -51,11 +51,9 @@ public class DataSetElementsController {
         // connect to database
         Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName,dataSourcePassword);
         ResultSet rs = con.prepareStatement(newQuery).executeQuery();
-         while (rs.next()) {
-        } 
-        
+        while (rs.next()) {
         dataSetElementsService.addDataSetElements(dataSetElements);     
-        
+        }
         return dataSetElements;    
     }
 
@@ -72,12 +70,10 @@ public class DataSetElementsController {
        String periodEnd = dataSetElements.getPeriodEnd();
 
        //Query manipulation
-       String newQuery = query.replaceAll("\\$\\{period-start\\}", periodStart).replaceAll("\\$\\{period-end\\}",
-               periodEnd);
+       String newQuery = query.replaceAll("\\$\\{period-start\\}",periodStart).replaceAll("\\$\\{period-end\\}",periodEnd);
 
        Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
        ResultSet rs = con.prepareStatement(newQuery).executeQuery();
-
        rs.next();
        return rs.getString(1);   
     }
