@@ -92,8 +92,7 @@ public class DataSetsService {
             System.out.println(e.getMessage());
         }
 
-        return remoteDataSetsList;
-        
+        return remoteDataSetsList; 
     }
 
     public Datasets AddDataSets(Datasets datasets) {
@@ -127,7 +126,6 @@ public class DataSetsService {
             reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             while ((line = reader.readLine()) != null) {
                 responseContent.append(line);
-
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());

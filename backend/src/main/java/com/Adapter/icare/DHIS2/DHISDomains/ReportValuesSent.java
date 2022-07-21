@@ -9,4 +9,5 @@ public class ReportValuesSent {
     private String datasetId;
     private String periodStart;
     private String periodEnd;
+    private String period;
 }

@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import com.Adapter.icare.Constants.DHISConstants;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValueSets;
+import com.Adapter.icare.DHIS2.DHISDomains.DataValues;
+import com.Adapter.icare.DHIS2.DHISDomains.DhisAggregateValues;
 import com.Adapter.icare.DHIS2.DHISDomains.ReportValuesSent;
 import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
 import com.Adapter.icare.Domains.DataSetElements;
@@ -35,11 +38,11 @@ public class ReportsController {
         List<DataValueSets> dvslist = new ArrayList<DataValueSets>();
         List<DataSetElements> dSetElementsList = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
       
-        for (DataSetElements dataSetElements : dSetElementsList) {
+        for (DataSetElements dataSetElement : dSetElementsList) {
 
-            String dataElementId = dataSetElements.getDataElement();
-            String categoryComboId = dataSetElements.getCategoryOptionCombo();
-            String query = dataSetElements.getSqlQuery();
+            String dataElementId = dataSetElement.getDataElement();
+            String categoryComboId = dataSetElement.getCategoryOptionCombo();
+            String query = dataSetElement.getSqlQuery();
             String periodStart = reportValuesSent.getPeriodStart();
             String periodEnd = reportValuesSent.getPeriodEnd();
             
@@ -47,9 +50,9 @@ public class ReportsController {
             String newQuery = query.replaceAll("\\$\\{period-start\\}",periodStart).replaceAll("\\$\\{period-end\\}",periodEnd);
 
             //Query execution
-            String dataSourceUrl = dataSetElements.getDatasource().getUrl();
-            String dataSourceUserName = dataSetElements.getDatasource().getUsername();
-            String dataSourcePassword = dataSetElements.getDatasource().getPassword();
+            String dataSourceUrl = dataSetElement.getDatasource().getUrl();
+            String dataSourceUserName = dataSetElement.getDatasource().getUsername();
+            String dataSourcePassword = dataSetElement.getDatasource().getPassword();
             Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
             ResultSet rs = con.prepareStatement(newQuery).executeQuery();
             rs.next();
@@ -61,6 +64,53 @@ public class ReportsController {
         }
         return dvslist;
     }
+
+    @PostMapping("/sendValues")
+    public void SendDataToDHIS(@RequestBody ReportValuesSent reportValuesSent) throws SQLException{
+
+        DHISConstants constant = new DHISConstants();
+        List<DhisAggregateValues> dhisAggregateValues = new ArrayList<DhisAggregateValues>();
+        List<DataValues> dataValues = new ArrayList<DataValues>();
+        List<DataSetElements> dSetElements = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
+        String datasetId = reportValuesSent.getDatasetId();
+        String period = reportValuesSent.getPeriod();
+        String completeDate = java.time.LocalDate.now().toString();
+        String attributeOptCombo = "";
+        String orgUnitId = constant.OrgUnit; 
+
+        for (DataSetElements dataSetElement : dSetElements) {
+            
+            String dataElementId = dataSetElement.getDataElement();
+            String categoryOptionComboId = dataSetElement.getCategoryOptionCombo();
+            String query = dataSetElement.getSqlQuery();
+            String periodStart = reportValuesSent.getPeriodStart();
+            String periodEnd = reportValuesSent.getPeriodEnd();
+
+            // Query manipulation
+            String newQuery = query.replaceAll("\\$\\{period-start\\}", periodStart).replaceAll("\\$\\{period-end\\}",
+                    periodEnd);
+
+            // Query execution
+            String dataSourceUrl = dataSetElement.getDatasource().getUrl();
+            String dataSourceUserName = dataSetElement.getDatasource().getUsername();
+            String dataSourcePassword = dataSetElement.getDatasource().getPassword();
+            Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
+            ResultSet rs = con.prepareStatement(newQuery).executeQuery();
+            rs.next();
+            String queryResult = rs.getString(1);
+            
+            //Adding the data values
+            dataValues.add(new DataValues(dataElementId, categoryOptionComboId,queryResult,""));
+        }
+
+        dhisAggregateValues.add(new DhisAggregateValues(datasetId, completeDate, period, orgUnitId,attributeOptCombo,dataValues));
+
+        reportsService.SendDataToDHIS(dhisAggregateValues,datasetId);
+
+    }
+
+
+   
 
 
     
