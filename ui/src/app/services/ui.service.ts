@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { fromEvent, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -39,5 +39,10 @@ export class UiService {
   onToggleAddDatasetForm(): Observable<any> {
     return this.subject.asObservable();
   }
+
+  clickEvent(): Observable<any> {
+    return fromEvent(document, 'click')
+  }
+
 }
 

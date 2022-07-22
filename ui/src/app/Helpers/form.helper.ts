@@ -59,6 +59,14 @@ export function onFormReady(
   forReporting: boolean,
   formReady: any
 ) {
+  //Set values if any
+  if (forReporting) {
+    dataValues.dataValues.map((dataValue: any) => {
+      let element = document.getElementById(dataValue.id);
+      element?.setAttribute('value', dataValue.val);
+    });
+  }
+
   // Find table elements and set bootstrap classes
   const tableElements = document.getElementsByTagName('TABLE');
   _.each(tableElements, (tableElement: any) => {
@@ -139,25 +147,19 @@ export function onFormReady(
           inputElement.setAttribute('class', 'entryfield form-control');
           if (forReporting) {
             inputElement.setAttribute('disabled', forReporting);
+            inputElement.style.pointerEvents = 'none';
           }
         }
       }
     } else {
       inputElement.setAttribute('type', 'number'); // by default if no valuetype make input type number
       inputElement.setAttribute('class', 'entryfield form-control text-center');
-      if(forReporting){
+      if (forReporting) {
         inputElement.setAttribute('disabled', forReporting);
+        inputElement.style.pointerEvents = 'none';
       }
     }
   });
-
-  //Set values if any
-  if(forReporting){
-    dataValues.dataValues.map((dataValue: any) => {
-      let element = document.getElementById(dataValue.id);
-      element?.setAttribute('value', dataValue.val);
-    });
-  }
 
   // formReady(formType, entryFormStatusColors, scriptsContentsArray);
 }

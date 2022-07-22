@@ -1,3 +1,5 @@
+import { ReportsService } from 'src/app/services/reports/reports.service';
+import { UiService } from 'src/app/services/ui.service';
 import { DataValueFetchService } from '../../../../services/dataValueFetch/data-value-fetch.service';
 import { DatasetInterface, DataValueFetchInterface } from '../../../../resources/interfaces';
 import {
@@ -16,6 +18,7 @@ import { SourceInterface } from 'src/app/resources/interfaces';
 import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { values } from 'lodash';
 
 @Component({
   selector: 'app-dataset-view-form',
@@ -34,6 +37,8 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   @Input() datasetValues: any[] | undefined;
 
   @Output() dataValueUpdate: EventEmitter<any> = new EventEmitter<any>();
+  
+  @Input() sendingObject: any;
 
   _htmlMarkup: SafeHtml | undefined;
   hasScriptSet: boolean | undefined;
@@ -44,8 +49,10 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   dataValueFetch: any;
 
   constructor(
+    private uiService: UiService,
     private sanitizer?: DomSanitizer,
     public dialog?: MatDialog,
+    private reportService?: ReportsService
   ) {
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
@@ -119,5 +126,11 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
       );
     }
   }
+
+  sendReport(){
+    console.log(this.sendingObject)
+    this.reportService?.sendReport(this.sendingObject).subscribe((values) => console.log(values));
+  }
+
 }
 

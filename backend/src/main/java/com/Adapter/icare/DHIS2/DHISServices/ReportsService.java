@@ -54,7 +54,7 @@ public class ReportsService {
             String username = dataset.get().getInstances().getUsername();
             String password = dataset.get().getInstances().getPassword();
             
-            url = new URL(instanceUrl.concat("api/dataValueSets"));
+            url = new URL(instanceUrl.concat("/api/dataValueSets"));
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             String userCredentials = username.concat(":").concat(password);
             String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));

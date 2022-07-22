@@ -1,6 +1,11 @@
 <div class="custom-entry-form" id="_custom_entry_form">
   <div class="row">
     <div class="col-12">
+      <button class="btn btn-outline-success" (click)="sendReport()"> Send to DHIS2</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
       <div [innerHTML]="_htmlMarkup"></div>
     </div>
   </div>
