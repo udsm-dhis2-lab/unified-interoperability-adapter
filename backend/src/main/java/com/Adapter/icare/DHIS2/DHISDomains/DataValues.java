@@ -10,8 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataValues {
-    private String dataElementId;
-    private String categoryOptionComboId;
+    private String dataElement;
+    private String categoryOptionCombo;
     private String value;
     private String comment;
 }

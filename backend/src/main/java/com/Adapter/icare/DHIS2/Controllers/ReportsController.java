@@ -66,10 +66,9 @@ public class ReportsController {
     }
 
     @PostMapping("/sendValues")
-    public void SendDataToDHIS(@RequestBody ReportValuesSent reportValuesSent) throws SQLException{
+    public String SendDataToDHIS(@RequestBody ReportValuesSent reportValuesSent) throws SQLException{
 
         DHISConstants constant = new DHISConstants();
-        List<DhisAggregateValues> dhisAggregateValues = new ArrayList<DhisAggregateValues>();
         List<DataValues> dataValues = new ArrayList<DataValues>();
         List<DataSetElements> dSetElements = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
         String datasetId = reportValuesSent.getDatasetId();
@@ -103,15 +102,10 @@ public class ReportsController {
             dataValues.add(new DataValues(dataElementId, categoryOptionComboId,queryResult,""));
         }
 
-        dhisAggregateValues.add(new DhisAggregateValues(datasetId, completeDate, period, orgUnitId,attributeOptCombo,dataValues));
+        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetId, completeDate,period, orgUnitId,attributeOptCombo,dataValues);
 
-        reportsService.SendDataToDHIS(dhisAggregateValues,datasetId);
+        return reportsService.SendDataToDHIS(dhisAggregateValues,datasetId);
 
     }
-
-
-   
-
-
     
 }

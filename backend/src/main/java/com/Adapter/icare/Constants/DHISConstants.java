@@ -5,5 +5,5 @@ public class DHISConstants {
     public final String DHIS2Instance = "https://tland.dhis2.udsm.ac.tz";
     public final String DHIS2Username = "dkibahila";
     public final String DHIS2Password = "Jezzy@1234";
-    public final String OrgUnit = "sfcNsVOQubY"; // ABIGA Maternity Home
+    public final String OrgUnit = "a6eqFyAF1Rz"; //AAR TABATA Other Clinic
 }
