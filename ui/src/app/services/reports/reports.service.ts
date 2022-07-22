@@ -31,7 +31,7 @@ export class ReportsService {
   // }
 
   sendReport(payload: any): Observable<any> {
-    const url = `${this.apiUrl}`;
+    const url = `${this.apiUrl}/sendValues`;
     return this.httpClient.post<any>(url, payload, httpOptions);
   }
 }

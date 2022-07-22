@@ -25,6 +25,7 @@ export class ReportsComponent implements OnInit {
   period?: any;
   viewDatasetReport: boolean = false;
   datasetValues: any;
+  sendingObject: any
 
   constructor(
     private datasetsService: DatasetsService,
@@ -78,6 +79,7 @@ export class ReportsComponent implements OnInit {
       periodEnd: this.period.lastDate,
       datasetId: this.dataset?.id,
     }
+
     console.log(this.periodValue)
     if (this.dataset && this.periodValue >= 0  && this.instance){
       // this.reportsService
@@ -105,6 +107,14 @@ export class ReportsComponent implements OnInit {
       this.datasetValues  = {
         dataValues: datasetValues
       }
+
+      this.sendingObject = {
+        periodStart: this.period.firstDate,
+        periodEnd: this.period.lastDate,
+        datasetId: this.dataset.id,
+        period: this.periodFilter?.getperiod(this.dataset.periodType!, this.period.firstDate)
+      };
+
       this.viewDatasetReport = true;
     }
     console.log(this.datasetValues);

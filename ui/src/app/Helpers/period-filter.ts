@@ -140,6 +140,21 @@ export class PeriodFilter {
       };
     } else return undefined;
   }
+
+  getperiod(_periodType: string, date: string){
+
+    let year = new Date(date).getFullYear();
+    let month = new Date(date).getMonth()+1;
+
+    switch(_periodType) {
+      case 'Yearly' : 
+        return `${year}`
+      case 'Monthly':
+        let value = String(month).length > 1 ? String(month) : `0${month}` 
+        return `${year}${value}`;
+      default : return "Not supported";
+    }
+  }
 }
 
 

@@ -1,3 +1,4 @@
+import { UiService } from 'src/app/services/ui.service';
 import { PeriodFilter } from './../../../../Helpers/period-filter';
 import { DataValueFetchService } from './../../../../services/dataValueFetch/data-value-fetch.service';
 import {
@@ -63,12 +64,14 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     contentHeight: '300px',
   };
   selectedPeriodItems: any[] = [];
+  dialogOpened: boolean = false;
   /**
    * End of period filter
    */
 
   constructor(
     private dataValueFetchService: DataValueFetchService,
+    private uiServices: UiService,
     private sanitizer?: DomSanitizer,
     private elementRef?: ElementRef,
     public dialog?: MatDialog,
@@ -161,14 +164,21 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     }
   }
 
+  
+
   getEnabledInputTagsOnHtmlContent() {
-    document.addEventListener('click', this.eventPopupListener, true);
+    let sub = this.uiServices.clickEvent().subscribe((event) => {
+      this.eventPopupListener(event);
+    });
   }
 
   eventPopupListener = (event: any) => {
     event.preventDefault();
     if (event.target.name === 'entryfield') {
-      this?.openDialog(this.sources!, event.target.id);
+      if(!this.dialogOpened){
+        this?.openDialog(this.sources!, event.target.id);
+        this.dialogOpened = true;
+      }
     }
   };
 
@@ -215,6 +225,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     // console.log("Opened: "+ this.dataValueFetch);
 
     dialogRef?.afterClosed().subscribe((result) => {
+      this.dialogOpened = false;
       if (result) {
         this.source = result.source;
         this.query = result.query;

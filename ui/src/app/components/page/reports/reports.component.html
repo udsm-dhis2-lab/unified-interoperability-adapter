@@ -59,7 +59,7 @@
         </form>
         <div class="row mt-5" *ngIf="viewDatasetReport"> 
             <div class="col-12">
-                <app-dataset-view-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset?.formDesignCode" [dataSetDataValues]="{}" [dataset]="dataset" [datasetValues]="datasetValues">
+                <app-dataset-view-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset?.formDesignCode" [dataSetDataValues]="{}" [dataset]="dataset" [datasetValues]="datasetValues" [sendingObject]="sendingObject">
                 </app-dataset-view-form>
             </div>
         </div>
