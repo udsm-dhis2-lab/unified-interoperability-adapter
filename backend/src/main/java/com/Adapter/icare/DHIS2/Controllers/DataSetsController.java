@@ -40,8 +40,13 @@ public class DataSetsController {
     public List<RemoteDatasets> getDHIS2DataSets(@PathVariable("instanceId") long instanceId){
 
         return dataSetsService.getDhis2DataSets(instanceId);
-
     } 
+
+    @GetMapping("/remote/{instanceId}/{searchTerm}")
+    public List<RemoteDatasets> getSearchedDataset(@PathVariable("instanceId") long instanceId,@PathVariable("searchTerm") String searchTerm){
+
+        return dataSetsService.getSearchedDataset(instanceId,searchTerm);
+    }
 
     @PostMapping
     public Datasets AddDataSets(@RequestBody Datasets datasets){
