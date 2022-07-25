@@ -155,5 +155,60 @@ public class DataSetsService {
         }
         dataSetsRepository.deleteById(datasetId);
     }
+
+    public List<RemoteDatasets> getSearchedDataset(long instanceId, String searchTerm) {
+
+       //Searching datasets 
+       URL url;
+       BufferedReader reader;
+       String line;
+       StringBuffer responseContent = new StringBuffer();
+       List<RemoteDatasets> remoteDataSetsList = new ArrayList<RemoteDatasets>();
+       Optional<Instances> instance = instancesRepository.findById(instanceId);
+
+       try {
+
+           String instanceurl = instance.get().getUrl();
+           String username = instance.get().getUsername();
+           String password = instance.get().getPassword();
+
+           url = new URL(instanceurl.concat("/api/dataSets?query="+searchTerm));
+
+           HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+           String userCredentials = username.concat(":").concat(password);
+           String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+           httpURLConnection.setRequestProperty("Authorization", basicAuth);
+           httpURLConnection.setRequestMethod("GET");
+           httpURLConnection.setRequestProperty("Content-Type", "application/json");
+
+           // int status = httpURLConnection.getResponseCode();
+
+           reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+           while ((line = reader.readLine()) != null) {
+               responseContent.append(line);
+
+           }
+           reader.close();
+           JSONObject jsObject = new JSONObject(responseContent.toString());
+           JSONArray js = jsObject.getJSONArray("dataSets");
+           // System.out.println(js);
+
+           for (Object ab : js) {
+
+               JSONObject ourDsObject = new JSONObject(ab.toString());
+               Map<String, Object> remoteDataSetMap = new HashMap<String, Object>();
+               remoteDataSetMap.put("id", ourDsObject.getString("id"));
+               remoteDataSetMap.put("displayName", ourDsObject.getString("displayName"));
+               RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
+               remoteDataSetsList.add(remoteDataSetToAdd);
+           }
+
+       } catch (Exception e) {
+           System.out.println(e.getMessage());
+       }
+
+       return remoteDataSetsList;
+    }
     
 }
