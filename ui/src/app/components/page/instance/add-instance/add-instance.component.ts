@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { InstanceInterface } from 'src/app/resources/interfaces';
 import { UiService } from 'src/app/services/ui.service';
@@ -15,7 +15,8 @@ export class AddInstanceComponent implements OnInit {
   password: string = "";
   url: string = "";
 
-  showAddInstanceForm: boolean = false;
+  @Input() showAddInstanceForm?: boolean;
+  
   subscription: Subscription | undefined;
 
   @Output() onAddInstance: EventEmitter<InstanceInterface> = new EventEmitter();

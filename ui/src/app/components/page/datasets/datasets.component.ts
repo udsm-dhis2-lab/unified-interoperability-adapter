@@ -28,6 +28,7 @@ export class DatasetsComponent implements OnInit {
   faCheck = faCheck;
   faCancel = faCancel;
   faMultiply = faMultiply;
+  datasetName?: string;
 
   constructor(
       private datasetsService: DatasetsService, 
@@ -41,6 +42,7 @@ export class DatasetsComponent implements OnInit {
     }
 
   ngOnInit(): void {
+    
     this.instancesService.getInstances().subscribe((instances) => (this.instances = instances));
 
     //Get all datasets
@@ -82,8 +84,12 @@ export class DatasetsComponent implements OnInit {
     if(!instance){
       this.instanceDatasets = undefined;    
     }
-
-
+  }
+  
+  searchInstanceDatasets(){
+    // console.log(this.instance.id, ' and ', this.datasetName);
+    this.instanceDatasetsService.searchInstanceDatasets(this.instance.id!, this.datasetName!).subscribe((instanceDatasets) => (this.instanceDatasets = instanceDatasets)); 
+    
   }
 
   datasetExisting(instanceDataset: InstanceDatasetsInterface){

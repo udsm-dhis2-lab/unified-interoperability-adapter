@@ -23,12 +23,17 @@ export class AddDatasetComponent implements OnInit {
 
   @Output() onAddDataset: EventEmitter<DatasetInterface> = new EventEmitter();
   @Output() onfilterDatasets: EventEmitter<InstanceInterface> = new EventEmitter();
+  loading: any;
   
   constructor(private uiService?: UiService) {
    }
 
   ngOnInit(): void {
+    setTimeout(() => {
+      this.loading = this.uiService?.loading$;
+    }, 0);
   }
+  
 
   filterDatasets(){
     this.onfilterDatasets.emit(this.instance)

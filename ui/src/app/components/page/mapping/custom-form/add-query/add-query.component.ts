@@ -32,9 +32,16 @@ export class AddQueryComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.periods = this.periodFilter?.filterPeriod(
-      this.data.dataset?.periodType!
-    );
+
+    if (this.data.dataset?.periodType! === 'Weekly') {
+      this.periods = this.periodFilter?.filterPeriod(this.data.dataset?.periodType!, 2022);
+    } else {
+      this.periods = this.periodFilter?.filterPeriod(this.data.dataset?.periodType!);
+    }
+
+    // this.periods = this.periodFilter?.filterPeriod(
+    //   this.data.dataset?.periodType!
+    // );
     this.source = this.data.source
     console.log("Source: ",this.source)
   }

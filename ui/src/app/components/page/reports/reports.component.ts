@@ -65,14 +65,21 @@ export class ReportsComponent implements OnInit {
 
 
   checkDataset(dataset: DatasetInterface) {
+
+    // this.periods = this.periodFilter?.filterPeriod('Weekly', 2020);
+    
     this.viewDatasetReport = false;
     this.dataset = dataset;
-    this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!);
+    if (this.dataset?.periodType! === 'Weekly') {
+      this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!, 2019);
+    } else {
+      this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!);
+    }
   }
 
   async viewReport(){
     this.period = this.periodFilter?.calculateDates(this.dataset?.periodType!, this.periodValue);
-    console.log(this.period)
+    
 
     let dataViewReport = {
       periodStart: this.period.firstDate,
@@ -90,7 +97,7 @@ export class ReportsComponent implements OnInit {
       //   );
       // this.viewDatasetReport = true;
       let datasetValues;
-      this.reportsService.viewReport(dataViewReport).subscribe(
+      await this.reportsService.viewReport(dataViewReport).subscribe(
         (data) =>
           (datasetValues = data.map((value: any) => {
             return {
@@ -102,7 +109,7 @@ export class ReportsComponent implements OnInit {
           }))
       );
 
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       this.datasetValues  = {
         dataValues: datasetValues

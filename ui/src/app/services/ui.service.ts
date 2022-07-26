@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { fromEvent, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, fromEvent, Observable, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +10,8 @@ export class UiService {
   private showAddInstanceForm: boolean = false;
   private showAddDatasetForm: boolean = false;
   private subject = new Subject<any>();
+  private _loading = new BehaviorSubject<boolean>(false);
+  public readonly loading$ = this._loading.asObservable();
 
   constructor() {}
 
@@ -42,6 +44,14 @@ export class UiService {
 
   clickEvent(): Observable<any> {
     return fromEvent(document, 'click')
+  }
+
+  show(){
+    this._loading.next(true);
+  }
+
+  hide(){
+    this._loading.next(false);
   }
 
 }
