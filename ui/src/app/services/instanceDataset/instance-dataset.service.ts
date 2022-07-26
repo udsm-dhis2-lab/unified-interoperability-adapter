@@ -23,6 +23,11 @@ export class InstanceDatasetsService {
     let url = `${this.apiUrl}/remote/${instanceId}`;
     return this.httpClient.get<InstanceDatasetsInterface[]>(url);
   }
+  
+  searchInstanceDatasets(instanceId: number, datasetName: string): Observable<InstanceDatasetsInterface[]> {
+    let url = `${this.apiUrl}/remote/${instanceId}/${datasetName}`;
+    return this.httpClient.get<InstanceDatasetsInterface[]>(url);
+  }
 
   deleteInstanceDataset(instanceDataset: InstanceDatasetsInterface): Observable<InstanceDatasetsInterface> {
     const url = `${this.apiUrl}/${instanceDataset.id}`;

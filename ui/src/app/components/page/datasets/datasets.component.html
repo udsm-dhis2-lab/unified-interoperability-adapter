@@ -16,9 +16,23 @@
         <div class="row" *ngIf="instanceDatasets">
             <div class="col-12">
                 <div class="row mt-5">
-                    <div class="col-10 ">
+                    <div class="col-6">
                         <div class="mb-3">
                             <h4 class="text-center"> Add/Remove Dataset</h4>
+                        </div>
+                    </div>
+                    <div class="col-6 ">
+                        <div class="mb-3">
+                            <form class="form">
+                                <div class="row form-group">
+                                    <div class="col-10">
+                                        <input type="text" [(ngModel)]="datasetName" class=" form-control" name="datasetName" [value]="datasetName">
+                                    </div>
+                                    <div class="col-2">
+                                        <input type="submit" class="btn btn-outline-success form-control" value="Search" (click)="searchInstanceDatasets()">
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>

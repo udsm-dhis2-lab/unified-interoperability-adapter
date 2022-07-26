@@ -112,16 +112,11 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onPeriodUpdate(periodObject: any, action: string): void {
-    this.periodObject = periodObject;
-  }
-
   ngAfterViewInit() {
     this.setScriptsOnHtmlContent(
       this.getScriptsContents(this.dataSetFormDesign)
     );
 
-    // console.log("Dataset We need: ",this.dataset)
   }
 
   getScriptsContents(html: any) {
@@ -167,7 +162,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   
 
   getEnabledInputTagsOnHtmlContent() {
-    let sub = this.uiServices.clickEvent().subscribe((event) => {
+    this.uiServices.clickEvent().subscribe((event) => {
       this.eventPopupListener(event);
     });
   }
@@ -210,7 +205,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
 
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
-      // disableClose: true,
       width: '50%',
       data: {
         sources: sourcesToChoose,

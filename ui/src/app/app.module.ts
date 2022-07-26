@@ -1,10 +1,14 @@
+import { NetworkInterceptor } from './interceptors/network/network.interceptor';
 import { NgModule, enableProdMode } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { MatToolbarModule } from '@angular/material/toolbar'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner'
+import { MatButtonModule } from '@angular/material/button'
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/core/header/header.component';
@@ -62,6 +66,9 @@ import { PeriodFilter } from './Helpers/period-filter';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
+    MatToolbarModule,
     RouterModule,
     HttpClientModule,
     FontAwesomeModule,
@@ -85,6 +92,11 @@ import { PeriodFilter } from './Helpers/period-filter';
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'fill' },
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: NetworkInterceptor,
+      multi: true,
     },
     PeriodFilter,
   ],

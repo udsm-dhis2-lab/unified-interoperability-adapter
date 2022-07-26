@@ -38,8 +38,28 @@ export class InstanceComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {
-    this.instancesService.getInstances().subscribe((instances) => (this.instances = instances));
+  async ngOnInit(): Promise<void> {
+    
+    this.instancesService.getInstances().subscribe({
+      next: async (instances) => {
+        this.instances = instances;
+
+        if (this.instances) {
+          this.showAddInstanceForm = false;
+        } else this.showAddInstanceForm = true;
+        
+      }
+      
+    });
+    console.log("Available: ",this.instances)
+
+    // while(!this.instances){
+    //   console.log("Available: ",this.instances)
+    // }
+    
+    
+    
+
   }
 
   onToggle(){

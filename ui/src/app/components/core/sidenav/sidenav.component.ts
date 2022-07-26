@@ -1,23 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
-  styleUrls: ['./sidenav.component.css']
+  styleUrls: ['./sidenav.component.css'],
 })
 export class SidenavComponent implements OnInit {
+  @Input() opened?: boolean;
 
-  showSidenav: boolean = false;
+  showSidenav: boolean = true;
 
   back: string = '<';
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
-  changeIcon(){
+  changeIcon() {
     this.showSidenav = !this.showSidenav;
   }
-
 }
