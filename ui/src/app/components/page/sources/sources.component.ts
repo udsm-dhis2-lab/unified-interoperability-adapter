@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { SourceInterface } from '../../../resources/interfaces';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'; 
 import { SourcesService } from 'src/app/services/sources/sources.service';
 import { UiService } from 'src/app/services/ui.service';
@@ -7,6 +6,7 @@ import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { EditSourceComponent } from './edit-source/edit-source.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SourceInterface } from 'src/app/models/source.model';
 
 @Component({
   selector: 'app-sources',

@@ -1,7 +1,7 @@
 import { ReportsService } from 'src/app/services/reports/reports.service';
 import { UiService } from 'src/app/services/ui.service';
 import { DataValueFetchService } from '../../../../services/dataValueFetch/data-value-fetch.service';
-import { DatasetInterface, DataValueFetchInterface } from '../../../../resources/interfaces';
+import { DataValueFetchInterface } from '../../../../resources/interfaces';
 import {
   Component,
   OnInit,
@@ -14,11 +14,11 @@ import {
 import * as _ from 'lodash';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { onFormReady, onDataValueChange } from 'src/app/Helpers/form.helper';
-import { SourceInterface } from 'src/app/resources/interfaces';
 import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { values } from 'lodash';
+import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
 
 @Component({
   selector: 'app-dataset-view-form',

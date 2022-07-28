@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { DatasetInterface } from 'src/app/resources/interfaces';
+import { DatasetInterface } from 'src/app/models/source.model';
 
 const httpOptions = {
   headers: new HttpHeaders({
