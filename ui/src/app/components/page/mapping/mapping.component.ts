@@ -1,7 +1,8 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Data } from '@angular/router';
-import { DatasetInterface, InstanceDatasetsInterface, InstanceInterface, SourceInterface } from 'src/app/resources/interfaces';
+import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
+import { InstanceDatasetsInterface, InstanceInterface } from 'src/app/resources/interfaces';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
 import { InstancesService } from 'src/app/services/instances/instances.service';

@@ -2,7 +2,6 @@ import { UiService } from 'src/app/services/ui.service';
 import { PeriodFilter } from './../../../../Helpers/period-filter';
 import { DataValueFetchService } from './../../../../services/dataValueFetch/data-value-fetch.service';
 import {
-  DatasetInterface,
   DataValueFetchInterface,
 } from './../../../../resources/interfaces';
 import {
@@ -17,11 +16,11 @@ import {
 import * as _ from 'lodash';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { onFormReady, onDataValueChange } from 'src/app/Helpers/form.helper';
-import { SourceInterface } from 'src/app/resources/interfaces';
 import { AddQueryComponent } from './add-query/add-query.component';
 import { MatDialog } from '@angular/material/dialog';
-import { map } from 'rxjs';
+import { first } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
+import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
 
 @Component({
   selector: 'app-custom-form',
@@ -79,6 +78,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     private route?: ActivatedRoute,
     private periodFilter?: PeriodFilter
   ) {
+
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
       WAIT: '#fffe8c',
@@ -89,17 +89,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
 
     this.entryFormType = 'aggregate';
 
-    // document.body.addEventListener(
-    //   'dataValueUpdate',
-    //   (e: CustomEvent) => {
-    //     e.stopPropagation();
-    //     const dataValueObject = e.detail;
-    //     if (dataValueObject) {
-    //       this.dataValueUpdate.emit(dataValueObject);
-    //     }
-    //   },
-    //   false
-    // );
+   
   }
 
   ngOnInit() {
@@ -162,14 +152,27 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   
 
   getEnabledInputTagsOnHtmlContent() {
-    this.uiServices.clickEvent().subscribe((event) => {
-      this.eventPopupListener(event);
+    // this.uiServices.clickEvent().pipe().subscribe((event) => {
+    //   if(event){
+    //     event.stopPropagation();
+    //     console.log("Event in Popup: ", event)
+    //     this.eventPopupListener(event);
+    //   }
+    // });
+    document.getElementsByName('entryfield').forEach((element)=>{
+        if(element){
+          element.addEventListener('click', (event) => {
+            this.eventPopupListener(event)
+          })
+        }
     });
+
+
   }
 
   eventPopupListener = (event: any) => {
-    event.preventDefault();
     if (event.target.name === 'entryfield') {
+      console.log(event)
       if(!this.dialogOpened){
         this?.openDialog(this.sources!, event.target.id);
         this.dialogOpened = true;

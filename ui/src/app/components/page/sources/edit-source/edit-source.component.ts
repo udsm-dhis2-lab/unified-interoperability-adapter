@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { SourceInterface } from 'src/app/resources/interfaces';
+import { SourceInterface } from 'src/app/models/source.model';
 
 @Component({
   selector: 'app-edit-source',
