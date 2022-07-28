@@ -1,7 +1,8 @@
-import { SourceInterface } from './../../../../resources/interfaces';
+
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { UiService } from 'src/app/services/ui.service';
 import { Subscription } from 'rxjs';
+import { SourceInterface } from 'src/app/models/source.model';
 
 @Component({
   selector: 'app-add-source',

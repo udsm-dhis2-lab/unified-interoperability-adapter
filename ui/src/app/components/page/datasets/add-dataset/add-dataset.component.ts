@@ -1,9 +1,10 @@
 import { InstancesService } from 'src/app/services/instances/instances.service';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { DatasetInterface, InstanceInterface } from 'src/app/resources/interfaces';
+import { InstanceInterface } from 'src/app/resources/interfaces';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { UiService } from 'src/app/services/ui.service';
+import { DatasetInterface } from 'src/app/models/source.model';
 
 @Component({
   selector: 'app-add-dataset',

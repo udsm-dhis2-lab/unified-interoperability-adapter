@@ -1,4 +1,4 @@
-import { DatasetInterface, InstanceInterface, PeriodInterface } from './../../../resources/interfaces';
+import { InstanceInterface, PeriodInterface } from './../../../resources/interfaces';
 import { Component, OnInit } from '@angular/core';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
@@ -7,6 +7,7 @@ import { PeriodFilter } from 'src/app/Helpers/period-filter';
 import { ReportsService } from 'src/app/services/reports/reports.service';
 import { map } from 'lodash';
 import { subscribeOn } from 'rxjs';
+import { DatasetInterface } from 'src/app/models/source.model';
 
 @Component({
   selector: 'app-reports',

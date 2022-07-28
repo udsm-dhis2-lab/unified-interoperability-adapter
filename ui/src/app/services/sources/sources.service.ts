@@ -1,7 +1,7 @@
-import { SourceInterface } from './../../resources/interfaces';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { SourceInterface } from 'src/app/models/source.model';
 
 
 const httpOptions = {
