@@ -183,7 +183,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   async openDialog(
     sourcesToChoose: SourceInterface[],
     elementId: string
-  ): Promise<any> {
+  ) {
     const dataValueFetchObject = {
       dataElementCategoryOptionCombo: elementId,
       sqlQuery: undefined,
