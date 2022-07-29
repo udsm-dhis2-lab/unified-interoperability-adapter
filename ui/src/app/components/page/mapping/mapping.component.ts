@@ -89,7 +89,11 @@ export class MappingComponent implements OnInit {
     }
   }
 
-  checkDataset(dataset: DatasetInterface){
+  async checkDataset(dataset: DatasetInterface){
+    this.dataset = undefined
+
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
     this.dataset = dataset
   }
   
