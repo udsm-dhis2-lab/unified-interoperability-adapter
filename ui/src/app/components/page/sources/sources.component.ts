@@ -55,7 +55,8 @@ export class SourcesComponent implements OnInit {
           this.messageType = 'success';
         },
         error: (error) => {
-          this.message = error.error.message;
+          this.message = "Couldn't delete the source."
+          console.log(error.error.message);
           this.messageType = 'danger';
         }
       });
