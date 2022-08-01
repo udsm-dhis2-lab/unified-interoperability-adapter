@@ -7,6 +7,7 @@ import { SourcesService } from 'src/app/services/sources/sources.service';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { PeriodFilter } from 'src/app/Helpers/period-filter';
 import { QueryData, SourceInterface } from 'src/app/models/source.model';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-add-query',
@@ -65,13 +66,12 @@ export class AddQueryComponent implements OnInit {
     console.log('On Save ', sourceSelected);
   }
 
-  clearForm() {}
-
-  async onTest() {
+  onTest() {
     let dates = this.periodFilter?.calculateDates(
       this.data.dataset?.periodType!,
       this.periodValue
     );
+
     const dataValueFetchObject = {
       dataElementCategoryOptionCombo: undefined,
       sqlQuery: this.data.query,
@@ -84,19 +84,24 @@ export class AddQueryComponent implements OnInit {
       periodStart: dates?.firstDate,
       periodEnd: dates?.lastDate,
     };
-
-    // console.log('Data for testing:', dates);
+    
     this.dataValueFetchService
       ?.testDataValueFetchQuery(dataValueFetchObject)
       .subscribe({
-        next: (value) => (this.testValue = value),
-        error: (err) => console.log('error occured'),
+        next: (value) => {
+          this.testValue = value;
+          this.message = 'Query ran successfully. View results and confirm before saving.';
+          this.messageType = 'success';
+        },
+        error: (err) => {
+          this.testValue = err.error.message;
+          this.message = "This query results to an error. View the message from the results field";
+          this.messageType= "danger"
+        },
       });
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log('Data for testing:', this.periodValue);
-
+    this.message = undefined
+    this.messageType = undefined
     this.showTestResults = true;
   }
 }

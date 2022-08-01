@@ -41,9 +41,25 @@ export class MappingComponent implements OnInit {
   ngOnInit(): void {
     
     
-    this.sourcesService.getSources().subscribe((sources) => (this.sources = sources));
+    this.sourcesService.getSources().subscribe({
+      next: (sources) => {
+        this.sources = sources
+      },
+      error: (error) => {
+        this.message = error.error.message;
+        this.messageType = "danger"
+      }
+    });
 
-    this.instancesService.getInstances().subscribe((instances) => (this.instances = instances));   
+    this.instancesService.getInstances().subscribe({
+      next: (instances) => {
+        this.instances = instances;
+      },
+      error: (error) => {
+         this.message = error.error.message;
+         this.messageType = "danger";
+      }
+    });   
     
     if (this.datasets){
       this.datasetsLength = this.datasets!.length > 0 ? true : false;
@@ -80,7 +96,15 @@ export class MappingComponent implements OnInit {
   public filterDatasets(){
     
     if(this.instance){
-      this.datasetsService.getDatasets().subscribe((datasets) => (this.datasets = datasets.filter(d => d.instances.id === this.instance!.id)));
+      this.datasetsService.getDatasets().subscribe({
+        next: (datasets) => {
+          this.datasets = datasets.filter((d: any) => d.instances.id === this.instance!.id)
+        },
+        error: (error) => {
+          this.message = 'Error: ', error.error.message;
+          this.messageType = 'danger';
+        }
+      });
       this.dataset = undefined;
     }
     else{

@@ -38,7 +38,6 @@ export class AddDatasetComponent implements OnInit {
 
   filterDatasets(){
     this.onfilterDatasets.emit(this.instance)
-    console.log("Firing: ",this.instance?.name)
   }
 
   onSubmit(){

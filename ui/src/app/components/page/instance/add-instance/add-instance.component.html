@@ -15,11 +15,21 @@
                                 <label for="name"> Name </label>
                                 <input type="text" name="name" [(ngModel)]="name" class="form-control"
                                     placeholder="instance name" required />
+                                <div *ngIf="message && !name">
+                                    <p class="text-danger">
+                                        {{message}}
+                                    </p>
+                                </div>
                             </div>
                             <div class="col-8">
                                 <label for="url"> URL </label>
                                 <input type="url" name="url" [(ngModel)]="url" class="form-control"
                                 placeholder="https://www.your-instance.db" required />
+                                <div *ngIf="message && !url">
+                                    <p class="text-danger">
+                                        {{message}}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                         <div class="row mt-5">
@@ -27,11 +37,21 @@
                                 <label for="username"> Username </label>
                                 <input type="text" name="username" [(ngModel)]="username" class="form-control"
                                     placeholder="Instance Username" required />
+                                <div *ngIf="message && !username">
+                                        <p class="text-danger">
+                                            {{message}}
+                                        </p>
+                                </div>
                             </div>
                             <div class="col-6">
                                 <label for="password"> Password </label>
                                 <input type="password" name="password" [(ngModel)]="password" class="form-control"
                                     placeholder="Instance Password" required />
+                                    <div *ngIf="message && !password">
+                                    <p class="text-danger">
+                                        {{message}}
+                                    </p>
+                                </div>
                             </div>
                         </div> <br>
                         <div class="row mt-3">

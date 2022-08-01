@@ -26,7 +26,9 @@ export class ReportsComponent implements OnInit {
   period?: any;
   viewDatasetReport: boolean = false;
   datasetValues: any;
-  sendingObject: any
+  sendingObject: any;
+  messageType: string | undefined;
+  message: string | undefined;
 
   constructor(
     private datasetsService: DatasetsService,
@@ -39,7 +41,15 @@ export class ReportsComponent implements OnInit {
   ngOnInit(): void {
     this.instancesService
       .getInstances()
-      .subscribe((instances) => (this.instances = instances));
+      .subscribe({
+        next: (instances) => {
+          this.instances = instances;
+        },
+        error: (error) => {
+          this.message = "Couldn't load instances due to: ", error.error.message;
+          this.messageType = "danger";
+        }
+      })
 
     if (this.datasets) {
       this.datasetsLength = this.datasets!.length > 0 ? true : false;
@@ -51,11 +61,16 @@ export class ReportsComponent implements OnInit {
     if (this.instance) {
       this.datasetsService
         .getDatasets()
-        .subscribe(
-          (datasets) =>
-            (this.datasets = datasets.filter(
-              (d) => d.instances.id === this.instance!.id
-            ))
+        .subscribe({
+          next: (datasets) => {
+            this.datasets = datasets.filter(
+              (d: any) => d.instances.id === this.instance!.id
+            )
+          },
+          error: (error) => {
+            
+          }
+        }
         );
       this.dataset = undefined;
     } else {
@@ -64,71 +79,86 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-
   checkDataset(dataset: DatasetInterface) {
-
     // this.periods = this.periodFilter?.filterPeriod('Weekly', 2020);
-    
+
     this.viewDatasetReport = false;
     this.dataset = dataset;
     if (this.dataset?.periodType! === 'Weekly') {
-      this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!, 2019);
+      this.periods = this.periodFilter?.filterPeriod(
+        this.dataset?.periodType!,
+        2019
+      );
     } else {
       this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!);
     }
   }
 
-  async viewReport(){
-    this.period = this.periodFilter?.calculateDates(this.dataset?.periodType!, this.periodValue);
-    
 
-    let dataViewReport = {
-      periodStart: this.period.firstDate,
-      periodEnd: this.period.lastDate,
-      datasetId: this.dataset?.id,
-    }
+  viewReport() {
+    this.period = this.periodFilter?.calculateDates(
+      this.dataset?.periodType!,
+      this.periodValue
+    );
 
-    console.log(this.periodValue)
-    if (this.dataset && this.periodValue >= 0  && this.instance){
-      // this.reportsService
-      //   .viewReport(dataViewReport)
-      //   .subscribe(
-      //     (data: any) =>
-      //       console.log(data)
-      //   );
-      // this.viewDatasetReport = true;
-      let datasetValues;
-      await this.reportsService.viewReport(dataViewReport).subscribe(
-        (data) =>
-          (datasetValues = data.map((value: any) => {
-            return {
-              id: value.dataElementCategoryCombo,
-              val: value.value,
-              com: 'false',
-            }
-            ;
-          }))
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      this.datasetValues  = {
-        dataValues: datasetValues
-      }
-
-      this.sendingObject = {
+    if (this.dataset && this.periodValue >= 0 && this.instance) {
+      let dataViewReport = {
         periodStart: this.period.firstDate,
         periodEnd: this.period.lastDate,
-        datasetId: this.dataset.id,
-        period: this.periodFilter?.getperiod(this.dataset.periodType!, this.period.firstDate)
+        datasetId: this.dataset?.id,
       };
 
-      this.viewDatasetReport = true;
+      this.reportsService.viewReport(dataViewReport).subscribe({
+        next: (data) => {
+          this.datasetValues = {
+            dataValues: data.map((value: any) => {
+              return {
+                id: value.dataElementCategoryCombo,
+                val: value.value,
+                com: 'false',
+              };
+            }),
+          };
+
+          this.sendingObject = {
+            periodStart: this.period.firstDate,
+            periodEnd: this.period.lastDate,
+            datasetId: this.dataset?.id,
+            period: this.periodFilter?.getperiod(
+              this.dataset?.periodType!,
+              this.period.firstDate
+            ),
+          };
+
+          this.message = 'Report view granted.';
+          this.messageType = 'success';
+          this.viewDatasetReport = true;
+        },
+
+        error: (error) => {
+          (this.message = 'Report view failure due to: '), error.error.message;
+          this.messageType = 'danger';
+        },
+      });
+    } 
+    else {
+      if (this.instance === undefined) {
+        this.message = 'This field is required';
+        this.messageType = 'danger';
+      }
+      if (this.dataset === undefined) {
+        this.message = 'This field is required';
+        this.messageType = 'danger';
+      }
+      if (this.periodValue === undefined) {
+        this.message = 'This field is required';
+        this.messageType = 'danger';
+      }
     }
-    console.log(this.datasetValues);
 
+    this.message = undefined;
+    this.messageType = undefined;
   }
-
 }
 
 

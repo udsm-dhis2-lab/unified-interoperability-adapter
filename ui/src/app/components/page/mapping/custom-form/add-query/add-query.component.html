@@ -10,14 +10,16 @@
         </div>
         <div class="row">
             <div class="col-12">
-                
-                <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
-                    {{ message}}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-
                 <form>
                     <div class="card p-4">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
+                                    {{ message}}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-12">
                                 <mat-form-field class="mt-control">
@@ -33,6 +35,23 @@
                         </div>
                         <div class="row mt-3">
                             <div class="col-12">
+                                <div class="helper-text">
+                                    <p >
+                                        Instructions:
+                                    </p>
+                                    <ol>
+                                        <li>Where you expect to put dates in your query please put exactly the following variables
+                                    
+                                            <ul>
+                                                <li>For starting date put {{'${period-start}'}}</li>
+                                                <li>For ending date put {{'${period-end}'}}</li>
+                                            </ul>
+                                        </li>
+                                        <li>Dates will be added as per period selected</li>
+                                        <li>Upon clicking "Test Query" button, data won't be saved but rather test the query and display query results</li>
+                                        <li>Upon clicking "Save Query" button, data will be saved and form closed automatically.</li>
+                                    </ol>
+                                </div>
                                 <label for="query">Type Query: </label>
                                 <textarea type="textarea" [(ngModel)]="data.query" name="query" [value]="query"  class="form-control" placeholder="SELECT * FROM [table name] WHERE [table name.field] like [condition]" required ></textarea>
                             </div> 
@@ -66,7 +85,7 @@
                                         </button>
                                     </div>
                                     <div class="col-4 float-end">
-                                        <button type="submit" [mat-dialog-close]="data" cdkFocusInitial (click)="clearForm()" class="btn btn-outline-success float-end"> Save Query </button>
+                                        <button type="submit" [mat-dialog-close]="data" cdkFocusInitial class="btn btn-outline-success float-end"> Save Query </button>
                                     </div>
                                 </div>
                             </div>

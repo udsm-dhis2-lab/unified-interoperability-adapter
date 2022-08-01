@@ -9,6 +9,14 @@
         </div>
         <div class="row">
             <div class="col-12">
+                <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
+                    {{ message}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
                 <app-add-dataset *ngIf="instances" [instances]="instances" (onfilterDatasets)="filterDatasets($event)"></app-add-dataset>
             </div>
         </div>
