@@ -72,7 +72,8 @@ export class InstanceComponent implements OnInit {
             this.messageType = 'success';
           },
           error: (error) => {
-              this.message = error.error.message;
+              this.message = "Couldn't delete instance"
+              console.log(error.error.message);
               this.messageType = 'danger';
           },
         }
@@ -109,18 +110,26 @@ export class InstanceComponent implements OnInit {
 
     dialogRef?.afterClosed().subscribe((result) => {
       if (result) {
-        console.log('Results: ', result);
-        this.instance = result;
-        this.instancesService.updateInstance(this.instance!).subscribe({
-          next: (value) => {
-            this.message = "Instance updated successfully.";
-            this.messageType = "success";
-          },
-          error: (error) => {
-             this.message = 'Failed to update instance.';
-             this.messageType = 'danger';
-          }
-        });
+        if (result.username && result.password && result.name && result.url) {
+          console.log(
+            `Results: ,
+            ${result.username} && ${result.password} && ${result.name} && ${result.url} `
+          );
+          this.instance = result;
+          this.instancesService.updateInstance(this.instance!).subscribe({
+            next: (value) => {
+              this.message = 'Instance updated successfully.';
+              this.messageType = 'success';
+            },
+            error: (error) => {
+              this.message = 'Failed to update instance due to: ', error.error.message;
+              this.messageType = 'danger';
+            }
+          });
+        } else {
+          this.message = 'Failed to update instance.';
+          this.messageType = 'danger';
+        }
       } else {
         window.location.reload();
       }
