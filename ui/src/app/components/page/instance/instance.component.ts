@@ -51,11 +51,6 @@ export class InstanceComponent implements OnInit {
         this.messageType = 'danger';
       }
     });
-    console.log('Available: ', this.instances);
-
-    // while(!this.instances){
-    //   console.log("Available: ",this.instances)
-    // }
   }
 
   onToggle() {

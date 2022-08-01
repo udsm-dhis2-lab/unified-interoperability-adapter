@@ -32,13 +32,32 @@ export class SourcesComponent implements OnInit {
   ) {
     this.subscription = this.uiService
       ?.onToggleAddForm()
-      .subscribe((value) => (this.showAddSourceForm = value));
+      .subscribe({
+          next: (value) => {
+            this.showAddSourceForm = value;
+          },
+          error: (error) => {
+            console.log(error.message)
+          }
+        }
+      );
   }
 
   ngOnInit(): void {
     this.sourcesService
       .getSources()
-      .subscribe((sources) => (this.sources = sources));
+      .subscribe({
+        next: (sources) => {
+          this.sources = sources;
+          if (this.sources) {
+            this.showAddSourceForm = false;
+          } else this.showAddSourceForm = true;
+        },
+        error: (error) => {
+          this.message = "Could't load sources"
+          this.messageType = "danger";
+        } 
+      });
   }
 
   onToggle() {
