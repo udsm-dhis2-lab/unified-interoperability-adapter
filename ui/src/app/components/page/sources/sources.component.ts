@@ -11,72 +11,106 @@ import { SourceInterface } from 'src/app/models/source.model';
 @Component({
   selector: 'app-sources',
   templateUrl: './sources.component.html',
-  styleUrls: ['./sources.component.css']
+  styleUrls: ['./sources.component.css'],
 })
 export class SourcesComponent implements OnInit {
-
   sources: SourceInterface[] | undefined;
   source: SourceInterface | undefined;
   showAddSourceForm: boolean = false;
   subscription: Subscription | undefined;
+  message: string | undefined;
+  messageType: string | undefined;
 
   faEdit = faEdit;
   faTrash = faTrash;
 
   constructor(
-    private sourcesService: SourcesService, 
-    private uiService?: UiService, 
+    private sourcesService: SourcesService,
+    private uiService?: UiService,
     private router?: Router,
     public dialog?: MatDialog
-  )
-  {
-    this.subscription = this.uiService?.onToggleAddForm().subscribe((value) => (this.showAddSourceForm = value));
+  ) {
+    this.subscription = this.uiService
+      ?.onToggleAddForm()
+      .subscribe((value) => (this.showAddSourceForm = value));
   }
 
   ngOnInit(): void {
-      this.sourcesService.getSources().subscribe((sources) => (this.sources = sources));
+    this.sourcesService
+      .getSources()
+      .subscribe((sources) => (this.sources = sources));
   }
 
-  onToggle(){
+  onToggle() {
     this.uiService?.toggleAddForm();
   }
 
   onDelete(source: SourceInterface) {
     this.sourcesService
-    .deleteSource(source)
-    .subscribe(() => (this.sources = this.sources?.filter((s) => s.id !== source.id)));
+      .deleteSource(source)
+      .subscribe({
+        next: () => {
+          this.sources = this.sources?.filter((s) => s.id !== source.id);
+          this.message = 'Source deleted successfully.';
+          this.messageType = 'success';
+        },
+        error: (error) => {
+          this.message = error.error.message;
+          this.messageType = 'danger';
+        }
+      });
     this.router?.navigate(['/sources']);
+    this.message = undefined;
+    this.messageType = undefined;
   }
 
   // activateSource(source: SourceInterface) {
   //   source.active = !source.active;
   //   this.sourcesService.updateSourceActivate(source).subscribe();
-  // } 
+  // }
 
-  addSource(source: SourceInterface){
-    this.sourcesService.addSource(source).subscribe((source) => (this.sources?.push(source)));
+  addSource(source: SourceInterface) {
+    this.sourcesService
+      .addSource(source)
+      .subscribe({
+        next: (source) => {
+          this.sources?.push(source)
+        },
+        error: (error) => {
+        this.message = error.error.message
+        this.messageType = "danger"
+        }
+      });
   }
-  
+
   openDialog(sourceToEdit: SourceInterface): void {
     const dialogRef = this.dialog?.open(EditSourceComponent, {
       width: '50%',
-      data: sourceToEdit
+      data: sourceToEdit,
     });
 
-    console.log("Opened: "+sourceToEdit.type);
+    console.log('Opened: ' + sourceToEdit.type);
 
-    dialogRef?.afterClosed().subscribe(result => {
-      if(result){
-        console.log("Results: ", result);
-          this.source = result;
-          this.sourcesService.updateSourceActivate(this.source!).subscribe();
-          this.router?.navigate(['/sources']);
-      } 
-      else{
+    dialogRef?.afterClosed().subscribe((result) => {
+      if (result) {
+        console.log('Results: ', result);
+        this.source = result;
+        this.sourcesService.updateSourceActivate(this.source!).subscribe({
+          next: () => {
+            this.router?.navigate(['/sources']);
+            this.message = 'Source added successfully.';
+            this.messageType = 'success';
+          },
+          error: (error) => {
+            this.message = error.error.message;
+            this.messageType = 'danger';
+          }
+        });
+      } else {
         window.location.reload();
-      }  
-
+      }
     });
+    this.message = undefined;
+    this.messageType = undefined;
   }
-
 }

@@ -30,6 +30,8 @@ export class DatasetsComponent implements OnInit {
   faCancel = faCancel;
   faMultiply = faMultiply;
   datasetName?: string;
+  message: string | undefined;
+  messageType: string | undefined;
 
   constructor(
       private datasetsService: DatasetsService, 
@@ -43,11 +45,26 @@ export class DatasetsComponent implements OnInit {
     }
 
   ngOnInit(): void {
-    
-    this.instancesService.getInstances().subscribe((instances) => (this.instances = instances));
-
+    this.instancesService.getInstances().subscribe({
+     next: (instances) => {
+        this.instances = instances;
+      },
+      error: (error) => {
+        this.message = error.error.message;
+        this.messageType = 'danger';
+      }
+    }
+    );
     //Get all datasets
-    this.datasetsService.getDatasets().subscribe((datasets) => (this.datasets = datasets));
+    this.datasetsService.getDatasets().subscribe({
+      next: (datasets) => {
+        this.datasets = datasets
+      },
+      error: (error) => {
+        this.message = error.error.message;
+        this.messageType = 'danger';
+      }
+    });
   }
 
   onToggle(){
@@ -57,10 +74,22 @@ export class DatasetsComponent implements OnInit {
   onDelete(instanceDataset: InstanceDatasetsInterface) {
     let datasetToDelete = this.datasets?.filter(dataset => dataset.id === instanceDataset.id)[0]
 
-    this.datasetsService
-    .deleteDataset(datasetToDelete!)
-    .subscribe(() => (this.datasets = this.datasets?.filter((d) => d.id !== datasetToDelete?.id)));
-    this.router?.navigate(['/datasets']);
+    this.datasetsService.deleteDataset(datasetToDelete!).subscribe({
+      next: () => {
+        this.datasets = this.datasets?.filter(
+          (d: any) => d.id !== datasetToDelete?.id
+        );
+        this.message = 'Dataset removed successfully.';
+        this.messageType = 'success';
+        this.router?.navigate(['/datasets']);
+      },
+      error: (error) => {
+        this.message = error.error.message;
+        this.messageType = 'danger';
+      },
+    });
+    this.message = undefined;
+    this.messageType = undefined;
   }
 
   addDataset(instanceDataset: InstanceDatasetsInterface){
@@ -75,22 +104,59 @@ export class DatasetsComponent implements OnInit {
       formDesign: instanceDataset.formDesign
     }
 
-    this.datasetsService.addDataset(datasetObject).subscribe((dataset) => (this.datasets?.push(dataset)));
-    console.log(datasetObject);
+    this.datasetsService.addDataset(datasetObject).subscribe({
+      next: (dataset) => {
+          this.datasets?.push(dataset);
+          this.message = "Dataset selected successfully.";
+          this.messageType = "success"
+        },
+      error: (error) => {
+        this.message = error.error.message;
+        this.messageType = "danger"
+      }
+    })
+    
+    this.message = undefined;
+    this.messageType = undefined;
   }
 
   filterDatasets(instance: InstanceInterface){
-    this.instanceDatasetsService.getInstanceDatasets(instance.id!).subscribe((instanceDatasets) => (this.instanceDatasets = instanceDatasets));
+    this.instanceDatasetsService.getInstanceDatasets(instance.id!).subscribe({
+      next: (instanceDatasets) => {
+        this.instanceDatasets = instanceDatasets;
+      },
+      error: (error) => { 
+        this.message = error.error.message;
+        this.messageType = 'danger';
+      } 
+    });
     this.instance = instance
     if(!instance){
       this.instanceDatasets = undefined;    
     }
+    this.message =undefined;
+    this.messageType = undefined;
   }
   
   searchInstanceDatasets(){
-    // console.log(this.instance.id, ' and ', this.datasetName);
-    this.instanceDatasetsService.searchInstanceDatasets(this.instance.id!, this.datasetName!).subscribe((instanceDatasets) => (this.instanceDatasets = instanceDatasets)); 
-    
+    if(this.datasetName){
+      this.instanceDatasetsService.searchInstanceDatasets(this.instance.id!, this.datasetName!).subscribe({
+        next: (instanceDatasets) => {
+          this.instanceDatasets = instanceDatasets 
+        },
+        error: (error) => {
+          this.message = error.error.message;
+          this.messageType = "danger";
+        }
+      });
+    }
+    else if(!this.datasetName) {
+      this.message = 'Can\'t search null dataset';
+      this.messageType = 'danger';
+    }
+     this.message = undefined;
+     this.messageType = undefined;
+  
   }
 
   datasetExisting(instanceDataset: InstanceDatasetsInterface){

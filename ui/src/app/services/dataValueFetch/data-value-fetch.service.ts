@@ -20,28 +20,28 @@ export class DataValueFetchService {
   constructor(private httpClient: HttpClient) {}
 
   //Using Observables to create a service instance
-  getDataValueFetchs(): Observable<DataValueFetchInterface[]> {
-    return this.httpClient.get<DataValueFetchInterface[]>(this.apiUrl)
+  getDataValueFetchs(): Observable<DataValueFetchInterface[]|any> {
+    return this.httpClient.get<DataValueFetchInterface[]|any>(this.apiUrl)
   }
 
-  deleteDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
+  deleteDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface|any> {
     const url = `${this.apiUrl}/${dataValueFetch.dataElementCategoryOptionCombo}`;
-    return this.httpClient.delete<DataValueFetchInterface>(url);
+    return this.httpClient.delete<DataValueFetchInterface|any>(url);
   }
   
-  getSingleDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
+  getSingleDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface|any> {
     const url = `${this.apiUrl}/searchDataSetElements`;
-    return this.httpClient.post<DataValueFetchInterface>(url, dataValueFetch, httpOptions);
+    return this.httpClient.post<DataValueFetchInterface|any>(url, dataValueFetch, httpOptions);
   }
 
-  addDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface> {
+  addDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface|any> {
     console.log(dataValueFetch);
-    return this.httpClient.post<DataValueFetchInterface>(this.apiUrl, dataValueFetch, httpOptions);
+    return this.httpClient.post<DataValueFetchInterface|any>(this.apiUrl, dataValueFetch, httpOptions);
   }
   
-  testDataValueFetchQuery(dataValueFetch: DataValueFetchInterface): Observable<string> {
+  testDataValueFetchQuery(dataValueFetch: any): Observable<any> {
     let url = `${this.apiUrl}/testQuery`;
-    return this.httpClient.post<string>(url, dataValueFetch, httpOptions);
+    return this.httpClient.post<any>(url, dataValueFetch, httpOptions);
   }
 
   

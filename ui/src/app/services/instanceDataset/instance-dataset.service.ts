@@ -19,22 +19,22 @@ export class InstanceDatasetsService {
   constructor(private httpClient: HttpClient) {}
 
   //Using Observables to create a service instance
-  getInstanceDatasets(instanceId: number): Observable<InstanceDatasetsInterface[]> {
+  getInstanceDatasets(instanceId: number): Observable<InstanceDatasetsInterface[] | any> {
     let url = `${this.apiUrl}/remote/${instanceId}`;
     return this.httpClient.get<InstanceDatasetsInterface[]>(url);
   }
   
-  searchInstanceDatasets(instanceId: number, datasetName: string): Observable<InstanceDatasetsInterface[]> {
+  searchInstanceDatasets(instanceId: number, datasetName: string): Observable<InstanceDatasetsInterface[] | any> {
     let url = `${this.apiUrl}/remote/${instanceId}/${datasetName}`;
     return this.httpClient.get<InstanceDatasetsInterface[]>(url);
   }
 
-  deleteInstanceDataset(instanceDataset: InstanceDatasetsInterface): Observable<InstanceDatasetsInterface> {
+  deleteInstanceDataset(instanceDataset: InstanceDatasetsInterface): Observable<InstanceDatasetsInterface | any> {
     const url = `${this.apiUrl}/${instanceDataset.id}`;
     return this.httpClient.delete<InstanceDatasetsInterface>(url);
   }
 
-  addInstanceDataset(instanceDataset: InstanceDatasetsInterface): Observable<InstanceDatasetsInterface> {
+  addInstanceDataset(instanceDataset: InstanceDatasetsInterface): Observable<InstanceDatasetsInterface | any> {
     return this.httpClient.post<InstanceDatasetsInterface>(this.apiUrl, instanceDataset, httpOptions);
   }
 }

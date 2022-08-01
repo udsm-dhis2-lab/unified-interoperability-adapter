@@ -10,14 +10,16 @@
         </div>
         <div class="row">
             <div class="col-12">
-                
-                <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
-                    {{ message}}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-
                 <form>
                     <div class="card p-4">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
+                                    {{ message}}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            </div>
+                        </div>
                         <div class="row">
                             <div class="col-12">
                                 <mat-form-field class="mt-control">
@@ -83,7 +85,7 @@
                                         </button>
                                     </div>
                                     <div class="col-4 float-end">
-                                        <button type="submit" [mat-dialog-close]="data" cdkFocusInitial (click)="clearForm()" class="btn btn-outline-success float-end"> Save Query </button>
+                                        <button type="submit" [mat-dialog-close]="data" cdkFocusInitial class="btn btn-outline-success float-end"> Save Query </button>
                                     </div>
                                 </div>
                             </div>
