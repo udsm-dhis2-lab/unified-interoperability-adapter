@@ -5,3 +5,13 @@
 textarea {
     min-height: 10vh;
 }
+
+.helper-text p{
+    font-size: medium;
+    color: #534a4a
+}
+
+.helper-text ol {
+    color: #534a4e;
+    font-size: small;
+}

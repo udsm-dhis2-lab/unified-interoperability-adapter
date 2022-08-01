@@ -49,6 +49,8 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   dataValueFetchs: DataValueFetchInterface[] | undefined;
   dataValueFetch: any;
   period: any;
+  message: string | undefined;
+  messageType: string | undefined;
 
   /**For period filter */
   periodObject: any;
@@ -78,7 +80,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     private route?: ActivatedRoute,
     private periodFilter?: PeriodFilter
   ) {
-
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
       WAIT: '#fffe8c',
@@ -88,8 +89,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     };
 
     this.entryFormType = 'aggregate';
-
-   
   }
 
   ngOnInit() {
@@ -106,7 +105,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     this.setScriptsOnHtmlContent(
       this.getScriptsContents(this.dataSetFormDesign)
     );
-
   }
 
   getScriptsContents(html: any) {
@@ -149,8 +147,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  
-
   getEnabledInputTagsOnHtmlContent() {
     // this.uiServices.clickEvent().pipe().subscribe((event) => {
     //   if(event){
@@ -159,31 +155,26 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     //     this.eventPopupListener(event);
     //   }
     // });
-    document.getElementsByName('entryfield').forEach((element)=>{
-        if(element){
-          element.addEventListener('click', (event) => {
-            this.eventPopupListener(event)
-          })
-        }
+    document.getElementsByName('entryfield').forEach((element) => {
+      if (element) {
+        element.addEventListener('click', (event) => {
+          this.eventPopupListener(event);
+        });
+      }
     });
-
-
   }
 
   eventPopupListener = (event: any) => {
     if (event.target.name === 'entryfield') {
-      console.log(event)
-      if(!this.dialogOpened){
+      console.log(event);
+      if (!this.dialogOpened) {
         this?.openDialog(this.sources!, event.target.id);
         this.dialogOpened = true;
       }
     }
   };
 
-  async openDialog(
-    sourcesToChoose: SourceInterface[],
-    elementId: string
-  ): Promise<any> {
+  async openDialog(sourcesToChoose: SourceInterface[], elementId: string) {
     const dataValueFetchObject = {
       dataElementCategoryOptionCombo: elementId,
       sqlQuery: undefined,
@@ -271,8 +262,19 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     };
     this.dataValueFetchService
       .addDataValueFetch(dataValueFetchObject)
-      .subscribe((dataValueFetch) =>
-        this.dataValueFetchs?.push(dataValueFetch)
-      );
+      .subscribe({
+        next: (dataValueFetch) => { 
+          this.dataValueFetchs?.push(dataValueFetch)
+          this.message = "Query saved successfully.";
+          this.messageType = "success";
+         },
+        error: (dataValueFetch) => {
+          this.message = dataValueFetch.error.message
+          this.messageType = "danger"
+        }
+      });
+
+      this.message = undefined;
+      this.messageType = undefined;
   }
 }

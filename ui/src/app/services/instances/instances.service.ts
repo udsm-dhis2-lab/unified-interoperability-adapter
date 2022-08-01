@@ -20,7 +20,7 @@ export class InstancesService {
   constructor(private httpClient: HttpClient) {}
 
   //Using Observables to create a service instance
-  getInstances(): Observable<InstanceInterface[]> {
+  getInstances(): Observable<InstanceInterface[]| any> {
     return this._instances.length > 0
       ? of(this._instances)
       : this.httpClient.get<InstanceInterface[]>(this.apiUrl).pipe(tap((instances) => {this._instances = instances}));
@@ -28,21 +28,21 @@ export class InstancesService {
 
   getSingleInstance(
     instance: InstanceInterface
-  ): Observable<InstanceInterface> {
+  ): Observable<InstanceInterface| any> {
     const url = `${this.apiUrl}/${instance.id}`;
     return this.httpClient.get<InstanceInterface>(url);
   }
-  deleteInstance(instance: InstanceInterface): Observable<InstanceInterface> {
+  deleteInstance(instance: InstanceInterface): Observable<InstanceInterface| any> {
     const url = `${this.apiUrl}/${instance.id}`;
     return this.httpClient.delete<InstanceInterface>(url);
   }
 
-  updateInstance(instance: InstanceInterface): Observable<InstanceInterface> {
+  updateInstance(instance: InstanceInterface): Observable<InstanceInterface| any> {
     const url = `${this.apiUrl}`;
     return this.httpClient.put<InstanceInterface>(url, instance, httpOptions);
   }
 
-  addInstance(instance: InstanceInterface): Observable<InstanceInterface> {
+  addInstance(instance: InstanceInterface): Observable<InstanceInterface| any> {
     console.log('Payload: ', instance);
     return this.httpClient.post<InstanceInterface>(
       this.apiUrl,

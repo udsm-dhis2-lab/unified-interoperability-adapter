@@ -20,21 +20,21 @@ export class DatasetsService {
   constructor(private httpClient: HttpClient) {}
 
   //Using Observables to create a service instance
-  getDatasets(): Observable<DatasetInterface[]> {
+  getDatasets(): Observable<DatasetInterface[] | any> {
     return this.httpClient.get<DatasetInterface[]>(this.apiUrl)
   }
 
-  getSingleDatasets(dataset: DatasetInterface): Observable<DatasetInterface> {
+  getSingleDatasets(dataset: DatasetInterface): Observable<DatasetInterface | any> {
     let url = this.apiUrl + "/single?datasetId="+dataset.id;
     return this.httpClient.get<DatasetInterface>(url);
   }
 
-  deleteDataset(dataset: DatasetInterface): Observable<DatasetInterface> {
+  deleteDataset(dataset: DatasetInterface): Observable<DatasetInterface | any> {
     const url = `${this.apiUrl}/${dataset.id}`;
     return this.httpClient.delete<DatasetInterface>(url);
   }
 
-  addDataset(dataset: DatasetInterface): Observable<DatasetInterface> {
+  addDataset(dataset: DatasetInterface): Observable<DatasetInterface | any> {
     console.log("New dataset:  ",dataset);
     return this.httpClient.post<DatasetInterface>(this.apiUrl, dataset, httpOptions);
   }

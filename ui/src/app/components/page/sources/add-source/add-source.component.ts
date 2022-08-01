@@ -19,6 +19,7 @@ export class AddSourceComponent implements OnInit {
   port!: number ;
   showAddForm: boolean = false;
   subscription: Subscription | undefined;
+  message: string | undefined;
 
   @Output() onAddSource: EventEmitter<SourceInterface> = new EventEmitter();
 
@@ -30,19 +31,35 @@ export class AddSourceComponent implements OnInit {
   }
 
   onSubmit(){
-    const newSource = {
-      type: this.type,
-      username: this.username,
-      password: this.password,
-      url: this.url
+    if (this.type === undefined || this.type === '') {
+      this.message = 'This field is required';
+    }
+    if (this.username === undefined || this.username === '') {
+      this.message = 'This field is required';
+    }
+    if (this.url === undefined || this.url === '') {
+      this.message = 'This field is required';
+    }
+    if (this.password === undefined || this.password === '') {
+      this.message = 'This field is required';
     }
 
-    this.onAddSource.emit(newSource);
-
-    this.type = '';
-    this.username = '';
-    this.password = '';
-    this.url = '';
+    if(this.type && this.username && this.url && this.password){
+      const newSource = {
+        type: this.type,
+        username: this.username,
+        password: this.password,
+        url: this.url
+      }
+  
+      this.onAddSource.emit(newSource);
+  
+      this.type = '';
+      this.username = '';
+      this.password = '';
+      this.url = '';
+      this.message = '';
+    }
   }
 
 }

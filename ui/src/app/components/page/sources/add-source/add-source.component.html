@@ -23,21 +23,41 @@
                                         <mat-option value="mysql">MySQL</mat-option>
                                     </mat-select>
                                 </mat-form-field>
+                                <div *ngIf="message && !type">
+                                        <p class="text-danger">
+                                            {{message}}
+                                        </p>
+                                </div>
                             </div>
                             <div class="col-6">
                                 <label for="url"> URL </label>
                                 <input type="url" name="url" [(ngModel)]="url" class="form-control" placeholder="your-dababase.db" required/> 
+                                <div *ngIf="message && !url">
+                                        <p class="text-danger">
+                                            {{message}}
+                                        </p>
+                                </div>
                                 
                             </div>
                         </div>
                         <div class="row mt-5">
                             <div class="col-6">
                                 <label for="username"> Username </label>
-                                <input type="text" name="username" [(ngModel)]="username" class="form-control" placeholder="Database Username" required/> 
+                                <input type="text" name="username" [(ngModel)]="username" class="form-control" placeholder="Database Username" required/>
+                                <div *ngIf="message && !username">
+                                        <p class="text-danger">
+                                            {{message}}
+                                        </p>
+                                </div> 
                             </div>
                             <div class="col-6">
                                 <label for="password"> Password </label>
-                                <input type="text" name="password" [(ngModel)]="password" class="form-control" placeholder="Database Password" required/> 
+                                <input type="text" name="password" [(ngModel)]="password" class="form-control" placeholder="Database Password" required/>
+                                <div *ngIf="message && !password">
+                                        <p class="text-danger">
+                                            {{message}}
+                                        </p>
+                                </div> 
                             </div>
                         </div> <br>
                         <div class="row mt-3">

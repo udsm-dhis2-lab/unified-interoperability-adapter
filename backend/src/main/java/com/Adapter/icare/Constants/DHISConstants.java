@@ -1,9 +1,20 @@
 package com.Adapter.icare.Constants;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
 public class DHISConstants {
-    
-    public final String DHIS2Instance = "https://tland.dhis2.udsm.ac.tz";
-    public final String DHIS2Username = "dkibahila";
-    public final String DHIS2Password = "Jezzy@1234";
-    public final String OrgUnit = "a6eqFyAF1Rz"; //AAR TABATA Other Clinic
+
+    @Value("${DHIS_URL:https://play.dhis2.org/2.36.11.1}")
+    public String DHIS2Instance;
+
+    @Value("${DHIS_USERNAME:admin}")
+    public String DHIS2Username; // = "dkibahila"
+
+    @Value("${DHIS_PASSWORD:district}")
+    public String DHIS2Password; // = "Jezzy@1234";
+
+    @Value("${DHIS_OU:ImspTQPwCqd}")
+    public String OrgUnit; // = "a6eqFyAF1Rz"; // AAR TABATA Other Clinic
 }
