@@ -15,7 +15,7 @@ import com.Adapter.icare.Services.DatasourceService;
 @RestController
 @RequestMapping("api/v1/datasource")
 public class DatasourceController {
-    
+
     private final DatasourceService datasourceService;
 
     public DatasourceController(DatasourceService datasourceService) {
@@ -25,6 +25,11 @@ public class DatasourceController {
     @GetMapping
     public List<Datasource> getDatasources() {
         return datasourceService.getDatasources();
+    }
+
+    @GetMapping("/status")
+    public String getStatus() {
+        return "OK";
     }
 
     @PostMapping
@@ -40,6 +45,6 @@ public class DatasourceController {
 
     @PutMapping
     public Datasource updateDatasource(@RequestBody Datasource datasource) {
-         return datasourceService.updateDatasource(datasource);
+        return datasourceService.updateDatasource(datasource);
     }
 }
