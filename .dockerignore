@@ -1,7 +1,7 @@
 ui/.angular
 ui/.vscode
-ui/dist
+#ui/dist
 ui/node_modules
-backend/target/
+# backend/target/
 backend/.env/
 backend/.mvn/
