@@ -14,7 +14,7 @@ const httpOptions = {
   providedIn: 'root'
 })
 export class InstanceDatasetsService {
-  private apiUrl = '/api/v1/datasets';
+  private apiUrl = './api/v1/datasets';
 
   constructor(private httpClient: HttpClient) {}
 
