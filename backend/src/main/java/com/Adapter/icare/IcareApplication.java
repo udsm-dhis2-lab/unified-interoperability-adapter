@@ -6,7 +6,8 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
-public class IcareApplication extends SpringBootServletInitializer {
+public class IcareApplication extends SpringBootServletInitializer
+{
 
 	public static void main(String[] args) {
 		SpringApplication.run(IcareApplication.class, args);

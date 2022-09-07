@@ -20,7 +20,7 @@ import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
 import com.Adapter.icare.Domains.DataSetElements;
 
 @RestController
-@RequestMapping("api/v1/reports")
+@RequestMapping("/api/v1/reports")
 public class ReportsController {
 
     @Autowired
