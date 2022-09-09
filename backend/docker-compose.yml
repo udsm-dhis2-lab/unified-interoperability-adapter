@@ -1,0 +1,27 @@
+version: '3.4'
+
+services:
+
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile-db
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - potal-db:/var/lib/postgresql/data
+
+  nginx:
+    image: nginx:1.17.9-alpine
+    env_file:
+      - .env
+    ports:
+      - 80:80
+    restart: always
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+
+volumes:
+  potal-db:
+    driver: local

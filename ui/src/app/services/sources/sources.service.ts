@@ -16,7 +16,7 @@ const httpOptions = {
 })
 export class SourcesService {
 
-  private apiUrl = '/api/v1/datasource';
+  private apiUrl = './api/v1/datasource';
 
   constructor(private httpClient: HttpClient) { }
 

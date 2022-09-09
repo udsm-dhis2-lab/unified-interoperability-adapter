@@ -15,7 +15,7 @@ const httpOptions = {
 export class InstancesService {
   private _instances: any[] = [];
   
-  private apiUrl = '/api/v1/instance';
+  private apiUrl = './api/v1/instance';
 
   constructor(private httpClient: HttpClient) {}
 

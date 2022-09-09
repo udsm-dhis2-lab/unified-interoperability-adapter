@@ -13,33 +13,38 @@ import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Services.InstanceService;
 
 @RestController
-@RequestMapping("api/v1/instance")
+@RequestMapping("/api/v1/instance")
 public class InstancesController {
-    
+
     private final InstanceService instanceService;
-    
+
     public InstancesController(InstanceService instanceService) {
         this.instanceService = instanceService;
     }
 
     @GetMapping
-    public List<Instances> getInstances(){
+    public List<Instances> getInstances() {
         return instanceService.getInstances();
     }
 
+    @GetMapping("/status")
+    public String getStatus() {
+        return "OK";
+    }
+
     @PostMapping
-    public Instances addInstances(@RequestBody Instances instances){
+    public Instances addInstances(@RequestBody Instances instances) {
         return instanceService.AddNewInstance(instances);
     }
 
     @DeleteMapping("/{instanceId}")
-    public void deleteInstance(@PathVariable("instanceId") Long instanceId){
+    public void deleteInstance(@PathVariable("instanceId") Long instanceId) {
         instanceService.deleteInstance(instanceId);
 
     }
 
     @PutMapping
-    public Instances updateInstances(@RequestBody Instances instances){
+    public Instances updateInstances(@RequestBody Instances instances) {
         return instanceService.updateInstances(instances);
     }
 }

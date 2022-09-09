@@ -74,7 +74,7 @@ import { PeriodFilter } from './Helpers/period-filter';
     FontAwesomeModule,
     FormsModule,
     SharedModule,
-    RouterModule.forRoot(appRoutes, { enableTracing: true }),
+    RouterModule.forRoot(appRoutes, { useHash: true, enableTracing: true }),
     NgxDhis2HttpClientModule.forRoot({
       namespace: 'iapps',
       version: 1,
