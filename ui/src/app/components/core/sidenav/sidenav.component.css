@@ -5,10 +5,11 @@
 
 .sidenav-drawer {
     width: 10vw;
-    background-color: grey ;
+    background-color: transparent;
     /* background-color: #188cd9 ; */
     height: 100%;
     opacity: 0.9;
+    /* border-right: solid 1px rgb(90, 85, 85); */
 }
 
 .sidenav-drawer ul {
@@ -17,11 +18,11 @@
 
 .sidenav-drawer ul li {
     margin: 0 0 1vh;
-    
+
 }
 
 .sidenav-drawer ul li a {
-    color: #fff;
+    color: black
 }
 
 mat-drawer-content button {
@@ -30,4 +31,27 @@ mat-drawer-content button {
     font-size: 25px;
     height: 60px;
     border-radius: 50%;
+}
+
+
+
+.maintenance-sidebar {
+  top: 50px;
+  bottom: 0;
+  left: 0;
+  border-radius: 100;
+  background: #fff;
+  width: 200vh;
+}
+
+.page-sidenav-content {
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+.maintenance-sidenav {
+  user-select: none;
+}
+.full-width {
+  width: 100%;
 }
