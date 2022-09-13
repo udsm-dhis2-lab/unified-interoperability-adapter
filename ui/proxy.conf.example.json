@@ -3,7 +3,7 @@
     "target": "http://localhost:8081",
     "secure": false,
     "logLevel": "debug",
-    "auth": "root:",
+    "auth": "",
     "changeOrigin": "true"
   }
 }
