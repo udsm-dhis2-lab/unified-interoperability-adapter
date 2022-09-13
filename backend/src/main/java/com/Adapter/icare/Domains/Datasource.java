@@ -31,7 +31,8 @@ public class Datasource implements Serializable{
     public enum Type{
         mysql("mysql"),
         postgres("postgres"),
-        oracle("oracle");
+        oracle("oracle"),
+        mariadb("mariadb");
 
         String value;
 
