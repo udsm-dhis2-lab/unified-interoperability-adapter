@@ -15,7 +15,7 @@ import { interval } from 'rxjs';
   styleUrls: ['./add-query.component.css'],
 })
 export class AddQueryComponent implements OnInit {
-  selectedSource: string | undefined;
+  selectedSource: any;
   query: string | undefined;
   showTestResults: boolean = false;
   message: string | undefined;
@@ -46,7 +46,6 @@ export class AddQueryComponent implements OnInit {
         this.data.dataset?.periodType!
       );
     }
-
     // this.periods = this.periodFilter?.filterPeriod(
     //   this.data.dataset?.periodType!
     // );
@@ -58,12 +57,10 @@ export class AddQueryComponent implements OnInit {
   }
 
   onDataSourceSelection(event: any){
-    this.selectedSource = event && event.value ? event.value : "";
-    console.log(event.value)
-  }
-
-  onSaveInstance(sourceSelected: SourceInterface): void {
-    console.log('On Save ', sourceSelected);
+    // this.selectedSource = event && event.value ? event.value : "";
+    this.data.source = event && event.value ? event.value : '';
+    let source = this.data.sources?.filter(source => source.type === event.value)[0]
+    this.data.source = source
   }
 
   onTest() {
