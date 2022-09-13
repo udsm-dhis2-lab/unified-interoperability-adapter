@@ -21,6 +21,7 @@
                                         <mat-option value="postgresql">PostgreSQL</mat-option>
                                         <mat-option value="oracle">Oracle</mat-option>
                                         <mat-option value="mysql">MySQL</mat-option>
+                                        <mat-option value="mariadb">MariaDB</mat-option>
                                     </mat-select>
                                 </mat-form-field>
                                 <div *ngIf="message && !type">
@@ -31,13 +32,13 @@
                             </div>
                             <div class="col-6">
                                 <label for="url"> URL </label>
-                                <input type="url" name="url" [(ngModel)]="url" class="form-control" placeholder="your-dababase.db" required/> 
+                                <input type="url" name="url" [(ngModel)]="url" class="form-control" placeholder="your-dababase.db" required/>
                                 <div *ngIf="message && !url">
                                         <p class="text-danger">
                                             {{message}}
                                         </p>
                                 </div>
-                                
+
                             </div>
                         </div>
                         <div class="row mt-5">
@@ -48,7 +49,7 @@
                                         <p class="text-danger">
                                             {{message}}
                                         </p>
-                                </div> 
+                                </div>
                             </div>
                             <div class="col-6">
                                 <label for="password"> Password </label>
@@ -57,7 +58,7 @@
                                         <p class="text-danger">
                                             {{message}}
                                         </p>
-                                </div> 
+                                </div>
                             </div>
                         </div> <br>
                         <div class="row mt-3">
@@ -67,7 +68,7 @@
                         </div>
                     </div>
                 </form>
-                
+
             </div>
         </div>
     </div>

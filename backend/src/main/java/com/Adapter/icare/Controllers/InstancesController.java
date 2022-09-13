@@ -13,7 +13,7 @@ import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Services.InstanceService;
 
 @RestController
-@RequestMapping("api/v1/instance")
+@RequestMapping("/api/v1/instance")
 public class InstancesController {
 
     private final InstanceService instanceService;

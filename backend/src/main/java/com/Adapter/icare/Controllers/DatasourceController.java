@@ -13,7 +13,7 @@ import com.Adapter.icare.Domains.Datasource;
 import com.Adapter.icare.Services.DatasourceService;
 
 @RestController
-@RequestMapping("api/v1/datasource")
+@RequestMapping("/api/v1/datasource")
 public class DatasourceController {
 
     private final DatasourceService datasourceService;

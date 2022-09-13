@@ -15,7 +15,7 @@ const httpOptions = {
 })
 export class DataValueFetchService {
 
-  private apiUrl = '/api/v1/datasetElements';
+  private apiUrl = './api/v1/datasetElements';
 
   constructor(private httpClient: HttpClient) {}
 

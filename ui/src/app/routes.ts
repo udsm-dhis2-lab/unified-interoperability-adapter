@@ -6,15 +6,16 @@ import { ReportsComponent } from './components/page/reports/reports.component';
 import { LogsComponent } from './components/page/logs/logs.component';
 import { SettingsComponent } from './components/page/settings/settings.component';
 import { DatasetsComponent } from './components/page/datasets/datasets.component';
+import { AppComponent } from './app.component';
 
 
 export const appRoutes: Routes = [
-    { path: '', redirectTo: '/instances', pathMatch: 'full'},
+    { path: '', redirectTo: '/reports', pathMatch: 'full'},
     { path: 'instances', component: InstanceComponent },
     { path: 'sources', component: SourcesComponent },
     { path: 'mapping', component: MappingComponent },
     { path: 'reports', component: ReportsComponent },
     { path: 'logs', component: LogsComponent },
     { path: 'settings', component: SettingsComponent },
-    { path: 'datasets', component: DatasetsComponent }
+    { path: 'datasets', component: DatasetsComponent },
   ]
