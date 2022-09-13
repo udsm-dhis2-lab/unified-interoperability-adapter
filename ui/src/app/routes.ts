@@ -10,7 +10,7 @@ import { AppComponent } from './app.component';
 
 
 export const appRoutes: Routes = [
-    { path: '', redirectTo: '/instances', pathMatch: 'full'},
+    { path: '', redirectTo: '/reports', pathMatch: 'full'},
     { path: 'instances', component: InstanceComponent },
     { path: 'sources', component: SourcesComponent },
     { path: 'mapping', component: MappingComponent },

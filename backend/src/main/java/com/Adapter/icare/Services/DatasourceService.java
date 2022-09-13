@@ -49,6 +49,9 @@ public class DatasourceService {
             case "oracle":
                 datasource.setUrl("jdbc:oracle:thin:@//"+url);
                 break;
+            case "mariadb":
+                datasource.setUrl("jdbc:mariadb://"+url);
+                break;    
             default:
                 break;
         }
