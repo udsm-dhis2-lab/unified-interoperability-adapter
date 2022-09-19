@@ -37,6 +37,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   @Input() datasetValues: any[] | undefined;
 
   @Output() dataValueUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() valueSentToDHIS2: EventEmitter<any> = new EventEmitter<any>();
 
   @Input() sendingObject: any;
 
@@ -144,10 +145,12 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   }
 
   sendReport() {
-    console.log(this.sendingObject);
     this.reportService
       ?.sendReport(this.sendingObject)
-      .subscribe((values) => console.log(values));
+      .subscribe({
+        next: response => this.valueSentToDHIS2.emit(response),
+        error: err => this.valueSentToDHIS2.emit(err)
+      });
   }
 
   onDownloadToExcel(event: Event, id: string): void {

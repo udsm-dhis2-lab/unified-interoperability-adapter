@@ -1,4 +1,7 @@
-import { InstanceInterface, PeriodInterface } from './../../../resources/interfaces';
+import {
+  InstanceInterface,
+  PeriodInterface,
+} from './../../../resources/interfaces';
 import { Component, OnInit } from '@angular/core';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
@@ -39,17 +42,16 @@ export class ReportsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.instancesService
-      .getInstances()
-      .subscribe({
-        next: (instances) => {
-          this.instances = instances;
-        },
-        error: (error) => {
-          this.message = "Couldn't load instances due to: ", error.error.message;
-          this.messageType = "danger";
-        }
-      })
+    this.instancesService.getInstances().subscribe({
+      next: (instances) => {
+        this.instances = instances;
+      },
+      error: (error) => {
+        (this.message = "Couldn't load instances due to: "),
+          error.error.message;
+        this.messageType = 'danger';
+      },
+    });
 
     if (this.datasets) {
       this.datasetsLength = this.datasets!.length > 0 ? true : false;
@@ -59,19 +61,14 @@ export class ReportsComponent implements OnInit {
   public filterDatasets() {
     this.viewDatasetReport = false;
     if (this.instance) {
-      this.datasetsService
-        .getDatasets()
-        .subscribe({
-          next: (datasets) => {
-            this.datasets = datasets.filter(
-              (d: any) => d.instances.id === this.instance!.id
-            )
-          },
-          error: (error) => {
-            
-          }
-        }
-        );
+      this.datasetsService.getDatasets().subscribe({
+        next: (datasets) => {
+          this.datasets = datasets.filter(
+            (d: any) => d.instances.id === this.instance!.id
+          );
+        },
+        error: (error) => {},
+      });
       this.dataset = undefined;
     } else {
       this.datasets = undefined;
@@ -93,7 +90,6 @@ export class ReportsComponent implements OnInit {
       this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!);
     }
   }
-
 
   viewReport() {
     this.period = this.periodFilter?.calculateDates(
@@ -140,8 +136,7 @@ export class ReportsComponent implements OnInit {
           this.messageType = 'danger';
         },
       });
-    } 
-    else {
+    } else {
       if (this.instance === undefined) {
         this.message = 'This field is required';
         this.messageType = 'danger';
@@ -158,7 +153,17 @@ export class ReportsComponent implements OnInit {
 
     this.message = undefined;
     this.messageType = undefined;
+    this.viewDatasetReport = false;
+  }
+
+  onValueSentToDHIS2(response: any) {
+    this.viewDatasetReport = true;
+    if (response?.error) {
+      this.message = response?.message;
+      this.messageType = 'danger';
+    } else {
+      this.message = 'Data sent successfully.';
+      this.messageType = 'success';
+    }
   }
 }
-
-

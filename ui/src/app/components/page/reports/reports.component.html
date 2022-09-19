@@ -11,8 +11,8 @@
       <div class="row">
         <div class="col-12">
           <div
-            class="alert alert-{{ messageType }} alert-dismissible fade show"
             *ngIf="message && viewDatasetReport"
+            class="alert alert-{{ messageType }} alert-dismissible fade show"
             role="alert"
           >
             {{ message }}
@@ -112,6 +112,7 @@
           [dataset]="dataset"
           [datasetValues]="datasetValues"
           [sendingObject]="sendingObject"
+          (valueSentToDHIS2)="onValueSentToDHIS2($event)"
         >
         </app-dataset-view-form>
       </div>
