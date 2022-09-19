@@ -71,6 +71,7 @@ export function onFormReady(
   const tableElements = document.getElementsByTagName('TABLE');
   _.each(tableElements, (tableElement: any) => {
     tableElement.setAttribute('class', 'table-custom-class table-sm');
+    tableElement.setAttribute('width', "100%");
   });
 
   // Find input items and set required properties to them
@@ -159,6 +160,8 @@ export function onFormReady(
         inputElement.style.pointerEvents = 'none';
       }
     }
+
+     inputElement.setAttribute('type', 'text');
   });
 
   // NOW create totals
