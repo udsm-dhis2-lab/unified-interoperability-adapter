@@ -37,7 +37,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   @Input() datasetValues: any[] | undefined;
 
   @Output() dataValueUpdate: EventEmitter<any> = new EventEmitter<any>();
-  
+
   @Input() sendingObject: any;
 
   _htmlMarkup: SafeHtml | undefined;
@@ -63,7 +63,6 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     };
 
     this.entryFormType = 'aggregate';
-
   }
 
   ngOnInit() {
@@ -71,13 +70,31 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
         this.dataSetFormDesign
       );
+
+      const iframe = document.createElement('iframe');
+      iframe.style.border = 'none';
+      iframe.style.width = '100%';
+      iframe.style.minHeight = '100vh';
+      iframe.setAttribute('id', 'iframe_id');
+      iframe.setAttribute(
+        'onload',
+        'this.height=this.contentWindow.document.body.scrollHeight;'
+      );
+      setTimeout(() => {
+        const ctnr = document.getElementById('html_dataset_report_id');
+        if (ctnr) {
+          ctnr.appendChild(iframe);
+          iframe.contentWindow?.document.open('text/htmlreplace');
+          iframe.contentWindow?.document.write(this.dataSetFormDesign);
+          iframe.contentWindow?.document.close();
+        }
+      }, 50);
     } catch (e) {
       // console.log(JSON.stringify(e));
     }
   }
 
   ngAfterViewInit() {
-    
     this.setScriptsOnHtmlContent(
       this.getScriptsContents(this.dataSetFormDesign)
     );
@@ -112,7 +129,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     );
 
     if (!this.hasScriptSet) {
-      console.log("Data set Values: ",dataElements)
+      console.log('Data set Values: ', dataElements);
       onFormReady(
         this.entryFormType,
         dataElements,
@@ -121,16 +138,49 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
         this.isDataEntryLevel,
         scriptsContentsArray,
         true,
-        () => {
-        }
+        () => {}
       );
     }
   }
 
-  sendReport(){
-    console.log(this.sendingObject)
-    this.reportService?.sendReport(this.sendingObject).subscribe((values) => console.log(values));
+  sendReport() {
+    console.log(this.sendingObject);
+    this.reportService
+      ?.sendReport(this.sendingObject)
+      .subscribe((values) => console.log(values));
   }
 
-}
+  onDownloadToExcel(event: Event, id: string): void {
+    event.stopPropagation();
+    const fileName = 'Report_';
+    event.stopPropagation();
+    const htmlTable = document.getElementById(id)?.outerHTML;
+    // const htmlTable = window.document.getElementById(id).outerHTML;
+    if (htmlTable) {
+      const uri = 'data:application/vnd.ms-excel;base64,',
+        template =
+          '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:' +
+          'office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook>' +
+          '<x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' +
+          '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+          '</head><body><table border="1">{table}</table><br /><table border="1">{table}</table></body></html>',
+        base64 = (s: any) => window.btoa(unescape(encodeURIComponent(s))),
+        format = (s: any, c: any) =>
+          s.replace(/{(\w+)}/g, (m: any, p: any) => c[p]);
 
+      const ctx = { worksheet: 'Data', filename: fileName };
+      let str =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office' +
+        ':excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook>' +
+        '<x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/>' +
+        '</x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body>';
+      // ctx['div'] = htmlTable;
+
+      str += htmlTable + '</body></html>';
+      const link = document.createElement('a');
+      link.download = fileName + '.xls';
+      link.href = uri + base64(format(str, ctx));
+      link.click();
+    }
+  }
+}
