@@ -1,13 +1,19 @@
 <div class="custom-entry-form" id="_custom_entry_form">
   <div class="row">
-    <div class="col-12">
-      <button class="btn btn-outline-success" (click)="sendReport()">
+    <div class="col-12 d-flex justify-content-between">
+      <button class="btn btn-outline-success no-print" (click)="sendReport()">
         Send to DHIS2
+      </button>
+      <button
+        class="btn btn-outline float-right no-print"
+        (click)="onDownloadToExcel($event, 'html-report')"
+      >
+        Download to Excel
       </button>
     </div>
   </div>
   <div class="row">
-    <div class="col-12">
+    <div class="col-12" style="overflow: auto" id="html-report">
       <!-- <div id="html_dataset_report_id"></div> -->
       <div [innerHTML]="_htmlMarkup"></div>
     </div>
