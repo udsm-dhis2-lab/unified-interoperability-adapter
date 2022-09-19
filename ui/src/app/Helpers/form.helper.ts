@@ -161,6 +161,34 @@ export function onFormReady(
     }
   });
 
+  // NOW create totals
+  const totalElems = document.querySelectorAll('[name="indicatorFormula"]');
+  totalElems.forEach((totalElem) => {
+    let formulaToEvaluate: any;
+    formulaToEvaluate = totalElem?.getAttribute('indicatorFormula')
+      ? totalElem.getAttribute('indicatorFormula')
+      : '';
+    const formulaPattern = /#\{.+?\}/g;
+    formulaToEvaluate?.match(formulaPattern)?.forEach((matchedItem: any) => {
+      // get value
+      const valueElem = document.getElementById(
+        matchedItem
+          ?.split('#{')
+          .join('')
+          ?.split('}')
+          .join('')
+          .split('.')
+          .join('-') + '-val'
+      );
+      const dataValue = valueElem?.getAttribute('value')
+        ? valueElem?.getAttribute('value')
+        : '0';
+      formulaToEvaluate = formulaToEvaluate?.replace(matchedItem, dataValue);
+    });
+    const dataEvaluated = eval(formulaToEvaluate);
+    totalElem?.setAttribute('value', dataEvaluated);
+  });
+
   // formReady(formType, entryFormStatusColors, scriptsContentsArray);
 }
 
