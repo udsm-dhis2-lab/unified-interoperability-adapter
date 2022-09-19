@@ -83,3 +83,4 @@ Thumbs.db
 
 #additional files
 db.json
+proxy.conf*

@@ -70,7 +70,7 @@ export function onFormReady(
   // Find table elements and set bootstrap classes
   const tableElements = document.getElementsByTagName('TABLE');
   _.each(tableElements, (tableElement: any) => {
-    tableElement.setAttribute('class', 'table table-bordered table-sm');
+    tableElement.setAttribute('class', 'table-custom-class table-sm');
   });
 
   // Find input items and set required properties to them
@@ -133,7 +133,7 @@ export function onFormReady(
           dataElementType.indexOf('INTEGER') > -1
         ) {
           inputElement.setAttribute('type', 'number');
-          inputElement.setAttribute('class', 'entryfield form-control');
+          inputElement.setAttribute('class', 'entryfield');
 
           if (dataElementType === 'INTEGER_POSITIVE') {
             inputElement.setAttribute('min', 1);
@@ -144,7 +144,7 @@ export function onFormReady(
           }
           inputElement.value = dataElementValue;
         } else {
-          inputElement.setAttribute('class', 'entryfield form-control');
+          inputElement.setAttribute('class', 'entryfield');
           if (forReporting) {
             inputElement.setAttribute('disabled', forReporting);
             inputElement.style.pointerEvents = 'none';
@@ -153,7 +153,7 @@ export function onFormReady(
       }
     } else {
       inputElement.setAttribute('type', 'number'); // by default if no valuetype make input type number
-      inputElement.setAttribute('class', 'entryfield form-control text-center');
+      inputElement.setAttribute('class', 'entryfield text-center');
       if (forReporting) {
         inputElement.setAttribute('disabled', forReporting);
         inputElement.style.pointerEvents = 'none';

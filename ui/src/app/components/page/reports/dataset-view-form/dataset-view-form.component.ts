@@ -37,7 +37,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   @Input() datasetValues: any[] | undefined;
 
   @Output() dataValueUpdate: EventEmitter<any> = new EventEmitter<any>();
-  
+
   @Input() sendingObject: any;
 
   _htmlMarkup: SafeHtml | undefined;
@@ -63,7 +63,6 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     };
 
     this.entryFormType = 'aggregate';
-
   }
 
   ngOnInit() {
@@ -71,13 +70,31 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
         this.dataSetFormDesign
       );
+
+      const iframe = document.createElement('iframe');
+      iframe.style.border = 'none';
+      iframe.style.width = '100%';
+      iframe.style.minHeight = '100vh';
+      iframe.setAttribute('id', 'iframe_id');
+      iframe.setAttribute(
+        'onload',
+        'this.height=this.contentWindow.document.body.scrollHeight;'
+      );
+      setTimeout(() => {
+        const ctnr = document.getElementById('html_dataset_report_id');
+        if (ctnr) {
+          ctnr.appendChild(iframe);
+          iframe.contentWindow?.document.open('text/htmlreplace');
+          iframe.contentWindow?.document.write(this.dataSetFormDesign);
+          iframe.contentWindow?.document.close();
+        }
+      }, 50);
     } catch (e) {
       // console.log(JSON.stringify(e));
     }
   }
 
   ngAfterViewInit() {
-    
     this.setScriptsOnHtmlContent(
       this.getScriptsContents(this.dataSetFormDesign)
     );
@@ -112,7 +129,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     );
 
     if (!this.hasScriptSet) {
-      console.log("Data set Values: ",dataElements)
+      console.log('Data set Values: ', dataElements);
       onFormReady(
         this.entryFormType,
         dataElements,
@@ -121,16 +138,15 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
         this.isDataEntryLevel,
         scriptsContentsArray,
         true,
-        () => {
-        }
+        () => {}
       );
     }
   }
 
-  sendReport(){
-    console.log(this.sendingObject)
-    this.reportService?.sendReport(this.sendingObject).subscribe((values) => console.log(values));
+  sendReport() {
+    console.log(this.sendingObject);
+    this.reportService
+      ?.sendReport(this.sendingObject)
+      .subscribe((values) => console.log(values));
   }
-
 }
-
