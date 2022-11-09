@@ -15,6 +15,7 @@ export class EditInstanceComponent {
   username: string | undefined;
   password: string | undefined;
   url: string | undefined;
+  orgUnit: string | undefined;
   
 
   constructor(
@@ -34,7 +35,8 @@ export class EditInstanceComponent {
       name: instance.name,
       username: instance.username,
       password: instance.password,
-      url: instance.url
+      url: instance.url,
+      orgUnit: instance.orgUnit
     }
     console.log("On Save ", editedInstance);
   }

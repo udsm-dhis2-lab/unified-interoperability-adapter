@@ -15,6 +15,7 @@ export class AddInstanceComponent implements OnInit {
   password: string = "";
   url: string = "";
   message: string | undefined;
+  orgUnit: string | undefined;
 
   @Input() showAddInstanceForm?: boolean;
   
@@ -44,13 +45,17 @@ export class AddInstanceComponent implements OnInit {
     if (this.password === undefined || this.password === ''){
       this.message = "This field is required"
     }
+    if (this.orgUnit === undefined || this.orgUnit === ''){
+      this.message = "This field is required"
+    }
 
-    if(this.name && this.username && this.url && this.password){
+    if(this.name && this.username && this.url && this.password && this.orgUnit){
       const newInstance = {
         name: this.name,
         username: this.username,
         password: this.password,
-        url: this.url
+        url: this.url,
+        orgUnit: this.orgUnit
       }
       this.onAddInstance.emit(newInstance);
       
@@ -58,6 +63,7 @@ export class AddInstanceComponent implements OnInit {
       this.username = '';
       this.password = '';
       this.url = '';
+      this.orgUnit = '';
       this.message = undefined;
     }
   }
