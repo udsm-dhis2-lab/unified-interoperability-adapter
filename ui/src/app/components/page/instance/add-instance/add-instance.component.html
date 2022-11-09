@@ -34,9 +34,9 @@
                         </div>
                         <div class="row mt-5">
                             <div class="col-12">
-                                <label for="username"> Organization Unit (OrgUnit) </label>
+                                <label for="username"> Organization Unit (OrgUnit) ID </label>
                                 <input type="text" name="orgUnit" [(ngModel)]="orgUnit" class="form-control"
-                                    placeholder="Organization Unit" required />
+                                    placeholder="Organization Unit ID" required />
                                 <div *ngIf="message && !orgUnit">
                                         <p class="text-danger">
                                             {{message}}
