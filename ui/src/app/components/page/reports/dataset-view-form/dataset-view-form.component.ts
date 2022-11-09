@@ -91,7 +91,6 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
         }
       }, 50);
     } catch (e) {
-      // console.log(JSON.stringify(e));
     }
   }
 
@@ -99,8 +98,6 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     this.setScriptsOnHtmlContent(
       this.getScriptsContents(this.dataSetFormDesign)
     );
-
-    // console.log("Dataset We need: ",this.dataset)
   }
 
   getScriptsContents(html: any) {
@@ -130,7 +127,6 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     );
 
     if (!this.hasScriptSet) {
-      console.log('Data set Values: ', dataElements);
       onFormReady(
         this.entryFormType,
         dataElements,

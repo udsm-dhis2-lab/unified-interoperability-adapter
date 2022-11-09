@@ -21,7 +21,6 @@ export class SidenavComponent implements OnInit {
 
     this.route.queryParams
       .subscribe(params => {
-        console.log(params);
         this.param = params['admin'];
 
         if (this.param === "admin") {

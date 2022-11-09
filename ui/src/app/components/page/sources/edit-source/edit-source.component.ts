@@ -38,7 +38,6 @@ export class EditSourceComponent implements OnInit {
       password: source.password,
       url: source.url
     }
-    console.log("On Save ", editedSource);
   }
 }
 

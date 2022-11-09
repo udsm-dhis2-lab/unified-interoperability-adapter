@@ -35,7 +35,6 @@ export class DataValueFetchService {
   }
 
   addDataValueFetch(dataValueFetch: DataValueFetchInterface): Observable<DataValueFetchInterface|any> {
-    console.log(dataValueFetch);
     return this.httpClient.post<DataValueFetchInterface|any>(this.apiUrl, dataValueFetch, httpOptions);
   }
   

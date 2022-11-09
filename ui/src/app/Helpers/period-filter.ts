@@ -128,7 +128,6 @@ export class PeriodFilter {
       case 'Monthly':
         //Create date objects
         firstDateObject = new Date(year!, value!, 1);
-        console.log('First Date Object: ', firstDateObject);
 
         lastDateObject = new Date(
           firstDateObject.getFullYear(),

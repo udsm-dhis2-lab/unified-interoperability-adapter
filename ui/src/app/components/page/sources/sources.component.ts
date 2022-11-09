@@ -37,7 +37,6 @@ export class SourcesComponent implements OnInit {
             this.showAddSourceForm = value;
           },
           error: (error) => {
-            console.log(error.message)
           }
         }
       );
@@ -75,7 +74,6 @@ export class SourcesComponent implements OnInit {
         },
         error: (error) => {
           this.message = "Couldn't delete the source."
-          console.log(error.error.message);
           this.messageType = 'danger';
         }
       });
@@ -109,11 +107,8 @@ export class SourcesComponent implements OnInit {
       data: sourceToEdit,
     });
 
-    console.log('Opened: ' + sourceToEdit.type);
-
     dialogRef?.afterClosed().subscribe((result) => {
       if (result) {
-        console.log('Results: ', result);
         this.source = result;
         this.sourcesService.updateSourceActivate(this.source!).subscribe({
           next: () => {

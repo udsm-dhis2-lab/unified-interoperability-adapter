@@ -38,6 +38,5 @@ export class EditInstanceComponent {
       url: instance.url,
       orgUnit: instance.orgUnit
     }
-    console.log("On Save ", editedInstance);
   }
 }

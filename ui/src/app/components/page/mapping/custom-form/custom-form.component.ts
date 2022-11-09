@@ -97,7 +97,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
         this.dataSetFormDesign
       );
     } catch (e) {
-      // console.log(JSON.stringify(e));
     }
   }
 
@@ -151,7 +150,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     // this.uiServices.clickEvent().pipe().subscribe((event) => {
     //   if(event){
     //     event.stopPropagation();
-    //     console.log("Event in Popup: ", event)
     //     this.eventPopupListener(event);
     //   }
     // });
@@ -166,7 +164,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
 
   eventPopupListener = (event: any) => {
     if (event.target.name === 'entryfield') {
-      console.log(event);
       if (!this.dialogOpened) {
         this?.openDialog(this.sources!, event.target.id);
         this.dialogOpened = true;
@@ -190,12 +187,9 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       .getSingleDataValueFetch(dataValueFetchObject)
       .subscribe((dataValueFetch) => {
         this.dataValueFetch = dataValueFetch;
-        // console.log('Data Value Fetching 1: ', this.dataValueFetch);
       });
 
     await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // console.log('Data Value Fetching 2: ', this.dataValueFetch);
 
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
@@ -210,14 +204,11 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       },
     });
 
-    // console.log("Opened: "+ this.dataValueFetch);
-
     dialogRef?.afterClosed().subscribe((result) => {
       this.dialogOpened = false;
       if (result) {
         this.source = result.source;
         this.query = result.query;
-        // console.log("Source: "+this.source?.type + " Query:" + this.query + ' Dataset: ' + this.dataset?.displayName+ ' Element ID: ' + result.elementId)
         this.addDataValueFetch(
           this.source?.id,
           this.query,
@@ -226,7 +217,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
           result.id
         );
       } else {
-        console.log('No data found');
         this.source = undefined;
         this.query = undefined;
       }

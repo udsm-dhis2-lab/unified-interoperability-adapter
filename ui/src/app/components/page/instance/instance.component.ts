@@ -68,7 +68,6 @@ export class InstanceComponent implements OnInit {
           },
           error: (error) => {
               this.message = "Couldn't delete instance"
-              console.log(error.error.message);
               this.messageType = 'danger';
           },
         }
@@ -101,15 +100,10 @@ export class InstanceComponent implements OnInit {
       data: instanceToEdit,
     });
 
-    console.log('Opened: ' + instanceToEdit.url);
-
     dialogRef?.afterClosed().subscribe((result) => {
       if (result) {
         if (result.username && result.password && result.name && result.url) {
-          console.log(
-            `Results: ,
-            ${result.username} && ${result.password} && ${result.name} && ${result.url} `
-          );
+          
           this.instance = result;
           this.instancesService.updateInstance(this.instance!).subscribe({
             next: (value) => {
