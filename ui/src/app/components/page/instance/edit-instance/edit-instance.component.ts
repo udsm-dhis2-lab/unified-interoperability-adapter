@@ -15,15 +15,15 @@ export class EditInstanceComponent {
   username: string | undefined;
   password: string | undefined;
   url: string | undefined;
-  orgUnit: string | undefined;
-  
+  organisationUnitId: string | undefined;
+
 
   constructor(
     public dialogRef: MatDialogRef<EditInstanceComponent>,
     @Inject(MAT_DIALOG_DATA) public instanceToEdit: InstanceInterface,
-  ) 
+  )
   {
-    
+
   }
 
   onNoClick(): void {
@@ -36,7 +36,7 @@ export class EditInstanceComponent {
       username: instance.username,
       password: instance.password,
       url: instance.url,
-      orgUnit: instance.orgUnit
+      organisationUnitId: instance.organisationUnitId
     }
   }
 }

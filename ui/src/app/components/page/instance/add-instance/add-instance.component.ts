@@ -15,14 +15,14 @@ export class AddInstanceComponent implements OnInit {
   password: string = "";
   url: string = "";
   message: string | undefined;
-  orgUnit: string | undefined;
+  organisationUnitId: string | undefined;
 
   @Input() showAddInstanceForm?: boolean;
-  
+
   subscription: Subscription | undefined;
 
   @Output() onAddInstance: EventEmitter<InstanceInterface> = new EventEmitter();
-  
+
   constructor(private uiService?: UiService) {
     this.subscription = this.uiService?.onToggleAddInstanceForm().subscribe(
       (value: boolean) => (this.showAddInstanceForm = value)
@@ -45,25 +45,25 @@ export class AddInstanceComponent implements OnInit {
     if (this.password === undefined || this.password === ''){
       this.message = "This field is required"
     }
-    if (this.orgUnit === undefined || this.orgUnit === ''){
+    if (this.organisationUnitId === undefined || this.organisationUnitId === ''){
       this.message = "This field is required"
     }
 
-    if(this.name && this.username && this.url && this.password && this.orgUnit){
+    if(this.name && this.username && this.url && this.password && this.organisationUnitId){
       const newInstance = {
         name: this.name,
         username: this.username,
         password: this.password,
         url: this.url,
-        orgUnit: this.orgUnit
+        organisationUnitId: this.organisationUnitId
       }
       this.onAddInstance.emit(newInstance);
-      
+
       this.name = '';
       this.username = '';
       this.password = '';
       this.url = '';
-      this.orgUnit = '';
+      this.organisationUnitId = '';
       this.message = undefined;
     }
   }
