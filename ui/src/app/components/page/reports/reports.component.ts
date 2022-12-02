@@ -27,11 +27,14 @@ export class ReportsComponent implements OnInit {
   periods?: PeriodInterface[];
   periodValue: any;
   period?: any;
+  selectedYear?: number;
+  selectionYears?: PeriodInterface[];
   viewDatasetReport: boolean = false;
   datasetValues: any;
   sendingObject: any;
   messageType: string | undefined;
   message: string | undefined;
+  showYearField: boolean = true;
 
   constructor(
     private datasetsService: DatasetsService,
@@ -58,6 +61,16 @@ export class ReportsComponent implements OnInit {
     }
   }
 
+  getSelectionYears() {
+    if (this.dataset?.periodType! === 'Yearly') {
+      this.showYearField = false;
+      this.checkDataset();
+    } else {
+      this.showYearField = true;
+      this.selectionYears = this.periodFilter?.getListOfYears(10);
+    }
+  }
+
   public filterDatasets() {
     this.viewDatasetReport = false;
     if (this.instance) {
@@ -76,18 +89,25 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  checkDataset(dataset: DatasetInterface) {
-    // this.periods = this.periodFilter?.filterPeriod('Weekly', 2020);
-
+  checkDataset() {
     this.viewDatasetReport = false;
-    this.dataset = dataset;
-    if (this.dataset?.periodType! === 'Weekly') {
+    if (this.selectedYear) {
+      if (this.dataset?.periodType === 'Weekly') {
+        this.periods = this.periodFilter?.filterPeriod(
+          this.dataset?.periodType!,
+          this.selectedYear
+        );
+      } else {
+        this.periods = this.periodFilter?.filterPeriod(
+          this.dataset?.periodType!,
+          this.selectedYear
+        );
+      }
+    } else {
       this.periods = this.periodFilter?.filterPeriod(
         this.dataset?.periodType!,
-        2019
+        this.selectedYear
       );
-    } else {
-      this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!);
     }
   }
 

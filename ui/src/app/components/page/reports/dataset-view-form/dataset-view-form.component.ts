@@ -51,9 +51,9 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
 
   constructor(
     private uiService: UiService,
+    private reportService: ReportsService,
     private sanitizer?: DomSanitizer,
-    public dialog?: MatDialog,
-    private reportService?: ReportsService
+    public dialog?: MatDialog
   ) {
     this.entryFormStatusColors = {
       OK: '#b9ffb9',
@@ -141,8 +141,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   }
 
   sendReport() {
-    this.reportService
-      ?.sendReport(this.sendingObject)
+    this.reportService.sendReport(this.sendingObject)
       .subscribe({
         next: response => this.valueSentToDHIS2.emit(response),
         error: err => this.valueSentToDHIS2.emit(err)
