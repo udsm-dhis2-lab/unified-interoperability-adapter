@@ -194,7 +194,7 @@ export class PeriodFilter {
       week = this.getWeekNumber(new Date());
     }
 
-    let weekObjects = [];
+    let weekObjects: any[] = [];
 
     for (let i = 1; i <= week; i++) {
       let weekValues = this.getDateRangeOfWeek(i, year);
@@ -202,7 +202,10 @@ export class PeriodFilter {
         name: `Week ${weekValues.weekNumber} (${weekValues.firstDate} - ${weekValues.lastDate})`,
         value: weekValues.weekNumber,
       };
-      weekObjects.push(weekObject);
+      weekObjects = [
+        ...weekObjects,
+        weekObject
+      ];
     }
 
     return weekObjects;
@@ -235,12 +238,12 @@ export class PeriodFilter {
 
     d1.setDate(d1.getDate() + 7 * weeksInTheFuture);
     let rangeIsFrom = String(
-      d1.getDate() + '/' + (d1.getMonth() + 1) + '/' + d1.getFullYear()
+      d1.getFullYear() + '-' + (d1.getMonth() + 1) + '-' + d1.getDate()
     );
 
     d1.setDate(d1.getDate() + 6);
     let rangeIsTo = String(
-      d1.getDate() + '/' + (d1.getMonth() + 1) + '/' + d1.getFullYear()
+      d1.getFullYear() + '-' + (d1.getMonth() + 1) + '-' + d1.getDate()
     );
 
     return {
