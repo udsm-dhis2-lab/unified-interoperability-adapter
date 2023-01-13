@@ -35,7 +35,6 @@ export class DatasetsService {
   }
 
   addDataset(dataset: DatasetInterface): Observable<DatasetInterface | any> {
-    console.log("New dataset:  ",dataset);
     return this.httpClient.post<DatasetInterface>(this.apiUrl, dataset, httpOptions);
   }
 

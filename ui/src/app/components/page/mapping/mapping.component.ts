@@ -69,7 +69,6 @@ export class MappingComponent implements OnInit {
 
 
   onChange(){
-    console.log(this.dataset?.displayName);
   }
 
   onSubmit(){
@@ -80,7 +79,6 @@ export class MappingComponent implements OnInit {
     }
 
     this.onViewDataset.emit(this.dataset)
-    // console.log(dataSetToView)
     
     if(dataSetToView.id){
       this.message = "Ready to view the form Design!" 
@@ -122,7 +120,6 @@ export class MappingComponent implements OnInit {
   }
   
   changesOnDataValue(e: Event){
-    console.log(e)
   }
 
 }

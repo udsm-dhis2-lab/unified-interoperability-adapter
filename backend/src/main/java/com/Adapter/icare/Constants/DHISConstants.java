@@ -16,5 +16,5 @@ public class DHISConstants {
     public String DHIS2Password; // = "Jezzy@1234";
 
     @Value("${DHIS_OU:ImspTQPwCqd}")
-    public String OrgUnit; // = "a6eqFyAF1Rz"; // AAR TABATA Other Clinic
+    public String OrgUnit;//="Yc6Dt4UL6yl"(Chuo Kikuu Health Center); // = "a6eqFyAF1Rz"; // AAR TABATA Other Clinic
 }

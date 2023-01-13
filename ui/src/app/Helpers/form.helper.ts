@@ -70,7 +70,8 @@ export function onFormReady(
   // Find table elements and set bootstrap classes
   const tableElements = document.getElementsByTagName('TABLE');
   _.each(tableElements, (tableElement: any) => {
-    tableElement.setAttribute('class', 'table table-bordered table-sm');
+    tableElement.setAttribute('class', 'table-custom-class table-sm');
+    tableElement.setAttribute('width', "100%");
   });
 
   // Find input items and set required properties to them
@@ -133,7 +134,7 @@ export function onFormReady(
           dataElementType.indexOf('INTEGER') > -1
         ) {
           inputElement.setAttribute('type', 'number');
-          inputElement.setAttribute('class', 'entryfield form-control');
+          inputElement.setAttribute('class', 'entryfield');
 
           if (dataElementType === 'INTEGER_POSITIVE') {
             inputElement.setAttribute('min', 1);
@@ -144,7 +145,7 @@ export function onFormReady(
           }
           inputElement.value = dataElementValue;
         } else {
-          inputElement.setAttribute('class', 'entryfield form-control');
+          inputElement.setAttribute('class', 'entryfield');
           if (forReporting) {
             inputElement.setAttribute('disabled', forReporting);
             inputElement.style.pointerEvents = 'none';
@@ -153,12 +154,42 @@ export function onFormReady(
       }
     } else {
       inputElement.setAttribute('type', 'number'); // by default if no valuetype make input type number
-      inputElement.setAttribute('class', 'entryfield form-control text-center');
+      inputElement.setAttribute('class', 'entryfield text-center');
       if (forReporting) {
         inputElement.setAttribute('disabled', forReporting);
         inputElement.style.pointerEvents = 'none';
       }
     }
+
+     inputElement.setAttribute('type', 'text');
+  });
+
+  // NOW create totals
+  const totalElems = document.querySelectorAll('[name="indicatorFormula"]');
+  totalElems.forEach((totalElem) => {
+    let formulaToEvaluate: any;
+    formulaToEvaluate = totalElem?.getAttribute('indicatorFormula')
+      ? totalElem.getAttribute('indicatorFormula')
+      : '';
+    const formulaPattern = /#\{.+?\}/g;
+    formulaToEvaluate?.match(formulaPattern)?.forEach((matchedItem: any) => {
+      // get value
+      const valueElem = document.getElementById(
+        matchedItem
+          ?.split('#{')
+          .join('')
+          ?.split('}')
+          .join('')
+          .split('.')
+          .join('-') + '-val'
+      );
+      const dataValue = valueElem?.getAttribute('value')
+        ? valueElem?.getAttribute('value')
+        : '0';
+      formulaToEvaluate = formulaToEvaluate?.replace(matchedItem, dataValue);
+    });
+    const dataEvaluated = eval(formulaToEvaluate);
+    totalElem?.setAttribute('value', dataEvaluated);
   });
 
   // formReady(formType, entryFormStatusColors, scriptsContentsArray);

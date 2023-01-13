@@ -21,7 +21,6 @@ export class BodyComponent implements OnInit {
   }
 
   toggleAddForm() {
-    console.log('toggleAddForm');
   }
 
 }

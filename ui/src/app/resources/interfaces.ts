@@ -6,6 +6,7 @@ export interface InstanceInterface {
     url: string;
     username: string;
     password: string;
+    organisationUnitId: string;
 }
 
 

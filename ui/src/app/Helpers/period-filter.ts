@@ -9,83 +9,67 @@ import { PeriodInterface } from '../resources/interfaces';
 export class PeriodFilter {
   period?: string;
 
-  years?: PeriodInterface[];
-
   constructor() {}
 
   filterPeriod(_periodType: string, year?: number) {
+    console.log("Yearly selected: ", year)
     switch (_periodType) {
       case 'Yearly':
-        let currrentyear = new Date().getFullYear();
-
-        this.years = [
-          {
-            name: currrentyear.toString(),
-            value: currrentyear,
-          },
-        ];
-
-        for (let i = 1; i <= 20; i++) {
-          this.years.push({
-            name: (currrentyear - i).toString(),
-            value: currrentyear - i,
-          });
-        }
-        return this.years;
+        return this.getListOfYears(10)
 
       case 'Monthly':
         return [
           {
-            name: 'January',
+            name: `January ${year}`,
             value: 0,
           },
           {
-            name: 'February',
+            name: `February ${year}`,
             value: 1,
           },
           {
-            name: 'March',
+            name: `March ${year}`,
             value: 2,
           },
           {
-            name: 'April',
+            name: `April ${year}`,
             value: 3,
           },
           {
-            name: 'May',
+            name: `May ${year}`,
             value: 4,
           },
           {
-            name: 'June',
+            name: `June ${year}`,
             value: 5,
           },
           {
-            name: 'July',
+            name: `July ${year}`,
             value: 6,
           },
           {
-            name: 'August',
+            name: `August ${year}`,
             value: 7,
           },
           {
-            name: 'September',
+            name: `September ${year}`,
             value: 8,
           },
           {
-            name: 'October',
+            name: `October ${year}`,
             value: 9,
           },
           {
-            name: 'November',
+            name: `November ${year}`,
             value: 10,
           },
           {
-            name: 'December',
+            name: `December ${year}`,
             value: 11,
           },
         ];
       case 'Weekly':
-        return this.weeksInYear(year!)
+        return this.weeksInYear(year!);
       default:
         return undefined;
     }
@@ -128,7 +112,6 @@ export class PeriodFilter {
       case 'Monthly':
         //Create date objects
         firstDateObject = new Date(year!, value!, 1);
-        console.log('First Date Object: ', firstDateObject);
 
         lastDateObject = new Date(
           firstDateObject.getFullYear(),
@@ -156,11 +139,11 @@ export class PeriodFilter {
         };
 
       case 'Weekly':
-        let weekObject =  this.getDateRangeOfWeek(value!, year!);
+        let weekObject = this.getDateRangeOfWeek(value!, year!);
         return {
           firstDate: weekObject.firstDate,
           lastDate: weekObject.lastDate,
-        }
+        };
       default:
         return undefined;
     }
@@ -211,15 +194,18 @@ export class PeriodFilter {
       week = this.getWeekNumber(new Date());
     }
 
-    let weekObjects = [];
+    let weekObjects: any[] = [];
 
     for (let i = 1; i <= week; i++) {
       let weekValues = this.getDateRangeOfWeek(i, year);
       let weekObject = {
         name: `Week ${weekValues.weekNumber} (${weekValues.firstDate} - ${weekValues.lastDate})`,
-        value: weekValues.weekNumber
-      }
-      weekObjects.push(weekObject);
+        value: weekValues.weekNumber,
+      };
+      weekObjects = [
+        ...weekObjects,
+        weekObject
+      ];
     }
 
     return weekObjects;
@@ -243,21 +229,21 @@ export class PeriodFilter {
 
   getDateRangeOfWeek(weekNo: number, year: number) {
     var d1 = new Date(year, 11, 31);
-    const numOfdaysPastSinceLastMonday = eval(String((d1.getDay()+1) - 1));
+    const numOfdaysPastSinceLastMonday = eval(String(d1.getDay() + 1 - 1));
 
     d1.setDate(d1.getDate() - numOfdaysPastSinceLastMonday);
 
     let weekNoToday = this.getWeekNumber(d1);
-    let weeksInTheFuture = (weekNo - weekNoToday);
+    let weeksInTheFuture = weekNo - weekNoToday;
 
-    d1.setDate(d1.getDate() + (7 * weeksInTheFuture));
+    d1.setDate(d1.getDate() + 7 * weeksInTheFuture);
     let rangeIsFrom = String(
-      d1.getDate() + '/' + (d1.getMonth() + 1) + '/' + d1.getFullYear()
+      d1.getFullYear() + '-' + (d1.getMonth() + 1) + '-' + d1.getDate()
     );
 
     d1.setDate(d1.getDate() + 6);
     let rangeIsTo = String(
-      d1.getDate() + '/' + (d1.getMonth() + 1) + '/' + d1.getFullYear()
+      d1.getFullYear() + '-' + (d1.getMonth() + 1) + '-' + d1.getDate()
     );
 
     return {
@@ -265,6 +251,39 @@ export class PeriodFilter {
       lastDate: rangeIsTo,
       weekNumber: weekNo,
     };
+  }
+
+  getListOfYears(
+    numberOfPastYears: number,
+    fromYear?: number
+  ): PeriodInterface[] {
+    let years: PeriodInterface[] = [];
+    let currentYear: number = fromYear ? fromYear : new Date().getFullYear();
+    if (fromYear && fromYear > numberOfPastYears) {
+      for (let i = 0; i <= numberOfPastYears; i++) {
+        years = [
+          ...years,
+          {
+            name: (currentYear - i).toString(),
+            value: currentYear - i,
+          },
+        ];
+      }
+      return years;
+    } else if (!fromYear) {
+      for (var i = 0; i < numberOfPastYears; i++) {
+        years = [
+          ...years,
+          {
+            name: (currentYear - i).toString(),
+            value: currentYear - i,
+          },
+        ];
+      }
+      return years;
+    } else {
+      return [];
+    }
   }
 }
 

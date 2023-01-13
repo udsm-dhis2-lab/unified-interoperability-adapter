@@ -26,6 +26,7 @@ public class ReportsController {
     @Autowired
     private final ReportsService reportsService;
 
+
     public ReportsController(ReportsService reportsService) {
         this.reportsService = reportsService;
     }
@@ -60,7 +61,9 @@ public class ReportsController {
             String dataElementCatCombo = dataElementId + "-" +categoryComboId +"-val";
             
             //Adding to a list
-            dvslist.add(new DataValueSets(dataElementCatCombo,queryResult));    
+            dvslist.add(new DataValueSets(dataElementCatCombo,queryResult));
+            rs.close();
+            con.close();    
         }
         return dvslist;
     }
@@ -75,7 +78,7 @@ public class ReportsController {
         String period = reportValuesSent.getPeriod();
         String completeDate = java.time.LocalDate.now().toString();
         String attributeOptCombo = "";
-        String orgUnitId = constant.OrgUnit; 
+        //String orgUnitId = constant.OrgUnit; 
 
         for (DataSetElements dataSetElement : dSetElements) {
             
@@ -100,9 +103,11 @@ public class ReportsController {
             
             //Adding the data values
             dataValues.add(new DataValues(dataElementId, categoryOptionComboId,queryResult,""));
+            rs.close();
+            con.close();    
         }
 
-        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetId, completeDate,period, orgUnitId,attributeOptCombo,dataValues);
+        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetId, completeDate,period, "",attributeOptCombo,dataValues);
 
         return reportsService.SendDataToDHIS(dhisAggregateValues,datasetId);
 

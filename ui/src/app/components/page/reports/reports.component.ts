@@ -1,4 +1,7 @@
-import { InstanceInterface, PeriodInterface } from './../../../resources/interfaces';
+import {
+  InstanceInterface,
+  PeriodInterface,
+} from './../../../resources/interfaces';
 import { Component, OnInit } from '@angular/core';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
@@ -24,11 +27,14 @@ export class ReportsComponent implements OnInit {
   periods?: PeriodInterface[];
   periodValue: any;
   period?: any;
+  selectedYear?: number;
+  selectionYears?: PeriodInterface[];
   viewDatasetReport: boolean = false;
   datasetValues: any;
   sendingObject: any;
   messageType: string | undefined;
   message: string | undefined;
+  showYearField: boolean = true;
 
   constructor(
     private datasetsService: DatasetsService,
@@ -39,39 +45,43 @@ export class ReportsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.instancesService
-      .getInstances()
-      .subscribe({
-        next: (instances) => {
-          this.instances = instances;
-        },
-        error: (error) => {
-          this.message = "Couldn't load instances due to: ", error.error.message;
-          this.messageType = "danger";
-        }
-      })
+    this.instancesService.getInstances().subscribe({
+      next: (instances) => {
+        this.instances = instances;
+      },
+      error: (error) => {
+        (this.message = "Couldn't load instances due to: "),
+          error.error.message;
+        this.messageType = 'danger';
+      },
+    });
 
     if (this.datasets) {
       this.datasetsLength = this.datasets!.length > 0 ? true : false;
     }
   }
 
+  getSelectionYears() {
+    if (this.dataset?.periodType! === 'Yearly') {
+      this.showYearField = false;
+      this.checkDataset();
+    } else {
+      this.showYearField = true;
+      this.selectionYears = this.periodFilter?.getListOfYears(10);
+    }
+  }
+
   public filterDatasets() {
     this.viewDatasetReport = false;
     if (this.instance) {
-      this.datasetsService
-        .getDatasets()
-        .subscribe({
-          next: (datasets) => {
-            this.datasets = datasets.filter(
-              (d: any) => d.instances.id === this.instance!.id
-            )
-          },
-          error: (error) => {
-            
-          }
-        }
-        );
+      this.datasetsService.getDatasets().subscribe({
+        next: (datasets) => {
+          this.datasets = datasets.filter(
+            (d: any) => d.instances.id === this.instance!.id
+          );
+        },
+        error: (error) => {},
+      });
       this.dataset = undefined;
     } else {
       this.datasets = undefined;
@@ -79,26 +89,33 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  checkDataset(dataset: DatasetInterface) {
-    // this.periods = this.periodFilter?.filterPeriod('Weekly', 2020);
-
+  checkDataset() {
     this.viewDatasetReport = false;
-    this.dataset = dataset;
-    if (this.dataset?.periodType! === 'Weekly') {
+    if (this.selectedYear) {
+      if (this.dataset?.periodType === 'Weekly') {
+        this.periods = this.periodFilter?.filterPeriod(
+          this.dataset?.periodType!,
+          this.selectedYear
+        );
+      } else {
+        this.periods = this.periodFilter?.filterPeriod(
+          this.dataset?.periodType!,
+          this.selectedYear
+        );
+      }
+    } else {
       this.periods = this.periodFilter?.filterPeriod(
         this.dataset?.periodType!,
-        2019
+        this.selectedYear
       );
-    } else {
-      this.periods = this.periodFilter?.filterPeriod(this.dataset?.periodType!);
     }
   }
-
 
   viewReport() {
     this.period = this.periodFilter?.calculateDates(
       this.dataset?.periodType!,
-      this.periodValue
+      this.periodValue,
+      this.selectedYear
     );
 
     if (this.dataset && this.periodValue >= 0 && this.instance) {
@@ -140,8 +157,7 @@ export class ReportsComponent implements OnInit {
           this.messageType = 'danger';
         },
       });
-    } 
-    else {
+    } else {
       if (this.instance === undefined) {
         this.message = 'This field is required';
         this.messageType = 'danger';
@@ -158,7 +174,17 @@ export class ReportsComponent implements OnInit {
 
     this.message = undefined;
     this.messageType = undefined;
+    this.viewDatasetReport = false;
+  }
+
+  onValueSentToDHIS2(response: any) {
+    this.viewDatasetReport = true;
+    if (response?.error) {
+      this.message = response?.message;
+      this.messageType = 'danger';
+    } else {
+      this.message = 'Data sent successfully.';
+      this.messageType = 'success';
+    }
   }
 }
-
-

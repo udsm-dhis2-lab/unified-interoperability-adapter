@@ -43,7 +43,6 @@ export class InstancesService {
   }
 
   addInstance(instance: InstanceInterface): Observable<InstanceInterface| any> {
-    console.log('Payload: ', instance);
     return this.httpClient.post<InstanceInterface>(
       this.apiUrl,
       instance,

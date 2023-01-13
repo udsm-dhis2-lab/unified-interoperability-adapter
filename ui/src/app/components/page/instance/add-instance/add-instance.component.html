@@ -33,6 +33,18 @@
                             </div>
                         </div>
                         <div class="row mt-5">
+                            <div class="col-12">
+                                <label for="username"> Organization Unit (organisationUnitId) ID </label>
+                                <input type="text" name="organisationUnitId" [(ngModel)]="organisationUnitId" class="form-control"
+                                    placeholder="Organization Unit ID" required />
+                                <div *ngIf="message && !organisationUnitId">
+                                        <p class="text-danger">
+                                            {{message}}
+                                        </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-5">
                             <div class="col-6">
                                 <label for="username"> Username </label>
                                 <input type="text" name="username" [(ngModel)]="username" class="form-control"
