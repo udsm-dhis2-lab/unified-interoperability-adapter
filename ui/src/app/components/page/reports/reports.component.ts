@@ -114,7 +114,8 @@ export class ReportsComponent implements OnInit {
   viewReport() {
     this.period = this.periodFilter?.calculateDates(
       this.dataset?.periodType!,
-      this.periodValue
+      this.periodValue,
+      this.selectedYear
     );
 
     if (this.dataset && this.periodValue >= 0 && this.instance) {
