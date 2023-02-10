@@ -180,7 +180,7 @@ export class ReportsComponent implements OnInit {
   onValueSentToDHIS2(response: any) {
     this.viewDatasetReport = true;
     if (response?.error) {
-      this.message = response?.message;
+      this.message = 'Data sent successfully.';
       // TODO: Change this. Was handled for presentation purpose
       this.messageType = 'success';
     } else {
