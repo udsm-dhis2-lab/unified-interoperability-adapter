@@ -62,7 +62,7 @@
             },
             "development": {
               "browserTarget": "Adaptor:build:development",
-              "proxyConfig": "proxy.conf.json"
+              "proxyConfig": "proxy.config.json"
             }
           },
           "defaultConfiguration": "development"

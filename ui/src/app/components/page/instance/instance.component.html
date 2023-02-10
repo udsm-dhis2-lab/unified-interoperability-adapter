@@ -1,8 +1,8 @@
 <div class="w-100 d-flex justify-content-between">
-  <div style="width: 160px; border-right: solid 1px #eee">
+  <div>
     <app-sidenav [selectedRoute]="'instances'"></app-sidenav>
   </div>
-  <div class="row mt-4" style="width: calc(100% - 169px)">
+  <div class="row mt-4" style="width: calc(100%); margin-left: 16px">
     <div class="col-12">
       <div class="row">
         <div class="col-12">
@@ -100,6 +100,8 @@
           </div>
         </div>
       </div>
+
+      <app-body></app-body>
     </div>
   </div>
 </div>
