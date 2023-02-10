@@ -1,8 +1,13 @@
-<button [ngStyle]="{
-        'background-color': backgroundColor, 
-        'color':fontColor, 
-        'border': '1px ' + borderColor + ' solid'
-    }" 
-    (click)="onClick()" class="btn">
-    {{ text }}  
-</button>
+<div class="d-flex justify-content-end">
+  <button
+    [ngStyle]="{
+      'background-color': backgroundColor,
+      color: fontColor,
+      border: '1px ' + borderColor + ' solid'
+    }"
+    (click)="onClick()"
+    class="btn"
+  >
+    {{ text }}
+  </button>
+</div>

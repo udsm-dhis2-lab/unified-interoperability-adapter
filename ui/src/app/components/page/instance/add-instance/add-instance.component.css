@@ -1,19 +1,25 @@
 .add-form {
-    margin: 0 0 5vh -5vw;
-
+  margin: 0 0 5vh -5vw;
 }
 
 input[type="checkbox"] {
-    margin: 1vh 0 0 0;
-    height: 2vh;
-    width: 2vw
+  margin: 1vh 0 0 0;
+  height: 2vh;
+  width: 2vw;
 }
 .btn-block {
-    width: 100%;
+  width: 100%;
 }
+
 .form-control {
-    border-bottom: 1px solid;
-    border-top: 0px none;
-    border-left: 0px none;
-    border-right: 0px none;
+  border-bottom: 1px solid;
+  border-top: 0px none;
+  border-left: 0px none;
+  border-right: 0px none;
+  border-radius: 0 !important;
+}
+
+input,
+input:hover {
+  outline: none !important;
 }

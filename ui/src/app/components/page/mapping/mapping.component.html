@@ -1,45 +1,68 @@
-<div class="row">
+<div class="w-100 d-flex justify-content-between">
+  <div style="width: 160px; border-right: solid 1px #eee">
+    <app-sidenav [selectedRoute]="'mapping'"></app-sidenav>
+  </div>
+  <div class="row mt-4" style="width: calc(100% - 169px)">
     <div class="col-12">
-        <div class="row">
-
-            <div class="col-12">
-                <div class="mb-3">
-                    <h3 class="text-"> Mapping</h3>
-                </div>
-            </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="mb-3">
+            <h3 class="text-">Mapping</h3>
+          </div>
         </div>
+      </div>
 
-        <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
-            {{ message}}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
+      <div
+        class="alert alert-{{ messageType }} alert-dismissible fade show"
+        *ngIf="message"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
 
-        <form (ngSubmit)="onSubmit()" class="row">
-            <div class="form-group row">
-                <div class="col-6">
-                    <mat-form-field class="mt-control">
-                        <mat-label>Instance: </mat-label>
-                        <mat-select [(ngModel)]="instance" name="instance" (selectionChange)="filterDatasets()">
-                            <mat-option></mat-option>
-                            <mat-option *ngFor="let instance of instances" [value]="instance">
-                                {{instance.name}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-                <div class="col-6">
-                    <mat-form-field class="mt-control">
-                        <mat-label>Linked Datasets: </mat-label>
-                        <mat-select [(ngModel)]="dataset" name="dataset" (selectionChange)="checkDataset(dataset!)">
-                            <mat-option></mat-option>
-                            <mat-option *ngFor="let dataset of datasets" [value]="dataset">
-                                {{dataset.displayName}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
-                </div>
-                
-                <!-- <div class="col-4 mt-4" *ngIf="datasets?.length">
+      <form (ngSubmit)="onSubmit()" class="row">
+        <div class="form-group row">
+          <div class="col-6">
+            <mat-form-field class="mt-control">
+              <mat-label>Instance: </mat-label>
+              <mat-select
+                [(ngModel)]="instance"
+                name="instance"
+                (selectionChange)="filterDatasets()"
+              >
+                <mat-option></mat-option>
+                <mat-option
+                  *ngFor="let instance of instances"
+                  [value]="instance"
+                >
+                  {{ instance.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="mt-control">
+              <mat-label>Linked Datasets: </mat-label>
+              <mat-select
+                [(ngModel)]="dataset"
+                name="dataset"
+                (selectionChange)="checkDataset(dataset!)"
+              >
+                <mat-option></mat-option>
+                <mat-option *ngFor="let dataset of datasets" [value]="dataset">
+                  {{ dataset.displayName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- <div class="col-4 mt-4" *ngIf="datasets?.length">
                     <app-button 
                         [ngStyle]="{
                             'padding-bottom': '90px',
@@ -51,20 +74,24 @@
                         text="View">
                     </app-button>
                 </div> -->
-            </div>
-        </form>
-
-        
-        
-
-        <div class="row mt-5" *ngIf="dataset?.formDesignCode">
-            
-            <div class="col-12">
-                <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
-                <app-custom-form [isDataEntryLevel]="true" [presetValuesSections]="[]" [dataSetFormDesign]="dataset?.formDesignCode"
-                    [dataSetDataValues]="{}" [sources]="sources" [dataset]="dataset" (dataValueUpdate)="changesOnDataValue($event)">
-                </app-custom-form>
-            </div>
         </div>
+      </form>
+
+      <div class="row mt-5" *ngIf="dataset?.formDesignCode">
+        <div class="col-12">
+          <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
+          <app-custom-form
+            [isDataEntryLevel]="true"
+            [presetValuesSections]="[]"
+            [dataSetFormDesign]="dataset?.formDesignCode"
+            [dataSetDataValues]="{}"
+            [sources]="sources"
+            [dataset]="dataset"
+            (dataValueUpdate)="changesOnDataValue($event)"
+          >
+          </app-custom-form>
+        </div>
+      </div>
     </div>
+  </div>
 </div>

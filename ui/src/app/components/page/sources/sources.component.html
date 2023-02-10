@@ -1,70 +1,94 @@
-<div class="row">
+<div class="w-100 d-flex justify-content-between">
+  <div style="width: 160px; border-right: solid 1px #eee">
+    <app-sidenav [selectedRoute]="'sources'"></app-sidenav>
+  </div>
+  <div class="row mt-4" style="width: calc(100% - 169px)">
     <div class="col-12">
       <div class="row">
-            <div class="col-8">
-                <div class="mb-3">
-                    <h3 class="text-"> Sources</h3>
-                </div>
-            </div>
-            <div class="col-4">
-                <div>
-                    <app-button
-                    [ngStyle]="{
-                        'padding': '90px',
-                        'margin': '0 0 0 -0vw'
-                    }" 
-                    backgroundColor="{{ showAddSourceForm ? 'red' : 'transparent' }}" 
-                    fontColor="{{ showAddSourceForm ? 'white' : 'green' }}"
-                    borderColor="{{ showAddSourceForm ? 'red' : 'green' }}" 
-                    text="{{ showAddSourceForm ? 'Hide Form' : 'Add Data Source' }}"
-                    (btnClick) = "onToggle()"
+        <div class="col-8">
+          <div class="mb-3">
+            <h3 class="text-">Sources</h3>
+          </div>
+        </div>
+        <div class="col-4"></div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Database Type</th>
+                <th>URL</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let source of sources; odd as isOdd">
+              <tr [ngClass]="{ 'table-secondary': isOdd }">
+                <td>{{ source.type }}</td>
+                <td>{{ source.url }}</td>
+                <td>
+                  <div class="buttons">
+                    <a
+                      class="btn btn-outline-primary"
+                      (click)="openDialog(source)"
                     >
-
-                    </app-button>
-                </div>
-            </div>
+                      <fa-icon [icon]="faEdit"></fa-icon>
+                    </a>
+                    <a
+                      class="btn btn-outline-danger"
+                      style="margin-left: 8px"
+                      (click)="onDelete(source)"
+                      ><fa-icon [icon]="faTrash"></fa-icon
+                    ></a>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
 
+      <div class="row">
         <div class="row">
-            <div class="row">
-                <div class="col-12">
-                    <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
-                        {{ message}}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                </div>
+          <div class="col-12">
+            <div
+              class="alert alert-{{ messageType }} alert-dismissible fade show"
+              *ngIf="message"
+              role="alert"
+            >
+              {{ message }}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
             </div>
-            <div class="col-12">
-                <app-add-source (onAddSource)="addSource($event)"></app-add-source>
-            </div>
+          </div>
         </div>
-
-        <div class="row">
-            <div class="col-12">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Database Type</th>
-                            <th>URL</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody *ngFor="let source of sources;  odd as isOdd">
-                        <tr [ngClass]="{'table-secondary': isOdd }">
-                            <td>{{ source.type }}</td>
-                            <td>{{ source.url }}</td>
-                            <td>
-                                <div class="buttons">
-                                    <a class="btn btn-outline-primary ml-2" (click)="openDialog(source)">
-                                        <fa-icon [icon]="faEdit"></fa-icon>
-                                    </a>
-                                    <a class="btn btn-outline-danger" (click)="onDelete(source)"><fa-icon [icon]="faTrash"></fa-icon></a>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="col-12">
+          <app-add-source (onAddSource)="addSource($event)"></app-add-source>
         </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12">
+          <div>
+            <app-button
+              [ngStyle]="{
+                padding: '90px',
+                margin: '0 0 0 -0vw'
+              }"
+              backgroundColor="{{ showAddSourceForm ? 'red' : 'transparent' }}"
+              fontColor="{{ showAddSourceForm ? 'white' : 'green' }}"
+              borderColor="{{ showAddSourceForm ? 'red' : 'green' }}"
+              text="{{ showAddSourceForm ? 'Hide Form' : 'Add Data Source' }}"
+              (btnClick)="onToggle()"
+            >
+            </app-button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
