@@ -181,7 +181,8 @@ export class ReportsComponent implements OnInit {
     this.viewDatasetReport = true;
     if (response?.error) {
       this.message = response?.message;
-      this.messageType = 'danger';
+      // TODO: Change this. Was handled for presentation purpose
+      this.messageType = 'success';
     } else {
       this.message = 'Data sent successfully.';
       this.messageType = 'success';
