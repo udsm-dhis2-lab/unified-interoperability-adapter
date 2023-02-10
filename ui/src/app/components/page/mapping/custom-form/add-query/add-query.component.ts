@@ -2,7 +2,7 @@ import { values } from 'lodash';
 import { DataValueFetchService } from './../../../../../services/dataValueFetch/data-value-fetch.service';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { PeriodInterface  } from 'src/app/resources/interfaces';
+import { PeriodInterface } from 'src/app/resources/interfaces';
 import { SourcesService } from 'src/app/services/sources/sources.service';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { PeriodFilter } from 'src/app/Helpers/period-filter';
@@ -32,35 +32,40 @@ export class AddQueryComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: QueryData,
     private dataValueFetchService?: DataValueFetchService,
     private periodFilter?: PeriodFilter
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     if (this.data.dataset?.periodType! === 'Weekly') {
       this.periods = this.periodFilter?.filterPeriod(
         this.data.dataset?.periodType!,
-        2022
+        new Date().getFullYear()
       );
     } else {
       this.periods = this.periodFilter?.filterPeriod(
-        this.data.dataset?.periodType!
+        this.data.dataset?.periodType!,
+        new Date().getFullYear()
       );
     }
     // this.periods = this.periodFilter?.filterPeriod(
     //   this.data.dataset?.periodType!
     // );
-    this.selectedSource =  this.data && this.data.source && this.data.source.type? this.data.source.type : '';
+    this.selectedSource =
+      this.data && this.data.source && this.data.source.type
+        ? this.data.source.type
+        : '';
   }
 
   onNoClick(): void {
     this.dialogRef.close();
   }
 
-  onDataSourceSelection(event: any){
+  onDataSourceSelection(event: any) {
     // this.selectedSource = event && event.value ? event.value : "";
     this.data.source = event && event.value ? event.value : '';
-    let source = this.data.sources?.filter(source => source.type === event.value)[0]
-    this.data.source = source
+    let source = this.data.sources?.filter(
+      (source) => source.type === event.value
+    )[0];
+    this.data.source = source;
   }
 
   onTest() {
@@ -81,26 +86,26 @@ export class AddQueryComponent implements OnInit {
       periodStart: dates?.firstDate,
       periodEnd: dates?.lastDate,
     };
-    
+
     this.dataValueFetchService
       ?.testDataValueFetchQuery(dataValueFetchObject)
       .subscribe({
         next: (value) => {
           this.testValue = value;
-          this.message = 'Query ran successfully. View results and confirm before saving.';
+          this.message =
+            'Query ran successfully. View results and confirm before saving.';
           this.messageType = 'success';
         },
         error: (err) => {
           this.testValue = err.error.message;
-          this.message = "This query results to an error. View the message from the results field";
-          this.messageType= "danger"
+          this.message =
+            'This query results to an error. View the message from the results field';
+          this.messageType = 'danger';
         },
       });
 
-    this.message = undefined
-    this.messageType = undefined
+    this.message = undefined;
+    this.messageType = undefined;
     this.showTestResults = true;
   }
 }
-
-
