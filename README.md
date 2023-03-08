@@ -25,7 +25,7 @@ To install the iAdapter you need to following 3 good steps
 - Easy to set up (Docker -Minimal technical skills needed)
 - Built to be set up on the premise where EMR runs
 
-## Where iAdapter works?
+## How does the iAdapter work?
 Here are the components of iAdapter being positioned on interoperability infrastructure, taking an example of Tanzania in particular the UDSM DHIS2 EMR Living Lab.
   - EMR system (Databases)
   - iAdapter
