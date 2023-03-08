@@ -1,7 +1,8 @@
 # Unified-Interoperability-Adapter (iAdapter)
-Unified dhis2 resources adaptor for querying data from EMR or any SQL database and submitting data to DHIS2
+Unified DHIS2 resources adaptor for querying data from EMR or any SQL database and submitting data to DHIS2
 
 ## Features
+- Directly map the DHIS2 data elements & categorycombos to data extraction queries
 - Support all SQL based database technologies.
 - Accommodate multiple DHIS2 instances
 - One DHIS2 dataset can connect to different databases i.e different dataset inputs can connect to different databases
