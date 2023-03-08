@@ -1,6 +1,20 @@
 # Unified-Interoperability-Adapter (iAdapter)
 Unified DHIS2 resources adaptor for querying data from EMR or any SQL database and submitting data to DHIS2
 
+## Getting started
+- The code base has frontend and backend codes together.
+- The frontend is developed using Angular 14
+- Backend is develped using Java
+
+## Installation
+To install the iAdapter you need to following 3 good steps
+- Install ```docker``` from ```https://docs.docker.com/get-docker/```
+- Add docker file shared on the folder you want the iAdapter to be situated
+- Within docker file directory, open terminal add run
+  - ```docker compose pull```
+  - ```docker compose up -d```
+
+
 ## Features
 - Directly map the DHIS2 data elements & categorycombos to data extraction queries
 - Support all SQL based database technologies.
