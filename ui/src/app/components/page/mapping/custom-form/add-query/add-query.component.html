@@ -1,100 +1,153 @@
 <div class="row">
-    <div class="col-12">
-        <div class="row">
-            <div class="col-11">
-                <h4 class="text-center">Add Select Query</h4>
-            </div>
-            <div class="col-1 float-end">
-                <fa-icon [icon]="faTimes" (click)="onNoClick()"></fa-icon>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <form>
-                    <div class="card p-4">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="alert alert-{{ messageType }} alert-dismissible fade show" *ngIf="message" role="alert">
-                                    {{ message}}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <mat-form-field class="mt-control">
-                                    <mat-label>Choose a Source: </mat-label>
-                                    <mat-select [(ngModel)]="selectedSource"  name="source" (selectionChange)="onDataSourceSelection($event)">
-                                        <mat-option> </mat-option>
-                                        <mat-option *ngFor="let source of data.sources" [value]="source?.type" >
-                                            {{source.type}}
-                                        </mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                            </div>                   
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="helper-text">
-                                    <p >
-                                        Instructions:
-                                    </p>
-                                    <ol>
-                                        <li>Where you expect to put dates in your query please put exactly the following variables
-                                    
-                                            <ul>
-                                                <li>For starting date put {{'${period-start}'}}</li>
-                                                <li>For ending date put {{'${period-end}'}}</li>
-                                            </ul>
-                                        </li>
-                                        <li>Dates will be added as per period selected</li>
-                                        <li>Upon clicking "Test Query" button, data won't be saved but rather test the query and display query results</li>
-                                        <li>Upon clicking "Save Query" button, data will be saved and form closed automatically.</li>
-                                    </ol>
-                                </div>
-                                <label for="query">Type Query: </label>
-                                <textarea type="textarea" [(ngModel)]="data.query" name="query" [value]="query"  class="form-control" placeholder="SELECT * FROM [table name] WHERE [table name.field] like [condition]" required ></textarea>
-                            </div> 
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <mat-form-field class="mt-control">
-                                <mat-label>Period (For testing only): </mat-label>
-                                <mat-select [(ngModel)]="periodValue" name="period">
-                                    <mat-option> </mat-option>
-                                    <mat-option *ngFor="let period of periods" [value]="period.value">
-                                        {{ period.name }}
-                                    </mat-option>
-                                </mat-select>
-                                </mat-form-field>
-                            </div> 
-                        </div>
-
-                        <div *ngIf="showTestResults" class="row mt-3">
-                            <div class="col-12">
-                                <label for="url">Results of Query </label>
-                                <textarea type="textarea" [(ngModel)]="testValue" name="testValue" [value]="testValue" class="form-control" disabled></textarea>
-                            </div>
-                        </div>
-
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <div class="row">
-                                    <div class="col-8 float-end">
-                                        <button (click)="onTest()" class="btn btn-outline-secondary float-end"> Test Query
-                                        </button>
-                                    </div>
-                                    <div class="col-4 float-end">
-                                        <button type="submit" [mat-dialog-close]="data" cdkFocusInitial class="btn btn-outline-success float-end"> Save Query </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="row">
+      <div class="col-11">
+        <h4 class="text-center">Add Select Query</h4>
+      </div>
+      <div class="col-1 float-end">
+        <fa-icon [icon]="faTimes" (click)="onNoClick()"></fa-icon>
+      </div>
     </div>
+    <div class="row">
+      <div class="col-12">
+        <form>
+          <div class="card p-4">
+            <div class="row">
+              <div class="col-12">
+                <div
+                  class="alert alert-{{
+                    messageType
+                  }} alert-dismissible fade show"
+                  *ngIf="message"
+                  role="alert"
+                >
+                  {{ message }}
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                  ></button>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12">
+                <mat-form-field class="mt-control">
+                  <mat-label>Choose a Source: </mat-label>
+                  <mat-select
+                    [(ngModel)]="selectedSource"
+                    name="source"
+                    (selectionChange)="onDataSourceSelection($event)"
+                  >
+                    <mat-option> </mat-option>
+                    <mat-option
+                      *ngFor="let source of data.sources"
+                      [value]="source?.type"
+                    >
+                      {{ source.type }}
+                      <span style="font-size: 0.8rem">
+                        ({{ source?.url }})</span
+                      >
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="helper-text">
+                  <p>Instructions:</p>
+                  <ol>
+                    <li>
+                      Where you expect to put dates in your query please put
+                      exactly the following variables
 
+                      <ul>
+                        <li>For starting date put {{ "${period-start}" }}</li>
+                        <li>For ending date put {{ "${period-end}" }}</li>
+                      </ul>
+                    </li>
+                    <li>Dates will be added as per period selected</li>
+                    <li>
+                      Upon clicking "Test Query" button, data won't be saved but
+                      rather test the query and display query results
+                    </li>
+                    <li>
+                      Upon clicking "Save Query" button, data will be saved and
+                      form closed automatically.
+                    </li>
+                  </ol>
+                </div>
+                <label for="query">Type Query: </label>
+                <textarea
+                  type="textarea"
+                  [(ngModel)]="data.query"
+                  name="query"
+                  [value]="query"
+                  class="form-control"
+                  placeholder="SELECT * FROM [table name] WHERE [table name.field] like [condition]"
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-12">
+                <mat-form-field class="mt-control">
+                  <mat-label>Period (For testing only): </mat-label>
+                  <mat-select [(ngModel)]="periodValue" name="period">
+                    <mat-option> </mat-option>
+                    <mat-option
+                      *ngFor="let period of periods"
+                      [value]="period.value"
+                    >
+                      {{ period.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div *ngIf="showTestResults" class="row mt-3">
+              <div class="col-12">
+                <label for="url">Results of Query </label>
+                <textarea
+                  type="textarea"
+                  [(ngModel)]="testValue"
+                  name="testValue"
+                  [value]="testValue"
+                  class="form-control"
+                  disabled
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-12">
+                <div class="row">
+                  <div class="col-12 d-flex justify-content-end">
+                    <button
+                      (click)="onTest()"
+                      class="btn btn-outline-secondary float-end"
+                    >
+                      Test Query
+                    </button>
+                    <button
+                      style="margin-left: 8px"
+                      type="submit"
+                      [mat-dialog-close]="data"
+                      cdkFocusInitial
+                      class="btn btn-outline-success float-end"
+                    >
+                      Save Query
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

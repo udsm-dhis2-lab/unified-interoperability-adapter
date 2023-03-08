@@ -1,9 +1,7 @@
 import { UiService } from 'src/app/services/ui.service';
 import { PeriodFilter } from './../../../../Helpers/period-filter';
 import { DataValueFetchService } from './../../../../services/dataValueFetch/data-value-fetch.service';
-import {
-  DataValueFetchInterface,
-} from './../../../../resources/interfaces';
+import { DataValueFetchInterface } from './../../../../resources/interfaces';
 import {
   Component,
   OnInit,
@@ -96,8 +94,7 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
         this.dataSetFormDesign
       );
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   ngAfterViewInit() {
@@ -190,7 +187,6 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
       });
 
     await new Promise((resolve) => setTimeout(resolve, 500));
-
     const dialogRef = this.dialog?.open(AddQueryComponent, {
       autoFocus: true,
       width: '50%',
@@ -253,18 +249,18 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     this.dataValueFetchService
       .addDataValueFetch(dataValueFetchObject)
       .subscribe({
-        next: (dataValueFetch) => { 
-          this.dataValueFetchs?.push(dataValueFetch)
-          this.message = "Query saved successfully.";
-          this.messageType = "success";
-         },
+        next: (dataValueFetch) => {
+          this.dataValueFetchs?.push(dataValueFetch);
+          this.message = 'Query saved successfully.';
+          this.messageType = 'success';
+        },
         error: (dataValueFetch) => {
-          this.message = dataValueFetch.error.message
-          this.messageType = "danger"
-        }
+          this.message = dataValueFetch.error.message;
+          this.messageType = 'danger';
+        },
       });
 
-      this.message = undefined;
-      this.messageType = undefined;
+    this.message = undefined;
+    this.messageType = undefined;
   }
 }

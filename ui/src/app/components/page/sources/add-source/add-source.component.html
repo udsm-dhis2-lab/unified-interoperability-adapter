@@ -1,75 +1,96 @@
 <div *ngIf="showAddForm" class="row add-form">
-    <div class="col-12">
-        <div class="row">
-            <div class="col-12">
-                <h4 class="text-center">Add Source</h4>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-8 offset-2">
-
-                <form action="" (ngSubmit)="onSubmit()">
-                    <div class="card p-4">
-                        <div class="row">
-                            <div class="col-6">
-                                <!-- <label for="name"> Type </label>
-                                <input type="text" name="type" [(ngModel)]="type" class="form-control" placeholder="Eg PostgreSQL " required/>  -->
-                                <mat-form-field class="mat-select">
-                                    <mat-label>Type </mat-label>
-                                    <mat-select [(ngModel)]="type" name="type">
-                                        <mat-option></mat-option>
-                                        <mat-option value="postgresql">PostgreSQL</mat-option>
-                                        <mat-option value="oracle">Oracle</mat-option>
-                                        <mat-option value="mysql">MySQL</mat-option>
-                                        <mat-option value="mariadb">MariaDB</mat-option>
-                                    </mat-select>
-                                </mat-form-field>
-                                <div *ngIf="message && !type">
-                                        <p class="text-danger">
-                                            {{message}}
-                                        </p>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <label for="url"> URL </label>
-                                <input type="url" name="url" [(ngModel)]="url" class="form-control" placeholder="your-dababase.db" required/>
-                                <div *ngIf="message && !url">
-                                        <p class="text-danger">
-                                            {{message}}
-                                        </p>
-                                </div>
-
-                            </div>
-                        </div>
-                        <div class="row mt-5">
-                            <div class="col-6">
-                                <label for="username"> Username </label>
-                                <input type="text" name="username" [(ngModel)]="username" class="form-control" placeholder="Database Username" required/>
-                                <div *ngIf="message && !username">
-                                        <p class="text-danger">
-                                            {{message}}
-                                        </p>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <label for="password"> Password </label>
-                                <input type="text" name="password" [(ngModel)]="password" class="form-control" placeholder="Database Password" required/>
-                                <div *ngIf="message && !password">
-                                        <p class="text-danger">
-                                            {{message}}
-                                        </p>
-                                </div>
-                            </div>
-                        </div> <br>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-outline-success btn-block"> Save </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-
-            </div>
-        </div>
+  <div class="col-12">
+    <div class="row">
+      <div class="col-12">
+        <h4 class="text-center">Add Source</h4>
+      </div>
     </div>
+    <div class="row">
+      <div class="col-8 offset-2">
+        <form action="" (ngSubmit)="onSubmit()">
+          <div class="card p-4">
+            <div class="row">
+              <div class="col-6">
+                <!-- <label for="name"> Type </label>
+                                <input type="text" name="type" [(ngModel)]="type" class="form-control" placeholder="Eg PostgreSQL " required/>  -->
+                <mat-form-field class="mat-select">
+                  <mat-label>Type </mat-label>
+                  <mat-select [(ngModel)]="type" name="type">
+                    <mat-option></mat-option>
+                    <mat-option value="postgresql">PostgreSQL</mat-option>
+                    <mat-option value="oracle">Oracle</mat-option>
+                    <mat-option value="mysql">MySQL</mat-option>
+                    <mat-option value="mariadb">MariaDB</mat-option>
+                  </mat-select>
+                </mat-form-field>
+                <div *ngIf="message && !type">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-6">
+                <label for="url"> URL </label>
+                <input
+                  type="url"
+                  name="url"
+                  [(ngModel)]="url"
+                  class="form-control"
+                  placeholder="your-dababase.db"
+                  required
+                />
+                <div *ngIf="message && !url">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-5">
+              <div class="col-6">
+                <label for="username"> Username </label>
+                <input
+                  type="text"
+                  name="username"
+                  [(ngModel)]="username"
+                  class="form-control"
+                  placeholder="Database Username"
+                  required
+                />
+                <div *ngIf="message && !username">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-6">
+                <label for="password"> Password </label>
+                <input
+                  type="password"
+                  name="password"
+                  [(ngModel)]="password"
+                  class="form-control"
+                  placeholder="Database Password"
+                  required
+                />
+                <div *ngIf="message && !password">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <br />
+            <div class="row mt-3">
+              <div class="col-12">
+                <button type="submit" class="btn btn-outline-success btn-block">
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
