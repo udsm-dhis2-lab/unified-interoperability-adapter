@@ -29,7 +29,7 @@ To install the iAdapter you need to following 3 good steps
 - Built to be set up on the premise where EMR runs
 
 ## How does the iAdapter work?
-Here are the components of iAdapter being positioned on interoperability infrastructure, taking an example of Tanzania in particular the University of Dar es Salaaam Health Centre Living Lab.
+Here are the components of iAdapter being positioned on interoperability infrastructure, taking an example of Tanzania in particular the University of Dar es Salaam Health Centre Living Lab.
   - EMR system (Databases)
   - iAdapter
   - Health Information Mediator
