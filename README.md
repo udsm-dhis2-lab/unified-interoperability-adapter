@@ -14,6 +14,9 @@ To install the iAdapter you need to following 3 good steps
   - ```docker compose pull```
   - ```docker compose up -d```
 
+## Prerequisites
+ - Mapping of ICD 10/11 diseases into disease diagnosis as per country's HMIS aggregate reporting tools
+    - The mapping should be carried out by medical practitioner with knowledge about ICD 10/11 classifications
 
 ## Features
 - Directly map the DHIS2 data elements & categorycombos to data extraction queries
@@ -26,7 +29,7 @@ To install the iAdapter you need to following 3 good steps
 - Built to be set up on the premise where EMR runs
 
 ## How does the iAdapter work?
-Here are the components of iAdapter being positioned on interoperability infrastructure, taking an example of Tanzania in particular the UDSM DHIS2 EMR Living Lab.
+Here are the components of iAdapter being positioned on interoperability infrastructure, taking an example of Tanzania in particular the University of Dar es Salaaam Health Centre Living Lab.
   - EMR system (Databases)
   - iAdapter
   - Health Information Mediator
