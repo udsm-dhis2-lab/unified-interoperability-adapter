@@ -63,7 +63,11 @@
 			<artifactId>json</artifactId>
 			<version>20190722</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.hisp.dhis.integration.sdk</groupId>
+			<artifactId>dhis2-java-sdk</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
