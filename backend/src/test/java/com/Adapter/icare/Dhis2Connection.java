@@ -64,7 +64,7 @@ public class Dhis2Connection {
         mockMvc.perform(
                 get("/api/v1/reports/dhisConnection").accept(MediaType.APPLICATION_JSON)
                 )
-                .andExpect(status().isOk()).andExpect(jsonPath("$.name", Matchers.is("Josephat Julius")));
+                .andExpect(status().isOk()).andExpect(jsonPath("$.username", Matchers.is("admin")));
     }
 
 }
