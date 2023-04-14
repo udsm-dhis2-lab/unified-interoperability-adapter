@@ -148,12 +148,8 @@ public class ReportsController {
 
     @GetMapping("/dhisConnection")
     public Map<String, Object> Dhis2Connection() throws SQLException {
-        System.out.println("TESTINGGGGGGGGGGGGGGGGGGGggg");
         Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( "https://play.dhis2.org/2.39.1/api", "admin","district" ).build();
         Map<String, Object> me = dhis2Client.get("me").transfer().returnAs(Map.class);
-
-        System.out.println("dhis2Client");
-        System.out.println(me);
         return  me;
     }
     

@@ -38,7 +38,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.hisp.dhis.integration.sdk.Dhis2ClientBuilder;
+import org.hisp.dhis.integration.sdk.api.Dhis2Client;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,40 +89,12 @@ public class ReportsService {
             String instanceUrl = dataset.get().getInstances().getUrl();
             String username = dataset.get().getInstances().getUsername();
             String password = dataset.get().getInstances().getPassword();
-            
-            url = new URL(instanceUrl.concat("/api/dataValueSets"));
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            String userCredentials = username.concat(":").concat(password);
-            String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-            httpURLConnection.setRequestProperty("Authorization", basicAuth);
-            httpURLConnection.setRequestMethod("POST");
-            httpURLConnection.setRequestProperty("Content-Type", "application/json");
-            httpURLConnection.setDoOutput(true);
-
-            //JSON STRING CREATION
-            // Creating the ObjectMapper object
-            ObjectMapper mapper = new ObjectMapper();
-            // Converting the Object to JSONString
-            String jsonString = mapper.writeValueAsString(dhisAggregateValues);
-            System.out.println(jsonString);
-
-            // int status = httpURLConnection.getResponseCode();
-
-            try (OutputStream os = httpURLConnection.getOutputStream()) {
-                byte[] input = jsonString.getBytes("utf-8");
-                os.write(input, 0, input.length);
+            // Using DHIS2-JAVA-SDK
+            Dhis2Client destinationDhis2Client = Dhis2ClientBuilder.newClient( instanceUrl +"/api", username,password ).build();
+            Map<String, Object> response = destinationDhis2Client.post("dataValueSets?async=true").withResource(dhisAggregateValues).transfer().returnAs(Map.class);
+            if (response.get("status") != null) {
+                ab = response.get("status").toString();
             }
-
-            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            while ((line = reader.readLine()) != null) {
-                responseContent.append(line);
-            }
-            reader.close();
-            //JSONObject jsObject = new JSONObject(responseContent.toString());
-            System.out.println(responseContent.toString());
-            // System.out.println(js);
-            jsObject = new JSONObject(responseContent.toString());
-             ab = jsObject.getString("status");
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
