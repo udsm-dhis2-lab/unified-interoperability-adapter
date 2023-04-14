@@ -31,36 +31,41 @@
 
 package com.Adapter.icare;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import com.Adapter.icare.DHIS2.Controllers.ReportsController;
+import org.hamcrest.Matchers;
+import org.junit.Before;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(classes = IcareApplicationTests.class)
-class IcareApplicationTests {
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-	@Test
-	void AddTwoNumbers() {
-		Calculator cl = new Calculator();
-		//given
-		int a = 10;
-		int b = 20;
+@RunWith(SpringJUnit4ClassRunner.class)
+public class Dhis2Connection {
 
-		//implementations
-		int result = cl.addNumbers(a, b);
+    private MockMvc mockMvc;
 
-		int expected = 30;
-		assertEquals(expected,result);
+    @InjectMocks
+    private ReportsController reportsController;
 
+    @Before
+    public  void setUp() throws Exception {
+        mockMvc = MockMvcBuilders.standaloneSetup(reportsController).build();
+    }
 
-	}
+    @Test
+    public void Dhis2ConnectionTest() throws Exception {
+        mockMvc.perform(
+                get("/api/v1/reports/dhisConnection").accept(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk()).andExpect(jsonPath("$.name", Matchers.is("Josephat Julius")));
+    }
 
 }
 
-class Calculator{
-
-	int addNumbers(int a, int b){
-
-		return a + b;
-	}
-}
