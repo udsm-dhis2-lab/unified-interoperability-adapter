@@ -104,8 +104,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </div> -->
         </div>
       </form>
-
-      <div class="row mt-2" *ngIf="dataset?.formDesignCode">
+      <div class="row mt-2">
+        <div class="col-12 d-flex justify-content-end">
+          <button
+            class="mr-2"
+            mat-stroked-button
+            [disabled]="!instance || !dataset"
+            (click)="onOpenPlayGround($event)"
+          >
+            Playground
+          </button>
+        </div>
+      </div>
+      <div class="row" *ngIf="dataset?.formDesignCode">
         <div class="col-12">
           <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
           <app-custom-form

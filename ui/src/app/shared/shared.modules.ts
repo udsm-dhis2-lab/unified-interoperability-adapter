@@ -34,14 +34,17 @@ import { NgxDhis2PeriodFilterModule } from '@iapps/ngx-dhis2-period-filter';
 import { materialModules } from './material.modules';
 import { sharedComponents } from './components';
 import { CommonModule } from '@angular/common';
+import { modals } from './modals';
 
 @NgModule({
   imports: [CommonModule, ...materialModules, NgxDhis2PeriodFilterModule],
   exports: [
     ...sharedComponents,
+    ...modals,
     ...materialModules,
     NgxDhis2PeriodFilterModule,
   ],
-  declarations: [...sharedComponents],
+  entryComponents: [...modals],
+  declarations: [...sharedComponents, ...modals],
 })
 export class SharedModule {}

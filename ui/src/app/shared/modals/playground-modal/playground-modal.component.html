@@ -1,0 +1,23 @@
+<div class="w-100">
+  <div class="h4">Playground</div>
+  <div class="query-container mt-2">
+    <textarea
+      type="textarea"
+      name="testQuery"
+      rows="6"
+      [value]="testQuery"
+      class="form-control"
+    ></textarea>
+  </div>
+  <div class="d-flex justify-content-end mt-2">
+    <button mat-stroked-button (click)="onCancel($event)">Cancel</button>
+    <button
+      mat-flat-button
+      color="primary"
+      class="ml-2"
+      (click)="onTest($event)"
+    >
+      Run
+    </button>
+  </div>
+</div>
