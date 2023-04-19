@@ -29,11 +29,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div class="w-100 d-flex justify-content-between">
-  <div>
-    <app-sidenav [selectedRoute]="'mapping'"></app-sidenav>
-  </div>
-  <div class="row mt-4" style="width: calc(100%); margin-left: 16px">
+<div class="w-100">
+  <div class="row mt-4">
     <div class="col-12">
       <div class="row">
         <div class="col-12">
@@ -60,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <form (ngSubmit)="onSubmit()" class="row">
         <div class="form-group row">
           <div class="col-6">
-            <mat-form-field class="mt-control">
+            <mat-form-field class="w-100" appearance="outline">
               <mat-label>Instance: </mat-label>
               <mat-select
                 [(ngModel)]="instance"
@@ -78,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </mat-form-field>
           </div>
           <div class="col-6">
-            <mat-form-field class="mt-control">
+            <mat-form-field class="w-100" appearance="outline">
               <mat-label>Linked Datasets: </mat-label>
               <mat-select
                 [(ngModel)]="dataset"
@@ -108,7 +105,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
       </form>
 
-      <div class="row mt-5" *ngIf="dataset?.formDesignCode">
+      <div class="row mt-2" *ngIf="dataset?.formDesignCode">
         <div class="col-12">
           <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
           <app-custom-form

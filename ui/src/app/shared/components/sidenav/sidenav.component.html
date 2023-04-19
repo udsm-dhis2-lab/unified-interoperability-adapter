@@ -1,0 +1,62 @@
+<ul class="navbar-nav side-menu" style="border-right: solid 1px #eee">
+  <div *ngIf="isAdmin">
+    <li class="nav-item active">
+      <a
+        class="nav-link"
+        [ngClass]="{ 'active-route': selectedRoute === 'instances' }"
+        (click)="onChangeRoute($event, 'instances')"
+        >Instances
+      </a>
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ 'active-route': selectedRoute === 'sources' }"
+        (click)="onChangeRoute($event, 'sources')"
+        >Sources</a
+      >
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ 'active-route': selectedRoute === 'datasets' }"
+        (click)="onChangeRoute($event, 'datasets')"
+        >Datasets</a
+      >
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ 'active-route': selectedRoute === 'mapping' }"
+        (click)="onChangeRoute($event, 'mapping')"
+        >Mappings</a
+      >
+    </li>
+
+    <!-- <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ 'active-route': selectedRoute === 'logs' }"
+        (click)="onChangeRoute($event, 'logs')"
+        >Logs</a
+      >
+    </li>
+    <li class="nav-item">
+      <a
+        class="nav-link"
+        [ngClass]="{ 'active-route': selectedRoute === 'settings' }"
+        (click)="onChangeRoute($event, 'settings')"
+        >Settings</a
+      >
+    </li> -->
+  </div>
+
+  <li class="nav-item">
+    <a
+      class="nav-link"
+      [ngClass]="{ 'active-route': selectedRoute === 'reports' }"
+      (click)="onChangeRoute($event, 'reports')"
+      >Reports</a
+    >
+  </li>
+</ul>

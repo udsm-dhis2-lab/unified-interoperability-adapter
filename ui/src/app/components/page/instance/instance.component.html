@@ -29,50 +29,61 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div class="w-100 d-flex justify-content-between">
-  <div>
-    <app-sidenav [selectedRoute]="'instances'"></app-sidenav>
-  </div>
-  <div class="row mt-4" style="width: calc(100%); margin-left: 16px">
+<div class="w-100">
+  <div class="row mt-4">
     <div class="col-12">
       <div class="row">
         <div class="col-12">
           <div class="mb-3">
-            <h3 class="text-">Instances</h3>
+            <h4 class="text-">Instances</h4>
           </div>
         </div>
       </div>
 
       <div class="row" *ngIf="instances">
         <div class="col-12">
-          <table class="table table-hover">
+          <table class="table table-stripped">
             <thead>
               <tr>
+                <th style="width: 20px">SN</th>
                 <th>Instance Name</th>
                 <th>URL</th>
-                <th>Action</th>
+                <th style="width: 40px">Action</th>
               </tr>
             </thead>
-            <tbody *ngFor="let instance of instances; odd as isOdd">
-              <tr [ngClass]="{ 'table-secondary': isOdd }">
+            <tbody>
+              <tr
+                [ngClass]="{ 'table-secondary': isOdd }"
+                *ngFor="
+                  let instance of instances;
+                  let count = index;
+                  odd as isOdd
+                "
+              >
+                <td>
+                  {{ count + 1 }}
+                </td>
                 <td>{{ instance.name }}</td>
                 <td>{{ instance.url }}</td>
                 <td>
-                  <div class="buttons">
+                  <div class="d-flex justify-content-end">
                     <a
-                      class="btn btn-outline-primary ml-2"
+                      style="background-color: transparent !important"
+                      mat-icon-button
+                      class="text-muted"
                       (click)="openDialog(instance)"
                     >
-                      <fa-icon [icon]="faEdit"></fa-icon>
+                      <mat-icon>edit</mat-icon>
                     </a>
                     <!-- <button mat-button (click)="openDialog()">Open dialog</button> -->
 
                     <a
-                      class="btn btn-outline-danger"
-                      style="margin-left: 8px"
+                      style="background-color: transparent !important"
+                      mat-icon-button
+                      class="ml-2 text-muted"
                       (click)="onDelete(instance)"
                     >
-                      <fa-icon [icon]="faTrash"></fa-icon>
+                      <mat-icon>delete</mat-icon>
                     </a>
                   </div>
                 </td>
@@ -110,11 +121,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
       </div>
 
-      <div class="row mt-2">
-        <div class="col-9"></div>
-        <div class="col-3 float-right">
-          <div>
-            <app-button
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-end">
+            <button (click)="onToggle()" mat-flat-button color="primary">
+              {{ showAddInstanceForm ? "Hide Form" : "Add Instance" }}
+            </button>
+            <!-- <app-button
+              *ngIf="!showAddInstanceForm"
               [ngStyle]="{
                 padding: '90px',
                 margin: '0 0 0 -0vw'
@@ -127,7 +141,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               text="{{ showAddInstanceForm ? 'Hide Form' : 'Add Instance' }}"
               (btnClick)="onToggle()"
             >
-            </app-button>
+            </app-button> -->
           </div>
         </div>
       </div>

@@ -29,11 +29,8 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div class="w-100 d-flex justify-content-between">
-  <div>
-    <app-sidenav [selectedRoute]="'reports'"></app-sidenav>
-  </div>
-  <div class="row mt-4" style="width: calc(100%); margin-left: 16px">
+<div class="w-100">
+  <div class="row mt-4">
     <div class="col-12">
       <div class="row">
         <div class="col-12">
@@ -62,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
         <div class="form-group row">
           <div class="col-3">
-            <mat-form-field class="mt-control">
+            <mat-form-field class="mt-control" appearance="outline">
               <mat-label>Instance: </mat-label>
               <mat-select
                 [(ngModel)]="instance"
@@ -85,7 +82,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
           </div>
           <div class="col-3">
-            <mat-form-field class="mt-control">
+            <mat-form-field class="mt-control" appearance="outline">
               <mat-label>Linked Datasets: </mat-label>
               <mat-select
                 [(ngModel)]="dataset"
@@ -105,7 +102,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
           </div>
           <div class="col-2" *ngIf="showYearField">
-            <mat-form-field class="mt-control">
+            <mat-form-field class="mt-control" appearance="outline">
               <mat-label>Year: </mat-label>
               <mat-select
                 [(ngModel)]="selectedYear"
@@ -128,7 +125,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
           </div>
           <div class="{{ showYearField ? 'col-2' : 'col-3' }}">
-            <mat-form-field class="mt-control">
+            <mat-form-field class="mt-control" appearance="outline">
               <mat-label>Period: </mat-label>
               <mat-select
                 [(ngModel)]="periodValue"
@@ -151,22 +148,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
           </div>
           <div class="{{ showYearField ? 'col-2' : 'col-3' }}">
-            <app-button
-              [ngStyle]="{
-                padding: '90px',
-                margin: '20px 0 0 -2vw'
-              }"
-              backgroundColor="transparent"
-              fontColor="green"
-              borderColor="green"
-              text="View Report"
-              (click)="viewReport()"
-            >
-            </app-button>
+            <div>
+              <button
+                style="margin-top: 12px"
+                color="primary"
+                [disabled]="!selectedYear || !dataset || !instance"
+                mat-flat-button
+                (click)="viewReport()"
+              >
+                View Report
+              </button>
+            </div>
           </div>
         </div>
       </form>
-      <div class="row mt-5" *ngIf="viewDatasetReport">
+      <div class="row mt-2" *ngIf="viewDatasetReport">
         <div class="col-12">
           <app-dataset-view-form
             [isDataEntryLevel]="true"

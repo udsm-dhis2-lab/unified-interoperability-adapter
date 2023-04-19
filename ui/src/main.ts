@@ -31,6 +31,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
+import { environment } from './environments/environment';
+import { enableProdMode } from '@angular/core';
 
 /* Favicon
  <link rel="icon" type="image/x-icon" href="favicon.ico" /> */
@@ -38,6 +40,13 @@ import { AppModule } from './app/app.module';
 /*if (environment.production) {
   enableProdMode();
 }*/
+
+if (environment.production) {
+  enableProdMode();
+  if (window) {
+    window.console.log = function () {};
+  }
+}
 
 platformBrowserDynamic()
   .bootstrapModule(AppModule)

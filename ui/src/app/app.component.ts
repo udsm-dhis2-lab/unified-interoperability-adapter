@@ -36,7 +36,13 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css'],
 })
 export class AppComponent {
-  title = 'Adaptor';
+  title = 'iAdapter';
+  showSideMenu: boolean = true;
 
   ngOnInit() {}
+
+  toggleSideMenu(event: Event): void {
+    event.stopPropagation();
+    this.showSideMenu = !this.showSideMenu;
+  }
 }

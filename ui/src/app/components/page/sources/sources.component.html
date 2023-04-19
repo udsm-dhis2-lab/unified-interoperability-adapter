@@ -29,16 +29,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div class="w-100 d-flex justify-content-between">
-  <div>
-    <app-sidenav [selectedRoute]="'sources'"></app-sidenav>
-  </div>
-  <div class="row mt-4" style="width: calc(100%); margin-left: 16px">
+<div class="w-100">
+  <div class="row mt-4">
     <div class="col-12">
       <div class="row">
         <div class="col-8">
           <div class="mb-3">
-            <h3 class="text-">Sources</h3>
+            <h4 class="text-">Sources</h4>
           </div>
         </div>
         <div class="col-4"></div>
@@ -49,29 +46,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <table class="table table-hover">
             <thead>
               <tr>
+                <th style="width: 20px">SN</th>
                 <th>Database Type</th>
                 <th>URL</th>
-                <th>Action</th>
+                <th style="width: 50px">Action</th>
               </tr>
             </thead>
-            <tbody *ngFor="let source of sources; odd as isOdd">
+            <tbody
+              *ngFor="let source of sources; let count = index; odd as isOdd"
+            >
               <tr [ngClass]="{ 'table-secondary': isOdd }">
+                <td>{{ count + 1 }}</td>
                 <td>{{ source.type }}</td>
                 <td>{{ source.url }}</td>
                 <td>
-                  <div class="buttons">
+                  <div class="d-flex justify-content-end">
                     <a
-                      class="btn btn-outline-primary"
+                      style="background-color: transparent !important"
+                      mat-flat-button
+                      class="text-muted"
                       (click)="openDialog(source)"
                     >
-                      <fa-icon [icon]="faEdit"></fa-icon>
+                      <mat-icon>edit</mat-icon>
                     </a>
                     <a
-                      class="btn btn-outline-danger"
-                      style="margin-left: 8px"
+                      style="background-color: transparent !important"
+                      mat-flat-button
+                      class="ml-2 text-muted"
                       (click)="onDelete(source)"
-                      ><fa-icon [icon]="faTrash"></fa-icon
-                    ></a>
+                    >
+                      <mat-icon>delete</mat-icon></a
+                    >
                   </div>
                 </td>
               </tr>
@@ -104,19 +109,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
       <div class="row mt-2">
         <div class="col-12">
-          <div>
-            <app-button
-              [ngStyle]="{
-                padding: '90px',
-                margin: '0 0 0 -0vw'
-              }"
-              backgroundColor="{{ showAddSourceForm ? 'red' : 'transparent' }}"
-              fontColor="{{ showAddSourceForm ? 'white' : 'green' }}"
-              borderColor="{{ showAddSourceForm ? 'red' : 'green' }}"
-              text="{{ showAddSourceForm ? 'Hide Form' : 'Add Data Source' }}"
-              (btnClick)="onToggle()"
-            >
-            </app-button>
+          <div class="d-flex justify-content-end">
+            <button (click)="onToggle()" mat-flat-button color="primary">
+              {{ showAddSourceForm ? "Hide Form" : "Add Data Source" }}
+            </button>
           </div>
         </div>
       </div>
