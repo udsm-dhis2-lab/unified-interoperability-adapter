@@ -32,14 +32,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <div class="row">
     <div class="col-12 d-flex justify-content-end">
       <button
-        class="btn btn-outline-success float-right no-print"
+        mat-button
+        class="no-print"
         (click)="onDownloadToExcel($event, 'html-report')"
       >
         Download to Excel
       </button>
       <button
-        class="btn btn-outline-success no-print"
-        style="margin-left: 8px"
+        mat-flat-button
+        color="primary"
+        class="no-print ml-2"
         (click)="sendReport()"
       >
         Send to DHIS2

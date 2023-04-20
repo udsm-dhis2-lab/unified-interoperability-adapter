@@ -36,15 +36,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatButtonModule } from '@angular/material/button';
 
 import { AppComponent } from './app.component';
-import { HeaderComponent } from './components/core/header/header.component';
-import { FooterComponent } from './components/core/footer/footer.component';
-import { ButtonComponent } from './components/core/button/button.component';
-import { BodyComponent } from './components/core/body/body.component';
 import { InstanceComponent } from './components/page/instance/instance.component';
 import { SourcesComponent } from './components/page/sources/sources.component';
 import { MappingComponent } from './components/page/mapping/mapping.component';
@@ -56,15 +49,12 @@ import { appRoutes } from './routes';
 import { AddInstanceComponent } from './components/page/instance/add-instance/add-instance.component';
 import { DatasetsComponent } from './components/page/datasets/datasets.component';
 import { AddDatasetComponent } from './components/page/datasets/add-dataset/add-dataset.component';
-import { SidenavComponent } from './components/core/sidenav/sidenav.component';
 import { EditInstanceComponent } from './components/page/instance/edit-instance/edit-instance.component';
 import { EditSourceComponent } from './components/page/sources/edit-source/edit-source.component';
 import { AddQueryComponent } from './components/page/mapping/custom-form/add-query/add-query.component';
 import { CustomFormComponent } from './components/page/mapping/custom-form/custom-form.component';
 import { DatasetViewFormComponent } from './components/page/reports/dataset-view-form/dataset-view-form.component';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
-
-import { NgxDhis2PeriodFilterModule } from '@iapps/ngx-dhis2-period-filter';
 import { SharedModule } from './shared/shared.modules';
 import { NgxDhis2HttpClientModule } from '@iapps/ngx-dhis2-http-client';
 import { PeriodFilter } from './Helpers/period-filter';
@@ -72,10 +62,6 @@ import { PeriodFilter } from './Helpers/period-filter';
 @NgModule({
   declarations: [
     AppComponent,
-    HeaderComponent,
-    FooterComponent,
-    ButtonComponent,
-    BodyComponent,
     InstanceComponent,
     SourcesComponent,
     MappingComponent,
@@ -86,7 +72,6 @@ import { PeriodFilter } from './Helpers/period-filter';
     AddInstanceComponent,
     DatasetsComponent,
     AddDatasetComponent,
-    SidenavComponent,
     EditInstanceComponent,
     EditSourceComponent,
     AddQueryComponent,
@@ -96,9 +81,6 @@ import { PeriodFilter } from './Helpers/period-filter';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    MatButtonModule,
-    MatProgressSpinnerModule,
-    MatToolbarModule,
     RouterModule,
     HttpClientModule,
     FontAwesomeModule,

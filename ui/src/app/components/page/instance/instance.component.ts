@@ -124,7 +124,7 @@ export class InstanceComponent implements OnInit {
 
   openDialog(instanceToEdit: InstanceInterface): void {
     const dialogRef = this.dialog?.open(EditInstanceComponent, {
-      width: '40%',
+      minWidth: '40%',
       data: instanceToEdit,
     });
 

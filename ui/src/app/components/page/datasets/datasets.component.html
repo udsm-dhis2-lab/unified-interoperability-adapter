@@ -29,16 +29,13 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div class="w-100 d-flex justify-content-between">
-  <div>
-    <app-sidenav [selectedRoute]="'datasets'"></app-sidenav>
-  </div>
-  <div class="row mt-4" style="width: calc(100%); margin-left: 16px">
+<div class="w-100">
+  <div class="row mt-4">
     <div class="col-12">
       <div class="row">
         <div class="col-9">
           <div class="mb-3">
-            <h3 class="text-">Datasets</h3>
+            <h4 class="text-">Datasets</h4>
           </div>
         </div>
       </div>
@@ -69,34 +66,36 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
       </div>
 
-      <div class="row" *ngIf="instanceDatasets">
+      <div class="row mt-2" *ngIf="instanceDatasets">
         <div class="col-12">
-          <div class="row mt-5">
-            <div class="col-6">
+          <div class="row">
+            <div class="col-3">
               <div class="mb-3">
-                <h4 class="text-left text-muted">Add/Remove Dataset</h4>
+                <h5 class="text-left text-muted">Add/Remove Dataset</h5>
               </div>
             </div>
-            <div class="col-6">
+            <div class="col-9">
               <div class="mb-3">
                 <form class="form">
                   <div class="row form-group">
-                    <div class="col-10">
+                    <div class="col-10 d-flex justify-content-end">
                       <input
                         type="text"
                         [(ngModel)]="datasetName"
-                        class="form-control"
+                        class="form-control w-75"
                         name="datasetName"
                         [value]="datasetName"
                       />
                     </div>
                     <div class="col-2">
-                      <input
-                        type="submit"
-                        class="btn btn-outline-success form-control"
-                        value="Search"
+                      <button
+                        class="ml-2"
+                        mat-icon-button
                         (click)="searchInstanceDatasets()"
-                      />
+                      >
+                        <mat-icon>search</mat-icon>
+                        <span class="ml-2">Search</span>
+                      </button>
                     </div>
                   </div>
                 </form>
@@ -109,15 +108,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <table class="table table-hover">
                 <thead>
                   <tr>
+                    <th style="width: 20px">SN</th>
                     <th>ID</th>
                     <th>Dataset name</th>
-                    <th>Add/Remove</th>
+                    <th style="width: 50px">Add/Remove</th>
                   </tr>
                 </thead>
-                <tbody
-                  *ngFor="let instanceDataset of instanceDatasets; odd as isOdd"
-                >
-                  <tr [ngClass]="{ 'table-secondary': isOdd }">
+                <tbody>
+                  <tr
+                    *ngFor="
+                      let instanceDataset of instanceDatasets;
+                      let count = index;
+                      odd as isOdd
+                    "
+                    [ngClass]="{ 'table-secondary': isOdd }"
+                  >
+                    <td>{{ count + 1 }}</td>
                     <td>{{ instanceDataset.id }}</td>
                     <td>{{ instanceDataset.displayName }}</td>
                     <td>

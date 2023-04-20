@@ -36,6 +36,7 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
 } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
 import { Data } from '@angular/router';
 import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
 import {
@@ -46,6 +47,7 @@ import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
 import { InstancesService } from 'src/app/services/instances/instances.service';
 import { SourcesService } from 'src/app/services/sources/sources.service';
+import { PlaygroundModalComponent } from 'src/app/shared/modals/playground-modal/playground-modal.component';
 
 @Component({
   selector: 'app-mapping',
@@ -70,7 +72,8 @@ export class MappingComponent implements OnInit {
     private instancesService: InstancesService,
     private datasetsService: DatasetsService,
     private instanceDatasetsService: InstanceDatasetsService,
-    private sourcesService: SourcesService
+    private sourcesService: SourcesService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -148,4 +151,11 @@ export class MappingComponent implements OnInit {
   }
 
   changesOnDataValue(e: Event) {}
+
+  onOpenPlayGround(event: Event): void {
+    event.stopPropagation();
+    this.dialog.open(PlaygroundModalComponent, {
+      minWidth: '60%',
+    });
+  }
 }

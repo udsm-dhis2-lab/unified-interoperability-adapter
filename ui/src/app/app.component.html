@@ -31,8 +31,35 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 <!-- <app-header></app-header> -->
 
-<div class="p-3">
-  <router-outlet></router-outlet>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2 col-sx-12 col-sm-12" *ngIf="showSideMenu">
+      <app-sidenav></app-sidenav>
+    </div>
+    <div
+      [ngClass]="{
+        'col-md-10 col-sx-12 col-sm-12': showSideMenu,
+        'col-md-12 col-sx-12 col-sm-12': !showSideMenu
+      }"
+    >
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-left">
+            <button
+              mat-icon-button
+              (click)="toggleSideMenu($event)"
+              style="margin-top: -10px; margin-left: -10px"
+            >
+              <mat-icon>menu</mat-icon>
+            </button>
+          </div>
+        </div>
+        <div class="col-12">
+          <router-outlet></router-outlet>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- <app-footer></app-footer> -->
