@@ -114,10 +114,13 @@ public class DataSetElementsController {
     public List<Map<String,Object>> queryList(@RequestBody Map<String,Object> queryMap) throws SQLException{
 
        String query = queryMap.get("sql").toString();
-       String datasourceId = queryMap.get("datasourceid").toString();
+       String datasourceId = ((Map) queryMap.get("datasource")).get("id").toString();
+        //Query manipulation
+       String newQuery = query.replaceAll("\\$\\{period-start\\}",queryMap.get("periodStart").toString()).replaceAll("\\$\\{period-end\\}",queryMap.get("periodEnd").toString());
+
        Datasource datasource = datasourceRepository.getById(Long.valueOf(datasourceId));
        Connection con = DriverManager.getConnection(datasource.getUrl(), datasource.getUsername(),datasource.getPassword());
-       ResultSet rs = con.prepareStatement(query).executeQuery();
+       ResultSet rs = con.prepareStatement(newQuery).executeQuery();
 
         // retrieve the column names and types from ResultSetMetaData
         ResultSetMetaData rsmd = rs.getMetaData();
