@@ -84,6 +84,7 @@ export class MappingComponent implements OnInit {
     this.dataSources$.subscribe({
       next: (sources) => {
         this.sources = sources;
+        console.log(sources);
       },
       error: (error) => {
         this.message = error.error.message;
