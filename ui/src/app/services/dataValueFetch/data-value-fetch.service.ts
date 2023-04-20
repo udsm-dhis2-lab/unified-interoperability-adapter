@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import { DataValueFetchInterface } from './../../resources/interfaces';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 
 const httpOptions = {
   headers: new HttpHeaders({
@@ -84,5 +84,24 @@ export class DataValueFetchService {
   testDataValueFetchQuery(dataValueFetch: any): Observable<any> {
     let url = `${this.apiUrl}/testQuery`;
     return this.httpClient.post<any>(url, dataValueFetch, httpOptions);
+  }
+
+  getTestQueryResults(payload: any): Observable<any> {
+    let url = `${this.apiUrl}/testquerylist`;
+    return this.httpClient.post<any>(url, payload, httpOptions).pipe(
+      map((response) => {
+        if (response?.length > 0) {
+          return {
+            headers: Object.keys(response[0]),
+            data: response,
+          };
+        } else {
+          return response;
+        }
+      }),
+      catchError((error) => {
+        return of(error);
+      })
+    );
   }
 }
