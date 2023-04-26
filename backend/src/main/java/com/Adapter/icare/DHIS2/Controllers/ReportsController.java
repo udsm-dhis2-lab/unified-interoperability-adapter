@@ -37,11 +37,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+
+import org.hisp.dhis.api.model.v2_37_7.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.Adapter.icare.Constants.DHISConstants;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValueSets;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValues;
@@ -49,6 +49,8 @@ import com.Adapter.icare.DHIS2.DHISDomains.DhisAggregateValues;
 import com.Adapter.icare.DHIS2.DHISDomains.ReportValuesSent;
 import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
 import com.Adapter.icare.Domains.DataSetElements;
+import org.hisp.dhis.integration.sdk.Dhis2ClientBuilder;
+import org.hisp.dhis.integration.sdk.api.Dhis2Client;
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -141,7 +143,14 @@ public class ReportsController {
         DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetId, completeDate,period, "",attributeOptCombo,dataValues);
 
         return reportsService.SendDataToDHIS(dhisAggregateValues,datasetId);
+    }
 
+
+    @GetMapping("/dhisConnection")
+    public Map<String, Object> Dhis2Connection() throws SQLException {
+        Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( "https://play.dhis2.org/2.39.1/api", "admin","district" ).build();
+        Map<String, Object> me = dhis2Client.get("me").transfer().returnAs(Map.class);
+        return  me;
     }
     
 }
