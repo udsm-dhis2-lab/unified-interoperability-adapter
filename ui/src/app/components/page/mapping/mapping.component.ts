@@ -38,6 +38,7 @@ import {
 } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Data } from '@angular/router';
+import { Observable } from 'rxjs';
 import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
 import {
   InstanceDatasetsInterface,
@@ -56,6 +57,7 @@ import { PlaygroundModalComponent } from 'src/app/shared/modals/playground-modal
 })
 export class MappingComponent implements OnInit {
   instance: InstanceInterface | undefined;
+  interoperabilityInstances$: Observable<any[]> | undefined;
   instances: InstanceInterface[] | undefined;
   datasets: DatasetInterface[] | undefined;
   datasetsLength: boolean = false;
@@ -63,6 +65,7 @@ export class MappingComponent implements OnInit {
   message: string | undefined;
   messageType: string | undefined;
   instanceDatasets: InstanceDatasetsInterface[] | undefined;
+  dataSources$: Observable<any[]> | undefined;
   sources: SourceInterface[] | undefined;
   source: SourceInterface | undefined;
 
@@ -77,9 +80,11 @@ export class MappingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.sourcesService.getSources().subscribe({
+    this.dataSources$ = this.sourcesService.getSources();
+    this.dataSources$.subscribe({
       next: (sources) => {
         this.sources = sources;
+        console.log(sources);
       },
       error: (error) => {
         this.message = error.error.message;
@@ -87,7 +92,8 @@ export class MappingComponent implements OnInit {
       },
     });
 
-    this.instancesService.getInstances().subscribe({
+    this.interoperabilityInstances$ = this.instancesService.getInstances();
+    this.interoperabilityInstances$.subscribe({
       next: (instances) => {
         this.instances = instances;
       },
@@ -152,10 +158,18 @@ export class MappingComponent implements OnInit {
 
   changesOnDataValue(e: Event) {}
 
-  onOpenPlayGround(event: Event): void {
+  onOpenPlayGround(
+    event: Event,
+    interoperabilityInstances: any,
+    dataSources: any
+  ): void {
     event.stopPropagation();
     this.dialog.open(PlaygroundModalComponent, {
-      minWidth: '60%',
+      minWidth: '80%',
+      data: {
+        interoperabilityInstances,
+        dataSources,
+      },
     });
   }
 }

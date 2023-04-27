@@ -29,17 +29,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div class="w-100">
+<div
+  class="w-100"
+  *ngIf="{
+    interoperabilityInstances: interoperabilityInstances$ | async,
+    dataSources: dataSources$ | async
+  } as params"
+>
   <div class="row mt-4">
     <div class="col-12">
-      <div class="row">
-        <div class="col-12">
-          <div class="mb-3">
-            <h3 class="text-">Mapping</h3>
-          </div>
-        </div>
+      <div class="mb-3">
+        <h3 class="text-">Mapping</h3>
       </div>
-
+    </div>
+    <div class="col-12">
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="!params?.interoperabilityInstances || !params?.dataSources"
+      ></mat-progress-bar>
+    </div>
+    <div class="col-12">
       <div
         class="alert alert-{{ messageType }} alert-dismissible fade show"
         *ngIf="message"
@@ -66,7 +75,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               >
                 <mat-option></mat-option>
                 <mat-option
-                  *ngFor="let instance of instances"
+                  *ngFor="let instance of params?.interoperabilityInstances"
                   [value]="instance"
                 >
                   {{ instance.name }}
@@ -109,8 +118,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           <button
             class="mr-2"
             mat-stroked-button
-            [disabled]="!instance || !dataset"
-            (click)="onOpenPlayGround($event)"
+            [disabled]="
+              !params?.interoperabilityInstances || !params?.dataSources
+            "
+            (click)="
+              onOpenPlayGround(
+                $event,
+                params?.interoperabilityInstances,
+                params?.dataSources
+              )
+            "
           >
             Playground
           </button>

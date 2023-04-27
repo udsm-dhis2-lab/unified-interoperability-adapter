@@ -15,6 +15,8 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatRadioModule } from '@angular/material/radio';
 
 export const materialModules: any[] = [
   MatButtonModule,
@@ -35,4 +37,6 @@ export const materialModules: any[] = [
   MatIconModule,
   MatToolbarModule,
   MatProgressSpinnerModule,
+  MatProgressBarModule,
+  MatRadioModule,
 ];

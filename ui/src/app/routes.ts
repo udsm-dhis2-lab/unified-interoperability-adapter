@@ -36,7 +36,6 @@ import { ReportsComponent } from './components/page/reports/reports.component';
 import { LogsComponent } from './components/page/logs/logs.component';
 import { SettingsComponent } from './components/page/settings/settings.component';
 import { DatasetsComponent } from './components/page/datasets/datasets.component';
-import { AppComponent } from './app.component';
 
 export const appRoutes: Routes = [
   { path: '', redirectTo: '/reports', pathMatch: 'full' },
