@@ -142,7 +142,7 @@ public class DataSetsService {
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
 
-            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=periodType,dataEntryForm[htmlCode]"));
+            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -162,9 +162,18 @@ public class DataSetsService {
             JSONObject jsObject = new JSONObject(responseContent.toString());
             String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
             String periodType = jsObject.getString("periodType");
+            int timelyDays = jsObject.getInt("timelyDays");
+            int expiryDays = jsObject.getInt("expiryDays");
+            String formType = jsObject.getString("formType");
+            String code = jsObject.getString("code");
 
             datasets.setFormDesignCode(htmlForm);
             datasets.setPeriodType(periodType);
+            datasets.setTimelyDays(timelyDays);
+            datasets.setExpiryDays(expiryDays);
+            datasets.setFormType(formType);
+            datasets.setCode(code);
+            datasets.setDatasetFields(jsObject.toString());
             //System.out.println(js);
 
         } catch (Exception e) {

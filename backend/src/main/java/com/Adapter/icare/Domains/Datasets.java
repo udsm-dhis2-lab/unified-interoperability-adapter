@@ -58,6 +58,19 @@ public class Datasets implements Serializable {
 
     @Lob
     private String formDesignCode;
+
+    private int timelyDays;
+
+    private int expiryDays;
+
+    private String formType;
+
+    private String code;
+
+    @Lob
+    private String datasetFields;
+
+
     
     @ManyToOne
     private Instances instances;
