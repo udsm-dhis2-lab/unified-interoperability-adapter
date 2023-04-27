@@ -43,10 +43,84 @@ public class RemoteDatasets {
     private String id;
     private String displayName;
 
+    private String shortName;
+
+    private String periodType;
+
+    private int dataSetElements;
+
+    private int version;
+
+    private int expiryDays;
+
+    private int timelyDays;
+
+    private int openFuturePeriods;
+
+    private boolean renderAsTabs;
+
+    private boolean renderHorizontally;
+
+    private boolean compulsoryFieldsCompleteOnly;
+
+    private String formType;
+
+    private String code;
+
     public static RemoteDatasets fromMap(Map<String, Object> RemoteDataSetMap) {
         RemoteDatasets newRemoteDataSet = new RemoteDatasets();
         newRemoteDataSet.setId((String) RemoteDataSetMap.get("id"));
         newRemoteDataSet.setDisplayName((String) RemoteDataSetMap.get("displayName"));
+        if(RemoteDataSetMap.get("dataSetElements")!= null) {
+            newRemoteDataSet.setDataSetElements((int) RemoteDataSetMap.get("dataSetElements"));
+        }
+
+        if(RemoteDataSetMap.get("formType")!= null) {
+            newRemoteDataSet.setFormType((String) RemoteDataSetMap.get("formType"));
+        }
+
+        if(RemoteDataSetMap.get("code")!= null) {
+            newRemoteDataSet.setCode((String) RemoteDataSetMap.get("code"));
+        }
+
+        if(RemoteDataSetMap.get("shortName")!= null) {
+            newRemoteDataSet.setShortName((String) RemoteDataSetMap.get("shortName"));
+        }
+
+        if(RemoteDataSetMap.get("periodType")!= null) {
+            newRemoteDataSet.setPeriodType((String) RemoteDataSetMap.get("periodType"));
+        }
+
+        if(RemoteDataSetMap.get("version")!= null) {
+            newRemoteDataSet.setVersion((int) RemoteDataSetMap.get("version"));
+        }
+
+        if(RemoteDataSetMap.get("expiryDays")!= null) {
+            newRemoteDataSet.setExpiryDays((int) RemoteDataSetMap.get("expiryDays"));
+        }
+
+        if(RemoteDataSetMap.get("timelyDays")!= null) {
+            newRemoteDataSet.setTimelyDays((int) RemoteDataSetMap.get("timelyDays"));
+        }
+
+        if(RemoteDataSetMap.get("openFuturePeriods")!= null) {
+            newRemoteDataSet.setOpenFuturePeriods((int) RemoteDataSetMap.get("openFuturePeriods"));
+        }
+
+        if(RemoteDataSetMap.get("renderAsTabs")!= null) {
+            newRemoteDataSet.setRenderAsTabs((boolean) RemoteDataSetMap.get("renderAsTabs"));
+        }
+
+        if(RemoteDataSetMap.get("renderHorizontally")!= null) {
+            newRemoteDataSet.setRenderHorizontally((boolean) RemoteDataSetMap.get("renderHorizontally"));
+        }
+
+        if(RemoteDataSetMap.get("compulsoryFieldsCompleteOnly")!= null) {
+            newRemoteDataSet.setCompulsoryFieldsCompleteOnly((boolean) RemoteDataSetMap.get("compulsoryFieldsCompleteOnly"));
+        }
+
+
+
         return newRemoteDataSet;
     }
 
