@@ -2,21 +2,20 @@
   <table class="table table-bordered">
     <tbody>
       <tr *ngFor="let dataElement of dataElementsDetails; let count = index">
-        <th style="width: 20px">
+        <th style="width: 40px">
           {{ count + 1 }}
         </th>
         <td style="max-width: 300px">
-          {{ dataElementsDetails[dataElement?.id]?.name }}
+          {{ dataElement?.name }}
         </td>
         <td
           *ngFor="
-            let entryInput of dataElementsDetails[dataElement?.id]
-              ?.categoryCombo?.categoryOptionCombos
+            let entryInput of dataElement?.categoryCombo?.categoryOptionCombos
           "
         >
           <app-dataelement-entry-field
             [entryInput]="entryInput"
-            [dataElement]="dataElementsDetails[dataElement?.id]"
+            [dataElement]="dataElement"
             (openDialog)="onOpenDialog(datasources, $event)"
           ></app-dataelement-entry-field>
         </td>

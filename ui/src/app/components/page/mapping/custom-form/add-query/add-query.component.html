@@ -89,11 +89,19 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <div class="helper-text w-100">
                   <div class="row">
                     <div class="col-6">
-                      <p>Instructions:</p>
+                      <p>Instructions</p>
                     </div>
-                    <div class="col-6"></div>
+                    <div class="col-6 d-flex justify-content-end">
+                      <section color="primary">
+                        <mat-checkbox
+                          (change)="onToggleInstructions($event)"
+                          [checked]="showInstructions"
+                          >Show</mat-checkbox
+                        >
+                      </section>
+                    </div>
                   </div>
-                  <div class="w-100">
+                  <div class="w-100" *ngIf="showInstructions">
                     <ol>
                       <li>
                         Where you expect to put dates in your query please put
@@ -123,6 +131,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   name="query"
                   [value]="query"
                   class="form-control"
+                  [rows]="showInstructions ? 4 : 8"
                   placeholder="SELECT * FROM [table name] WHERE [table name.field] like [condition]"
                   required
                 ></textarea>

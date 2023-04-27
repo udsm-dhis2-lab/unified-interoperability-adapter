@@ -187,25 +187,37 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           >
           </app-custom-form>
         </div>
-        <div class="col-12">
-          <app-section-form
-            *ngIf="instance && dataset && dataset?.formType === 'SECTION'"
-            [dataset]="dataset"
-            [datasources]="sources"
-          ></app-section-form>
-        </div>
         <div
           class="col-12"
+          *ngIf="instance && dataset && dataset?.formType === 'SECTION'"
+        >
+          <div class="h4 text-muted">
+            {{ dataset?.displayName }}
+          </div>
+          <div class="w-100 mt-2">
+            <app-section-form
+              [dataset]="dataset"
+              [datasources]="sources"
+            ></app-section-form>
+          </div>
+        </div>
+        <div
+          class="col-12 mt-2"
           *ngIf="
             instance &&
             dataset &&
             (dataset?.formType === 'DEFAULT' || !dataset?.formType)
           "
         >
-          <app-default-form
-            [dataset]="dataset"
-            [datasources]="sources"
-          ></app-default-form>
+          <div class="h4 text-muted">
+            {{ dataset?.displayName }}
+          </div>
+          <div class="w-100 mt-2">
+            <app-default-form
+              [dataset]="dataset"
+              [datasources]="sources"
+            ></app-default-form>
+          </div>
         </div>
       </div>
     </div>

@@ -45,6 +45,7 @@ export class DefaultFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log(this.dataset);
     this.dataElementsDetails =
       this.dataset?.datasetFields?.dataSetElements?.map(
         (datasetElement: any) => {

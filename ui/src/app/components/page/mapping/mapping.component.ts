@@ -133,6 +133,10 @@ export class MappingComponent implements OnInit {
 
   public filterDatasets() {
     if (this.instance) {
+      this.isFormReady = false;
+      setTimeout(() => {
+        this.isFormReady = this.instance && this.dataset ? true : false;
+      }, 100);
       this.datasetsService.getDatasets().subscribe({
         next: (datasets) => {
           this.datasets = (
@@ -171,6 +175,7 @@ export class MappingComponent implements OnInit {
     this.dataset = undefined;
     await new Promise((resolve) => setTimeout(resolve, 5));
     this.dataset = dataset;
+    this.isFormReady = this.instance && this.dataset ? true : false;
   }
 
   changesOnDataValue(e: Event) {}

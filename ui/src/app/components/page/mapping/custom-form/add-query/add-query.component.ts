@@ -38,6 +38,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { PeriodFilter } from 'src/app/Helpers/period-filter';
 import { QueryData, SourceInterface } from 'src/app/models/source.model';
 import { interval } from 'rxjs';
+import { MatCheckboxChange } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-add-query',
@@ -56,6 +57,7 @@ export class AddQueryComponent implements OnInit {
   periods?: PeriodInterface[];
   periodValue: any;
   period?: PeriodInterface;
+  showInstructions: boolean | undefined = true;
 
   constructor(
     public dialogRef: MatDialogRef<AddQueryComponent>,
@@ -87,6 +89,10 @@ export class AddQueryComponent implements OnInit {
 
   onNoClick(): void {
     this.dialogRef.close();
+  }
+
+  onToggleInstructions(event: MatCheckboxChange | undefined): void {
+    this.showInstructions = event?.checked;
   }
 
   onDataSourceSelection(event: any) {
