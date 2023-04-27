@@ -1,6 +1,7 @@
 package com.Adapter.icare.Domains;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,7 +14,11 @@ import java.util.UUID;
 @MappedSuperclass
 public class BaseEntity implements Serializable {
     @GeneratedValue(generator = "UUID")
-    @Column(columnDefinition = "BINARY(16)", updatable = false, nullable = false)
+    @GenericGenerator(
+            name = "UUID",
+            strategy = "org.hibernate.id.UUIDGenerator"
+    )
+    @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
     private Date createdon;
     private Integer createdby;

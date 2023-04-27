@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
+import scala.math.BigInt;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Table(name = "users")
 public class User extends BaseEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name="userid")
     private Long id;
     private String username;
@@ -37,3 +38,5 @@ public class User extends BaseEntity implements Serializable {
     private Boolean disabled;
     private Date accountexpiry;
 }
+
+

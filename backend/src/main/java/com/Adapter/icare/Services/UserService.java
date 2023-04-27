@@ -1,12 +1,13 @@
 package com.Adapter.icare.Services;
 
-import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Repository.InstancesRepository;
+import com.Adapter.icare.Mappers.Mappers;
 import com.Adapter.icare.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -19,16 +20,16 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User AddNewUser(User user) {
-        return userRepository.save(user);
-    }
-
-    public void deleteUser(User user) {
-        boolean exists = userRepository.existsById(user.getId());
-        if(!exists){
-            throw new IllegalStateException("The user with username "+ user.getUsername() + " does not exist");
+    public User createUser(User user) throws Exception {
+        User createdUser = new User();
+        try {
+            UUID uuid = UUID.randomUUID();
+            user.setUuid(uuid);
+            createdUser = userRepository.save(user);
+        } catch (Exception e) {
+            System.out.println("Error while creating user" + e);
         }
-        userRepository.deleteById(user.getId());
+        return createdUser;
     }
 
     public User updateUser(User user) {
