@@ -52,6 +52,7 @@ export interface DatasetInterface {
   instances: {
     id?: number;
   };
+  categoryCombo?: any;
   formDesignCode?: string;
   periodType?: string;
   timelyDays?: number;

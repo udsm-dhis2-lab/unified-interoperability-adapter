@@ -34,7 +34,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <div class="container-fluid">
   <div class="row">
     <div class="col-md-2 col-sx-12 col-sm-12" *ngIf="showSideMenu">
-      <app-sidenav></app-sidenav>
+      <div class="w-100">
+        <app-sidenav></app-sidenav>
+      </div>
     </div>
     <div
       [ngClass]="{

@@ -1,43 +1,96 @@
 <ul class="navbar-nav side-menu" style="border-right: solid 1px #eee">
+  <div class="w-100 mb-2 mt-2">
+    <button color="primary" mat-icon-button>
+      <mat-icon>person</mat-icon>
+      <span> <b> Testing Admin </b> </span>
+    </button>
+    <hr style="margin-bottom: 2px; color: #5a5a5a" />
+  </div>
   <div *ngIf="isAdmin">
     <li class="nav-item active">
-      <a
-        class="nav-link"
+      <button
+        mat-icon-button
         [ngClass]="{ 'active-route': selectedRoute === 'instances' }"
         (click)="onChangeRoute($event, 'instances')"
-        >Instances
-      </a>
+        class="nav-link"
+      >
+        <mat-icon style="font-size: 20px"> dvr </mat-icon>
+        <span style="margin-left: 6px">Instances </span>
+      </button>
     </li>
-    <li class="nav-item">
-      <a
+    <li class="nav-item active">
+      <button
+        mat-icon-button
         class="nav-link"
         [ngClass]="{ 'active-route': selectedRoute === 'sources' }"
         (click)="onChangeRoute($event, 'sources')"
-        >Sources</a
       >
+        <mat-icon style="font-size: 20px"> present_to_all </mat-icon>
+        <span style="margin-left: 6px">Sources </span>
+      </button>
     </li>
-    <li class="nav-item">
-      <a
+
+    <li class="nav-item active">
+      <button
+        mat-icon-button
         class="nav-link"
         [ngClass]="{ 'active-route': selectedRoute === 'datasets' }"
         (click)="onChangeRoute($event, 'datasets')"
-        >Datasets</a
       >
+        <mat-icon style="font-size: 20px"> folder_open </mat-icon>
+        <span style="margin-left: 6px">Datasets </span>
+      </button>
     </li>
-    <li class="nav-item">
-      <a
+
+    <li class="nav-item active">
+      <button
+        mat-icon-button
         class="nav-link"
         [ngClass]="{ 'active-route': selectedRoute === 'mapping' }"
         (click)="onChangeRoute($event, 'mapping')"
-        >Mappings</a
       >
+        <mat-icon style="font-size: 20px"> swap_horizontal_circle </mat-icon>
+        <span style="margin-left: 6px">Mappings </span>
+      </button>
     </li>
+  </div>
 
-    <!-- <li class="nav-item">
+  <li class="nav-item active">
+    <button
+      mat-icon-button
+      class="nav-link"
+      [ngClass]="{ 'active-route': selectedRoute === 'reports' }"
+      (click)="onChangeRoute($event, 'reports')"
+    >
+      <mat-icon style="font-size: 20px"> file_copy </mat-icon>
+      <span style="margin-left: 6px">Reports </span>
+    </button>
+  </li>
+  <li class="nav-item active">
+    <button
+      disabled="true"
+      mat-icon-button
+      class="nav-link"
+      [ngClass]="{ 'active-route': selectedRoute === 'logs' }"
+    >
+      <mat-icon style="font-size: 20px"> message </mat-icon>
+      <span style="margin-left: 6px">Logs </span>
+    </button>
+  </li>
+  <li class="nav-item active">
+    <button
+      disabled="true"
+      mat-icon-button
+      class="nav-link"
+      [ngClass]="{ 'active-route': selectedRoute === 'settings' }"
+      (click)="onChangeRoute($event, 'settings')"
+    >
+      <mat-icon style="font-size: 20px"> settings </mat-icon>
+      <span style="margin-left: 6px">Settings </span>
+    </button>
+  </li>
+  <!-- <li class="nav-item">
       <a
-        class="nav-link"
-        [ngClass]="{ 'active-route': selectedRoute === 'logs' }"
-        (click)="onChangeRoute($event, 'logs')"
         >Logs</a
       >
     </li>
@@ -49,14 +102,4 @@
         >Settings</a
       >
     </li> -->
-  </div>
-
-  <li class="nav-item">
-    <a
-      class="nav-link"
-      [ngClass]="{ 'active-route': selectedRoute === 'reports' }"
-      (click)="onChangeRoute($event, 'reports')"
-      >Reports</a
-    >
-  </li>
 </ul>

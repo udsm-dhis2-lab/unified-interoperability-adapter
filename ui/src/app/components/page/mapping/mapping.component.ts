@@ -30,14 +30,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import {
-  FormControl,
-  FormGroup,
-  UntypedFormControl,
-  UntypedFormGroup,
-} from '@angular/forms';
+
 import { MatDialog } from '@angular/material/dialog';
-import { Data } from '@angular/router';
+import { MatSelectChange } from '@angular/material/select';
 import { Observable } from 'rxjs';
 import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
 import {
@@ -68,13 +63,14 @@ export class MappingComponent implements OnInit {
   dataSources$: Observable<any[]> | undefined;
   sources: SourceInterface[] | undefined;
   source: SourceInterface | undefined;
+  formAttribute: any | undefined;
+  isFormReady: boolean = false;
 
   @Output() onViewDataset = new EventEmitter();
 
   constructor(
     private instancesService: InstancesService,
     private datasetsService: DatasetsService,
-    private instanceDatasetsService: InstanceDatasetsService,
     private sourcesService: SourcesService,
     private dialog: MatDialog
   ) {}
@@ -109,6 +105,14 @@ export class MappingComponent implements OnInit {
 
   onChange() {}
 
+  getFormAttribute(event: MatSelectChange | undefined): void {
+    this.formAttribute = event?.value;
+    this.isFormReady = false;
+    setTimeout(() => {
+      this.isFormReady = true;
+    });
+  }
+
   onSubmit() {
     const dataSetToView = {
       id: this.dataset?.id,
@@ -131,9 +135,25 @@ export class MappingComponent implements OnInit {
     if (this.instance) {
       this.datasetsService.getDatasets().subscribe({
         next: (datasets) => {
-          this.datasets = datasets.filter(
-            (d: any) => d.instances.id === this.instance!.id
-          );
+          this.datasets = (
+            datasets.filter(
+              (dataset: any) => dataset?.instances?.id === this.instance?.id
+            ) || []
+          )?.map((dataSet: any) => {
+            const dataSetFields = dataSet?.datasetFields
+              ? JSON.parse(dataSet?.datasetFields)
+              : null;
+            return {
+              ...dataSet,
+              formDesignCode: dataSet?.formDesignCode
+                ? dataSet?.formDesignCode
+                : dataSetFields?.dataEntryForm &&
+                  dataSetFields?.dataEntryForm?.htmlCode
+                ? dataSetFields?.dataEntryForm?.htmlCode
+                : null,
+              datasetFields: dataSetFields,
+            };
+          });
         },
         error: (error) => {
           (this.message = 'Error: '), error.error.message;

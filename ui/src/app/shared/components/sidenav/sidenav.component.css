@@ -45,3 +45,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     overflow: auto;
   }
 }
+
+.nav-item {
+  border-bottom: solid 1px #f2f1f1;
+}

@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <div class="col-12">
     <div class="row">
       <div class="col-11">
-        <h4 class="text-left text-muted">Add Select Query</h4>
+        <h4 class="text-left text-muted">Add Data Extraction Query</h4>
       </div>
       <div class="col-1 float-end">
         <fa-icon [icon]="faTimes" (click)="onNoClick()"></fa-icon>
@@ -84,32 +84,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </mat-form-field>
               </div>
             </div>
-            <div class="row mt-3">
+            <div class="row mt-1">
               <div class="col-12">
-                <div class="helper-text">
-                  <p>Instructions:</p>
-                  <ol>
-                    <li>
-                      Where you expect to put dates in your query please put
-                      exactly the following variables
+                <div class="helper-text w-100">
+                  <div class="row">
+                    <div class="col-6">
+                      <p>Instructions:</p>
+                    </div>
+                    <div class="col-6"></div>
+                  </div>
+                  <div class="w-100">
+                    <ol>
+                      <li>
+                        Where you expect to put dates in your query please put
+                        exactly the following variables
 
-                      <ul>
-                        <li>For starting date put {{ "${period-start}" }}</li>
-                        <li>For ending date put {{ "${period-end}" }}</li>
-                      </ul>
-                    </li>
-                    <li>Dates will be added as per period selected</li>
-                    <li>
-                      Upon clicking "Test Query" button, data won't be saved but
-                      rather test the query and display query results
-                    </li>
-                    <li>
-                      Upon clicking "Save Query" button, data will be saved and
-                      form closed automatically.
-                    </li>
-                  </ol>
+                        <ul>
+                          <li>For starting date put {{ "${period-start}" }}</li>
+                          <li>For ending date put {{ "${period-end}" }}</li>
+                        </ul>
+                      </li>
+                      <li>Dates will be added as per period selected</li>
+                      <li>
+                        Upon clicking "Test Query" button, data won't be saved
+                        but rather test the query and display query results
+                      </li>
+                      <li>
+                        Upon clicking "Save Query" button, data will be saved
+                        and form closed automatically.
+                      </li>
+                    </ol>
+                  </div>
                 </div>
-                <label for="query">Type Query: </label>
+                <label for="query" class="text-muted">Type Query: </label>
                 <textarea
                   type="textarea"
                   [(ngModel)]="data.query"

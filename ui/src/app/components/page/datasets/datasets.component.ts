@@ -40,7 +40,7 @@ import {
   faSubtract,
   faTrash,
 } from '@fortawesome/free-solid-svg-icons';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { DatasetInterface } from 'src/app/models/source.model';
 import {
   InstanceInterface,
@@ -57,6 +57,7 @@ import { UiService } from 'src/app/services/ui.service';
   styleUrls: ['./datasets.component.css'],
 })
 export class DatasetsComponent implements OnInit {
+  instanceDatasets$: Observable<InstanceDatasetsInterface[]> | undefined;
   instanceDatasets: InstanceDatasetsInterface[] | undefined;
   datasets: DatasetInterface[] | undefined;
   subscription: Subscription | undefined;
@@ -140,7 +141,7 @@ export class DatasetsComponent implements OnInit {
       instances: {
         id: this.instance.id,
       },
-      formDesign: instanceDataset.formDesign,
+      formDesignCode: instanceDataset.formDesignCode,
     };
 
     this.datasetsService.addDataset(datasetObject).subscribe({
@@ -160,7 +161,11 @@ export class DatasetsComponent implements OnInit {
   }
 
   filterDatasets(instance: InstanceInterface) {
-    this.instanceDatasetsService.getInstanceDatasets(instance.id!).subscribe({
+    this.instanceDatasets = undefined;
+    this.instanceDatasets$ = this.instanceDatasetsService.getInstanceDatasets(
+      instance.id!
+    );
+    this.instanceDatasets$.subscribe({
       next: (instanceDatasets) => {
         this.instanceDatasets = instanceDatasets;
       },

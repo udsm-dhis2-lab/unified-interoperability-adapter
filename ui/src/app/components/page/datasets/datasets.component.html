@@ -29,7 +29,10 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
 
-<div class="w-100">
+<div
+  class="w-100"
+  *ngIf="{ instanceDatasets: instanceDatasets$ | async } as params"
+>
   <div class="row mt-4">
     <div class="col-12">
       <div class="row">
@@ -66,6 +69,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
       </div>
 
+      <div class="w-100 mt-2" *ngIf="instance && !params?.instanceDatasets">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      </div>
       <div class="row mt-2" *ngIf="instanceDatasets">
         <div class="col-12">
           <div class="row">
@@ -102,15 +108,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </div>
             </div>
           </div>
-
           <div class="row mt-2">
             <div class="col-12">
               <table class="table table-hover">
                 <thead>
                   <tr>
                     <th style="width: 20px">SN</th>
-                    <th>ID</th>
+                    <th>UID</th>
+                    <th>Code</th>
                     <th>Dataset name</th>
+                    <th>Form type</th>
+                    <th>Period type</th>
                     <th style="width: 50px">Add/Remove</th>
                   </tr>
                 </thead>
@@ -124,8 +132,25 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     [ngClass]="{ 'table-secondary': isOdd }"
                   >
                     <td>{{ count + 1 }}</td>
-                    <td>{{ instanceDataset.id }}</td>
+                    <td style="width: 30px">{{ instanceDataset?.id }}</td>
+                    <td>
+                      {{ instanceDataset?.code ? instanceDataset?.code : "-" }}
+                    </td>
                     <td>{{ instanceDataset.displayName }}</td>
+                    <td>
+                      {{
+                        instanceDataset?.formType
+                          ? instanceDataset?.formType
+                          : "CUSTOM"
+                      }}
+                    </td>
+                    <td>
+                      {{
+                        instanceDataset?.periodType
+                          ? instanceDataset?.periodType
+                          : "-"
+                      }}
+                    </td>
                     <td>
                       <div class="buttons">
                         <a

@@ -67,7 +67,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div class="form-group row">
           <div class="col-6">
             <mat-form-field class="w-100" appearance="outline">
-              <mat-label>Instance: </mat-label>
+              <mat-label>DHIS2 link & data source: </mat-label>
               <mat-select
                 [(ngModel)]="instance"
                 name="instance"
@@ -113,6 +113,38 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </div> -->
         </div>
       </form>
+
+      <div
+        class="row"
+        *ngIf="
+          instance &&
+          dataset &&
+          dataset?.categoryCombo &&
+          dataset?.categoryCombo?.name !== 'default'
+        "
+      >
+        <div class="col-6">
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>{{ dataset?.categoryCombo?.name }} </mat-label>
+            <mat-select
+              [(ngModel)]="formAttribute"
+              name="formAttribute"
+              (selectionChange)="getFormAttribute($event)"
+            >
+              <mat-option></mat-option>
+              <mat-option
+                *ngFor="
+                  let categoryOptionCombo of dataset?.categoryCombo
+                    ?.categoryOptionCombos
+                "
+                [value]="categoryOptionCombo"
+              >
+                {{ categoryOptionCombo?.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
       <div class="row mt-2">
         <div class="col-12 d-flex justify-content-end">
           <button
@@ -133,10 +165,15 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </button>
         </div>
       </div>
-      <div class="row">
+      <div class="row" *ngIf="isFormReady">
         <div
           class="col-12"
-          *ngIf="dataset?.formDesignCode && dataset?.formType === 'CUSTOM'"
+          *ngIf="
+            dataset?.formDesignCode &&
+            (!dataset?.formType ||
+              (dataset?.formType !== 'SECTION' &&
+                dataset?.formType !== 'DEFAULT'))
+          "
         >
           <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
           <app-custom-form
@@ -159,7 +196,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
         <div
           class="col-12"
-          *ngIf="instance && dataset && dataset?.formType === 'DEFAULT'"
+          *ngIf="
+            instance &&
+            dataset &&
+            (dataset?.formType === 'DEFAULT' || !dataset?.formType)
+          "
         >
           <app-default-form
             [dataset]="dataset"
