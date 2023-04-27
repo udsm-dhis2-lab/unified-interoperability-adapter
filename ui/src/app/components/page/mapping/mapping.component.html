@@ -133,8 +133,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </button>
         </div>
       </div>
-      <div class="row" *ngIf="dataset?.formDesignCode">
-        <div class="col-12">
+      <div class="row">
+        <div
+          class="col-12"
+          *ngIf="dataset?.formDesignCode && dataset?.formType === 'CUSTOM'"
+        >
           <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
           <app-custom-form
             [isDataEntryLevel]="true"
@@ -146,6 +149,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             (dataValueUpdate)="changesOnDataValue($event)"
           >
           </app-custom-form>
+        </div>
+        <div class="col-12">
+          <app-section-form
+            *ngIf="instance && dataset && dataset?.formType === 'SECTION'"
+            [dataset]="dataset"
+            [datasources]="sources"
+          ></app-section-form>
+        </div>
+        <div
+          class="col-12"
+          *ngIf="instance && dataset && dataset?.formType === 'DEFAULT'"
+        >
+          <app-default-form
+            [dataset]="dataset"
+            [datasources]="sources"
+          ></app-default-form>
         </div>
       </div>
     </div>

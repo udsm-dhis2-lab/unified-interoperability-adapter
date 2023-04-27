@@ -1,0 +1,11 @@
+<!-- <mat-form-field appearance="outline">
+    <mat-label>{{
+      entryInput?.name === "default" ? "" : "entryInput?.name"
+    }}</mat-label>
+    <input matInput />
+  </mat-form-field> -->
+<input
+  class="data-input-field"
+  id="{{ id }}"
+  (click)="onOpenDialog($event, id)"
+/>

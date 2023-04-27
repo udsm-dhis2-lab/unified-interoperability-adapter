@@ -46,10 +46,34 @@ export interface SourceInterface {
 
 export interface DatasetInterface {
   id?: string;
+  code?: string;
+  formType?: string;
   displayName: string;
   instances: {
     id?: number;
   };
   formDesignCode?: string;
   periodType?: string;
+  timelyDays?: number;
+  expiryDays?: number;
+  datasetFields?: {
+    name: string;
+    id: string;
+    code?: string;
+    shortName: string;
+    renderHorizontally: boolean;
+    formType: string;
+    renderAsTabs: boolean;
+    displayName: string;
+    compulsoryFieldsCompleteOnly: boolean;
+    version: number;
+    timelyDays: number;
+    periodType: string;
+    openFuturePeriods: number;
+    expiryDays: number;
+    categoryCombo: any;
+    dataSetElements: [];
+    attributeValues?: [];
+    sections?: Array<any>;
+  };
 }

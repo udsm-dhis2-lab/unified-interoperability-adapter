@@ -32,7 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   <div class="col-12">
     <div class="row">
       <div class="col-11">
-        <h4 class="text-center">Add Select Query</h4>
+        <h4 class="text-left text-muted">Add Select Query</h4>
       </div>
       <div class="col-1 float-end">
         <fa-icon [icon]="faTimes" (click)="onNoClick()"></fa-icon>
@@ -154,20 +154,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
             <div class="row mt-3">
               <div class="col-12">
-                <div class="row">
-                  <div class="col-12 d-flex justify-content-end">
+                <div class="w-100">
+                  <div class="w-100 d-flex justify-content-end">
                     <button
+                      mat-stroked-button
+                      color="primary"
                       (click)="onTest()"
-                      class="btn btn-outline-secondary float-end"
                     >
                       Test Query
                     </button>
                     <button
+                      mat-flat-button
                       style="margin-left: 8px"
                       type="submit"
                       [mat-dialog-close]="data"
                       cdkFocusInitial
-                      class="btn btn-outline-success float-end"
+                      color="primary"
                     >
                       Save Query
                     </button>
