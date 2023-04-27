@@ -152,7 +152,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
         <div class="col-12">
           <app-section-form
-            *ngIf="instance && dataset"
+            *ngIf="instance && dataset && dataset?.formType === 'SECTION'"
             [dataset]="dataset"
             [datasources]="sources"
           ></app-section-form>
