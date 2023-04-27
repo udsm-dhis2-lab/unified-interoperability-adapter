@@ -84,7 +84,6 @@ export class MappingComponent implements OnInit {
     this.dataSources$.subscribe({
       next: (sources) => {
         this.sources = sources;
-        console.log(sources);
       },
       error: (error) => {
         this.message = error.error.message;
@@ -150,9 +149,7 @@ export class MappingComponent implements OnInit {
 
   async checkDataset(dataset: DatasetInterface) {
     this.dataset = undefined;
-
     await new Promise((resolve) => setTimeout(resolve, 5));
-
     this.dataset = dataset;
   }
 
