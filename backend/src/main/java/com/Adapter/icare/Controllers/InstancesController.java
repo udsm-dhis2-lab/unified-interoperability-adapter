@@ -71,7 +71,6 @@ public class InstancesController {
     @DeleteMapping("/{instanceId}")
     public void deleteInstance(@PathVariable("instanceId") Long instanceId) {
         instanceService.deleteInstance(instanceId);
-
     }
 
     @PutMapping
