@@ -41,26 +41,26 @@ public class User extends BaseEntity implements Serializable {
     @Column()
     private String firstname;
 
-//    @Column()
-//    private Boolean externalauth;
-//
-//    @Column()
-//    private Date passwordlastupdated;
-//
-//    @Column()
-//    private Date lastlogin;
-//
-//    @Column()
-//    private String restoretoken;
-//
-//    @Column()
-//    private Date restoreexpiry;
+    @Column()
+    private Boolean externalauth;
+
+    @Column()
+    private Date passwordlastupdated;
+
+    @Column()
+    private Date lastlogin;
+
+    @Column()
+    private String restoretoken;
+
+    @Column()
+    private Date restoreexpiry;
 
     @Column()
     private Boolean disabled;
 
-//    @Column()
-//    private Date accountexpiry;
+    @Column()
+    private Date accountexpiry;
 }
 
 

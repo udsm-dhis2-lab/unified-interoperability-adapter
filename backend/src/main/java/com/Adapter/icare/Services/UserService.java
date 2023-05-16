@@ -17,19 +17,16 @@ public class UserService {
     }
 
     public List<User> getUsers(){
-        System.out.println("HAHA");
         return userRepository.findAll();
     }
 
     public User createUser(User user) throws Exception {
-        System.out.println("SERVICE");
         User createdUser = new User();
         try {
-//            UUID uuid = UUID.randomUUID();
-//            user.setUuid(uuid);
+            UUID uuid = UUID.randomUUID();
+            user.setUuid(uuid);
 //            System.out.println(user.getUuid());
-//            createdUser = userRepository.save(user);
-            createdUser = user;
+            createdUser = userRepository.save(user);
         } catch (Exception e) {
             System.out.println("Error while creating user" + e);
         }

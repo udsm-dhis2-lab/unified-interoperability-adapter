@@ -4,10 +4,13 @@ import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.UserGetDto;
 import com.Adapter.icare.Mappers.Mappers;
 import com.Adapter.icare.Services.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -15,19 +18,15 @@ public class UserController {
     private final UserService userService;
     private Mappers mappers;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/status")
     public String getStatus() {
-        List<User> users= userService.getUsers();
-        System.out.println(users.size());
-        if (users == null) {
-            System.out.println("NULL");
-        } else {
-            System.out.println("NOT NULL");
-        }
         return "OK";
     }
 
@@ -42,12 +41,11 @@ public class UserController {
         return  users;
     }
 
-    @PostMapping()
-    public User createUser(@RequestBody User user) throws Exception {
+    @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> createUser(@RequestBody User user) throws Exception {
+        User userResponse = new User();
         try {
-            System.out.println(user.getId());
-            return userService.createUser(user);
-//            return userResponse;
+            userResponse = userService.createUser(user);
         } catch (Exception e) {
             throw new RuntimeException("Error creating user: " + e);
         }
@@ -57,7 +55,7 @@ public class UserController {
 //            mappers.userToUserGetDto(userResponse);
 //            System.out.println(userGetDto);
 //        }
-//        return  userResponse;
+        return (Map) userResponse;
     }
 
     @PutMapping("/{uuid}")
