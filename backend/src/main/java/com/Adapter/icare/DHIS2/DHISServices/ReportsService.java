@@ -91,7 +91,7 @@ public class ReportsService {
             String password = dataset.get().getInstances().getPassword();
             // Using DHIS2-JAVA-SDK
             Dhis2Client destinationDhis2Client = Dhis2ClientBuilder.newClient( instanceUrl +"/api", username,password ).build();
-            Map<String, Object> response = destinationDhis2Client.post("dataValueSets?async=true").withResource(dhisAggregateValues).transfer().returnAs(Map.class);
+            Map<String, Object> response = destinationDhis2Client.post("dataValueSets?orgUnitIdScheme=code&async=true").withResource(dhisAggregateValues).transfer().returnAs(Map.class);
             if (response.get("status") != null) {
                 ab = response.get("status").toString();
             }
