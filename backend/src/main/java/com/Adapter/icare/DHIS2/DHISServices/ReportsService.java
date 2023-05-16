@@ -101,5 +101,11 @@ public class ReportsService {
         }
         return ab;
     }
-    
+
+    public Map<String, Object> fetchOrgUnitUsingCode(String url, String username, String password, String code) {
+        Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+        Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+        Map<String, Object> organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+        return organisationUnit;
+    }
 }

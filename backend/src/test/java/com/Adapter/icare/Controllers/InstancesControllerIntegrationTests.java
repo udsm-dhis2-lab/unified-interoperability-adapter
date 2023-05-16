@@ -71,10 +71,11 @@ class InstancesControllerIntegrationTests {
     @Test
     void addInstancesTest() throws Exception {
         Instances instance = new Instances();
-        instance.setUrl("https://play.dhis2.org/2/38.1.2");
+        instance.setUrl("https://play.dhis2.org/2.38.3.1");
         instance.setUsername("admin");
         instance.setPassword("district");
         instance.setName("TEST and TLAND");
+        instance.setCode("OU_559");
         instance.setOrganisationUnitId("23984278937429");
         mockMvc.perform(
                 post("/api/v1/instance").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(instance))

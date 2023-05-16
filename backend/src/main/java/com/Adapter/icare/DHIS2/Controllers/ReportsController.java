@@ -36,11 +36,14 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hisp.dhis.api.model.v2_37_7.User;
+import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import com.Adapter.icare.Constants.DHISConstants;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValueSets;
@@ -147,10 +150,29 @@ public class ReportsController {
 
 
     @GetMapping("/dhisConnection")
-    public Map<String, Object> Dhis2Connection() throws SQLException {
+    public Map<String, Object> Dhis2Connection() throws Exception {
         Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( "https://play.dhis2.org/2.39.1/api", "admin","district" ).build();
         Map<String, Object> me = dhis2Client.get("me").transfer().returnAs(Map.class);
         return  me;
+    }
+
+    @PostMapping(path = "/verifyCode",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> getDHIS2OrgUnitViaCode(@RequestBody Instances instance) throws Exception {
+        String url = instance.getUrl() + "/api";
+        String username = instance.getUsername();
+        String password =instance.getPassword();
+        String code = instance.getCode();
+        Map<String, Object> organisationUnit = new HashMap<>();
+        try {
+//            organisationUnit = reportsService.fetchOrgUnitUsingCode(url,username,password,code);
+//            System.out.println(organisationUnit);
+            Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+            Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+            organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+        }catch (Exception e) {
+            throw new RuntimeException("Error verifying organisation unit using: " + e);
+        }
+        return organisationUnit;
     }
     
 }
