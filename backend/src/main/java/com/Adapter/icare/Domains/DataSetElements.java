@@ -49,7 +49,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table
-public class DataSetElements {
+public class DataSetElements extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

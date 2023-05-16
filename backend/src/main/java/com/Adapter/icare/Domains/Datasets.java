@@ -48,7 +48,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table
-public class Datasets implements Serializable {
+public class Datasets extends BaseEntity implements Serializable {
 
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
