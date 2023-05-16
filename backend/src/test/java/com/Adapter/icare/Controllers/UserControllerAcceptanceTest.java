@@ -52,10 +52,10 @@ public class UserControllerAcceptanceTest {
     @Test
     public void createUserTest() throws Exception {
         Map<String, Object> user = new HashMap<>();
-        user.put("username","abdul");
+        user.put("username","dennis");
         user.put("firstname","Abdul");
-        user.put("surname","Mrisho");
-        user.put("email","mrisho@gmail.com");
+        user.put("surname","Kibahila");
+        user.put("email","dennis@gmail.com");
         user.put("password","Testing");
         user.put("phonenumber","0798762321");
         user.put("disabled",false);
@@ -65,7 +65,7 @@ public class UserControllerAcceptanceTest {
 //        user.setId(1);
         System.out.println(user);
         mockMvc.perform(
-                        post("/api/v1/users").accept(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(user))
+                        post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(user))
                 ).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }

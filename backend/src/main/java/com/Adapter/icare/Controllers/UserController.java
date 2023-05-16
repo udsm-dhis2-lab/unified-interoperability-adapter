@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> createUser(@RequestBody User user) throws Exception {
+    public User createUser(@RequestBody User user) throws Exception {
         User userResponse = new User();
         try {
             userResponse = userService.createUser(user);
@@ -55,7 +55,7 @@ public class UserController {
 //            mappers.userToUserGetDto(userResponse);
 //            System.out.println(userGetDto);
 //        }
-        return (Map) userResponse;
+        return userResponse;
     }
 
     @PutMapping("/{uuid}")
