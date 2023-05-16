@@ -4,10 +4,13 @@ import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.UserGetDto;
 import com.Adapter.icare.Mappers.Mappers;
 import com.Adapter.icare.Services.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -16,6 +19,8 @@ public class UserController {
     private Mappers mappers;
 
     @Autowired
+    private ObjectMapper objectMapper;
+
     public UserController(UserService userService) {
         this.userService = userService;
     }
@@ -36,21 +41,17 @@ public class UserController {
         return  users;
     }
 
-    @PostMapping
+
+    @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public User createUser(@RequestBody User user) throws Exception {
-        User userResponse;
+        User userResponse = new User();
         try {
             userResponse = userService.createUser(user);
         } catch (Exception e) {
             throw new RuntimeException("Error creating user: " + e);
         }
-//        if (userResponse != null) {
-//            UserGetDto userGetDto = new UserGetDto();
-//            System.out.println(userResponse.toString());
-////            mappers.userToUserDto(userResponse);
-//            System.out.println(userGetDto);
-//        }
-        return  userResponse;
+        return userResponse;
+
     }
 
     @PutMapping("/{uuid}")

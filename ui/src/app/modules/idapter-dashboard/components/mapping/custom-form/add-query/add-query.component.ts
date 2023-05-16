@@ -29,16 +29,14 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import { DataValueFetchService } from './../../../../../services/dataValueFetch/data-value-fetch.service';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { PeriodInterface } from 'src/app/resources/interfaces';
-import { SourcesService } from 'src/app/services/sources/sources.service';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { PeriodFilter } from 'src/app/Helpers/period-filter';
-import { QueryData, SourceInterface } from 'src/app/models/source.model';
-import { interval } from 'rxjs';
+import { QueryData } from 'src/app/models/source.model';
 import { MatCheckboxChange } from '@angular/material/checkbox';
+import { DataValueFetchService } from 'src/app/services/dataValueFetch/data-value-fetch.service';
 
 @Component({
   selector: 'app-add-query',

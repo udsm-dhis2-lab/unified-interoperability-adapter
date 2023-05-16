@@ -35,14 +35,21 @@ import { materialModules } from './material.modules';
 import { sharedComponents } from './components';
 import { CommonModule } from '@angular/common';
 import { modals } from './modals';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   imports: [CommonModule, ...materialModules, NgxDhis2PeriodFilterModule],
   exports: [
+    CommonModule,
+    FormsModule,
     ...sharedComponents,
     ...modals,
     ...materialModules,
     NgxDhis2PeriodFilterModule,
+    HttpClientModule,
+    FontAwesomeModule,
   ],
   entryComponents: [...modals],
   declarations: [...sharedComponents, ...modals],

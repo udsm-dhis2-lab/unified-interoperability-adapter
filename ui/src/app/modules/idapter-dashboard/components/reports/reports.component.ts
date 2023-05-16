@@ -29,19 +29,17 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import {
-  InstanceInterface,
-  PeriodInterface,
-} from './../../../resources/interfaces';
 import { Component, OnInit } from '@angular/core';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
 import { InstancesService } from 'src/app/services/instances/instances.service';
 import { PeriodFilter } from 'src/app/Helpers/period-filter';
 import { ReportsService } from 'src/app/services/reports/reports.service';
-import { map } from 'lodash';
-import { subscribeOn } from 'rxjs';
 import { DatasetInterface } from 'src/app/models/source.model';
+import {
+  InstanceInterface,
+  PeriodInterface,
+} from 'src/app/resources/interfaces';
 
 @Component({
   selector: 'app-reports',

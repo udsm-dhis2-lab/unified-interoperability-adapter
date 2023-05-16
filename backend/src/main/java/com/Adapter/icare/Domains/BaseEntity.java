@@ -1,6 +1,7 @@
 package com.Adapter.icare.Domains;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -20,6 +21,8 @@ public class BaseEntity implements Serializable {
     )
     @Column(name = "uuid", updatable = false, nullable = false)
     private UUID uuid;
+
+    @CreationTimestamp
     private Date createdon;
     private User createdby;
     private Date lastupdatedon;
