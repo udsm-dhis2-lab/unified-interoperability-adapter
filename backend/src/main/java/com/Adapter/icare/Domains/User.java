@@ -22,21 +22,45 @@ public class User extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name="userid")
-    private Long id;
+    private Integer id;
+    @Column(unique = true)
     private String username;
+    @Column()
     private String password;
+
+    @Column(unique = true)
     private String email;
+
+    @Column()
     private String phonenumber;
+    @Column()
     private String surname;
+
+    @Column()
     private String middlename;
+    @Column()
     private String firstname;
-    private Boolean externalauth;
-    private Date passwordlastupdated;
-    private Date lastlogin;
-    private String restoretoken;
-    private Date restoreexpiry;
+
+//    @Column()
+//    private Boolean externalauth;
+//
+//    @Column()
+//    private Date passwordlastupdated;
+//
+//    @Column()
+//    private Date lastlogin;
+//
+//    @Column()
+//    private String restoretoken;
+//
+//    @Column()
+//    private Date restoreexpiry;
+
+    @Column()
     private Boolean disabled;
-    private Date accountexpiry;
+
+//    @Column()
+//    private Date accountexpiry;
 }
 
 

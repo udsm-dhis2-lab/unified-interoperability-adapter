@@ -15,13 +15,19 @@ public class UserController {
     private final UserService userService;
     private Mappers mappers;
 
-    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/status")
     public String getStatus() {
+        List<User> users= userService.getUsers();
+        System.out.println(users.size());
+        if (users == null) {
+            System.out.println("NULL");
+        } else {
+            System.out.println("NOT NULL");
+        }
         return "OK";
     }
 
@@ -38,19 +44,20 @@ public class UserController {
 
     @PostMapping()
     public User createUser(@RequestBody User user) throws Exception {
-        User userResponse;
         try {
-            userResponse = userService.createUser(user);
+            System.out.println(user.getId());
+            return userService.createUser(user);
+//            return userResponse;
         } catch (Exception e) {
             throw new RuntimeException("Error creating user: " + e);
         }
-        if (userResponse != null) {
-            UserGetDto userGetDto = new UserGetDto();
-            System.out.println(userResponse.toString());
-//            mappers.userToUserDto(userResponse);
-            System.out.println(userGetDto);
-        }
-        return  userResponse;
+//        if (userResponse != null) {
+//            UserGetDto userGetDto = new UserGetDto();
+//            System.out.println(userResponse.toString());
+//            mappers.userToUserGetDto(userResponse);
+//            System.out.println(userGetDto);
+//        }
+//        return  userResponse;
     }
 
     @PutMapping("/{uuid}")

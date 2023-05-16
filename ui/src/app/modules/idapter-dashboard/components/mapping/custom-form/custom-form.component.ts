@@ -30,9 +30,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import { UiService } from 'src/app/services/ui.service';
-import { PeriodFilter } from './../../../../Helpers/period-filter';
-import { DataValueFetchService } from './../../../../services/dataValueFetch/data-value-fetch.service';
-import { DataValueFetchInterface } from './../../../../resources/interfaces';
 import {
   Component,
   OnInit,
@@ -50,6 +47,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { first } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
+import { DataValueFetchInterface } from 'src/app/resources/interfaces';
+import { DataValueFetchService } from 'src/app/services/dataValueFetch/data-value-fetch.service';
+import { PeriodFilter } from 'src/app/Helpers/period-filter';
 
 @Component({
   selector: 'app-custom-form',

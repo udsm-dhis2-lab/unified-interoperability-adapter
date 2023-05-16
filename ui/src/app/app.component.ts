@@ -37,12 +37,6 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'iAdapter';
-  showSideMenu: boolean = true;
 
   ngOnInit() {}
-
-  toggleSideMenu(event: Event): void {
-    event.stopPropagation();
-    this.showSideMenu = !this.showSideMenu;
-  }
 }

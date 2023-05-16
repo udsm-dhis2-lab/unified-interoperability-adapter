@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { AddQueryComponent } from 'src/app/components/page/mapping/custom-form/add-query/add-query.component';
 import { SourceInterface } from 'src/app/models/source.model';
+import { AddQueryComponent } from 'src/app/modules/idapter-dashboard/components/mapping/custom-form/add-query/add-query.component';
 import { DataValueFetchInterface } from 'src/app/resources/interfaces';
 import { DataValueFetchService } from 'src/app/services/dataValueFetch/data-value-fetch.service';
 

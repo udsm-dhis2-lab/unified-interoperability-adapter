@@ -49,19 +49,19 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class Dhis2Connection {
 
-    private MockMvc mockMvc;
+    private MockMvc mockMvcDHIS2;
 
     @InjectMocks
     private ReportsController reportsController;
 
     @Before
     public  void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(reportsController).build();
+        mockMvcDHIS2 = MockMvcBuilders.standaloneSetup(reportsController).build();
     }
 
     @Test
     public void Dhis2ConnectionTest() throws Exception {
-        mockMvc.perform(
+        mockMvcDHIS2.perform(
                 get("/api/v1/reports/dhisConnection").accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk()).andExpect(jsonPath("$.username", Matchers.is("admin")));
