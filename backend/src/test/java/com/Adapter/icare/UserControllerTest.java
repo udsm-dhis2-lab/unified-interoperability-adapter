@@ -2,27 +2,21 @@ package com.Adapter.icare;
 import com.Adapter.icare.Controllers.UserController;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Services.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
-
-import static org.hamcrest.Matchers.hasSize;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import scala.math.BigInt;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.UUID;
 
@@ -65,7 +59,7 @@ public class UserControllerTest {
                         get("/api/v1/users").accept(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(jsonPath("$", hasSize(0)));;
+                .andExpect(jsonPath("$.username").value("josephat"));;
     }
 
 //    @Test
@@ -97,4 +91,26 @@ public class UserControllerTest {
 //                .andExpect(jsonPath("$.username").value("josephat"))
 //                .andExpect(jsonPath("$.email").value("josephat@gmail.com"));
 //    }
+
+    @Test
+    public void createUserTest() throws Exception {
+//        MockHttpServletRequest newPostRequest = newPostRequest("icare/item", item);
+//        MockHttpServletResponse handle = handle(newPostRequest);
+        ObjectMapper objectMapper = new ObjectMapper();
+        User user = new User();
+        user.setUsername("Dennis");
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/v1/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(user)))
+                        .andReturn();
+        String responseContent = result.getResponse().getContentAsString();
+        System.out.println("Response: " + responseContent);
+
+//                .andExpect(MockMvcResultMatchers.status().isOk())
+//                //.andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+//                .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("Dennis"));
+
+
+    }
 }

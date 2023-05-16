@@ -29,6 +29,8 @@ public class UserService {
         } catch (Exception e) {
             System.out.println("Error while creating user" + e);
         }
+
+        System.out.println("created user: "+createdUser);
         return createdUser;
     }
 

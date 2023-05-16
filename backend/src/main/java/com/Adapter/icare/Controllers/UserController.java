@@ -36,7 +36,7 @@ public class UserController {
         return  users;
     }
 
-    @PostMapping()
+    @PostMapping
     public User createUser(@RequestBody User user) throws Exception {
         User userResponse;
         try {
@@ -44,12 +44,12 @@ public class UserController {
         } catch (Exception e) {
             throw new RuntimeException("Error creating user: " + e);
         }
-        if (userResponse != null) {
-            UserGetDto userGetDto = new UserGetDto();
-            System.out.println(userResponse.toString());
-//            mappers.userToUserDto(userResponse);
-            System.out.println(userGetDto);
-        }
+//        if (userResponse != null) {
+//            UserGetDto userGetDto = new UserGetDto();
+//            System.out.println(userResponse.toString());
+////            mappers.userToUserDto(userResponse);
+//            System.out.println(userGetDto);
+//        }
         return  userResponse;
     }
 
