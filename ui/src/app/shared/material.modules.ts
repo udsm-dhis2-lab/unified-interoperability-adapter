@@ -17,6 +17,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatMenuModule } from '@angular/material/menu';
 
 export const materialModules: any[] = [
   MatButtonModule,
@@ -39,4 +40,5 @@ export const materialModules: any[] = [
   MatProgressSpinnerModule,
   MatProgressBarModule,
   MatRadioModule,
+  MatMenuModule,
 ];

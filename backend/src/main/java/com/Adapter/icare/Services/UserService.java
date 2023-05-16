@@ -25,6 +25,7 @@ public class UserService {
         try {
             UUID uuid = UUID.randomUUID();
             user.setUuid(uuid);
+//            System.out.println(user.getUuid());
             createdUser = userRepository.save(user);
         } catch (Exception e) {
             System.out.println("Error while creating user" + e);
