@@ -1,4 +1,4 @@
-package com.Adapter.icare.Configurations.security;
+package com.Adapter.icare.Configurations;
 
 import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;

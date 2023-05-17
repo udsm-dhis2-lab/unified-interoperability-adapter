@@ -9,9 +9,7 @@ import scala.math.BigInt;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -82,6 +80,69 @@ public class User extends BaseEntity implements Serializable {
             @JoinColumn(name = "group_name", referencedColumnName = "group_name")
     })
     private Set<Group> groups;
+
+    public Map<String,Object> toMap(){
+
+        Map<String,Object> userMap = new HashMap<>();
+
+        if(this.getUsername() != null){
+            userMap.put("username", this.getUsername());
+        }
+        if(this.getEmail() != null){
+            userMap.put("email", this.getEmail());
+        }
+        if(this.getPhoneNumber() != null){
+            userMap.put("phoneNumber", this.getPhoneNumber());
+        }
+        if(this.getSurname() != null){
+            userMap.put("surname",this.getSurname());
+        }
+        if(this.getMiddleName() != null){
+            userMap.put("middleName",this.getMiddleName());
+        }
+        if(this.getFirstName() != null){
+            userMap.put("firstName",this.getFirstName());
+        }
+        if(this.getExternalAuth() == null){
+            userMap.put("externalAuth",this.getExternalAuth());
+        }
+        if(this.getPasswordLastUpdated() != null){
+            userMap.put("passwordLastUpdated", this.getPasswordLastUpdated());
+        }
+        if(this.getLastLogin() != null){
+            userMap.put("lastLogin", this.getLastLogin());
+        }
+        if(this.getRestoreToken() != null){
+            userMap.put("restoreToken", this.getRestoreToken());
+        }
+        if(this.getRestoreExpiry() != null){
+            userMap.put("restoreExpiry",this.getRestoreExpiry());
+        }
+        if(this.getDisabled() != null){
+            userMap.put("disabled", this.getDisabled());
+        }
+        if(this.getAccountExpiry() != null){
+            userMap.put("accountExpiry",this.getAccountExpiry());
+        }
+        if(this.getRoles() != null){
+            List<Map<String,Object>> rolesMap = new ArrayList<>();
+            for( Role role : this.getRoles()){
+                rolesMap.add(role.toMap());
+            }
+            userMap.put("roles",rolesMap);
+        }
+
+        if(this.getGroups() != null){
+            List<Map<String,Object>> groupsMap = new ArrayList<>();
+            for(Group group : this.getGroups()){
+                groupsMap.add(group.toMap());
+            }
+            userMap.put("groups",groupsMap);
+        }
+
+        return userMap;
+
+    }
 }
 
 
