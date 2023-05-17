@@ -151,8 +151,17 @@ public class ReportsController {
 
     @GetMapping("/dhisConnection")
     public Map<String, Object> Dhis2Connection() throws Exception {
-        Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( "https://play.dhis2.org/2.39.1/api", "admin","district" ).build();
-        Map<String, Object> me = dhis2Client.get("me").transfer().returnAs(Map.class);
+        Dhis2Client dhis2Client = null;
+        Map<String, Object> me = new HashMap<>();
+        try {
+            dhis2Client = Dhis2ClientBuilder.newClient( "https://play.dhis2.org/2.39.1/api", "admin","district" ).build();
+        } catch (Exception e) {
+            System.err.println("Error establishing DHIS2 client: " + e.getMessage());
+            e.printStackTrace();
+        }
+        if (dhis2Client != null) {
+            me = dhis2Client.get("me").transfer().returnAs(Map.class);
+        }
         return  me;
     }
 
@@ -166,11 +175,25 @@ public class ReportsController {
         try {
 //            organisationUnit = reportsService.fetchOrgUnitUsingCode(url,username,password,code);
 //            System.out.println(organisationUnit);
-            Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
-            Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
-            organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+            Dhis2Client dhis2Client = null;
+            try {
+                dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+            } catch (Exception e) {
+                System.err.println("Error establishing DHIS2 client: " + e.getMessage());
+                e.printStackTrace();
+            }
+            if (dhis2Client != null) {
+                Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+                if (response != null && response.get("organisationUnits") != null && ((List) response.get("organisationUnits")).size() > 0) {
+                    organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+                } else {
+                    organisationUnit.put("message", "No organisation unit matching the code " + code);
+                    organisationUnit.put("status", "OK");
+                }
+            }
+
         }catch (Exception e) {
-            throw new RuntimeException("Error verifying organisation unit using: " + e);
+            throw new RuntimeException("Error verifying organisation unit using code: " + e);
         }
         return organisationUnit;
     }
