@@ -1,5 +1,7 @@
 package com.Adapter.icare.Controllers;
 
+import com.Adapter.icare.Domains.Privilege;
+import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.UserGetDto;
 import com.Adapter.icare.Mappers.Mappers;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +44,7 @@ public class UserController {
         return  users;
     }
 
+
     @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public User createUser(@RequestBody User user) throws Exception {
         User userResponse = new User();
@@ -49,17 +53,57 @@ public class UserController {
         } catch (Exception e) {
             throw new RuntimeException("Error creating user: " + e);
         }
-//        if (userResponse != null) {
-//            UserGetDto userGetDto = new UserGetDto();
-//            System.out.println(userResponse.toString());
-//            mappers.userToUserGetDto(userResponse);
-//            System.out.println(userGetDto);
-//        }
         return userResponse;
+
     }
 
     @PutMapping("/{uuid}")
     public User updateUser(@RequestBody User user) {
         return userService.updateUser(user);
+    }
+
+    @PostMapping("roles")
+    public List<Map<String,Object>> createRoles(@RequestBody List<Map<String,Object>> rolesMap){
+        List<Map<String,Object>> createdRoles = new ArrayList<>();
+        for(Map<String, Object> roleMap: rolesMap){
+            Role role = Role.fromMap(roleMap);
+            Role createdRole = userService.saveRole(role);
+            createdRoles.add(createdRole.toMap());
+        }
+        return createdRoles;
+    }
+
+    @GetMapping("roles")
+    public List<Map<String,Object>> getRoles(){
+        List<Map<String,Object>> savedRoles = new ArrayList<>();
+        List<Role> roles = userService.getRoles();
+
+        for(Role role : roles){
+            savedRoles.add(role.toMap());
+        }
+        return savedRoles;
+    }
+
+    @PostMapping("privileges")
+    public List<Map<String,Object>> createPrivileges(@RequestBody List<Map<String,Object>> privilegesMap){
+        List<Map<String,Object>> createdPrivileges = new ArrayList<>();
+        for(Map<String,Object> priviligeMap : privilegesMap){
+            Privilege privilege = Privilege.fromMap(priviligeMap);
+            Privilege savedPrivilege = userService.savePrivilege(privilege);
+            createdPrivileges.add(savedPrivilege.toMap());
+        }
+        return createdPrivileges;
+    }
+
+    @GetMapping("privileges")
+    public List<Map<String,Object>> getPrivileges(){
+        List<Map<String,Object>> privilegesMap = new ArrayList<>();
+        List<Privilege> privileges = userService.getPrivileges();
+
+        for(Privilege privilege : privileges){
+            privilegesMap.add(privilege.toMap());
+        }
+
+        return privilegesMap;
     }
 }

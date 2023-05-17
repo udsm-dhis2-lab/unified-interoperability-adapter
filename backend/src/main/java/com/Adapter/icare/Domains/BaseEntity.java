@@ -24,18 +24,12 @@ public class BaseEntity implements Serializable {
 
     @CreationTimestamp
     private Date createdon;
-
-    @Column()
     private User createdby;
-
-    @Column()
     private Date lastupdatedon;
-
-    @Column()
     private User lastupdatedby;
-
-    @Column()
     private Boolean retired;
-    @Column()
     private User retiredby;
+
+    @Column(columnDefinition = "json")
+    private String sharing;
 }
