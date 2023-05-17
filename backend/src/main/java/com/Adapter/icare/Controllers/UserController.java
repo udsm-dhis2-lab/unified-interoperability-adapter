@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping("/api/v1")
 public class UserController {
     private final UserService userService;
     private Mappers mappers;
@@ -28,7 +28,13 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/status")
+
+    @GetMapping("/login")
+    public String logins() {
+        return "OK";
+    }
+
+    @GetMapping("/users/status")
     public String getStatus() {
         return "OK";
     }
@@ -45,7 +51,7 @@ public class UserController {
     }
 
 
-    @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/users", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
     public User createUser(@RequestBody User user) throws Exception {
         User userResponse = new User();
         try {
@@ -57,12 +63,12 @@ public class UserController {
 
     }
 
-    @PutMapping("/{uuid}")
+    @PutMapping("/users/{uuid}")
     public User updateUser(@RequestBody User user) {
         return userService.updateUser(user);
     }
 
-    @PostMapping("roles")
+    @PostMapping("/users/roles")
     public List<Map<String,Object>> createRoles(@RequestBody List<Map<String,Object>> rolesMap){
         List<Map<String,Object>> createdRoles = new ArrayList<>();
         for(Map<String, Object> roleMap: rolesMap){
@@ -73,7 +79,7 @@ public class UserController {
         return createdRoles;
     }
 
-    @GetMapping("roles")
+    @GetMapping("/users/roles")
     public List<Map<String,Object>> getRoles(){
         List<Map<String,Object>> savedRoles = new ArrayList<>();
         List<Role> roles = userService.getRoles();
@@ -84,7 +90,7 @@ public class UserController {
         return savedRoles;
     }
 
-    @PostMapping("privileges")
+    @PostMapping("/users/privileges")
     public List<Map<String,Object>> createPrivileges(@RequestBody List<Map<String,Object>> privilegesMap){
         List<Map<String,Object>> createdPrivileges = new ArrayList<>();
         for(Map<String,Object> priviligeMap : privilegesMap){
@@ -95,7 +101,7 @@ public class UserController {
         return createdPrivileges;
     }
 
-    @GetMapping("privileges")
+    @GetMapping("/users/privileges")
     public List<Map<String,Object>> getPrivileges(){
         List<Map<String,Object>> privilegesMap = new ArrayList<>();
         List<Privilege> privileges = userService.getPrivileges();
