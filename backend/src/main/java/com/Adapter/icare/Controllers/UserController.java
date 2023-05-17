@@ -40,14 +40,17 @@ public class UserController {
     }
 
     @GetMapping
-    public List<User> getUsers() throws Exception{
-        List<User> users;
+    public List<Map<String,Object>> getUsers() throws Exception{
+        List<Map<String,Object>> usersMap = new ArrayList<>();
         try {
-            users = userService.getUsers();
+            List<User> users = userService.getUsers();
+            for(User user : users){
+                usersMap.add(user.toMap());
+            }
         } catch (Exception e) {
             throw new RuntimeException("Error getting users: " + e);
         }
-        return  users;
+        return usersMap;
     }
 
 
@@ -112,4 +115,7 @@ public class UserController {
 
         return privilegesMap;
     }
+
+
+
 }

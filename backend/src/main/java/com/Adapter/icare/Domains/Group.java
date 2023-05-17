@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,4 +24,15 @@ public class Group extends BaseEntity {
 
     @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
     private Set<User> users;
+
+    public Map<String,Object> toMap(){
+        Map<String,Object> groupMap = new HashMap<>();
+        if(this.getGroupName() != null){
+            groupMap.put("groupName",this.getGroupName());
+        }
+        if(this.getDescription() != null){
+            groupMap.put("description",this.getDescription());
+        }
+        return groupMap;
+    }
 }
