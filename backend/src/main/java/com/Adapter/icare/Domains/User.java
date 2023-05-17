@@ -22,7 +22,7 @@ import java.util.UUID;
 public class User extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name="user_id")
+    @Column(name="userid")
     private Integer id;
     @Column(unique = true)
     private String username;
@@ -63,20 +63,20 @@ public class User extends BaseEntity implements Serializable {
     @Column()
     private Date accountexpiry;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_role",
     joinColumns = {
-            @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+            @JoinColumn(name = "user_id", referencedColumnName = "userid")
     },
     inverseJoinColumns = {
             @JoinColumn(name = "role_name", referencedColumnName = "role_name")
     })
     private Set<Role> roles;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name="user_group",
     joinColumns = {
-            @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+            @JoinColumn(name = "user_id", referencedColumnName = "userid")
     },
     inverseJoinColumns = {
             @JoinColumn(name = "group_name", referencedColumnName = "group_name")

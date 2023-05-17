@@ -42,4 +42,5 @@ import java.util.List;
 @Repository
 public interface DatasourceRepository extends JpaRepository<Datasource, Long> {
     List<Datasource> findAll();
+
 }
