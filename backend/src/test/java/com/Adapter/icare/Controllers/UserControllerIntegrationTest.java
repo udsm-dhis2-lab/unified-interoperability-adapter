@@ -36,13 +36,13 @@ public class UserControllerIntegrationTest {
     public void getUsersTest() throws Exception {
         User user = new User();
         user.setUsername("abdul");
-        user.setFirstname("Abdul");
+        user.setFirstName("Abdul");
         user.setSurname("Mrisho");
         user.setEmail("mrisho@gmail.com");
         user.setPassword("Testing");
-        user.setPhonenumber("0798762321");
+        user.setPhoneNumber("0798762321");
         user.setDisabled(false);
-        user.setMiddlename("Test");
+        user.setMiddleName("Test");
         // 1. Define the behavior of the service
         when(userService.createUser(user)).thenReturn(user);
         mockMvc.perform(
@@ -53,13 +53,13 @@ public class UserControllerIntegrationTest {
     public void createUserTest() throws Exception {
         User user = new User();
         user.setUsername("abdul");
-        user.setFirstname("Abdul");
+        user.setFirstName("Abdul");
         user.setSurname("Mrisho");
         user.setEmail("mrisho@gmail.com");
         user.setPassword("Testing");
-        user.setPhonenumber("0798762321");
+        user.setPhoneNumber("0798762321");
         user.setDisabled(false);
-        user.setMiddlename("Test");
+        user.setMiddleName("Test");
         // 1. Define the behavior of the service
         when(userService.createUser(user)).thenReturn(user);
         // 2. Use the mockMvc
