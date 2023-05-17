@@ -1,6 +1,8 @@
 package com.Adapter.icare.Services;
 
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import com.Adapter.icare.Domains.Datasource;
 import com.Adapter.icare.Domains.Datasource.Type;
@@ -55,7 +57,8 @@ public class DatasourceService {
             default:
                 break;
         }
-
+        UUID uuid = UUID.randomUUID();
+        datasource.setUuid(uuid);
         return datasourceRepository.save(datasource);
     }
 

@@ -35,12 +35,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -243,7 +239,8 @@ public class DataSetsService {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        
+        UUID uuid = UUID.randomUUID();
+        datasets.setUuid(uuid);
         return dataSetsRepository.save(datasets);
     }
 

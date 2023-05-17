@@ -37,6 +37,8 @@ import org.springframework.stereotype.Service;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetElementsRepository;
 import com.Adapter.icare.Domains.DataSetElements;
 
+import java.util.UUID;
+
 @Service
 public class DataSetElementsService {
     
@@ -47,7 +49,8 @@ public class DataSetElementsService {
     }
 
     public void addDataSetElements(DataSetElements dataSetElements) {
-
+        UUID uuid = UUID.randomUUID();
+        dataSetElements.setUuid(uuid);
         dataSetElementsRepository.save(dataSetElements);    
     }
 
