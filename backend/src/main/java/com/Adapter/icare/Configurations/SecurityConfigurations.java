@@ -33,6 +33,7 @@ package com.Adapter.icare.Configurations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -58,8 +59,17 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
+        http.csrf().disable();
         http.authorizeRequests()
                 .antMatchers("/")
+                .permitAll()
+                .antMatchers(HttpMethod.GET, "/**")
+                .permitAll()
+                .antMatchers(HttpMethod.PUT, "/**")
+                .permitAll()
+                .antMatchers(HttpMethod.DELETE, "/**")
+                .permitAll()
+                .antMatchers(HttpMethod.POST, "/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

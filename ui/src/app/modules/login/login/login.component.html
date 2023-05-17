@@ -53,7 +53,7 @@
             (click)="onLogin($event)"
           >
             <mat-spinner
-              *ngIf="(authenticatingUser$ | async) && !(error$ | async)"
+              *ngIf="authenticating"
               diameter="20"
               strokeWidth="3"
               color="primary"
@@ -61,9 +61,7 @@
             Login
           </button>
         </div>
-        <p class="text-danger text-center" *ngIf="error$ | async">
-          {{ (error$ | async)?.error?.error }}
-        </p>
+        <p class="text-danger text-center"></p>
       </div>
     </div>
     <div class="col"></div>

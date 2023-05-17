@@ -33,13 +33,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
 import { InstanceInterface } from '../../resources/interfaces';
-
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-  }),
-};
-
 @Injectable({
   providedIn: 'root',
 })
@@ -48,25 +41,34 @@ export class InstancesService {
 
   private apiUrl = './api/v1/instance';
   private reportsApiUrl = './api/v1/reports';
-
-  constructor(private httpClient: HttpClient) {}
+  httpOptions: any;
+  constructor(private httpClient: HttpClient) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
+      }),
+    };
+  }
 
   //Using Observables to create a service instance
   getInstances(): Observable<InstanceInterface[] | any> {
     return this._instances.length > 0
       ? of(this._instances)
-      : this.httpClient.get<InstanceInterface[]>(this.apiUrl).pipe(
-          tap((instances) => {
-            this._instances = instances;
-          })
-        );
+      : this.httpClient
+          .get<InstanceInterface[]>(this.apiUrl, this.httpOptions)
+          .pipe(
+            tap((instances: any) => {
+              this._instances = instances;
+            })
+          );
   }
 
   getSingleInstance(
     instance: InstanceInterface
   ): Observable<InstanceInterface | any> {
     const url = `${this.apiUrl}/${instance.id}`;
-    return this.httpClient.get<InstanceInterface>(url);
+    return this.httpClient.get<InstanceInterface>(url, this.httpOptions);
   }
   deleteInstance(
     instance: InstanceInterface
@@ -79,7 +81,11 @@ export class InstancesService {
     instance: InstanceInterface
   ): Observable<InstanceInterface | any> {
     const url = `${this.apiUrl}`;
-    return this.httpClient.put<InstanceInterface>(url, instance, httpOptions);
+    return this.httpClient.put<InstanceInterface>(
+      url,
+      instance,
+      this.httpOptions
+    );
   }
 
   addInstance(
@@ -88,7 +94,7 @@ export class InstancesService {
     return this.httpClient.post<InstanceInterface>(
       this.apiUrl,
       instance,
-      httpOptions
+      this.httpOptions
     );
   }
 
@@ -96,7 +102,7 @@ export class InstancesService {
     return this.httpClient.post(
       this.reportsApiUrl + '/verifyCode',
       parameters,
-      httpOptions
+      this.httpOptions
     );
   }
 }

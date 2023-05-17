@@ -29,51 +29,43 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { SourceInterface } from 'src/app/models/source.model';
+import { Injectable } from '@angular/core';
+import { Observable, catchError, map, of } from 'rxjs';
+import { DatasetInterface } from 'src/app/models/source.model';
+
+const httpOptions = {
+  headers: new HttpHeaders({
+    'Content-Type': 'application/json',
+  }),
+};
 
 @Injectable({
   providedIn: 'root',
 })
-export class SourcesService {
-  private apiUrl = './api/v1/datasource';
-  httpOptions: any;
+export class LoginService {
+  private apiUrl = './api/v1/login';
 
-  constructor(private httpClient: HttpClient) {
-    this.httpOptions = {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
-      }),
-    };
-  }
+  constructor(private httpClient: HttpClient) {}
 
   //Using Observables to create a service instance
-  getSources(): Observable<SourceInterface[]> {
+  login(credentials: any): Observable<any> {
+    const basicAuth = btoa(credentials?.username + ':' + credentials?.password);
+    localStorage.setItem('iadapterAuthKey', basicAuth);
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + basicAuth,
+      }),
+    };
     return this.httpClient
-      .get<SourceInterface[]>(this.apiUrl, this.httpOptions)
-      .pipe(map((response: any) => response));
-  }
-
-  deleteSource(source: SourceInterface): Observable<SourceInterface> {
-    const url = `${this.apiUrl}/${source.id}`;
-    return this.httpClient
-      .delete<SourceInterface>(url, this.httpOptions)
-      .pipe(map((response: any) => response));
-  }
-
-  updateSourceActivate(source: SourceInterface): Observable<SourceInterface> {
-    const url = `${this.apiUrl}`;
-    return this.httpClient
-      .put<SourceInterface>(url, source, this.httpOptions)
-      .pipe(map((response: any) => response));
-  }
-
-  addSource(source: SourceInterface): Observable<SourceInterface> {
-    return this.httpClient
-      .post<SourceInterface>(this.apiUrl, source, this.httpOptions)
-      .pipe(map((response: any) => response));
+      .get<DatasetInterface[]>(this.apiUrl, httpOptions)
+      .pipe(
+        map((response: any) => {
+          console.log(response);
+          return response;
+        }),
+        catchError((error: any) => of(error))
+      );
   }
 }

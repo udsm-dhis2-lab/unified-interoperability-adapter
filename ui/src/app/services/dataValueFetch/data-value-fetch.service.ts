@@ -34,30 +34,37 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-  }),
-};
-
 @Injectable({
   providedIn: 'root',
 })
 export class DataValueFetchService {
   private apiUrl = './api/v1/datasetElements';
-
-  constructor(private httpClient: HttpClient) {}
+  httpOptions: any;
+  constructor(private httpClient: HttpClient) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
+      }),
+    };
+  }
 
   //Using Observables to create a service instance
   getDataValueFetchs(): Observable<DataValueFetchInterface[] | any> {
-    return this.httpClient.get<DataValueFetchInterface[] | any>(this.apiUrl);
+    return this.httpClient.get<DataValueFetchInterface[] | any>(
+      this.apiUrl,
+      this.httpOptions
+    );
   }
 
   deleteDataValueFetch(
     dataValueFetch: DataValueFetchInterface
   ): Observable<DataValueFetchInterface | any> {
     const url = `${this.apiUrl}/${dataValueFetch.dataElementCategoryOptionCombo}`;
-    return this.httpClient.delete<DataValueFetchInterface | any>(url);
+    return this.httpClient.delete<DataValueFetchInterface | any>(
+      url,
+      this.httpOptions
+    );
   }
 
   getSingleDataValueFetch(
@@ -67,7 +74,7 @@ export class DataValueFetchService {
     return this.httpClient.post<DataValueFetchInterface | any>(
       url,
       dataValueFetch,
-      httpOptions
+      this.httpOptions
     );
   }
 
@@ -77,19 +84,19 @@ export class DataValueFetchService {
     return this.httpClient.post<DataValueFetchInterface | any>(
       this.apiUrl,
       dataValueFetch,
-      httpOptions
+      this.httpOptions
     );
   }
 
   testDataValueFetchQuery(dataValueFetch: any): Observable<any> {
     let url = `${this.apiUrl}/testQuery`;
-    return this.httpClient.post<any>(url, dataValueFetch, httpOptions);
+    return this.httpClient.post<any>(url, dataValueFetch, this.httpOptions);
   }
 
   getTestQueryResults(payload: any): Observable<any> {
     let url = `${this.apiUrl}/testquerylist`;
-    return this.httpClient.post<any>(url, payload, httpOptions).pipe(
-      map((response) => {
+    return this.httpClient.post<any>(url, payload, this.httpOptions).pipe(
+      map((response: any) => {
         if (response?.length > 0) {
           return {
             headers: Object.keys(response[0]),

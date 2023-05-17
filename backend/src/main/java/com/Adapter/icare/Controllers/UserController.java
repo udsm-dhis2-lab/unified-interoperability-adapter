@@ -39,7 +39,7 @@ public class UserController {
         return "OK";
     }
 
-    @GetMapping
+    @GetMapping(path = "/users")
     public List<Map<String,Object>> getUsers() throws Exception{
         List<Map<String,Object>> usersMap = new ArrayList<>();
         try {

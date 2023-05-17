@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
+import { LoginService } from 'src/app/services/authentication/login.service';
 
 @Component({
   selector: 'app-login',
@@ -12,14 +13,25 @@ export class LoginComponent implements OnInit {
   password: string | undefined;
   error$: Observable<any> | undefined;
   hide: boolean = true;
-  authenticatingUser$: Observable<boolean> | undefined;
-  constructor(private router: Router) {}
+  authenticating: boolean = false;
+  authenticatingUser$: Observable<any> | undefined;
+  constructor(private router: Router, private loginService: LoginService) {}
 
   ngOnInit(): void {}
 
   onLogin(event: Event): void {
     event.stopPropagation();
+    this.authenticating = true;
     const creadentials = { username: this.username, password: this.password };
-    this.router.navigate(['/dashboard']);
+    this.authenticatingUser$ = this.loginService.login(creadentials);
+    this.authenticatingUser$.subscribe((response: any) => {
+      if (response) {
+        console.log('gete');
+        this.authenticating = false;
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 100);
+      }
+    });
   }
 }

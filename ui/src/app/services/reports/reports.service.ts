@@ -33,23 +33,25 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-  }),
-};
-
 @Injectable({
   providedIn: 'root',
 })
 export class ReportsService {
   private apiUrl = 'api/v1/reports';
+  httpOptions: any;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
+      }),
+    };
+  }
 
   viewReport(payload: any): Observable<any> {
     const url = `${this.apiUrl}`;
-    return this.httpClient.post<any>(url, payload, httpOptions);
+    return this.httpClient.post<any>(url, payload, this.httpOptions);
   }
 
   // viewReport(payload: any): any {
@@ -63,6 +65,6 @@ export class ReportsService {
 
   sendReport(payload: any): Observable<any> {
     const url = `${this.apiUrl}/sendValues`;
-    return this.httpClient.post<any>(url, payload, httpOptions);
+    return this.httpClient.post<any>(url, payload, this.httpOptions);
   }
 }

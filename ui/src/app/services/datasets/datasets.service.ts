@@ -34,19 +34,21 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DatasetInterface } from 'src/app/models/source.model';
 
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-  }),
-};
-
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetsService {
   private apiUrl = './api/v1/datasets';
+  httpOptions: any;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
+      }),
+    };
+  }
 
   //Using Observables to create a service instance
   getDatasets(): Observable<DatasetInterface[] | any> {
@@ -57,19 +59,19 @@ export class DatasetsService {
     dataset: DatasetInterface
   ): Observable<DatasetInterface | any> {
     let url = this.apiUrl + '/single?datasetId=' + dataset.id;
-    return this.httpClient.get<DatasetInterface>(url);
+    return this.httpClient.get<DatasetInterface>(url, this.httpOptions);
   }
 
   deleteDataset(dataset: DatasetInterface): Observable<DatasetInterface | any> {
     const url = `${this.apiUrl}/${dataset.id}`;
-    return this.httpClient.delete<DatasetInterface>(url);
+    return this.httpClient.delete<DatasetInterface>(url, this.httpOptions);
   }
 
   addDataset(dataset: DatasetInterface): Observable<DatasetInterface | any> {
     return this.httpClient.post<DatasetInterface>(
       this.apiUrl,
       dataset,
-      httpOptions
+      this.httpOptions
     );
   }
 }
