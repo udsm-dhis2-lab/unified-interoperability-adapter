@@ -81,8 +81,8 @@ public class ReportsService {
         Optional<Datasets> dataset= dataSetsRepository.findById(datasetId);
         JSONObject jsObject = new JSONObject();
         String ab = "";
-        String orgUnitID = dataset.get().getInstances().getOrganisationUnitId();
-        dhisAggregateValues.setOrgUnit(orgUnitID);
+        String orgUnit = dataset.get().getInstances().getCode();
+        dhisAggregateValues.setOrgUnit(orgUnit);
 
         try {
 
