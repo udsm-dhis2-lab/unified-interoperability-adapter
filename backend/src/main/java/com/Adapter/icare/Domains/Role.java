@@ -13,22 +13,24 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "role")
+@Table(name = "role_tbl")
 public class Role extends BaseEntity{
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role")
-    private String role;
+    @Column(name = "role_name", length = 50)
+    private String roleName;
     private String description;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "role_privilege",
     joinColumns = {
-            @JoinColumn(name = "role", referencedColumnName = "role")
+            @JoinColumn(name = "role_name", referencedColumnName = "role_name")
     },
     inverseJoinColumns = {
-            @JoinColumn(name="privilege",referencedColumnName = "privilege")
+            @JoinColumn(name="privilege_name",referencedColumnName = "privilege_name")
     })
     private Set<Privilege> privileges;
+
+    @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
+    private Set<User> users;
 }

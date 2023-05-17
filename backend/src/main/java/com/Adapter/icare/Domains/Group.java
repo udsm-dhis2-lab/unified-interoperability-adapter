@@ -7,20 +7,19 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Set;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table(name = "privilege_tbl")
-public class Privilege extends BaseEntity {
+@Table(name = "group_tbl")
+public class Group extends BaseEntity {
+
     @Id
-    @Column(name = "privilege_name",length = 50)
-    private String privilegeName;
+    @Column(name = "group_name")
+    private String groupName;
     private String description;
 
-    @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
-    private Set<Role> roles;
-
+    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
+    private Set<User> users;
 }
