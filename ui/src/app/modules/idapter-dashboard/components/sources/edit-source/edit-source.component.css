@@ -34,4 +34,5 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   border-top: 0px none;
   border-left: 0px none;
   border-right: 0px none;
+  border-radius: 0 !important;
 }
