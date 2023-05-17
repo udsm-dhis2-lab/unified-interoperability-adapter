@@ -10,6 +10,7 @@ import scala.math.BigInt;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -61,6 +62,26 @@ public class User extends BaseEntity implements Serializable {
 
     @Column()
     private Date accountexpiry;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_role",
+    joinColumns = {
+            @JoinColumn(name = "user_id", referencedColumnName = "userid")
+    },
+    inverseJoinColumns = {
+            @JoinColumn(name = "role_name", referencedColumnName = "role_name")
+    })
+    private Set<Role> roles;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name="user_group",
+    joinColumns = {
+            @JoinColumn(name = "user_id", referencedColumnName = "userid")
+    },
+    inverseJoinColumns = {
+            @JoinColumn(name = "group_name", referencedColumnName = "group_name")
+    })
+    private Set<Group> groups;
 }
 
 

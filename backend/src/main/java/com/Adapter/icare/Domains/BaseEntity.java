@@ -29,4 +29,7 @@ public class BaseEntity implements Serializable {
     private User lastupdatedby;
     private Boolean retired;
     private User retiredby;
+
+    @Column(columnDefinition = "json")
+    private String sharing;
 }
