@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { InstanceInterface } from 'src/app/resources/interfaces';
+import { InstancesService } from 'src/app/services/instances/instances.service';
 import { UiService } from 'src/app/services/ui.service';
 
 @Component({
@@ -45,7 +46,7 @@ export class AddInstanceComponent implements OnInit {
   password: string = '';
   url: string = '';
   message: string | undefined;
-  organisationUnitId: string | undefined;
+  organisationUnitCode: string | undefined;
 
   @Input() showAddInstanceForm?: boolean;
 
@@ -53,7 +54,13 @@ export class AddInstanceComponent implements OnInit {
 
   @Output() onAddInstance: EventEmitter<InstanceInterface> = new EventEmitter();
 
-  constructor(private uiService?: UiService) {
+  verifying: boolean = false;
+  verificationResponse: any;
+
+  constructor(
+    private uiService?: UiService,
+    private instanceService?: InstancesService
+  ) {
     this.subscription = this.uiService
       ?.onToggleAddInstanceForm()
       .subscribe((value: boolean) => (this.showAddInstanceForm = value));
@@ -75,8 +82,8 @@ export class AddInstanceComponent implements OnInit {
       this.message = 'This field is required';
     }
     if (
-      this.organisationUnitId === undefined ||
-      this.organisationUnitId === ''
+      this.organisationUnitCode === undefined ||
+      this.organisationUnitCode === ''
     ) {
       this.message = 'This field is required';
     }
@@ -86,23 +93,46 @@ export class AddInstanceComponent implements OnInit {
       this.username &&
       this.url &&
       this.password &&
-      this.organisationUnitId
+      this.organisationUnitCode
     ) {
       const newInstance = {
         name: this.name,
         username: this.username,
         password: this.password,
         url: this.url,
-        organisationUnitId: this.organisationUnitId,
+        code: this.organisationUnitCode,
       };
+      setTimeout(() => {
+        this.verificationResponse = null;
+      }, 50);
       this.onAddInstance.emit(newInstance);
 
       this.name = '';
       this.username = '';
       this.password = '';
       this.url = '';
-      this.organisationUnitId = '';
+      this.organisationUnitCode = '';
       this.message = undefined;
     }
+  }
+
+  onVerify(event: Event): void {
+    event.stopPropagation();
+    this.verifying = true;
+    const parameters = {
+      url: this.url,
+      username: this.username,
+      password: this.password,
+      code: this.organisationUnitCode,
+    };
+    this.verificationResponse = null;
+    this.instanceService
+      ?.verifyDHIS2Connection(parameters)
+      .subscribe((response: any) => {
+        if (response) {
+          this.verifying = false;
+          this.verificationResponse = response;
+        }
+      });
   }
 }

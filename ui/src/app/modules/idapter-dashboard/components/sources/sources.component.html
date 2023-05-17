@@ -52,10 +52,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 <th style="width: 50px">Action</th>
               </tr>
             </thead>
-            <tbody
-              *ngFor="let source of sources; let count = index; odd as isOdd"
-            >
-              <tr [ngClass]="{ 'table-secondary': isOdd }">
+            <tbody>
+              <tr
+                [ngClass]="{ 'table-secondary': isOdd }"
+                *ngFor="let source of sources; let count = index; odd as isOdd"
+              >
                 <td>{{ count + 1 }}</td>
                 <td>{{ source.type }}</td>
                 <td>{{ source.url }}</td>
@@ -77,6 +78,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     >
                       <mat-icon>delete</mat-icon></a
                     >
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="sources?.length === 0">
+                <td colspan="100%">
+                  <div class="alert alert-warning" role="alert">
+                    No Source (Database connection) is set
                   </div>
                 </td>
               </tr>

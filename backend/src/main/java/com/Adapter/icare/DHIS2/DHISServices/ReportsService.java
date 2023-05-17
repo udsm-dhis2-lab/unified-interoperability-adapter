@@ -81,8 +81,8 @@ public class ReportsService {
         Optional<Datasets> dataset= dataSetsRepository.findById(datasetId);
         JSONObject jsObject = new JSONObject();
         String ab = "";
-        String orgUnitID = dataset.get().getInstances().getOrganisationUnitId();
-        dhisAggregateValues.setOrgUnit(orgUnitID);
+        String orgUnit = dataset.get().getInstances().getCode();
+        dhisAggregateValues.setOrgUnit(orgUnit);
 
         try {
 
@@ -91,7 +91,7 @@ public class ReportsService {
             String password = dataset.get().getInstances().getPassword();
             // Using DHIS2-JAVA-SDK
             Dhis2Client destinationDhis2Client = Dhis2ClientBuilder.newClient( instanceUrl +"/api", username,password ).build();
-            Map<String, Object> response = destinationDhis2Client.post("dataValueSets?async=true").withResource(dhisAggregateValues).transfer().returnAs(Map.class);
+            Map<String, Object> response = destinationDhis2Client.post("dataValueSets?orgUnitIdScheme=code&async=true").withResource(dhisAggregateValues).transfer().returnAs(Map.class);
             if (response.get("status") != null) {
                 ab = response.get("status").toString();
             }
@@ -101,5 +101,11 @@ public class ReportsService {
         }
         return ab;
     }
-    
+
+    public Map<String, Object> fetchOrgUnitUsingCode(String url, String username, String password, String code) {
+        Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+        Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+        Map<String, Object> organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+        return organisationUnit;
+    }
 }

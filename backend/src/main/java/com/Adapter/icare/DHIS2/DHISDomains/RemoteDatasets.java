@@ -119,8 +119,6 @@ public class RemoteDatasets {
             newRemoteDataSet.setCompulsoryFieldsCompleteOnly((boolean) RemoteDataSetMap.get("compulsoryFieldsCompleteOnly"));
         }
 
-
-
         return newRemoteDataSet;
     }
 

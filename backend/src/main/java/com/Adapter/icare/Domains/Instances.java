@@ -57,4 +57,5 @@ public class Instances extends BaseEntity implements Serializable {
     private String password;
     private String name;
     private String organisationUnitId;
+    private String code;
 }
