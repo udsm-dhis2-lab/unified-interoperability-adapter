@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -33,4 +35,30 @@ public class Role extends BaseEntity{
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     private Set<User> users;
+
+    public static Role fromMap(Map<String,Object> roleMap){
+        Role role = new Role();
+        if(roleMap.get("roleName") != null){
+            role.setRoleName(roleMap.get("roleName").toString());
+        }
+
+        if(roleMap.get("description") != null){
+            role.setDescription(roleMap.get("description").toString());
+        }
+
+        return role;
+    }
+
+    public Map<String,Object> toMap(){
+        Map<String,Object> roleMap = new HashMap<>();
+        if(this.getRoleName() != null){
+            roleMap.put("roleName",this.getRoleName());
+        }
+
+        if(this.getDescription() != null){
+            roleMap.put("description",this.getDescription());
+        }
+
+        return roleMap;
+    }
 }
