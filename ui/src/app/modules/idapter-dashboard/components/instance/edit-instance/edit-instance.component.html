@@ -128,14 +128,39 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   type="submit"
                   [mat-dialog-close]="instanceToEdit"
                   color="primary"
+                  [disabled]="
+                    verificationResponse?.message || verificationResponse?.error
+                  "
                 >
                   Save
                 </button>
               </div>
-              <div class="col-12" *ngIf="verificationResponse?.name">
-                The organisation unit to connect with
-                <b>{{ instanceToEdit?.url }}</b> is
-                <b>{{ verificationResponse?.name }}</b>
+              <div class="col-12" *ngIf="verificationResponse">
+                <p *ngIf="verificationResponse?.name">
+                  The organisation unit to connect with
+                  <b>{{ instanceToEdit?.url }}</b> is
+                  <b>{{ verificationResponse?.name }}</b>
+                </p>
+                <p
+                  *ngIf="
+                    verificationResponse?.message &&
+                    !verificationResponse?.error
+                  "
+                  class="alert alert-warning"
+                  role="alert"
+                >
+                  {{ verificationResponse?.message }}
+                </p>
+                <p
+                  *ngIf="verificationResponse?.error"
+                  class="alert alert-danger"
+                  role="alert"
+                >
+                  {{ verificationResponse?.error }}
+                  <span style="margin-left: 4px">
+                    Re-check the credentials
+                  </span>
+                </p>
               </div>
             </div>
           </div>

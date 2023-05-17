@@ -155,7 +155,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     !name ||
                     !url ||
                     !organisationUnitCode ||
-                    !verificationResponse
+                    !verificationResponse ||
+                    verificationResponse?.message ||
+                    verificationResponse?.error
                   "
                   mat-flat-button
                   color="primary"
@@ -163,9 +165,29 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                   Save
                 </button>
               </div>
-              <div class="col-12" *ngIf="verificationResponse?.name">
-                The organisation unit to connect with <b>{{ url }}</b> is
-                <b>{{ verificationResponse?.name }}</b>
+              <div class="col-12" *ngIf="verificationResponse">
+                <p *ngIf="verificationResponse?.name">
+                  The organisation unit to connect with
+                  <b>{{ url }}</b> is
+                  <b>{{ verificationResponse?.name }}</b>
+                </p>
+                <p
+                  *ngIf="
+                    verificationResponse?.message &&
+                    !verificationResponse?.error
+                  "
+                  class="alert alert-warning"
+                  role="alert"
+                >
+                  {{ verificationResponse?.message }}
+                </p>
+                <p
+                  *ngIf="verificationResponse?.error"
+                  class="alert alert-danger"
+                  role="alert"
+                >
+                  {{ verificationResponse?.error }}
+                </p>
               </div>
             </div>
           </div>
