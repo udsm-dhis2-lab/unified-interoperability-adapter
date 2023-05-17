@@ -12,7 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "group_tbl")
+@Table(name = "groups")
 public class Group extends BaseEntity {
 
     @Id

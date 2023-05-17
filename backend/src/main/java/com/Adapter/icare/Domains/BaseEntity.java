@@ -23,12 +23,12 @@ public class BaseEntity implements Serializable {
     private UUID uuid;
 
     @CreationTimestamp
-    private Date createdon;
-    private User createdby;
-    private Date lastupdatedon;
-    private User lastupdatedby;
+    private Date createdOn;
+    private User createdBy;
+    private Date lastUpdatedOn;
+    private User lastUpdatedBy;
     private Boolean retired;
-    private User retiredby;
+    private User retiredBy;
 
     @Column(columnDefinition = "json")
     private String sharing;

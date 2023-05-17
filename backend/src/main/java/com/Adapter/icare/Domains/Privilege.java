@@ -16,7 +16,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "privilege_tbl")
+@Table(name = "privileges")
 public class Privilege extends BaseEntity {
     @Id
     @Column(name = "privilege_name",length = 50)

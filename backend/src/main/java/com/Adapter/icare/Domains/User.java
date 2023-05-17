@@ -22,7 +22,7 @@ import java.util.UUID;
 public class User extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name="userid")
+    @Column(name="user_id")
     private Integer id;
     @Column(unique = true)
     private String username;
@@ -33,40 +33,40 @@ public class User extends BaseEntity implements Serializable {
     private String email;
 
     @Column()
-    private String phonenumber;
+    private String phoneNumber;
     @Column()
     private String surname;
 
     @Column()
-    private String middlename;
+    private String middleName;
     @Column()
-    private String firstname;
+    private String firstName;
 
     @Column()
-    private Boolean externalauth;
+    private Boolean externalAuth;
 
     @Column()
-    private Date passwordlastupdated;
+    private Date passwordLastUpdated;
 
     @Column()
-    private Date lastlogin;
+    private Date lastLogin;
 
     @Column()
-    private String restoretoken;
+    private String restoreToken;
 
     @Column()
-    private Date restoreexpiry;
+    private Date restoreExpiry;
 
     @Column()
     private Boolean disabled;
 
     @Column()
-    private Date accountexpiry;
+    private Date accountExpiry;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name = "user_role",
     joinColumns = {
-            @JoinColumn(name = "user_id", referencedColumnName = "userid")
+            @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     },
     inverseJoinColumns = {
             @JoinColumn(name = "role_name", referencedColumnName = "role_name")
@@ -76,7 +76,7 @@ public class User extends BaseEntity implements Serializable {
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(name="user_group",
     joinColumns = {
-            @JoinColumn(name = "user_id", referencedColumnName = "userid")
+            @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     },
     inverseJoinColumns = {
             @JoinColumn(name = "group_name", referencedColumnName = "group_name")
