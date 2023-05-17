@@ -158,6 +158,7 @@ public class ReportsController {
         } catch (Exception e) {
             System.err.println("Error establishing DHIS2 client: " + e.getMessage());
             e.printStackTrace();
+
         }
         if (dhis2Client != null) {
             me = dhis2Client.get("me").transfer().returnAs(Map.class);
@@ -179,8 +180,7 @@ public class ReportsController {
             try {
                 dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
             } catch (Exception e) {
-                System.err.println("Error establishing DHIS2 client: " + e.getMessage());
-                e.printStackTrace();
+                throw new RuntimeException("Error establishing DHIS2 client: " + e);
             }
             if (dhis2Client != null) {
                 Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
