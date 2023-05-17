@@ -75,18 +75,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
             <div class="row mt-5">
               <div class="col-12">
-                <label for="username">
-                  Organization Unit (organisationUnitId) ID
-                </label>
+                <label for="username"> Organization Unit (Code) </label>
                 <input
                   type="text"
-                  name="organisationUnitId"
-                  [(ngModel)]="organisationUnitId"
+                  name="organisationUnitCode"
+                  [(ngModel)]="organisationUnitCode"
                   class="form-control w-50"
-                  placeholder="Organization Unit ID"
+                  placeholder="Code"
                   required
                 />
-                <div *ngIf="message && !organisationUnitId">
+                <div *ngIf="message && !organisationUnitCode">
                   <p class="text-danger">
                     {{ message }}
                   </p>
@@ -129,21 +127,45 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
             <br />
             <div class="row mt-3">
+              <mat-progress-bar
+                mode="indeterminate"
+                *ngIf="verifying"
+              ></mat-progress-bar>
               <div class="col-12 d-flex justify-content-end">
                 <button
+                  [disabled]="
+                    !username ||
+                    !password ||
+                    !name ||
+                    !url ||
+                    !organisationUnitCode
+                  "
+                  mat-stroked-button
+                  color="primary"
+                  (click)="onVerify($event)"
+                >
+                  Verify
+                </button>
+                <button
+                  style="margin-left: 8px"
                   (click)="onSubmit()"
                   [disabled]="
                     !username ||
                     !password ||
                     !name ||
                     !url ||
-                    !organisationUnitId
+                    !organisationUnitCode ||
+                    !verificationResponse
                   "
                   mat-flat-button
                   color="primary"
                 >
                   Save
                 </button>
+              </div>
+              <div class="col-12" *ngIf="verificationResponse?.name">
+                The organisation unit to connect with <b>{{ url }}</b> is
+                <b>{{ verificationResponse?.name }}</b>
               </div>
             </div>
           </div>

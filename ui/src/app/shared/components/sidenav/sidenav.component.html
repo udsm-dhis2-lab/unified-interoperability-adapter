@@ -10,8 +10,8 @@
     <li class="nav-item active">
       <button
         mat-icon-button
-        [ngClass]="{ 'active-route': selectedRoute === 'instances' }"
-        (click)="onChangeRoute($event, 'instances')"
+        [ngClass]="{ 'active-route': selectedRoute === 'dashboard/instances' }"
+        (click)="onChangeRoute($event, 'dashboard/instances')"
         class="nav-link"
       >
         <mat-icon style="font-size: 20px"> dvr </mat-icon>
@@ -22,8 +22,8 @@
       <button
         mat-icon-button
         class="nav-link"
-        [ngClass]="{ 'active-route': selectedRoute === 'sources' }"
-        (click)="onChangeRoute($event, 'sources')"
+        [ngClass]="{ 'active-route': selectedRoute === 'dashboard/sources' }"
+        (click)="onChangeRoute($event, 'dashboard/sources')"
       >
         <mat-icon style="font-size: 20px"> present_to_all </mat-icon>
         <span style="margin-left: 6px">Sources </span>
@@ -34,8 +34,8 @@
       <button
         mat-icon-button
         class="nav-link"
-        [ngClass]="{ 'active-route': selectedRoute === 'datasets' }"
-        (click)="onChangeRoute($event, 'datasets')"
+        [ngClass]="{ 'active-route': selectedRoute === 'dashboard/datasets' }"
+        (click)="onChangeRoute($event, 'dashboard/datasets')"
       >
         <mat-icon style="font-size: 20px"> folder_open </mat-icon>
         <span style="margin-left: 6px">Datasets </span>
@@ -46,8 +46,8 @@
       <button
         mat-icon-button
         class="nav-link"
-        [ngClass]="{ 'active-route': selectedRoute === 'mapping' }"
-        (click)="onChangeRoute($event, 'mapping')"
+        [ngClass]="{ 'active-route': selectedRoute === 'dashboard/mapping' }"
+        (click)="onChangeRoute($event, 'dashboard/mapping')"
       >
         <mat-icon style="font-size: 20px"> swap_horizontal_circle </mat-icon>
         <span style="margin-left: 6px">Mappings </span>
@@ -59,8 +59,8 @@
     <button
       mat-icon-button
       class="nav-link"
-      [ngClass]="{ 'active-route': selectedRoute === 'reports' }"
-      (click)="onChangeRoute($event, 'reports')"
+      [ngClass]="{ 'active-route': selectedRoute === 'dashboard/reports' }"
+      (click)="onChangeRoute($event, 'dashboard/reports')"
     >
       <mat-icon style="font-size: 20px"> file_copy </mat-icon>
       <span style="margin-left: 6px">Reports </span>
@@ -71,7 +71,7 @@
       disabled="true"
       mat-icon-button
       class="nav-link"
-      [ngClass]="{ 'active-route': selectedRoute === 'logs' }"
+      [ngClass]="{ 'active-route': selectedRoute === 'dashboard/logs' }"
     >
       <mat-icon style="font-size: 20px"> message </mat-icon>
       <span style="margin-left: 6px">Logs </span>
@@ -82,7 +82,7 @@
       disabled="true"
       mat-icon-button
       class="nav-link"
-      [ngClass]="{ 'active-route': selectedRoute === 'settings' }"
+      [ngClass]="{ 'active-route': selectedRoute === 'dashboard/settings' }"
       (click)="onChangeRoute($event, 'settings')"
     >
       <mat-icon style="font-size: 20px"> settings </mat-icon>

@@ -63,14 +63,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
         <div class="row mt-3">
           <div class="col-12">
-            <label for="username">
-              Organization Unit (organisationUnitId) ID
-            </label>
+            <label for="username"> Organization Unit (Code) </label>
             <input
               type="text"
-              [(ngModel)]="instanceToEdit.organisationUnitId"
-              name="organisationUnitId"
-              value="{{ instanceToEdit.organisationUnitId }}"
+              [(ngModel)]="instanceToEdit.code"
+              name="code"
+              value="{{ instanceToEdit.code }}"
               class="form-control"
               required
             />
@@ -103,23 +101,41 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <div class="row mt-3">
           <div class="col-12">
             <div class="row">
-              <div class="col-10 float-end">
+              <mat-progress-bar
+                mode="indeterminate"
+                *ngIf="verifying"
+              ></mat-progress-bar>
+              <div class="col-12 d-flex justify-content-end">
+                <button mat-stroked-button (click)="onNoClick()">Close</button>
                 <button
-                  (click)="onNoClick()"
-                  class="btn btn-outline-danger float-end"
+                  style="margin-left: 8px"
+                  [disabled]="
+                    !instanceToEdit?.username ||
+                    !instanceToEdit?.password ||
+                    !instanceToEdit?.name ||
+                    !instanceToEdit?.url ||
+                    !instanceToEdit?.code
+                  "
+                  mat-stroked-button
+                  color="primary"
+                  (click)="onVerify($event)"
                 >
-                  Close
+                  Verify
                 </button>
-              </div>
-              <div class="col-2 float-end">
                 <button
+                  mat-flat-button
+                  style="margin-left: 8px"
                   type="submit"
                   [mat-dialog-close]="instanceToEdit"
-                  cdkFocusInitial
-                  class="btn btn-outline-success float-end"
+                  color="primary"
                 >
                   Save
                 </button>
+              </div>
+              <div class="col-12" *ngIf="verificationResponse?.name">
+                The organisation unit to connect with
+                <b>{{ instanceToEdit?.url }}</b> is
+                <b>{{ verificationResponse?.name }}</b>
               </div>
             </div>
           </div>

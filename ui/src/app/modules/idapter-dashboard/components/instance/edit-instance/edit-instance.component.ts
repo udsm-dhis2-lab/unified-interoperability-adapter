@@ -32,6 +32,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 import { InstanceInterface } from 'src/app/resources/interfaces';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { InstancesService } from 'src/app/services/instances/instances.service';
 
 @Component({
   selector: 'app-edit-instance',
@@ -44,11 +45,15 @@ export class EditInstanceComponent {
   username: string | undefined;
   password: string | undefined;
   url: string | undefined;
-  organisationUnitId: string | undefined;
+  organisationUnitCode: string | undefined;
+
+  verifying: boolean = false;
+  verificationResponse: any;
 
   constructor(
     public dialogRef: MatDialogRef<EditInstanceComponent>,
-    @Inject(MAT_DIALOG_DATA) public instanceToEdit: InstanceInterface
+    @Inject(MAT_DIALOG_DATA) public instanceToEdit: InstanceInterface,
+    private instanceService: InstancesService
   ) {}
 
   onNoClick(): void {
@@ -61,7 +66,27 @@ export class EditInstanceComponent {
       username: instance.username,
       password: instance.password,
       url: instance.url,
-      organisationUnitId: instance.organisationUnitId,
+      code: instance.code,
     };
+  }
+
+  onVerify(event: Event): void {
+    event.stopPropagation();
+    this.verifying = true;
+    const parameters = {
+      url: this.instanceToEdit?.url,
+      username: this.instanceToEdit?.username,
+      password: this.instanceToEdit?.password,
+      code: this.instanceToEdit?.code,
+    };
+    this.verificationResponse = null;
+    this.instanceService
+      ?.verifyDHIS2Connection(parameters)
+      .subscribe((response: any) => {
+        if (response) {
+          this.verifying = false;
+          this.verificationResponse = response;
+        }
+      });
   }
 }

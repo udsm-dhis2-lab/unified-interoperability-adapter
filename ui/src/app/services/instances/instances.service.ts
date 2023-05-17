@@ -47,6 +47,7 @@ export class InstancesService {
   private _instances: any[] = [];
 
   private apiUrl = './api/v1/instance';
+  private reportsApiUrl = './api/v1/reports';
 
   constructor(private httpClient: HttpClient) {}
 
@@ -87,6 +88,14 @@ export class InstancesService {
     return this.httpClient.post<InstanceInterface>(
       this.apiUrl,
       instance,
+      httpOptions
+    );
+  }
+
+  verifyDHIS2Connection(parameters: any): Observable<any> {
+    return this.httpClient.post(
+      this.reportsApiUrl + '/verifyCode',
+      parameters,
       httpOptions
     );
   }
