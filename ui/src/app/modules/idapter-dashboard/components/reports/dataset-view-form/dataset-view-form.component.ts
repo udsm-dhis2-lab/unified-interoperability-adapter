@@ -165,7 +165,8 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  sendReport() {
+  sendReport(event: Event) {
+    console.log('SEND', this.sendingObject);
     this.reportService.sendReport(this.sendingObject).subscribe({
       next: (response) => this.valueSentToDHIS2.emit(response),
       error: (err) => this.valueSentToDHIS2.emit(err),

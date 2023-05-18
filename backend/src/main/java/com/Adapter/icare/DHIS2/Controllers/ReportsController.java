@@ -114,6 +114,7 @@ public class ReportsController {
         String period = reportValuesSent.getPeriod();
         String completeDate = java.time.LocalDate.now().toString();
         String attributeOptCombo = "";
+//        Dhis2Client dhis2Client;
         //String orgUnitId = constant.OrgUnit; 
 
         for (DataSetElements dataSetElement : dSetElements) {

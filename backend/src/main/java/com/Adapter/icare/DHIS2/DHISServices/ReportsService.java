@@ -89,15 +89,38 @@ public class ReportsService {
             String instanceUrl = dataset.get().getInstances().getUrl();
             String username = dataset.get().getInstances().getUsername();
             String password = dataset.get().getInstances().getPassword();
-            // Using DHIS2-JAVA-SDK
-            Dhis2Client destinationDhis2Client = Dhis2ClientBuilder.newClient( instanceUrl +"/api", username,password ).build();
-            Map<String, Object> response = destinationDhis2Client.post("dataValueSets?orgUnitIdScheme=code&async=true").withResource(dhisAggregateValues).transfer().returnAs(Map.class);
-            if (response.get("status") != null) {
-                ab = response.get("status").toString();
+
+            url = new URL(instanceUrl.concat("/api/dataValueSets.json?orgUnitIdScheme=code"));
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            String userCredentials = username.concat(":").concat(password);
+            String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+            httpURLConnection.setRequestProperty("Authorization", basicAuth);
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setDoOutput(true);
+
+            //JSON STRING CREATION
+            // Creating the ObjectMapper object
+            ObjectMapper mapper = new ObjectMapper();
+            // Converting the Object to JSONString
+            String jsonString = mapper.writeValueAsString(dhisAggregateValues);
+
+            // int status = httpURLConnection.getResponseCode();
+
+            try (OutputStream os = httpURLConnection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("utf-8");
+                os.write(input, 0, input.length);
             }
 
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+            reader.close();
+            jsObject = new JSONObject(responseContent.toString());
+            ab = jsObject.getString("status");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Error sending values to DHIS2: " + e);
         }
         return ab;
     }
