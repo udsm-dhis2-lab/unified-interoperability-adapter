@@ -59,14 +59,18 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception{
-        http.csrf().disable();
-        http.authorizeRequests()
-                .antMatchers("/")
-                .permitAll()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
+       http.csrf().disable();
+//        http.authorizeRequests()
+//                .antMatchers("/")
+//                .permitAll()
+//                .antMatchers("/runtime.*").permitAll()
+//                .antMatchers("/scripts*").permitAll()
+//                .antMatchers("/assets/fonts/**").permitAll()
+//                .antMatchers("/polyfills*").permitAll()
+//                .anyRequest()
+//                .authenticated()
+//                .and()
+//                .httpBasic();
     }
 
     
