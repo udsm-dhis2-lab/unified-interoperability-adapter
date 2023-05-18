@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { DatasetInterface } from 'src/app/models/source.model';
 
 @Injectable({
@@ -52,7 +52,22 @@ export class DatasetsService {
 
   //Using Observables to create a service instance
   getDatasets(): Observable<DatasetInterface[] | any> {
-    return this.httpClient.get<DatasetInterface[]>(this.apiUrl);
+    return this.httpClient
+      .get<DatasetInterface[]>(this.apiUrl, this.httpOptions)
+      .pipe(
+        map((response: any) => {
+          return response?.map((dataset: any) => {
+            return {
+              ...dataset,
+              formDesignCode:
+                dataset?.formType == 'CUSTOM' &&
+                dataset?.datasetFields?.indexOf('{') > -1
+                  ? JSON?.parse(dataset?.datasetFields)?.dataEntryForm?.htmlCode
+                  : dataset?.datasetFields,
+            };
+          });
+        })
+      );
   }
 
   getSingleDatasets(
