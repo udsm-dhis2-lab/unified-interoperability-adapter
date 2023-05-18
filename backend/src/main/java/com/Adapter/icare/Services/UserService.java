@@ -1,9 +1,11 @@
 package com.Adapter.icare.Services;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Domains.Group;
 import com.Adapter.icare.Domains.Privilege;
 import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Repository.GroupRepository;
 import com.Adapter.icare.Repository.PrivilegeRepository;
 import com.Adapter.icare.Repository.RoleRepository;
 import com.Adapter.icare.Repository.UserRepository;
@@ -12,7 +14,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -23,10 +24,13 @@ public class UserService implements UserDetailsService {
     private  final RoleRepository roleRepository;
 
     private final PrivilegeRepository privilegeRepository;
-    public UserService(UserRepository userRepository,RoleRepository roleRepository, PrivilegeRepository privilegeRepository) {
+
+    private final GroupRepository groupRepository;
+    public UserService(UserRepository userRepository,RoleRepository roleRepository, PrivilegeRepository privilegeRepository, GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.privilegeRepository = privilegeRepository;
+        this.groupRepository = groupRepository;
     }
 
     public List<User> getUsers(){
@@ -67,6 +71,8 @@ public class UserService implements UserDetailsService {
     }
 
     public Role saveRole(Role role){
+        UUID uuid = UUID.randomUUID();
+        role.setUuid(uuid);
         return roleRepository.save(role);
     }
 
@@ -75,10 +81,70 @@ public class UserService implements UserDetailsService {
     }
 
     public Privilege savePrivilege(Privilege privilege){
+        UUID uuid = UUID.randomUUID();
+        privilege.setUuid(uuid);
         return privilegeRepository.save(privilege);
     }
 
     public List<Privilege> getPrivileges(){
         return privilegeRepository.findAll();
+    }
+
+    public User getUSer(String uuid) throws Exception {
+        User user = userRepository.findByUuid(uuid);
+        if(user == null){
+            throw new Exception("User with uuid "+uuid+" does not exist");
+        }
+        return user;
+    }
+
+    public Role getRole(String uuid) throws Exception {
+        Role role = roleRepository.findByUuid(uuid);
+        if(role == null){
+            throw new Exception("The role with uuid "+uuid+" does not exist");
+        }
+        return roleRepository.findByUuid(uuid);
+    }
+
+    public Role updateRole(Role role, String uuid) throws Exception {
+        Role savedRole = this.getRole(uuid);
+        role.setRoleName(savedRole.getRoleName());
+        role.setUuid(savedRole.getUuid());
+        return roleRepository.save(role);
+    }
+
+    public Privilege getPrivilege(String uuid) throws Exception {
+        Privilege privilege = privilegeRepository.findByUuid(uuid);
+        if(privilege == null){
+            throw new Exception("Privilege with uuid "+uuid+" does not exist");
+        }
+
+        return privilege;
+    }
+
+    public Privilege updatePrivilage(Privilege privilege, String uuid) throws Exception {
+        Privilege savedPrivilege = this.getPrivilege(uuid);
+        privilege.setUuid(savedPrivilege.getUuid());
+        return privilegeRepository.save(privilege);
+
+    }
+
+    public Group createGroup(Group group) {
+        UUID uuid = UUID.randomUUID();
+        group.setUuid(uuid);
+        return groupRepository.save(group);
+    }
+
+    public List<Group> getGroups() {
+
+        return groupRepository.findAll();
+    }
+
+    public Group getGroup(String uuid) throws Exception {
+        Group group = groupRepository.findByUuid(uuid);
+        if(group == null){
+            throw new Exception("The group with uuid "+uuid+" does not exist");
+        }
+        return group;
     }
 }

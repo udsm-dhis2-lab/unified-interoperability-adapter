@@ -81,9 +81,35 @@ public class User extends BaseEntity implements Serializable {
     })
     private Set<Group> groups;
 
+
+    private static User fromMap(Map<String,Object> userMap){
+        User user = new User();
+
+        if(userMap.get("uuid") != null){
+            user.setUuid((UUID) userMap.get("uuid"));
+        }
+        if(userMap.get("username") != null){
+            user.setUsername(userMap.get("username").toString());
+        }
+        if(userMap.get("email") != null){
+            user.setEmail(userMap.get("email").toString());
+        }
+        if(userMap.get("phoneNumber") != null){
+            user.setPhoneNumber(userMap.get("phoneNumber").toString());
+        }
+        if(userMap.get("surname") != null){
+            user.setSurname(userMap.get("surname").toString());
+        }
+        return user;
+
+
+
+    }
+
     public Map<String,Object> toMap(){
 
         Map<String,Object> userMap = new HashMap<>();
+        userMap.put("uuid",this.getUuid());
 
         if(this.getUsername() != null){
             userMap.put("username", this.getUsername());
@@ -127,7 +153,7 @@ public class User extends BaseEntity implements Serializable {
         if(this.getRoles() != null){
             List<Map<String,Object>> rolesMap = new ArrayList<>();
             for( Role role : this.getRoles()){
-                rolesMap.add(role.toMap());
+                rolesMap.add(role.toMap(false));
             }
             userMap.put("roles",rolesMap);
         }
@@ -135,9 +161,13 @@ public class User extends BaseEntity implements Serializable {
         if(this.getGroups() != null){
             List<Map<String,Object>> groupsMap = new ArrayList<>();
             for(Group group : this.getGroups()){
-                groupsMap.add(group.toMap());
+                groupsMap.add(group.toMap(false));
             }
             userMap.put("groups",groupsMap);
+        }
+
+        if(this.getSharing() != null){
+            userMap.put("sharing",this.getSharing());
         }
 
         return userMap;

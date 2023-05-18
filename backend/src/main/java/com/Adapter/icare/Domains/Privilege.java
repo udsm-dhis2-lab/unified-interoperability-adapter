@@ -7,9 +7,7 @@ import lombok.Setter;
 import org.springframework.security.core.parameters.P;
 
 import javax.persistence.*;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,17 +34,36 @@ public class Privilege extends BaseEntity {
             privilege.setDescription(privilegeMap.get("description").toString());
         }
 
+        if(privilegeMap.get("sharing") != null){
+            privilege.setSharing(privilegeMap.get("sharing").toString());
+        }
+
         return privilege;
     }
 
-    public Map<String,Object> toMap(){
+    public Map<String,Object> toMap(Boolean withRoles){
         Map<String,Object> privilegeMap = new HashMap<>();
+        privilegeMap.put("uuid",this.getUuid());
         if(this.getPrivilegeName() != null){
             privilegeMap.put("privilegeName",this.getPrivilegeName());
         }
 
         if(this.getDescription() != null){
             privilegeMap.put("description",this.getDescription());
+        }
+        if(this.getSharing() != null){
+            privilegeMap.put("sharing", this.getSharing());
+        }
+
+        if(withRoles){
+            if(this.getRoles() != null) {
+                List<Map<String, Object>> rolesMap = new ArrayList<>();
+                for (Role role : this.getRoles()) {
+                    rolesMap.add(role.toMap(false));
+                }
+                privilegeMap.put("roles",rolesMap);
+            }
+
         }
 
         return privilegeMap;

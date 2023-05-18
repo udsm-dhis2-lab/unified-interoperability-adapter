@@ -3,7 +3,6 @@ package com.Adapter.icare.Initializer;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Repository.UserRepository;
 import com.Adapter.icare.Services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
