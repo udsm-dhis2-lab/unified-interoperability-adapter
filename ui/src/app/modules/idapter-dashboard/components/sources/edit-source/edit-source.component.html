@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
     </div>
     <div class="row">
-      <div class="col-8 offset-2">
+      <div class="col-12">
         <form>
           <div class="card p-4">
             <div class="row">
@@ -59,7 +59,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 </mat-form-field>
               </div>
               <div class="col-6">
-                <label for="url"> URL </label>
+                <label for="url"> URL/Path </label>
                 <input
                   type="url"
                   name="url"
@@ -97,20 +97,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             <div class="row mt-3">
               <div class="col-12">
                 <div class="row">
-                  <div class="col-10 float-end">
-                    <button
-                      (click)="onNoClick()"
-                      class="btn btn-outline-danger float-end"
-                    >
+                  <div class="col-12 d-flex justify-content-end">
+                    <button mat-stroked-button (click)="onNoClick()">
                       Close
                     </button>
-                  </div>
-                  <div class="col-2 float-end">
                     <button
+                      mat-flat-button
+                      style="margin-left: 8px"
                       type="submit"
+                      color="primary"
                       [mat-dialog-close]="sourceToEdit"
                       cdkFocusInitial
-                      class="btn btn-outline-success float-end"
                     >
                       Save
                     </button>
