@@ -3,6 +3,7 @@ package com.Adapter.icare.Services;
 import java.util.List;
 import java.util.UUID;
 
+import com.Adapter.icare.Utils.EncryptionUtils;
 import org.springframework.stereotype.Service;
 import com.Adapter.icare.Domains.Datasource;
 import com.Adapter.icare.Domains.Datasource.Type;
@@ -32,7 +33,7 @@ public class DatasourceService {
     }
         
 
-    public Datasource AddNewDataSource(Datasource datasource) {
+    public Datasource AddNewDataSource(Datasource datasource) throws Exception {
 
         boolean db = databaseTypeExists(datasource.getType());
         if(!db){
@@ -59,6 +60,9 @@ public class DatasourceService {
         }
         UUID uuid = UUID.randomUUID();
         datasource.setUuid(uuid);
+        // Password encryption
+        String encryptedPassword = EncryptionUtils.encrypt(datasource.getPassword());
+        datasource.setPassword(encryptedPassword);
         return datasourceRepository.save(datasource);
     }
 
@@ -70,12 +74,16 @@ public class DatasourceService {
         datasourceRepository.deleteById(datasourceId);
     }
 
-    public Datasource updateDatasource(Datasource datasource) {
+    public Datasource updateDatasource(Datasource datasource) throws Exception {
 
         boolean db = databaseTypeExists(datasource.getType());
         if (!db) {
             throw new IllegalStateException("The database type is invalid");
         }
+
+        // Password encryption
+        String encryptedPassword = EncryptionUtils.encrypt(datasource.getPassword());
+        datasource.setPassword(encryptedPassword);
         return datasourceRepository.save(datasource);
     }
     

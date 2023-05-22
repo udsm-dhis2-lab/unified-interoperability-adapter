@@ -42,6 +42,7 @@ import java.util.Map;
 
 import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Utils.EncryptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -69,7 +70,7 @@ public class ReportsController {
 
 
     @PostMapping
-    public List<DataValueSets> SearchDataSetElementsPerDataSet(@RequestBody ReportValuesSent reportValuesSent) throws SQLException{
+    public List<DataValueSets> SearchDataSetElementsPerDataSet(@RequestBody ReportValuesSent reportValuesSent) throws Exception {
         
         //String dataSetId = reportValuesSent.getDataSetID();
         List<DataValueSets> dvslist = new ArrayList<DataValueSets>();
@@ -89,7 +90,8 @@ public class ReportsController {
             //Query execution
             String dataSourceUrl = dataSetElement.getDatasource().getUrl();
             String dataSourceUserName = dataSetElement.getDatasource().getUsername();
-            String dataSourcePassword = dataSetElement.getDatasource().getPassword();
+            String decryptedPassword = EncryptionUtils.decrypt(dataSetElement.getDatasource().getPassword());
+            String dataSourcePassword = decryptedPassword;
             Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
             ResultSet rs = con.prepareStatement(newQuery).executeQuery();
             rs.next();
@@ -105,7 +107,7 @@ public class ReportsController {
     }
 
     @PostMapping("/sendValues")
-    public String SendDataToDHIS(@RequestBody ReportValuesSent reportValuesSent) throws SQLException{
+    public String SendDataToDHIS(@RequestBody ReportValuesSent reportValuesSent) throws Exception {
 
         DHISConstants constant = new DHISConstants();
         List<DataValues> dataValues = new ArrayList<DataValues>();
@@ -132,7 +134,8 @@ public class ReportsController {
             // Query execution
             String dataSourceUrl = dataSetElement.getDatasource().getUrl();
             String dataSourceUserName = dataSetElement.getDatasource().getUsername();
-            String dataSourcePassword = dataSetElement.getDatasource().getPassword();
+            String decryptedPassword = EncryptionUtils.decrypt(dataSetElement.getDatasource().getPassword());
+            String dataSourcePassword = decryptedPassword;
             Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
             ResultSet rs = con.prepareStatement(newQuery).executeQuery();
             rs.next();
