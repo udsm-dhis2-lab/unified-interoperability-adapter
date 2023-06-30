@@ -144,14 +144,20 @@ export class MappingComponent implements OnInit {
               (dataset: any) => dataset?.instances?.id === this.instance?.id
             ) || []
           )?.map((dataSet: any) => {
-            const dataSetFields = dataSet?.datasetFields
-              ? JSON.parse(dataSet?.datasetFields)
-              : null;
+            let dataSetFields: any = {};
+            try {
+              dataSet?.datasetFields
+                ? JSON.parse(dataSet?.datasetFields)
+                : null;
+            } catch (e) {
+              // console.log(e);
+            }
             return {
               ...dataSet,
               formDesignCode: dataSet?.formDesignCode
                 ? dataSet?.formDesignCode
-                : dataSetFields?.dataEntryForm &&
+                : dataSetFields &&
+                  dataSetFields?.dataEntryForm &&
                   dataSetFields?.dataEntryForm?.htmlCode
                 ? dataSetFields?.dataEntryForm?.htmlCode
                 : null,

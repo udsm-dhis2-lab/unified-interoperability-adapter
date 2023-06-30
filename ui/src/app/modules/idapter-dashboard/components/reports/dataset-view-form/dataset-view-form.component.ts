@@ -45,6 +45,7 @@ import { onFormReady, onDataValueChange } from 'src/app/Helpers/form.helper';
 import { MatDialog } from '@angular/material/dialog';
 import { DatasetInterface, SourceInterface } from 'src/app/models/source.model';
 import { DataValueFetchInterface } from 'src/app/resources/interfaces';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-dataset-view-form',
@@ -74,7 +75,8 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   query: string | undefined;
   dataValueFetchs: DataValueFetchInterface[] | undefined;
   dataValueFetch: any;
-
+  sendingData: boolean = false;
+  sendingDataResponse$: Observable<any> | undefined;
   constructor(
     private uiService: UiService,
     private reportService: ReportsService,
@@ -165,11 +167,22 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     }
   }
 
-  sendReport(event: Event) {
-    console.log('SEND', this.sendingObject);
-    this.reportService.sendReport(this.sendingObject).subscribe({
-      next: (response) => this.valueSentToDHIS2.emit(response),
+  sendReport(event: Event): void {
+    event.stopPropagation();
+    this.sendingData = true;
+    this.sendingDataResponse$ = this.reportService.sendReport(
+      this.sendingObject
+    );
+    this.sendingDataResponse$.subscribe({
+      next: (response) => {
+        this.valueSentToDHIS2.emit(response);
+      },
       error: (err) => this.valueSentToDHIS2.emit(err),
+    });
+    this.sendingDataResponse$.subscribe((response) => {
+      if (response) {
+        this.sendingData = false;
+      }
     });
   }
 

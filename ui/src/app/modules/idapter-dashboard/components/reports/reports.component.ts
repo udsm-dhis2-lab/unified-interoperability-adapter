@@ -40,6 +40,7 @@ import {
   InstanceInterface,
   PeriodInterface,
 } from 'src/app/resources/interfaces';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-reports',
@@ -64,7 +65,8 @@ export class ReportsComponent implements OnInit {
   messageType: string | undefined;
   message: string | undefined;
   showYearField: boolean = true;
-
+  reportResponse$: Observable<any> | undefined;
+  gettingData: boolean = false;
   constructor(
     private datasetsService: DatasetsService,
     private instanceDatasetsService: InstanceDatasetsService,
@@ -147,6 +149,8 @@ export class ReportsComponent implements OnInit {
       this.selectedYear
     );
 
+    this.gettingData = true;
+
     if (this.dataset && this.periodValue >= 0 && this.instance) {
       let dataViewReport = {
         periodStart: this.period.firstDate,
@@ -176,9 +180,10 @@ export class ReportsComponent implements OnInit {
             ),
           };
 
-          this.message = 'Report view granted.';
+          this.message = 'Report generated successfully';
           this.messageType = 'success';
           this.viewDatasetReport = true;
+          this.gettingData = false;
         },
 
         error: (error) => {
