@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -65,6 +65,9 @@ export class ReportsService {
 
   sendReport(payload: any): Observable<any> {
     const url = `${this.apiUrl}/sendValues`;
-    return this.httpClient.post<any>(url, payload, this.httpOptions);
+    return this.httpClient.post<any>(url, payload, this.httpOptions).pipe(
+      map((response) => response),
+      catchError((error) => of(error))
+    );
   }
 }
