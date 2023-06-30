@@ -80,7 +80,7 @@ public class ReportsService {
         StringBuffer responseContent = new StringBuffer();
         Optional<Datasets> dataset= dataSetsRepository.findById(datasetId);
         JSONObject jsObject = new JSONObject();
-        String ab = "";
+        String status = "";
         String orgUnit = dataset.get().getInstances().getCode();
         dhisAggregateValues.setOrgUnit(orgUnit);
 
@@ -118,11 +118,11 @@ public class ReportsService {
             }
             reader.close();
             jsObject = new JSONObject(responseContent.toString());
-            ab = jsObject.getString("status");
+            status = jsObject.getString("status");
         } catch (Exception e) {
             throw new RuntimeException("Error sending values to DHIS2: " + e);
         }
-        return ab;
+        return status;
     }
 
     public Map<String, Object> fetchOrgUnitUsingCode(String url, String username, String password, String code) {

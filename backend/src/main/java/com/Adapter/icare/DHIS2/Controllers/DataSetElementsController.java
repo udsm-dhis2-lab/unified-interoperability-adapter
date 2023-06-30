@@ -34,6 +34,7 @@ package com.Adapter.icare.DHIS2.Controllers;
 import java.sql.*;
 import java.util.*;
 
+import com.Adapter.icare.Utils.EncryptionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,7 +58,7 @@ public class DataSetElementsController {
     }
 
     @PostMapping
-    public DataSetElements addDataSetElements(@RequestBody DataSetElements dataSetElements) throws SQLException {
+    public DataSetElements addDataSetElements(@RequestBody DataSetElements dataSetElements) throws Exception {
 
         //Manipulating the received request
         String dataElementsCategoryOptionCombString = dataSetElements.getDataElementCategoryOptionCombo();
@@ -70,7 +71,9 @@ public class DataSetElementsController {
         //Obtaining the data from dataSetElements
         String SqlQuery = dataSetElements.getSqlQuery();
         String dataSourceUrl = datasource.get().getUrl();
-        String dataSourcePassword = datasource.get().getPassword();
+        String decryptedPassword = EncryptionUtils.decrypt(datasource.get().getPassword());
+        String dataSourcePassword = decryptedPassword;
+        //String dataSourcePassword = datasource.get().getPassword();
         String dataSourceUserName = datasource.get().getUsername();
 
         // Query manipulation
@@ -88,12 +91,13 @@ public class DataSetElementsController {
     }
 
     @PostMapping("/testQuery")
-    public String testQuery(@RequestBody DataSetElements dataSetElements) throws SQLException{
+    public String testQuery(@RequestBody DataSetElements dataSetElements) throws Exception {
 
        Long dataSourceId = dataSetElements.getDatasource().getId();
        Optional<Datasource> datasource = datasourceRepository.findById(dataSourceId);
        String dataSourceUrl = datasource.get().getUrl();
-       String dataSourcePassword = datasource.get().getPassword();
+       String decryptedPassword = EncryptionUtils.decrypt(datasource.get().getPassword());
+       String dataSourcePassword = decryptedPassword;
        String dataSourceUserName = datasource.get().getUsername();
        String query = dataSetElements.getSqlQuery();
        String periodStart = dataSetElements.getPeriodStart();
@@ -111,7 +115,7 @@ public class DataSetElementsController {
     }
 
     @PostMapping("/testquerylist")
-    public List<Map<String,Object>> queryList(@RequestBody Map<String,Object> queryMap) throws SQLException{
+    public List<Map<String,Object>> queryList(@RequestBody Map<String,Object> queryMap) throws Exception {
 
        String query = queryMap.get("sql").toString();
        String datasourceId = ((Map) queryMap.get("datasource")).get("id").toString();
@@ -119,7 +123,9 @@ public class DataSetElementsController {
        String newQuery = query.replaceAll("\\$\\{period-start\\}",queryMap.get("periodStart").toString()).replaceAll("\\$\\{period-end\\}",queryMap.get("periodEnd").toString());
 
        Datasource datasource = datasourceRepository.getById(Long.valueOf(datasourceId));
-       Connection con = DriverManager.getConnection(datasource.getUrl(), datasource.getUsername(),datasource.getPassword());
+       String decryptedPassword = EncryptionUtils.decrypt(datasource.getPassword());
+       String dataSourcePassword = decryptedPassword;
+       Connection con = DriverManager.getConnection(datasource.getUrl(), datasource.getUsername(),dataSourcePassword);
        ResultSet rs = con.prepareStatement(newQuery).executeQuery();
 
         // retrieve the column names and types from ResultSetMetaData

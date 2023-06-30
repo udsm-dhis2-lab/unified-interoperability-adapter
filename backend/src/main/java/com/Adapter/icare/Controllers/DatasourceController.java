@@ -64,7 +64,7 @@ public class DatasourceController {
     }
 
     @PostMapping
-    public Datasource addDatasource(@RequestBody Datasource datasource) {
+    public Datasource addDatasource(@RequestBody Datasource datasource) throws Exception {
         return datasourceService.AddNewDataSource(datasource);
     }
 
@@ -75,7 +75,7 @@ public class DatasourceController {
     }
 
     @PutMapping
-    public Datasource updateDatasource(@RequestBody Datasource datasource) {
+    public Datasource updateDatasource(@RequestBody Datasource datasource) throws Exception {
         return datasourceService.updateDatasource(datasource);
     }
 }
