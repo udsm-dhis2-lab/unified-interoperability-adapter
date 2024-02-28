@@ -36,11 +36,13 @@ import { UiService } from 'src/app/services/ui.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { EditSourceComponent } from './edit-source/edit-source.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SourceInterface } from 'src/app/models/source.model';
 import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
 import { AddSourceComponent } from './add-source/add-source.component';
 import { ManageSourcesModalComponent } from './modals/manage-sources-modal/manage-sources-modal.component';
+import { result } from 'lodash';
+import { LoadingComponent } from 'src/app/shared/loader/loading/loading.component';
 
 @Component({
   selector: 'app-sources',
@@ -72,20 +74,35 @@ export class SourcesComponent implements OnInit {
     });
   }
 
+  
   ngOnInit(): void {
+    this.loadSources();
+  }
+
+
+  loadSources(): void {
+    const loadingDialog = this.dialog?.open(LoadingComponent, {
+      width: 'auto',
+      disableClose: true, 
+    });
     this.sourcesService.getSources().subscribe({
       next: (sources) => {
+        if (loadingDialog) {
+          loadingDialog.close();
+        }
         this.sources = sources;
-        if (this.sources) {
-          this.showAddSourceForm = false;
-        } else this.showAddSourceForm = true;
+        this.showAddSourceForm = !this.sources;
       },
       error: (error) => {
-        this.message = "Could't load sources";
+        if (loadingDialog) {
+          loadingDialog.close();
+        }
+        this.message = "Couldn't load sources";
         this.messageType = 'danger';
       },
     });
   }
+  
 
   onToggle() {
     this.uiService?.toggleAddForm();
@@ -95,7 +112,7 @@ export class SourcesComponent implements OnInit {
     this.dialog?.open(SharedConfirmationModalComponent, {
       minWidth: '30%',
       data: {
-        title: 'Confirmation',
+        title: 'Confirm delete',
         message: `Are you sure you want to delete ${source.url} source?`,
         color: 'primary'
       },
@@ -122,22 +139,6 @@ export class SourcesComponent implements OnInit {
 
 }
 
-
-
-  // activateSource(source: SourceInterface) {
-  //   source.active = !source.active;
-  //   this.sourcesService.updateSourceActivate(source).subscribe();
-  // }
-
-
-
-  // onOpenDataSourceModal(event: Event): void {
-  // const dialog =  this.dialog?.open(ManageSourcesModalComponent, {
-  //     width:'900px',
-  //     height:'450',
-  //   });
-  // }
-
   // onOpenDataSourceModal(event: Event): void {
   //   this.dialog?.open(ManageSourcesModalComponent, {
   //     width: '900px',
@@ -162,56 +163,117 @@ export class SourcesComponent implements OnInit {
 
  
 
+  // onOpenDataSourceModal(event: Event): void {
+  //   this.dialog?.open(ManageSourcesModalComponent, {
+  //     width: '900px',
+  //   }).afterClosed().subscribe((loadSources?: boolean) => {
+  //     if(loadSources) {
+  //       this.loadSources();
+  //     }
+  //   })
+  // }
   onOpenDataSourceModal(event: Event): void {
-    const dialogReff = this.dialog?.open(ManageSourcesModalComponent, {
-      width: '900px',
-    });
-    // dialogReff?.afterClosed().subscribe((result: SourceInterface | undefined) => {
-    //   if (result) {
-    //     this.sourcesService.addSource(result).subscribe({
-    //       next: (source: SourceInterface) => {
-    //         this.sources?.push(source);
-    //         this.message = 'Source added successfully.';
-    //         this.messageType = 'success';
-    //       },
-    //       error: (error: any) => {
-    //         this.message = error.error.message;
-    //         this.messageType = 'danger';
-    //       },
-    //     });
-    //   }
+
+    // const loadingDialog = this.dialog?.open(LoadingComponent, {
+    //   width: 'auto',
+    //   disableClose: true, 
     // });
+    
+
+    this.dialog?.open(ManageSourcesModalComponent, {
+      width: '900px',
+    }).afterClosed().subscribe((loadSources?: boolean) => {
+      if(loadSources) {
+        this.loadSources();
+      }
+    })
+
   }
-  
 
 
-  
-
+ 
   openDialog(sourceToEdit: SourceInterface): void {
-    const dialogRef = this.dialog?.open(EditSourceComponent, {
+    // Open the edit source modal
+    const editDialog = this.dialog?.open(EditSourceComponent, {
       width: '50%',
       data: sourceToEdit,
     });
-    dialogRef?.afterClosed().subscribe((result) => {
+
+    editDialog?.afterClosed().subscribe((result: SourceInterface | undefined) => {
       if (result) {
-        this.source = result;
-        this.sourcesService.updateSourceActivate(this.source!).subscribe({
-          next: () => {
-            this.router?.navigate(['/sources']);
-            this.message = 'Source has been successfully updated.';
-            this.messageType = 'success';
+        // Open a confirmation modal
+        const confirmationDialog = this.dialog?.open(SharedConfirmationModalComponent, {
+          minWidth: '30%',
+          data: {
+            title: 'Confirmation',
+            message: `Are you sure you want to update data?`,
+            color: 'primary'
           },
-          error: (error) => {
-            this.message = error.error.message;
-            this.messageType = 'danger';
-          },
+          enterAnimationDuration: '1200ms',
+          exitAnimationDuration: '1200ms'
         });
-      } else {
-        window.location.reload();
+  
+        confirmationDialog?.afterClosed().subscribe((confirmed?: boolean) => {
+          if (confirmed) {
+            // Update the source if confirmed
+            this.sourcesService.updateSourceActivate(result).subscribe({
+              next: () => {
+                this.router?.navigate(['/sources']);
+                this.message = 'Source has been successfully updated.';
+                this.messageType = 'success';
+              },
+              error: (error) => {
+                this.message = error.error.message;
+                this.messageType = 'danger';
+              }
+            });
+          } else {
+            window.location.reload(); // Reload the page if not confirmed
+          }
+        });
       }
     });
+  
     this.message = undefined;
     this.messageType = undefined;
   }
+  
+  
+
 
 }
+
+
+
+
+
+
+
+
+  // openDialog(sourceToEdit: SourceInterface): void {
+  //   const dialogRef = this.dialog?.open(EditSourceComponent, {
+  //     width: '50%',
+  //     data: sourceToEdit,
+  //   });
+  //   dialogRef?.afterClosed().subscribe((result) => {
+  //     if (result) {
+  //       this.source = result;
+  //       this.sourcesService.updateSourceActivate(this.source!).subscribe({
+  //         next: () => {
+  //           this.router?.navigate(['/sources']);
+  //           this.message = 'Source has been successfully updated.';
+  //           this.messageType = 'success';
+  //         },
+  //         error: (error) => {
+  //           this.message = error.error.message;
+  //           this.messageType = 'danger';
+  //         },
+  //       });
+  //     } else {
+  //       window.location.reload();
+  //     }
+  //   });
+  //   this.message = undefined;
+  //   this.messageType = undefined;
+  // }
+

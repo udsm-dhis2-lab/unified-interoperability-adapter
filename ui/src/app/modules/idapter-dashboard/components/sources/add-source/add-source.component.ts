@@ -57,8 +57,6 @@ export class AddSourceComponent implements OnInit {
 
   constructor(
     private uiService?: UiService,
-    // public dialogRef?: MatDialogRef<AddSourceComponent>,
-    // @Inject(MAT_DIALOG_DATA) public sourceToEdit: SourceInterface
     ) {
     this.subscription = this.uiService
       ?.onToggleAddForm()
@@ -68,9 +66,6 @@ export class AddSourceComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  onNoClick(): void {
-      // this.dialogRef?.close();
-  }
  
   onSubmit() {
     if (this.type === undefined || this.type === '') {

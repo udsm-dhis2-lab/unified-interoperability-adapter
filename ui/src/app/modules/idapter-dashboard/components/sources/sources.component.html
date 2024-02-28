@@ -67,12 +67,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </div>
         </div>
   
-        <div class="row mt-2">
+        <div class="row mt-2 add-source-button-container" >
           <div class="col-12">
             <div class="d-flex justify-content-end">
-              <button (click)="onOpenDataSourceModal($event)" mat-flat-button color="primary">
-                {{ showAddSourceForm ? "Hide Form" : "Add Data Sources" }}
+              <button (click)="onOpenDataSourceModal($event)" mat-flat-button color="primary" class="add-data-source-button">
+                <mat-icon aria-hidden="false" aria-label="Add" class="add-icon">add</mat-icon>
+                <span class="button-text">{{ showAddSourceForm ? "Hide Form" : "Add Data Source" }}</span>
               </button>
+              
             </div>
           </div>
         </div>

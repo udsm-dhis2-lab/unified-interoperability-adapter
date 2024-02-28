@@ -62,13 +62,6 @@ export class ManageSourcesModalComponent implements OnInit {
   //   });
   // }
 
-
-  
-
-
-
-
-
   addSource(source: SourceInterface) {
     // Open the confirmation modal
     this.dialog?.open(SharedConfirmationModalComponent, {
@@ -84,12 +77,7 @@ export class ManageSourcesModalComponent implements OnInit {
       if (confirmed) {
         this.sourcesService.addSource(source).subscribe({
           next: () => {
-            // this.sources?.push(source);
-            this.router?.navigate(['./sources']);
-            // this.message = 'Source added successfully.';
-            // this.messageType = 'success';
             this.dialogRef?.close(true);
-            
           },
           error: (error) => {
             this.message = error.error.message;
