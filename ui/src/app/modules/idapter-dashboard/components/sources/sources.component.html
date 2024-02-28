@@ -35,13 +35,51 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <div class="row">
         <div class="col-8">
           <div class="mb-3">
-            <h4 class="text-">Sources</h4>
+            <h4 class="text">Sources</h4>
           </div>
         </div>
         <div class="col-4"></div>
       </div>
-
+     
       <div class="row">
+        <div class="row">
+          <div class="row">
+            <div class="col-12">
+              <div
+                class="alert alert-{{ messageType }} alert-dismissible fade show"
+                *ngIf="message"
+                role="alert"
+              >
+                {{ message }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+
+            <!-- <app-add-source (onAddSource)="addSource($event)"></app-add-source> -->
+
+          </div>
+        </div>
+  
+        <div class="row mt-2">
+          <div class="col-12">
+            <div class="d-flex justify-content-end">
+              <button (click)="onOpenDataSourceModal($event)" mat-flat-button color="primary">
+                {{ showAddSourceForm ? "Hide Form" : "Add Data Sources" }}
+              </button>
+            </div>
+          </div>
+        </div>
+      
+        
+
+        <mat-card>
         <div class="col-12">
           <table class="table table-hover">
             <thead>
@@ -91,39 +129,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </tbody>
           </table>
         </div>
+      </mat-card>
       </div>
 
-      <div class="row">
-        <div class="row">
-          <div class="col-12">
-            <div
-              class="alert alert-{{ messageType }} alert-dismissible fade show"
-              *ngIf="message"
-              role="alert"
-            >
-              {{ message }}
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Close"
-              ></button>
-            </div>
-          </div>
-        </div>
-        <div class="col-12">
-          <app-add-source (onAddSource)="addSource($event)"></app-add-source>
-        </div>
-      </div>
-      <div class="row mt-2">
-        <div class="col-12">
-          <div class="d-flex justify-content-end">
-            <button (click)="onToggle()" mat-flat-button color="primary">
-              {{ showAddSourceForm ? "Hide Form" : "Add Data Source" }}
-            </button>
-          </div>
-        </div>
-      </div>
+
+
     </div>
   </div>
 </div>

@@ -26,6 +26,7 @@ const routes: Routes = [
       { path: 'logs', component: LogsComponent },
       { path: 'settings', component: SettingsComponent },
       { path: 'datasets', component: DatasetsComponent },
+    
     ],
   },
 ];

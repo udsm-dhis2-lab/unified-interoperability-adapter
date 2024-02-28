@@ -36,6 +36,7 @@ export interface QueryData {
   dataset?: DatasetInterface;
 }
 
+
 export interface SourceInterface {
   id?: number;
   type?: string;

@@ -38,6 +38,7 @@ import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { EditInstanceComponent } from './edit-instance/edit-instance.component';
+import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
 
 @Component({
   selector: 'app-instance',
@@ -89,6 +90,17 @@ export class InstanceComponent implements OnInit {
   }
 
   onDelete(instance: InstanceInterface) {
+    this.dialog?.open(SharedConfirmationModalComponent, {
+      minWidth: '30%',
+      data: {
+        title: 'Confirmation',
+        message: `Are you sure you want to delete ${instance.name} source?`,
+        color: 'primary'
+      },
+      enterAnimationDuration: '1200ms',
+      exitAnimationDuration: '1200ms'
+    }).afterClosed().subscribe((confirmed?: boolean) => {
+    if(confirmed){
     this.instancesService.deleteInstance(instance).subscribe({
       next: () => {
         this.instances = this.instances?.filter((i) => i.id !== instance.id);
@@ -102,6 +114,41 @@ export class InstanceComponent implements OnInit {
     });
     this.router?.navigate(['/instances']);
   }
+  })
+  }
+
+
+//   onDelete(source: SourceInterface) {
+//     this.dialog?.open(SharedConfirmationModalComponent, {
+//       minWidth: '30%',
+//       data: {
+//         title: 'Confirmation',
+//         message: `Are you sure you want to delete ${source.url} source?`,
+//         color: 'primary'
+//       },
+//       enterAnimationDuration: '1200ms',
+//       exitAnimationDuration: '1200ms'
+//     }).afterClosed().subscribe((confirmed?: boolean) => {
+//       if (confirmed) {
+//         this.sourcesService.deleteSource(source).subscribe({
+//           next: () => {
+//             this.sources = this.sources?.filter((s) => s.id !== source.id);
+//             this.message = 'Source deleted successfully.';
+//             this.messageType = 'success';
+//           },
+//           error: (error) => {
+//             this.message = "Couldn't delete the source.";
+//             this.messageType = 'danger';
+//           },
+//         });
+//         this.router?.navigate(['/sources']);
+//         this.message = undefined;
+//         this.messageType = undefined;
+//       }
+//     })
+
+// }
+
 
   // activateInstance(instance: InstanceInterface) {
   //   instance.active = !instance.active;

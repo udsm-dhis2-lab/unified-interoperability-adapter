@@ -46,8 +46,10 @@ export class EditSourceComponent implements OnInit {
   url: string | undefined;
 
   constructor(
+
     public dialogRef: MatDialogRef<EditSourceComponent>,
     @Inject(MAT_DIALOG_DATA) public sourceToEdit: SourceInterface
+    
   ) {}
   ngOnInit(): void {
     throw new Error('Method not implemented.');
@@ -65,4 +67,6 @@ export class EditSourceComponent implements OnInit {
       url: source.url,
     };
   }
+
+
 }

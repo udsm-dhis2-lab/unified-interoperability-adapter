@@ -1,6 +1,6 @@
 {
   "/api/*": {
-    "target": "http://localhost:8081",
+    "target": "https://iadapter.dhis2.udsm.ac.tz/",
     "secure": false,
     "logLevel": "debug",
     "auth": "",

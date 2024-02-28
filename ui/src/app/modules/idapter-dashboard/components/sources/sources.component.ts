@@ -38,6 +38,9 @@ import { Router } from '@angular/router';
 import { EditSourceComponent } from './edit-source/edit-source.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SourceInterface } from 'src/app/models/source.model';
+import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
+import { AddSourceComponent } from './add-source/add-source.component';
+import { ManageSourcesModalComponent } from './modals/manage-sources-modal/manage-sources-modal.component';
 
 @Component({
   selector: 'app-sources',
@@ -89,52 +92,113 @@ export class SourcesComponent implements OnInit {
   }
 
   onDelete(source: SourceInterface) {
-    this.sourcesService.deleteSource(source).subscribe({
-      next: () => {
-        this.sources = this.sources?.filter((s) => s.id !== source.id);
-        this.message = 'Source deleted successfully.';
-        this.messageType = 'success';
+    this.dialog?.open(SharedConfirmationModalComponent, {
+      minWidth: '30%',
+      data: {
+        title: 'Confirmation',
+        message: `Are you sure you want to delete ${source.url} source?`,
+        color: 'primary'
       },
-      error: (error) => {
-        this.message = "Couldn't delete the source.";
-        this.messageType = 'danger';
-      },
-    });
-    this.router?.navigate(['/sources']);
-    this.message = undefined;
-    this.messageType = undefined;
-  }
+      enterAnimationDuration: '1200ms',
+      exitAnimationDuration: '1200ms'
+    }).afterClosed().subscribe((confirmed?: boolean) => {
+      if (confirmed) {
+        this.sourcesService.deleteSource(source).subscribe({
+          next: () => {
+            this.sources = this.sources?.filter((s) => s.id !== source.id);
+            this.message = 'Source deleted successfully.';
+            this.messageType = 'success';
+          },
+          error: (error) => {
+            this.message = "Couldn't delete the source.";
+            this.messageType = 'danger';
+          },
+        });
+        this.router?.navigate(['/sources']);
+        this.message = undefined;
+        this.messageType = undefined;
+      }
+    })
+
+}
+
+
 
   // activateSource(source: SourceInterface) {
   //   source.active = !source.active;
   //   this.sourcesService.updateSourceActivate(source).subscribe();
   // }
 
-  addSource(source: SourceInterface) {
-    this.sourcesService.addSource(source).subscribe({
-      next: (source) => {
-        this.sources?.push(source);
-      },
-      error: (error) => {
-        this.message = error.error.message;
-        this.messageType = 'danger';
-      },
+
+
+  // onOpenDataSourceModal(event: Event): void {
+  // const dialog =  this.dialog?.open(ManageSourcesModalComponent, {
+  //     width:'900px',
+  //     height:'450',
+  //   });
+  // }
+
+  // onOpenDataSourceModal(event: Event): void {
+  //   this.dialog?.open(ManageSourcesModalComponent, {
+  //     width: '900px',
+  //     height: '450px',
+  //   });   
+  // }
+
+  // addSource(source: SourceInterface) {
+    
+  //   this.sourcesService.addSource(source).subscribe({
+  //     next: (source) => {
+  //       this.sources?.push(source);
+  //       this.message = 'Source added successfully.';
+  //       this.messageType = 'success';
+  //     },
+  //     error: (error) => {
+  //       this.message = error.error.message;
+  //       this.messageType = 'danger';
+  //     },
+  //   });
+  // }
+
+ 
+
+  onOpenDataSourceModal(event: Event): void {
+    const dialogReff = this.dialog?.open(ManageSourcesModalComponent, {
+      width: '900px',
     });
+    // dialogReff?.afterClosed().subscribe((result: SourceInterface | undefined) => {
+    //   if (result) {
+    //     this.sourcesService.addSource(result).subscribe({
+    //       next: (source: SourceInterface) => {
+    //         this.sources?.push(source);
+    //         this.message = 'Source added successfully.';
+    //         this.messageType = 'success';
+    //       },
+    //       error: (error: any) => {
+    //         this.message = error.error.message;
+    //         this.messageType = 'danger';
+    //       },
+    //     });
+    //   }
+    // });
   }
+  
+
+
+  
 
   openDialog(sourceToEdit: SourceInterface): void {
     const dialogRef = this.dialog?.open(EditSourceComponent, {
       width: '50%',
       data: sourceToEdit,
     });
-
     dialogRef?.afterClosed().subscribe((result) => {
       if (result) {
         this.source = result;
         this.sourcesService.updateSourceActivate(this.source!).subscribe({
           next: () => {
             this.router?.navigate(['/sources']);
-            this.message = 'Source added successfully.';
+            this.message = 'Source has been successfully updated.';
             this.messageType = 'success';
           },
           error: (error) => {
@@ -149,4 +213,5 @@ export class SourcesComponent implements OnInit {
     this.message = undefined;
     this.messageType = undefined;
   }
+
 }

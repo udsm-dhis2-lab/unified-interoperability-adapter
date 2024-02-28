@@ -40,7 +40,46 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
       </div>
 
-      <div class="row" *ngIf="instances">
+      <div class="row">
+        <div class="col-12">
+          <div class="row">
+            <div class="col-12">
+              <div
+                class="alert alert-{{
+                  messageType
+                }} alert-dismissible fade show"
+                *ngIf="message"
+                role="alert"
+              >
+                {{ message }}
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"
+                ></button>
+              </div>
+            </div>
+          </div>
+          <app-add-instance
+            [showAddInstanceForm]="showAddInstanceForm"
+            (onAddInstance)="addInstance($event)"
+          ></app-add-instance>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12">
+          <div class="d-flex justify-content-end">
+            <button (click)="onToggle()" mat-flat-button color="primary">
+              {{ showAddInstanceForm ? "Hide Form" : "Add Instance" }}
+            </button>
+          
+          </div>
+        </div>
+      </div>
+<mat-card>
+        <div class="row" *ngIf="instances">
         <div class="col-12">
           <table class="table table-stripped">
             <thead>
@@ -99,61 +138,14 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
           </table>
         </div>
       </div>
+    </mat-card>
 
-      <div class="row">
-        <div class="col-12">
-          <div class="row">
-            <div class="col-12">
-              <div
-                class="alert alert-{{
-                  messageType
-                }} alert-dismissible fade show"
-                *ngIf="message"
-                role="alert"
-              >
-                {{ message }}
-                <button
-                  type="button"
-                  class="btn-close"
-                  data-bs-dismiss="alert"
-                  aria-label="Close"
-                ></button>
-              </div>
-            </div>
-          </div>
-          <app-add-instance
-            [showAddInstanceForm]="showAddInstanceForm"
-            (onAddInstance)="addInstance($event)"
-          ></app-add-instance>
-        </div>
-      </div>
 
-      <div class="row">
-        <div class="col-12">
-          <div class="d-flex justify-content-end">
-            <button (click)="onToggle()" mat-flat-button color="primary">
-              {{ showAddInstanceForm ? "Hide Form" : "Add Instance" }}
-            </button>
-            <!-- <app-button
-              *ngIf="!showAddInstanceForm"
-              [ngStyle]="{
-                padding: '90px',
-                margin: '0 0 0 -0vw'
-              }"
-              backgroundColor="{{
-                showAddInstanceForm ? 'red' : 'transparent'
-              }}"
-              fontColor="{{ showAddInstanceForm ? 'white' : 'green' }}"
-              borderColor="{{ showAddInstanceForm ? 'red' : 'green' }}"
-              text="{{ showAddInstanceForm ? 'Hide Form' : 'Add Instance' }}"
-              (btnClick)="onToggle()"
-            >
-            </app-button> -->
-          </div>
-        </div>
-      </div>
 
-      <!-- <app-body></app-body> -->
+
+
+
+
     </div>
   </div>
 </div>
