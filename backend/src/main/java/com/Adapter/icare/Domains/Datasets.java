@@ -69,8 +69,6 @@ public class Datasets extends BaseEntity implements Serializable {
 
     @Lob
     private String datasetFields;
-
-
     
     @ManyToOne
     private Instances instances;
