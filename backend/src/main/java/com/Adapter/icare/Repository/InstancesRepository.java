@@ -33,7 +33,9 @@ package com.Adapter.icare.Repository;
 
 import java.util.List;
 
+import com.Adapter.icare.Domains.Datasets;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.Adapter.icare.Domains.Instances;
@@ -42,5 +44,7 @@ import com.Adapter.icare.Domains.Instances;
 public interface InstancesRepository extends JpaRepository<Instances,Long> {
 
     List<Instances> findAll();
-    
+
+    @Query(value = "SELECT * FROM instances WHERE uuid=:uuid",nativeQuery = true)
+    Instances getInstanceUuid(String uuid);
 }

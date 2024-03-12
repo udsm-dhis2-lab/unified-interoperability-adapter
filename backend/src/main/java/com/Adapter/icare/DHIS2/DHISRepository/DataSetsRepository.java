@@ -31,10 +31,14 @@
 
 package com.Adapter.icare.DHIS2.DHISRepository;
 
+import com.Adapter.icare.Domains.DataSetElements;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.Adapter.icare.Domains.Datasets;
+import org.springframework.data.jpa.repository.Query;
 
 public interface DataSetsRepository extends JpaRepository<Datasets,String> {
-    
+
+    @Query(value = "SELECT * FROM datasets WHERE uuid=:uuid",nativeQuery = true)
+    Datasets getDatasetInstanceUuid(String uuid);
 }

@@ -17,9 +17,11 @@ public class InstanceService {
     }
 
     public List<Instances> getInstances(){
-
        return instancesRepository.findAll();
+    }
 
+    public Instances getInstanceByUuid(String uuid) {
+        return instancesRepository.getInstanceUuid(uuid);
     }
 
     public Instances AddNewInstance(Instances instances) {
@@ -38,9 +40,7 @@ public class InstanceService {
     }
 
     public Instances updateInstances(Instances instances) {
-
         return instancesRepository.save(instances);
     }
-
 
 }

@@ -101,9 +101,6 @@ public class User extends BaseEntity implements Serializable {
             user.setSurname(userMap.get("surname").toString());
         }
         return user;
-
-
-
     }
 
     public Map<String,Object> toMap(){
@@ -169,9 +166,7 @@ public class User extends BaseEntity implements Serializable {
         if(this.getSharing() != null){
             userMap.put("sharing",this.getSharing());
         }
-
         return userMap;
-
     }
 }
 

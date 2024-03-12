@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.*;
 
 @AllArgsConstructor
@@ -13,15 +14,15 @@ import java.util.*;
 @Getter
 @Setter
 @Entity
-@Table(name = "groups")
+@Table(name = "access_groups")
 public class Group extends BaseEntity {
 
     @Id
-    @Column(name = "group_name")
+    @Column(name = "group_name", length = 50)
     private String groupName;
     private String description;
 
-    @ManyToMany(mappedBy = "groups", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "groups", fetch = FetchType.EAGER)
     private Set<User> users;
 
     public static Group fromMap(Map<String,Object> groupMap){
@@ -37,9 +38,7 @@ public class Group extends BaseEntity {
         if(groupMap.get("sharing") != null){
             group.setSharing(groupMap.get("sharing").toString());
         }
-
         return group;
-
     }
 
     public Map<String,Object> toMap(Boolean withUSers){
