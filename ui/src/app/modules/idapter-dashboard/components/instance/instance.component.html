@@ -61,19 +61,24 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </div>
             </div>
           </div>
-          <app-add-instance
+          <!-- <app-add-instance
             [showAddInstanceForm]="showAddInstanceForm"
             (onAddInstance)="addInstance($event)"
-          ></app-add-instance>
+          ></app-add-instance> -->
         </div>
       </div>
 
       <div class="row">
         <div class="col-12">
           <div class="d-flex justify-content-end">
-            <button (click)="onToggle()" mat-flat-button color="primary">
-              {{ showAddInstanceForm ? "Hide Form" : "Add Instance" }}
+
+            <button (click)="onOpenInstanceModal($event)" mat-flat-button color="primary" class="add-data-source-button">
+              <mat-icon aria-hidden="false" aria-label="Add" class="add-icon">add</mat-icon>
+              <span class="button-text">{{ showAddInstanceForm ? "Hide Form" : "Add instance" }}</span>
             </button>
+            <!-- <button (click)="onToggle()" mat-flat-button color="primary">
+              {{ showAddInstanceForm ? "Hide Form" : "Add Instance" }}
+            </button> -->
           
           </div>
         </div>
