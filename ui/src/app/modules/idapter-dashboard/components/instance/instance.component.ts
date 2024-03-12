@@ -39,6 +39,7 @@ import { Subscription } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { EditInstanceComponent } from './edit-instance/edit-instance.component';
 import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
+import { LoadingComponent } from 'src/app/shared/loader/loading/loading.component';
 
 @Component({
   selector: 'app-instance',
@@ -70,8 +71,20 @@ export class InstanceComponent implements OnInit {
   }
 
   ngOnInit() {
+   this.loadInstances();
+  }
+
+  loadInstances():void{
+
+    const loadingDialog = this.dialog?.open(LoadingComponent, {
+      width: 'auto',
+      disableClose: true, 
+    });
     this.instancesService.getInstances().subscribe({
       next: (instances) => {
+        if (loadingDialog) {
+          loadingDialog.close();
+        }
         this.instances = instances;
 
         if (this.instances) {
@@ -79,6 +92,9 @@ export class InstanceComponent implements OnInit {
         } else this.showAddInstanceForm = true;
       },
       error: (error) => {
+        if (loadingDialog) {
+          loadingDialog.close();
+        }
         this.message = "Couldn't find instances";
         this.messageType = 'danger';
       },
@@ -101,6 +117,10 @@ export class InstanceComponent implements OnInit {
       exitAnimationDuration: '1200ms'
     }).afterClosed().subscribe((confirmed?: boolean) => {
     if(confirmed){
+      const loadingDialog = this.dialog?.open(LoadingComponent, {
+        width: 'auto',
+        disableClose: true,
+      });
     this.instancesService.deleteInstance(instance).subscribe({
       next: () => {
         this.instances = this.instances?.filter((i) => i.id !== instance.id);
@@ -110,6 +130,9 @@ export class InstanceComponent implements OnInit {
       error: (error) => {
         this.message = "Couldn't delete instance";
         this.messageType = 'danger';
+      },
+      complete: () => {
+        loadingDialog?.close();
       },
     });
     this.router?.navigate(['/instances']);
@@ -168,37 +191,101 @@ export class InstanceComponent implements OnInit {
       },
     });
   }
-
   openDialog(instanceToEdit: InstanceInterface): void {
     const dialogRef = this.dialog?.open(EditInstanceComponent, {
-      minWidth: '40%',
-      data: instanceToEdit,
+        minWidth: '40%',
+        data: instanceToEdit,
     });
 
     dialogRef?.afterClosed().subscribe((result) => {
-      if (result) {
-        if (result.username && result.password && result.name && result.url) {
-          this.instance = result;
-          this.instancesService.updateInstance(this.instance!).subscribe({
-            next: (value) => {
-              this.message = 'Instance updated successfully.';
-              this.messageType = 'success';
-            },
-            error: (error) => {
-              (this.message = 'Failed to update instance due to: '),
-                error.error.message;
-              this.messageType = 'danger';
-            },
-          });
+        if (result) {
+            const confirmationDialog = this.dialog?.open(SharedConfirmationModalComponent, {
+                minWidth: '30%',
+                data: {
+                    title: 'Confirmation',
+                    message: `Are you sure you want to update data?`,
+                    color: 'primary',
+                },
+                enterAnimationDuration: '1200ms',
+                exitAnimationDuration: '1200ms',
+            });
+
+            confirmationDialog?.afterClosed().subscribe((confirmed?: boolean) => {
+                if (confirmed) {
+                    const loadingDialog = this.dialog?.open(LoadingComponent, {
+                        width: 'auto',
+                        disableClose: true,
+                    });
+
+                    if (result.username && result.password && result.name && result.url) {
+                        this.instance = result;
+                        this.instancesService.updateInstance(this.instance!).subscribe({
+                            next: (value) => {
+                                loadingDialog?.close();
+                                this.message = 'Instance updated successfully.';
+                                this.messageType = 'success';
+                            },
+                            error: (error) => {
+                                loadingDialog?.close();
+                                this.message = 'Failed to update instance due to: ' + error.error.message;
+                                this.messageType = 'danger';
+                            },
+                        });
+                    } else {
+                        this.message = 'Failed to update instance.';
+                        this.messageType = 'danger';
+                    }
+                } else {
+                    // User cancelled the confirmation, handle as needed
+                }
+            });
         } else {
-          this.message = 'Failed to update instance.';
-          this.messageType = 'danger';
+            window.location.reload();
         }
-      } else {
-        window.location.reload();
-      }
+
+        // Reset messages
+        this.message = undefined;
+        this.messageType = undefined;
     });
-    this.message = undefined;
-    this.messageType = undefined;
-  }
+}
+
+
+  // openDialog(instanceToEdit: InstanceInterface): void {
+  //   const dialogRef = this.dialog?.open(EditInstanceComponent, {
+  //     minWidth: '40%',
+  //     data: instanceToEdit,
+  //   });
+  //   dialogRef?.afterClosed().subscribe((result) => {
+  //     if (result) {
+
+  //       const loadingDialog = this.dialog?.open(LoadingComponent, {
+  //         width: 'auto',
+  //         disableClose: true,
+  //       });
+  //       if (result.username && result.password && result.name && result.url) {
+  //         this.instance = result;
+  //         this.instancesService.updateInstance(this.instance!).subscribe({
+  //           next: (value) => {
+  //             loadingDialog?.close();
+  //             this.message = 'Instance updated successfully.';
+  //             this.messageType = 'success';
+  //           },
+  //           error: (error) => {
+  //             loadingDialog?.close();
+  //             (this.message = 'Failed to update instance due to: '),
+  //               error.error.message;
+  //             this.messageType = 'danger';
+  //           },
+  //         });
+  //       } else {
+  //         this.message = 'Failed to update instance.';
+  //         this.messageType = 'danger';
+  //       }
+  //     } else {
+  //       window.location.reload();
+  //     }
+  //   });
+  //   this.message = undefined;
+  //   this.messageType = undefined;
+  // }
 }
