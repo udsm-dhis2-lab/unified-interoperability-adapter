@@ -4,9 +4,11 @@ import { containers } from './containers';
 import { components } from './components';
 import { IAdapterDashboardRoutingModule } from './iadapter-dashboard.routing.module';
 import { modals } from './components/sources/modals';
+import {MatSnackBarModule} from '@angular/material/snack-bar'
+
 
 @NgModule({
-  imports: [IAdapterDashboardRoutingModule, SharedModule],
+  imports: [IAdapterDashboardRoutingModule, SharedModule,MatSnackBarModule],
   exports: [],
   entryComponents: [...components, ...modals],
   declarations: [...containers, ...components, ...modals],

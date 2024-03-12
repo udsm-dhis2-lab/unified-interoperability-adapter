@@ -108,20 +108,32 @@ export class SourcesComponent implements OnInit {
     this.uiService?.toggleAddForm();
   }
 
+
   onDelete(source: SourceInterface) {
-    this.dialog?.open(SharedConfirmationModalComponent, {
-      minWidth: '30%',
-      data: {
-        title: 'Confirm delete',
-        message: `Are you sure you want to delete ${source.url} source?`,
-        color: 'primary'
-      },
-      enterAnimationDuration: '1200ms',
-      exitAnimationDuration: '1200ms'
-    }).afterClosed().subscribe((confirmed?: boolean) => {
+    const confirmationDialog = this.dialog?.open(
+      SharedConfirmationModalComponent,
+      {
+        minWidth: '30%',
+        data: {
+          title: 'Confirm delete',
+          message: `Are you sure you want to delete ${source.url} source?`,
+          color: 'primary',
+        },
+        enterAnimationDuration: '1200ms',
+        exitAnimationDuration: '1200ms',
+      }
+    );
+
+    confirmationDialog?.afterClosed().subscribe((confirmed?: boolean) => {
       if (confirmed) {
+        const loadingDialog = this.dialog?.open(LoadingComponent, {
+          width: 'auto',
+          disableClose: true,
+        });
+
         this.sourcesService.deleteSource(source).subscribe({
           next: () => {
+            // Remove the deleted source from the sources array
             this.sources = this.sources?.filter((s) => s.id !== source.id);
             this.message = 'Source deleted successfully.';
             this.messageType = 'success';
@@ -130,14 +142,17 @@ export class SourcesComponent implements OnInit {
             this.message = "Couldn't delete the source.";
             this.messageType = 'danger';
           },
+          complete: () => {
+            loadingDialog?.close();
+          },
         });
+
         this.router?.navigate(['/sources']);
         this.message = undefined;
         this.messageType = undefined;
       }
-    })
-
-}
+    });
+  }
 
   // onOpenDataSourceModal(event: Event): void {
   //   this.dialog?.open(ManageSourcesModalComponent, {
@@ -193,53 +208,58 @@ export class SourcesComponent implements OnInit {
 
  
   openDialog(sourceToEdit: SourceInterface): void {
-    // Open the edit source modal
     const editDialog = this.dialog?.open(EditSourceComponent, {
       width: '50%',
       data: sourceToEdit,
     });
 
-    editDialog?.afterClosed().subscribe((result: SourceInterface | undefined) => {
-      if (result) {
-        // Open a confirmation modal
-        const confirmationDialog = this.dialog?.open(SharedConfirmationModalComponent, {
-          minWidth: '30%',
-          data: {
-            title: 'Confirmation',
-            message: `Are you sure you want to update data?`,
-            color: 'primary'
-          },
-          enterAnimationDuration: '1200ms',
-          exitAnimationDuration: '1200ms'
-        });
-  
-        confirmationDialog?.afterClosed().subscribe((confirmed?: boolean) => {
-          if (confirmed) {
-            // Update the source if confirmed
-            this.sourcesService.updateSourceActivate(result).subscribe({
-              next: () => {
-                this.router?.navigate(['/sources']);
-                this.message = 'Source has been successfully updated.';
-                this.messageType = 'success';
+    editDialog
+      ?.afterClosed()
+      .subscribe((result: SourceInterface | undefined) => {
+        if (result) {
+          const confirmationDialog = this.dialog?.open(
+            SharedConfirmationModalComponent,
+            {
+              minWidth: '30%',
+              data: {
+                title: 'Confirmation',
+                message: `Are you sure you want to update data?`,
+                color: 'primary',
               },
-              error: (error) => {
-                this.message = error.error.message;
-                this.messageType = 'danger';
-              }
-            });
-          } else {
-            window.location.reload(); // Reload the page if not confirmed
-          }
-        });
-      }
-    });
-  
+              enterAnimationDuration: '1200ms',
+              exitAnimationDuration: '1200ms',
+            }
+          );
+
+          confirmationDialog?.afterClosed().subscribe((confirmed?: boolean) => {
+            if (confirmed) {
+              const loadingDialog = this.dialog?.open(LoadingComponent, {
+                width: 'auto',
+                disableClose: true,
+              });
+              this.sourcesService.updateSourceActivate(result).subscribe({
+                next: () => {
+                  this.router?.navigate(['/sources']);
+                  loadingDialog?.close();
+                  this.message = 'Source has been successfully updated.';
+                  this.messageType = 'success';
+                },
+                error: (error) => {
+                  loadingDialog?.close();
+                  this.message = error.error.message;
+                  this.messageType = 'danger';
+                },
+              });
+            } else {
+              window.location.reload();
+            }
+          });
+        }
+      });
+
     this.message = undefined;
     this.messageType = undefined;
   }
-  
-  
-
 
 }
 
