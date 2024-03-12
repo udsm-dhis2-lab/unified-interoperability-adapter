@@ -39,9 +39,7 @@ import { EditSourceComponent } from './edit-source/edit-source.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SourceInterface } from 'src/app/models/source.model';
 import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
-import { AddSourceComponent } from './add-source/add-source.component';
 import { ManageSourcesModalComponent } from './modals/manage-sources-modal/manage-sources-modal.component';
-import { result } from 'lodash';
 import { LoadingComponent } from 'src/app/shared/loader/loading/loading.component';
 
 @Component({
@@ -187,18 +185,16 @@ export class SourcesComponent implements OnInit {
   //     }
   //   })
   // }
+
+
   onOpenDataSourceModal(event: Event): void {
-
-    // const loadingDialog = this.dialog?.open(LoadingComponent, {
-    //   width: 'auto',
-    //   disableClose: true, 
-    // });
-    
-
     this.dialog?.open(ManageSourcesModalComponent, {
       width: '900px',
     }).afterClosed().subscribe((loadSources?: boolean) => {
+
+      console.log('den',loadSources)
       if(loadSources) {
+
         this.loadSources();
       }
     })

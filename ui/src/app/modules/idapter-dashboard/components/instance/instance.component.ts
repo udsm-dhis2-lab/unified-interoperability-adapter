@@ -36,7 +36,7 @@ import { InstanceInterface } from 'src/app/resources/interfaces';
 import { UiService } from 'src/app/services/ui.service';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Subscription } from 'rxjs';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { EditInstanceComponent } from './edit-instance/edit-instance.component';
 import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
 import { LoadingComponent } from 'src/app/shared/loader/loading/loading.component';
@@ -63,7 +63,7 @@ export class InstanceComponent implements OnInit {
     private instancesService: InstancesService,
     private uiService?: UiService,
     private router?: Router,
-    public dialog?: MatDialog
+    public dialog?: MatDialog,
   ) {
     this.subscription = this.uiService?.onToggleAddInstanceForm().subscribe({
       next: (value) => (this.showAddInstanceForm = value),
@@ -76,7 +76,6 @@ export class InstanceComponent implements OnInit {
   }
 
   loadInstances():void{
-
     const loadingDialog = this.dialog?.open(LoadingComponent, {
       width: 'auto',
       disableClose: true, 
@@ -140,28 +139,14 @@ export class InstanceComponent implements OnInit {
   }
   })
   }
-
-
-
-  // addInstance(instance: InstanceInterface): void {
-  //   this.instancesService.addInstance(instance).subscribe({
-  //     next: (instance) => {
-  //       this.instances = [...this.instances!, instance];
-  //       this.message = 'Instance added successfully.';
-  //       this.messageType = 'success';
-  //     },
-  //     error: (error) => {
-  //       this.message = error.error.message;
-  //       this.messageType = 'danger';
-  //     },
-  //   });
-  // }
-
+  
   onOpenInstanceModal(event: Event): void {
     this.dialog?.open(ManageInstanceModalComponent, {
       width: '900px',
-    }).afterClosed().subscribe((loadSources?: boolean) => {
-      if(loadSources) {
+    }).afterClosed().subscribe((loadInstances?: boolean) => {
+
+      console.log('dannn',loadInstances);
+      if(loadInstances) {
         this.loadInstances();
       }
     })

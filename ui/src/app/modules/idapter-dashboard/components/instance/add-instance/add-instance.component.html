@@ -133,6 +133,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 *ngIf="verifying"
               ></mat-progress-bar>
               <div class="col-12 d-flex justify-content-end">
+                <button mat-button mat-dialog-close>
+                  Close
+                </button>
                 <button
                   [disabled]="
                     !username ||
