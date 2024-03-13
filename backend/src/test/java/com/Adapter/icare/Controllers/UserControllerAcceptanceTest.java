@@ -61,7 +61,7 @@ public class UserControllerAcceptanceTest {
         user.put("disabled",false);
         user.put("middlename","Test");
 //        UUID uuid = UUID.randomUUID();
-//        user.setUuid(uuid);
+//        user.setUuid(uuid.toString());
 //        user.setId(1);
         System.out.println(user);
         mockMvc.perform(

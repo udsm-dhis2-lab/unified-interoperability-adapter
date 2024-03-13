@@ -43,6 +43,7 @@ import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
 import { InstancesService } from 'src/app/services/instances/instances.service';
 import { SourcesService } from 'src/app/services/sources/sources.service';
+import { DatasetQueriesManagementModalComponent } from 'src/app/shared/modals/dataset-queries-management-modal/dataset-queries-management-modal.component';
 import { PlaygroundModalComponent } from 'src/app/shared/modals/playground-modal/playground-modal.component';
 
 @Component({
@@ -196,6 +197,25 @@ export class MappingComponent implements OnInit {
       minWidth: '80%',
       data: {
         interoperabilityInstances,
+        dataSources,
+      },
+    });
+  }
+
+  onOpenMappingQueries(
+    event: Event,
+    instance: any,
+    dataSetInstance: any,
+    dataSources: any[]
+  ): void {
+    event.stopPropagation();
+    console.log(instance);
+    console.log(dataSources);
+    this.dialog.open(DatasetQueriesManagementModalComponent, {
+      minWidth: '80%',
+      data: {
+        instance,
+        dataSetInstance,
         dataSources,
       },
     });

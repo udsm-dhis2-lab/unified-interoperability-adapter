@@ -59,7 +59,7 @@ public class DatasourceService {
                 break;
         }
         UUID uuid = UUID.randomUUID();
-        datasource.setUuid(uuid);
+        datasource.setUuid(uuid.toString());
         // Password encryption
         String encryptedPassword = EncryptionUtils.encrypt(datasource.getPassword());
         datasource.setPassword(encryptedPassword);
@@ -85,6 +85,10 @@ public class DatasourceService {
         String encryptedPassword = EncryptionUtils.encrypt(datasource.getPassword());
         datasource.setPassword(encryptedPassword);
         return datasourceRepository.save(datasource);
+    }
+
+    public Datasource getDataSourceByUuid(String uuid) {
+        return  datasourceRepository.getDataSourceByUuid(uuid);
     }
     
 }

@@ -240,7 +240,7 @@ public class DataSetsService {
             System.out.println(e.getMessage());
         }
         UUID uuid = UUID.randomUUID();
-        datasets.setUuid(uuid);
+        datasets.setUuid(uuid.toString());
         return dataSetsRepository.save(datasets);
     }
 

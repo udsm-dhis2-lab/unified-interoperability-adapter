@@ -41,7 +41,7 @@ public class UserService implements UserDetailsService {
         User createdUser = new User();
         try {
             UUID uuid = UUID.randomUUID();
-            user.setUuid(uuid);
+            user.setUuid(uuid.toString());
 
             //Password encoding
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -72,7 +72,7 @@ public class UserService implements UserDetailsService {
 
     public Role saveRole(Role role){
         UUID uuid = UUID.randomUUID();
-        role.setUuid(uuid);
+        role.setUuid(uuid.toString());
         return roleRepository.save(role);
     }
 
@@ -82,7 +82,7 @@ public class UserService implements UserDetailsService {
 
     public Privilege savePrivilege(Privilege privilege){
         UUID uuid = UUID.randomUUID();
-        privilege.setUuid(uuid);
+        privilege.setUuid(uuid.toString());
         return privilegeRepository.save(privilege);
     }
 
@@ -131,7 +131,7 @@ public class UserService implements UserDetailsService {
 
     public Group createGroup(Group group) {
         UUID uuid = UUID.randomUUID();
-        group.setUuid(uuid);
+        group.setUuid(uuid.toString());
         return groupRepository.save(group);
     }
 

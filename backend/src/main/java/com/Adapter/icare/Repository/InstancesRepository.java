@@ -46,5 +46,5 @@ public interface InstancesRepository extends JpaRepository<Instances,Long> {
     List<Instances> findAll();
 
     @Query(value = "SELECT * FROM instances WHERE uuid=:uuid",nativeQuery = true)
-    Instances getInstanceUuid(String uuid);
+    Instances getInstanceByUuid(String uuid);
 }

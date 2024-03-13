@@ -21,12 +21,12 @@ public class InstanceService {
     }
 
     public Instances getInstanceByUuid(String uuid) {
-        return instancesRepository.getInstanceUuid(uuid);
+        return instancesRepository.getInstanceByUuid(uuid);
     }
 
     public Instances AddNewInstance(Instances instances) {
         UUID uuid = UUID.randomUUID();
-        instances.setUuid(uuid);
+        instances.setUuid(uuid.toString());
         return instancesRepository.save(instances);
     }
 

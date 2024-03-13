@@ -24,8 +24,7 @@ public class DatasetQueryService {
 
     public DatasetQuery saveDataSetQuery(DatasetQuery datasetQuery) {
             UUID uuid = UUID.randomUUID();
-            DatasetQuery dataToSave = new DatasetQuery();
-            datasetQuery.setUuid(uuid);
-        return datasetQueryRepository.save(dataToSave);
+            datasetQuery.setUuid(uuid.toString());
+        return datasetQueryRepository.save(datasetQuery);
     }
 }

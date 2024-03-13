@@ -148,10 +148,31 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <div class="row mt-2">
         <div class="col-12 d-flex justify-content-end">
           <button
-            class="mr-2"
             mat-stroked-button
             [disabled]="
-              !params?.interoperabilityInstances || !params?.dataSources
+              !params?.interoperabilityInstances ||
+              !params?.dataSources ||
+              !instance ||
+              !dataset
+            "
+            (click)="
+              onOpenMappingQueries(
+                $event,
+                instance,
+                dataset,
+                params?.dataSources
+              )
+            "
+          >
+            Mapping queries
+          </button>
+          <button
+            class="ml-2 mr-2"
+            mat-stroked-button
+            [disabled]="
+              !params?.interoperabilityInstances ||
+              !params?.dataSources ||
+              !instance
             "
             (click)="
               onOpenPlayGround(

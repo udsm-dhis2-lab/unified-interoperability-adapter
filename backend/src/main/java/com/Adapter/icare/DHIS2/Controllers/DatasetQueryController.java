@@ -30,9 +30,11 @@ public class DatasetQueryController {
     public DatasetQuery saveDataSetQuery(@RequestBody Map<String, Object> datasetQueryMap) throws Exception {
         //Manipulating the received request
         DatasetQuery datasetQuery = new DatasetQuery();
-        datasetQuery.setDataSet(dataSetsService.getDataSetByUuid(((Map<String, Object>) datasetQueryMap.get("dataSet")).get("uuid").toString()));
+        datasetQuery.setDataSet(dataSetsService.getDataSetByUuid(((Map<String, Object>) datasetQueryMap.get("dataSetInstance")).get("uuid").toString()));
         datasetQuery.setInstance(instanceService.getInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("instance")).get("uuid").toString()));
-        datasetQueryService.saveDataSetQuery(DatasetQuery.fromMap(datasetQuery.toMap()));
+        datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSource")).get("uuid").toString()));
+        datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
+        datasetQueryService.saveDataSetQuery(datasetQuery);
         return datasetQuery;
     }
 
