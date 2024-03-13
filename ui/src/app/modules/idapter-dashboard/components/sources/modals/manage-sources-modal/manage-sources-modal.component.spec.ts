@@ -28,11 +28,25 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-.btn {
-  border-radius: 0px !important;
-}
+import { ManageSourcesModalComponent } from './manage-sources-modal.component';
 
-.add-source-button-container {
-  margin-bottom: 20px; 
-}
+describe('ManageSourcesModalComponent', () => {
+  let component: ManageSourcesModalComponent;
+  let fixture: ComponentFixture<ManageSourcesModalComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ManageSourcesModalComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(ManageSourcesModalComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

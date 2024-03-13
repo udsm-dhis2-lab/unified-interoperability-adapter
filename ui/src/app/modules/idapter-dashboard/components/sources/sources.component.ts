@@ -36,8 +36,11 @@ import { UiService } from 'src/app/services/ui.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { EditSourceComponent } from './edit-source/edit-source.component';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SourceInterface } from 'src/app/models/source.model';
+import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
+import { ManageSourcesModalComponent } from './modals/manage-sources-modal/manage-sources-modal.component';
+import { LoadingComponent } from 'src/app/shared/loader/loading/loading.component';
 
 @Component({
   selector: 'app-sources',
@@ -70,15 +73,27 @@ export class SourcesComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadSources();
+  }
+
+  loadSources(): void {
+    const loadingDialog = this.dialog?.open(LoadingComponent, {
+      width: 'auto',
+      disableClose: true,
+    });
     this.sourcesService.getSources().subscribe({
       next: (sources) => {
+        if (loadingDialog) {
+          loadingDialog.close();
+        }
         this.sources = sources;
-        if (this.sources) {
-          this.showAddSourceForm = false;
-        } else this.showAddSourceForm = true;
+        this.showAddSourceForm = !this.sources;
       },
       error: (error) => {
-        this.message = "Could't load sources";
+        if (loadingDialog) {
+          loadingDialog.close();
+        }
+        this.message = "Couldn't load sources";
         this.messageType = 'danger';
       },
     });
@@ -89,63 +104,113 @@ export class SourcesComponent implements OnInit {
   }
 
   onDelete(source: SourceInterface) {
-    this.sourcesService.deleteSource(source).subscribe({
-      next: () => {
-        this.sources = this.sources?.filter((s) => s.id !== source.id);
-        this.message = 'Source deleted successfully.';
-        this.messageType = 'success';
-      },
-      error: (error) => {
-        this.message = "Couldn't delete the source.";
-        this.messageType = 'danger';
-      },
+    const confirmationDialog = this.dialog?.open(
+      SharedConfirmationModalComponent,
+      {
+        minWidth: '30%',
+        data: {
+          title: 'Confirm delete',
+          message: `Are you sure you want to delete ${source.url} source?`,
+          color: 'primary',
+        },
+        enterAnimationDuration: '1200ms',
+        exitAnimationDuration: '1200ms',
+      }
+    );
+
+    confirmationDialog?.afterClosed().subscribe((confirmed?: boolean) => {
+      if (confirmed) {
+        const loadingDialog = this.dialog?.open(LoadingComponent, {
+          width: 'auto',
+          disableClose: true,
+        });
+
+        this.sourcesService.deleteSource(source).subscribe({
+          next: () => {
+            this.sources = this.sources?.filter((s) => s.id !== source.id);
+            this.message = 'Source deleted successfully.';
+            this.messageType = 'success';
+          },
+          error: (error) => {
+            this.message = "Couldn't delete the source.";
+            this.messageType = 'danger';
+          },
+          complete: () => {
+            loadingDialog?.close();
+          },
+        });
+
+        this.router?.navigate(['/sources']);
+        this.message = undefined;
+        this.messageType = undefined;
+      }
     });
-    this.router?.navigate(['/sources']);
-    this.message = undefined;
-    this.messageType = undefined;
   }
 
-  // activateSource(source: SourceInterface) {
-  //   source.active = !source.active;
-  //   this.sourcesService.updateSourceActivate(source).subscribe();
-  // }
-
-  addSource(source: SourceInterface) {
-    this.sourcesService.addSource(source).subscribe({
-      next: (source) => {
-        this.sources?.push(source);
-      },
-      error: (error) => {
-        this.message = error.error.message;
-        this.messageType = 'danger';
-      },
-    });
+  onOpenDataSourceModal(event: Event): void {
+    this.dialog
+      ?.open(ManageSourcesModalComponent, {
+        width: '900px',
+      })
+      .afterClosed()
+      .subscribe((loadSources?: boolean) => {
+        console.log('den', loadSources);
+        if (loadSources) {
+          this.loadSources();
+        }
+      });
   }
 
   openDialog(sourceToEdit: SourceInterface): void {
-    const dialogRef = this.dialog?.open(EditSourceComponent, {
+    const editDialog = this.dialog?.open(EditSourceComponent, {
       width: '50%',
       data: sourceToEdit,
     });
 
-    dialogRef?.afterClosed().subscribe((result) => {
-      if (result) {
-        this.source = result;
-        this.sourcesService.updateSourceActivate(this.source!).subscribe({
-          next: () => {
-            this.router?.navigate(['/sources']);
-            this.message = 'Source added successfully.';
-            this.messageType = 'success';
-          },
-          error: (error) => {
-            this.message = error.error.message;
-            this.messageType = 'danger';
-          },
-        });
-      } else {
-        window.location.reload();
-      }
-    });
+    editDialog
+      ?.afterClosed()
+      .subscribe((result: SourceInterface | undefined) => {
+        if (result) {
+          const confirmationDialog = this.dialog?.open(
+            SharedConfirmationModalComponent,
+            {
+              minWidth: '30%',
+              data: {
+                title: 'Confirmation',
+                message: `Are you sure you want to update data?`,
+                color: 'primary',
+              },
+              enterAnimationDuration: '1200ms',
+              exitAnimationDuration: '1200ms',
+            }
+          );
+
+          confirmationDialog?.afterClosed().subscribe((confirmed?: boolean) => {
+            if (confirmed) {
+              const loadingDialog = this.dialog?.open(LoadingComponent, {
+                width: 'auto',
+                disableClose: true,
+              });
+              this.sourcesService.updateSourceActivate(result).subscribe({
+                next: () => {
+                  this.router?.navigate(['/sources']);
+                  loadingDialog?.close();
+                  this.message = 'Source has been successfully updated.';
+                  this.messageType = 'success';
+                },
+                error: (error) => {
+                  loadingDialog?.close();
+                  this.message = error.error.message;
+                  this.messageType = 'danger';
+                },
+              });
+            } else {
+              window.location.reload();
+            }
+          });
+        }
+      });
+
     this.message = undefined;
     this.messageType = undefined;
   }

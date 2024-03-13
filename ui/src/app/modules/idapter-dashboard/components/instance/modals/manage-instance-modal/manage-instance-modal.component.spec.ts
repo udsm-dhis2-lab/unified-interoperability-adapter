@@ -28,11 +28,24 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ManageInstanceModalComponent } from './manage-instance-modal.component';
 
-.btn {
-  border-radius: 0px !important;
-}
+describe('ManageInstanceModalComponent', () => {
+  let component: ManageInstanceModalComponent;
+  let fixture: ComponentFixture<ManageInstanceModalComponent>;
 
-.add-source-button-container {
-  margin-bottom: 20px; 
-}
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ManageInstanceModalComponent],
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(ManageInstanceModalComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

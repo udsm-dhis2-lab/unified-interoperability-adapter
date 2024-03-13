@@ -28,7 +28,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -->
-<div *ngIf="showAddInstanceForm" class="row add-form">
+<div  class="row add-form">
   <div class="col-12">
     <div class="row">
       <div class="col-12">
@@ -132,6 +132,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 *ngIf="verifying"
               ></mat-progress-bar>
               <div class="col-12 d-flex justify-content-end">
+                <button mat-button mat-dialog-close>
+                  Close
+                </button>
                 <button
                   [disabled]="
                     !username ||

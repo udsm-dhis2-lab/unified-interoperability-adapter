@@ -28,11 +28,10 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+import { ManageInstanceModalComponent } from '../../instance/modals/manage-instance-modal/manage-instance-modal.component';
+import { ManageSourcesModalComponent } from './manage-sources-modal/manage-sources-modal.component';
 
-.btn {
-  border-radius: 0px !important;
-}
-
-.add-source-button-container {
-  margin-bottom: 20px; 
-}
+export const modals: any[] = [
+  ManageSourcesModalComponent,
+  ManageInstanceModalComponent,
+];

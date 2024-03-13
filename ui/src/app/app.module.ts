@@ -42,9 +42,11 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { SharedModule } from './shared/shared.modules';
 import { NgxDhis2HttpClientModule } from '@iapps/ngx-dhis2-http-client';
 import { PeriodFilter } from './Helpers/period-filter';
+import { MatDialogModule } from '@angular/material/dialog';
+
 
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -62,6 +64,9 @@ import { PeriodFilter } from './Helpers/period-filter';
         dataStore_scorecards: 'id',
       },
     }),
+
+    MatDialogModule,
+  
   ],
   providers: [
     {
