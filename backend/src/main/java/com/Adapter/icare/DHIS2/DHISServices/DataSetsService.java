@@ -249,8 +249,9 @@ public class DataSetsService {
     }
 
     public Datasets getDataSetByUuid(String uuid) {
-        return dataSetsRepository.getDatasetInstanceUuid(uuid);
+        return dataSetsRepository.getDatasetInstanceByUuid(uuid);
     }
+
     public void deleteDataSets(String datasetId)  {
 
         boolean exists = dataSetsRepository.existsById(datasetId);

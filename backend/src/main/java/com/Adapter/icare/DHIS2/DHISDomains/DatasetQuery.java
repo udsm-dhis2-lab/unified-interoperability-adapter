@@ -14,10 +14,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table
-//@Table(uniqueConstraints={
-//        @UniqueConstraint(columnNames = {"id","data_set", "instance"})
-//})
+@Table(uniqueConstraints={
+        @UniqueConstraint(columnNames = {"data_set_id", "instance_id"})
+})
 public class DatasetQuery extends BaseEntity implements Serializable  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,7 +56,7 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
         dataSetsQueries.put("sqlQuery",this.getSqlQuery());
         dataSetsQueries.put("dataSetInstance",this.getDataSet());
         dataSetsQueries.put("instance",this.getInstance());
-        dataSetsQueries.put("source", this.getDataSource());
+        dataSetsQueries.put("dataSource", this.getDataSource());
         return dataSetsQueries;
     }
 }

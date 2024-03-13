@@ -40,5 +40,5 @@ import org.springframework.data.jpa.repository.Query;
 public interface DataSetsRepository extends JpaRepository<Datasets,String> {
 
     @Query(value = "SELECT * FROM datasets WHERE uuid=:uuid",nativeQuery = true)
-    Datasets getDatasetInstanceUuid(String uuid);
+    Datasets getDatasetInstanceByUuid(String uuid);
 }

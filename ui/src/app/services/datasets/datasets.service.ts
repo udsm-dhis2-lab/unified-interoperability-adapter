@@ -90,12 +90,37 @@ export class DatasetsService {
     );
   }
 
-  addDataSetQuery(payload: any): Observable<any> {
+  saveDataSetQuery(payload: any): Observable<any> {
+    return (
+      !payload?.uuid
+        ? this.httpClient.post(
+            `./api/v1/dataSetQueries`,
+            payload,
+            this.httpOptions
+          )
+        : this.httpClient.put(
+            `./api/v1/dataSetQueries`,
+            payload,
+            this.httpOptions
+          )
+    ).pipe(
+      map((response: any) => response),
+      catchError((error: any) => of(error))
+    );
+  }
+
+  getDataSetQueries(paramaters?: string[]): Observable<any> {
     return this.httpClient
-      .post(`./api/v1/dataSetQueries`, payload, this.httpOptions)
+      .get(
+        `./api/v1/dataSetQueries${
+          paramaters ? '?' + paramaters?.join('&') : ''
+        }`
+      )
       .pipe(
-        map((response: any) => response),
-        catchError((error: any) => of(error))
+        map((response: any) => {
+          console.log((response?.filter((item: any) => item) || [])?.length);
+          return response?.filter((item: any) => item) || [];
+        })
       );
   }
 }

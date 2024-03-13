@@ -209,8 +209,6 @@ export class MappingComponent implements OnInit {
     dataSources: any[]
   ): void {
     event.stopPropagation();
-    console.log(instance);
-    console.log(dataSources);
     this.dialog.open(DatasetQueriesManagementModalComponent, {
       minWidth: '80%',
       data: {
