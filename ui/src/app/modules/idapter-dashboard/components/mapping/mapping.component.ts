@@ -185,7 +185,9 @@ export class MappingComponent implements OnInit {
     this.isFormReady = this.instance && this.dataset ? true : false;
   }
 
-  changesOnDataValue(e: Event) {}
+  changesOnDataValue(e: Event) {
+    console.log(e);
+  }
 
   onOpenPlayGround(
     event: Event,

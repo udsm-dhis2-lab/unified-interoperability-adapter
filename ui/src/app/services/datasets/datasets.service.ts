@@ -118,7 +118,6 @@ export class DatasetsService {
       )
       .pipe(
         map((response: any) => {
-          console.log((response?.filter((item: any) => item) || [])?.length);
           return response?.filter((item: any) => item) || [];
         })
       );

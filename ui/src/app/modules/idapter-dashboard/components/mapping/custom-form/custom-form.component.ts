@@ -181,6 +181,31 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     //     this.eventPopupListener(event);
     //   }
     // });
+    let dataRows = [];
+    document
+      .querySelectorAll('tr')
+      .forEach((tr: HTMLTableRowElement, index: number) => {
+        // console.log(tr);
+        let dataRow = {};
+        let cells: any[] = [];
+        tr.querySelectorAll('td').forEach(
+          (td: HTMLTableCellElement, cellIndex: number) => {
+            let cellData: any = {};
+            // console.log(td.children[0]);
+
+            cellData['index'] = cellIndex;
+            cellData['id'] = td.children[0]
+              ? td.children[0].getAttribute('id')
+              : '';
+            cells.push(cellData);
+          }
+        );
+
+        dataRow['index'] = index;
+        dataRow['cells'] = cells;
+        dataRows.push(dataRow);
+        console.log(dataRows);
+      });
     document.getElementsByName('entryfield').forEach((element) => {
       if (element) {
         element.addEventListener('click', (event) => {
