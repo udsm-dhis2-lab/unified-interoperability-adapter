@@ -33,7 +33,11 @@ import { Component, OnInit, Output, EventEmitter, Inject } from '@angular/core';
 import { UiService } from 'src/app/services/ui.service';
 import { Subscription } from 'rxjs';
 import { SourceInterface } from 'src/app/models/source.model';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-add-source',
@@ -41,8 +45,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dial
   styleUrls: ['./add-source.component.css'],
 })
 export class AddSourceComponent implements OnInit {
-  // dialogRef!: MatDialogRef<AddSourceComponent>;
-
   type: string = '';
   username: string = '';
   password: string = '';
@@ -55,18 +57,14 @@ export class AddSourceComponent implements OnInit {
 
   @Output() onAddSource: EventEmitter<SourceInterface> = new EventEmitter();
 
-  constructor(
-    private uiService?: UiService,
-    ) {
+  constructor(private uiService?: UiService) {
     this.subscription = this.uiService
       ?.onToggleAddForm()
       .subscribe((value) => (this.showAddForm = value));
   }
 
-
   ngOnInit(): void {}
 
- 
   onSubmit() {
     if (this.type === undefined || this.type === '') {
       this.message = 'This field is required';
@@ -97,9 +95,5 @@ export class AddSourceComponent implements OnInit {
       this.url = '';
       this.message = '';
     }
-
-    
   }
-
- 
 }

@@ -61,96 +61,87 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               </div>
             </div>
           </div>
-          <!-- <app-add-instance
-            [showAddInstanceForm]="showAddInstanceForm"
-            (onAddInstance)="addInstance($event)"
-          ></app-add-instance> -->
         </div>
       </div>
 
       <div class="row">
         <div class="col-12">
           <div class="d-flex justify-content-end">
-
-            <button (click)="onOpenInstanceModal($event)" mat-flat-button color="primary" class="add-data-source-button">
-              <mat-icon aria-hidden="false" aria-label="Add" class="add-icon">add</mat-icon>
-              <span class="button-text">{{ showAddInstanceForm ? "Hide Form" : "Add instance" }}</span>
+            <button
+              (click)="onOpenInstanceModal($event)"
+              mat-flat-button
+              color="primary"
+              class="add-data-source-button"
+            >
+              <mat-icon aria-hidden="false" aria-label="Add" class="add-icon"
+                >add</mat-icon
+              >
+              <span class="button-text">{{
+                showAddInstanceForm ? "Hide Form" : "Add instance"
+              }}</span>
             </button>
-            <!-- <button (click)="onToggle()" mat-flat-button color="primary">
-              {{ showAddInstanceForm ? "Hide Form" : "Add Instance" }}
-            </button> -->
-          
           </div>
         </div>
       </div>
-<mat-card>
+      <mat-card>
         <div class="row" *ngIf="instances">
-        <div class="col-12">
-          <table class="table table-stripped">
-            <thead>
-              <tr>
-                <th style="width: 20px">SN</th>
-                <th>Instance Name</th>
-                <th>URL</th>
-                <th style="width: 40px">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                [ngClass]="{ 'table-secondary': isOdd }"
-                *ngFor="
-                  let instance of instances;
-                  let count = index;
-                  odd as isOdd
-                "
-              >
-                <td>
-                  {{ count + 1 }}
-                </td>
-                <td>{{ instance.name }}</td>
-                <td>{{ instance.url }}</td>
-                <td>
-                  <div class="d-flex justify-content-end">
-                    <a
-                      style="background-color: transparent !important"
-                      mat-icon-button
-                      class="text-muted"
-                      (click)="openDialog(instance)"
-                    >
-                      <mat-icon>edit</mat-icon>
-                    </a>
-                    <!-- <button mat-button (click)="openDialog()">Open dialog</button> -->
-
-                    <a
-                      style="background-color: transparent !important"
-                      mat-icon-button
-                      class="ml-2 text-muted"
-                      (click)="onDelete(instance)"
-                    >
-                      <mat-icon>delete</mat-icon>
-                    </a>
-                  </div>
-                </td>
-              </tr>
-              <tr *ngIf="instances?.length === 0">
-                <td colspan="100%">
-                  <div class="alert alert-warning" role="alert">
-                    No Instance (Connection between system A and DHIS2) is set
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="col-12">
+            <table class="table table-stripped">
+              <thead>
+                <tr>
+                  <th style="width: 20px">SN</th>
+                  <th>Instance Name</th>
+                  <th>URL</th>
+                  <th style="width: 40px">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  [ngClass]="{ 'table-secondary': isOdd }"
+                  *ngFor="
+                    let instance of instances;
+                    let count = index;
+                    odd as isOdd
+                  "
+                >
+                  <td>
+                    {{ count + 1 }}
+                  </td>
+                  <td>{{ instance.name }}</td>
+                  <td>{{ instance.url }}</td>
+                  <td>
+                    <div class="d-flex justify-content-end">
+                      <a
+                        style="background-color: transparent !important"
+                        mat-icon-button
+                        class="text-muted"
+                        (click)="openDialog(instance)"
+                      >
+                        <mat-icon>edit</mat-icon>
+                      </a>
+                      <a
+                        style="background-color: transparent !important"
+                        mat-icon-button
+                        class="ml-2 text-muted"
+                        (click)="onDelete(instance)"
+                      >
+                        <mat-icon>delete</mat-icon>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr *ngIf="instances?.length === 0">
+                  <td colspan="100%">
+                    <div class="alert alert-warning" role="alert">
+                      No Instance (Connection between system A and DHIS2) is set
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-    </mat-card>
-
-
-
-
-
-
-
+      </mat-card>
     </div>
   </div>
 </div>
