@@ -1,3 +1,5 @@
+import { flatten } from 'lodash';
+
 function identifyMaximumRowsWithEntryFields(tableRowsMetadata: any[]): number {
   let maximumCells: number = 1;
   for (let count = 0; count < tableRowsMetadata?.length; count++) {
@@ -28,32 +30,42 @@ export function formatTableRowsMetadataForMappings(
 export function createReferencesFromQueryOutputs(query: string): any[] {
   let queryOutputs: any[] = [];
   queryOutputs = query.split('UNION').map((queryRow: string, index: number) => {
+    // console.log('queryRow', queryRow);
+    queryRow = query.replace(/\n/g, '');
     return {
       row: index,
-      outputs: (
+      outputs:
         (
-          queryRow
-            .split(',')
-            .filter(
-              (output: string) => output.toLowerCase().indexOf('as') > -1
-            ) || []
-        ).map((expectedOutput: string) => {
-          const columnsString: string = expectedOutput
-            ?.toLocaleLowerCase()
-            .replace('select ', '')
-            .split(' ')
-            .join('');
-          const pattern = /(["'])(?:(?=(\\?))\2.)*?\1/g;
-          return columnsString.match(pattern)[0]?.split('"').join('');
-        }) || []
-      ).map((formatted: string) => {
-        return {
-          key: formatted,
-          value: formatted,
-          row: Number(formatted.split('-')[0]),
-          column: Number(formatted.split('-')[1]),
-        };
-      }),
+          flatten(
+            (
+              queryRow
+                .split(',')
+                .filter(
+                  (output: string) => output.toLowerCase().indexOf('as') > -1
+                ) || []
+            ).map((expectedOutput: string) => {
+              const columnsString: string = expectedOutput
+                ?.toLocaleLowerCase()
+                .replace('select ', '')
+                .split(' ')
+                .join('');
+              const pattern = /(["'])(?:(?=(\\?))\2.)*?\1/g;
+              return flatten(
+                columnsString.match(pattern)?.map((matched: any) => {
+                  if (matched.length > 1) return matched?.split('"').join('');
+                  return null;
+                }) || []
+              );
+            }) || []
+          ).filter((matched: any) => matched && matched.length > 2) || []
+        ).map((formatted: any) => {
+          return {
+            key: formatted,
+            value: formatted,
+            row: Number(formatted?.split('-')[0]),
+            column: Number(formatted.split('-')[1]),
+          };
+        }) || [],
     };
   });
   return queryOutputs;
