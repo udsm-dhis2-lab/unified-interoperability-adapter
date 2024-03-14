@@ -62,7 +62,7 @@ export class ReportsComponent implements OnInit {
   selectionYears?: PeriodInterface[];
   viewDatasetReport: boolean = false;
   datasetValues: any;
-  sendingObject: any;
+  payloadToSend: any;
   messageType: string | undefined;
   message: string | undefined;
   showYearField: boolean = true;
@@ -189,14 +189,21 @@ export class ReportsComponent implements OnInit {
             }),
           };
 
-          this.sendingObject = {
-            periodStart: this.period.firstDate,
-            periodEnd: this.period.lastDate,
-            datasetId: this.dataset?.id,
+          this.payloadToSend = {
+            dataSet: this.dataset?.uuid,
             period: this.periodFilter?.getperiod(
               this.dataset?.periodType!,
               this.period.firstDate
             ),
+            dataValues:
+              data.map((dataValue: any) => {
+                return {
+                  dataElement: dataValue?.id?.split('-')[0],
+                  categoryOptionCombo: dataValue?.id?.split('-')[1],
+                  value: dataValue?.value.toString(),
+                  comment: 'FROM IADAPTER',
+                };
+              }) || [],
           };
 
           this.message = 'Report generated successfully';

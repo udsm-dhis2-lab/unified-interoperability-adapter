@@ -78,19 +78,27 @@ public class ReportsService {
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        Optional<Datasets> dataset= dataSetsRepository.findById(datasetId);
+        Datasets dataset= dataSetsRepository.getDatasetInstanceByUuid(datasetId);
         JSONObject jsObject = new JSONObject();
         String status = "";
-        String orgUnit = dataset.get().getInstances().getCode();
+        String orgUnit = dataset.getInstances().getCode();
         dhisAggregateValues.setOrgUnit(orgUnit);
+        dhisAggregateValues.setDataSet(dataset.getId());
 
         try {
 
-            String instanceUrl = dataset.get().getInstances().getUrl();
-            String username = dataset.get().getInstances().getUsername();
-            String password = dataset.get().getInstances().getPassword();
+            String instanceUrl = dataset.getInstances().getUrl();
+            String username = dataset.getInstances().getUsername();
+            String password = dataset.getInstances().getPassword();
+            System.out.println(username);
+            System.out.println(password);
+            System.out.println(instanceUrl);
+            if (instanceUrl.substring(instanceUrl.length() -1).equals("/")) {
+                url = new URL(instanceUrl.concat("api/dataValueSets.json?orgUnitIdScheme=code"));
+            } else {
+                url = new URL(instanceUrl.concat("/api/dataValueSets.json?orgUnitIdScheme=code"));
+            }
 
-            url = new URL(instanceUrl.concat("/api/dataValueSets.json?orgUnitIdScheme=code"));
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             String userCredentials = username.concat(":").concat(password);
             String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
