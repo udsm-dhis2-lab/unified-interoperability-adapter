@@ -40,7 +40,8 @@ import {
   InstanceInterface,
   PeriodInterface,
 } from 'src/app/resources/interfaces';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
+import { MatSelectChange } from '@angular/material/select';
 
 @Component({
   selector: 'app-reports',
@@ -67,6 +68,8 @@ export class ReportsComponent implements OnInit {
   showYearField: boolean = true;
   reportResponse$: Observable<any> | undefined;
   gettingData: boolean = false;
+  dataSetQuery$: Observable<any>;
+
   constructor(
     private datasetsService: DatasetsService,
     private instanceDatasetsService: InstanceDatasetsService,
@@ -92,14 +95,19 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  getSelectionYears() {
-    if (this.dataset?.periodType! === 'Yearly') {
+  getDatasetForReport(datasetInstanceEvent: MatSelectChange): void {
+    const dataset: any = datasetInstanceEvent?.value;
+    if (dataset?.periodType! === 'Yearly') {
       this.showYearField = false;
-      this.checkDataset();
+      this.getYearPeriod();
     } else {
       this.showYearField = true;
       this.selectionYears = this.periodFilter?.getListOfYears(10);
     }
+
+    this.dataSetQuery$ = this.datasetsService
+      .getDataSetQueries(['dataSet=' + dataset?.uuid])
+      .pipe(map((responses: any[]) => responses[0] || {}));
   }
 
   public filterDatasets() {
@@ -120,7 +128,7 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  checkDataset() {
+  getYearPeriod() {
     this.viewDatasetReport = false;
     if (this.selectedYear) {
       if (this.dataset?.periodType === 'Weekly') {
@@ -142,14 +150,16 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  viewReport() {
+  viewReport(event: Event, dataSetQuery: any): void {
+    event.stopPropagation();
+    // console.log(dataSetQuery);
     this.period = this.periodFilter?.calculateDates(
       this.dataset?.periodType!,
       this.periodValue,
       this.selectedYear
     );
 
-    this.gettingData = true;
+    // this.gettingData = true;
 
     if (this.dataset && this.periodValue >= 0 && this.instance) {
       let dataViewReport = {
@@ -158,13 +168,22 @@ export class ReportsComponent implements OnInit {
         datasetId: this.dataset?.id,
       };
 
-      this.reportsService.viewReport(dataViewReport).subscribe({
+      (dataSetQuery
+        ? this.reportsService.getDatasetReportUsingDatasetQuery(
+            dataSetQuery?.uuid,
+            dataViewReport
+          )
+        : this.reportsService.viewReport(dataViewReport)
+      ).subscribe({
         next: (data) => {
           this.datasetValues = {
             dataValues: data.map((value: any) => {
               return {
-                id: value.dataElementCategoryCombo,
-                val: value.value,
+                ...value,
+                id: value?.dataElementCategoryCombo
+                  ? value?.dataElementCategoryCombo
+                  : value?.id,
+                val: value?.value,
                 com: 'false',
               };
             }),
