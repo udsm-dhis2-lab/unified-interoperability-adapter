@@ -51,7 +51,7 @@ export class SidenavComponent implements OnInit {
 
   ngOnInit(): void {
     // this.selectedRoute =
-    console.log(this.route.snapshot.queryParams);
+    // console.log(this.route.snapshot.queryParams);
     this.route.queryParams.subscribe((params) => {
       this.param = params['admin'];
 

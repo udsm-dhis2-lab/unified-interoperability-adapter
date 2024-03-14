@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { DatasetInterface } from 'src/app/models/source.model';
 
 @Injectable({
@@ -88,5 +88,38 @@ export class DatasetsService {
       dataset,
       this.httpOptions
     );
+  }
+
+  saveDataSetQuery(payload: any): Observable<any> {
+    return (
+      !payload?.uuid
+        ? this.httpClient.post(
+            `./api/v1/dataSetQueries`,
+            payload,
+            this.httpOptions
+          )
+        : this.httpClient.put(
+            `./api/v1/dataSetQueries`,
+            payload,
+            this.httpOptions
+          )
+    ).pipe(
+      map((response: any) => response),
+      catchError((error: any) => of(error))
+    );
+  }
+
+  getDataSetQueries(paramaters?: string[]): Observable<any> {
+    return this.httpClient
+      .get(
+        `./api/v1/dataSetQueries${
+          paramaters ? '?' + paramaters?.join('&') : ''
+        }`
+      )
+      .pipe(
+        map((response: any) => {
+          return response?.filter((item: any) => item) || [];
+        })
+      );
   }
 }

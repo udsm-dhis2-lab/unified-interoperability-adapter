@@ -70,4 +70,20 @@ export class ReportsService {
       catchError((error) => of(error))
     );
   }
+
+  getDatasetReportUsingDatasetQuery(
+    uuid: string,
+    parameters: any
+  ): Observable<any> {
+    return this.httpClient
+      .post(
+        `./api/v1/dataSetQueries/${uuid}/generate`,
+        parameters,
+        this.httpOptions
+      )
+      .pipe(
+        map((response) => response),
+        catchError((error) => of(error))
+      );
+  }
 }

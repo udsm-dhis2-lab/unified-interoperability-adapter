@@ -43,6 +43,7 @@ import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
 import { InstancesService } from 'src/app/services/instances/instances.service';
 import { SourcesService } from 'src/app/services/sources/sources.service';
+import { DatasetQueriesManagementModalComponent } from 'src/app/shared/modals/dataset-queries-management-modal/dataset-queries-management-modal.component';
 import { PlaygroundModalComponent } from 'src/app/shared/modals/playground-modal/playground-modal.component';
 
 @Component({
@@ -65,6 +66,7 @@ export class MappingComponent implements OnInit {
   source: SourceInterface | undefined;
   formAttribute: any | undefined;
   isFormReady: boolean = false;
+  tableRowsMetadata: any;
 
   @Output() onViewDataset = new EventEmitter();
 
@@ -184,7 +186,9 @@ export class MappingComponent implements OnInit {
     this.isFormReady = this.instance && this.dataset ? true : false;
   }
 
-  changesOnDataValue(e: Event) {}
+  changesOnDataValue(e: Event) {
+    console.log(e);
+  }
 
   onOpenPlayGround(
     event: Event,
@@ -199,5 +203,28 @@ export class MappingComponent implements OnInit {
         dataSources,
       },
     });
+  }
+
+  onOpenMappingQueries(
+    event: Event,
+    instance: any,
+    dataSetInstance: any,
+    dataSources: any[],
+    tableRowsMetadata: any
+  ): void {
+    event.stopPropagation();
+    this.dialog.open(DatasetQueriesManagementModalComponent, {
+      minWidth: '80%',
+      data: {
+        instance,
+        dataSetInstance,
+        dataSources,
+        tableRowsMetadata,
+      },
+    });
+  }
+
+  getTableMetadataReferences(tableRowsMetadata: any): void {
+    this.tableRowsMetadata = tableRowsMetadata;
   }
 }

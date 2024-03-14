@@ -50,7 +50,7 @@ public class DataSetElementsService {
 
     public void addDataSetElements(DataSetElements dataSetElements) {
         UUID uuid = UUID.randomUUID();
-        dataSetElements.setUuid(uuid);
+        dataSetElements.setUuid(uuid.toString());
         dataSetElementsRepository.save(dataSetElements);    
     }
 

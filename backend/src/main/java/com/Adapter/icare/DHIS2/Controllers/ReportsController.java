@@ -107,49 +107,20 @@ public class ReportsController {
     }
 
     @PostMapping("/sendValues")
-    public String SendDataToDHIS(@RequestBody ReportValuesSent reportValuesSent) throws Exception {
+    public String SendDataToDHIS(@RequestBody Map<String, Object> reportData) throws Exception {
 
         DHISConstants constant = new DHISConstants();
-        List<DataValues> dataValues = new ArrayList<DataValues>();
-        List<DataSetElements> dSetElements = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
-        String datasetId = reportValuesSent.getDatasetId();
-        String period = reportValuesSent.getPeriod();
-        String completeDate = java.time.LocalDate.now().toString();
-        String attributeOptCombo = "";
-//        Dhis2Client dhis2Client;
-        //String orgUnitId = constant.OrgUnit; 
-
-        for (DataSetElements dataSetElement : dSetElements) {
-            
-            String dataElementId = dataSetElement.getDataElement();
-            String categoryOptionComboId = dataSetElement.getCategoryOptionCombo();
-            String query = dataSetElement.getSqlQuery();
-            String periodStart = reportValuesSent.getPeriodStart();
-            String periodEnd = reportValuesSent.getPeriodEnd();
-
-            // Query manipulation
-            String newQuery = query.replaceAll("\\$\\{period-start\\}", periodStart).replaceAll("\\$\\{period-end\\}",
-                    periodEnd);
-
-            // Query execution
-            String dataSourceUrl = dataSetElement.getDatasource().getUrl();
-            String dataSourceUserName = dataSetElement.getDatasource().getUsername();
-            String decryptedPassword = EncryptionUtils.decrypt(dataSetElement.getDatasource().getPassword());
-            String dataSourcePassword = decryptedPassword;
-            Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
-            ResultSet rs = con.prepareStatement(newQuery).executeQuery();
-            rs.next();
-            String queryResult = rs.getString(1);
-            
-            //Adding the data values
-            dataValues.add(new DataValues(dataElementId, categoryOptionComboId,queryResult,""));
-            rs.close();
-            con.close();    
+        List<DataValues> dataValues =  (List<DataValues>) reportData.get("dataValues");
+        String datasetUuid = reportData.get("dataSet").toString();
+        String period = reportData.get("period").toString();
+        String attributeOptCombo = null;
+        if (reportData.get("attributeOptCombo") != null) {
+            attributeOptCombo =  reportData.get("attributeOptCombo").toString();
         }
+        String completeDate = java.time.LocalDate.now().toString();
 
-        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetId, completeDate,period, "",attributeOptCombo,dataValues);
-
-        return reportsService.SendDataToDHIS(dhisAggregateValues,datasetId);
+        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetUuid, completeDate,period, "",attributeOptCombo,dataValues);
+        return reportsService.SendDataToDHIS(dhisAggregateValues,datasetUuid);
     }
 
 

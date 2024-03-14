@@ -1,0 +1,131 @@
+<!-- BSD 3-Clause License
+
+Copyright (c) 2022, UDSM DHIS2 Lab Tanzania.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<ng-container *ngIf="{ dataSetQuery: dataSetQuery$ | async } as params">
+  <h2 mat-dialog-title>Dataset Query</h2>
+  <mat-dialog-content class="mat-typography">
+    <mat-progress-bar
+      mode="indeterminate"
+      *ngIf="!params?.dataSetQuery"
+    ></mat-progress-bar>
+
+    <div class="loading-overlay" *ngIf="saving">
+      <div class="text-center">
+        <div><b>Saving .......</b></div>
+        <div class="mt-3 d-flex justify-content-center w-100">
+          <mat-spinner
+            color="primary"
+            diameter="80"
+            strokeWidth="2"
+          ></mat-spinner>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-100" *ngIf="!saving && params.dataSetQuery">
+      <div class="row">
+        <div class="col-10">
+          <mat-form-field class="mt-control">
+            <mat-label>Choose a Source: </mat-label>
+            <mat-select
+              [value]="selectedSource"
+              name="source"
+              (selectionChange)="onDataSourceSelection($event)"
+            >
+              <mat-option> </mat-option>
+              <mat-option
+                *ngFor="let source of data.dataSources"
+                [value]="source?.uuid"
+              >
+                {{ source.type }}
+                <span style="font-size: 0.8rem"> ({{ source?.url }})</span>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-2 d-flex justify-content-end">
+          <div>
+            <button mat-stroked-button (click)="onToggleValidate($event)">
+              Validate ouput mapping
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row d-flex justify-content-center">
+        <div
+          class="query-container"
+          [ngClass]="{
+            'col-md-8 col-sm-12 col-sx-12': showValidationContainer,
+            'col-md-12 col-sm-12 col-sx-12': !showValidationContainer
+          }"
+        >
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Query</mat-label>
+            <textarea
+              [value]="
+                params?.dataSetQuery?.sqlQuery
+                  ? params?.dataSetQuery?.sqlQuery
+                  : query
+              "
+              matInput
+              (keyup)="onGetEnteredValue($event)"
+              rows="20"
+              placeholder="SELECT COUNT(*) FROM [table name] WHERE [table name.field] like [condition]"
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <div
+          class="side-validation-container"
+          [ngClass]="{
+            'col-md-4 col-sm-12 col-sx-12': showValidationContainer
+          }"
+          *ngIf="showValidationContainer"
+        >
+          <app-validate-query-outputs-and-dataset-data
+            [query]="query"
+            [tableRowsMetadata]="data?.tableRowsMetadata"
+          ></app-validate-query-outputs-and-dataset-data>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Close</button>
+    <button
+      mat-stroked-button
+      class="ml-2"
+      (click)="onSave($event, params?.dataSetQuery)"
+      cdkFocusInitial
+    >
+      {{ params?.dataSetQuery?.uuid ? "Update" : "Save" }}
+    </button>
+  </mat-dialog-actions>
+</ng-container>

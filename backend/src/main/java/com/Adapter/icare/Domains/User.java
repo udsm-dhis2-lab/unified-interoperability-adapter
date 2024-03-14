@@ -86,7 +86,7 @@ public class User extends BaseEntity implements Serializable {
         User user = new User();
 
         if(userMap.get("uuid") != null){
-            user.setUuid((UUID) userMap.get("uuid"));
+            user.setUuid(userMap.get("uuid").toString());
         }
         if(userMap.get("username") != null){
             user.setUsername(userMap.get("username").toString());
@@ -101,9 +101,6 @@ public class User extends BaseEntity implements Serializable {
             user.setSurname(userMap.get("surname").toString());
         }
         return user;
-
-
-
     }
 
     public Map<String,Object> toMap(){
@@ -169,9 +166,7 @@ public class User extends BaseEntity implements Serializable {
         if(this.getSharing() != null){
             userMap.put("sharing",this.getSharing());
         }
-
         return userMap;
-
     }
 }
 

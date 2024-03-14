@@ -66,7 +66,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   @Output() dataValueUpdate: EventEmitter<any> = new EventEmitter<any>();
   @Output() valueSentToDHIS2: EventEmitter<any> = new EventEmitter<any>();
 
-  @Input() sendingObject: any;
+  @Input() payloadToSend: any;
 
   _htmlMarkup: SafeHtml | undefined;
   hasScriptSet: boolean | undefined;
@@ -171,7 +171,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
     event.stopPropagation();
     this.sendingData = true;
     this.sendingDataResponse$ = this.reportService.sendReport(
-      this.sendingObject
+      this.payloadToSend
     );
 
     this.sendingDataResponse$.subscribe((response) => {

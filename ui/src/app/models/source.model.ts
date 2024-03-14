@@ -36,7 +36,6 @@ export interface QueryData {
   dataset?: DatasetInterface;
 }
 
-
 export interface SourceInterface {
   id?: number;
   type?: string;
@@ -53,6 +52,7 @@ export interface DatasetInterface {
   instances: {
     id?: number;
   };
+  uuid?: string;
   categoryCombo?: any;
   formDesignCode?: string;
   periodType?: string;

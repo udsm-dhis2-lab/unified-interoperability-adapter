@@ -240,12 +240,16 @@ public class DataSetsService {
             System.out.println(e.getMessage());
         }
         UUID uuid = UUID.randomUUID();
-        datasets.setUuid(uuid);
+        datasets.setUuid(uuid.toString());
         return dataSetsRepository.save(datasets);
     }
 
     public Optional<Datasets> GetSingleDataSet(String datasetId) {
         return dataSetsRepository.findById(datasetId);
+    }
+
+    public Datasets getDataSetByUuid(String uuid) {
+        return dataSetsRepository.getDatasetInstanceByUuid(uuid);
     }
 
     public void deleteDataSets(String datasetId)  {
