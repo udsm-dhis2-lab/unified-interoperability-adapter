@@ -50,6 +50,7 @@ public class DatasetQueryController {
         datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSource")).get("uuid").toString()));
         datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
         datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());
+//        System.out.println(datasetQueryMap.get("mappings").toString());
         if (datasetQueryMap.get("uuid") != null) {
             datasetQuery.setUuid(datasetQueryMap.get("uuid").toString());
         }

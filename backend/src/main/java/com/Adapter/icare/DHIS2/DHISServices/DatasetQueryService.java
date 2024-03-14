@@ -33,7 +33,7 @@ public class DatasetQueryService {
 
     public DatasetQuery saveDataSetQuery(DatasetQuery datasetQuery) {
         String uuid;
-        if (datasetQuery.getUuid() != null) {
+        if (datasetQuery.getUuid() == null) {
             uuid = UUID.randomUUID().toString();
         } else {
             uuid = datasetQuery.getUuid().toString();
@@ -47,6 +47,8 @@ public class DatasetQueryService {
         existingDataSetQuery.setSqlQuery(datasetQuery.getSqlQuery().toString());
         existingDataSetQuery.setDataSource(datasetQuery.getDataSource());
         existingDataSetQuery.setInstance(datasetQuery.getInstance());
+        System.out.println(datasetQuery.getMappings());
+        existingDataSetQuery.setMappings(datasetQuery.getMappings());
         return datasetQueryRepository.save(existingDataSetQuery);
 //        return datasetQueryRepository.updateDataSetQuery(datasetQuery.getSqlQuery().toString(), datasetQuery.getDataSource().getId(), datasetQuery.getInstance().getId(), datasetQuery.getUuid());
     }

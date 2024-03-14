@@ -48,7 +48,7 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
 
   onSave(event: Event, savedDataSetQuery: any): void {
     event.stopPropagation();
-    const dataSetQuery = {
+    let dataSetQuery: any = {
       sqlQuery: this.query ? this.query : savedDataSetQuery?.sqlQuery,
       dataSource: {
         uuid: this.selectedSource,
@@ -61,8 +61,10 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
         // TODO: Possible duplicate since dataSetInstance already has instance
         uuid: this.data?.instance?.uuid,
       },
-      uuid: savedDataSetQuery?.uuid ? savedDataSetQuery?.uuid : null,
     };
+    if (savedDataSetQuery?.uuid) {
+      dataSetQuery['uuid'] = savedDataSetQuery?.uuid;
+    }
     this.saving = true;
     this.datasetsService
       .saveDataSetQuery(dataSetQuery)

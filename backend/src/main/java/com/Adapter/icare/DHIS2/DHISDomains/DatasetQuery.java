@@ -6,7 +6,9 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -40,7 +42,7 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
         if(datasetQueryMap.get("uuid") != null) {
             datasetQuery.setUuid(datasetQueryMap.get("uuid").toString());
         }
-        if (datasetQueryMap.get("sql") != null) {
+        if (datasetQueryMap.get("sqlQuery") != null) {
             datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
         }
 
@@ -58,6 +60,7 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
         dataSetsQueries.put("dataSetInstance",this.getDataSet());
         dataSetsQueries.put("instance",this.getInstance());
         dataSetsQueries.put("dataSource", this.getDataSource());
+        dataSetsQueries.put("mappings", this.getMappings());
         return dataSetsQueries;
     }
 }
