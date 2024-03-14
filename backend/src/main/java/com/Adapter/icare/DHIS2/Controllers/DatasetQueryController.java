@@ -37,6 +37,7 @@ public class DatasetQueryController {
         datasetQuery.setInstance(instanceService.getInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("instance")).get("uuid").toString()));
         datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSource")).get("uuid").toString()));
         datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
+        datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());
         datasetQueryService.saveDataSetQuery(datasetQuery);
         return datasetQuery;
     }
@@ -48,6 +49,7 @@ public class DatasetQueryController {
         datasetQuery.setInstance(instanceService.getInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("instance")).get("uuid").toString()));
         datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSource")).get("uuid").toString()));
         datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
+        datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());
         if (datasetQueryMap.get("uuid") != null) {
             datasetQuery.setUuid(datasetQueryMap.get("uuid").toString());
         }

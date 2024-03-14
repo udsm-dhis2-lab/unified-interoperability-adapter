@@ -1,6 +1,5 @@
 package com.Adapter.icare.DHIS2.DHISDomains;
 
-import com.Adapter.icare.DHIS2.DHISServices.DatasetQueryService;
 import com.Adapter.icare.Domains.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,7 +8,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -32,6 +30,9 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
 
     @ManyToOne
     private Datasource dataSource;
+
+    @Lob
+    private String mappings;
 
     public static DatasetQuery fromMap(Map<String, Object> datasetQueryMap) {
         DatasetQuery datasetQuery = new DatasetQuery();

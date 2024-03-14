@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSelectChange } from '@angular/material/select';
 import { Observable, map } from 'rxjs';
 import { DatasetsService } from 'src/app/services/datasets/datasets.service';
+import { flatten } from 'lodash';
 
 @Component({
   selector: 'app-dataset-queries-management-modal',
@@ -55,6 +56,7 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
       dataSetInstance: {
         uuid: this.data?.dataSetInstance?.uuid,
       },
+      mappings: this.getDatasetQueryOutputMapping(this.data?.tableRowsMetadata),
       instance: {
         // TODO: Possible duplicate since dataSetInstance already has instance
         uuid: this.data?.instance?.uuid,
@@ -79,5 +81,28 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
   onToggleValidate(event: Event): void {
     event.stopPropagation();
     this.showValidationContainer = !this.showValidationContainer;
+  }
+
+  getDatasetQueryOutputMapping(tableRowsMetadata: any): string {
+    const mappings: any[] = flatten(
+      tableRowsMetadata
+        .filter((tableRow: any) => tableRow?.queryRowReference > 0)
+        .map((tableRow: any) => {
+          return (
+            tableRow?.cells?.filter(
+              (cell: any) => cell?.queryOutputReference
+            ) || []
+          )?.map((cell: any) => {
+            return {
+              row: tableRow?.queryRowReference,
+              column: cell?.queryOutputReference,
+              de: cell?.id.split('-')[0],
+              co: cell?.id.split('-')[1],
+            };
+          });
+        })
+    );
+
+    return JSON.stringify(mappings);
   }
 }

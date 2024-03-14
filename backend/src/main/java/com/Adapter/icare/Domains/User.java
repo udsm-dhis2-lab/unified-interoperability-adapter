@@ -86,7 +86,7 @@ public class User extends BaseEntity implements Serializable {
         User user = new User();
 
         if(userMap.get("uuid") != null){
-            user.setUuid((UUID) userMap.get("uuid"));
+            user.setUuid(userMap.get("uuid").toString());
         }
         if(userMap.get("username") != null){
             user.setUsername(userMap.get("username").toString());
