@@ -73,18 +73,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         </div>
         <div class="col-2 d-flex justify-content-end">
           <div>
-            <button mat-button (click)="onToggleValidate($event)">
-              Validate
+            <button mat-stroked-button (click)="onToggleValidate($event)">
+              Validate ouput mapping
             </button>
           </div>
         </div>
       </div>
-      <div class="w-100 d-flex justify-content-center">
+      <div class="row d-flex justify-content-center">
         <div
           class="query-container"
           [ngClass]="{
-            'w-50': showValidationContainer,
-            'w-100': !showValidationContainer
+            'col-md-8 col-sm-12 col-sx-12': showValidationContainer,
+            'col-md-12 col-sm-12 col-sx-12': !showValidationContainer
           }"
         >
           <mat-form-field class="w-100" appearance="outline">
@@ -97,14 +97,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               "
               matInput
               (keyup)="onGetEnteredValue($event)"
-              rows="8"
+              rows="20"
               placeholder="SELECT COUNT(*) FROM [table name] WHERE [table name.field] like [condition]"
             ></textarea>
           </mat-form-field>
         </div>
         <div
           class="side-validation-container"
-          [ngClass]="{ 'w-50': showValidationContainer }"
+          [ngClass]="{
+            'col-md-4 col-sm-12 col-sx-12': showValidationContainer
+          }"
           *ngIf="showValidationContainer"
         >
           <app-validate-query-outputs-and-dataset-data
