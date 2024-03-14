@@ -30,6 +30,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import {
   faAdd,
@@ -50,6 +51,8 @@ import { DatasetsService } from 'src/app/services/datasets/datasets.service';
 import { InstanceDatasetsService } from 'src/app/services/instanceDataset/instance-dataset.service';
 import { InstancesService } from 'src/app/services/instances/instances.service';
 import { UiService } from 'src/app/services/ui.service';
+import { LoadingComponent } from 'src/app/shared/loader/loading/loading.component';
+import { SharedConfirmationModalComponent } from 'src/app/shared/modals/shared-confirmation-modal/shared-confirmation-modal.component';
 
 @Component({
   selector: 'app-datasets',
@@ -80,7 +83,8 @@ export class DatasetsComponent implements OnInit {
     private instancesService: InstancesService,
     private instanceDatasetsService: InstanceDatasetsService,
     private uiService?: UiService,
-    private router?: Router
+    private router?: Router,
+    public dialog?: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -113,24 +117,45 @@ export class DatasetsComponent implements OnInit {
     let datasetToDelete = this.datasets?.filter(
       (dataset) => dataset.id === instanceDataset.id
     )[0];
-
-    this.datasetsService.deleteDataset(datasetToDelete!).subscribe({
-      next: () => {
-        this.datasets = this.datasets?.filter(
-          (d: any) => d.id !== datasetToDelete?.id
-        );
-        this.message = 'Dataset removed successfully.';
-        this.messageType = 'success';
-        this.router?.navigate(['/datasets']);
-      },
-      error: (error) => {
-        this.message = error.error.message;
-        this.messageType = 'danger';
-      },
+    const confirmationDialog = this.dialog?.open(
+      SharedConfirmationModalComponent,
+      {
+        minWidth: '30%',
+        data: {
+          title: 'Confirmation',
+          message: `Are you sure you want to remove dataset?`,
+          color: 'primary',
+        },
+        enterAnimationDuration: '1200ms',
+        exitAnimationDuration: '1200ms',
+      }
+    );
+    confirmationDialog?.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        const loadingDialog = this.dialog?.open(LoadingComponent, {
+          width: 'auto',
+          disableClose: true,
+        });
+        this.datasetsService.deleteDataset(datasetToDelete!).subscribe({
+          next: () => {
+            this.datasets = this.datasets?.filter(
+              (d: any) => d.id !== datasetToDelete?.id
+            );
+            loadingDialog?.close();
+            this.message = 'Dataset removed successfully.';
+            this.messageType = 'success';
+            this.router?.navigate(['/datasets']);
+          },
+          error: (error) => {
+            loadingDialog?.close();
+            this.message = error.error.message;
+            this.messageType = 'danger';
+          },
+        });
+      }
     });
     this.message = undefined;
     this.messageType = undefined;
-    
   }
 
   addDataset(instanceDataset: InstanceDatasetsInterface) {
@@ -145,16 +170,40 @@ export class DatasetsComponent implements OnInit {
       formDesignCode: instanceDataset.formDesignCode,
     };
 
-    this.datasetsService.addDataset(datasetObject).subscribe({
-      next: (dataset) => {
-        this.datasets?.push(dataset);
-        this.message = 'Dataset selected successfully.';
-        this.messageType = 'success';
-      },
-      error: (error) => {
-        this.message = error.error.message;
-        this.messageType = 'danger';
-      },
+    const confirmationDialog = this.dialog?.open(
+      SharedConfirmationModalComponent,
+      {
+        minWidth: '30%',
+        data: {
+          title: 'Confirmation',
+          message: `Are you sure you want to select dataset?`,
+          color: 'primary',
+        },
+        enterAnimationDuration: '1200ms',
+        exitAnimationDuration: '1200ms',
+      }
+    );
+    confirmationDialog?.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        const loadingDialog = this.dialog?.open(LoadingComponent, {
+          width: 'auto',
+          disableClose: true,
+        });
+
+        this.datasetsService.addDataset(datasetObject).subscribe({
+          next: (dataset) => {
+            loadingDialog?.close();
+            this.datasets?.push(dataset);
+            this.message = 'Dataset selected successfully.';
+            this.messageType = 'success';
+          },
+          error: (error) => {
+            loadingDialog?.close();
+            this.message = error.error.message;
+            this.messageType = 'danger';
+          },
+        });
+      }
     });
 
     this.message = undefined;
@@ -202,9 +251,7 @@ export class DatasetsComponent implements OnInit {
     }
     this.message = undefined;
     this.messageType = undefined;
-   
   }
- 
 
   datasetExisting(instanceDataset: InstanceDatasetsInterface) {
     return this.datasets?.some((dataset) => dataset.id === instanceDataset.id);
