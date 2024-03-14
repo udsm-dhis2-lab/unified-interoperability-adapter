@@ -50,42 +50,69 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
     </div>
 
-    <div class="w-100" *ngIf="!saving">
-      <mat-form-field class="mt-control">
-        <mat-label>Choose a Source: </mat-label>
-        <mat-select
-          [value]="
-            params?.dataSetQuery?.dataSource
-              ? params?.dataSetQuery?.dataSource?.uuid
-              : selectedSource
-          "
-          name="source"
-          (selectionChange)="onDataSourceSelection($event)"
+    <div class="w-100" *ngIf="!saving && params.dataSetQuery">
+      <div class="row">
+        <div class="col-10">
+          <mat-form-field class="mt-control">
+            <mat-label>Choose a Source: </mat-label>
+            <mat-select
+              [value]="selectedSource"
+              name="source"
+              (selectionChange)="onDataSourceSelection($event)"
+            >
+              <mat-option> </mat-option>
+              <mat-option
+                *ngFor="let source of data.dataSources"
+                [value]="source?.uuid"
+              >
+                {{ source.type }}
+                <span style="font-size: 0.8rem"> ({{ source?.url }})</span>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-2 d-flex justify-content-end">
+          <div>
+            <button mat-button (click)="onToggleValidate($event)">
+              Validate
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="w-100 d-flex justify-content-center">
+        <div
+          class="query-container"
+          [ngClass]="{
+            'w-50': showValidationContainer,
+            'w-100': !showValidationContainer
+          }"
         >
-          <mat-option> </mat-option>
-          <mat-option
-            *ngFor="let source of data.dataSources"
-            [value]="source?.uuid"
-          >
-            {{ source.type }}
-            <span style="font-size: 0.8rem"> ({{ source?.url }})</span>
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-      <mat-form-field class="w-100" appearance="outline">
-        <mat-label>Query</mat-label>
-        <textarea
-          [value]="
-            params?.dataSetQuery?.sqlQuery
-              ? params?.dataSetQuery?.sqlQuery
-              : query
-          "
-          matInput
-          (keyup)="onGetEnteredValue($event)"
-          rows="8"
-          placeholder="SELECT COUNT(*) FROM [table name] WHERE [table name.field] like [condition]"
-        ></textarea>
-      </mat-form-field>
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>Query</mat-label>
+            <textarea
+              [value]="
+                params?.dataSetQuery?.sqlQuery
+                  ? params?.dataSetQuery?.sqlQuery
+                  : query
+              "
+              matInput
+              (keyup)="onGetEnteredValue($event)"
+              rows="8"
+              placeholder="SELECT COUNT(*) FROM [table name] WHERE [table name.field] like [condition]"
+            ></textarea>
+          </mat-form-field>
+        </div>
+        <div
+          class="side-validation-container"
+          [ngClass]="{ 'w-50': showValidationContainer }"
+          *ngIf="showValidationContainer"
+        >
+          <app-validate-query-outputs-and-dataset-data
+            [query]="query"
+            [tableRowsMetadata]="data?.tableRowsMetadata"
+          ></app-validate-query-outputs-and-dataset-data>
+        </div>
+      </div>
     </div>
   </mat-dialog-content>
   <mat-dialog-actions align="end">

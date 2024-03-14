@@ -69,6 +69,8 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
   @Input() dataset: DatasetInterface | undefined;
 
   @Output() dataValueUpdate: EventEmitter<any> = new EventEmitter<any>();
+  @Output() tableMetadataReferences: EventEmitter<any> =
+    new EventEmitter<any>();
 
   _htmlMarkup: SafeHtml | undefined;
   hasScriptSet: boolean | undefined;
@@ -182,12 +184,14 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
     //   }
     // });
     let dataRows = [];
+    let rowsForQueryOutputReference: number = 0;
     document
       .querySelectorAll('tr')
       .forEach((tr: HTMLTableRowElement, index: number) => {
         // console.log(tr);
         let dataRow = {};
         let cells: any[] = [];
+        let countStartingFromFirstCellWithId: number = 0;
         tr.querySelectorAll('td').forEach(
           (td: HTMLTableCellElement, cellIndex: number) => {
             let cellData: any = {};
@@ -197,15 +201,36 @@ export class CustomFormComponent implements OnInit, AfterViewInit {
             cellData['id'] = td.children[0]
               ? td.children[0].getAttribute('id')
               : '';
+
+            if (cellData['id'] && cellData['id'].length > 0) {
+              if (countStartingFromFirstCellWithId === 0) {
+                countStartingFromFirstCellWithId =
+                  countStartingFromFirstCellWithId + 1;
+              }
+              cellData['queryOutputReference'] =
+                countStartingFromFirstCellWithId;
+            }
+            if (countStartingFromFirstCellWithId > 0) {
+              countStartingFromFirstCellWithId =
+                countStartingFromFirstCellWithId + 1;
+            }
+
+            cellData['colSpan'] = td.colSpan;
+            cellData['rowSpan'] = td.rowSpan;
+            cellData['innerText'] = td.innerText;
             cells.push(cellData);
           }
         );
+        if (countStartingFromFirstCellWithId > 0) {
+          rowsForQueryOutputReference = rowsForQueryOutputReference + 1;
+        }
 
-        dataRow['index'] = index;
+        dataRow['row'] = index + 1;
         dataRow['cells'] = cells;
+        dataRow['queryRowReference'] = rowsForQueryOutputReference;
         dataRows.push(dataRow);
-        console.log(dataRows);
       });
+    this.tableMetadataReferences.emit(dataRows);
     document.getElementsByName('entryfield').forEach((element) => {
       if (element) {
         element.addEventListener('click', (event) => {

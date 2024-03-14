@@ -1,0 +1,29 @@
+<table class="table table-bordered">
+  <tbody>
+    <tr *ngFor="let row of tableRowsMetadata">
+      <td
+        [attr.rowspan]="cell?.rowSpan"
+        [attr.colspan]="cell?.colSpan"
+        *ngFor="let cell of row?.cells"
+        [ngClass]="{
+          'mapped-cell':
+            row?.queryRowReference &&
+            cell?.queryOutputReference &&
+            keyedQueryOutputsReferences[
+              row?.queryRowReference + '-' + cell?.queryOutputReference
+            ]
+        }"
+      >
+        <span *ngIf="cell?.id">
+          <input
+            disabled="disabled"
+            [value]="row?.queryRowReference + '-' + cell?.queryOutputReference"
+          />
+        </span>
+        <span *ngIf="cell?.innerText">
+          {{ cell?.innerText }}
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>

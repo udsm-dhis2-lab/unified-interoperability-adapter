@@ -14,13 +14,14 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
   selectedSource: string;
   saving: boolean = false;
   dataSetQuery$: Observable<any>;
+  showValidationContainer: boolean = false;
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: any,
     private datasetsService: DatasetsService
   ) {}
 
   ngOnInit(): void {
-    // console.log(this.data);
+    console.log(this.data);
     this.getDataSetQuery();
   }
 
@@ -28,6 +29,12 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
     this.dataSetQuery$ = this.datasetsService
       .getDataSetQueries(['dataSet=' + this.data?.dataSetInstance?.uuid])
       .pipe(map((responses: any[]) => responses[0] || {}));
+    this.dataSetQuery$.subscribe((response: any) => {
+      if (response) {
+        this.query = response?.sqlQuery;
+        this.selectedSource = response?.dataSource?.uuid;
+      }
+    });
   }
 
   onGetEnteredValue(event: KeyboardEvent): void {
@@ -59,6 +66,7 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
       .saveDataSetQuery(dataSetQuery)
       .subscribe((response: any) => {
         if (response) {
+          this.getDataSetQuery();
           this.saving = false;
         } else {
           //TODO: Handle errors
@@ -66,5 +74,10 @@ export class DatasetQueriesManagementModalComponent implements OnInit {
           this.saving = false;
         }
       });
+  }
+
+  onToggleValidate(event: Event): void {
+    event.stopPropagation();
+    this.showValidationContainer = !this.showValidationContainer;
   }
 }

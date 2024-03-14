@@ -153,14 +153,16 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               !params?.interoperabilityInstances ||
               !params?.dataSources ||
               !instance ||
-              !dataset
+              !dataset ||
+              !tableRowsMetadata
             "
             (click)="
               onOpenMappingQueries(
                 $event,
                 instance,
                 dataset,
-                params?.dataSources
+                params?.dataSources,
+                tableRowsMetadata
               )
             "
           >
@@ -205,6 +207,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             [sources]="sources"
             [dataset]="dataset"
             (dataValueUpdate)="changesOnDataValue($event)"
+            (tableMetadataReferences)="getTableMetadataReferences($event)"
           >
           </app-custom-form>
         </div>

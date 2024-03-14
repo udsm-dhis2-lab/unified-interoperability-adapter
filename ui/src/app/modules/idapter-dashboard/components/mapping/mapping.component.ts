@@ -66,6 +66,7 @@ export class MappingComponent implements OnInit {
   source: SourceInterface | undefined;
   formAttribute: any | undefined;
   isFormReady: boolean = false;
+  tableRowsMetadata: any;
 
   @Output() onViewDataset = new EventEmitter();
 
@@ -208,7 +209,8 @@ export class MappingComponent implements OnInit {
     event: Event,
     instance: any,
     dataSetInstance: any,
-    dataSources: any[]
+    dataSources: any[],
+    tableRowsMetadata: any
   ): void {
     event.stopPropagation();
     this.dialog.open(DatasetQueriesManagementModalComponent, {
@@ -217,7 +219,12 @@ export class MappingComponent implements OnInit {
         instance,
         dataSetInstance,
         dataSources,
+        tableRowsMetadata,
       },
     });
+  }
+
+  getTableMetadataReferences(tableRowsMetadata: any): void {
+    this.tableRowsMetadata = tableRowsMetadata;
   }
 }

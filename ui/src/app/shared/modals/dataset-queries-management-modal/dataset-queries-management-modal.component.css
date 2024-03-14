@@ -1,0 +1,5 @@
+.side-validation-container {
+  height: 60vh;
+  overflow: auto;
+  padding: 8px;
+}
