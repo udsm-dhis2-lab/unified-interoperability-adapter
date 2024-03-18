@@ -147,6 +147,9 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       </div>
       <div class="row mt-2">
         <div class="col-12 d-flex justify-content-end">
+          <button (click)="onDownload($event, instance)" [disabled]="!instance">
+            Download
+          </button>
           <button
             mat-stroked-button
             [disabled]="

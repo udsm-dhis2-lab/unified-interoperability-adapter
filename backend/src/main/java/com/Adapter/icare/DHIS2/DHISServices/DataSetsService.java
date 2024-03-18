@@ -251,6 +251,9 @@ public class DataSetsService {
     public Datasets getDataSetByUuid(String uuid) {
         return dataSetsRepository.getDatasetInstanceByUuid(uuid);
     }
+    public Datasets getDataSetInstanceByDataSetId(String id) {
+        return dataSetsRepository.getDatasetInstanceById(id);
+    }
 
     public void deleteDataSets(String datasetId)  {
 

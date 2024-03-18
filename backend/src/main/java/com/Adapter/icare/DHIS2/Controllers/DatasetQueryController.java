@@ -4,14 +4,22 @@ import com.Adapter.icare.DHIS2.DHISDomains.DatasetQuery;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
 import com.Adapter.icare.DHIS2.DHISServices.DatasetQueryService;
 import com.Adapter.icare.Domains.Datasets;
+import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Services.DatasourceService;
 import com.Adapter.icare.Services.InstanceService;
 import com.Adapter.icare.Utils.EncryptionUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 @RestController
 @RequestMapping("/api/v1/dataSetQueries")
@@ -84,6 +94,50 @@ public class DatasetQueryController {
     public DatasetQuery getDataSetQueryByUuid(@PathVariable("uuid" ) String uuid) {
         return datasetQueryService.getDataSetQueryByUuid(uuid);
     }
+
+    @GetMapping()
+    public List<Map<String, Object>> downloadDataSetQueriesAsZip(@RequestParam(name="instance", required = true) String instance) throws Exception {
+        String uuid = instance;
+        Instances instanceData = instanceService.getInstanceByUuid(uuid);
+
+//        response.setContentType("application/zip");
+//        response.setHeader("Content-Disposition", "attachment; filename=\"dataset_queries_by_instance.zip\"");
+
+        List<DatasetQuery> datasetQueries = datasetQueryService.getDataSetQueriesByInstanceId(instanceData);
+        List<Map<String, Object>> datasetQueriesData = new ArrayList<>();
+        for(DatasetQuery datasetQuery: datasetQueries) {
+            Map<String, Object> datasetQueryInfo = new HashMap<>();
+            datasetQueryInfo.put("sqlQuery", datasetQuery.getSqlQuery().toString());
+            datasetQueryInfo.put("uuid", datasetQuery.getUuid());
+            datasetQueryInfo.put("dataSetUuid",datasetQuery.getDataSet().getId());
+            datasetQueryInfo.put("mappings", datasetQuery.getMappings());
+            datasetQueriesData.add(datasetQueryInfo);
+        }
+//        String dataForQuery = new ObjectMapper().writeValueAsString(datasetQueriesData);
+//        String fileName = "datasetquery.zip";
+//        String jsonName = "datasetquery.json";
+//        byte[] data = dataForQuery.getBytes();
+//        byte[] bytes;
+//        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+//            zipOutputStream.setLevel(1);
+//            ZipEntry ze = new ZipEntry(jsonName);
+//            ze.setSize(data.length);
+//            zipOutputStream.putNextEntry(ze);
+//            zipOutputStream.write(data);
+//            zipOutputStream.closeEntry();
+//            bytes = byteArrayOutputStream.toByteArray();
+//        }
+//        response.setContentType("application/zip");
+//        response.setContentLength(bytes.length);
+//        response.setHeader("Content-Disposition", "attachment; "
+//                        + String.format("filename*=" + StandardCharsets.UTF_8.name() + "''%s", fileName));
+//        ServletOutputStream outputStream = response.getOutputStream();
+//        FileCopyUtils.copy(bytes, outputStream);
+//        outputStream.close();
+        return datasetQueriesData;
+    }
+
     @PostMapping("/{uuid}/generate")
     public List<Map<String, Object>> generatePayloadFromDataSetQuery(@PathVariable("uuid" ) String uuid, @RequestBody Map<String, Object> dataRequestPayload) throws Exception {
         DatasetQuery datasetQuery = datasetQueryService.getDataSetQueryByUuid(uuid);
@@ -101,9 +155,9 @@ public class DatasetQueryController {
 
         int numCols = metadata.getColumnCount();
         List<String> colNames = IntStream.range(0, numCols)
-        .mapToObj(i -> {
+        .mapToObj(index -> {
             try {
-                return metadata.getColumnName(i + 1);
+                return metadata.getColumnName(index + 1);
             } catch (SQLException e) {
                 e.printStackTrace();
                 return "?";
@@ -113,9 +167,9 @@ public class DatasetQueryController {
         List<Map<String, Object>> results = new ArrayList<>();
         while (resultSet.next()) {
             Map<String, Object> row = new HashMap<>();
-            colNames.forEach(cn -> {
+            colNames.forEach(columnName -> {
                 try {
-                    row.put(cn, resultSet.getObject(cn));
+                    row.put(columnName, resultSet.getObject(columnName));
                 } catch (JSONException | SQLException e) {
                     e.printStackTrace();
                 }
@@ -124,11 +178,11 @@ public class DatasetQueryController {
         }
 
         List<Map<String, Object>> formattedResults = new ArrayList<>();
-        JSONArray array = new JSONArray(mappings);
-        for(int i=0; i < array.length(); i++)
+        JSONArray mappingsArray = new JSONArray(mappings);
+        for(int count=0; count < mappingsArray.length(); count++)
         {
             Map<String, Object> formattedResult = new HashMap<>();
-            JSONObject object = array.getJSONObject(i);
+            JSONObject object = mappingsArray.getJSONObject(count);
             Integer row = object.getInt("row");
             Integer column = object.getInt("column");
             String key = row+ "-" + column;
@@ -145,6 +199,25 @@ public class DatasetQueryController {
             }
         }
         return formattedResults;
+    }
+
+    @PostMapping("/import")
+    public List<Map<String, Object>> importDataSetQueries(@RequestBody Map<String, Object> datasetQueryImportMap) throws Exception {
+        //Manipulating the received request
+        List<Map<String, Object>> dataSetQueryImportResponses = new ArrayList<>();
+        for(Map<String, Object> datasetQueryMap: (List<Map<String, Object>>) datasetQueryImportMap.get("dataSetQueries")) {
+            DatasetQuery datasetQuery = new DatasetQuery();
+            Datasets dataset = dataSetsService.getDataSetInstanceByDataSetId(datasetQueryMap.get("dataSetUuid").toString());
+            datasetQuery.setDataSet(dataset);
+            datasetQuery.setInstance(dataset.getInstances());
+            datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryImportMap.get("dataSource")).get("uuid").toString()));
+            datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
+            datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());
+            datasetQuery.setUuid(datasetQueryMap.get("uuid").toString());
+            Map<String, Object> response = datasetQueryService.saveDataSetQuery(datasetQuery).toMap();
+            dataSetQueryImportResponses.add(response);
+        }
+        return dataSetQueryImportResponses;
     }
 
 }

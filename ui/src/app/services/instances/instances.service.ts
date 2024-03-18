@@ -31,7 +31,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap } from 'rxjs';
 import { InstanceInterface } from '../../resources/interfaces';
 @Injectable({
   providedIn: 'root',
@@ -103,6 +103,13 @@ export class InstancesService {
       this.reportsApiUrl + '/verifyCode',
       parameters,
       this.httpOptions
+    );
+  }
+
+  getDataSetQueriesByInstanceUuid(uuid: string): Observable<any> {
+    return this.httpClient.get(`./api/v1/dataSetQueries?instance=${uuid}`).pipe(
+      map((response: any) => response),
+      catchError((error: any) => of(error))
     );
   }
 }

@@ -68,6 +68,17 @@
   </li>
   <li class="nav-item active">
     <button
+      mat-icon-button
+      class="nav-link"
+      [ngClass]="{ 'active-route': selectedRoute === 'dashboard/reports' }"
+      (click)="onChangeRoute($event, 'dashboard/reports')"
+    >
+      <mat-icon style="font-size: 20px"> file_copy </mat-icon>
+      <span style="margin-left: 6px">Import/Export </span>
+    </button>
+  </li>
+  <li class="nav-item active">
+    <button
       disabled="true"
       mat-icon-button
       class="nav-link"

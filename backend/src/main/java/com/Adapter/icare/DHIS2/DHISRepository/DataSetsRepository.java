@@ -41,4 +41,6 @@ public interface DataSetsRepository extends JpaRepository<Datasets,String> {
 
     @Query(value = "SELECT * FROM datasets WHERE uuid=:uuid",nativeQuery = true)
     Datasets getDatasetInstanceByUuid(String uuid);
+    @Query(value = "SELECT * FROM datasets WHERE id=:id",nativeQuery = true)
+    Datasets getDatasetInstanceById(String id);
 }

@@ -227,4 +227,37 @@ export class MappingComponent implements OnInit {
   getTableMetadataReferences(tableRowsMetadata: any): void {
     this.tableRowsMetadata = tableRowsMetadata;
   }
+
+  onDownload(event: Event, instance: any): void {
+    event.stopPropagation();
+    this.instancesService
+      .getDataSetQueriesByInstanceUuid(instance?.uuid)
+      .subscribe((response: any) => {
+        this.downloadFile(response);
+      });
+  }
+
+  private downloadFile(data: any[]): void {
+    let jsonData = JSON.stringify(data);
+    console.log(jsonData);
+
+    //Convert JSON string to BLOB.
+    let jsonDataBlob = [jsonData];
+    var blob1 = new Blob(jsonDataBlob, { type: 'text/plain;charset=utf-8' });
+
+    //Check the Browser.
+    let isIE = false;
+    if (isIE) {
+      // window.navigator.msSaveBlob(blob1, "datasetqueries.json");
+    } else {
+      let url = window.URL || window.webkitURL;
+      let link = url.createObjectURL(blob1);
+      let a = document.createElement('a');
+      a.download = 'datasetqueries.json';
+      a.href = link;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+  }
 }

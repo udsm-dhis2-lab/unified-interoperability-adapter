@@ -108,8 +108,6 @@ public class ReportsController {
 
     @PostMapping("/sendValues")
     public String SendDataToDHIS(@RequestBody Map<String, Object> reportData) throws Exception {
-
-        DHISConstants constant = new DHISConstants();
         List<DataValues> dataValues =  (List<DataValues>) reportData.get("dataValues");
         String datasetUuid = reportData.get("dataSet").toString();
         String period = reportData.get("period").toString();
