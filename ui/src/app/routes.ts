@@ -44,4 +44,11 @@ export const appRoutes: Routes = [
         (m) => m.IAdapterDashboardModule
       ),
   },
+  {
+    path: 'import-export',
+    loadChildren: () =>
+      import('./modules/import-export/import-export.module').then(
+        (m) => m.ImportExportModule
+      ),
+  },
 ];
