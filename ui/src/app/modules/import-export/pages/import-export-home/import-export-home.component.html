@@ -103,7 +103,20 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
       <div class="col-12">
         <p>Import export works!</p>
+        <!-- <select (change)="onInstanceSelect($event.target.value)">
+          <option *ngFor="let instance of instances$ | async" [value]="instance.uuid">{{ instance.name }}</option>
+        </select> -->
+
+
+        <select (change)="onInstanceSelect($event)">
+          <option *ngFor="let instance of instances$ | async" [value]="instance.uuid">{{ instance.name }}</option>
+        </select><br>
+        
+
+        <button (click)="onDownload($event, instances$)">Export Data</button>    
+
       </div>
+      
     </div>
   </div>
 </div>
