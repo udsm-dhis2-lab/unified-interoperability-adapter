@@ -12,11 +12,14 @@ export class ImportExportHomeComponent implements OnInit {
   showSideMenu: boolean = true;
   currentUser$: Observable<any> | undefined;
   instances$: Observable<any>;
+  selectedInstance: any;
 
   constructor(
     private router: Router,
     private instancesService: InstancesService
-  ) {}
+  ) {
+    this.instances$ = this.instancesService.getInstances(); 
+  }
 
   ngOnInit() {
     this.currentUser$ = of({
@@ -33,6 +36,13 @@ export class ImportExportHomeComponent implements OnInit {
 
   onLogout(): void {
     this.router.navigate(['/login']);
+  }
+
+  onInstanceSelect(event: any): void {
+    const selectedUuid = event.target.value;
+    this.instances$.subscribe(instances => {
+      this.selectedInstance = instances.find(instance => instance.uuid === selectedUuid);
+    });
   }
 
   onDownload(event: Event, instance: any): void {
