@@ -108,6 +108,7 @@ export class InstancesService {
 
   getDataSetQueriesByInstanceUuid(uuid: string): Observable<any> {
     return this.httpClient.get(`./api/v1/dataSetQueries?instance=${uuid}`).pipe(
+      
       map((response: any) => response),
       catchError((error: any) => of(error))
     );

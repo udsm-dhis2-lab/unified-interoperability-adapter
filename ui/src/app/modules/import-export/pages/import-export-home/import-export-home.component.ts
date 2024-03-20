@@ -8,6 +8,8 @@ import { InstancesService } from 'src/app/services/instances/instances.service';
   templateUrl: './import-export-home.component.html',
   styleUrls: ['./import-export-home.component.css'],
 })
+
+
 export class ImportExportHomeComponent implements OnInit {
   showSideMenu: boolean = true;
   currentUser$: Observable<any> | undefined;
@@ -18,7 +20,7 @@ export class ImportExportHomeComponent implements OnInit {
     private router: Router,
     private instancesService: InstancesService
   ) {
-    this.instances$ = this.instancesService.getInstances(); 
+   
   }
 
   ngOnInit() {
@@ -39,11 +41,14 @@ export class ImportExportHomeComponent implements OnInit {
   }
 
   onInstanceSelect(event: any): void {
-    const selectedUuid = event.target.value;
-    this.instances$.subscribe(instances => {
-      this.selectedInstance = instances.find(instance => instance.uuid === selectedUuid);
+    const selectedUuid = event.value;
+    this.instances$.subscribe((instances) => {
+      this.selectedInstance = instances.find(
+        (instance) => instance.uuid === selectedUuid
+      );
     });
   }
+  
 
   onDownload(event: Event, instance: any): void {
     event.stopPropagation();
