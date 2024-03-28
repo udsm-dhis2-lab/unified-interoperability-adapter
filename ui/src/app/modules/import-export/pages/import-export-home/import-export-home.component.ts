@@ -47,8 +47,6 @@ export class ImportExportHomeComponent implements OnInit {
     });
   }
 
-
-
   onDownload(event: Event, instance: any): void {
     event.stopPropagation();
     this.instancesService
@@ -60,12 +58,12 @@ export class ImportExportHomeComponent implements OnInit {
   }
   private downloadFile(data: any[]): void {
     let jsonData = JSON.stringify(data);
-    //Convert JSON string to BLOB.
+
     let blodData = new Blob([jsonData], { type: 'text/plain;charset=utf-8' });
-    //Check the Browser.
+    
     let isIE = false;
+
     if (isIE) {
-      // window.navigator.msSaveBlob(blob1, "datasetqueries.json");
     } else {
       let url = window.URL || window.webkitURL;
       let link = url.createObjectURL(blodData);
