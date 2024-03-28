@@ -95,14 +95,14 @@ export class ImportExportHomeComponent implements OnInit {
       if (fileContent) {
         const jsonContent: any = JSON.parse(fileContent.toString());
         console.log('JSON file content:', jsonContent);
-        // You can process the JSON content here
+        
       }
     };
     reader.readAsText(file);
   }
 
   startImport(): void {
-    // Add your import logic here
+    // import logic here
   }
 
 }
