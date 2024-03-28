@@ -141,6 +141,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 style="display: none"
                 (change)="onFileSelected($event)"
               />
+              <mat-form-field class="w-100" appearance="outline">
+                <mat-label>Instance: </mat-label>
+                <mat-select (selectionChange)="onInstanceSelect($event)">
+                  <mat-option
+                    *ngFor="let instance of instances$ | async"
+                    [value]="instance.uuid"
+                  >
+                    {{ instance.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              
               <button mat-raised-button (click)="fileInput.click()">
                 -- Select JSON File --
               </button>
@@ -155,6 +167,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
             </div>
           </div>
         </mat-card>
+
+        
       </div>
     </div>
   </div>
