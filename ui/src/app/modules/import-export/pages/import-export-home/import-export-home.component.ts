@@ -20,9 +20,8 @@ export class ImportExportHomeComponent implements OnInit {
     private router: Router,
     private instancesService: InstancesService
   ) {
-   
-  }
 
+  }
   ngOnInit() {
     this.currentUser$ = of({
       displayName: 'Testing Admin',
@@ -35,7 +34,6 @@ export class ImportExportHomeComponent implements OnInit {
     event.stopPropagation();
     this.showSideMenu = !this.showSideMenu;
   }
-
   onLogout(): void {
     this.router.navigate(['/login']);
   }
@@ -48,23 +46,22 @@ export class ImportExportHomeComponent implements OnInit {
       );
     });
   }
-  
+
+
 
   onDownload(event: Event, instance: any): void {
     event.stopPropagation();
     this.instancesService
       .getDataSetQueriesByInstanceUuid(instance?.uuid)
       .subscribe((response: any) => {
+        console.log("this is data", instance);
         this.downloadFile(response);
       });
   }
-
   private downloadFile(data: any[]): void {
     let jsonData = JSON.stringify(data);
-
     //Convert JSON string to BLOB.
     let blodData = new Blob([jsonData], { type: 'text/plain;charset=utf-8' });
-
     //Check the Browser.
     let isIE = false;
     if (isIE) {
@@ -80,4 +77,32 @@ export class ImportExportHomeComponent implements OnInit {
       document.body.removeChild(a);
     }
   }
+
+
+
+
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.readFile(file);
+    }
+  }
+
+  readFile(file: File): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const fileContent: string | ArrayBuffer | null = reader.result;
+      if (fileContent) {
+        const jsonContent: any = JSON.parse(fileContent.toString());
+        console.log('JSON file content:', jsonContent);
+        // You can process the JSON content here
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  startImport(): void {
+    // Add your import logic here
+  }
+
 }
