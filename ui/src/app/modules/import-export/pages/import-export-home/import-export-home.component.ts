@@ -8,20 +8,18 @@ import { InstancesService } from 'src/app/services/instances/instances.service';
   templateUrl: './import-export-home.component.html',
   styleUrls: ['./import-export-home.component.css'],
 })
-
-
 export class ImportExportHomeComponent implements OnInit {
   showSideMenu: boolean = true;
   currentUser$: Observable<any> | undefined;
   instances$: Observable<any>;
   selectedInstance: any;
-
+  selectedFileName: string | undefined;
+  downloadInProgress: boolean = false;
+  fileInput: HTMLInputElement | undefined;
   constructor(
     private router: Router,
     private instancesService: InstancesService
-  ) {
-
-  }
+  ) {}
   ngOnInit() {
     this.currentUser$ = of({
       displayName: 'Testing Admin',
@@ -52,7 +50,7 @@ export class ImportExportHomeComponent implements OnInit {
     this.instancesService
       .getDataSetQueriesByInstanceUuid(instance?.uuid)
       .subscribe((response: any) => {
-        console.log("this is data", instance);
+        console.log('this is data', instance);
         this.downloadFile(response);
       });
   }
@@ -60,7 +58,7 @@ export class ImportExportHomeComponent implements OnInit {
     let jsonData = JSON.stringify(data);
 
     let blodData = new Blob([jsonData], { type: 'text/plain;charset=utf-8' });
-    
+
     let isIE = false;
 
     if (isIE) {
@@ -76,9 +74,6 @@ export class ImportExportHomeComponent implements OnInit {
     }
   }
 
-
-
-
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
@@ -93,14 +88,26 @@ export class ImportExportHomeComponent implements OnInit {
       if (fileContent) {
         const jsonContent: any = JSON.parse(fileContent.toString());
         console.log('JSON file content:', jsonContent);
-        
+        // You can process the JSON content here
       }
     };
     reader.readAsText(file);
   }
 
-  startImport(): void {
-    // import logic here
+  startImport(): void {}
+  handleFileSelection(): void {
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
   }
-
+  handleFileChange(event: Event): string | null {
+    const fileInput = event.target as HTMLInputElement;
+    const file = fileInput.files?.[0];
+    if (file && file.type === 'application/json') {
+      return file.name;
+    } else {
+      return null;
+    }
+  }
 }
