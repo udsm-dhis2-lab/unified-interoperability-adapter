@@ -120,55 +120,44 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
               <button
                 mat-raised-button
                 color="primary"
-                style="margin-left: 10px"
+                style="margin-right: 10px"
                 (click)="
                   selectedInstance && onDownload($event, selectedInstance)
                 "
+                [disabled]="!selectedInstance || selectedFileName "
               >
                 <mat-icon>cloud_download</mat-icon> Export
               </button>
-            </div>
-          </div>
-        </mat-card>
 
-        <mat-card class="mt-3">
-          <div class="row">
-            <div class="col-12">
+           
+
+              <button mat-raised-button (click)="handleFileSelection()">
+                <mat-icon class="mat-primary">attach_file</mat-icon>
+
+                {{ selectedFileName || "Choose JSON File" }}
+              </button> 
+
+
               <input
+                id="fileInput"
                 type="file"
-                #fileInput
                 accept=".json"
                 style="display: none"
-                (change)="onFileSelected($event)"
+                (change)="selectedFileName = handleFileChange($event)"
               />
-              <mat-form-field class="w-100" appearance="outline">
-                <mat-label>Instance: </mat-label>
-                <mat-select (selectionChange)="onInstanceSelect($event)">
-                  <mat-option
-                    *ngFor="let instance of instances$ | async"
-                    [value]="instance.uuid"
-                  >
-                    {{ instance.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-              
-              <button mat-raised-button (click)="fileInput.click()">
-                -- Select JSON File --
-              </button>
+
               <button
                 mat-raised-button
                 color="primary"
                 style="margin-left: 10px"
-                (click)="startImport()"
+                (click)="selectedInstance && startImport()"
+                [disabled]="!selectedFileName"
               >
                 <mat-icon>cloud_upload</mat-icon> Import
               </button>
             </div>
           </div>
         </mat-card>
-
-        
       </div>
     </div>
   </div>

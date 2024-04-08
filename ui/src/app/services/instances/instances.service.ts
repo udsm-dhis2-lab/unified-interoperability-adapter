@@ -113,4 +113,22 @@ export class InstancesService {
       catchError((error: any) => of(error))
     );
   }
+
+  // postDataSetQueriesByInstanceUuid(uuid: string): Observable<any> {
+  //   const requestBody = { instance: uuid };
+  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+  
+  //   return this.httpClient.post('./api/v1/dataSetQueries', requestBody, { headers }).pipe(
+  //     catchError((error: any) => of(error))
+  //   );
+  // }
+  postDataSetQueriesByInstanceUuid(uuid: string, requestBody: any): Observable<any> {
+    const headers = new HttpHeaders();
+    // Add any headers if needed
+
+    return this.httpClient.post(`./api/v1/dataSetQueries?instance=${uuid}`, requestBody, { headers }).pipe(
+      catchError((error: any) => of(error))
+    );
+  }
+  
 }
