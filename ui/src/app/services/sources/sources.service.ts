@@ -31,43 +31,49 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { SourceInterface } from 'src/app/models/source.model';
-
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-  }),
-};
 
 @Injectable({
   providedIn: 'root',
 })
 export class SourcesService {
   private apiUrl = './api/v1/datasource';
+  httpOptions: any;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
+      }),
+    };
+  }
 
   //Using Observables to create a service instance
   getSources(): Observable<SourceInterface[]> {
-    return this.httpClient.get<SourceInterface[]>(this.apiUrl);
+    return this.httpClient
+      .get<SourceInterface[]>(this.apiUrl, this.httpOptions)
+      .pipe(map((response: any) => response));
   }
 
   deleteSource(source: SourceInterface): Observable<SourceInterface> {
     const url = `${this.apiUrl}/${source.id}`;
-    return this.httpClient.delete<SourceInterface>(url);
+    return this.httpClient
+      .delete<SourceInterface>(url, this.httpOptions)
+      .pipe(map((response: any) => response));
   }
 
   updateSourceActivate(source: SourceInterface): Observable<SourceInterface> {
     const url = `${this.apiUrl}`;
-    return this.httpClient.put<SourceInterface>(url, source, httpOptions);
+    return this.httpClient
+      .put<SourceInterface>(url, source, this.httpOptions)
+      .pipe(map((response: any) => response));
   }
 
   addSource(source: SourceInterface): Observable<SourceInterface> {
-    return this.httpClient.post<SourceInterface>(
-      this.apiUrl,
-      source,
-      httpOptions
-    );
+    return this.httpClient
+      .post<SourceInterface>(this.apiUrl, source, this.httpOptions)
+      .pipe(map((response: any) => response));
   }
 }

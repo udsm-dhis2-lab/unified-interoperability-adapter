@@ -35,12 +35,8 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -83,7 +79,7 @@ public class DataSetsService {
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
 
-            url = new URL(instanceurl.concat("/api/dataSets"));
+            url = new URL(instanceurl.concat("/api/dataSets?fields=id,code,shortName,name,displayName,formType,version,timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size"));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
 
@@ -102,6 +98,7 @@ public class DataSetsService {
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
+            System.out.println(jsObject);
             JSONArray js = jsObject.getJSONArray("dataSets"); 
             //System.out.println(js);
 
@@ -114,6 +111,54 @@ public class DataSetsService {
                 Map<String, Object> remoteDataSetMap = new HashMap<String, Object>();
                 remoteDataSetMap.put("id", ourDsObject.getString("id"));
                 remoteDataSetMap.put("displayName", ourDsObject.getString("displayName"));
+
+                if(ourDsObject.has("formType")){
+                    remoteDataSetMap.put("formType", ourDsObject.getString("formType"));
+                }
+
+                if(ourDsObject.has("code")){
+                    remoteDataSetMap.put("code", ourDsObject.getString("code"));
+                }
+                if(ourDsObject.has("shortName")){
+                    remoteDataSetMap.put("shortName",ourDsObject.getString("shortName"));
+                }
+
+                if(ourDsObject.has("periodType")){
+                    remoteDataSetMap.put("periodType",ourDsObject.getString("periodType"));
+                }
+
+                if(ourDsObject.has("dataSetElements")){
+                    remoteDataSetMap.put("dataSetElements",ourDsObject.getInt("dataSetElements"));
+                }
+
+                if(ourDsObject.has("version")){
+                    remoteDataSetMap.put("version",ourDsObject.getInt("version"));
+                }
+
+                if(ourDsObject.has("expiryDays")){
+                    remoteDataSetMap.put("expiryDays",ourDsObject.getInt("expiryDays"));
+                }
+
+                if(ourDsObject.has("timelyDays")){
+                    remoteDataSetMap.put("timelyDays",ourDsObject.getInt("timelyDays"));
+                }
+
+                if(ourDsObject.has("openFuturePeriods")){
+                    remoteDataSetMap.put("openFuturePeriods",ourDsObject.getInt("openFuturePeriods"));
+                }
+
+                if(ourDsObject.has("renderAsTabs")){
+                    remoteDataSetMap.put("renderAsTabs",ourDsObject.getBoolean("renderAsTabs"));
+                }
+
+                if(ourDsObject.has("renderHorizontally")){
+                    remoteDataSetMap.put("renderHorizontally",ourDsObject.getBoolean("renderHorizontally"));
+                }
+
+                if(ourDsObject.has("compulsoryFieldsCompleteOnly")){
+                    remoteDataSetMap.put("compulsoryFieldsCompleteOnly",ourDsObject.getBoolean("compulsoryFieldsCompleteOnly"));
+                }
+
                 RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
                 remoteDataSetsList.add(remoteDataSetToAdd);
 
@@ -142,7 +187,7 @@ public class DataSetsService {
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
 
-            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=periodType,dataEntryForm[htmlCode]"));
+            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -160,22 +205,54 @@ public class DataSetsService {
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
-            String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
-            String periodType = jsObject.getString("periodType");
+            if(jsObject.has("formType")) {
+                String formType = jsObject.getString("formType");
+                datasets.setFormType(formType);
+            }
+            //String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
+            if(jsObject.has("periodType")) {
+                String periodType = jsObject.getString("periodType");
+                datasets.setPeriodType(periodType);
+            }
 
-            datasets.setFormDesignCode(htmlForm);
-            datasets.setPeriodType(periodType);
+            if(jsObject.has("timelyDays")) {
+                int timelyDays = jsObject.getInt("timelyDays");
+                datasets.setTimelyDays(timelyDays);
+            }
+
+            if (jsObject.has("expiryDays")) {
+                int expiryDays = jsObject.getInt("expiryDays");
+                datasets.setExpiryDays(expiryDays);
+            }
+
+            if(jsObject.has("code")) {
+                String code = jsObject.getString("code");
+                datasets.setCode(code);
+            }
+
+            datasets.setDatasetFields(jsObject.toString());
+            //datasets.setFormDesignCode(htmlForm);
+
+
             //System.out.println(js);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        
+        UUID uuid = UUID.randomUUID();
+        datasets.setUuid(uuid.toString());
         return dataSetsRepository.save(datasets);
     }
 
     public Optional<Datasets> GetSingleDataSet(String datasetId) {
         return dataSetsRepository.findById(datasetId);
+    }
+
+    public Datasets getDataSetByUuid(String uuid) {
+        return dataSetsRepository.getDatasetInstanceByUuid(uuid);
+    }
+    public Datasets getDataSetInstanceByDataSetId(String id) {
+        return dataSetsRepository.getDatasetInstanceById(id);
     }
 
     public void deleteDataSets(String datasetId)  {

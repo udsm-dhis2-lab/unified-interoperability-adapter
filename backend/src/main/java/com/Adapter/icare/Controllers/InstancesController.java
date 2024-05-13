@@ -32,6 +32,8 @@
 package com.Adapter.icare.Controllers;
 
 import java.util.List;
+
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,7 +65,7 @@ public class InstancesController {
         return "OK";
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Instances addInstances(@RequestBody Instances instances) {
         return instanceService.AddNewInstance(instances);
     }
@@ -71,7 +73,6 @@ public class InstancesController {
     @DeleteMapping("/{instanceId}")
     public void deleteInstance(@PathVariable("instanceId") Long instanceId) {
         instanceService.deleteInstance(instanceId);
-
     }
 
     @PutMapping

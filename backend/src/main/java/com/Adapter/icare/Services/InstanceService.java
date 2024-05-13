@@ -1,6 +1,8 @@
 package com.Adapter.icare.Services;
 
 import java.util.List;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 import com.Adapter.icare.Domains.Instances;
 import com.Adapter.icare.Repository.InstancesRepository;
@@ -15,13 +17,16 @@ public class InstanceService {
     }
 
     public List<Instances> getInstances(){
-
        return instancesRepository.findAll();
+    }
 
+    public Instances getInstanceByUuid(String uuid) {
+        return instancesRepository.getInstanceByUuid(uuid);
     }
 
     public Instances AddNewInstance(Instances instances) {
-
+        UUID uuid = UUID.randomUUID();
+        instances.setUuid(uuid.toString());
         return instancesRepository.save(instances);
     }
 
@@ -35,9 +40,7 @@ public class InstanceService {
     }
 
     public Instances updateInstances(Instances instances) {
-
         return instancesRepository.save(instances);
     }
-
 
 }

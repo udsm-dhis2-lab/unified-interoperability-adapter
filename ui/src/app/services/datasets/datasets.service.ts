@@ -31,45 +31,95 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { DatasetInterface } from 'src/app/models/source.model';
-
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-  }),
-};
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetsService {
   private apiUrl = './api/v1/datasets';
+  httpOptions: any;
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
+      }),
+    };
+  }
 
   //Using Observables to create a service instance
   getDatasets(): Observable<DatasetInterface[] | any> {
-    return this.httpClient.get<DatasetInterface[]>(this.apiUrl);
+    return this.httpClient
+      .get<DatasetInterface[]>(this.apiUrl, this.httpOptions)
+      .pipe(
+        map((response: any) => {
+          return response?.map((dataset: any) => {
+            return {
+              ...dataset,
+              formDesignCode:
+                dataset?.formType == 'CUSTOM' &&
+                dataset?.datasetFields?.indexOf('{') > -1
+                  ? JSON?.parse(dataset?.datasetFields)?.dataEntryForm?.htmlCode
+                  : dataset?.datasetFields,
+            };
+          });
+        })
+      );
   }
 
   getSingleDatasets(
     dataset: DatasetInterface
   ): Observable<DatasetInterface | any> {
     let url = this.apiUrl + '/single?datasetId=' + dataset.id;
-    return this.httpClient.get<DatasetInterface>(url);
+    return this.httpClient.get<DatasetInterface>(url, this.httpOptions);
   }
 
   deleteDataset(dataset: DatasetInterface): Observable<DatasetInterface | any> {
     const url = `${this.apiUrl}/${dataset.id}`;
-    return this.httpClient.delete<DatasetInterface>(url);
+    return this.httpClient.delete<DatasetInterface>(url, this.httpOptions);
   }
 
   addDataset(dataset: DatasetInterface): Observable<DatasetInterface | any> {
     return this.httpClient.post<DatasetInterface>(
       this.apiUrl,
       dataset,
-      httpOptions
+      this.httpOptions
     );
+  }
+
+  saveDataSetQuery(payload: any): Observable<any> {
+    return (
+      !payload?.uuid
+        ? this.httpClient.post(
+            `./api/v1/dataSetQueries`,
+            payload,
+            this.httpOptions
+          )
+        : this.httpClient.put(
+            `./api/v1/dataSetQueries`,
+            payload,
+            this.httpOptions
+          )
+    ).pipe(
+      map((response: any) => response),
+      catchError((error: any) => of(error))
+    );
+  }
+
+  getDataSetQueries(paramaters?: string[]): Observable<any> {
+    return this.httpClient
+      .get(
+        `./api/v1/dataSetQueries${
+          paramaters ? '?' + paramaters?.join('&') : ''
+        }`
+      )
+      .pipe(
+        map((response: any) => {
+          return response?.filter((item: any) => item) || [];
+        })
+      );
   }
 }

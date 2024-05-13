@@ -1,0 +1,202 @@
+<!-- BSD 3-Clause License
+
+Copyright (c) 2022, UDSM DHIS2 Lab Tanzania.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<div  class="row add-form">
+  <div class="col-12">
+    <div class="row">
+      <div class="col-12">
+        <h4 class="text-center">Add Instance</h4>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-8 offset-2">
+        <form action="">
+          <div class="card p-4">
+            <div class="row">
+              <div class="col-4">
+                <label for="name"> Name </label>
+                <input
+                  type="text"
+                  name="name"
+                  [(ngModel)]="name"
+                  class="form-control"
+                  placeholder="instance name"
+                  required
+                />
+                <div *ngIf="message && !name">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-8">
+                <label for="url"> URL/API </label>
+                <input
+                  type="url"
+                  name="url"
+                  [(ngModel)]="url"
+                  class="form-control"
+                  placeholder="https://www.your-instance.db"
+                  required
+                />
+                <div *ngIf="message && !url">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-5">
+              <div class="col-12">
+                <label for="username"> Organization Unit (Code) </label>
+                <input
+                  type="text"
+                  name="organisationUnitCode"
+                  [(ngModel)]="organisationUnitCode"
+                  class="form-control w-50"
+                  placeholder="Code"
+                  required
+                />
+                <div *ngIf="message && !organisationUnitCode">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-5">
+              <div class="col-6">
+                <label for="username"> Username </label>
+                <input
+                  type="text"
+                  name="username"
+                  [(ngModel)]="username"
+                  class="form-control"
+                  placeholder="Instance Username"
+                  required
+                />
+                <div *ngIf="message && !username">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+              <div class="col-6">
+                <label for="password"> Password </label>
+                <input
+                  type="password"
+                  name="password"
+                  [(ngModel)]="password"
+                  class="form-control"
+                  placeholder="Instance Password"
+                  required
+                />
+                <div *ngIf="message && !password">
+                  <p class="text-danger">
+                    {{ message }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <br />
+            <div class="row mt-3">
+              <mat-progress-bar
+                mode="indeterminate"
+                *ngIf="verifying"
+              ></mat-progress-bar>
+              <div class="col-12 d-flex justify-content-end">
+                <button mat-button mat-dialog-close>
+                  Close
+                </button>
+                <button
+                  [disabled]="
+                    !username ||
+                    !password ||
+                    !name ||
+                    !url ||
+                    !organisationUnitCode
+                  "
+                  mat-stroked-button
+                  color="primary"
+                  (click)="onVerify($event)"
+                >
+                  Verify
+                </button>
+                <button
+                  style="margin-left: 8px"
+                  (click)="onSubmit()"
+                  [disabled]="
+                    !username ||
+                    !password ||
+                    !name ||
+                    !url ||
+                    !organisationUnitCode ||
+                    !verificationResponse ||
+                    verificationResponse?.message ||
+                    verificationResponse?.error
+                  "
+                  mat-flat-button
+                  color="primary"
+                >
+                  Save
+                </button>
+              </div>
+              <div class="col-12" *ngIf="verificationResponse">
+                <p *ngIf="verificationResponse?.name">
+                  The organisation unit to connect with
+                  <b>{{ url }}</b> is
+                  <b>{{ verificationResponse?.name }}</b>
+                </p>
+                <p
+                  *ngIf="
+                    verificationResponse?.message &&
+                    !verificationResponse?.error
+                  "
+                  class="alert alert-warning"
+                  role="alert"
+                >
+                  {{ verificationResponse?.message }}
+                </p>
+                <p
+                  *ngIf="verificationResponse?.error"
+                  class="alert alert-danger"
+                  role="alert"
+                >
+                  {{ verificationResponse?.error }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<br />

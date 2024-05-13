@@ -35,14 +35,20 @@ export interface InstanceInterface {
   url: string;
   username: string;
   password: string;
-  organisationUnitId: string;
+  organisationUnitId?: string;
+  code?: string;
 }
 
 export interface InstanceDatasetsInterface {
   id?: string;
+  code?: string;
   displayName: string;
+  formType?: string;
+  periodType?: string;
   instanceId: string;
-  formDesign?: string;
+  formDesignCode?: string;
+  timelyDays?: number;
+  expiryDays?: number;
 }
 
 export interface DataValueFetchInterface {

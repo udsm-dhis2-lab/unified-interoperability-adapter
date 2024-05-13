@@ -30,60 +30,28 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 import { NgModule } from '@angular/core';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatSelectModule } from '@angular/material/select';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatChipsModule } from '@angular/material/chips';
-import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { DragDropModule } from '@angular/cdk/drag-drop';
 import { NgxDhis2PeriodFilterModule } from '@iapps/ngx-dhis2-period-filter';
+import { materialModules } from './material.modules';
+import { sharedComponents } from './components';
+import { CommonModule } from '@angular/common';
+import { modals } from './modals';
+import { HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
-  declarations: [],
-  imports: [
-    MatButtonModule,
-    MatCheckboxModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatTooltipModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatDatepickerModule,
-    MatInputModule,
-    MatNativeDateModule,
-    MatButtonToggleModule,
-    DragDropModule,
-    NgxDhis2PeriodFilterModule,
-  ],
+  imports: [CommonModule, ...materialModules, NgxDhis2PeriodFilterModule],
   exports: [
-    MatButtonModule,
-    MatCheckboxModule,
-    MatSidenavModule,
-    MatSelectModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatTooltipModule,
-    MatIconModule,
-    MatCardModule,
-    MatChipsModule,
-    MatDatepickerModule,
-    MatInputModule,
-    MatNativeDateModule,
-    MatButtonToggleModule,
-    DragDropModule,
+    CommonModule,
+    FormsModule,
+    ...sharedComponents,
+    ...modals,
+    ...materialModules,
     NgxDhis2PeriodFilterModule,
+    HttpClientModule,
+    FontAwesomeModule,
   ],
+  entryComponents: [...modals],
+  declarations: [...sharedComponents, ...modals],
 })
 export class SharedModule {}

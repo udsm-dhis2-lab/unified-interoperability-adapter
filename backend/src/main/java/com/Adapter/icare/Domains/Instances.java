@@ -48,7 +48,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table
-public class Instances implements Serializable {
+public class Instances extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -57,5 +57,5 @@ public class Instances implements Serializable {
     private String password;
     private String name;
     private String organisationUnitId;
-    
+    private String code;
 }

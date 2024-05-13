@@ -38,7 +38,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import org.hisp.dhis.integration.sdk.Dhis2ClientBuilder;
+import org.hisp.dhis.integration.sdk.api.Dhis2Client;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,19 +78,33 @@ public class ReportsService {
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        Optional<Datasets> dataset= dataSetsRepository.findById(datasetId);
+        Datasets dataset= dataSetsRepository.getDatasetInstanceByUuid(datasetId);
         JSONObject jsObject = new JSONObject();
-        String ab = "";
-        String orgUnitID = dataset.get().getInstances().getOrganisationUnitId();
-        dhisAggregateValues.setOrgUnit(orgUnitID);
+        String status = "";
+        String orgUnit = dataset.getInstances().getCode();
+        dhisAggregateValues.setOrgUnit(orgUnit);
+        dhisAggregateValues.setDataSet(dataset.getId());
 
+//        Map<String, Object> response = null;
         try {
 
-            String instanceUrl = dataset.get().getInstances().getUrl();
-            String username = dataset.get().getInstances().getUsername();
-            String password = dataset.get().getInstances().getPassword();
-            
-            url = new URL(instanceUrl.concat("/api/dataValueSets"));
+            String instanceUrl = dataset.getInstances().getUrl();
+            String username = dataset.getInstances().getUsername();
+            String password = dataset.getInstances().getPassword();
+            if (instanceUrl.substring(instanceUrl.length() -1).equals("/")) {
+                url = new URL(instanceUrl.concat("api/dataValueSets.json?orgUnitIdScheme=code"));
+            } else {
+                url = new URL(instanceUrl.concat("/api/dataValueSets.json?orgUnitIdScheme=code"));
+            }
+
+//            Dhis2Client dhis2Client = null;
+//            try {
+//                dhis2Client = Dhis2ClientBuilder.newClient( instanceUrl, username,password ).build();
+//                response = dhis2Client.post("dataValueSets").withResource(dhisAggregateValues).withParameter("orgUnitIdScheme", "code").transfer().returnAs(Map.class);
+//            } catch (Exception e) {
+//                throw new RuntimeException("Error establishing DHIS2 client: " + e);
+//            }
+
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             String userCredentials = username.concat(":").concat(password);
             String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
@@ -100,9 +118,6 @@ public class ReportsService {
             ObjectMapper mapper = new ObjectMapper();
             // Converting the Object to JSONString
             String jsonString = mapper.writeValueAsString(dhisAggregateValues);
-            System.out.println(jsonString);
-
-            // int status = httpURLConnection.getResponseCode();
 
             try (OutputStream os = httpURLConnection.getOutputStream()) {
                 byte[] input = jsonString.getBytes("utf-8");
@@ -114,16 +129,18 @@ public class ReportsService {
                 responseContent.append(line);
             }
             reader.close();
-            //JSONObject jsObject = new JSONObject(responseContent.toString());
-            System.out.println(responseContent.toString());
-            // System.out.println(js);
             jsObject = new JSONObject(responseContent.toString());
-             ab = jsObject.getString("status");
-
+            status = jsObject.getString("status");
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            throw new RuntimeException("Error sending values to DHIS2: " + e);
         }
-        return ab;
+        return jsObject.toString();
     }
-    
+
+    public Map<String, Object> fetchOrgUnitUsingCode(String url, String username, String password, String code) {
+        Dhis2Client dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+        Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+        Map<String, Object> organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+        return organisationUnit;
+    }
 }

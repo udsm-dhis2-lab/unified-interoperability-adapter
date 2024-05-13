@@ -1,0 +1,252 @@
+<!-- BSD 3-Clause License
+
+Copyright (c) 2022, UDSM DHIS2 Lab Tanzania.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<div
+  class="w-100"
+  *ngIf="{
+    interoperabilityInstances: interoperabilityInstances$ | async,
+    dataSources: dataSources$ | async
+  } as params"
+>
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="mb-3">
+        <h3 class="text-">Mapping</h3>
+      </div>
+    </div>
+    <div class="col-12">
+      <mat-progress-bar
+        mode="indeterminate"
+        *ngIf="!params?.interoperabilityInstances || !params?.dataSources"
+      ></mat-progress-bar>
+    </div>
+    <div class="col-12">
+      <div
+        class="alert alert-{{ messageType }} alert-dismissible fade show"
+        *ngIf="message"
+        role="alert"
+      >
+        {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <form (ngSubmit)="onSubmit()" class="row">
+        <div class="form-group row">
+          <div class="col-6">
+            <mat-form-field class="w-100" appearance="outline">
+              <mat-label>DHIS2 link & data source: </mat-label>
+              <mat-select
+                [(ngModel)]="instance"
+                name="instance"
+                (selectionChange)="filterDatasets()"
+              >
+                <mat-option></mat-option>
+                <mat-option
+                  *ngFor="let instance of params?.interoperabilityInstances"
+                  [value]="instance"
+                >
+                  {{ instance.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-6">
+            <mat-form-field class="w-100" appearance="outline">
+              <mat-label>Linked Datasets: </mat-label>
+              <mat-select
+                [(ngModel)]="dataset"
+                name="dataset"
+                (selectionChange)="checkDataset(dataset!)"
+              >
+                <mat-option></mat-option>
+                <mat-option *ngFor="let dataset of datasets" [value]="dataset">
+                  {{ dataset.displayName }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <!-- <div class="col-4 mt-4" *ngIf="datasets?.length">
+                    <app-button 
+                        [ngStyle]="{
+                            'padding-bottom': '90px',
+                            'margin': '0 0 0 -0vw'
+                        }" 
+                        backgroundColor="transparent" 
+                        fontColor="green" 
+                        borderColor="green" 
+                        text="View">
+                    </app-button>
+                </div> -->
+        </div>
+      </form>
+
+      <div
+        class="row"
+        *ngIf="
+          instance &&
+          dataset &&
+          dataset?.categoryCombo &&
+          dataset?.categoryCombo?.name !== 'default'
+        "
+      >
+        <div class="col-6">
+          <mat-form-field class="w-100" appearance="outline">
+            <mat-label>{{ dataset?.categoryCombo?.name }} </mat-label>
+            <mat-select
+              [(ngModel)]="formAttribute"
+              name="formAttribute"
+              (selectionChange)="getFormAttribute($event)"
+            >
+              <mat-option></mat-option>
+              <mat-option
+                *ngFor="
+                  let categoryOptionCombo of dataset?.categoryCombo
+                    ?.categoryOptionCombos
+                "
+                [value]="categoryOptionCombo"
+              >
+                {{ categoryOptionCombo?.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      <div class="row mt-2">
+        <div class="col-12 d-flex justify-content-end">
+          <button
+            mat-stroked-button
+            [disabled]="
+              !params?.interoperabilityInstances ||
+              !params?.dataSources ||
+              !instance ||
+              !dataset ||
+              !tableRowsMetadata
+            "
+            (click)="
+              onOpenMappingQueries(
+                $event,
+                instance,
+                dataset,
+                params?.dataSources,
+                tableRowsMetadata
+              )
+            "
+          >
+            Mapping query
+          </button>
+          <!--
+            [disabled]="
+              !params?.interoperabilityInstances ||
+              !params?.dataSources ||
+              !instance
+            "
+          -->
+          <button
+            style="margin-left: 16px"
+            mat-stroked-button
+            [disabled]="true"
+            (click)="
+              onOpenPlayGround(
+                $event,
+                params?.interoperabilityInstances,
+                params?.dataSources
+              )
+            "
+          >
+            Playground
+          </button>
+        </div>
+      </div>
+      <div class="row" *ngIf="isFormReady">
+        <div
+          class="col-12"
+          *ngIf="
+            dataset?.formDesignCode &&
+            (!dataset?.formType ||
+              (dataset?.formType !== 'SECTION' &&
+                dataset?.formType !== 'DEFAULT'))
+          "
+        >
+          <!-- <app-view-form-design [dataset]="dataset" [sources]="sources"></app-view-form-design>  -->
+          <app-custom-form
+            [isDataEntryLevel]="true"
+            [presetValuesSections]="[]"
+            [dataSetFormDesign]="dataset?.formDesignCode"
+            [dataSetDataValues]="{}"
+            [sources]="sources"
+            [dataset]="dataset"
+            (dataValueUpdate)="changesOnDataValue($event)"
+            (tableMetadataReferences)="getTableMetadataReferences($event)"
+          >
+          </app-custom-form>
+        </div>
+        <div
+          class="col-12"
+          *ngIf="instance && dataset && dataset?.formType === 'SECTION'"
+        >
+          <div class="h4 text-muted">
+            {{ dataset?.displayName }}
+          </div>
+          <div class="w-100 mt-2">
+            <app-section-form
+              [dataset]="dataset"
+              [datasources]="sources"
+            ></app-section-form>
+          </div>
+        </div>
+        <div
+          class="col-12 mt-2"
+          *ngIf="
+            instance &&
+            dataset &&
+            (dataset?.formType === 'DEFAULT' || !dataset?.formType)
+          "
+        >
+          <div class="h4 text-muted">
+            {{ dataset?.displayName }}
+          </div>
+          <div class="w-100 mt-2">
+            <app-default-form
+              [dataset]="dataset"
+              [datasources]="sources"
+            ></app-default-form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

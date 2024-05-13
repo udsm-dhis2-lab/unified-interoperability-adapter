@@ -31,13 +31,19 @@
 
 package com.Adapter.icare.Repository;
 
+import com.Adapter.icare.Domains.Instances;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.Adapter.icare.Domains.Datasource;
 
+import java.util.List;
+
 @Repository
 public interface DatasourceRepository extends JpaRepository<Datasource, Long> {
-    
-    
+    List<Datasource> findAll();
+
+    @Query(value = "SELECT * FROM datasource WHERE uuid=:uuid",nativeQuery = true)
+    Datasource getDataSourceByUuid(String uuid);
 }

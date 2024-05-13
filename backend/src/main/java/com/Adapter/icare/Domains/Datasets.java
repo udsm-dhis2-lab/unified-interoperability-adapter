@@ -32,11 +32,8 @@
 package com.Adapter.icare.Domains;
 
 import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,16 +45,28 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table
-public class Datasets implements Serializable {
+public class Datasets extends BaseEntity implements Serializable {
 
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(length = 50)
     private String id;
     private String displayName;
     private String periodType;
 
     @Lob
     private String formDesignCode;
+
+    private int timelyDays;
+
+    private int expiryDays;
+
+    private String formType;
+
+    private String code;
+
+    @Lob
+    private String datasetFields;
     
     @ManyToOne
     private Instances instances;

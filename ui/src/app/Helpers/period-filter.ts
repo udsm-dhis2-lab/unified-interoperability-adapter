@@ -42,7 +42,6 @@ export class PeriodFilter {
   constructor() {}
 
   filterPeriod(_periodType: string, year?: number) {
-    console.log('Yearly selected: ', year);
     switch (_periodType) {
       case 'Yearly':
         return this.getListOfYears(10);

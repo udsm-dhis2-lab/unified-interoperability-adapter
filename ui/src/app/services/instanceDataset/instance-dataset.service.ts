@@ -34,26 +34,30 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { InstanceDatasetsInterface } from 'src/app/resources/interfaces';
 
-const httpOptions = {
-  headers: new HttpHeaders({
-    'Content-Type': 'application/json',
-  }),
-};
-
 @Injectable({
   providedIn: 'root',
 })
 export class InstanceDatasetsService {
   private apiUrl = './api/v1/datasets';
-
-  constructor(private httpClient: HttpClient) {}
+  httpOptions: any;
+  constructor(private httpClient: HttpClient) {
+    this.httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
+      }),
+    };
+  }
 
   //Using Observables to create a service instance
   getInstanceDatasets(
     instanceId: number
   ): Observable<InstanceDatasetsInterface[] | any> {
     let url = `${this.apiUrl}/remote/${instanceId}`;
-    return this.httpClient.get<InstanceDatasetsInterface[]>(url);
+    return this.httpClient.get<InstanceDatasetsInterface[]>(
+      url,
+      this.httpOptions
+    );
   }
 
   searchInstanceDatasets(
@@ -61,14 +65,20 @@ export class InstanceDatasetsService {
     datasetName: string
   ): Observable<InstanceDatasetsInterface[] | any> {
     let url = `${this.apiUrl}/remote/${instanceId}/${datasetName}`;
-    return this.httpClient.get<InstanceDatasetsInterface[]>(url);
+    return this.httpClient.get<InstanceDatasetsInterface[]>(
+      url,
+      this.httpOptions
+    );
   }
 
   deleteInstanceDataset(
     instanceDataset: InstanceDatasetsInterface
   ): Observable<InstanceDatasetsInterface | any> {
     const url = `${this.apiUrl}/${instanceDataset.id}`;
-    return this.httpClient.delete<InstanceDatasetsInterface>(url);
+    return this.httpClient.delete<InstanceDatasetsInterface>(
+      url,
+      this.httpOptions
+    );
   }
 
   addInstanceDataset(
@@ -77,7 +87,7 @@ export class InstanceDatasetsService {
     return this.httpClient.post<InstanceDatasetsInterface>(
       this.apiUrl,
       instanceDataset,
-      httpOptions
+      this.httpOptions
     );
   }
 }

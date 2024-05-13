@@ -36,12 +36,16 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Utils.EncryptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import com.Adapter.icare.Constants.DHISConstants;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValueSets;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValues;
@@ -49,6 +53,8 @@ import com.Adapter.icare.DHIS2.DHISDomains.DhisAggregateValues;
 import com.Adapter.icare.DHIS2.DHISDomains.ReportValuesSent;
 import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
 import com.Adapter.icare.Domains.DataSetElements;
+import org.hisp.dhis.integration.sdk.Dhis2ClientBuilder;
+import org.hisp.dhis.integration.sdk.api.Dhis2Client;
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -64,7 +70,7 @@ public class ReportsController {
 
 
     @PostMapping
-    public List<DataValueSets> SearchDataSetElementsPerDataSet(@RequestBody ReportValuesSent reportValuesSent) throws SQLException{
+    public List<DataValueSets> SearchDataSetElementsPerDataSet(@RequestBody ReportValuesSent reportValuesSent) throws Exception {
         
         //String dataSetId = reportValuesSent.getDataSetID();
         List<DataValueSets> dvslist = new ArrayList<DataValueSets>();
@@ -84,7 +90,8 @@ public class ReportsController {
             //Query execution
             String dataSourceUrl = dataSetElement.getDatasource().getUrl();
             String dataSourceUserName = dataSetElement.getDatasource().getUsername();
-            String dataSourcePassword = dataSetElement.getDatasource().getPassword();
+            String decryptedPassword = EncryptionUtils.decrypt(dataSetElement.getDatasource().getPassword());
+            String dataSourcePassword = decryptedPassword;
             Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
             ResultSet rs = con.prepareStatement(newQuery).executeQuery();
             rs.next();
@@ -100,48 +107,68 @@ public class ReportsController {
     }
 
     @PostMapping("/sendValues")
-    public String SendDataToDHIS(@RequestBody ReportValuesSent reportValuesSent) throws SQLException{
-
-        DHISConstants constant = new DHISConstants();
-        List<DataValues> dataValues = new ArrayList<DataValues>();
-        List<DataSetElements> dSetElements = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
-        String datasetId = reportValuesSent.getDatasetId();
-        String period = reportValuesSent.getPeriod();
-        String completeDate = java.time.LocalDate.now().toString();
-        String attributeOptCombo = "";
-        //String orgUnitId = constant.OrgUnit; 
-
-        for (DataSetElements dataSetElement : dSetElements) {
-            
-            String dataElementId = dataSetElement.getDataElement();
-            String categoryOptionComboId = dataSetElement.getCategoryOptionCombo();
-            String query = dataSetElement.getSqlQuery();
-            String periodStart = reportValuesSent.getPeriodStart();
-            String periodEnd = reportValuesSent.getPeriodEnd();
-
-            // Query manipulation
-            String newQuery = query.replaceAll("\\$\\{period-start\\}", periodStart).replaceAll("\\$\\{period-end\\}",
-                    periodEnd);
-
-            // Query execution
-            String dataSourceUrl = dataSetElement.getDatasource().getUrl();
-            String dataSourceUserName = dataSetElement.getDatasource().getUsername();
-            String dataSourcePassword = dataSetElement.getDatasource().getPassword();
-            Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
-            ResultSet rs = con.prepareStatement(newQuery).executeQuery();
-            rs.next();
-            String queryResult = rs.getString(1);
-            
-            //Adding the data values
-            dataValues.add(new DataValues(dataElementId, categoryOptionComboId,queryResult,""));
-            rs.close();
-            con.close();    
+    public String SendDataToDHIS(@RequestBody Map<String, Object> reportData) throws Exception {
+        List<DataValues> dataValues =  (List<DataValues>) reportData.get("dataValues");
+        String datasetUuid = reportData.get("dataSet").toString();
+        String period = reportData.get("period").toString();
+        String attributeOptCombo = null;
+        if (reportData.get("attributeOptCombo") != null) {
+            attributeOptCombo =  reportData.get("attributeOptCombo").toString();
         }
+        String completeDate = java.time.LocalDate.now().toString();
 
-        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetId, completeDate,period, "",attributeOptCombo,dataValues);
+        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetUuid, completeDate,period, "",attributeOptCombo,dataValues);
+        return reportsService.SendDataToDHIS(dhisAggregateValues,datasetUuid);
+    }
 
-        return reportsService.SendDataToDHIS(dhisAggregateValues,datasetId);
 
+    @GetMapping("/dhisConnection")
+    public Map<String, Object> Dhis2Connection() throws Exception {
+        Dhis2Client dhis2Client = null;
+        Map<String, Object> me = new HashMap<>();
+        try {
+            dhis2Client = Dhis2ClientBuilder.newClient( "https://play.dhis2.org/2.39.1/api", "admin","district" ).build();
+        } catch (Exception e) {
+            System.err.println("Error establishing DHIS2 client: " + e.getMessage());
+            e.printStackTrace();
+
+        }
+        if (dhis2Client != null) {
+            me = dhis2Client.get("me").transfer().returnAs(Map.class);
+        }
+        return  me;
+    }
+
+    @PostMapping(path = "/verifyCode",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Map<String, Object> getDHIS2OrgUnitViaCode(@RequestBody Instances instance) throws Exception {
+        String url = instance.getUrl() + "/api";
+        String username = instance.getUsername();
+        String password =instance.getPassword();
+        String code = instance.getCode();
+        Map<String, Object> organisationUnit = new HashMap<>();
+        try {
+//            organisationUnit = reportsService.fetchOrgUnitUsingCode(url,username,password,code);
+//            System.out.println(organisationUnit);
+            Dhis2Client dhis2Client = null;
+            try {
+                dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+            } catch (Exception e) {
+                throw new RuntimeException("Error establishing DHIS2 client: " + e);
+            }
+            if (dhis2Client != null) {
+                Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+                if (response != null && response.get("organisationUnits") != null && ((List) response.get("organisationUnits")).size() > 0) {
+                    organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+                } else {
+                    organisationUnit.put("message", "No organisation unit matching the code " + code);
+                    organisationUnit.put("status", "OK");
+                }
+            }
+
+        }catch (Exception e) {
+            throw new RuntimeException("Error verifying organisation unit using code: " + e);
+        }
+        return organisationUnit;
     }
     
 }

@@ -1,0 +1,75 @@
+<!-- BSD 3-Clause License
+
+Copyright (c) 2022, UDSM DHIS2 Lab Tanzania.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<div class="custom-entry-form" id="_custom_entry_form">
+  <div class="row">
+    <div class="col-12 d-flex justify-content-end">
+      <button
+        mat-button
+        class="no-print"
+        (click)="onDownloadToExcel($event, 'html-report')"
+      >
+        Download to Excel
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        class="no-print ml-2"
+        (click)="sendReport($event)"
+      >
+        Send to DHIS2
+      </button>
+    </div>
+  </div>
+  <div class="loading-overlay" *ngIf="sendingData">
+    <div class="text-center">
+      <div><b>Sending data.......</b></div>
+      <div class="mt-3 d-flex justify-content-center w-100">
+        <mat-spinner
+          color="primary"
+          diameter="80"
+          strokeWidth="2"
+        ></mat-spinner>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12" style="overflow: auto" id="html-report">
+      <!-- <div id="html_dataset_report_id"></div> -->
+      <div [innerHTML]="_htmlMarkup"></div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!(presetValuesSections || dataSetDataValues || dataSetFormDesign)">
+  To view Preset Values Data Entry Forms 1. Drill Down the organisationUnitId
+  component (on the left) to Facility Level 2. The selected Facility Level will
+  be highlighted
+</div>
