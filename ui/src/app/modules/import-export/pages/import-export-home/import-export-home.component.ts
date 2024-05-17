@@ -45,33 +45,55 @@ export class ImportExportHomeComponent implements OnInit {
     });
   }
 
+  // onDownload(event: Event, instance: any): void {
+  //   event.stopPropagation();
+  //   this.instancesService
+  //     .getDataSetQueriesByInstanceUuid(instance?.uuid)
+  //     .subscribe((response: any) => {
+  //       console.log('this is data', instance);
+  //       this.downloadFile(response);
+  //     });
+  // }
+
+  // private downloadFile(data: any[]): void {
+  //   let jsonData = JSON.stringify(data);
+
+  //   let blodData = new Blob([jsonData], { type: 'text/plain;charset=utf-8' });
+
+  //   let isIE = false;
+
+  //   if (isIE) {
+  //   } else {
+  //     let url = window.URL || window.webkitURL;
+  //     let link = url.createObjectURL(blodData);
+  //     let a = document.createElement('a');
+  //     a.download = 'datasetqueries.json';
+  //     a.href = link;
+  //     document.body.appendChild(a);
+  //     a.click();
+  //     document.body.removeChild(a);
+  //   }
+  // }
+
+  private downloadFile(data: Blob): void {
+    let url = window.URL || window.webkitURL;
+    let blobUrl = url.createObjectURL(data);
+    let a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'dataset_queries.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // Release the object URL
+    URL.revokeObjectURL(blobUrl);
+  }
   onDownload(event: Event, instance: any): void {
     event.stopPropagation();
     this.instancesService
       .getDataSetQueriesByInstanceUuid(instance?.uuid)
-      .subscribe((response: any) => {
-        console.log('this is data', instance);
+      .subscribe((response: Blob) => {
         this.downloadFile(response);
       });
-  }
-  private downloadFile(data: any[]): void {
-    let jsonData = JSON.stringify(data);
-
-    let blodData = new Blob([jsonData], { type: 'text/plain;charset=utf-8' });
-
-    let isIE = false;
-
-    if (isIE) {
-    } else {
-      let url = window.URL || window.webkitURL;
-      let link = url.createObjectURL(blodData);
-      let a = document.createElement('a');
-      a.download = 'datasetqueries.json';
-      a.href = link;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
   }
 
   onFileSelected(event: any): void {

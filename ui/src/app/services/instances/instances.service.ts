@@ -106,29 +106,31 @@ export class InstancesService {
     );
   }
 
-  getDataSetQueriesByInstanceUuid(uuid: string): Observable<any> {
-    return this.httpClient.get(`./api/v1/dataSetQueries?instance=${uuid}`).pipe(
-      
-      map((response: any) => response),
-      catchError((error: any) => of(error))
-    );
-  }
-
-  // postDataSetQueriesByInstanceUuid(uuid: string): Observable<any> {
-  //   const requestBody = { instance: uuid };
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-  
-  //   return this.httpClient.post('./api/v1/dataSetQueries', requestBody, { headers }).pipe(
+  // getDataSetQueriesByInstanceUuid(uuid: string): Observable<any> {
+  //   return this.httpClient.get(`./api/v1/dataSetQueries/download?instance=${uuid}`).pipe(
+  //    map((response: any) => response),
   //     catchError((error: any) => of(error))
   //   );
   // }
-  postDataSetQueriesByInstanceUuid(uuid: string, requestBody: any): Observable<any> {
-    const headers = new HttpHeaders();
-    // Add any headers if needed
 
-    return this.httpClient.post(`./api/v1/dataSetQueries?instance=${uuid}`, requestBody, { headers }).pipe(
+  getDataSetQueriesByInstanceUuid(uuid: string): Observable<Blob> {
+    const url = `./api/v1/dataSetQueries/download?instance=${uuid}`;
+    return this.httpClient.get(url, {
+      responseType: 'blob', // Set response type to 'blob' for binary data
+      headers: this.httpOptions.headers, // Pass headers
+      observe: 'response', // Ensure full response is received, including headers
+    }).pipe(
+      map((response: any) => response.body), // Extract the response body (blob)
       catchError((error: any) => of(error))
     );
   }
+  // postDataSetQueriesByInstanceUuid(uuid: string, requestBody: any): Observable<any> {
+  //   const headers = new HttpHeaders();
+  //   // Add any headers if needed
+
+  //   return this.httpClient.post(`./api/v1/dataSetQueries?instance=${uuid}`, requestBody, { headers }).pipe(
+  //     catchError((error: any) => of(error))
+  //   );
+  // }
   
 }
