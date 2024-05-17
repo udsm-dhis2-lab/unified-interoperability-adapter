@@ -89,12 +89,7 @@ public class DatasetQueryController {
         datasetQueryService.updateDataSetQuery(datasetQuery);
         return datasetQuery;
     }
-<<<<<<< HEAD
-
-    @GetMapping()
-=======
     @GetMapping
->>>>>>> 75069f1 (recent changes)
     public List<DatasetQuery> GetAllDataSetsQueries(@RequestParam(name="dataSet", required = false) String dataSet){
         if (dataSet == null) {
             return datasetQueryService.getAllDataSetsQueries();
@@ -111,52 +106,6 @@ public class DatasetQueryController {
         return datasetQueryService.getDataSetQueryByUuid(uuid);
     }
 
-<<<<<<< HEAD
-    @GetMapping("zip")
-    public List<Map<String, Object>> downloadDataSetQueriesAsZip(@RequestParam(name="instance", required = true) String instance) throws Exception {
-        String uuid = instance;
-        Instances instanceData = instanceService.getInstanceByUuid(uuid);
-
-//        response.setContentType("application/zip");
-//        response.setHeader("Content-Disposition", "attachment; filename=\"dataset_queries_by_instance.zip\"");
-
-        List<DatasetQuery> datasetQueries = datasetQueryService.getDataSetQueriesByInstanceId(instanceData);
-        List<Map<String, Object>> datasetQueriesData = new ArrayList<>();
-//        for(DatasetQuery datasetQuery: datasetQueries) {
-//            Map<String, Object> datasetQueryInfo = new HashMap<>();
-//            datasetQueryInfo.put("sqlQuery", datasetQuery.getSqlQuery().toString());
-//            datasetQueryInfo.put("uuid", datasetQuery.getUuid());
-//            datasetQueryInfo.put("dataSetUuid",datasetQuery.getDataSet().getId());
-//            datasetQueryInfo.put("mappings", datasetQuery.getMappings());
-//            datasetQueriesData.add(datasetQueryInfo);
-//        }
-//        String dataForQuery = new ObjectMapper().writeValueAsString(datasetQueriesData);
-//        String fileName = "datasetquery.zip";
-//        String jsonName = "datasetquery.json";
-//        byte[] data = dataForQuery.getBytes();
-//        byte[] bytes;
-//        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
-//            zipOutputStream.setLevel(1);
-//            ZipEntry ze = new ZipEntry(jsonName);
-//            ze.setSize(data.length);
-//            zipOutputStream.putNextEntry(ze);
-//            zipOutputStream.write(data);
-//            zipOutputStream.closeEntry();
-//            bytes = byteArrayOutputStream.toByteArray();
-//        }
-//        response.setContentType("application/zip");
-//        response.setContentLength(bytes.length);
-//        response.setHeader("Content-Disposition", "attachment; "
-//                        + String.format("filename*=" + StandardCharsets.UTF_8.name() + "''%s", fileName));
-//        ServletOutputStream outputStream = response.getOutputStream();
-//        FileCopyUtils.copy(bytes, outputStream);
-//        outputStream.close();
-        return datasetQueriesData;
-    }
-
-=======
->>>>>>> 75069f1 (recent changes)
     @PostMapping("/{uuid}/generate")
     public List<Map<String, Object>> generatePayloadFromDataSetQuery(@PathVariable("uuid" ) String uuid, @RequestBody Map<String, Object> dataRequestPayload) throws Exception {
         DatasetQuery datasetQuery = datasetQueryService.getDataSetQueryByUuid(uuid);
