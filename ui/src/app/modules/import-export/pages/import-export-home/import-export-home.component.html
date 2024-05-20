@@ -124,12 +124,10 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 (click)="
                   selectedInstance && onDownload($event, selectedInstance)
                 "
-                [disabled]="!selectedInstance || selectedFileName "
+                [disabled]="!selectedInstance || selectedFileName"
               >
                 <mat-icon>cloud_download</mat-icon> Export
               </button>
-
-           
 
               <!-- <button mat-raised-button (click)="handleFileSelection()">
                 <mat-icon class="mat-primary">attach_file</mat-icon>
@@ -158,17 +156,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
               <button mat-raised-button (click)="handleFileSelection()">
                 <mat-icon class="mat-primary">attach_file</mat-icon>
-                {{ selectedFileName || "Choose JSON File" }}
-              </button> 
-              
+                {{ selectedFileName || "Choose File" }}
+              </button>
+
               <input
                 id="fileInput"
                 type="file"
-                accept=".json"
+                accept=".zip"
                 style="display: none"
                 (change)="handleFileChange($event)"
               />
-              
+
               <button
                 mat-raised-button
                 color="primary"

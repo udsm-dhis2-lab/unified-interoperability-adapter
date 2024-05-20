@@ -66,7 +66,6 @@ export class ImportExportHomeComponent implements OnInit {
     this.instancesService
       .getDataSetQueriesByInstanceUuid(instance?.uuid)
       .subscribe((response: any) => {
-        console.log('this is data', instance);
         this.downloadFile(response);
       });
   }
@@ -82,8 +81,6 @@ export class ImportExportHomeComponent implements OnInit {
       const file = input.files[0];
       this.selectedFile = file; // Store the file object
       this.selectedFileName = file.name;
-      console.log('Selected File:', this.selectedFile);
-      console.log('Selected File Name:', this.selectedFileName);
     } else {
       this.selectedFile = undefined;
       this.selectedFileName = undefined;
@@ -91,21 +88,11 @@ export class ImportExportHomeComponent implements OnInit {
   }
 
   startImport(): void {
-    console.log('startImport called');
-    console.log('Selected Instance:', this.selectedInstance);
-    console.log('Selected File Name:', this.selectedFileName);
-
     if (this.selectedInstance && this.selectedFile) {
-      console.log('Starting import with the following:');
-      console.log('Instance:', this.selectedInstance);
-      console.log('File:', this.selectedFile);
-
       const fileReader = new FileReader();
       fileReader.onload = (e) => {
         const fileContent = e.target?.result;
         if (fileContent) {
-          console.log('File Content:', fileContent);
-
           // Call the service method
           this.instancesService
             .postDataSetQueriesByInstanceUuid(

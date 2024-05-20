@@ -58,8 +58,10 @@ public class DatasourceService {
             default:
                 break;
         }
-        UUID uuid = UUID.randomUUID();
-        datasource.setUuid(uuid.toString());
+        if (datasource.getUuid() == null) {
+            UUID uuid = UUID.randomUUID();
+            datasource.setUuid(uuid.toString());
+        }
         // Password encryption
         String encryptedPassword = EncryptionUtils.encrypt(datasource.getPassword());
         datasource.setPassword(encryptedPassword);
