@@ -13,6 +13,12 @@ export class ImportExportHomeComponent implements OnInit {
   currentUser$: Observable<any> | undefined;
   instances$: Observable<any>;
 
+  downloadInProgress: boolean = false;
+  fileInput: HTMLInputElement | undefined;
+
+  selectedFileName: string | null = null;
+  selectedFile: File | null = null;
+  selectedInstance: any | null = null;
   constructor(
     private router: Router,
     private instancesService: InstancesService
@@ -30,9 +36,29 @@ export class ImportExportHomeComponent implements OnInit {
     event.stopPropagation();
     this.showSideMenu = !this.showSideMenu;
   }
-
   onLogout(): void {
     this.router.navigate(['/login']);
+  }
+
+  onInstanceSelect(event: any): void {
+    const selectedUuid = event.value;
+    this.instances$.subscribe((instances) => {
+      this.selectedInstance = instances.find(
+        (instance) => instance.uuid === selectedUuid
+      );
+    });
+  }
+
+  private downloadFile(data: Blob): void {
+    let url = window.URL || window.webkitURL;
+    let blobUrl = url.createObjectURL(data);
+    let a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'dataset_queries.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
   }
 
   onDownload(event: Event, instance: any): void {
@@ -40,29 +66,74 @@ export class ImportExportHomeComponent implements OnInit {
     this.instancesService
       .getDataSetQueriesByInstanceUuid(instance?.uuid)
       .subscribe((response: any) => {
+        console.log('this is data', instance);
         this.downloadFile(response);
       });
   }
 
-  private downloadFile(data: any[]): void {
-    let jsonData = JSON.stringify(data);
+  handleFileSelection(): void {
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    fileInput.click();
+  }
 
-    //Convert JSON string to BLOB.
-    let blodData = new Blob([jsonData], { type: 'text/plain;charset=utf-8' });
-
-    //Check the Browser.
-    let isIE = false;
-    if (isIE) {
-      // window.navigator.msSaveBlob(blob1, "datasetqueries.json");
+  handleFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.selectedFile = file; // Store the file object
+      this.selectedFileName = file.name;
+      console.log('Selected File:', this.selectedFile);
+      console.log('Selected File Name:', this.selectedFileName);
     } else {
-      let url = window.URL || window.webkitURL;
-      let link = url.createObjectURL(blodData);
-      let a = document.createElement('a');
-      a.download = 'datasetqueries.json';
-      a.href = link;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      this.selectedFile = undefined;
+      this.selectedFileName = undefined;
+    }
+  }
+
+  startImport(): void {
+    console.log('startImport called');
+    console.log('Selected Instance:', this.selectedInstance);
+    console.log('Selected File Name:', this.selectedFileName);
+
+    if (this.selectedInstance && this.selectedFile) {
+      console.log('Starting import with the following:');
+      console.log('Instance:', this.selectedInstance);
+      console.log('File:', this.selectedFile);
+
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        const fileContent = e.target?.result;
+        if (fileContent) {
+          console.log('File Content:', fileContent);
+
+          // Call the service method
+          this.instancesService
+            .postDataSetQueriesByInstanceUuid(
+              this.selectedFile!,
+              this.selectedInstance.uuid
+            )
+            .subscribe({
+              next: (response) => {
+                console.log('File upload response:', response);
+              },
+              error: (error) => {
+                console.error('Error uploading file:', error);
+              },
+            });
+        }
+      };
+      fileReader.onerror = (e) => {
+        console.error('Error reading file:', e);
+      };
+      fileReader.readAsText(this.selectedFile);
+    } else {
+      console.error('Instance or file is not selected.');
+      if (!this.selectedInstance) {
+        console.error('selectedInstance is not selected.');
+      }
+      if (!this.selectedFile) {
+        console.error('selectedFile is not selected.');
+      }
     }
   }
 }
