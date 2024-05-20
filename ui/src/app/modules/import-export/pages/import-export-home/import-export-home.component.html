@@ -131,7 +131,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
            
 
-              <button mat-raised-button (click)="handleFileSelection()">
+              <!-- <button mat-raised-button (click)="handleFileSelection()">
                 <mat-icon class="mat-primary">attach_file</mat-icon>
 
                 {{ selectedFileName || "Choose JSON File" }}
@@ -151,7 +151,30 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                 color="primary"
                 style="margin-left: 10px"
                 (click)="selectedInstance && startImport()"
-                [disabled]="!selectedFileName"
+                [disabled]="!selectedInstance || !selectedFileName"
+              >
+                <mat-icon>cloud_upload</mat-icon> Import
+              </button> -->
+
+              <button mat-raised-button (click)="handleFileSelection()">
+                <mat-icon class="mat-primary">attach_file</mat-icon>
+                {{ selectedFileName || "Choose JSON File" }}
+              </button> 
+              
+              <input
+                id="fileInput"
+                type="file"
+                accept=".json"
+                style="display: none"
+                (change)="handleFileChange($event)"
+              />
+              
+              <button
+                mat-raised-button
+                color="primary"
+                style="margin-left: 10px"
+                (click)="startImport()"
+                [disabled]="!selectedInstance || !selectedFileName"
               >
                 <mat-icon>cloud_upload</mat-icon> Import
               </button>

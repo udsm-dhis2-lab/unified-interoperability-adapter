@@ -34,15 +34,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
-
 import { AppComponent } from './app.component';
-
 import { appRoutes } from './routes';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { SharedModule } from './shared/shared.modules';
 import { NgxDhis2HttpClientModule } from '@iapps/ngx-dhis2-http-client';
 import { PeriodFilter } from './Helpers/period-filter';
 import { MatDialogModule } from '@angular/material/dialog';
+
 
 
 @NgModule({
@@ -66,6 +65,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     }),
 
     MatDialogModule,
+    
   
   ],
   providers: [

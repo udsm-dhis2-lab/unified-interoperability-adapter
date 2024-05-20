@@ -16,5 +16,4 @@ public interface DatasetQueryRepository extends JpaRepository<DatasetQuery,Strin
 
     @Query(value = "SELECT * FROM dataset_query WHERE instance_id=:instanceId", nativeQuery = true)
     List<DatasetQuery> getDataSetQueriesByInstanceId(Long instanceId);
-
 }

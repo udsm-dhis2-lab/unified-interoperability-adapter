@@ -12,14 +12,18 @@ export class ImportExportHomeComponent implements OnInit {
   showSideMenu: boolean = true;
   currentUser$: Observable<any> | undefined;
   instances$: Observable<any>;
-  selectedInstance: any;
-  selectedFileName: string | undefined;
+
   downloadInProgress: boolean = false;
   fileInput: HTMLInputElement | undefined;
+
+  selectedFileName: string | null = null;
+  selectedFile: File | null = null;
+  selectedInstance: any | null = null;
   constructor(
     private router: Router,
     private instancesService: InstancesService
   ) {}
+
   ngOnInit() {
     this.currentUser$ = of({
       displayName: 'Testing Admin',
@@ -45,6 +49,18 @@ export class ImportExportHomeComponent implements OnInit {
     });
   }
 
+  private downloadFile(data: Blob): void {
+    let url = window.URL || window.webkitURL;
+    let blobUrl = url.createObjectURL(data);
+    let a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = 'dataset_queries.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(blobUrl);
+  }
+
   onDownload(event: Event, instance: any): void {
     event.stopPropagation();
     this.instancesService
@@ -54,60 +70,70 @@ export class ImportExportHomeComponent implements OnInit {
         this.downloadFile(response);
       });
   }
-  private downloadFile(data: any[]): void {
-    let jsonData = JSON.stringify(data);
 
-    let blodData = new Blob([jsonData], { type: 'text/plain;charset=utf-8' });
-
-    let isIE = false;
-
-    if (isIE) {
-    } else {
-      let url = window.URL || window.webkitURL;
-      let link = url.createObjectURL(blodData);
-      let a = document.createElement('a');
-      a.download = 'datasetqueries.json';
-      a.href = link;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
-  }
-
-  onFileSelected(event: any): void {
-    const file: File = event.target.files[0];
-    if (file) {
-      this.readFile(file);
-    }
-  }
-
-  readFile(file: File): void {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const fileContent: string | ArrayBuffer | null = reader.result;
-      if (fileContent) {
-        const jsonContent: any = JSON.parse(fileContent.toString());
-        console.log('JSON file content:', jsonContent);
-        // You can process the JSON content here
-      }
-    };
-    reader.readAsText(file);
-  }
-
-  startImport(): void {}
   handleFileSelection(): void {
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    if (fileInput) {
-      fileInput.click();
+    fileInput.click();
+  }
+
+  handleFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      this.selectedFile = file; // Store the file object
+      this.selectedFileName = file.name;
+      console.log('Selected File:', this.selectedFile);
+      console.log('Selected File Name:', this.selectedFileName);
+    } else {
+      this.selectedFile = undefined;
+      this.selectedFileName = undefined;
     }
   }
-  handleFileChange(event: Event): string | null {
-    const fileInput = event.target as HTMLInputElement;
-    const file = fileInput.files?.[0];
-    if (file && file.type === 'application/json') {
-      return file.name;
+
+  startImport(): void {
+    console.log('startImport called');
+    console.log('Selected Instance:', this.selectedInstance);
+    console.log('Selected File Name:', this.selectedFileName);
+
+    if (this.selectedInstance && this.selectedFile) {
+      console.log('Starting import with the following:');
+      console.log('Instance:', this.selectedInstance);
+      console.log('File:', this.selectedFile);
+
+      const fileReader = new FileReader();
+      fileReader.onload = (e) => {
+        const fileContent = e.target?.result;
+        if (fileContent) {
+          console.log('File Content:', fileContent);
+
+          // Call the service method
+          this.instancesService
+            .postDataSetQueriesByInstanceUuid(
+              this.selectedFile!,
+              this.selectedInstance.uuid
+            )
+            .subscribe({
+              next: (response) => {
+                console.log('File upload response:', response);
+              },
+              error: (error) => {
+                console.error('Error uploading file:', error);
+              },
+            });
+        }
+      };
+      fileReader.onerror = (e) => {
+        console.error('Error reading file:', e);
+      };
+      fileReader.readAsText(this.selectedFile);
     } else {
-      return null;
+      console.error('Instance or file is not selected.');
+      if (!this.selectedInstance) {
+        console.error('selectedInstance is not selected.');
+      }
+      if (!this.selectedFile) {
+        console.error('selectedFile is not selected.');
+      }
     }
   }
 }
