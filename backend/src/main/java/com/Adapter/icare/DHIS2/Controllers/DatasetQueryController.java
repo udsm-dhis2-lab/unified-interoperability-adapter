@@ -1,7 +1,9 @@
 package com.Adapter.icare.DHIS2.Controllers;
 import com.Adapter.icare.DHIS2.DHISDomains.DatasetQuery;
+import com.Adapter.icare.DHIS2.DHISServices.DataSetElementsService;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
 import com.Adapter.icare.DHIS2.DHISServices.DatasetQueryService;
+import com.Adapter.icare.Domains.DataSetElements;
 import com.Adapter.icare.Domains.Datasets;
 import com.Adapter.icare.Services.DatasourceService;
 import com.Adapter.icare.Services.InstanceService;
@@ -38,6 +40,9 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.zip.ZipInputStream;
 import org.springframework.web.bind.annotation.CrossOrigin;
+
+import javax.activation.DataSource;
+
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/v1/dataSetQueries")
@@ -45,15 +50,16 @@ public class DatasetQueryController {
     private final DatasetQueryService datasetQueryService;
     private final ObjectMapper objectMapper;
     private final DataSetsService dataSetsService;
-
+    private final DataSetElementsService dataSetElementsService;
     private final InstanceService instanceService;
 
     private final DatasourceService datasourceService;
 
-    public DatasetQueryController(DatasetQueryService datasetQueryService, ObjectMapper objectMapper, DataSetsService dataSetsService, InstanceService instanceService, DatasourceService datasourceService) {
+    public DatasetQueryController(DatasetQueryService datasetQueryService, ObjectMapper objectMapper, DataSetsService dataSetsService, DataSetElementsService dataSetElementsService, InstanceService instanceService, DatasourceService datasourceService) {
         this.datasetQueryService = datasetQueryService;
         this.objectMapper = objectMapper;
         this.dataSetsService = dataSetsService;
+        this.dataSetElementsService = dataSetElementsService;
         this.instanceService = instanceService;
         this.datasourceService = datasourceService;
     }
@@ -143,7 +149,6 @@ public class DatasetQueryController {
             });
             results.add((row));
         }
-
         List<Map<String, Object>> formattedResults = new ArrayList<>();
         JSONArray mappingsArray = new JSONArray(mappings);
         for (int count = 0; count < mappingsArray.length(); count++) {
@@ -166,7 +171,6 @@ public class DatasetQueryController {
         }
         return formattedResults;
     }
-
     @PostMapping("/import")
     public List<Map<String, Object>> importDataSetQueries(@RequestBody Map<String, Object> datasetQueryImportMap) throws Exception {
         //Manipulating the received request
@@ -190,28 +194,44 @@ public class DatasetQueryController {
     public byte[] downloadDataSetQueriesAsZip(@RequestParam(name = "instance", required = true) String instance) throws Exception {
         Instances instanceData = instanceService.getInstanceByUuid(instance);
         List<DatasetQuery> datasetQueries = datasetQueryService.getDataSetQueriesByInstanceId(instanceData);
-
         List<Map<String, Object>> datasetQueriesData = new ArrayList<>();
-
-       
         for (DatasetQuery datasetQuery : datasetQueries) {
             Map<String, Object> datasetQueryInfo = new HashMap<>();
+            // Fetching DataSource details
+            String dataSourceUrl = datasetQuery.getDataSource().getUrl();
+            String decryptedPassword = EncryptionUtils.decrypt(datasetQuery.getDataSource().getPassword());
+            String dataSourcePassword = decryptedPassword;
+            String dataSourceUserName = datasetQuery.getDataSource().getUsername();
             datasetQueryInfo.put("sqlQuery", datasetQuery.getSqlQuery());
             datasetQueryInfo.put("uuid", datasetQuery.getUuid());
             datasetQueryInfo.put("mappings", datasetQuery.getMappings());
             datasetQueryInfo.put("instance", datasetQuery.getInstance().getUuid());
+            datasetQueryInfo.put("instanceName", datasetQuery.getInstance().getName());
             datasetQueryInfo.put("dataSetUuid", datasetQuery.getDataSet().getUuid());
-            datasetQueryInfo.put("dataSource", datasetQuery.getDataSource().getUuid());
+            Map<String, Object> dataSourceInfo = new HashMap<>();
+            dataSourceInfo.put("dataSourceUuid", datasetQuery.getDataSource().getUuid());
+            dataSourceInfo.put("dataSourceUrl", dataSourceUrl);
+            dataSourceInfo.put("dataSourceUserName", dataSourceUserName);
+            dataSourceInfo.put("dataSourcePassword", dataSourcePassword);
+
+            datasetQueryInfo.put("dataSource", dataSourceInfo);
+            List<DataSetElements> dataSetElements = dataSetElementsService.searchExistingDataSetElementsPerDataSet(datasetQuery.getDataSet().getUuid());
+            List<Map<String, Object>> dataSetElementsInfo = new ArrayList<>();
+
+            for (DataSetElements element : dataSetElements) {
+                Map<String, Object> elementInfo = new HashMap<>();
+                elementInfo.put("uuid", element.getUuid());
+                elementInfo.put("dataElement", element.getDataElement());
+                elementInfo.put("categoryOptionCombo", element.getCategoryOptionCombo());
+                elementInfo.put("value", element.getId().byteValue());
+                dataSetElementsInfo.add(elementInfo);
+
+            }
+            datasetQueryInfo.put("dataSetElements", dataSetElementsInfo);
             datasetQueriesData.add(datasetQueryInfo);
         }
-
-      
         String datasetQueriesDataString = objectMapper.writeValueAsString(datasetQueriesData);
-
-     
         byte[] datasetQueriesDataBytes = datasetQueriesDataString.getBytes();
-
-     
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
         ZipEntry zipEntry = new ZipEntry("datasetQueriesData.json");
@@ -220,10 +240,11 @@ public class DatasetQueryController {
         IOUtils.write(datasetQueriesDataBytes, zipOutputStream);
         zipOutputStream.closeEntry();
         zipOutputStream.close();
-
-   
         return byteArrayOutputStream.toByteArray();
     }
+
+
+
     @PostMapping("/upload")
     public ResponseEntity<String> uploadDataSetQueriesByInstanceUuid(@RequestParam("file") MultipartFile file, @RequestParam("instance") String instanceUuid) {
      
@@ -239,13 +260,13 @@ public class DatasetQueryController {
             ZipEntry zipEntry;
             List<Map<String, Object>> datasetQueryImportList = new ArrayList<>();
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-//                System.out.println("Processing ZIP entry: " + zipEntry.getName());
+                System.out.println("Processing ZIP entry: " + zipEntry.getName());
                 if (!zipEntry.isDirectory() && zipEntry.getName().endsWith(".json")) {
                   
                     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                     IOUtils.copy(zipInputStream, byteArrayOutputStream);
                     String jsonString = byteArrayOutputStream.toString();
-//                    System.out.println("JSON content for entry " + zipEntry.getName() + ": " + jsonString);
+                    System.out.println("JSON content for entry " + zipEntry.getName() + ": " + jsonString);
 
                     try {
                      
@@ -280,7 +301,6 @@ public class DatasetQueryController {
                 }
                 zipInputStream.closeEntry();
             }
-
             System.out.println("Data uploaded successfully");
             return new ResponseEntity<>("Data uploaded successfully", HttpStatus.OK);
         } catch (IOException e) {
@@ -289,6 +309,17 @@ public class DatasetQueryController {
             return new ResponseEntity<>("Error processing the file", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
+
+
+
+
+
+
+
+
 
 }
 

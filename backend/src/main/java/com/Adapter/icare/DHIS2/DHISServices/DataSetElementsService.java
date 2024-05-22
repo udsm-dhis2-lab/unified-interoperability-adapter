@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetElementsRepository;
 import com.Adapter.icare.Domains.DataSetElements;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -70,6 +71,10 @@ public class DataSetElementsService {
         return dataSetElementsRepository.searchExistingDataSetElements(dataElement,categoryOptionCombo,dataset);
     }
 
+
+    public List<DataSetElements> searchExistingDataSetElementsPerDataSet(String dataset) {
+        return dataSetElementsRepository.searchExistingDataSetElementsPerDataSet(dataset);
+    }
     
 
 }

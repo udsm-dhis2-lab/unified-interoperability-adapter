@@ -33,12 +33,11 @@ package com.Adapter.icare.DHIS2.Controllers;
 
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import com.Adapter.icare.DHIS2.DHISRepository.DataSetElementsRepository;
 import com.Adapter.icare.Utils.EncryptionUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetElementsService;
 import com.Adapter.icare.Domains.DataSetElements;
 import com.Adapter.icare.Domains.Datasource;
@@ -47,15 +46,17 @@ import com.Adapter.icare.Repository.DatasourceRepository;
 @RestController
 @RequestMapping("/api/v1/datasetElements")
 public class DataSetElementsController {
-    
     private final DataSetElementsService dataSetElementsService;
     private final DatasourceRepository datasourceRepository;
 
-    public DataSetElementsController(DataSetElementsService dataSetElementsService,DatasourceRepository datasourceRepository) {
+    public DataSetElementsController(DataSetElementsService dataSetElementsService, DatasourceRepository datasourceRepository, DataSetElementsRepository dataSetElementsRepository) {
         this.dataSetElementsService = dataSetElementsService;
         this.datasourceRepository = datasourceRepository;
-       
+
     }
+
+
+
 
     @PostMapping
     public DataSetElements addDataSetElements(@RequestBody DataSetElements dataSetElements) throws Exception {
@@ -67,7 +68,7 @@ public class DataSetElementsController {
         dataSetElements.setCategoryOptionCombo(stringArray[1]);
         Long dataSourceId = dataSetElements.getDatasource().getId();
         Optional<Datasource> datasource = datasourceRepository.findById(dataSourceId);
-        
+
         //Obtaining the data from dataSetElements
         String SqlQuery = dataSetElements.getSqlQuery();
         String dataSourceUrl = datasource.get().getUrl();
@@ -79,17 +80,16 @@ public class DataSetElementsController {
         // Query manipulation
         String newQuery = SqlQuery.replaceAll("\\$\\{period-start\\}","1900-01-01").replaceAll("\\$\\{period-end\\}",
                 "5000-01-01");
-        
+
         // connect to database
         Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName,dataSourcePassword);
         ResultSet rs = con.prepareStatement(newQuery).executeQuery();
 
         while (rs.next()) {
-        dataSetElementsService.addDataSetElements(dataSetElements);     
+        dataSetElementsService.addDataSetElements(dataSetElements);
         }
-        return dataSetElements;    
+        return dataSetElements;
     }
-
     @PostMapping("/testQuery")
     public String testQuery(@RequestBody DataSetElements dataSetElements) throws Exception {
 
@@ -105,23 +105,19 @@ public class DataSetElementsController {
 
        //Query manipulation
        String newQuery = query.replaceAll("\\$\\{period-start\\}",periodStart).replaceAll("\\$\\{period-end\\}",periodEnd);
-
        System.out.println(newQuery);
-
        Connection con = DriverManager.getConnection(dataSourceUrl, dataSourceUserName, dataSourcePassword);
        ResultSet rs = con.prepareStatement(newQuery).executeQuery();
        rs.next();
-       return rs.getString(1);   
+       return rs.getString(1);
     }
 
     @PostMapping("/testquerylist")
     public List<Map<String,Object>> queryList(@RequestBody Map<String,Object> queryMap) throws Exception {
-
        String query = queryMap.get("sql").toString();
        String datasourceId = ((Map) queryMap.get("datasource")).get("id").toString();
         //Query manipulation
        String newQuery = query.replaceAll("\\$\\{period-start\\}",queryMap.get("periodStart").toString()).replaceAll("\\$\\{period-end\\}",queryMap.get("periodEnd").toString());
-
        Datasource datasource = datasourceRepository.getById(Long.valueOf(datasourceId));
        String decryptedPassword = EncryptionUtils.decrypt(datasource.getPassword());
        String dataSourcePassword = decryptedPassword;
@@ -136,28 +132,40 @@ public class DataSetElementsController {
             String columnName = rsmd.getColumnName(i);
             columnNames.add(columnName);
         }
-
         // create a list to store the query results
         List<Map<String, Object>> resultList = new ArrayList<Map<String, Object>>();
-
         // iterate through the result set and store the data in the list
         while (rs.next()) {
             Map<String, Object> row = new HashMap<String, Object>();
             for (String columnName : columnNames) {
+
                 Object value = rs.getObject(columnName);
+
                 row.put(columnName, value);
+
             }
+
             resultList.add(row);
+
         }
 
         return resultList;
-    }
 
+    }
     @PostMapping("/searchDataSetElements")
+
     public DataSetElements SearchExistingDataSetElements(@RequestBody DataSetElements dataSetElements){
-        
+
        return dataSetElementsService.SearchExistingDataSetElements(dataSetElements);
     }
 
-    
+
+
+//    @GetMapping("/sqlQueries")
+//    public List<String> getAllDataSetElementQueries() {
+//        List<DataSetElements> dataSetElementsList = dataSetElementsRepository.findAll();
+//        return dataSetElementsList.stream()
+//                .map(DataSetElements::getSqlQuery)
+//                .collect(Collectors.toList());
+//    }
 }
