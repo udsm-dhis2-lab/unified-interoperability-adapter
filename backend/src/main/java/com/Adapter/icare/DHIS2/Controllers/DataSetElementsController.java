@@ -54,13 +54,8 @@ public class DataSetElementsController {
         this.datasourceRepository = datasourceRepository;
 
     }
-
-
-
-
     @PostMapping
     public DataSetElements addDataSetElements(@RequestBody DataSetElements dataSetElements) throws Exception {
-
         //Manipulating the received request
         String dataElementsCategoryOptionCombString = dataSetElements.getDataElementCategoryOptionCombo();
         String [] stringArray = dataElementsCategoryOptionCombString.split("-");
@@ -152,20 +147,10 @@ public class DataSetElementsController {
         return resultList;
 
     }
-    @PostMapping("/searchDataSetElements")
-
-    public DataSetElements SearchExistingDataSetElements(@RequestBody DataSetElements dataSetElements){
-
-       return dataSetElementsService.SearchExistingDataSetElements(dataSetElements);
+    @GetMapping("/search")
+    public DataSetElements searchExistingDataSetElements(@RequestBody DataSetElements dataSetElements) {
+        return dataSetElementsService.searchExistingDataSetElements(dataSetElements);
     }
 
 
-
-//    @GetMapping("/sqlQueries")
-//    public List<String> getAllDataSetElementQueries() {
-//        List<DataSetElements> dataSetElementsList = dataSetElementsRepository.findAll();
-//        return dataSetElementsList.stream()
-//                .map(DataSetElements::getSqlQuery)
-//                .collect(Collectors.toList());
-//    }
 }

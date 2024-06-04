@@ -41,4 +41,5 @@ public class BaseEntity implements Serializable {
 
     @Column(columnDefinition = "json")
     private String sharing;
+
 }

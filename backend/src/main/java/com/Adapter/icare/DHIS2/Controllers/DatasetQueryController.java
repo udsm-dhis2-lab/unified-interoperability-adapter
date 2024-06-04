@@ -1,4 +1,5 @@
 package com.Adapter.icare.DHIS2.Controllers;
+import ch.qos.logback.classic.Logger;
 import com.Adapter.icare.DHIS2.DHISDomains.DatasetQuery;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetElementsService;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
@@ -9,9 +10,11 @@ import com.Adapter.icare.Services.DatasourceService;
 import com.Adapter.icare.Services.InstanceService;
 import com.Adapter.icare.Utils.EncryptionUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
+import org.hisp.dhis.api.model.v2_37_7.DataSetElement;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -189,7 +192,6 @@ public class DatasetQueryController {
         }
         return dataSetQueryImportResponses;
     }
-
     @GetMapping("/download")
     public byte[] downloadDataSetQueriesAsZip(@RequestParam(name = "instance", required = true) String instance) throws Exception {
         Instances instanceData = instanceService.getInstanceByUuid(instance);
@@ -204,34 +206,31 @@ public class DatasetQueryController {
             String dataSourceUserName = datasetQuery.getDataSource().getUsername();
             datasetQueryInfo.put("sqlQuery", datasetQuery.getSqlQuery());
             datasetQueryInfo.put("uuid", datasetQuery.getUuid());
+            datasetQueryInfo.put("id", datasetQuery.getId());
             datasetQueryInfo.put("mappings", datasetQuery.getMappings());
             datasetQueryInfo.put("instance", datasetQuery.getInstance().getUuid());
             datasetQueryInfo.put("instanceName", datasetQuery.getInstance().getName());
             datasetQueryInfo.put("dataSetUuid", datasetQuery.getDataSet().getUuid());
+
+            // Adding DataSource info
             Map<String, Object> dataSourceInfo = new HashMap<>();
             dataSourceInfo.put("dataSourceUuid", datasetQuery.getDataSource().getUuid());
             dataSourceInfo.put("dataSourceUrl", dataSourceUrl);
             dataSourceInfo.put("dataSourceUserName", dataSourceUserName);
             dataSourceInfo.put("dataSourcePassword", dataSourcePassword);
-
             datasetQueryInfo.put("dataSource", dataSourceInfo);
-            List<DataSetElements> dataSetElements = dataSetElementsService.searchExistingDataSetElementsPerDataSet(datasetQuery.getDataSet().getUuid());
-            List<Map<String, Object>> dataSetElementsInfo = new ArrayList<>();
 
-            for (DataSetElements element : dataSetElements) {
-                Map<String, Object> elementInfo = new HashMap<>();
-                elementInfo.put("uuid", element.getUuid());
-                elementInfo.put("dataElement", element.getDataElement());
-                elementInfo.put("categoryOptionCombo", element.getCategoryOptionCombo());
-                elementInfo.put("value", element.getId().byteValue());
-                dataSetElementsInfo.add(elementInfo);
-
-            }
-            datasetQueryInfo.put("dataSetElements", dataSetElementsInfo);
+            // Fetching DataSetElements and adding to the info
+            String dataSetUuid = datasetQuery.getDataSet().getUuid();
+            System.out.println(dataSetUuid);
+            List<Map<String, Object>> dataSetElements = dataSetElementsService.getDatasetId(dataSetUuid);
+            datasetQueryInfo.put("dataSetElements", dataSetElements);
             datasetQueriesData.add(datasetQueryInfo);
         }
+
         String datasetQueriesDataString = objectMapper.writeValueAsString(datasetQueriesData);
         byte[] datasetQueriesDataBytes = datasetQueriesDataString.getBytes();
+
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream);
         ZipEntry zipEntry = new ZipEntry("datasetQueriesData.json");
@@ -244,15 +243,12 @@ public class DatasetQueryController {
     }
 
 
-
     @PostMapping("/upload")
     public ResponseEntity<String> uploadDataSetQueriesByInstanceUuid(@RequestParam("file") MultipartFile file, @RequestParam("instance") String instanceUuid) {
-     
         if (file.isEmpty()) {
             System.out.println("File is empty");
             return new ResponseEntity<>("File is empty", HttpStatus.BAD_REQUEST);
         }
-
         UUID instance = UUID.fromString(instanceUuid);
         System.out.println("Instance UUID: " + instance);
 
@@ -309,17 +305,6 @@ public class DatasetQueryController {
             return new ResponseEntity<>("Error processing the file", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }
 
