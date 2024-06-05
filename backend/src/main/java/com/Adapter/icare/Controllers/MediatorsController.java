@@ -40,6 +40,11 @@ public class MediatorsController {
         return mediatorsService.updateMediator(mediator);
     }
 
+    @DeleteMapping("mediators/{uuid}")
+    public void deleteMediator(@PathVariable("uuid") String uuid) throws Exception {
+         mediatorsService.deleteMediator(uuid);
+    }
+
     @GetMapping("dataTemplates")
     public List<Map<String, Object>> getDataTemplatesList () throws Exception {
         return  mediatorsService.getDataTemplatesList();

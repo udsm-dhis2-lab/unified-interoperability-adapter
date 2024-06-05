@@ -52,6 +52,20 @@ public class MediatorsService {
 
     }
 
+    public void deleteMediator(String uuid) throws Exception {
+        if (uuid == null) {
+            throw new IllegalStateException("uuid is missing");
+        } else {
+            Mediator mediator = mediatorsRepository.getMediatorByUuid(uuid);
+            if (mediator != null) {
+                mediatorsRepository.deleteById(mediator.getId());
+            } else {
+                throw new IllegalStateException("Mediator with uuid " + uuid + " does not exists");
+            }
+
+        }
+    }
+
     public List<Map<String, Object>> getDataTemplatesList() throws Exception {
         List<Map<String, Object>> dataTemplates = new ArrayList<>();
         return  dataTemplates;

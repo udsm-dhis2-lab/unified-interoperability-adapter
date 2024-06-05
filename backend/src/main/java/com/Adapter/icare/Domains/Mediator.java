@@ -28,12 +28,32 @@ public class Mediator  extends BaseEntity implements Serializable {
     @Column(name = "auth_type", nullable = true)
     private String authType;
 
+    @Column(name="category", nullable = true)
+    private String category;
+
     public enum AuthType{
         BASIC("BASIC"),
         TOKEN("TOKEN");
         final String value;
 
         AuthType(String value){
+            this.value = value;
+        }
+
+        public String getValue(){
+            return value;
+        }
+    }
+
+    public enum Category{
+        DATA_TEMPLATE_METADATA("DATA_TEMPLATE_METADATA"),
+        DATA_TEMPLATE("DATA_TEMPLATE"),
+        ICD("ICD"),
+        LOINC("LOINC");
+
+        final String value;
+
+        Category(String value){
             this.value = value;
         }
 
