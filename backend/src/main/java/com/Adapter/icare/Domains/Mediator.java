@@ -14,7 +14,6 @@ import java.io.Serializable;
 @Setter
 @Entity
 @Table
-
 public class Mediator  extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

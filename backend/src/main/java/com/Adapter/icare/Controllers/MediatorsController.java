@@ -1,19 +1,15 @@
 package com.Adapter.icare.Controllers;
 
 
+import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Base64;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,9 +18,11 @@ import java.util.Map;
 public class MediatorsController {
 
     private final  MediatorsService mediatorsService;
+    private final DatastoreService datastoreService;
 
-    public MediatorsController(MediatorsService mediatorsService) {
+    public MediatorsController(MediatorsService mediatorsService, DatastoreService datastoreService) {
         this.mediatorsService = mediatorsService;
+        this.datastoreService = datastoreService;
     }
 
     @PostMapping("mediators")
@@ -47,12 +45,23 @@ public class MediatorsController {
 
     @GetMapping("dataTemplates")
     public List<Map<String, Object>> getDataTemplatesList () throws Exception {
-        return  mediatorsService.getDataTemplatesList();
+        List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
+        List<Map<String, Object>> dataTemplates = new ArrayList<>();
+        for(Datastore datastore: dataTemplateNameSpaceDetails) {
+            Map<String, Object> dataTemplate = datastore.getValue();
+            dataTemplate.put("uuid", datastore.getUuid());
+            dataTemplates.add(dataTemplate);
+        }
+        return  dataTemplates;
     }
 
     @GetMapping("dataTemplates/{id}")
     public Map<String, Object> getDataTemplateById(@PathVariable("id") String id) throws Exception {
-        return mediatorsService.getDataTemplateById(id);
+        Datastore datastore = datastoreService.getDatastoreByUuid(id);
+        if (datastore == null) {
+            throw new Exception("Data template for the id " + id + " does not exists");
+        }
+        return datastore.getValue();
     }
 
     @PostMapping(value = "dataTemplates", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
