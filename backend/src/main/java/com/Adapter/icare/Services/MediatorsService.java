@@ -81,8 +81,14 @@ public class MediatorsService {
          */
         Map<String, Object> workflow =(Map<String, Object>) ((Map<String, Object>) data.get("templateDetails")).get("workflow");
         if (workflow != null) {
-            if (workflow.get("uuid") != null) {
-                Mediator mediator = mediatorsRepository.getMediatorByUuid(workflow.get("uuid").toString());
+            if (workflow.get("id") != null || workflow.get("uuid") != null) {
+                String id = "";
+                if (workflow.get("id") != null) {
+                    id = workflow.get("id").toString();
+                } else if (workflow.get("uuid") != null) {
+                    id = workflow.get("uuid").toString();
+                }
+                Mediator mediator = mediatorsRepository.getMediatorByUuid(id);
                 String authType = mediator.getAuthType();
                 String authToken = mediator.getAuthToken();
                 String baseUrl = mediator.getBaseUrl();
@@ -129,7 +135,7 @@ public class MediatorsService {
                 }
                 return  returnStr;
             } else {
-                throw new IllegalStateException("Workflow uuid is missing");
+                throw new IllegalStateException("Workflow uuid or id is missing");
             }
 
         } else {

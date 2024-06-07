@@ -36,6 +36,7 @@ public class DatastoreService {
             String uuid = datastore.getUuid();
             Datastore datastoreToUpdate = datastoreRepository.getDatastoreByUuid(uuid);
             if (datastoreToUpdate != null) {
+                datastore.setId(datastoreToUpdate.getId());
                 return datastoreRepository.save(datastore);
             } else {
                 throw new IllegalStateException("Datastore with uuid " + uuid + " does not exists");
