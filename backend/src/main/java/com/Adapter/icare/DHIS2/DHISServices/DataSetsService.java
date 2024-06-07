@@ -248,7 +248,7 @@ public class DataSetsService {
         return dataSetsRepository.findById(datasetId);
     }
 
-    public Datasets getDataSetByUuid(String uuid) {
+    public Datasets getDataSetInstanceByUuid(String uuid) {
         return dataSetsRepository.getDatasetInstanceByUuid(uuid);
     }
     public Datasets getDataSetInstanceByDataSetId(String id) {

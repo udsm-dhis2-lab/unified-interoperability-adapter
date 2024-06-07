@@ -49,8 +49,10 @@ public class DataSetElementsService {
     }
 
     public void addDataSetElements(DataSetElements dataSetElements) {
-        UUID uuid = UUID.randomUUID();
-        dataSetElements.setUuid(uuid.toString());
+        if (dataSetElements.getUuid() == null) {
+            UUID uuid = UUID.randomUUID();
+            dataSetElements.setUuid(uuid.toString());
+        }
         dataSetElementsRepository.save(dataSetElements);    
     }
 
