@@ -1,0 +1,140 @@
+package com.Adapter.icare.Services;
+
+import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Repository.MediatorsRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+
+@Service
+public class MediatorsService {
+    private final MediatorsRepository mediatorsRepository;
+
+    public MediatorsService(MediatorsRepository mediatorsRepository) {
+        this.mediatorsRepository = mediatorsRepository;
+    }
+
+    public Mediator saveMediatorConfigs(Mediator mediator) throws Exception {
+        if (mediator.getUuid() == null) {
+            UUID uuid = UUID.randomUUID();
+            mediator.setUuid(uuid.toString());
+        }
+        return mediatorsRepository.save(mediator);
+    }
+
+    public List<Mediator> getMediatorsConfigs() throws Exception {
+        return mediatorsRepository.findAll();
+    }
+
+    public Mediator getMediatorByUuid(String uuid) throws Exception {
+        return  mediatorsRepository.getMediatorByUuid(uuid);
+    }
+
+    public Mediator updateMediator(Mediator mediator) throws Exception {
+        if (mediator.getUuid() != null) {
+            String uuid = mediator.getUuid();
+            Mediator mediatorToUpdate = mediatorsRepository.getMediatorByUuid(uuid);
+            if (mediatorToUpdate != null) {
+                return mediatorsRepository.save(mediator);
+            } else {
+                throw new IllegalStateException("Mediator with uuid " + uuid + " does not exists");
+            }
+        } else {
+            throw new IllegalStateException("Mediator uuid is not set");
+        }
+
+    }
+
+    public void deleteMediator(String uuid) throws Exception {
+        if (uuid == null) {
+            throw new IllegalStateException("uuid is missing");
+        } else {
+            Mediator mediator = mediatorsRepository.getMediatorByUuid(uuid);
+            if (mediator != null) {
+                mediatorsRepository.deleteById(mediator.getId());
+            } else {
+                throw new IllegalStateException("Mediator with uuid " + uuid + " does not exists");
+            }
+
+        }
+    }
+
+    public List<Map<String, Object>> getDataTemplatesList() throws Exception {
+        List<Map<String, Object>> dataTemplates = new ArrayList<>();
+        return  dataTemplates;
+    }
+
+    public Map<String, Object> getDataTemplateById(String id) throws Exception {
+        return  new HashMap<>();
+    }
+
+    public String sendDataToMediator(Map<String, Object> data) throws Exception {
+        /**
+         * TODO: The base url, path and authentication details should be put on configurations
+         */
+        Map<String, Object> workflow =(Map<String, Object>) ((Map<String, Object>) data.get("templateDetails")).get("workflow");
+        if (workflow != null) {
+            if (workflow.get("uuid") != null) {
+                Mediator mediator = mediatorsRepository.getMediatorByUuid(workflow.get("uuid").toString());
+                String authType = mediator.getAuthType();
+                String authToken = mediator.getAuthToken();
+                String baseUrl = mediator.getBaseUrl();
+                String path = mediator.getPath();
+                URL url = new URL(baseUrl + path);
+                BufferedReader reader;
+                String dataLine;
+                StringBuffer responseContent = new StringBuffer();
+                JSONObject responseJsonObject = new JSONObject();
+                String returnStr = "";
+                try {
+                    HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                    String authentication = "";
+                    if (authType.equals("BASIC")) {
+                        authentication =  "Basic " + authToken;
+                        httpURLConnection.setRequestProperty("Authorization", authentication);
+                    } else if (authType.equals("TOKEN")) {
+                       authentication = "Bearer " + authToken;
+                        httpURLConnection.setRequestProperty("Authorization", authentication);
+                    }
+                    httpURLConnection.setRequestMethod("POST");
+                    httpURLConnection.setRequestProperty("Content-Type", "application/json");
+                    httpURLConnection.setRequestProperty("Accept", "application/json");
+                    httpURLConnection.setDoOutput(true);
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    String jsonString = mapper.writeValueAsString(data);
+
+                    try (OutputStream os = httpURLConnection.getOutputStream()) {
+                        byte[] input = jsonString.getBytes("utf-8");
+                        os.write(input, 0, input.length);
+                    }
+
+                    reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                    while ((dataLine = reader.readLine()) != null) {
+                        responseContent.append(dataLine);
+                    }
+                    reader.close();
+                    // System.out.println(js);
+                    responseJsonObject = new JSONObject(responseContent.toString());
+                    returnStr  = responseJsonObject.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return  returnStr;
+            } else {
+                throw new IllegalStateException("Workflow uuid is missing");
+            }
+
+        } else {
+            throw new IllegalStateException("Workflow not set");
+        }
+
+    }
+}
