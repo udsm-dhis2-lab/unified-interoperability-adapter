@@ -48,7 +48,8 @@ public class Mediator  extends BaseEntity implements Serializable {
         DATA_TEMPLATE_METADATA("DATA_TEMPLATE_METADATA"),
         DATA_TEMPLATE("DATA_TEMPLATE"),
         ICD("ICD"),
-        LOINC("LOINC");
+        LOINC("LOINC"),
+        OPENMRS("OPENMRS");
 
         final String value;
 

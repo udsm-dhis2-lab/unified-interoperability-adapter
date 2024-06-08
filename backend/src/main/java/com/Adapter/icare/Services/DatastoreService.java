@@ -31,6 +31,10 @@ public class DatastoreService {
         return  datastoreRepository.getDatastoreByUuid(uuid);
     }
 
+    public Datastore getDatastoreByNamespaceAndKey(String namespace, String key) throws Exception {
+        return  datastoreRepository.getDatastoreByNamespaceAndKey(namespace, key);
+    }
+
     public Datastore updateDatastore(Datastore datastore) throws Exception {
         if (datastore.getUuid() != null) {
             String uuid = datastore.getUuid();

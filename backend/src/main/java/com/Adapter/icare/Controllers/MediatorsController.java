@@ -45,6 +45,7 @@ public class MediatorsController {
 
     @GetMapping("dataTemplates")
     public List<Map<String, Object>> getDataTemplatesList () throws Exception {
+        // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
         List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
         List<Map<String, Object>> dataTemplates = new ArrayList<>();
         for(Datastore datastore: dataTemplateNameSpaceDetails) {
@@ -55,11 +56,11 @@ public class MediatorsController {
         return  dataTemplates;
     }
 
-    @GetMapping("dataTemplates/{id}")
-    public Map<String, Object> getDataTemplateById(@PathVariable("id") String id) throws Exception {
-        Datastore datastore = datastoreService.getDatastoreByUuid(id);
+    @GetMapping("dataTemplates/{uuid}")
+    public Map<String, Object> getDataTemplateByUuid(@PathVariable("uuid") String uuid) throws Exception {
+        Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
         if (datastore == null) {
-            throw new Exception("Data template for the id " + id + " does not exists");
+            throw new Exception("Data template for the uuid " + uuid + " does not exists");
         }
         return datastore.getValue();
     }

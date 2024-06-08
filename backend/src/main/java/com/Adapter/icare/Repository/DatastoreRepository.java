@@ -15,5 +15,8 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     @Query(value = "SELECT * FROM datastore WHERE namespace=:namespace",nativeQuery = true)
     List<Datastore> getDatastoreByNamespace(String namespace);
 
+    @Query(value = "SELECT * FROM datastore WHERE namespace=:namespace AND data_key=:dataKey",nativeQuery = true)
+    Datastore getDatastoreByNamespaceAndKey(String namespace, String dataKey);
+
 
 }
