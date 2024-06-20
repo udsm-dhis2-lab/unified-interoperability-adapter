@@ -70,7 +70,11 @@ public class MediatorsController {
         /**
          * Send data to Mediator where all the logics will be done.
          */
-
-        return mediatorsService.sendDataToMediator(data);
+        return mediatorsService.sendDataToMediatorWorkflow(data);
     }
+
+//    @GetMapping("codeSystems")
+//    public Map<String, Object> getCodeSystemsList() throws Exception {
+//
+//    }
 }

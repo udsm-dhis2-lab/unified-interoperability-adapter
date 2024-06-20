@@ -2,6 +2,7 @@ package com.Adapter.icare.Services;
 
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Repository.DatastoreRepository;
+import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -51,7 +52,7 @@ public class DatastoreService {
 
     }
 
-    public void deleteDatastore(String uuid) throws Exception {
+    public void deleteDatastore(String uuid) throws NotFoundException {
         if (uuid == null) {
             throw new IllegalStateException("uuid is missing");
         } else {
@@ -59,7 +60,8 @@ public class DatastoreService {
             if (datastore != null) {
                 datastoreRepository.deleteById(datastore.getId());
             } else {
-                throw new IllegalStateException("Datastore with uuid " + uuid + " does not exists");
+                throw new NotFoundException(
+                        String.format("Datastore with uuid " + uuid + " does not exists"));
             }
 
         }

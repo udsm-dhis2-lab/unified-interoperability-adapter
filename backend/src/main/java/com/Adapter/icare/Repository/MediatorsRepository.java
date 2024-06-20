@@ -12,4 +12,7 @@ public interface MediatorsRepository extends JpaRepository<Mediator, Long> {
 
     @Query(value = "SELECT * FROM mediator WHERE uuid=:uuid",nativeQuery = true)
     Mediator getMediatorByUuid(String uuid);
+
+    @Query(value = "SELECT * FROM mediator WHERE category=:category",nativeQuery = true)
+    Mediator getMediatorByCategory(String category);
 }

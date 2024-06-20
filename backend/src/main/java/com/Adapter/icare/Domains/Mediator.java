@@ -47,8 +47,8 @@ public class Mediator  extends BaseEntity implements Serializable {
     public enum Category{
         DATA_TEMPLATE_METADATA("DATA_TEMPLATE_METADATA"),
         DATA_TEMPLATE("DATA_TEMPLATE"),
-        ICD("ICD"),
-        LOINC("LOINC"),
+        FHIR("FHIR"),
+        WHOICDAPI("WHOICDAPI"),
         OPENMRS("OPENMRS");
 
         final String value;

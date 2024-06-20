@@ -67,15 +67,19 @@ public class MediatorsService {
     }
 
     public List<Map<String, Object>> getDataTemplatesList() throws Exception {
+        // To be used in case data templates can be stored on FHIR resource
+        // TODO: Implement as per FHIR resource
         List<Map<String, Object>> dataTemplates = new ArrayList<>();
         return  dataTemplates;
     }
 
     public Map<String, Object> getDataTemplateById(String id) throws Exception {
+        // To be used in case data templates can be stored on FHIR resource
+        // TODO: Implement as per FHIR resource
         return  new HashMap<>();
     }
 
-    public String sendDataToMediator(Map<String, Object> data) throws Exception {
+    public String sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
         /**
          * TODO: The base url, path and authentication details should be put on configurations
          */
@@ -88,7 +92,9 @@ public class MediatorsService {
                 } else if (workflow.get("uuid") != null) {
                     id = workflow.get("uuid").toString();
                 }
+//                System.out.println(id);
                 Mediator mediator = mediatorsRepository.getMediatorByUuid(id);
+//                System.out.println(mediator.getUuid());
                 String authType = mediator.getAuthType();
                 String authToken = mediator.getAuthToken();
                 String baseUrl = mediator.getBaseUrl();
@@ -142,5 +148,16 @@ public class MediatorsService {
             throw new IllegalStateException("Workflow not set");
         }
 
+    }
+
+    public Map<String, Object> getCodeSystems() throws Exception {
+        Map<String, Object> codeSystemsData = new HashMap<>();
+        Mediator FHIRMediator = mediatorsRepository.getMediatorByCategory("FHIR");
+        String authType = FHIRMediator.getAuthType();
+        String authToken = FHIRMediator.getAuthToken();
+        String baseUrl = FHIRMediator.getBaseUrl();
+        String path = "CodeSystem";
+        URL url = new URL(baseUrl + path);
+        return  codeSystemsData;
     }
 }
