@@ -25,6 +25,12 @@ public class MediatorsController {
         this.datastoreService = datastoreService;
     }
 
+
+    @GetMapping("mediators")
+    public List<Mediator> getMediators() throws Exception {
+        return mediatorsService.getMediatorsConfigs();
+    }
+
     @PostMapping("mediators")
     public Mediator saveMediator(@RequestBody Mediator mediator) throws Exception {
         return mediatorsService.saveMediatorConfigs(mediator);

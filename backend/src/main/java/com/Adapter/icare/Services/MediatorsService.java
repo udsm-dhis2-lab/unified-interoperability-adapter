@@ -149,7 +149,12 @@ public class MediatorsService {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                return  returnStr;
+                Map<String, Object> returnResults = new HashMap<>();
+                returnResults.put("templateDetails", data.get("templateDetails"));
+                returnResults.put("statusText", "OK");
+                returnResults.put("statusCode", 200);
+                returnResults.put("workOrder", returnStr);
+                return  returnResults.toString();
             } else {
                 throw new IllegalStateException("Workflow uuid or id is missing");
             }
