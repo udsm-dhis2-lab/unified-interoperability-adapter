@@ -84,7 +84,17 @@ public class MediatorsService {
          * TODO: The base url, path and authentication details should be put on configurations
          */
         Map<String, Object> workflow =(Map<String, Object>) ((Map<String, Object>) data.get("templateDetails")).get("workflow");
-        if (workflow != null) {
+        if (workflow == null) {
+            throw new IllegalStateException("Workflow not set");
+        } else if (((Map<String, Object>) data.get("templateDetails")).get("data") == null) {
+            throw new IllegalStateException("Data section is missing");
+        } else if (((Map<String, Object>)((Map<String, Object>) data.get("templateDetails")).get("data")).get("facilityDetails") == null) {
+            throw new IllegalStateException("Facility is not set");
+        } else if (((Map<String, Object>)((Map<String, Object>) data.get("templateDetails")).get("data")).get("listGrid") == null) {
+            throw new IllegalStateException("List grid is not set");
+        } else if (((List)((Map<String, Object>)((Map<String, Object>) data.get("templateDetails")).get("data")).get("listGrid")).size() == 0) {
+            throw new IllegalStateException("Nothing set on the list grid section");
+        } else {
             if (workflow.get("id") != null || workflow.get("uuid") != null) {
                 String id = "";
                 if (workflow.get("id") != null) {
@@ -143,9 +153,6 @@ public class MediatorsService {
             } else {
                 throw new IllegalStateException("Workflow uuid or id is missing");
             }
-
-        } else {
-            throw new IllegalStateException("Workflow not set");
         }
 
     }
