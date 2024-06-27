@@ -83,6 +83,7 @@ public class MediatorsService {
         /**
          * TODO: The base url, path and authentication details should be put on configurations
          */
+        System.out.println(JSONObject.valueToString((Map<String, Object>) data.get("templateDetails")));
         Map<String, Object> workflow =(Map<String, Object>) ((Map<String, Object>) data.get("templateDetails")).get("workflow");
         if (workflow == null) {
             throw new IllegalStateException("Workflow not set");
@@ -93,14 +94,14 @@ public class MediatorsService {
         } else if (((Map<String, Object>) data.get("data")).get("listGrid") == null) {
             throw new IllegalStateException("List grid is not set");
         } else if (((List) ((Map<String, Object>) data.get("data")).get("listGrid")).size() == 0) {
-            throw new IllegalStateException("Nothing set on the list grid section");
+            throw new IllegalStateException("Nothing set on the list grid block");
         } else {
             if (workflow.get("id") != null || workflow.get("uuid") != null) {
                 String id = "";
-                if (workflow.get("id") != null) {
-                    id = workflow.get("id").toString();
-                } else if (workflow.get("uuid") != null) {
+                if (workflow.get("uuid") != null) {
                     id = workflow.get("uuid").toString();
+                } else if (workflow.get("id") != null) {
+                    id = workflow.get("id").toString();
                 }
 //                System.out.println(id);
                 Mediator mediator = mediatorsRepository.getMediatorByUuid(id);
@@ -118,10 +119,11 @@ public class MediatorsService {
                 try {
                     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                     String authentication = "";
-                    if (authType.equals("BASIC")) {
+                    if (authType.toLowerCase().equals("basic")) {
                         authentication =  "Basic " + authToken;
+                        System.out.println(authentication);
                         httpURLConnection.setRequestProperty("Authorization", authentication);
-                    } else if (authType.equals("TOKEN")) {
+                    } else if (authType.toLowerCase().equals("token")) {
                        authentication = "Bearer " + authToken;
                         httpURLConnection.setRequestProperty("Authorization", authentication);
                     }
@@ -150,11 +152,11 @@ public class MediatorsService {
                     e.printStackTrace();
                 }
                 Map<String, Object> returnResults = new HashMap<>();
-                returnResults.put("templateDetails", data.get("templateDetails"));
+                returnResults.put("templateDetails", (Map<String, Object>) data.get("templateDetails"));
                 returnResults.put("statusText", "OK");
                 returnResults.put("statusCode", 200);
                 returnResults.put("workOrder", returnStr);
-                return  returnResults.toString();
+                return  JSONObject.valueToString(returnResults);
             } else {
                 throw new IllegalStateException("Workflow uuid or id is missing");
             }
