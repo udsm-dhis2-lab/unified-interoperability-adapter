@@ -50,16 +50,24 @@ public class MediatorsController {
     }
 
     @GetMapping("dataTemplates")
-    public List<Map<String, Object>> getDataTemplatesList () throws Exception {
+    public List<Map<String, Object>> getDataTemplatesList (@RequestParam String id) throws Exception {
         // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
         List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
         List<Map<String, Object>> dataTemplates = new ArrayList<>();
         for(Datastore datastore: dataTemplateNameSpaceDetails) {
             Map<String, Object> dataTemplate = datastore.getValue();
-            dataTemplate.put("uuid", datastore.getUuid());
-            dataTemplates.add(dataTemplate);
+            if (id != null) {
+                if ( ((Map<String, Object>) dataTemplate.get("templateDetails")).get("id").equals(id)) {
+                    dataTemplate.put("uuid", datastore.getUuid());
+                    dataTemplates.add(dataTemplate);
+                }
+            } else {
+                dataTemplate.put("uuid", datastore.getUuid());
+                dataTemplates.add(dataTemplate);
+            }
         }
         return  dataTemplates;
+
     }
 
     @GetMapping("dataTemplates/{uuid}")

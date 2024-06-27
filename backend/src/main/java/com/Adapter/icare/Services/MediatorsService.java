@@ -86,13 +86,13 @@ public class MediatorsService {
         Map<String, Object> workflow =(Map<String, Object>) ((Map<String, Object>) data.get("templateDetails")).get("workflow");
         if (workflow == null) {
             throw new IllegalStateException("Workflow not set");
-        } else if (((Map<String, Object>) data.get("templateDetails")).get("data") == null) {
+        } else if (data.get("data") == null) {
             throw new IllegalStateException("Data section is missing");
-        } else if (((Map<String, Object>)((Map<String, Object>) data.get("templateDetails")).get("data")).get("facilityDetails") == null) {
+        } else if (((Map<String, Object>) data.get("data")).get("facilityDetails") == null) {
             throw new IllegalStateException("Facility is not set");
-        } else if (((Map<String, Object>)((Map<String, Object>) data.get("templateDetails")).get("data")).get("listGrid") == null) {
+        } else if (((Map<String, Object>) data.get("data")).get("listGrid") == null) {
             throw new IllegalStateException("List grid is not set");
-        } else if (((List)((Map<String, Object>)((Map<String, Object>) data.get("templateDetails")).get("data")).get("listGrid")).size() == 0) {
+        } else if (((List) ((Map<String, Object>) data.get("data")).get("listGrid")).size() == 0) {
             throw new IllegalStateException("Nothing set on the list grid section");
         } else {
             if (workflow.get("id") != null || workflow.get("uuid") != null) {
