@@ -150,7 +150,7 @@ export class ReportsComponent implements OnInit {
     }
   }
 
-  viewReport(event: Event, dataSetQuery: any): void {
+  viewReport(event: Event, dataSetQuery?: any): void {
     event.stopPropagation();
     // console.log(dataSetQuery);
     this.period = this.periodFilter?.calculateDates(
@@ -168,7 +168,7 @@ export class ReportsComponent implements OnInit {
         datasetId: this.dataset?.id,
       };
 
-      (dataSetQuery
+      (dataSetQuery && dataSetQuery?.uuid
         ? this.reportsService.getDatasetReportUsingDatasetQuery(
             dataSetQuery?.uuid,
             dataViewReport
