@@ -45,7 +45,7 @@ export class InstancesService {
   constructor(private httpClient: HttpClient) {
     this.httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type': 'application/zip',
+        'Content-Type': 'application/json',
         Auth: 'Basic ' + localStorage.getItem('iadapterAuthKey'),
       }),
     };
