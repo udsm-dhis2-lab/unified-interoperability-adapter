@@ -198,8 +198,14 @@ export class ReportsComponent implements OnInit {
             dataValues:
               data.map((dataValue: any) => {
                 return {
-                  dataElement: dataValue?.id?.split('-')[0],
-                  categoryOptionCombo: dataValue?.id?.split('-')[1],
+                  dataElement: (dataValue?.id
+                    ? dataValue?.id
+                    : dataValue?.dataElementCategoryCombo
+                  )?.split('-')[0],
+                  categoryOptionCombo: (dataValue?.id
+                    ? dataValue?.id
+                    : dataValue?.dataElementCategoryCombo
+                  )?.split('-')[1],
                   value: dataValue?.value.toString(),
                   comment: 'FROM IADAPTER',
                 };

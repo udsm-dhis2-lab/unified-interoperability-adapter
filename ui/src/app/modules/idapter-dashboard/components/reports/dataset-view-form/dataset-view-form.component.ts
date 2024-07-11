@@ -95,6 +95,7 @@ export class DatasetViewFormComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    console.log('payloadToSend', this.payloadToSend);
     try {
       this._htmlMarkup = this.sanitizer?.bypassSecurityTrustHtml(
         this.dataSetFormDesign
