@@ -31,18 +31,20 @@
 
 package com.Adapter.icare.DHIS2.Controllers;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.Adapter.icare.Domains.Instances;
-import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
+import com.Adapter.icare.Domains.*;
+import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Utils.EncryptionUtils;
+import org.apache.tomcat.util.json.JSONParser;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -52,9 +54,10 @@ import com.Adapter.icare.DHIS2.DHISDomains.DataValues;
 import com.Adapter.icare.DHIS2.DHISDomains.DhisAggregateValues;
 import com.Adapter.icare.DHIS2.DHISDomains.ReportValuesSent;
 import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
-import com.Adapter.icare.Domains.DataSetElements;
 import org.hisp.dhis.integration.sdk.Dhis2ClientBuilder;
 import org.hisp.dhis.integration.sdk.api.Dhis2Client;
+
+import javax.json.stream.JsonParser;
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -62,10 +65,14 @@ public class ReportsController {
 
     @Autowired
     private final ReportsService reportsService;
+    private final DatastoreService datastoreService;
+    private final DataSetsService dataSetsService;
 
 
-    public ReportsController(ReportsService reportsService) {
+    public ReportsController(ReportsService reportsService, DatastoreService datastoreService, DataSetsService dataSetsService) {
         this.reportsService = reportsService;
+        this.datastoreService = datastoreService;
+        this.dataSetsService = dataSetsService;
     }
 
 
@@ -109,7 +116,7 @@ public class ReportsController {
     @PostMapping("/sendValues")
     public String SendDataToDHIS(@RequestBody Map<String, Object> reportData) throws Exception {
         List<DataValues> dataValues =  (List<DataValues>) reportData.get("dataValues");
-        String datasetUuid = reportData.get("dataSet").toString();
+        String datasetInstanceUuid = reportData.get("dataSet").toString();
         String period = reportData.get("period").toString();
         String attributeOptCombo = null;
         if (reportData.get("attributeOptCombo") != null) {
@@ -117,8 +124,38 @@ public class ReportsController {
         }
         String completeDate = java.time.LocalDate.now().toString();
 
-        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetUuid, completeDate,period, "",attributeOptCombo,dataValues);
-        return reportsService.SendDataToDHIS(dhisAggregateValues,datasetUuid);
+        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetInstanceUuid, completeDate,period, "",attributeOptCombo,dataValues);
+        String DHIS2Response = reportsService.SendDataToDHIS(dhisAggregateValues,datasetInstanceUuid);
+        Map<String, Object> jsonObjectForDatastore = new HashMap<>();
+        Datasets datasetsInstanceDetails =dataSetsService.getDataSetInstanceByUuid(datasetInstanceUuid);
+        jsonObjectForDatastore.put("dataValues", dhisAggregateValues);
+        jsonObjectForDatastore.put("period", period);
+        Map<String, Object> dataSet = new HashMap<>();
+        dataSet.put("uuid", datasetsInstanceDetails.getId());
+        dataSet.put("code", datasetsInstanceDetails.getCode());
+        dataSet.put("name", datasetsInstanceDetails.getDisplayName());
+        dataSet.put("instanceUuid", datasetsInstanceDetails.getInstances().getUuid());
+        jsonObjectForDatastore.put("dataSet",dataSet);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime now = LocalDateTime.now();
+        jsonObjectForDatastore.put("pushedOn",dtf.format(now));
+        jsonObjectForDatastore.put("dataSet",dataSet);
+        jsonObjectForDatastore.put("response",DHIS2Response);
+        Datastore datastore = new Datastore();
+        String namespace = datasetsInstanceDetails.getUuid();
+        String key = period;
+        datastore.setNamespace(namespace);
+        datastore.setDataKey(key);
+        datastore.setValue(jsonObjectForDatastore);
+        Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, key);
+        Datastore datastoreResponse = new Datastore();
+        if (existingDatastore == null) {
+            datastoreResponse = datastoreService.saveDatastore(datastore);
+        } else {
+            existingDatastore.setValue(datastore.getValue());
+            datastoreResponse = datastoreService.updateDatastore(existingDatastore);
+        }
+        return DHIS2Response;
     }
 
 
@@ -156,7 +193,7 @@ public class ReportsController {
                 throw new RuntimeException("Error establishing DHIS2 client: " + e);
             }
             if (dhis2Client != null) {
-                Map<String, Object> response = dhis2Client.get("organisationUnits").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+                Map<String, Object> response = dhis2Client.get("organisationUnits.json").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
                 if (response != null && response.get("organisationUnits") != null && ((List) response.get("organisationUnits")).size() > 0) {
                     organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
                 } else {

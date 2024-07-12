@@ -98,7 +98,7 @@ public class DataSetsService {
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
-            System.out.println(jsObject);
+//            System.out.println(jsObject);
             JSONArray js = jsObject.getJSONArray("dataSets"); 
             //System.out.println(js);
 
@@ -251,8 +251,9 @@ public class DataSetsService {
     public Datasets getDataSetInstanceByUuid(String uuid) {
         return dataSetsRepository.getDatasetInstanceByUuid(uuid);
     }
-    public Datasets getDataSetInstanceByDataSetId(String id) {
-        return dataSetsRepository.getDatasetInstanceById(id);
+
+    public Datasets getDataSetInstanceByDataSetId(String dhis2Uid) {
+        return dataSetsRepository.getDatasetInstanceById(dhis2Uid);
     }
 
     public void deleteDataSets(String datasetId)  {
