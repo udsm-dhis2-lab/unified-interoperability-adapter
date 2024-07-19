@@ -1,5 +1,6 @@
 package com.Adapter.icare.Services;
 
+import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Repository.MediatorsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,14 +12,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class MediatorsService {
     private final MediatorsRepository mediatorsRepository;
+    private final DatastoreService datastoreService;
 
-    public MediatorsService(MediatorsRepository mediatorsRepository) {
+    public MediatorsService(MediatorsRepository mediatorsRepository, DatastoreService datastoreService) {
         this.mediatorsRepository = mediatorsRepository;
+        this.datastoreService = datastoreService;
     }
 
     public Mediator saveMediatorConfigs(Mediator mediator) throws Exception {
@@ -83,7 +88,7 @@ public class MediatorsService {
         /**
          * TODO: The base url, path and authentication details should be put on configurations
          */
-        System.out.println(JSONObject.valueToString((Map<String, Object>) data.get("templateDetails")));
+//        System.out.println(JSONObject.valueToString((Map<String, Object>) data.get("templateDetails")));
         Map<String, Object> workflow =(Map<String, Object>) ((Map<String, Object>) data.get("templateDetails")).get("workflow");
         if (workflow == null) {
             throw new IllegalStateException("Workflow not set");
@@ -121,7 +126,7 @@ public class MediatorsService {
                     String authentication = "";
                     if (authType.toLowerCase().equals("basic")) {
                         authentication =  "Basic " + authToken;
-                        System.out.println(authentication);
+//                        System.out.println(authentication);
                         httpURLConnection.setRequestProperty("Authorization", authentication);
                     } else if (authType.toLowerCase().equals("token")) {
                        authentication = "Bearer " + authToken;
@@ -152,6 +157,40 @@ public class MediatorsService {
                     e.printStackTrace();
                 }
                 Map<String, Object> returnResults = new HashMap<>();
+                Map<String, Object> templateDetails = ((Map<String, Object>) data.get("templateDetails"));
+                Map<String, Object> dataSection = ((Map<String, Object>) data.get("data"));
+                List<Map<String, Object>> listGrid = new ArrayList<>();
+                listGrid = (List<Map<String, Object>>) dataSection.get("listGrid");
+                Map<String, Object> facilityDetails = (Map<String, Object>)dataSection.get("facilityDetails");
+                String hfrCode = facilityDetails.get("HFCode").toString();
+                for(Map<String, Object> clientData: listGrid ) {
+                    // TODO: Add support to retrive client details before saving
+                    Datastore datastore = new Datastore();
+                    datastore.setNamespace("clients-" + hfrCode);
+                    Map<String, Object> demographicDetails = (Map<String, Object>) clientData.get("demographicDetails");
+                    datastore.setDataKey(demographicDetails.get("mrn").toString());
+                    datastore.setValue(demographicDetails);
+                    Datastore clientResponse = datastoreService.saveDatastore(datastore);
+                    // Save service data for each client
+                    Datastore serviceDetails = new Datastore();
+                    Map<String, Object> visitDetails = (Map<String, Object>) clientData.get("visitDetails");
+                    String visitDateString = visitDetails.get("visitDate").toString();
+                    String pattern = "yyyy-MM-dd";
+                    SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+                    Date visitDate = new Date();
+                    try {
+                        visitDate = formatter.parse(visitDateString);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+                    String date = simpleDateFormat.format(visitDate);
+                    String visitId = visitDetails.get("visitId").toString();
+                    serviceDetails.setNamespace("CLIENT-VISITS-" + clientResponse.getUuid());
+                    serviceDetails.setDataKey( date + "-" + visitId);
+                    serviceDetails.setValue(clientData);
+                    datastoreService.saveDatastore(serviceDetails);
+                }
                 returnResults.put("templateDetails", (Map<String, Object>) data.get("templateDetails"));
                 returnResults.put("statusText", "OK");
                 returnResults.put("statusCode", 200);
