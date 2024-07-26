@@ -5,6 +5,7 @@ import com.Adapter.icare.Repository.DatastoreRepository;
 import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,6 +69,29 @@ public class DatastoreService {
     }
 
     public List<Datastore> getDatastoreNamespaceDetails(String namespace) throws Exception {
-        return  datastoreRepository.getDatastoreByNamespace(namespace);
+        return datastoreRepository.getDatastoreByNamespace(namespace);
     }
+
+    public List<Datastore> getClientsVisitsDataByNameSpace(String namespace) throws Exception {
+        return datastoreRepository.getDatastoreClientsVisitsNamespaceDetails(namespace);
+    }
+
+    public List<Datastore> getClientsVisitsDataByKey(String key) throws Exception {
+        return datastoreRepository.getDatastoreByDataKey(key);
+    }
+
+    public List<Datastore> getClientsVisits(String key, String ageType, Integer startAge, Integer endAge, String gender, String diagnosis) throws Exception {
+        if (gender == null && diagnosis == null) {
+            return datastoreRepository.getDatastoreByDataKeyAndAgeGroup(key, ageType,startAge, endAge);
+        } else if (gender != null &&diagnosis == null) {
+            return datastoreRepository.getDatastoreByDataKeyAndAgeGroupAndGender(key, ageType,startAge, endAge, gender);
+        } else if (gender == null &&diagnosis != null) {
+            return datastoreRepository.getDatastoreByDataKeyAndAgeGroupAndDiagnosis(key, ageType,startAge, endAge, diagnosis);
+        } else if (gender != null &&diagnosis != null) {
+            return datastoreRepository.getDatastoreByDataKeyAndAgeGroupAndGenderAndDiagnosis(key, ageType,startAge, endAge, gender, diagnosis);
+        } else {
+            return new ArrayList<Datastore>();
+        }
+    }
+
 }

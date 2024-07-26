@@ -82,4 +82,25 @@ public class DatastoreController {
     public void deleteDatastore(@PathVariable("uuid") String uuid) throws Exception {
         datastoreService.deleteDatastore(uuid);
     }
+
+    // CUSTOM implementation for supporting HDU API temporarily
+    @GetMapping("clientsVisitsByNamespace/{namespace}")
+    public List<Datastore> getClientsVisitsDataByNamespace(@PathVariable("namespace") String namespace) throws Exception {
+        return datastoreService.getClientsVisitsDataByNameSpace(namespace);
+    }
+
+    @GetMapping("clientsVisitsByKey/{key}")
+    public List<Datastore> getClientsVisitsDataByKey(@PathVariable("key") String key) throws Exception {
+        return datastoreService.getClientsVisitsDataByKey(key);
+    }
+
+    @GetMapping("clientsVisits")
+    public List<Datastore> getClientsVisits(@RequestParam(value = "key") String key,
+                                                     @RequestParam(value = "ageType") String ageType,
+                                                     @RequestParam(value = "startAge") Integer startAge,
+                                                     @RequestParam(value = "endAge") Integer endAge,
+                                                     @RequestParam(value = "gender", required = false) String gender,
+                                                     @RequestParam(value = "diagnosis", required = false) String diagnosis) throws Exception {
+        return datastoreService.getClientsVisits(key, ageType, startAge, endAge, gender, diagnosis);
+    }
 }

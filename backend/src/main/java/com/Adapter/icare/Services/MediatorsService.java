@@ -13,7 +13,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 
 @Service
@@ -164,14 +165,24 @@ public class MediatorsService {
                 Map<String, Object> facilityDetails = (Map<String, Object>)dataSection.get("facilityDetails");
                 String hfrCode = facilityDetails.get("HFCode").toString();
                 for(Map<String, Object> clientData: listGrid ) {
-                    // TODO: Add support to retrive client details before saving
-                    Datastore datastore = new Datastore();
-                    datastore.setNamespace("clients-" + hfrCode);
+                    // TODO: Add support to retrieve client details before saving
                     Map<String, Object> demographicDetails = (Map<String, Object>) clientData.get("demographicDetails");
-                    datastore.setDataKey(demographicDetails.get("mrn").toString());
-                    datastore.setValue(demographicDetails);
-                    Datastore clientResponse = datastoreService.saveDatastore(datastore);
-                    // Save service data for each client
+                    String namespace = "clients-" + hfrCode;
+                    String key = demographicDetails.get("mrn").toString();
+                    Datastore clientDetailsDatastore = new Datastore();
+                    Datastore clientResponse = new Datastore();
+                    clientDetailsDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+                    if (clientDetailsDatastore != null) {
+                        clientResponse = clientDetailsDatastore;
+                        // TODO: Add support to update if there are changes
+                    } else {
+                        clientDetailsDatastore = new Datastore();
+                        clientDetailsDatastore.setNamespace(namespace);
+                        clientDetailsDatastore.setDataKey(key);
+                        clientDetailsDatastore.setValue(demographicDetails);
+                        datastoreService.saveDatastore(clientDetailsDatastore);
+                    }
+                    // Save or update service data for each client
                     Datastore serviceDetails = new Datastore();
                     Map<String, Object> visitDetails = (Map<String, Object>) clientData.get("visitDetails");
                     String visitDateString = visitDetails.get("visitDate").toString();
@@ -184,12 +195,38 @@ public class MediatorsService {
                         e.printStackTrace();
                     }
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-                    String date = simpleDateFormat.format(visitDate);
+                    String visitDateFormatted = simpleDateFormat.format(visitDate);
                     String visitId = visitDetails.get("visitId").toString();
-                    serviceDetails.setNamespace("CLIENT-VISITS-" + clientResponse.getUuid());
-                    serviceDetails.setDataKey( date + "-" + visitId);
-                    serviceDetails.setValue(clientData);
-                    datastoreService.saveDatastore(serviceDetails);
+                    String visitDataNamespace = "client-visits-" + clientResponse.getUuid();
+                    String visitDataKey = visitDateFormatted + "-" + visitId;
+                    serviceDetails = datastoreService.getDatastoreByNamespaceAndKey(visitDataNamespace, visitDataKey);
+                    Datastore visitDetailsResponse = new Datastore();
+
+                    if (serviceDetails != null) {
+                        // Update incoming data
+                        Map<String, Object> updatedClientData  = updateClientData(serviceDetails.getValue(), clientData);
+                        serviceDetails.setValue(updatedClientData);
+                        visitDetailsResponse = datastoreService.updateDatastore(serviceDetails);
+                    } else {
+                        serviceDetails = new Datastore();
+                        serviceDetails.setNamespace(visitDataNamespace);
+                        serviceDetails.setDataKey( visitDataKey);
+                        Map<String, Object> ageDetails = calculateByDateOfBirthAge(demographicDetails.get("dateOfBirth").toString());
+                        // TODO: Review age calculation process
+                        if ((Integer) ageDetails.get("years") == 0 && (Integer) ageDetails.get("months") == 0) {
+                            clientData.put("ageType", "days");
+                            clientData.put("age", ageDetails.get("days"));
+                        } else if ((Integer) ageDetails.get("years") > 0) {
+                            clientData.put("ageType", "years");
+                            clientData.put("age", ageDetails.get("years"));
+                        } else if ((Integer) ageDetails.get("years") == 0 && (Integer) ageDetails.get("months") > 0) {
+                            clientData.put("ageType", "months");
+                            clientData.put("age", ageDetails.get("months"));
+                        }
+                        clientData.put("gender", formatGender(demographicDetails.get("gender").toString()));
+                        serviceDetails.setValue(clientData);
+                        visitDetailsResponse = datastoreService.saveDatastore(serviceDetails);
+                    }
                 }
                 returnResults.put("templateDetails", (Map<String, Object>) data.get("templateDetails"));
                 returnResults.put("statusText", "OK");
@@ -212,5 +249,45 @@ public class MediatorsService {
         String path = "CodeSystem";
         URL url = new URL(baseUrl + path);
         return  codeSystemsData;
+    }
+
+    private Map<String, Object> updateClientData(Map<String, Object> existingClientData, Map<String, Object> incomingClientData) throws Exception {
+        Map<String, Object> clientData = existingClientData;
+        clientData.put("demographicDetails", existingClientData.get("demographicDetails"));
+        List<Map<String, Object>> diagnosisDetails =new ArrayList<>();
+        diagnosisDetails =  (List<Map<String, Object>>) existingClientData.get("diagnosisDetails");
+        for (Map<String, Object> diagnosisDetail: (List<Map<String, Object>>) incomingClientData.get("diagnosisDetails")) {
+            diagnosisDetails.add(diagnosisDetail);
+        }
+
+        clientData.put("diagnosisDetails", diagnosisDetails);
+        List<Map<String, Object>> investigationDetails = (List<Map<String, Object>>) existingClientData.get("investigationDetails");
+        for (Map<String, Object> investigationDetail: (List<Map<String, Object>>) incomingClientData.get("investigationDetails")) {
+            investigationDetails.add(investigationDetail);
+        }
+
+        clientData.put("investigationDetails", investigationDetails);
+        return clientData;
+    }
+
+    private Map<String, Object> calculateByDateOfBirthAge(String dateOfBirth) throws Exception {
+        LocalDate today = LocalDate.now();
+        LocalDate dob = LocalDate.parse(dateOfBirth);
+        Period period = Period.between(dob, today);
+        Map<String, Object> ageDetails = new HashMap<>();
+        ageDetails.put("years", period.getYears());
+        ageDetails.put("months", period.getMonths());
+        ageDetails.put("days", period.getDays());
+        return ageDetails;
+    }
+
+    private String formatGender(String gender) throws Exception {
+        if (gender.toLowerCase().equals("male") || gender.toLowerCase().equals("m")) {
+            return "M";
+        } else if (gender.toLowerCase().equals("female") || gender.toLowerCase().equals("f")) {
+            return "F";
+        }  else {
+            return "U";
+        }
     }
 }
