@@ -1,15 +1,26 @@
 package com.Adapter.icare.Repository;
 
 import com.Adapter.icare.Domains.Datastore;
+import org.hibernate.query.NativeQuery;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Repository
 public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
+
+    @PersistenceContext
+    EntityManager entityManager = null;
+
     List<Datastore> findAll();
 
     @Query(value = "SELECT * FROM datastore WHERE uuid=:uuid",nativeQuery = true)
