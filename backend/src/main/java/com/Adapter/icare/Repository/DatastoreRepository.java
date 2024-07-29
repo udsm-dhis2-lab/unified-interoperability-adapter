@@ -4,7 +4,10 @@ import com.Adapter.icare.Domains.Datastore;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     List<Datastore> findAll();
@@ -44,4 +47,33 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "AND JSON_EXTRACT(value, '$.gender') = :gender " +
             "AND JSON_CONTAINS(value, JSON_OBJECT('diagnosisCode', :diagnosisCode), '$.diagnosisDetails')",nativeQuery = true)
     List<Datastore> getDatastoreByDataKeyAndAgeGroupAndGenderAndDiagnosis(String dataKeyPart, String ageType, Integer startAge, Integer endAge, String gender, String diagnosisCode);
+
+    @Query(value = "SELECT COUNT(*) as aggregated FROM datastore WHERE data_key LIKE CONCAT(:dataKeyPart, '%')  AND JSON_EXTRACT(value, '$.ageType') =:ageType " +
+            "AND JSON_EXTRACT(value, '$.age') >= :startAge AND JSON_EXTRACT(value, '$.age') < :endAge " +
+            "AND JSON_EXTRACT(value, '$.gender') = :gender " +
+            "AND JSON_CONTAINS(value, JSON_OBJECT('diagnosisCode', :diagnosisCode), '$.diagnosisDetails')",nativeQuery = true)
+    List<Map<String, Object>> getDatastoreAggregateByDataKeyAndAgeGroupAndGenderAndDiagnosis(String dataKeyPart, String ageType, Integer startAge, Integer endAge, String gender, String diagnosisCode);
+
+    @Query(value = "SELECT COUNT(*) as aggregated " +
+            "FROM datastore ds " +
+            "WHERE CAST(JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDate')) AS DATETIME)  BETWEEN :startDate AND :endDate " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) >= :startAge " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) < :endAge " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) =  :gender " +
+            "  AND  (" +
+            "        SELECT COUNT(*) " +
+            "        FROM (" +
+            "            SELECT jt.code " +
+            "            FROM datastore " +
+            "            CROSS JOIN JSON_TABLE(value, '$.mappings[*]' " +
+            "                COLUMNS (" +
+            "                    code VARCHAR(255) PATH '$.code' " +
+            "                ) " +
+            "            ) AS jt WHERE namespace = :mappingsNamespace " +
+            "            AND data_key = :mappingsKey " +
+            "            AND JSON_CONTAINS_PATH(ds.value, 'one', '$.diagnosisDetails[*].diagnosisCode', jt.code) " +
+            "        ) AS subquery " +
+            "    ) > 0",nativeQuery = true)
+    List<Map<String, Object>> getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey);
 }

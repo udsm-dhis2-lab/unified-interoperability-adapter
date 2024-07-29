@@ -7,10 +7,9 @@ import javassist.NotFoundException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -102,5 +101,32 @@ public class DatastoreController {
                                                      @RequestParam(value = "gender", required = false) String gender,
                                                      @RequestParam(value = "diagnosis", required = false) String diagnosis) throws Exception {
         return datastoreService.getClientsVisits(key, ageType, startAge, endAge, gender, diagnosis);
+    }
+
+    @PostMapping(value = "generateAggregateData",produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getAggregateVisits(@RequestBody Map<String, Object> requestParams) throws Exception {
+        Map<String, Object> results = new HashMap<>();
+        List<Map<String, Object>> data = new ArrayList<>();
+        String pattern = "yyyy-MM-dd";
+        Map<String, Object> mappings = (Map<String, Object>) requestParams.get("mappings");
+        String mappingsNamespace = mappings.get("namespace").toString();
+        String mappingsKey = mappings.get("key").toString();
+        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+        for(Map<String, Object> requestParam: (List<Map<String, Object>>) requestParams.get("params")) {
+            Map<String, Object> dataValue = new HashMap<>();
+            List<Map<String, Object>> requestedData = datastoreService.getAggregatedData(
+                    requestParams.get("startDate").toString(),
+                    requestParams.get("endDate").toString(),
+                    requestParam.get("ageType").toString(),
+                    (Integer) requestParam.get("startAge"),
+                    (Integer) requestParam.get("endAge"),
+                    requestParam.get("gender").toString(),
+                    mappingsNamespace, mappingsKey);
+//            System.out.println(requestedData);
+            dataValue.put("value", requestedData.get(0).get("aggregated"));
+            data.add(dataValue);
+        }
+        results.put("data", data);
+        return results;
     }
 }

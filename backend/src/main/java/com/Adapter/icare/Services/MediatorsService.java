@@ -224,6 +224,7 @@ public class MediatorsService {
                             clientData.put("age", ageDetails.get("months"));
                         }
                         clientData.put("gender", formatGender(demographicDetails.get("gender").toString()));
+                        clientData.put("visitDate",visitDateString);
                         serviceDetails.setValue(clientData);
                         visitDetailsResponse = datastoreService.saveDatastore(serviceDetails);
                     }

@@ -5,9 +5,8 @@ import com.Adapter.icare.Repository.DatastoreRepository;
 import javassist.NotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.sql.Timestamp;
+import java.util.*;
 
 @Service
 public class DatastoreService {
@@ -94,4 +93,17 @@ public class DatastoreService {
         }
     }
 
+    public List<Map<String, Object>> getAggregatedData(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey) throws Exception {
+        if (gender == null && mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null &&mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender == null &&mappingsNamespace != null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
+            return datastoreRepository.getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey);
+        } else {
+            return new ArrayList<Map<String, Object>>();
+        }
+    }
 }
