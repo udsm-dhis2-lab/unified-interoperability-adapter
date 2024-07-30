@@ -107,4 +107,8 @@ public class DatastoreService {
             return new ArrayList<Map<String, Object>>();
         }
     }
+
+    public List<Map<String, Object>> getAggregateDataFromDailyAggregatedData(String id, String startDate, String endDate) throws Exception {
+        return datastoreRepository.getAggregateDataByStartDateAndEndDate(id,startDate,endDate);
+    }
 }

@@ -3,6 +3,7 @@ package com.Adapter.icare.Controllers;
 
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Services.DatastoreService;
+import com.google.common.collect.Maps;
 import javassist.NotFoundException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.web.bind.annotation.*;
@@ -134,8 +135,18 @@ public class DatastoreController {
                 }
             }
         }
-
         results.put("data", data);
+        return results;
+    }
+
+    @GetMapping("dailyAggregatedData")
+    public Map<String, Object> getAggregateDataByStartDateAndEndDate(@RequestParam(value = "id") String id,
+                                                                     @RequestParam(value = "startDate") String startDate,
+                                                                     @RequestParam(value = "endDate") String endDate
+                                                                     ) throws Exception {
+        Map<String, Object> results = Maps.newHashMap();
+        List<Map<String, Object>> dailyAggregatedDataList =  datastoreService.getAggregateDataFromDailyAggregatedData(id,startDate,endDate);
+        results.put("data", dailyAggregatedDataList);
         return results;
     }
 }

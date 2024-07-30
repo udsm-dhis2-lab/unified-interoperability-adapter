@@ -31,7 +31,6 @@ public class Datastore  extends BaseEntity implements Serializable {
     @Column(name = "data_key", nullable = false)
     private String dataKey;
 
-
     @Column(name = "value", columnDefinition = "json", nullable = false)
     @Convert(converter = HashMapConverter.class)
     private Map<String, Object> value;

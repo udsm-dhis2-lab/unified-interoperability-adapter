@@ -1,25 +1,15 @@
 package com.Adapter.icare.Repository;
 
 import com.Adapter.icare.Domains.Datastore;
-import org.hibernate.query.NativeQuery;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @Repository
 public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
-
-    @PersistenceContext
-    EntityManager entityManager = null;
 
     List<Datastore> findAll();
 
@@ -87,4 +77,9 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "        ) AS subquery " +
             "    ) > 0",nativeQuery = true)
     List<Map<String, Object>> getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey);
+
+
+    @Query(value = "SELECT datastore.value FROM datastore WHERE namespace =:namespace " +
+            "AND JSON_EXTRACT(value, '$.startDate') >= :startDate AND JSON_EXTRACT(value, '$.endDate') <= :endDate",nativeQuery = true)
+    List<Map<String, Object>> getAggregateDataByStartDateAndEndDate(String namespace, String startDate, String endDate);
 }
