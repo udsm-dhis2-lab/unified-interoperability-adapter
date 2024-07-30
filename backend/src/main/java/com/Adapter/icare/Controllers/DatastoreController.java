@@ -104,28 +104,37 @@ public class DatastoreController {
     }
 
     @PostMapping(value = "generateAggregateData",produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Map<String, Object> getAggregateVisits(@RequestBody Map<String, Object> requestParams) throws Exception {
+    public Map<String, Object>     getAggregateVisits(@RequestBody Map<String, Object> requestParams) throws Exception {
         Map<String, Object> results = new HashMap<>();
         List<Map<String, Object>> data = new ArrayList<>();
         String pattern = "yyyy-MM-dd";
         Map<String, Object> mappings = (Map<String, Object>) requestParams.get("mappings");
         String mappingsNamespace = mappings.get("namespace").toString();
         String mappingsKey = mappings.get("key").toString();
+        List<Datastore> storedToolMappings = datastoreService.getDatastoreNamespaceDetails(mappingsNamespace);
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        for(Map<String, Object> requestParam: (List<Map<String, Object>>) requestParams.get("params")) {
-            Map<String, Object> dataValue = new HashMap<>();
-            List<Map<String, Object>> requestedData = datastoreService.getAggregatedData(
-                    requestParams.get("startDate").toString(),
-                    requestParams.get("endDate").toString(),
-                    requestParam.get("ageType").toString(),
-                    (Integer) requestParam.get("startAge"),
-                    (Integer) requestParam.get("endAge"),
-                    requestParam.get("gender").toString(),
-                    mappingsNamespace, mappingsKey);
-//            System.out.println(requestedData);
-            dataValue.put("value", requestedData.get(0).get("aggregated"));
-            data.add(dataValue);
+        for (Datastore storedToolMapping: storedToolMappings) {
+            if (storedToolMapping.getValue().get("type").equals("diagnosisDetails")) {
+                for(Map<String, Object> requestParam: (List<Map<String, Object>>) storedToolMapping.getValue().get("params")) {
+                    Map<String, Object> dataValue = new HashMap<>();
+                    List<Map<String, Object>> requestedData = datastoreService.getAggregatedData(
+                            requestParams.get("startDate").toString(),
+                            requestParams.get("endDate").toString(),
+                            requestParam.get("ageType").toString(),
+                            (Integer) requestParam.get("startAge"),
+                            (Integer) requestParam.get("endAge"),
+                            requestParam.get("gender").toString(),
+                            mappingsNamespace, mappingsKey
+                    );
+//              System.out.println(requestedData);
+                    dataValue.put("value", requestedData.get(0).get("aggregated"));
+                    dataValue.put("de", (( Map<String, Object>)storedToolMapping.getValue().get("dataElement")).get("id").toString());
+                    dataValue.put("co", requestParam.get("co"));
+                    data.add(dataValue);
+                }
+            }
         }
+
         results.put("data", data);
         return results;
     }
