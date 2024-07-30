@@ -57,7 +57,29 @@ public class DatastoreController {
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Datastore saveDatastore(@RequestBody Datastore datastore) throws Exception {
+    public Datastore saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {
+        String namespace = datastore.getNamespace();
+        String dataKey = datastore.getDataKey();
+        // Check if exists provided update is set to true
+        if (update != null && update.equals(true)) {
+           Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
+           if (existingDatastore != null) {
+               existingDatastore.setValue(datastore.getValue());
+               return datastoreService.updateDatastore(existingDatastore);
+           } else {
+               return datastoreService.saveDatastore(datastore);
+           }
+        } else {
+            return datastoreService.saveDatastore(datastore);
+        }
+    }
+
+    @PostMapping(value = "{namespace}/{key}", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+    public Datastore saveDatastore(@PathVariable(value = "namespace") String namespace, @PathVariable(value = "key") String key, @RequestBody Map<String, Object> datastoreValue) throws Exception {
+        Datastore datastore = new Datastore();
+        datastore.setNamespace(namespace);
+        datastore.setDataKey(key);
+        datastore.setValue(datastoreValue);
         return datastoreService.saveDatastore(datastore);
     }
 
