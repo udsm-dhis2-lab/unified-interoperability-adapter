@@ -24,6 +24,9 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
 
 
     // TODO: Make these queries general from the controller side
+    @Query(value = "SELECT * FROM datastore WHERE namespace =:namespace)",nativeQuery = true)
+    List<Datastore> getHealthFacilitiesReportedData(String namespace);
+
     @Query(value = "SELECT * FROM datastore WHERE namespace IN (SELECT CONCAT('client-visits-',uuid) FROM datastore WHERE namespace=:namespace)",nativeQuery = true)
     List<Datastore> getDatastoreClientsVisitsNamespaceDetails(String namespace);
 
@@ -61,7 +64,8 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) >= :startAge " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) < :endAge " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) =  :gender " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
             "  AND  (" +
             "        SELECT COUNT(*) " +
             "        FROM (" +
@@ -76,7 +80,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "            AND JSON_CONTAINS_PATH(ds.value, 'one', '$.diagnosisDetails[*].diagnosisCode', jt.code) " +
             "        ) AS subquery " +
             "    ) > 0",nativeQuery = true)
-    List<Map<String, Object>> getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey);
+    List<Map<String, Object>> getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode);
 
 
     @Query(value = "SELECT de,co,SUM(dataValue) AS value " +

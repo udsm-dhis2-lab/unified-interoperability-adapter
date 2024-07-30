@@ -4,6 +4,7 @@ import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Repository.MediatorsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -164,11 +165,22 @@ public class MediatorsService {
                 listGrid = (List<Map<String, Object>>) dataSection.get("listGrid");
                 Map<String, Object> facilityDetails = (Map<String, Object>)dataSection.get("facilityDetails");
                 String hfrCode = facilityDetails.get("HFCode").toString();
+                Datastore healthFacilityData = new Datastore();
+                healthFacilityData.setNamespace("Health-facilities");
+                healthFacilityData.setDataKey(hfrCode);
+                facilityDetails.put("code", hfrCode);
+                healthFacilityData.setValue(facilityDetails);
+                Datastore facilitiesResponse = this.saveHealthFacilityDataToDatastore(healthFacilityData);
                 for(Map<String, Object> clientData: listGrid ) {
                     // TODO: Add support to retrieve client details before saving
                     Map<String, Object> demographicDetails = (Map<String, Object>) clientData.get("demographicDetails");
                     String namespace = "clients-" + hfrCode;
-                    String key = demographicDetails.get("mrn").toString();
+                    String key;
+                    if (demographicDetails.get("mrn") != null) {
+                        key = demographicDetails.get("mrn").toString();
+                    } else {
+                        key = demographicDetails.get("identifier").toString();
+                    }
                     Datastore clientDetailsDatastore = new Datastore();
                     Datastore clientResponse = new Datastore();
                     clientDetailsDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
@@ -182,6 +194,7 @@ public class MediatorsService {
                         clientDetailsDatastore.setValue(demographicDetails);
                         datastoreService.saveDatastore(clientDetailsDatastore);
                     }
+
                     // Save or update service data for each client
                     Datastore serviceDetails = new Datastore();
                     Map<String, Object> visitDetails = (Map<String, Object>) clientData.get("visitDetails");
@@ -224,6 +237,7 @@ public class MediatorsService {
                             clientData.put("age", ageDetails.get("months"));
                         }
                         clientData.put("gender", formatGender(demographicDetails.get("gender").toString()));
+                        clientData.put("orgUnit", hfrCode);
                         clientData.put("visitDate",visitDateString);
                         serviceDetails.setValue(clientData);
                         visitDetailsResponse = datastoreService.saveDatastore(serviceDetails);
@@ -290,5 +304,20 @@ public class MediatorsService {
         }  else {
             return "U";
         }
+    }
+
+    private Datastore saveHealthFacilityDataToDatastore(Datastore healthFacilitiesData) throws Exception {
+        // Check if exists
+        Datastore response;
+        String namespace = healthFacilitiesData.getNamespace();
+        String dataKey = healthFacilitiesData.getDataKey();
+        Datastore existingHealthFacilityData = datastoreService.getDatastoreByNamespaceAndKey(namespace,dataKey);
+        if (existingHealthFacilityData != null) {
+            existingHealthFacilityData.setValue(healthFacilitiesData.getValue());
+            response = datastoreService.updateDatastore(existingHealthFacilityData);
+        } else {
+            response = datastoreService.saveDatastore(healthFacilitiesData);
+        }
+        return response;
     }
 }

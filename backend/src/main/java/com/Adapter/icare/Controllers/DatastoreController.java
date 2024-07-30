@@ -132,6 +132,7 @@ public class DatastoreController {
         List<Map<String, Object>> data = new ArrayList<>();
         String pattern = "yyyy-MM-dd";
         Map<String, Object> mappings = (Map<String, Object>) requestParams.get("mappings");
+        Map<String, Object> orgUnit = (Map<String, Object>) requestParams.get("orgUnit");
         String mappingsNamespace = mappings.get("namespace").toString();
         String mappingsKey = mappings.get("key").toString();
         List<Datastore> storedToolMappings = datastoreService.getDatastoreNamespaceDetails(mappingsNamespace);
@@ -147,7 +148,9 @@ public class DatastoreController {
                             (Integer) requestParam.get("startAge"),
                             (Integer) requestParam.get("endAge"),
                             requestParam.get("gender").toString(),
-                            mappingsNamespace, mappingsKey
+                            mappingsNamespace,
+                            mappingsKey,
+                            orgUnit.get("code").toString()
                     );
 //              System.out.println(requestedData);
                     dataValue.put("value", requestedData.get(0).get("aggregated"));

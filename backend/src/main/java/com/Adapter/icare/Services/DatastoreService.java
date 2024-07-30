@@ -94,7 +94,7 @@ public class DatastoreService {
         }
     }
 
-    public List<Map<String, Object>> getAggregatedData(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey) throws Exception {
+    public List<Map<String, Object>> getAggregatedData(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode) throws Exception {
         if (gender == null && mappingsNamespace == null) {
             return new ArrayList<Map<String, Object>>();
         } else if (gender != null &&mappingsNamespace == null) {
@@ -102,7 +102,7 @@ public class DatastoreService {
         } else if (gender == null &&mappingsNamespace != null) {
             return new ArrayList<Map<String, Object>>();
         } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
-            return datastoreRepository.getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey);
+            return datastoreRepository.getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode);
         } else {
             return new ArrayList<Map<String, Object>>();
         }
