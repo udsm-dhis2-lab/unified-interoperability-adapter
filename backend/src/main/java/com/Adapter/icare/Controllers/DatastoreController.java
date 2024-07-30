@@ -139,7 +139,7 @@ public class DatastoreController {
         return results;
     }
 
-    @GetMapping("dailyAggregatedData")
+    @GetMapping("aggregatedData")
     public Map<String, Object> getAggregateDataByStartDateAndEndDate(@RequestParam(value = "id") String id,
                                                                      @RequestParam(value = "startDate") String startDate,
                                                                      @RequestParam(value = "endDate") String endDate
