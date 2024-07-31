@@ -208,7 +208,12 @@ public class MediatorsService {
                     }
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
                     String visitDateFormatted = simpleDateFormat.format(visitDate);
-                    String visitId = visitDetails.get("visitId").toString();
+                    String visitId;
+                    if (visitDetails.get("visitId") !=null) {
+                        visitId = visitDetails.get("visitId").toString();
+                    } else {
+                        visitId = visitDetails.get("id").toString();
+                    }
                     String visitDataNamespace = "client-visits-" + clientResponse.getUuid();
                     String visitDataKey = visitDateFormatted + "-" + visitId;
                     serviceDetails = datastoreService.getDatastoreByNamespaceAndKey(visitDataNamespace, visitDataKey);
