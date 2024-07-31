@@ -134,10 +134,10 @@ public class DatastoreController {
         Map<String, Object> mappings = (Map<String, Object>) requestParams.get("mappings");
         Map<String, Object> orgUnit = (Map<String, Object>) requestParams.get("orgUnit");
         String mappingsNamespace = mappings.get("namespace").toString();
-        String mappingsKey = mappings.get("key").toString();
         List<Datastore> storedToolMappings = datastoreService.getDatastoreNamespaceDetails(mappingsNamespace);
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         for (Datastore storedToolMapping: storedToolMappings) {
+            String mappingsKey = storedToolMapping.getDataKey();
             if (storedToolMapping.getValue().get("type").equals("diagnosisDetails")) {
                 for(Map<String, Object> requestParam: (List<Map<String, Object>>) storedToolMapping.getValue().get("params")) {
                     Map<String, Object> dataValue = new HashMap<>();

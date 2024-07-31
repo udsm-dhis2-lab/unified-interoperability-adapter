@@ -2,7 +2,9 @@ package com.Adapter.icare.Controllers;
 
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Services.DatastoreService;
+import com.Adapter.icare.Services.MediatorsService;
 import com.google.common.collect.Maps;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
@@ -18,11 +20,51 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class HDUAPIController {
 
     private final DatastoreService datastoreService;
+    private final MediatorsService mediatorsService;
 
-    public  HDUAPIController(DatastoreService datastoreService) {
+    public  HDUAPIController(DatastoreService datastoreService, MediatorsService mediatorsService) {
         this.datastoreService = datastoreService;
+        this.mediatorsService = mediatorsService;
     }
 
+
+    @GetMapping("dataTemplates")
+    public List<Map<String, Object>> getDataTemplatesList (@RequestParam(value = "id", required = false) String id) throws Exception {
+        // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
+        List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
+        List<Map<String, Object>> dataTemplates = new ArrayList<>();
+        for(Datastore datastore: dataTemplateNameSpaceDetails) {
+            Map<String, Object> dataTemplate = datastore.getValue();
+            if (id != null) {
+                if ( ((Map<String, Object>) dataTemplate.get("templateDetails")).get("id").equals(id)) {
+                    dataTemplate.put("uuid", datastore.getUuid());
+                    dataTemplates.add(dataTemplate);
+                }
+            } else {
+                dataTemplate.put("uuid", datastore.getUuid());
+                dataTemplates.add(dataTemplate);
+            }
+        }
+        return  dataTemplates;
+
+    }
+
+    @GetMapping("dataTemplates/{uuid}")
+    public Map<String, Object> getDataTemplateByUuid(@PathVariable("uuid") String uuid) throws Exception {
+        Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+        if (datastore == null) {
+            throw new Exception("Data template for the uuid " + uuid + " does not exists");
+        }
+        return datastore.getValue();
+    }
+
+    @PostMapping(value = "dataTemplates", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String passDataToMediator(@RequestBody Map<String, Object> data) throws Exception {
+        /**
+         * Send data to Mediator where all the logics will be done.
+         */
+        return mediatorsService.sendDataToMediatorWorkflow(data);
+    }
 
     @DeleteMapping("datastore/{uuid}")
     public void deleteDatastore(@PathVariable("uuid") String uuid) throws Exception {
@@ -30,6 +72,30 @@ public class HDUAPIController {
     }
 
     // CUSTOM implementation for supporting HDU API temporarily
+    @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
+    public List<Datastore> getDatastoreByNamespace(@PathVariable("namespace") String namespace) throws Exception {
+        return  datastoreService.getDatastoreNamespaceDetails(namespace);
+    }
+
+
+    @PostMapping(value = "datastore", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+    public Datastore saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {
+        String namespace = datastore.getNamespace();
+        String dataKey = datastore.getDataKey();
+        // Check if exists provided update is set to true
+        if (update != null && update.equals(true)) {
+            Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
+            if (existingDatastore != null) {
+                existingDatastore.setValue(datastore.getValue());
+                return datastoreService.updateDatastore(existingDatastore);
+            } else {
+                return datastoreService.saveDatastore(datastore);
+            }
+        } else {
+            return datastoreService.saveDatastore(datastore);
+        }
+    }
+
     @GetMapping("clientsVisitsByNamespace/{namespace}")
     public List<Datastore> getClientsVisitsDataByNamespace(@PathVariable("namespace") String namespace) throws Exception {
         return datastoreService.getClientsVisitsDataByNameSpace(namespace);
@@ -58,10 +124,10 @@ public class HDUAPIController {
         Map<String, Object> mappings = (Map<String, Object>) requestParams.get("mappings");
         Map<String, Object> orgUnit = (Map<String, Object>) requestParams.get("orgUnit");
         String mappingsNamespace = mappings.get("namespace").toString();
-        String mappingsKey = mappings.get("key").toString();
         List<Datastore> storedToolMappings = datastoreService.getDatastoreNamespaceDetails(mappingsNamespace);
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         for (Datastore storedToolMapping: storedToolMappings) {
+            String mappingsKey = storedToolMapping.getDataKey();
                 for(Map<String, Object> requestParam: (List<Map<String, Object>>) storedToolMapping.getValue().get("params")) {
                     Map<String, Object> dataValue = new HashMap<>();
                     List<Map<String, Object>> requestedData = List.of();
