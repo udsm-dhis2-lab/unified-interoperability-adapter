@@ -154,8 +154,8 @@ public class DatastoreController {
                     );
 //              System.out.println(requestedData);
                     dataValue.put("value", requestedData.get(0).get("aggregated"));
-                    dataValue.put("de", (( Map<String, Object>)storedToolMapping.getValue().get("dataElement")).get("id").toString());
-                    dataValue.put("co", requestParam.get("co"));
+                    dataValue.put("dataElement", (( Map<String, Object>)storedToolMapping.getValue().get("dataElement")).get("id").toString());
+                    dataValue.put("categoryOptionCombo", requestParam.get("co"));
                     data.add(dataValue);
                 }
             }

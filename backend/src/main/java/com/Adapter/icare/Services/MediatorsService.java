@@ -170,7 +170,6 @@ public class MediatorsService {
                 healthFacilityData.setDataKey(hfrCode);
                 facilityDetails.put("code", hfrCode);
                 healthFacilityData.setValue(facilityDetails);
-                Datastore facilitiesResponse = this.saveHealthFacilityDataToDatastore(healthFacilityData);
                 for(Map<String, Object> clientData: listGrid ) {
                     // TODO: Add support to retrieve client details before saving
                     Map<String, Object> demographicDetails = (Map<String, Object>) clientData.get("demographicDetails");
@@ -243,6 +242,7 @@ public class MediatorsService {
                         visitDetailsResponse = datastoreService.saveDatastore(serviceDetails);
                     }
                 }
+                Datastore facilitiesResponse = this.saveHealthFacilityDataToDatastore(healthFacilityData);
                 returnResults.put("templateDetails", (Map<String, Object>) data.get("templateDetails"));
                 returnResults.put("statusText", "OK");
                 returnResults.put("statusCode", 200);
