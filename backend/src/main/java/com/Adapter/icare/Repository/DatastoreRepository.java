@@ -87,8 +87,8 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "FROM datastore," +
             "JSON_TABLE(datastore.value, '$.data[*]'" +
             "    COLUMNS (" +
-            "        de VARCHAR(255) PATH '$.de'," +
-            "        co VARCHAR(255) PATH '$.co'," +
+            "        de VARCHAR(255) PATH '$.dataElement'," +
+            "        co VARCHAR(255) PATH '$.categoryOptionCombo'," +
             "        dataValue INT PATH '$.value'" +
             "    )" +
             ") AS jsonTable" +
