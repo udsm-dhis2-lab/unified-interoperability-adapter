@@ -83,17 +83,17 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     List<Map<String, Object>> getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode);
 
 
-    @Query(value = "SELECT de,co,SUM(dataValue) AS value " +
+    @Query(value = "SELECT dataElement,categoryOptionCombo,SUM(dataValue) AS value " +
             "FROM datastore," +
             "JSON_TABLE(datastore.value, '$.data[*]'" +
             "    COLUMNS (" +
-            "        de VARCHAR(255) PATH '$.dataElement'," +
-            "        co VARCHAR(255) PATH '$.categoryOptionCombo'," +
+            "        dataElement VARCHAR(255) PATH '$.dataElement'," +
+            "        categoryOptionCombo VARCHAR(255) PATH '$.categoryOptionCombo'," +
             "        dataValue INT PATH '$.value'" +
             "    )" +
             ") AS jsonTable" +
             " WHERE namespace=:namespace" +
             " AND JSON_EXTRACT(value, '$.startDate') >= :startDate AND JSON_EXTRACT(value, '$.endDate') <= :endDate" +
-            " GROUP BY de,co;",nativeQuery = true)
+            " GROUP BY dataElement,categoryOptionCombo;",nativeQuery = true)
     List<Map<String, Object>> getAggregateDataByStartDateAndEndDate(String namespace, String startDate, String endDate);
 }
