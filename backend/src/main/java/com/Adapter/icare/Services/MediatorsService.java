@@ -198,6 +198,8 @@ public class MediatorsService {
                     Datastore serviceDetails = new Datastore();
                     Map<String, Object> visitDetails = (Map<String, Object>) clientData.get("visitDetails");
                     String visitDateString = visitDetails.get("visitDate").toString();
+                    Boolean newThisYear = (Boolean) visitDetails.get("newThisYear");
+                    Boolean isNew = (Boolean) visitDetails.get("new");
                     String pattern = "yyyy-MM-dd";
                     SimpleDateFormat formatter = new SimpleDateFormat(pattern);
                     Date visitDate = new Date();
@@ -242,6 +244,8 @@ public class MediatorsService {
                         }
                         clientData.put("gender", formatGender(demographicDetails.get("gender").toString()));
                         clientData.put("orgUnit", hfrCode);
+                        clientData.put("newThisYear", newThisYear);
+                        clientData.put("isNew",isNew);
                         clientData.put("visitDate",visitDateString);
                         serviceDetails.setValue(clientData);
                         visitDetailsResponse = datastoreService.saveDatastore(serviceDetails);

@@ -108,6 +108,42 @@ public class DatastoreService {
         }
     }
 
+    public List<Map<String, Object>> getAggregatedVisitsData(String startDate, String endDate,
+                                                             String ageType, Integer startAge,
+                                                             Integer endAge, String gender,
+                                                             String mappingsNamespace, String mappingsKey,
+                                                             String orgUnitCode, Boolean newThisYear) throws Exception {
+        if (gender == null && mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null &&mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender == null &&mappingsNamespace != null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
+            return datastoreRepository.getDatastoreAggregateVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode, newThisYear);
+        } else {
+            return new ArrayList<Map<String, Object>>();
+        }
+    }
+
+    public List<Map<String, Object>> getAggregatedNewOrRepeatVisitsData(String startDate, String endDate,
+                                                                        String ageType, Integer startAge,
+                                                                        Integer endAge, String gender,
+                                                                        String mappingsNamespace, String mappingsKey,
+                                                                        String orgUnitCode, Boolean isNewVisit) {
+        if (gender == null && mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null &&mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender == null &&mappingsNamespace != null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
+            return datastoreRepository.getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode, isNewVisit);
+        } else {
+            return new ArrayList<Map<String, Object>>();
+        }
+    }
+
     public List<Map<String, Object>> getAggregateDataFromDailyAggregatedData(String id, String startDate, String endDate) throws Exception {
         return datastoreRepository.getAggregateDataByStartDateAndEndDate(id,startDate,endDate);
     }

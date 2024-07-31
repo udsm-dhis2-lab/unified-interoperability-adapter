@@ -62,27 +62,67 @@ public class HDUAPIController {
         List<Datastore> storedToolMappings = datastoreService.getDatastoreNamespaceDetails(mappingsNamespace);
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         for (Datastore storedToolMapping: storedToolMappings) {
-            if (storedToolMapping.getValue().get("type").equals("diagnosisDetails")) {
                 for(Map<String, Object> requestParam: (List<Map<String, Object>>) storedToolMapping.getValue().get("params")) {
                     Map<String, Object> dataValue = new HashMap<>();
-                    List<Map<String, Object>> requestedData = datastoreService.getAggregatedData(
-                            requestParams.get("startDate").toString(),
-                            requestParams.get("endDate").toString(),
-                            requestParam.get("ageType").toString(),
-                            (Integer) requestParam.get("startAge"),
-                            (Integer) requestParam.get("endAge"),
-                            requestParam.get("gender").toString(),
-                            mappingsNamespace,
-                            mappingsKey,
-                            orgUnit.get("code").toString()
-                    );
+                    List<Map<String, Object>> requestedData = List.of();
+                    if (storedToolMapping.getValue().get("type").equals("diagnosisDetails")) {
+                        requestedData = datastoreService.getAggregatedData(
+                                requestParams.get("startDate").toString(),
+                                requestParams.get("endDate").toString(),
+                                requestParam.get("ageType").toString(),
+                                (Integer) requestParam.get("startAge"),
+                                (Integer) requestParam.get("endAge"),
+                                requestParam.get("gender").toString(),
+                                mappingsNamespace,
+                                mappingsKey,
+                                orgUnit.get("code").toString()
+                        );
+                    } else if (storedToolMapping.getValue().get("type").equals("visitDetails.newThisYear")) {
+                        requestedData = datastoreService.getAggregatedVisitsData(
+                                requestParams.get("startDate").toString(),
+                                requestParams.get("endDate").toString(),
+                                requestParam.get("ageType").toString(),
+                                (Integer) requestParam.get("startAge"),
+                                (Integer) requestParam.get("endAge"),
+                                requestParam.get("gender").toString(),
+                                mappingsNamespace,
+                                mappingsKey,
+                                orgUnit.get("code").toString(),
+                                true
+                        );
+                    } else if (storedToolMapping.getValue().get("type").equals("visitDetails.new")) {
+                        requestedData = datastoreService.getAggregatedNewOrRepeatVisitsData(
+                                requestParams.get("startDate").toString(),
+                                requestParams.get("endDate").toString(),
+                                requestParam.get("ageType").toString(),
+                                (Integer) requestParam.get("startAge"),
+                                (Integer) requestParam.get("endAge"),
+                                requestParam.get("gender").toString(),
+                                mappingsNamespace,
+                                mappingsKey,
+                                orgUnit.get("code").toString(),
+                                true
+                        );
+                    } else if (storedToolMapping.getValue().get("type").equals("visitDetails.repeat")) {
+                        requestedData = datastoreService.getAggregatedNewOrRepeatVisitsData(
+                                requestParams.get("startDate").toString(),
+                                requestParams.get("endDate").toString(),
+                                requestParam.get("ageType").toString(),
+                                (Integer) requestParam.get("startAge"),
+                                (Integer) requestParam.get("endAge"),
+                                requestParam.get("gender").toString(),
+                                mappingsNamespace,
+                                mappingsKey,
+                                orgUnit.get("code").toString(),
+                                false
+                        );
+                    }
 //              System.out.println(requestedData);
                     dataValue.put("value", requestedData.get(0).get("aggregated"));
                     dataValue.put("dataElement", (( Map<String, Object>)storedToolMapping.getValue().get("dataElement")).get("id").toString());
                     dataValue.put("categoryOptionCombo", requestParam.get("co"));
                     data.add(dataValue);
                 }
-            }
         }
         results.put("data", data);
         return results;
