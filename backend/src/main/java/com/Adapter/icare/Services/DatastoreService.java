@@ -111,16 +111,15 @@ public class DatastoreService {
     public List<Map<String, Object>> getAggregatedVisitsData(String startDate, String endDate,
                                                              String ageType, Integer startAge,
                                                              Integer endAge, String gender,
-                                                             String mappingsNamespace, String mappingsKey,
                                                              String orgUnitCode, Boolean newThisYear) throws Exception {
-        if (gender == null && mappingsNamespace == null) {
+        if (gender == null && newThisYear == null) {
             return new ArrayList<Map<String, Object>>();
-        } else if (gender != null &&mappingsNamespace == null) {
+        } else if (gender != null &&newThisYear == null) {
             return new ArrayList<Map<String, Object>>();
-        } else if (gender == null &&mappingsNamespace != null) {
+        } else if (gender == null &&newThisYear != null) {
             return new ArrayList<Map<String, Object>>();
-        } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
-            return datastoreRepository.getDatastoreAggregateVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode, newThisYear);
+        } else if (gender != null && newThisYear != null) {
+            return datastoreRepository.getDatastoreAggregateVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, newThisYear);
         } else {
             return new ArrayList<Map<String, Object>>();
         }
@@ -129,16 +128,15 @@ public class DatastoreService {
     public List<Map<String, Object>> getAggregatedNewOrRepeatVisitsData(String startDate, String endDate,
                                                                         String ageType, Integer startAge,
                                                                         Integer endAge, String gender,
-                                                                        String mappingsNamespace, String mappingsKey,
                                                                         String orgUnitCode, Boolean isNewVisit) {
-        if (gender == null && mappingsNamespace == null) {
+        if (gender == null && isNewVisit == null) {
             return new ArrayList<Map<String, Object>>();
-        } else if (gender != null &&mappingsNamespace == null) {
+        } else if (gender != null &&isNewVisit == null) {
             return new ArrayList<Map<String, Object>>();
-        } else if (gender == null &&mappingsNamespace != null) {
+        } else if (gender == null &&isNewVisit != null) {
             return new ArrayList<Map<String, Object>>();
-        } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
-            return datastoreRepository.getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode, isNewVisit);
+        } else if (gender != null && isNewVisit != null) {
+            return datastoreRepository.getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, isNewVisit);
         } else {
             return new ArrayList<Map<String, Object>>();
         }

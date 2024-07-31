@@ -151,8 +151,6 @@ public class HDUAPIController {
                                 (Integer) requestParam.get("startAge"),
                                 (Integer) requestParam.get("endAge"),
                                 requestParam.get("gender").toString(),
-                                mappingsNamespace,
-                                mappingsKey,
                                 orgUnit.get("code").toString(),
                                 true
                         );
@@ -164,8 +162,6 @@ public class HDUAPIController {
                                 (Integer) requestParam.get("startAge"),
                                 (Integer) requestParam.get("endAge"),
                                 requestParam.get("gender").toString(),
-                                mappingsNamespace,
-                                mappingsKey,
                                 orgUnit.get("code").toString(),
                                 true
                         );
@@ -177,8 +173,6 @@ public class HDUAPIController {
                                 (Integer) requestParam.get("startAge"),
                                 (Integer) requestParam.get("endAge"),
                                 requestParam.get("gender").toString(),
-                                mappingsNamespace,
-                                mappingsKey,
                                 orgUnit.get("code").toString(),
                                 false
                         );
