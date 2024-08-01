@@ -111,35 +111,15 @@ public class DatastoreService {
     public List<Map<String, Object>> getAggregatedVisitsData(String startDate, String endDate,
                                                              String ageType, Integer startAge,
                                                              Integer endAge, String gender,
-                                                             String orgUnitCode, Boolean newThisYear) throws Exception {
-        if (gender == null && newThisYear == null) {
-            return new ArrayList<Map<String, Object>>();
-        } else if (gender != null &&newThisYear == null) {
-            return new ArrayList<Map<String, Object>>();
-        } else if (gender == null &&newThisYear != null) {
-            return new ArrayList<Map<String, Object>>();
-        } else if (gender != null && newThisYear != null) {
-            return datastoreRepository.getDatastoreAggregateVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, newThisYear);
-        } else {
-            return new ArrayList<Map<String, Object>>();
-        }
+                                                             String orgUnitCode, String newThisYear) throws Exception {
+        return datastoreRepository.getDatastoreAggregateVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, newThisYear);
     }
 
     public List<Map<String, Object>> getAggregatedNewOrRepeatVisitsData(String startDate, String endDate,
                                                                         String ageType, Integer startAge,
                                                                         Integer endAge, String gender,
-                                                                        String orgUnitCode, Boolean isNewVisit) {
-        if (gender == null && isNewVisit == null) {
-            return new ArrayList<Map<String, Object>>();
-        } else if (gender != null &&isNewVisit == null) {
-            return new ArrayList<Map<String, Object>>();
-        } else if (gender == null &&isNewVisit != null) {
-            return new ArrayList<Map<String, Object>>();
-        } else if (gender != null && isNewVisit != null) {
-            return datastoreRepository.getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, isNewVisit);
-        } else {
-            return new ArrayList<Map<String, Object>>();
-        }
+                                                                        String orgUnitCode, String isNewVisit) {
+        return datastoreRepository.getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, isNewVisit);
     }
 
     public List<Map<String, Object>> getAggregateDataFromDailyAggregatedData(String id, String startDate, String endDate) throws Exception {

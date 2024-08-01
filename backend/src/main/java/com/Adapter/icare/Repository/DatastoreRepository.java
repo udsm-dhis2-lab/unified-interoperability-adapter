@@ -62,8 +62,8 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "FROM datastore ds " +
             "WHERE CAST(JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDate')) AS DATETIME)  BETWEEN :startDate AND :endDate " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) >= :startAge " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) < :endAge " +
+            "AND JSON_EXTRACT(value, '$.age') >= :startAge " +
+            "AND JSON_EXTRACT(value, '$.age') < :endAge " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
             "  AND  (" +
@@ -87,24 +87,24 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "FROM datastore ds " +
             "WHERE CAST(JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDate')) AS DATETIME)  BETWEEN :startDate AND :endDate " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) >= :startAge " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) < :endAge " +
+            "AND JSON_EXTRACT(value, '$.age') >= :startAge " +
+            "AND JSON_EXTRACT(value, '$.age') < :endAge " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.newThisYear')) = :newThisYear",nativeQuery = true)
-    List<Map<String, Object>> getDatastoreAggregateVisitsByDatesAndAgeGroupAndGender(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String orgUnitCode, Boolean newThisYear);
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDetails.newThisYear')) = :newThisYear",nativeQuery = true)
+    List<Map<String, Object>> getDatastoreAggregateVisitsByDatesAndAgeGroupAndGender(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String orgUnitCode, String newThisYear);
 
 
     @Query(value = "SELECT COUNT(*) as aggregated " +
             "FROM datastore ds " +
             "WHERE CAST(JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDate')) AS DATETIME)  BETWEEN :startDate AND :endDate " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) >= :startAge " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.age')) < :endAge " +
+            "AND JSON_EXTRACT(value, '$.age') >= :startAge " +
+            "AND JSON_EXTRACT(value, '$.age') < :endAge " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
-            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.isNew')) = :isNew",nativeQuery = true)
-    List<Map<String, Object>> getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String orgUnitCode, Boolean isNew);
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDetails.new')) = :isNew",nativeQuery = true)
+    List<Map<String, Object>> getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String orgUnitCode, String isNew);
 
 
     @Query(value = "SELECT dataElement,categoryOptionCombo,SUM(dataValue) AS value " +

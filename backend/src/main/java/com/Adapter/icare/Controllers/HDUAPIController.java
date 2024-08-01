@@ -152,7 +152,7 @@ public class HDUAPIController {
                                 (Integer) requestParam.get("endAge"),
                                 requestParam.get("gender").toString(),
                                 orgUnit.get("code").toString(),
-                                true
+                                "true"
                         );
                     } else if (storedToolMapping.getValue().get("type").equals("visitDetails.new")) {
                         requestedData = datastoreService.getAggregatedNewOrRepeatVisitsData(
@@ -163,7 +163,7 @@ public class HDUAPIController {
                                 (Integer) requestParam.get("endAge"),
                                 requestParam.get("gender").toString(),
                                 orgUnit.get("code").toString(),
-                                true
+                                "true"
                         );
                     } else if (storedToolMapping.getValue().get("type").equals("visitDetails.repeat")) {
                         requestedData = datastoreService.getAggregatedNewOrRepeatVisitsData(
@@ -174,7 +174,7 @@ public class HDUAPIController {
                                 (Integer) requestParam.get("endAge"),
                                 requestParam.get("gender").toString(),
                                 orgUnit.get("code").toString(),
-                                false
+                                "false"
                         );
                     }
 //              System.out.println(requestedData);
