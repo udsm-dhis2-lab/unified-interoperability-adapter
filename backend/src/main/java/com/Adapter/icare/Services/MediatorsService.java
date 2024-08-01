@@ -191,7 +191,7 @@ public class MediatorsService {
                         clientDetailsDatastore.setNamespace(namespace);
                         clientDetailsDatastore.setDataKey(key);
                         clientDetailsDatastore.setValue(demographicDetails);
-                        datastoreService.saveDatastore(clientDetailsDatastore);
+                        clientResponse = datastoreService.saveDatastore(clientDetailsDatastore);
                     }
 
                     // Save or update service data for each client
@@ -244,8 +244,6 @@ public class MediatorsService {
                         }
                         clientData.put("gender", formatGender(demographicDetails.get("gender").toString()));
                         clientData.put("orgUnit", hfrCode);
-                        clientData.put("newThisYear", newThisYear);
-                        clientData.put("isNew",isNew);
                         clientData.put("visitDate",visitDateString);
                         serviceDetails.setValue(clientData);
                         visitDetailsResponse = datastoreService.saveDatastore(serviceDetails);
