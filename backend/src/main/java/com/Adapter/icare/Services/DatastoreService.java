@@ -94,7 +94,7 @@ public class DatastoreService {
         }
     }
 
-    public List<Map<String, Object>> getAggregatedData(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode) throws Exception {
+    public List<Map<String, Object>> getAggregatedDataByDiagnosisDetails(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode) throws Exception {
         if (gender == null && mappingsNamespace == null) {
             return new ArrayList<Map<String, Object>>();
         } else if (gender != null &&mappingsNamespace == null) {
@@ -134,6 +134,20 @@ public class DatastoreService {
                                                                               Integer endAge, String gender,
                                                                               String orgUnitCode, String referred) {
         return datastoreRepository.getDatastoreAggregateVisitsByReferralDetails( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, referred);
+    }
+
+    public List<Map<String, Object>> getAggregatedDeathDataByDiagnosisDetails(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode) throws Exception {
+        if (gender == null && mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null &&mappingsNamespace == null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender == null &&mappingsNamespace != null) {
+            return new ArrayList<Map<String, Object>>();
+        } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
+            return datastoreRepository.getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode);
+        } else {
+            return new ArrayList<Map<String, Object>>();
+        }
     }
 
 

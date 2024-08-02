@@ -132,7 +132,7 @@ public class HDUAPIController {
                     Map<String, Object> dataValue = new HashMap<>();
                     List<Map<String, Object>> requestedData = List.of();
                     if (storedToolMapping.getValue().get("type").equals("diagnosisDetails")) {
-                        requestedData = datastoreService.getAggregatedData(
+                        requestedData = datastoreService.getAggregatedDataByDiagnosisDetails(
                                 requestParams.get("startDate").toString(),
                                 requestParams.get("endDate").toString(),
                                 requestParam.get("ageType").toString(),
@@ -197,6 +197,18 @@ public class HDUAPIController {
                                 requestParam.get("gender").toString(),
                                 orgUnit.get("code").toString(),
                                 requestParam.get("paymentCategory").toString()
+                        );
+                    } else if (storedToolMapping.getValue().get("type").equals("causeOfDeath")) {
+                        requestedData = datastoreService.getAggregatedDeathDataByDiagnosisDetails(
+                                requestParams.get("startDate").toString(),
+                                requestParams.get("endDate").toString(),
+                                requestParam.get("ageType").toString(),
+                                (Integer) requestParam.get("startAge"),
+                                (Integer) requestParam.get("endAge"),
+                                requestParam.get("gender").toString(),
+                                mappingsNamespace,
+                                mappingsKey,
+                                orgUnit.get("code").toString()
                         );
                     }
 //              System.out.println(requestedData);

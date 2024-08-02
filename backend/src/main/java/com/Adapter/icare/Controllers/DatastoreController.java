@@ -141,7 +141,7 @@ public class DatastoreController {
             if (storedToolMapping.getValue().get("type").equals("diagnosisDetails")) {
                 for(Map<String, Object> requestParam: (List<Map<String, Object>>) storedToolMapping.getValue().get("params")) {
                     Map<String, Object> dataValue = new HashMap<>();
-                    List<Map<String, Object>> requestedData = datastoreService.getAggregatedData(
+                    List<Map<String, Object>> requestedData = datastoreService.getAggregatedDataByDiagnosisDetails(
                             requestParams.get("startDate").toString(),
                             requestParams.get("endDate").toString(),
                             requestParam.get("ageType").toString(),

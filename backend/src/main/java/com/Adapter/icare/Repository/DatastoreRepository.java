@@ -82,6 +82,30 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "    ) > 0",nativeQuery = true)
     List<Map<String, Object>> getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode);
 
+    @Query(value = "SELECT COUNT(*) as aggregated " +
+            "FROM datastore ds " +
+            "WHERE CAST(JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDate')) AS DATETIME)  BETWEEN :startDate AND :endDate " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
+            "AND JSON_EXTRACT(value, '$.age') >= :startAge " +
+            "AND JSON_EXTRACT(value, '$.age') < :endAge " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
+            "  AND  (" +
+            "        SELECT COUNT(*) " +
+            "        FROM (" +
+            "            SELECT jt.code " +
+            "            FROM datastore " +
+            "            CROSS JOIN JSON_TABLE(value, '$.mappings[*]' " +
+            "                COLUMNS (" +
+            "                    code VARCHAR(255) PATH '$.code' " +
+            "                ) " +
+            "            ) AS jt WHERE namespace = :mappingsNamespace " +
+            "            AND data_key = :mappingsKey " +
+            "            AND JSON_CONTAINS_PATH(ds.value, 'one', '$.causesOfDeathDetails.underlyingCauseDiagnosisCode', jt.code) " +
+            "        ) AS subquery " +
+            "    ) > 0",nativeQuery = true)
+    List<Map<String, Object>> getDatastoreAggregateDeathsByDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode);
+
 
     @Query(value = "SELECT COUNT(*) as aggregated " +
             "FROM datastore ds " +
