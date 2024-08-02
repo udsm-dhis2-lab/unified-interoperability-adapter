@@ -176,6 +176,28 @@ public class HDUAPIController {
                                 orgUnit.get("code").toString(),
                                 "false"
                         );
+                    } else if (storedToolMapping.getValue().get("type").equals("paymentCategoryDetails")) {
+                        requestedData = datastoreService.getAggregatedVisitsDataByPaymentCategory(
+                                requestParams.get("startDate").toString(),
+                                requestParams.get("endDate").toString(),
+                                requestParam.get("ageType").toString(),
+                                (Integer) requestParam.get("startAge"),
+                                (Integer) requestParam.get("endAge"),
+                                requestParam.get("gender").toString(),
+                                orgUnit.get("code").toString(),
+                                requestParam.get("paymentCategory").toString()
+                        );
+                    } else if (storedToolMapping.getValue().get("type").equals("outcomeDetails.referred")) {
+                        requestedData = datastoreService.getAggregatedVisitsDataByReferralDetails(
+                                requestParams.get("startDate").toString(),
+                                requestParams.get("endDate").toString(),
+                                requestParam.get("ageType").toString(),
+                                (Integer) requestParam.get("startAge"),
+                                (Integer) requestParam.get("endAge"),
+                                requestParam.get("gender").toString(),
+                                orgUnit.get("code").toString(),
+                                requestParam.get("paymentCategory").toString()
+                        );
                     }
 //              System.out.println(requestedData);
                     dataValue.put("value", requestedData.get(0).get("aggregated"));

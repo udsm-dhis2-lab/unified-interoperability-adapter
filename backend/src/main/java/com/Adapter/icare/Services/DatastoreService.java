@@ -122,6 +122,21 @@ public class DatastoreService {
         return datastoreRepository.getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, isNewVisit);
     }
 
+    public List<Map<String, Object>> getAggregatedVisitsDataByPaymentCategory(String startDate, String endDate,
+                                                                        String ageType, Integer startAge,
+                                                                        Integer endAge, String gender,
+                                                                        String orgUnitCode, String paymentCategory) {
+        return datastoreRepository.getDatastoreAggregateVisitsByPaymentCategory( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, paymentCategory);
+    }
+
+    public List<Map<String, Object>> getAggregatedVisitsDataByReferralDetails(String startDate, String endDate,
+                                                                              String ageType, Integer startAge,
+                                                                              Integer endAge, String gender,
+                                                                              String orgUnitCode, String referred) {
+        return datastoreRepository.getDatastoreAggregateVisitsByReferralDetails( startDate,endDate, ageType,startAge, endAge, gender,orgUnitCode, referred);
+    }
+
+
     public List<Map<String, Object>> getAggregateDataFromDailyAggregatedData(String id, String startDate, String endDate) throws Exception {
         return datastoreRepository.getAggregateDataByStartDateAndEndDate(id,startDate,endDate);
     }

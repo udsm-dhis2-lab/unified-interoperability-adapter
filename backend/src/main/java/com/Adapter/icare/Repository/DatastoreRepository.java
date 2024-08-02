@@ -107,6 +107,28 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     List<Map<String, Object>> getDatastoreAggregateNewOrRepeatVisitsByDatesAndAgeGroupAndGender(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String orgUnitCode, String isNew);
 
 
+    @Query(value = "SELECT COUNT(*) as aggregated " +
+            "FROM datastore ds " +
+            "WHERE CAST(JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDate')) AS DATETIME)  BETWEEN :startDate AND :endDate " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
+            "AND JSON_EXTRACT(value, '$.age') >= :startAge " +
+            "AND JSON_EXTRACT(value, '$.age') < :endAge " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.paymentCategoryDetails.type')) = :paymentCategory",nativeQuery = true)
+    List<Map<String, Object>> getDatastoreAggregateVisitsByPaymentCategory(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String orgUnitCode, String paymentCategory);
+
+    @Query(value = "SELECT COUNT(*) as aggregated " +
+            "FROM datastore ds " +
+            "WHERE CAST(JSON_UNQUOTE(JSON_EXTRACT(value, '$.visitDate')) AS DATETIME)  BETWEEN :startDate AND :endDate " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.ageType')) = :ageType " +
+            "AND JSON_EXTRACT(value, '$.age') >= :startAge " +
+            "AND JSON_EXTRACT(value, '$.age') < :endAge " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
+            "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.outcomeDetails.referred')) = :referred",nativeQuery = true)
+    List<Map<String, Object>> getDatastoreAggregateVisitsByReferralDetails(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String orgUnitCode, String referred);
+
     @Query(value = "SELECT dataElement,categoryOptionCombo,SUM(dataValue) AS value " +
             "FROM datastore," +
             "JSON_TABLE(datastore.value, '$.data[*]'" +
