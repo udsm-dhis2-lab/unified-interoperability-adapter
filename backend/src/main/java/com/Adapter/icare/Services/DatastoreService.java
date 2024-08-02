@@ -144,7 +144,7 @@ public class DatastoreService {
         } else if (gender == null &&mappingsNamespace != null) {
             return new ArrayList<Map<String, Object>>();
         } else if (gender != null && mappingsNamespace != null && mappingsKey != null) {
-            return datastoreRepository.getDatastoreAggregateByDatesAndAgeGroupAndGenderAndDiagnosis( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode);
+            return datastoreRepository.getDatastoreAggregateDeathsByDiagnosis( startDate,endDate, ageType,startAge, endAge, gender, mappingsNamespace, mappingsKey,orgUnitCode);
         } else {
             return new ArrayList<Map<String, Object>>();
         }
