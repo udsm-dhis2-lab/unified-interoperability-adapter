@@ -197,7 +197,7 @@ public class HDUAPIController {
                                 (Integer) requestParam.get("endAge"),
                                 requestParam.get("gender").toString(),
                                 orgUnit.get("code").toString(),
-                                requestParam.get("paymentCategory").toString()
+                                "true"
                         );
                     } else if (storedToolMapping.getValue().get("type").equals("causeOfDeath")) {
                         requestedData = datastoreService.getAggregatedDeathDataByDiagnosisDetails(
