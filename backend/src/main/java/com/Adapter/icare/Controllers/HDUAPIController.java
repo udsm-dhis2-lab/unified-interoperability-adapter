@@ -7,6 +7,7 @@ import com.google.common.collect.Maps;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -211,10 +212,11 @@ public class HDUAPIController {
                                 orgUnit.get("code").toString()
                         );
                     }
-//              System.out.println(requestedData);
-                    Integer value = 0;
+                    BigInteger value = null;
                     if (requestedData != null && requestedData.size()> 0) {
-                        value = (Integer) requestedData.get(0).get("aggregated");
+                        value = (BigInteger) requestedData.get(0).get("aggregated");
+                    } else {
+                        value = BigInteger.valueOf(0);
                     }
                     dataValue.put("value", value);
                     dataValue.put("dataElement", (( Map<String, Object>)storedToolMapping.getValue().get("dataElement")).get("id").toString());

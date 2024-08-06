@@ -8,6 +8,7 @@ import javassist.NotFoundException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -152,9 +153,11 @@ public class DatastoreController {
                             mappingsKey,
                             orgUnit.get("code").toString()
                     );
-                    Integer value = 0;
+                    BigInteger value = null;
                     if (requestedData != null && requestedData.size()> 0) {
-                        value = (Integer) requestedData.get(0).get("aggregated");
+                        value = (BigInteger) requestedData.get(0).get("aggregated");
+                    } else {
+                        value = BigInteger.valueOf(0);
                     }
                     dataValue.put("value", value);
                     dataValue.put("dataElement", (( Map<String, Object>)storedToolMapping.getValue().get("dataElement")).get("id").toString());
