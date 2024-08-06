@@ -90,20 +90,11 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "AND JSON_EXTRACT(value, '$.age') < :endAge " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
-            "  AND  (" +
-            "        SELECT COUNT(*) " +
-            "        FROM (" +
-            "            SELECT jt.code " +
-            "            FROM datastore " +
-            "            CROSS JOIN JSON_TABLE(value, '$.mappings[*]' " +
-            "                COLUMNS (" +
-            "                    code VARCHAR(255) PATH '$.code' " +
-            "                ) " +
-            "            ) AS jt WHERE namespace = :mappingsNamespace " +
-            "            AND data_key = :mappingsKey " +
-            "            AND JSON_CONTAINS_PATH(ds.value, 'one', '$.causesOfDeathDetails.underlyingCauseDiagnosisCode', jt.code) " +
-            "        ) AS subquery " +
-            "    ) > 0",nativeQuery = true)
+            "AND JSON_UNQUOTE(JSON_EXTRACT(ds.value, '$.causesOfDeathDetails.underlyingCauseDiagnosisCode')) IN (" +
+            "SELECT jt.code " +
+            "    FROM datastore sub_ds " +
+            "    CROSS JOIN JSON_TABLE(sub_ds.value, '$.mappings[*]' COLUMNS (code VARCHAR(255) PATH '$.code')" +
+            ") AS jt WHERE sub_ds.namespace = :mappingsNamespace AND sub_ds.data_key = :mappingsKey",nativeQuery = true)
     List<Map<String, Object>> getDatastoreAggregateDeathsByDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode);
 
 
