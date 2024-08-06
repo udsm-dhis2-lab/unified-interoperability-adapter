@@ -91,10 +91,13 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.gender')) = :gender " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(value, '$.orgUnit')) = :orgUnitCode " +
             "AND JSON_UNQUOTE(JSON_EXTRACT(ds.value, '$.causesOfDeathDetails.underlyingCauseDiagnosisCode')) IN (" +
-            "SELECT jt.code " +
+            "    SELECT jt.code " +
             "    FROM datastore sub_ds " +
-            "    CROSS JOIN JSON_TABLE(sub_ds.value, '$.mappings[*]' COLUMNS (code VARCHAR(255) PATH '$.code')" +
-            ") AS jt WHERE sub_ds.namespace = :mappingsNamespace AND sub_ds.data_key = :mappingsKey",nativeQuery = true)
+            "    CROSS JOIN JSON_TABLE(sub_ds.value, '$.mappings[*]' " +
+            "        COLUMNS (code VARCHAR(255) PATH '$.code') " +
+            "    ) AS jt " +
+            "    WHERE sub_ds.namespace = :mappingsNamespace AND sub_ds.data_key = :mappingsKey " +
+            ")",nativeQuery = true)
     List<Map<String, Object>> getDatastoreAggregateDeathsByDiagnosis(String startDate, String endDate, String ageType, Integer startAge, Integer endAge, String gender, String mappingsNamespace, String mappingsKey, String orgUnitCode);
 
 
