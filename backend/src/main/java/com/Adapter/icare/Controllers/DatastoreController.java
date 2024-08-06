@@ -152,8 +152,11 @@ public class DatastoreController {
                             mappingsKey,
                             orgUnit.get("code").toString()
                     );
-//              System.out.println(requestedData);
-                    dataValue.put("value", requestedData.get(0).get("aggregated"));
+                    Integer value = 0;
+                    if (requestedData != null && requestedData.size()> 0) {
+                        value = (Integer) requestedData.get(0).get("aggregated");
+                    }
+                    dataValue.put("value", value);
                     dataValue.put("dataElement", (( Map<String, Object>)storedToolMapping.getValue().get("dataElement")).get("id").toString());
                     dataValue.put("categoryOptionCombo", requestParam.get("co"));
                     data.add(dataValue);
