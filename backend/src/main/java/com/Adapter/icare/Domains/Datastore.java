@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 
@@ -34,4 +35,22 @@ public class Datastore  extends BaseEntity implements Serializable {
     @Column(name = "value", columnDefinition = "json", nullable = false)
     @Convert(converter = HashMapConverter.class)
     private Map<String, Object> value;
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> mappedDatastore = new HashMap<>();
+        mappedDatastore.put("uuid", this.getUuid());
+        mappedDatastore.put("namespace", this.getNamespace());
+        mappedDatastore.put("dataKey", this.getDataKey());
+        mappedDatastore.put("value", this.getValue());
+        mappedDatastore.put("description", this.getDescription());
+        if (this.getCreatedBy() != null) {
+            mappedDatastore.put("createdBy", this.getCreatedBy().toMap());
+        }
+        if (this.getLastUpdatedBy() != null) {
+            mappedDatastore.put("lastUpdatedBy", getLastUpdatedBy().toMap());
+        }
+        mappedDatastore.put("createdOn", getCreatedOn());
+        mappedDatastore.put("lastUpdatedOn", getLastUpdatedOn());
+        return mappedDatastore;
+    }
 }

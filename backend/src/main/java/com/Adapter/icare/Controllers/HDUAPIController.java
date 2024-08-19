@@ -68,19 +68,30 @@ public class HDUAPIController {
     }
 
     @DeleteMapping("datastore/{uuid}")
-    public void deleteDatastore(@PathVariable("uuid") String uuid) throws Exception {
+    public Map<String, Object> deleteDatastore(@PathVariable("uuid") String uuid) throws Exception {
+        Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+        Map<String, Object> returnObj = new HashMap<>();
+        returnObj.put("uuid", uuid);
+        returnObj.put("dataKey", datastore.getDataKey());
+        returnObj.put("namespace", datastore.getNamespace());
+        returnObj.put("message", "Successful deleted");
         datastoreService.deleteDatastore(uuid);
+        return returnObj;
     }
 
     // CUSTOM implementation for supporting HDU API temporarily
     @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
-    public List<Datastore> getDatastoreByNamespace(@PathVariable("namespace") String namespace) throws Exception {
-        return  datastoreService.getDatastoreNamespaceDetails(namespace);
+    public List<Map<String, Object>> getDatastoreByNamespace(@PathVariable("namespace") String namespace) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        for (Datastore datastore: datastoreService.getDatastoreNamespaceDetails(namespace)) {
+           namespaceDetails.add(datastore.toMap());
+        }
+        return  namespaceDetails;
     }
 
 
     @PostMapping(value = "datastore", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Datastore saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {
+    public Map<String, Object> saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {
         String namespace = datastore.getNamespace();
         String dataKey = datastore.getDataKey();
         // Check if exists provided update is set to true
@@ -88,33 +99,45 @@ public class HDUAPIController {
             Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
             if (existingDatastore != null) {
                 existingDatastore.setValue(datastore.getValue());
-                return datastoreService.updateDatastore(existingDatastore);
+                return datastoreService.updateDatastore(existingDatastore).toMap();
             } else {
-                return datastoreService.saveDatastore(datastore);
+                return datastoreService.saveDatastore(datastore).toMap();
             }
         } else {
-            return datastoreService.saveDatastore(datastore);
+            return datastoreService.saveDatastore(datastore).toMap();
         }
     }
 
     @GetMapping("clientsVisitsByNamespace/{namespace}")
-    public List<Datastore> getClientsVisitsDataByNamespace(@PathVariable("namespace") String namespace) throws Exception {
-        return datastoreService.getClientsVisitsDataByNameSpace(namespace);
+    public List<Map<String,Object>> getClientsVisitsDataByNamespace(@PathVariable("namespace") String namespace) throws Exception {
+        List<Map<String, Object>> clientDetails = new ArrayList<>();
+        for (Datastore datastore: datastoreService.getClientsVisitsDataByNameSpace(namespace)) {
+            clientDetails.add(datastore.toMap());
+        }
+        return clientDetails;
     }
 
     @GetMapping("clientsVisitsByKey/{key}")
-    public List<Datastore> getClientsVisitsDataByKey(@PathVariable("key") String key) throws Exception {
-        return datastoreService.getClientsVisitsDataByKey(key);
+    public List<Map<String,Object>> getClientsVisitsDataByKey(@PathVariable("key") String key) throws Exception {
+        List<Map<String, Object>> clientDetails = new ArrayList<>();
+        for (Datastore datastore: datastoreService.getClientsVisitsDataByKey(key)) {
+            clientDetails.add(datastore.toMap());
+        }
+        return clientDetails;
     }
 
     @GetMapping("clientsVisits")
-    public List<Datastore> getClientsVisits(@RequestParam(value = "key") String key,
+    public List<Map<String,Object>> getClientsVisits(@RequestParam(value = "key") String key,
                                             @RequestParam(value = "ageType") String ageType,
                                             @RequestParam(value = "startAge") Integer startAge,
                                             @RequestParam(value = "endAge") Integer endAge,
                                             @RequestParam(value = "gender", required = false) String gender,
                                             @RequestParam(value = "diagnosis", required = false) String diagnosis) throws Exception {
-        return datastoreService.getClientsVisits(key, ageType, startAge, endAge, gender, diagnosis);
+        List<Map<String,Object>> mappedData = new ArrayList<>();
+        for(Datastore datastore: datastoreService.getClientsVisits(key, ageType, startAge, endAge, gender, diagnosis)) {
+            mappedData.add(datastore.toMap());
+        }
+        return mappedData;
     }
 
     @PostMapping(value = "generateAggregateData",produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
