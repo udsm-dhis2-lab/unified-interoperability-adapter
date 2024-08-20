@@ -30,30 +30,38 @@ public class HDUAPIController {
 
 
     @GetMapping("dataTemplates")
-    public Map<String, Object> getDataTemplatesList (@RequestParam(value = "id", required = false) String id) throws Exception {
+    public Map<String, Object> getDataTemplatesList (@RequestParam(value = "id", required = false) String id, @RequestParam(value = "uuid", required = false) String uuid) throws Exception {
         // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
-        List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
         Map<String, Object> dataTemplatesResults = new HashMap<>();
-        List<Map<String, Object>> dataTemplates = new ArrayList<>();
-        for(Datastore datastore: dataTemplateNameSpaceDetails) {
-            Map<String, Object> dataTemplate = datastore.getValue();
-            if (id != null) {
-                if ( ((Map<String, Object>) dataTemplate.get("templateDetails")).get("id").equals(id)) {
+        if (uuid == null) {
+            List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
+            List<Map<String, Object>> dataTemplates = new ArrayList<>();
+            for(Datastore datastore: dataTemplateNameSpaceDetails) {
+                Map<String, Object> dataTemplate = datastore.getValue();
+                if (id != null) {
+                    if ( ((Map<String, Object>) dataTemplate.get("templateDetails")).get("id").equals(id)) {
+                        dataTemplate.put("uuid", datastore.getUuid());
+                        dataTemplates.add(dataTemplate);
+                    }
+                } else {
                     dataTemplate.put("uuid", datastore.getUuid());
                     dataTemplates.add(dataTemplate);
                 }
-            } else {
-                dataTemplate.put("uuid", datastore.getUuid());
-                dataTemplates.add(dataTemplate);
             }
-        }
-        if (id != null) {
-            if (!dataTemplates.isEmpty()) {
-                dataTemplatesResults =dataTemplates.get(0);
+            if (id != null) {
+                if (!dataTemplates.isEmpty()) {
+                    dataTemplatesResults =dataTemplates.get(0);
+                }
+            } else {
+                dataTemplatesResults.put("results", dataTemplates);
             }
         } else {
-            dataTemplatesResults.put("results", dataTemplates);
+            Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+            Map<String, Object> dataTemplate = datastore.getValue();
+            dataTemplate.put("uuid", datastore.getUuid());
+            dataTemplatesResults = dataTemplate;
         }
+
         return  dataTemplatesResults;
     }
     @GetMapping("dataTemplates/examples")
@@ -82,15 +90,6 @@ public class HDUAPIController {
             dataTemplatesExampleObject.put("results", dataTemplatesExamples);
         }
         return dataTemplatesExampleObject;
-    }
-
-    @GetMapping("dataTemplates/{uuid}")
-    public Map<String, Object> getDataTemplateByUuid(@PathVariable("uuid") String uuid) throws Exception {
-        Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
-        if (datastore == null) {
-            throw new Exception("Data template for the uuid " + uuid + " does not exists");
-        }
-        return datastore.getValue();
     }
 
     @PostMapping(value = "dataTemplates", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
