@@ -30,9 +30,10 @@ public class HDUAPIController {
 
 
     @GetMapping("dataTemplates")
-    public List<Map<String, Object>> getDataTemplatesList (@RequestParam(value = "id", required = false) String id) throws Exception {
+    public Map<String, Object> getDataTemplatesList (@RequestParam(value = "id", required = false) String id) throws Exception {
         // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
         List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
+        Map<String, Object> dataTemplatesResults = new HashMap<>();
         List<Map<String, Object>> dataTemplates = new ArrayList<>();
         for(Datastore datastore: dataTemplateNameSpaceDetails) {
             Map<String, Object> dataTemplate = datastore.getValue();
@@ -46,8 +47,41 @@ public class HDUAPIController {
                 dataTemplates.add(dataTemplate);
             }
         }
-        return  dataTemplates;
-
+        if (id != null) {
+            if (!dataTemplates.isEmpty()) {
+                dataTemplatesResults =dataTemplates.get(0);
+            }
+        } else {
+            dataTemplatesResults.put("results", dataTemplates);
+        }
+        return  dataTemplatesResults;
+    }
+    @GetMapping("dataTemplates/examples")
+    public Map<String, Object> getDataTemplatesExamples (@RequestParam(value = "id", required = false) String id) throws Exception {
+        // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
+        List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplatesExamples");
+        Map<String, Object> dataTemplatesExampleObject = new HashMap<>();
+        List<Map<String, Object>> dataTemplatesExamples = new ArrayList<>();
+        for(Datastore datastore: dataTemplateNameSpaceDetails) {
+            Map<String, Object> dataTemplateExample = datastore.getValue();
+            if (id != null) {
+                if ( datastore.getDataKey().equals(id)) {
+                    dataTemplateExample.put("uuid", datastore.getUuid());
+                    dataTemplatesExamples.add(dataTemplateExample);
+                }
+            } else {
+                dataTemplateExample.put("uuid", datastore.getUuid());
+                dataTemplatesExamples.add(dataTemplateExample);
+            }
+        }
+        if (id != null) {
+            if (!dataTemplatesExamples.isEmpty()) {
+                dataTemplatesExampleObject =dataTemplatesExamples.get(0);
+            }
+        } else {
+            dataTemplatesExampleObject.put("results", dataTemplatesExamples);
+        }
+        return dataTemplatesExampleObject;
     }
 
     @GetMapping("dataTemplates/{uuid}")
