@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Changeset to modify the created_by column type -->
+    <changeSet id="1" author="josephat-mwakyusa">
+
+        <!-- Alter the column type of created_by -->
+        <modifyDataType tableName="datastore" columnName="created_by" newDataType="INT"/>
+    </changeSet>
+
+</databaseChangeLog>

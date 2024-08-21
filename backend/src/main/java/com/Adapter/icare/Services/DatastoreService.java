@@ -1,9 +1,13 @@
 package com.Adapter.icare.Services;
 
+import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Datastore;
+import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Repository.DatastoreRepository;
 import com.google.common.collect.Maps;
 import javassist.NotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -12,15 +16,22 @@ import java.util.*;
 @Service
 public class DatastoreService {
     private final DatastoreRepository datastoreRepository;
+    private final UserService userService;
 
-    public DatastoreService(DatastoreRepository datastoreRepository) {
+    public DatastoreService(DatastoreRepository datastoreRepository, UserService userService) {
         this.datastoreRepository = datastoreRepository;
+        this.userService = userService;
     }
 
     public Datastore saveDatastore(Datastore datastore) throws Exception {
         if (datastore.getUuid() == null) {
             UUID uuid = UUID.randomUUID();
             datastore.setUuid(uuid.toString());
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            User authenticatedUser = userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+            datastore.setCreatedBy(authenticatedUser);
         }
         return datastoreRepository.save(datastore);
     }
@@ -153,5 +164,9 @@ public class DatastoreService {
 
     public List<Map<String, Object>> getAggregateDataFromDailyAggregatedData(String id, String startDate, String endDate) throws Exception {
         return datastoreRepository.getAggregateDataByStartDateAndEndDate(id,startDate,endDate);
+    }
+
+    public List<Map<String, Object>> getDatastoreByNamespaceKeyAndVersion(String namespace, String key, String version) throws Exception {
+        return datastoreRepository.getStoredDataByNamespaceKeyAndVersion(namespace,key,version);
     }
 }

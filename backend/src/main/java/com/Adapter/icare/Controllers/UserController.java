@@ -145,7 +145,7 @@ public class UserController {
         return privilege.toMap(withRoles);
     }
 
-    @PutMapping("/user/priviliges/{uuid}")
+    @PutMapping("/user/privileges/{uuid}")
     public Map<String,Object> updatePrivilege(@RequestBody Map<String,Object> privilegeMap,@PathVariable String uuid) throws Exception {
         Privilege privilege = Privilege.fromMap(privilegeMap);
         Privilege updatedPrivilege = userService.updatePrivilage(privilege,uuid);
@@ -176,11 +176,6 @@ public class UserController {
     @GetMapping("/users/group/{uuid}")
     public Map<String,Object> getGroup(@PathVariable String uuid,@RequestParam(defaultValue = "true") boolean withUsers) throws Exception {
         Group group = userService.getGroup(uuid);
-
         return group.toMap(withUsers);
     }
-
-
-
-
 }

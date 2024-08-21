@@ -22,21 +22,29 @@ public class BaseEntity implements Serializable {
     @Column(name = "uuid", updatable = false, nullable = false)
     private String uuid;
 
-    @Column(name = "created_by")
+    @ManyToOne
+    @JoinColumn(name = "created_by")
     private User createdBy;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_on")
     private Date createdOn;
-    @Column(name = "last_updated_by")
+
+    @ManyToOne
+    @JoinColumn(name = "last_updated_by")
     private User lastUpdatedBy;
+
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "last_updated_on")
     private Date lastUpdatedOn;
+
     @Column(name = "retired")
     private Boolean retired;
-    @Column(name = "retired_by")
+
+    @ManyToOne
+    @JoinColumn(name = "retired_by")
     private User retiredBy;
 
     @Column(columnDefinition = "json")

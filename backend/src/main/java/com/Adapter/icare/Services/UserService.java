@@ -9,6 +9,8 @@ import com.Adapter.icare.Repository.GroupRepository;
 import com.Adapter.icare.Repository.PrivilegeRepository;
 import com.Adapter.icare.Repository.RoleRepository;
 import com.Adapter.icare.Repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -46,13 +48,18 @@ public class UserService implements UserDetailsService {
             //Password encoding
             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null) {
+                User authenticatedUser = this.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+                if (authenticatedUser != null) {
+                    user.setCreatedBy(authenticatedUser);
+                }
+            }
             createdUser = userRepository.save(user);
         } catch (Exception e) {
             System.out.println("Error while creating user" + e);
         }
 
-        System.out.println("created user: "+createdUser);
         return createdUser;
     }
 
@@ -68,6 +75,15 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("User Not found");
         }
         return new CustomUserDetails(user);
+    }
+
+    public User getUserByUsername(String username) throws UsernameNotFoundException {
+
+        User user = userRepository.findByUsername(username);
+        if(user == null){
+            throw new UsernameNotFoundException("User Not found");
+        }
+        return user;
     }
 
     public Role saveRole(Role role){

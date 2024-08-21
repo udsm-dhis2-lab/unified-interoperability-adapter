@@ -122,6 +122,21 @@ public class HDUAPIController {
         return  namespaceDetails;
     }
 
+    @GetMapping(value="codeSystems/{codeSystem}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getCodeSystem(@PathVariable("codeSystem") String codeSystem) throws Exception {
+        String namespace = "codeSystems";
+        return  datastoreService.getDatastoreByNamespaceAndKey( namespace, codeSystem).toMap();
+    }
+
+    @GetMapping(value="codeSystems/{codeSystem}/{version}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getCodeSystem(@PathVariable("codeSystem") String codeSystem, @PathVariable("version") String version) throws Exception {
+        String namespace = "codeSystems";
+        Map<String, Object> results = new HashMap<>();
+        List<Map<String, Object>> codeSystemsData = datastoreService.getDatastoreByNamespaceKeyAndVersion( namespace, codeSystem, version);
+        results.put("results", codeSystemsData);
+        return results;
+    }
+
 
     @PostMapping(value = "datastore", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public Map<String, Object> saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {

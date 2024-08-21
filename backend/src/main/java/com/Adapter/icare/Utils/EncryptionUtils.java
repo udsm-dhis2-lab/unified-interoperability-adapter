@@ -15,12 +15,9 @@ public class EncryptionUtils {
 
     private static final String ENCRYPTION_KEY = "fTjWnZr4u7x!A%D*F-JaNdRgUkXp2s5v"; //256 bits
 
-
     static {
         Security.addProvider(new BouncyCastleProvider());
     }
-
-
 
     public static String encrypt(String plainText) throws Exception {
         SecretKeySpec keySpec = new SecretKeySpec(ENCRYPTION_KEY.getBytes(), ALGORITHM);

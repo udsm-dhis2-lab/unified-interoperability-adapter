@@ -160,4 +160,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             " AND JSON_EXTRACT(value, '$.startDate') >= :startDate AND JSON_EXTRACT(value, '$.endDate') <= :endDate" +
             " GROUP BY dataElement,categoryOptionCombo;",nativeQuery = true)
     List<Map<String, Object>> getAggregateDataByStartDateAndEndDate(String namespace, String startDate, String endDate);
+
+    @Query(value = "SELECT * FROM datastore WHERE namespace = :namespace AND data_key =: key AND JSON_CONTAINS(JSON_EXTRACT(datastore.value, '$.versions[*].version'), :version)",nativeQuery = true)
+    List<Map<String, Object>> getStoredDataByNamespaceKeyAndVersion(String namespace, String key, String version);
 }
