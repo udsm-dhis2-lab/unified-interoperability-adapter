@@ -104,7 +104,6 @@ public class User extends BaseEntity implements Serializable {
     }
 
     public Map<String,Object> toMap(){
-
         Map<String,Object> userMap = new HashMap<>();
         userMap.put("uuid",this.getUuid());
 
@@ -167,6 +166,20 @@ public class User extends BaseEntity implements Serializable {
             userMap.put("sharing",this.getSharing());
         }
         return userMap;
+    }
+
+    public Map<String, Object> getReferencedProperties() {
+        Map<String,Object> userMappedProperties = new HashMap<>();
+        userMappedProperties.put("uuid", this.getUuid());
+        String displayName = "";
+        if (this.getFirstName() != null) {
+            displayName.concat(this.getFirstName()).concat(" ");
+        }
+        if (this.getSurname() != null) {
+            displayName.concat(this.getSurname());
+        }
+        userMappedProperties.put("displayName", displayName);
+        return userMappedProperties;
     }
 }
 

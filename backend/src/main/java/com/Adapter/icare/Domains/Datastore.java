@@ -44,10 +44,10 @@ public class Datastore  extends BaseEntity implements Serializable {
         mappedDatastore.put("value", this.getValue());
         mappedDatastore.put("description", this.getDescription());
         if (this.getCreatedBy() != null) {
-            mappedDatastore.put("createdBy", this.getCreatedBy().toMap());
+            mappedDatastore.put("createdBy", this.getCreatedBy().getReferencedProperties());
         }
         if (this.getLastUpdatedBy() != null) {
-            mappedDatastore.put("lastUpdatedBy", getLastUpdatedBy().toMap());
+            mappedDatastore.put("lastUpdatedBy", getLastUpdatedBy().getReferencedProperties());
         }
         mappedDatastore.put("createdOn", getCreatedOn());
         mappedDatastore.put("lastUpdatedOn", getLastUpdatedOn());
