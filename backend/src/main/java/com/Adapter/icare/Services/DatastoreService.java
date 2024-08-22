@@ -167,9 +167,6 @@ public class DatastoreService {
     }
 
     public List<Map<String, Object>> getDatastoreByNamespaceKeyAndVersion(String namespace, String key, String version) throws Exception {
-        System.out.println(namespace);
-        System.out.println(key);
-        System.out.println(version);
         return datastoreRepository.getStoredDataByNamespaceKeyAndVersion(namespace,key,version);
     }
 }

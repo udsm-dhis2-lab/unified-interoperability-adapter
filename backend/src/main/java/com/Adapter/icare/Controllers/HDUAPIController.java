@@ -128,15 +128,151 @@ public class HDUAPIController {
         return  datastoreService.getDatastoreByNamespaceAndKey( namespace, codeSystem).toMap();
     }
 
+    @GetMapping(value="codeSystems/icd", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getICDCodeSystemData(@RequestParam("version") String version,@RequestParam("releaseYear") String releaseYear) throws Exception {
+        Map<String, Object> returnDataObject = new HashMap<>();
+        String namespace = "codeSystems";
+        List<Map<String, Object>> chapters = new ArrayList<>();
+        String key = "icd";
+        if (version != null) {
+            key = "icd".concat(version);
+        }
+        if (releaseYear!=null && version == null) {
+            throw new IllegalStateException("You have to specify version when release year has been specified");
+        }
+        if (releaseYear != null) {
+            // Load chapters data as per the version available for the year
+            String chaptersNameSpace = "ICD-CHAPTERS";
+            List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(chaptersNameSpace);
+            for(Datastore datastore: chaptersDatastore) {
+                if (datastore.getDataKey().contains(version)) {
+                    chapters.add(datastore.toMap());
+                }
+            }
+        }
+        returnDataObject =  datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
+
+        // Load extended data
+        returnDataObject.put("chapters", chapters);
+        return returnDataObject;
+    }
+
+    @GetMapping(value="codeSystems/loinc", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getLOINCCodeSystemData(@RequestParam("version") String version) throws Exception {
+        Map<String, Object> returnDataObject = new HashMap<>();
+        String namespace = "codeSystems";
+        String key = "loinc";
+        if (version != null) {
+            key = "loinc".concat(version);
+        }
+        returnDataObject =  datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
+        return returnDataObject;
+    }
+
     @GetMapping(value="codeSystems/{codeSystem}/{version}", produces = APPLICATION_JSON_VALUE)
     public Map<String, Object> getCodeSystem(@PathVariable("codeSystem") String codeSystem, @PathVariable("version") String version) throws Exception {
+        List<Map<String, Object>> chapters = new ArrayList<>();
         String namespace = "codeSystems";
         Map<String, Object> results = new HashMap<>();
+        String chaptersNameSpace = "ICD-CHAPTERS";
+        List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(chaptersNameSpace);
+        for(Datastore datastore: chaptersDatastore) {
+            if (datastore.getDataKey().contains(version)) {
+                chapters.add(datastore.toMap());
+            }
+        }
         List<Map<String, Object>> codeSystemsData = datastoreService.getDatastoreByNamespaceKeyAndVersion( namespace, codeSystem, version);
-        results.put("results", codeSystemsData);
+        results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
+        results.put("chapters", chapters);
         return results;
     }
 
+    @GetMapping(value="codeSystems/{codeSystem}/{version}/{releaseYear}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getCodeSystemData(@PathVariable("codeSystem") String codeSystem, @PathVariable("version") String version, @PathVariable("releaseYear") String releaseYear) throws Exception {
+        List<Map<String, Object>> blocks = new ArrayList<>();
+        String namespace = "codeSystems";
+        Map<String, Object> results = new HashMap<>();
+        String blocksNameSpace = "ICD-BLOCKS";
+        List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(blocksNameSpace);
+        for(Datastore datastore: chaptersDatastore) {
+            if (datastore.getDataKey().contains(version) && datastore.getValue().get("release").equals(releaseYear)) {
+                blocks.add(datastore.toMap());
+            }
+        }
+        results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
+        results.put("chapters", blocks);
+        return results;
+    }
+
+    @GetMapping(value="codeSystems/{codeSystem}/{version}/{releaseYear}/{chapter}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getCodeSystemChapterData(@PathVariable("codeSystem") String codeSystem,
+                                                        @PathVariable("version") String version,
+                                                        @PathVariable("releaseYear") String releaseYear,
+                                                        @PathVariable("chapter") String chapter) throws Exception {
+        // TODO: Improve to accommodate release year filtering
+        Map<String, Object> results = new HashMap<>();
+        if (codeSystem.equals("icd")) {
+            String namespace = "ICD-CHAPTERS";
+            String key = version.concat("-").concat(chapter);
+            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
+        } else {
+            // For LOINC
+            String namespace = "LOINC-CATEGORY";
+            String key = version.concat("-").concat(chapter);
+            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
+        }
+        return results;
+    }
+    @GetMapping(value="codeSystems/icd/{version}/{releaseYear}/{chapter}/{block}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getICDCodeSystemBlockData(@PathVariable("version") String version,
+                                                        @PathVariable("releaseYear") String releaseYear,
+                                                        @PathVariable("chapter") String chapter,
+                                                         @PathVariable("block") String block) throws Exception {
+        // TODO: Improve to accommodate release year, version, chapter filtering
+        Map<String, Object> results = new HashMap<>();
+        String namespace = "ICD-BLOCKS";
+        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, block).toMap();
+        return results;
+    }
+
+    @GetMapping(value="codeSystems/loinc/{version}/{releaseYear}/{chapter}/{code}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getLOINCCodeSystemCodeData(@PathVariable("version") String version,
+                                                         @PathVariable("releaseYear") String releaseYear,
+                                                         @PathVariable("chapter") String chapter,
+                                                         @PathVariable("code") String code) throws Exception {
+        // TODO: Improve to accommodate release year, version and chapter filtering
+        Map<String, Object> results = new HashMap<>();
+        String namespace = "LOINC-CODES";
+        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, code).toMap();
+        return results;
+    }
+
+    @GetMapping(value="codeSystems/icd/{version}/{releaseYear}/{chapter}/{block}/{category}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getICDCodeSystemCategoryData(@PathVariable("version") String version,
+                                                            @PathVariable("releaseYear") String releaseYear,
+                                                            @PathVariable("chapter") String chapter,
+                                                            @PathVariable("block") String block,
+                                                            @PathVariable("category") String category) throws Exception {
+        // TODO: Improve to accommodate release year, version, chapter filtering
+        Map<String, Object> results = new HashMap<>();
+        String namespace = "ICD-CATEGORIES";
+        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, category).toMap();
+        return results;
+    }
+
+    @GetMapping(value="codeSystems/icd/{version}/{releaseYear}/{chapter}/{block}/{category}/{code}", produces = APPLICATION_JSON_VALUE)
+    public Map<String, Object> getICDCodeSystemCodeData(@PathVariable("version") String version,
+                                                        @PathVariable("releaseYear") String releaseYear,
+                                                        @PathVariable("chapter") String chapter,
+                                                        @PathVariable("block") String block,
+                                                        @PathVariable("category") String category,
+                                                        @PathVariable("code") String code) throws Exception {
+        // TODO: Improve to accommodate release year, version, chapter, block, category filtering
+        Map<String, Object> results = new HashMap<>();
+        String namespace = "ICD-CODES";
+        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, code).toMap();
+        return results;
+    }
 
     @PostMapping(value = "datastore", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public Map<String, Object> saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {
