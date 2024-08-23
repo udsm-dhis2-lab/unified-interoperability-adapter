@@ -236,7 +236,12 @@ public class HDUAPIController {
                 String namespace = "LOINC";
                 List<Map<String, Object>> codes = new ArrayList<>();
                 for (Datastore datastore: datastoreService.getDatastoreNamespaceDetails(namespace)) {
-                    codes.add( (Map<String, Object>) datastore.toMap().get("value"));
+                    Map<String, Object> codeDetails = (Map<String, Object>) datastore.toMap().get("value");
+                    Map<String, Object> selectedParameters = new HashMap<>();
+                    selectedParameters.put("code", codeDetails.get("code"));
+                    selectedParameters.put("name", codeDetails.get("name"));
+                    selectedParameters.put("status", codeDetails.get("status"));
+                    codes.add(selectedParameters);
                 }
                 results.put("results", codes);
             }
@@ -260,11 +265,11 @@ public class HDUAPIController {
                                                          @PathVariable("releaseYear") String releaseYear,
                                                          @PathVariable("chapter") String chapter,
                                                          @PathVariable("code") String code) throws Exception {
-        // TODO: Improve to accommodate release year, version and chapter filtering
+        // TODO: Improve to accommodate release year and chapter filtering
         Map<String, Object> results = new HashMap<>();
        if (chapter.equals("lab")) {
            String namespace = "LOINC";
-           results = datastoreService.getDatastoreByNamespaceAndKey( namespace, code).toMap();
+           results = datastoreService.getDatastoreByNamespaceAndKey( namespace, version.concat("-").concat(code)).toMap();
        }
         return results;
     }
