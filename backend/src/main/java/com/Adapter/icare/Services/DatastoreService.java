@@ -177,7 +177,12 @@ public class DatastoreService {
     public List<Datastore> getLOINCCOdesByVersionAndReleaseYear(String namespace, String version, String releaseYear) throws Exception {
         return datastoreRepository.getStoredDataByNamespaceVersionAndReleaseYear(namespace,version, releaseYear);
     }
+
     public List<Datastore> getLOINCCOdesByReleaseYear(String namespace, String releaseYear) throws Exception {
         return datastoreRepository.getStoredDataByNamespaceAndReleaseYear(namespace, releaseYear);
+    }
+
+    public List<Datastore> getLOINCCOdesMatchingCode(String namespace, String code) throws Exception {
+        return datastoreRepository.getStoredDataByNamespaceMatchingCode(namespace, code);
     }
 }

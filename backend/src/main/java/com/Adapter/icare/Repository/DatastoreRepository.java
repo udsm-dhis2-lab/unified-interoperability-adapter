@@ -174,4 +174,8 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
 
     @Query(value="SELECT * FROM datastore WHERE namespace = :namespace AND JSON_EXTRACT(value, '$.release') =:releaseYear", nativeQuery = true)
     List<Datastore> getStoredDataByNamespaceAndReleaseYear(String namespace, String releaseYear);
+
+    @Query(value="SELECT * FROM datastore WHERE namespace = :namespace AND data_key LIKE CONCAT('%',:code)", nativeQuery = true)
+    List<Datastore> getStoredDataByNamespaceMatchingCode(String namespace, String code);
+
 }

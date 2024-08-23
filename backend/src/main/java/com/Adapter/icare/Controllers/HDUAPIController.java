@@ -125,7 +125,12 @@ public class HDUAPIController {
     }
 
     @GetMapping(value="codeSystems/icd", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> getICDCodeSystemData(@RequestParam(value = "version", required = false) String version,@RequestParam(value = "release", required = false) String release) throws Exception {
+    public ResponseEntity<Map<String, Object>> getICDCodeSystemData(@RequestParam(value = "version", required = false) String version,
+                                                                    @RequestParam(value = "release", required = false) String release,
+                                                                    @RequestParam(value = "chapter", required = false) String chapter,
+                                                                    @RequestParam(value = "block", required = false) String block,
+                                                                    @RequestParam(value = "category", required = false) String category,
+                                                                    @RequestParam(value = "code", required = false) String code) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         try {
             List<Map<String, Object>> chapters = new ArrayList<>();
@@ -154,30 +159,39 @@ public class HDUAPIController {
     }
 
     @GetMapping(value="codeSystems/loinc", produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> getLOINCCodeSystemData(@RequestParam(value = "version", required = false) String version,@RequestParam(value = "release", required = false) String release) throws Exception {
+    public ResponseEntity<Map<String, Object>> getLOINCCodeSystemData(@RequestParam(value = "version", required = false) String version,
+                                                                      @RequestParam(value = "release", required = false) String release,
+                                                                      @RequestParam(value = "code", required = false) String code) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = "LOINC";
         try {
             List<Map<String, Object>> codes = new ArrayList<>();
             List<Datastore> datastoreList = new ArrayList<>();
-            if (version == null && release == null) {
+            if (version == null && release == null && code == null) {
                 datastoreList =  datastoreService.getDatastoreNamespaceDetails(namespace);
-            } else if (version != null && release == null) {
+            } else if (version != null && release == null && code == null) {
                 datastoreList = datastoreService.getLOINCCodesByVersion(namespace,version);
-            } else if (version == null) {
+            } else if (version == null && code == null) {
                 datastoreList =datastoreService.getLOINCCOdesByReleaseYear(namespace,release);
-            } else {
+            } else if (release !=null && version != null && code == null) {
                 datastoreList =datastoreService.getLOINCCOdesByVersionAndReleaseYear(namespace,version,release);
+            } else {
+                datastoreList =datastoreService.getLOINCCOdesMatchingCode(namespace,code);
             }
             for (Datastore datastore: datastoreList) {
                 Map<String, Object> codeDetails =datastore.getValue();
-                Map<String, Object> selectedParameters = new HashMap<>();
-                selectedParameters.put("code", codeDetails.get("code"));
-                selectedParameters.put("name", codeDetails.get("name"));
-                selectedParameters.put("release", codeDetails.get("release"));
-                selectedParameters.put("version", codeDetails.get("version"));
-                selectedParameters.put("status", codeDetails.get("status"));
-                codes.add(selectedParameters);
+                if (code == null) {
+                    Map<String, Object> selectedParameters = new HashMap<>();
+                    selectedParameters.put("code", codeDetails.get("code"));
+                    selectedParameters.put("name", codeDetails.get("name"));
+                    selectedParameters.put("release", codeDetails.get("release"));
+                    selectedParameters.put("version", codeDetails.get("version"));
+                    selectedParameters.put("status", codeDetails.get("status"));
+                    codes.add(selectedParameters);
+                } else {
+                    codes.add(codeDetails);
+                }
+
             }
             returnDataObject.put("results", codes);
             return ResponseEntity.ok(returnDataObject);
