@@ -163,7 +163,7 @@ public class HDUAPIController {
         String namespace = "codeSystems";
         String key = "loinc";
         if (version != null) {
-            key = "loinc".concat(version);
+            key = "loinc-".concat(version);
         }
         returnDataObject =  datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
         return returnDataObject;
@@ -171,19 +171,32 @@ public class HDUAPIController {
 
     @GetMapping(value="codeSystems/{codeSystem}/{version}", produces = APPLICATION_JSON_VALUE)
     public Map<String, Object> getCodeSystem(@PathVariable("codeSystem") String codeSystem, @PathVariable("version") String version) throws Exception {
-        List<Map<String, Object>> chapters = new ArrayList<>();
         String namespace = "codeSystems";
         Map<String, Object> results = new HashMap<>();
-        String chaptersNameSpace = "ICD-CHAPTERS";
-        List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(chaptersNameSpace);
-        for(Datastore datastore: chaptersDatastore) {
-            if (datastore.getDataKey().contains(version)) {
-                chapters.add(datastore.toMap());
+        if (codeSystem.equals("icd")) {
+            List<Map<String, Object>> chapters = new ArrayList<>();
+            String chaptersNameSpace = "ICD-CHAPTERS";
+            List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(chaptersNameSpace);
+            for(Datastore datastore: chaptersDatastore) {
+                if (datastore.getDataKey().contains(version)) {
+                    chapters.add(datastore.toMap());
+                }
             }
+            List<Map<String, Object>> codeSystemsData = datastoreService.getDatastoreByNamespaceKeyAndVersion( namespace, codeSystem, version);
+            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
+            results.put("chapters", chapters);
+        } else {
+            List<Map<String, Object>> loincData = new ArrayList<>();
+            List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(codeSystem);
+            for(Datastore datastore: chaptersDatastore) {
+                if (datastore.getDataKey().contains(version)) {
+                    loincData.add(datastore.toMap());
+                }
+            }
+            String key = "loinc-".concat(version);
+            results =  datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
+            results.put("codes", loincData);
         }
-        List<Map<String, Object>> codeSystemsData = datastoreService.getDatastoreByNamespaceKeyAndVersion( namespace, codeSystem, version);
-        results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
-        results.put("chapters", chapters);
         return results;
     }
 
@@ -192,15 +205,17 @@ public class HDUAPIController {
         List<Map<String, Object>> blocks = new ArrayList<>();
         String namespace = "codeSystems";
         Map<String, Object> results = new HashMap<>();
-        String blocksNameSpace = "ICD-BLOCKS";
-        List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(blocksNameSpace);
-        for(Datastore datastore: chaptersDatastore) {
-            if (datastore.getDataKey().contains(version) && datastore.getValue().get("release").equals(releaseYear)) {
-                blocks.add(datastore.toMap());
+        if (codeSystem.equals("icd")) {
+            String blocksNameSpace = "ICD-BLOCKS";
+            List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(blocksNameSpace);
+            for(Datastore datastore: chaptersDatastore) {
+                if (datastore.getDataKey().contains(version) && datastore.getValue().get("release").equals(releaseYear)) {
+                    blocks.add(datastore.toMap());
+                }
             }
+            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
+            results.put("chapters", blocks);
         }
-        results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
-        results.put("chapters", blocks);
         return results;
     }
 
@@ -217,7 +232,7 @@ public class HDUAPIController {
             results = datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
         } else {
             // For LOINC
-            String namespace = "LOINC-CATEGORY";
+            String namespace = "LOINC";
             String key = version.concat("-").concat(chapter);
             results = datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
         }
@@ -242,7 +257,7 @@ public class HDUAPIController {
                                                          @PathVariable("code") String code) throws Exception {
         // TODO: Improve to accommodate release year, version and chapter filtering
         Map<String, Object> results = new HashMap<>();
-        String namespace = "LOINC-CODES";
+        String namespace = "LOINC";
         results = datastoreService.getDatastoreByNamespaceAndKey( namespace, code).toMap();
         return results;
     }
