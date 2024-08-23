@@ -169,4 +169,15 @@ public class DatastoreService {
     public List<Map<String, Object>> getDatastoreByNamespaceKeyAndVersion(String namespace, String key, String version) throws Exception {
         return datastoreRepository.getStoredDataByNamespaceKeyAndVersion(namespace,key,version);
     }
+
+    public List<Datastore> getLOINCCodesByVersion(String namespace, String version) throws Exception {
+        return datastoreRepository.getStoredDataByNamespaceAndVersion(namespace,version);
+    }
+
+    public List<Datastore> getLOINCCOdesByVersionAndReleaseYear(String namespace, String version, String releaseYear) throws Exception {
+        return datastoreRepository.getStoredDataByNamespaceVersionAndReleaseYear(namespace,version, releaseYear);
+    }
+    public List<Datastore> getLOINCCOdesByReleaseYear(String namespace, String releaseYear) throws Exception {
+        return datastoreRepository.getStoredDataByNamespaceAndReleaseYear(namespace, releaseYear);
+    }
 }

@@ -165,4 +165,13 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     @Query(value = "SELECT value FROM datastore WHERE namespace = :namespace AND data_key = :key " +
             "AND JSON_SEARCH(value, 'one', :version, NULL, '$.versions[*].version') IS NOT NULL",nativeQuery = true)
     List<Map<String, Object>> getStoredDataByNamespaceKeyAndVersion(String namespace, String key, String version);
+
+    @Query(value = "SELECT * FROM datastore WHERE namespace = :namespace AND JSON_EXTRACT(value, '$.majorVersion') =:version",nativeQuery = true)
+    List<Datastore> getStoredDataByNamespaceAndVersion(String namespace, String version);
+
+    @Query(value = "SELECT * FROM datastore WHERE namespace = :namespace AND JSON_EXTRACT(value, '$.majorVersion') =:version AND JSON_EXTRACT(value, '$.release') =:releaseYear",nativeQuery = true)
+    List<Datastore> getStoredDataByNamespaceVersionAndReleaseYear(String namespace, String version, String releaseYear);
+
+    @Query(value="SELECT * FROM datastore WHERE namespace = :namespace AND JSON_EXTRACT(value, '$.release') =:releaseYear", nativeQuery = true)
+    List<Datastore> getStoredDataByNamespaceAndReleaseYear(String namespace, String releaseYear);
 }
