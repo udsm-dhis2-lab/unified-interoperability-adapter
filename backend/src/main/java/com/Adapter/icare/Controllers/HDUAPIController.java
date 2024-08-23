@@ -224,17 +224,22 @@ public class HDUAPIController {
                                                         @PathVariable("version") String version,
                                                         @PathVariable("releaseYear") String releaseYear,
                                                         @PathVariable("chapter") String chapter) throws Exception {
-        // TODO: Improve to accommodate release year filtering
+        // TODO: Improve to accommodate release year and version filtering
         Map<String, Object> results = new HashMap<>();
         if (codeSystem.equals("icd")) {
             String namespace = "ICD-CHAPTERS";
             String key = version.concat("-").concat(chapter);
             results = datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
         } else {
-            // For LOINC
-            String namespace = "LOINC";
-            String key = version.concat("-").concat(chapter);
-            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
+            if (chapter.equals("lab")) {
+                // For LOINC
+                String namespace = "LOINC";
+                List<Map<String, Object>> codes = new ArrayList<>();
+                for (Datastore datastore: datastoreService.getDatastoreNamespaceDetails(namespace)) {
+                    codes.add( (Map<String, Object>) datastore.toMap().get("value"));
+                }
+                results.put("results", codes);
+            }
         }
         return results;
     }
@@ -257,8 +262,10 @@ public class HDUAPIController {
                                                          @PathVariable("code") String code) throws Exception {
         // TODO: Improve to accommodate release year, version and chapter filtering
         Map<String, Object> results = new HashMap<>();
-        String namespace = "LOINC";
-        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, code).toMap();
+       if (chapter.equals("lab")) {
+           String namespace = "LOINC";
+           results = datastoreService.getDatastoreByNamespaceAndKey( namespace, code).toMap();
+       }
         return results;
     }
 
