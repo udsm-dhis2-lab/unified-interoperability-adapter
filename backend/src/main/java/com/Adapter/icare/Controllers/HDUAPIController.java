@@ -4,6 +4,7 @@ import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.google.common.collect.Maps;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -94,7 +95,7 @@ public class HDUAPIController {
         return dataTemplatesExampleObject;
     }
 
-    @PostMapping(value = "dataTemplates", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public String passDataToMediator(@RequestBody Map<String, Object> data) throws Exception {
         /**
          * Send data to Mediator where all the logics will be done.
@@ -161,23 +162,17 @@ public class HDUAPIController {
     @GetMapping(value="codeSystems/loinc", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getLOINCCodeSystemData(@RequestParam(value = "version", required = false) String version,
                                                                       @RequestParam(value = "release", required = false) String release,
-                                                                      @RequestParam(value = "code", required = false) String code) throws Exception {
+                                                                      @RequestParam(value = "code", required = false) String code,
+                                                                      @RequestParam(value = "q", required = false) String q,
+                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                      @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = "LOINC";
         try {
+            String key = null;
             List<Map<String, Object>> codes = new ArrayList<>();
-            List<Datastore> datastoreList = new ArrayList<>();
-            if (version == null && release == null && code == null) {
-                datastoreList =  datastoreService.getDatastoreNamespaceDetails(namespace);
-            } else if (version != null && release == null && code == null) {
-                datastoreList = datastoreService.getLOINCCodesByVersion(namespace,version);
-            } else if (version == null && code == null) {
-                datastoreList =datastoreService.getLOINCCOdesByReleaseYear(namespace,release);
-            } else if (release !=null && version != null && code == null) {
-                datastoreList =datastoreService.getLOINCCOdesByVersionAndReleaseYear(namespace,version,release);
-            } else {
-                datastoreList =datastoreService.getLOINCCOdesMatchingCode(namespace,code);
-            }
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize);
+            List<Datastore> datastoreList = pagedDatastoreData.getContent();
             for (Datastore datastore: datastoreList) {
                 Map<String, Object> codeDetails =datastore.getValue();
                 if (code == null) {
@@ -191,147 +186,18 @@ public class HDUAPIController {
                 } else {
                     codes.add(codeDetails);
                 }
-
             }
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("total", pagedDatastoreData.getTotalElements());
             returnDataObject.put("results", codes);
+            returnDataObject.put("pager",pager);
             return ResponseEntity.ok(returnDataObject);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
-//
-//    @GetMapping(value="codeSystems/{codeSystem}/{version}", produces = APPLICATION_JSON_VALUE)
-//    public Map<String, Object> getCodeSystem(@PathVariable("codeSystem") String codeSystem, @PathVariable("version") String version) throws Exception {
-//        String namespace = "codeSystems";
-//        Map<String, Object> results = new HashMap<>();
-//        if (codeSystem.equals("icd")) {
-//            List<Map<String, Object>> chapters = new ArrayList<>();
-//            String chaptersNameSpace = "ICD-CHAPTERS";
-//            List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(chaptersNameSpace);
-//            for(Datastore datastore: chaptersDatastore) {
-//                if (datastore.getDataKey().contains(version)) {
-//                    chapters.add(datastore.toMap());
-//                }
-//            }
-//            List<Map<String, Object>> codeSystemsData = datastoreService.getDatastoreByNamespaceKeyAndVersion( namespace, codeSystem, version);
-//            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
-//            results.put("chapters", chapters);
-//        } else {
-//            List<Map<String, Object>> loincData = new ArrayList<>();
-//            List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(codeSystem);
-//            for(Datastore datastore: chaptersDatastore) {
-//                if (datastore.getDataKey().contains(version)) {
-//                    loincData.add(datastore.toMap());
-//                }
-//            }
-//            String key = "loinc-".concat(version);
-//            results =  datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
-//            results.put("codes", loincData);
-//        }
-//        return results;
-//    }
-//
-//    @GetMapping(value="codeSystems/{codeSystem}/{version}/{releaseYear}", produces = APPLICATION_JSON_VALUE)
-//    public Map<String, Object> getCodeSystemData(@PathVariable("codeSystem") String codeSystem, @PathVariable("version") String version, @PathVariable("releaseYear") String releaseYear) throws Exception {
-//        List<Map<String, Object>> blocks = new ArrayList<>();
-//        String namespace = "codeSystems";
-//        Map<String, Object> results = new HashMap<>();
-//        if (codeSystem.equals("icd")) {
-//            String blocksNameSpace = "ICD-BLOCKS";
-//            List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(blocksNameSpace);
-//            for(Datastore datastore: chaptersDatastore) {
-//                if (datastore.getDataKey().contains(version) && datastore.getValue().get("release").equals(releaseYear)) {
-//                    blocks.add(datastore.toMap());
-//                }
-//            }
-//            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,codeSystem.concat(version)).toMap();
-//            results.put("chapters", blocks);
-//        }
-//        return results;
-//    }
-//
-//    @GetMapping(value="codeSystems/{codeSystem}/{version}/{releaseYear}/{chapter}", produces = APPLICATION_JSON_VALUE)
-//    public Map<String, Object> getCodeSystemChapterData(@PathVariable("codeSystem") String codeSystem,
-//                                                        @PathVariable("version") String version,
-//                                                        @PathVariable("releaseYear") String releaseYear,
-//                                                        @PathVariable("chapter") String chapter) throws Exception {
-//        // TODO: Improve to accommodate release year and version filtering
-//        Map<String, Object> results = new HashMap<>();
-//        if (codeSystem.equals("icd")) {
-//            String namespace = "ICD-CHAPTERS";
-//            String key = version.concat("-").concat(chapter);
-//            results = datastoreService.getDatastoreByNamespaceAndKey( namespace,key).toMap();
-//        } else {
-//            if (chapter.equals("lab")) {
-//                // For LOINC
-//                String namespace = "LOINC";
-//                List<Map<String, Object>> codes = new ArrayList<>();
-//                for (Datastore datastore: datastoreService.getDatastoreNamespaceDetails(namespace)) {
-//                    Map<String, Object> codeDetails = (Map<String, Object>) datastore.toMap().get("value");
-//                    Map<String, Object> selectedParameters = new HashMap<>();
-//                    selectedParameters.put("code", codeDetails.get("code"));
-//                    selectedParameters.put("name", codeDetails.get("name"));
-//                    selectedParameters.put("status", codeDetails.get("status"));
-//                    codes.add(selectedParameters);
-//                }
-//                results.put("results", codes);
-//            }
-//        }
-//        return results;
-//    }
-//
-//    @GetMapping(value="codeSystems/icd/{version}/{releaseYear}/{chapter}/{block}", produces = APPLICATION_JSON_VALUE)
-//    public Map<String, Object> getICDCodeSystemBlockData(@PathVariable("version") String version,
-//                                                        @PathVariable("releaseYear") String releaseYear,
-//                                                        @PathVariable("chapter") String chapter,
-//                                                         @PathVariable("block") String block) throws Exception {
-//        // TODO: Improve to accommodate release year, version, chapter filtering
-//        Map<String, Object> results = new HashMap<>();
-//        String namespace = "ICD-BLOCKS";
-//        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, block).toMap();
-//        return results;
-//    }
-//
-//    @GetMapping(value="codeSystems/loinc/{version}/{releaseYear}/{chapter}/{code}", produces = APPLICATION_JSON_VALUE)
-//    public Map<String, Object> getLOINCCodeSystemCodeData(@PathVariable("version") String version,
-//                                                         @PathVariable("releaseYear") String releaseYear,
-//                                                         @PathVariable("chapter") String chapter,
-//                                                         @PathVariable("code") String code) throws Exception {
-//        // TODO: Improve to accommodate release year and chapter filtering
-//        Map<String, Object> results = new HashMap<>();
-//       if (chapter.equals("lab")) {
-//           String namespace = "LOINC";
-//           results = datastoreService.getDatastoreByNamespaceAndKey( namespace, version.concat("-").concat(code)).toMap();
-//       }
-//        return results;
-//    }
-//
-//    @GetMapping(value="codeSystems/icd/{version}/{releaseYear}/{chapter}/{block}/{category}", produces = APPLICATION_JSON_VALUE)
-//    public Map<String, Object> getICDCodeSystemCategoryData(@PathVariable("version") String version,
-//                                                            @PathVariable("releaseYear") String releaseYear,
-//                                                            @PathVariable("chapter") String chapter,
-//                                                            @PathVariable("block") String block,
-//                                                            @PathVariable("category") String category) throws Exception {
-//        // TODO: Improve to accommodate release year, version, chapter filtering
-//        Map<String, Object> results = new HashMap<>();
-//        String namespace = "ICD-CATEGORIES";
-//        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, category).toMap();
-//        return results;
-//    }
-//
-//    @GetMapping(value="codeSystems/icd/{version}/{releaseYear}/{chapter}/{block}/{category}/{code}", produces = APPLICATION_JSON_VALUE)
-//    public Map<String, Object> getICDCodeSystemCodeData(@PathVariable("version") String version,
-//                                                        @PathVariable("releaseYear") String releaseYear,
-//                                                        @PathVariable("chapter") String chapter,
-//                                                        @PathVariable("block") String block,
-//                                                        @PathVariable("category") String category,
-//                                                        @PathVariable("code") String code) throws Exception {
-//        // TODO: Improve to accommodate release year, version, chapter, block, category filtering
-//        Map<String, Object> results = new HashMap<>();
-//        String namespace = "ICD-CODES";
-//        results = datastoreService.getDatastoreByNamespaceAndKey( namespace, code).toMap();
-//        return results;
-//    }
 
     @PostMapping(value = "datastore", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
     public Map<String, Object> saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {

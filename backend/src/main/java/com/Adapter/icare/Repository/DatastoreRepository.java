@@ -1,8 +1,11 @@
 package com.Adapter.icare.Repository;
 
 import com.Adapter.icare.Domains.Datastore;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -161,21 +164,29 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             " GROUP BY dataElement,categoryOptionCombo;",nativeQuery = true)
     List<Map<String, Object>> getAggregateDataByStartDateAndEndDate(String namespace, String startDate, String endDate);
 
-    // TODO: This has to be reviewed as it brings wrong results
-    @Query(value = "SELECT value FROM datastore WHERE namespace = :namespace AND data_key = :key " +
-            "AND JSON_SEARCH(value, 'one', :version, NULL, '$.versions[*].version') IS NOT NULL",nativeQuery = true)
-    List<Map<String, Object>> getStoredDataByNamespaceKeyAndVersion(String namespace, String key, String version);
-
-    @Query(value = "SELECT * FROM datastore WHERE namespace = :namespace AND JSON_EXTRACT(value, '$.majorVersion') =:version",nativeQuery = true)
-    List<Datastore> getStoredDataByNamespaceAndVersion(String namespace, String version);
-
-    @Query(value = "SELECT * FROM datastore WHERE namespace = :namespace AND JSON_EXTRACT(value, '$.majorVersion') =:version AND JSON_EXTRACT(value, '$.release') =:releaseYear",nativeQuery = true)
-    List<Datastore> getStoredDataByNamespaceVersionAndReleaseYear(String namespace, String version, String releaseYear);
-
-    @Query(value="SELECT * FROM datastore WHERE namespace = :namespace AND JSON_EXTRACT(value, '$.release') =:releaseYear", nativeQuery = true)
-    List<Datastore> getStoredDataByNamespaceAndReleaseYear(String namespace, String releaseYear);
-
-    @Query(value="SELECT * FROM datastore WHERE namespace = :namespace AND data_key LIKE CONCAT('%',:code)", nativeQuery = true)
-    List<Datastore> getStoredDataByNamespaceMatchingCode(String namespace, String code);
+    @Query(value="SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            "(:key IS NULL OR data_key =:key) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
+            "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code) AND " +
+            "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
+            "JSON_EXTRACT(value, '$.definitionDescription') LIKE CONCAT('%',:q,'%') OR " +
+            "JSON_EXTRACT(value, '$.code') LIKE CONCAT('%',:q,'%'))",
+            countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+                    "(:key IS NULL OR data_key =:key) AND " +
+                    "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+                    "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
+                    "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code) AND " +
+                    "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
+                    "JSON_EXTRACT(value, '$.definitionDescription') LIKE CONCAT('%',:q,'%') OR " +
+                    "JSON_EXTRACT(value, '$.code') LIKE CONCAT('%',:q,'%') )",
+            nativeQuery = true)
+    Page<Datastore> findDatastoreDataBySpecifiedParams(String namespace,
+                                                       String key,
+                                                       String version,
+                                                       String releaseYear,
+                                                       String code,
+                                                       String q,
+                                                       Pageable pageable);
 
 }

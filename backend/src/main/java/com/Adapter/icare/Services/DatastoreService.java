@@ -6,6 +6,9 @@ import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Repository.DatastoreRepository;
 import com.google.common.collect.Maps;
 import javassist.NotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -161,28 +164,9 @@ public class DatastoreService {
         }
     }
 
-
-    public List<Map<String, Object>> getAggregateDataFromDailyAggregatedData(String id, String startDate, String endDate) throws Exception {
-        return datastoreRepository.getAggregateDataByStartDateAndEndDate(id,startDate,endDate);
-    }
-
-    public List<Map<String, Object>> getDatastoreByNamespaceKeyAndVersion(String namespace, String key, String version) throws Exception {
-        return datastoreRepository.getStoredDataByNamespaceKeyAndVersion(namespace,key,version);
-    }
-
-    public List<Datastore> getLOINCCodesByVersion(String namespace, String version) throws Exception {
-        return datastoreRepository.getStoredDataByNamespaceAndVersion(namespace,version);
-    }
-
-    public List<Datastore> getLOINCCOdesByVersionAndReleaseYear(String namespace, String version, String releaseYear) throws Exception {
-        return datastoreRepository.getStoredDataByNamespaceVersionAndReleaseYear(namespace,version, releaseYear);
-    }
-
-    public List<Datastore> getLOINCCOdesByReleaseYear(String namespace, String releaseYear) throws Exception {
-        return datastoreRepository.getStoredDataByNamespaceAndReleaseYear(namespace, releaseYear);
-    }
-
-    public List<Datastore> getLOINCCOdesMatchingCode(String namespace, String code) throws Exception {
-        return datastoreRepository.getStoredDataByNamespaceMatchingCode(namespace, code);
+    public Page<Datastore> getDatastoreMatchingParams(String namespace, String key, String version,
+                                                      String releaseYear, String code, String q, Integer page, Integer pageSize) throws Exception {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return datastoreRepository.findDatastoreDataBySpecifiedParams(namespace,key,version,releaseYear,code,q,pageable);
     }
 }
