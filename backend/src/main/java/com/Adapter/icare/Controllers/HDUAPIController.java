@@ -164,9 +164,16 @@ public class HDUAPIController {
                     chapters.add(datastore.getValue());
                 }
                 namespace = "ICD";
-                returnDataObject = datastoreService.getDatastoreByNamespaceAndKey(namespace,key).getValue();
+                List<Datastore> icdData = datastoreService.getDatastoreNamespaceDetails(namespace);
+                List<Map<String, Object>> results = new ArrayList<>();
+                for(Datastore datastore: icdData) {
+                    Map<String, Object> icd =  datastore.getValue();
+                    // TODO: Add support to filter by available versions
+                    icd.put("chapters", chapters);
+                    results.add(icd);
+                }
                 // Load extended data
-                returnDataObject.put("chapters", chapters);
+                returnDataObject.put("results", results);
             } else if (chapter == null && block == null && category == null && code == null) {
                 namespace = "ICD-CHAPTERS";
                 pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize);
