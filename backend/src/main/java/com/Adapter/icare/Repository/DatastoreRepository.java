@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -32,7 +31,12 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
                     "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
                     "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
                     "(:code IS NULL OR JSON_EXTRACT(value, '$.code') = :code )",nativeQuery = true)
-    Page<Datastore> getDatastoreByNamespaceWithPagination(String namespace, String category, String department, String q, String code, Pageable pageable);
+    Page<Datastore> getDatastoreByNamespaceWithPagination(String namespace,
+                                                          String category,
+                                                          String department,
+                                                          String q,
+                                                          String code,
+                                                          Pageable pageable);
 
     @Query(value = "SELECT * FROM datastore WHERE namespace=:namespace AND data_key=:dataKey",nativeQuery = true)
     Datastore getDatastoreByNamespaceAndKey(String namespace, String dataKey);
@@ -217,7 +221,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
             "(:release IS NULL OR JSON_EXTRACT(value, '$.release') =:release) AND " +
-            "(:category IS NULL OR JSON_EXTRACT(value, '$.category.code') =:category) AND ",nativeQuery = true)
-    List<Datastore> getICDDataByCategory(String namespace, String block, String release, String version);
+            "(:category IS NULL OR JSON_EXTRACT(value, '$.category.code') =:category) ",nativeQuery = true)
+    List<Datastore> getICDDataByCategory(String namespace, String category, String release, String version);
 
 }
