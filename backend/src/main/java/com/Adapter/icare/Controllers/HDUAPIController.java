@@ -155,16 +155,15 @@ public class HDUAPIController {
         String key = null;
         Page<Datastore> pagedDatastoreData = null;
         try {
-
             List<Map<String, Object>> chapters = new ArrayList<>();
             if (version == null && chapter == null && block == null && category == null && code == null) {
                 // Load chapters data as per the version available for the year
                 String chaptersNameSpace = "ICD-CHAPTERS";
-                namespace = "codeSystems";
                 List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(chaptersNameSpace);
-                for(Datastore datastore: chaptersDatastore) {
+                for (Datastore datastore : chaptersDatastore) {
                     chapters.add(datastore.getValue());
                 }
+                namespace = "ICD";
                 returnDataObject = datastoreService.getDatastoreByNamespaceAndKey(namespace,key).getValue();
                 // Load extended data
                 returnDataObject.put("chapters", chapters);

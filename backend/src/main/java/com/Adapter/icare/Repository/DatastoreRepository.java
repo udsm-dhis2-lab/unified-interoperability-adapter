@@ -38,7 +38,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
                                                           String code,
                                                           Pageable pageable);
 
-    @Query(value = "SELECT * FROM datastore WHERE namespace=:namespace AND data_key=:dataKey",nativeQuery = true)
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace=:namespace) AND (:dataKey IS NULL OR data_key=:dataKey)",nativeQuery = true)
     Datastore getDatastoreByNamespaceAndKey(String namespace, String dataKey);
 
 
