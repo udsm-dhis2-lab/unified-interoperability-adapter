@@ -164,9 +164,26 @@ public class DatastoreService {
         }
     }
 
+
+    public List<Map<String, Object>> getAggregateDataFromDailyAggregatedData(String id, String startDate, String endDate) throws Exception {
+        return datastoreRepository.getAggregateDataByStartDateAndEndDate(id,startDate,endDate);
+    }
+
     public Page<Datastore> getDatastoreMatchingParams(String namespace, String key, String version,
                                                       String releaseYear, String code, String q, Integer page, Integer pageSize) throws Exception {
         Pageable pageable = PageRequest.of(page, pageSize);
         return datastoreRepository.findDatastoreDataBySpecifiedParams(namespace,key,version,releaseYear,code,q,pageable);
+    }
+
+    public List<Datastore> getICDDataByChapter(String namespace, String chapter, String release, String version) throws Exception {
+        return datastoreRepository.getICDDataByChapter(namespace,chapter,release,version);
+    }
+
+    public List<Datastore> getICDDataByBlock(String namespace, String block, String release, String version) throws Exception {
+        return datastoreRepository.getICDDataByBlock(namespace,block,release,version);
+    }
+
+    public List<Datastore> getICDDataByCategory(String namespace, String category, String release, String version) throws Exception {
+        return datastoreRepository.getICDDataByCategory(namespace,category,release,version);
     }
 }

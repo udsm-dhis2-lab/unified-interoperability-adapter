@@ -5,6 +5,7 @@ import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.google.common.collect.Maps;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -131,28 +132,90 @@ public class HDUAPIController {
                                                                     @RequestParam(value = "chapter", required = false) String chapter,
                                                                     @RequestParam(value = "block", required = false) String block,
                                                                     @RequestParam(value = "category", required = false) String category,
-                                                                    @RequestParam(value = "code", required = false) String code) throws Exception {
+                                                                    @RequestParam(value = "code", required = false) String code,
+                                                                    @RequestParam(value = "q", required = false) String q,
+                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                    @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
+        String namespace = null;
+        String key = null;
+        Page<Datastore> pagedDatastoreData = null;
         try {
+
             List<Map<String, Object>> chapters = new ArrayList<>();
-            String key = "icd";
-            if (version != null) {
-                key = "icd".concat(version);
+            if (version == null && chapter == null && block == null && category == null && code == null) {
                 // Load chapters data as per the version available for the year
                 String chaptersNameSpace = "ICD-CHAPTERS";
+                namespace = "codeSystems";
                 List<Datastore> chaptersDatastore = datastoreService.getDatastoreNamespaceDetails(chaptersNameSpace);
                 for(Datastore datastore: chaptersDatastore) {
                     chapters.add(datastore.getValue());
                 }
+                returnDataObject = datastoreService.getDatastoreByNamespaceAndKey(namespace,key).getValue();
+                // Load extended data
+                returnDataObject.put("chapters", chapters);
+            } else if (chapter == null && block == null && category == null && code == null) {
+                namespace = "ICD-CHAPTERS";
+                pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize);
+                Map<String, Object> pager = new HashMap<>();
+                pager.put("page", page);
+                pager.put("pageSize", pageSize);
+                pager.put("total", pagedDatastoreData.getTotalElements());
+                List<Datastore> datastoreList = pagedDatastoreData.getContent();
+                List<Map<String,Object>> itemsList = new ArrayList<>();
+                for (Datastore datastore: datastoreList) {
+                    Map<String, Object> codeDetails =datastore.getValue();
+                    Map<String, Object> selectedParameters = new HashMap<>();
+                    selectedParameters.put("code", codeDetails.get("code"));
+                    selectedParameters.put("name", codeDetails.get("name"));
+                    selectedParameters.put("release", codeDetails.get("release"));
+                    selectedParameters.put("version", codeDetails.get("version"));
+                    selectedParameters.put("status", codeDetails.get("status"));
+                    chapters.add(selectedParameters);
+                    itemsList.add(codeDetails);
+                }
+                returnDataObject.put("results", itemsList);
+                returnDataObject.put("pager",pager);
+            } else if (version != null && chapter != null && block == null && category == null && code == null) {
+                namespace = "ICD-CHAPTERS";
+                key = version.concat("-").concat(chapter);
+                List<Map<String, Object>> blocks = new ArrayList<>();
+                // TODO: Load specified chapter details, if found the load code blocks
+                Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+                returnDataObject = datastore.getValue();
+                String blocksNamespace = "ICD-BLOCKS";
+                List<Datastore> blocksData =   datastoreService.getICDDataByChapter(blocksNamespace,chapter,release,version);
+                for (Datastore blockDatastore: blocksData) {
+                    blocks.add(blockDatastore.getValue());
+                }
+                returnDataObject.put("blocks", blocks);
+            } else if (version != null && chapter != null && block != null && category == null && code == null) {
+                // TODO: Load specified block and respective categories
+                namespace = "ICD-BLOCKS";
+                List<Map<String, Object>> categories = new ArrayList<>();
+                key = version.concat("-").concat(block);
+                Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+                returnDataObject = datastore.getValue();
+                String categoriesNamespace = "ICD-CATEGORIES";
+                List<Datastore> categoriesData =   datastoreService.getICDDataByBlock(categoriesNamespace,block,release,version);
+                for (Datastore categoryDatastore: categoriesData) {
+                    categories.add(categoryDatastore.getValue());
+                }
+                returnDataObject.put("categories", categories);
+            }else if (version != null && chapter != null && block != null && category != null && code == null) {
+                // TODO: Load specified block and respective categories
+                namespace = "ICD-CATEGORIES";
+                List<Map<String, Object>> codes = new ArrayList<>();
+                key = version.concat("-").concat(block);
+                Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+                returnDataObject = datastore.getValue();
+                String codesNamespace = "ICD-CODES";
+                List<Datastore> codesData =   datastoreService.getICDDataByCategory(codesNamespace,category,release,version);
+                for (Datastore codesDatastore: codesData) {
+                    codes.add(codesDatastore.getValue());
+                }
+                returnDataObject.put("codes", codes);
             }
-            String namespace = "ICD";
-            if (version == null) {
-              namespace = "codeSystems";
-            }
-
-            returnDataObject = datastoreService.getDatastoreByNamespaceAndKey(namespace,key).getValue();
-            // Load extended data
-            returnDataObject.put("chapters", chapters);
             return ResponseEntity.ok(returnDataObject);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -174,18 +237,7 @@ public class HDUAPIController {
             Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize);
             List<Datastore> datastoreList = pagedDatastoreData.getContent();
             for (Datastore datastore: datastoreList) {
-                Map<String, Object> codeDetails =datastore.getValue();
-                if (code == null) {
-                    Map<String, Object> selectedParameters = new HashMap<>();
-                    selectedParameters.put("code", codeDetails.get("code"));
-                    selectedParameters.put("name", codeDetails.get("name"));
-                    selectedParameters.put("release", codeDetails.get("release"));
-                    selectedParameters.put("version", codeDetails.get("version"));
-                    selectedParameters.put("status", codeDetails.get("status"));
-                    codes.add(selectedParameters);
-                } else {
-                    codes.add(codeDetails);
-                }
+                codes.add(datastore.getValue());
             }
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
@@ -369,5 +421,14 @@ public class HDUAPIController {
         List<Map<String, Object>> dailyAggregatedDataList =  datastoreService.getAggregateDataFromDailyAggregatedData(id,startDate,endDate);
         results.put("data", dailyAggregatedDataList);
         return results;
+    }
+
+    private List<Map<String, Object>> formatDatastoreObject(List<Datastore> datastoreList) throws Exception {
+        List<Map<String, Object>> formattedItems = new ArrayList<>();
+        for (Datastore datastore: datastoreList) {
+            Map<String, Object> codeDetails = datastore.getValue();
+            formattedItems.add(codeDetails);
+        }
+        return  formattedItems;
     }
 }

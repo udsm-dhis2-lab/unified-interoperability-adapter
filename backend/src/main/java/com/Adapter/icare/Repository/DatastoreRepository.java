@@ -189,4 +189,23 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
                                                        String q,
                                                        Pageable pageable);
 
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:release IS NULL OR JSON_EXTRACT(value, '$.release') =:release) AND " +
+            "(:chapter IS NULL OR JSON_EXTRACT(value, '$.chapter.code') =:chapter) AND ",nativeQuery = true)
+    List<Datastore> getICDDataByChapter(String namespace, String chapter, String release, String version);
+
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:release IS NULL OR JSON_EXTRACT(value, '$.release') =:release) AND " +
+            "(:block IS NULL OR JSON_EXTRACT(value, '$.block.code') =:block) AND ",nativeQuery = true)
+    List<Datastore> getICDDataByBlock(String namespace, String block, String release, String version);
+
+
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:release IS NULL OR JSON_EXTRACT(value, '$.release') =:release) AND " +
+            "(:category IS NULL OR JSON_EXTRACT(value, '$.category.code') =:category) AND ",nativeQuery = true)
+    List<Datastore> getICDDataByCategory(String namespace, String block, String release, String version);
+
 }
