@@ -22,6 +22,18 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     @Query(value = "SELECT * FROM datastore WHERE namespace=:namespace",nativeQuery = true)
     List<Datastore> getDatastoreByNamespace(String namespace);
 
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
+            "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
+            "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
+            "(:code IS NULL OR JSON_EXTRACT(value, '$.code') = :code )",
+            countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+                    "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
+                    "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
+                    "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
+                    "(:code IS NULL OR JSON_EXTRACT(value, '$.code') = :code )",nativeQuery = true)
+    Page<Datastore> getDatastoreByNamespaceWithPagination(String namespace, String category, String department, String q, String code, Pageable pageable);
+
     @Query(value = "SELECT * FROM datastore WHERE namespace=:namespace AND data_key=:dataKey",nativeQuery = true)
     Datastore getDatastoreByNamespaceAndKey(String namespace, String dataKey);
 

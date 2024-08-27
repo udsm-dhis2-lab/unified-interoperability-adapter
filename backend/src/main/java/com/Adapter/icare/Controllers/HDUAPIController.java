@@ -118,12 +118,26 @@ public class HDUAPIController {
 
     // CUSTOM implementation for supporting HDU API temporarily
     @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
-    public List<Map<String, Object>> getDatastoreByNamespace(@PathVariable("namespace") String namespace) throws Exception {
+    public Map<String, Object> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
+                                                       @RequestParam(value="category", required = false) String category,
+                                                       @RequestParam(value="department", required = false) String department,
+                                                       @RequestParam(value="q",required = false) String q,
+                                                       @RequestParam(value="code",required = false) String code,
+                                                       @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                                       @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-        for (Datastore datastore: datastoreService.getDatastoreNamespaceDetails(namespace)) {
-           namespaceDetails.add(datastore.toMap());
+        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, category, department, q, code, page,pageSize);
+        for (Datastore datastore: pagedDatastoreData.getContent()) {
+           namespaceDetails.add(datastore.getValue());
         }
-        return  namespaceDetails;
+        Map<String, Object> returnObject =  new HashMap<>();
+        Map<String, Object> pager = new HashMap<>();
+        pager.put("page", page);
+        pager.put("pageSize", pageSize);
+        pager.put("total", pagedDatastoreData.getTotalElements());
+        returnObject.put("pager",pager);
+        returnObject.put("results", namespaceDetails);
+        return returnObject;
     }
 
     @GetMapping(value="codeSystems/icd", produces = APPLICATION_JSON_VALUE)
