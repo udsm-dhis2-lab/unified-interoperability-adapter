@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -174,7 +171,7 @@ public class HDUAPIController {
                 }
                 // Load extended data
                 returnDataObject.put("results", results);
-            } else if (chapter == null && block == null && category == null && code == null) {
+            } else if (version!= null && chapter ==null && block ==null && category ==null && code == null) {
                 namespace = "ICD-CHAPTERS";
                 pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize);
                 Map<String, Object> pager = new HashMap<>();
@@ -184,57 +181,55 @@ public class HDUAPIController {
                 List<Datastore> datastoreList = pagedDatastoreData.getContent();
                 List<Map<String,Object>> itemsList = new ArrayList<>();
                 for (Datastore datastore: datastoreList) {
-                    Map<String, Object> codeDetails =datastore.getValue();
-                    Map<String, Object> selectedParameters = new HashMap<>();
-                    selectedParameters.put("code", codeDetails.get("code"));
-                    selectedParameters.put("name", codeDetails.get("name"));
-                    selectedParameters.put("release", codeDetails.get("release"));
-                    selectedParameters.put("version", codeDetails.get("version"));
-                    selectedParameters.put("status", codeDetails.get("status"));
-                    chapters.add(selectedParameters);
-                    itemsList.add(codeDetails);
+                    itemsList.add(datastore.getValue());
                 }
                 returnDataObject.put("results", itemsList);
                 returnDataObject.put("pager",pager);
-            } else if (version != null && chapter != null && block == null && category == null && code == null) {
+            } else if (chapter != null && block ==null && category ==null && code == null) {
                 namespace = "ICD-CHAPTERS";
-                key = version.concat("-").concat(chapter);
+                key = Objects.requireNonNullElse(version, "10").concat("-").concat(chapter);
                 List<Map<String, Object>> blocks = new ArrayList<>();
                 // TODO: Load specified chapter details, if found the load code blocks
                 Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
-                returnDataObject = datastore.getValue();
-                String blocksNamespace = "ICD-BLOCKS";
-                List<Datastore> blocksData =   datastoreService.getICDDataByChapter(blocksNamespace,chapter,release,version);
-                for (Datastore blockDatastore: blocksData) {
-                    blocks.add(blockDatastore.getValue());
+                if (datastore !=null) {
+                    returnDataObject = datastore.getValue();
+                    String blocksNamespace = "ICD-BLOCKS";
+                    List<Datastore> blocksData =   datastoreService.getICDDataByChapter(blocksNamespace,chapter,release,version);
+                    for (Datastore blockDatastore: blocksData) {
+                        blocks.add(blockDatastore.getValue());
+                    }
+                    returnDataObject.put("blocks", blocks);
                 }
-                returnDataObject.put("blocks", blocks);
-            } else if (version != null && chapter != null && block != null && category == null && code == null) {
+            } else if (block != null) {
                 // TODO: Load specified block and respective categories
                 namespace = "ICD-BLOCKS";
                 List<Map<String, Object>> categories = new ArrayList<>();
-                key = version.concat("-").concat(block);
+                key = Objects.requireNonNullElse(version, "10").concat("-").concat(block);
                 Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
-                returnDataObject = datastore.getValue();
-                String categoriesNamespace = "ICD-CATEGORIES";
-                List<Datastore> categoriesData =   datastoreService.getICDDataByBlock(categoriesNamespace,block,release,version);
-                for (Datastore categoryDatastore: categoriesData) {
-                    categories.add(categoryDatastore.getValue());
+                if (datastore != null) {
+                    returnDataObject = datastore.getValue();
+                    String categoriesNamespace = "ICD-CATEGORIES";
+                    List<Datastore> categoriesData =   datastoreService.getICDDataByBlock(categoriesNamespace,block,release,version);
+                    for (Datastore categoryDatastore: categoriesData) {
+                        categories.add(categoryDatastore.getValue());
+                    }
+                    returnDataObject.put("categories", categories);
                 }
-                returnDataObject.put("categories", categories);
-            }else if (version != null && chapter != null && block != null && category != null && code == null) {
+            }else if (category != null) {
                 // TODO: Load specified block and respective categories
                 namespace = "ICD-CATEGORIES";
                 List<Map<String, Object>> codes = new ArrayList<>();
-                key = version.concat("-").concat(block);
+                key = Objects.requireNonNullElse(version, "10").concat("-").concat(category);
                 Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
-                returnDataObject = datastore.getValue();
-                String codesNamespace = "ICD-CODES";
-                List<Datastore> codesData =   datastoreService.getICDDataByCategory(codesNamespace,category,release,version);
-                for (Datastore codesDatastore: codesData) {
-                    codes.add(codesDatastore.getValue());
+                if (datastore != null) {
+                    returnDataObject = datastore.getValue();
+                    String codesNamespace = "ICD-CODES";
+                    List<Datastore> codesData =   datastoreService.getICDDataByCategory(codesNamespace,category,release,version);
+                    for (Datastore codesDatastore: codesData) {
+                        codes.add(codesDatastore.getValue());
+                    }
+                    returnDataObject.put("codes", codes);
                 }
-                returnDataObject.put("codes", codes);
             }
             return ResponseEntity.ok(returnDataObject);
         } catch (Exception e) {

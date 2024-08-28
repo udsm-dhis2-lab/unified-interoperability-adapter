@@ -38,7 +38,8 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
                                                           String code,
                                                           Pageable pageable);
 
-    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace=:namespace) AND (:dataKey IS NULL OR data_key=:dataKey)",nativeQuery = true)
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace=:namespace) AND " +
+            "(:dataKey IS NULL OR data_key=:dataKey)",nativeQuery = true)
     Datastore getDatastoreByNamespaceAndKey(String namespace, String dataKey);
 
 
@@ -182,7 +183,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
 
     @Query(value="SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             "(:key IS NULL OR data_key =:key) AND " +
-            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version OR JSON_EXTRACT(value, '$.version') =:version) AND " +
             "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
             "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code) AND " +
             "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
@@ -190,7 +191,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "JSON_EXTRACT(value, '$.code') LIKE CONCAT('%',:q,'%'))",
             countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
                     "(:key IS NULL OR data_key =:key) AND " +
-                    "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+                    "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version  OR JSON_EXTRACT(value, '$.version') =:version) AND " +
                     "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
                     "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code) AND " +
                     "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
@@ -206,20 +207,20 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
                                                        Pageable pageable);
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
-            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version OR JSON_EXTRACT(value, '$.version') =:version) AND " +
             "(:release IS NULL OR JSON_EXTRACT(value, '$.release') =:release) AND " +
-            "(:chapter IS NULL OR JSON_EXTRACT(value, '$.chapter.code') =:chapter) AND ",nativeQuery = true)
+            "(:chapter IS NULL OR JSON_EXTRACT(value, '$.chapter.code') =:chapter) ",nativeQuery = true)
     List<Datastore> getICDDataByChapter(String namespace, String chapter, String release, String version);
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
-            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version OR JSON_EXTRACT(value, '$.version') =:version) AND " +
             "(:release IS NULL OR JSON_EXTRACT(value, '$.release') =:release) AND " +
-            "(:block IS NULL OR JSON_EXTRACT(value, '$.block.code') =:block) AND ",nativeQuery = true)
+            "(:block IS NULL OR JSON_EXTRACT(value, '$.block.code') =:block) ",nativeQuery = true)
     List<Datastore> getICDDataByBlock(String namespace, String block, String release, String version);
 
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
-            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version OR JSON_EXTRACT(value, '$.version') =:version) AND " +
             "(:release IS NULL OR JSON_EXTRACT(value, '$.release') =:release) AND " +
             "(:category IS NULL OR JSON_EXTRACT(value, '$.category.code') =:category) ",nativeQuery = true)
     List<Datastore> getICDDataByCategory(String namespace, String category, String release, String version);
