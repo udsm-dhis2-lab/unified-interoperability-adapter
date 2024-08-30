@@ -7,7 +7,6 @@
 
     <!-- Changeset to modify the created_by column type -->
     <changeSet id="1" author="josephat-mwakyusa">
-
         <!-- Alter the column type of created_by -->
         <modifyDataType tableName="datastore" columnName="created_by" newDataType="INT"/>
     </changeSet>

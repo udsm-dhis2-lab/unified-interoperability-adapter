@@ -62,7 +62,15 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/adapter/**").permitAll()
+                .antMatchers(
+                        "/adapter/**",          // Adapter path
+                        "/static/**",           // Default static resources
+                        "/webjars/**",          // Webjars for bootstrap/jquery
+                        "/resources/**",        // Any other resource paths
+                        "/css/**",              // CSS files
+                        "/js/**",               // JavaScript files
+                        "/images/**"
+                    ).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .httpBasic()

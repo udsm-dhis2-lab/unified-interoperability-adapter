@@ -8,7 +8,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/adapter/**")
-                .addResourceLocations("file:/usr/local/tomcat/webapps/adapter/WEB-INF/classes/static/", "");
+        System.out.println("Executed handler file successfully");
+        registry
+                .addResourceHandler("/adapter/**")
+                .addResourceLocations("classpath:/static/");
     }
 }
