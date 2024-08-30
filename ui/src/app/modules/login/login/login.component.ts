@@ -25,8 +25,8 @@ export class LoginComponent implements OnInit {
     const creadentials = { username: this.username, password: this.password };
     this.authenticatingUser$ = this.loginService.login(creadentials);
     this.authenticatingUser$.subscribe((response: any) => {
-      if (response) {
-        console.log('gete');
+      console.log('response', response);
+      if (response && response?.authenticated) {
         this.authenticating = false;
         setTimeout(() => {
           this.router.navigate(['/dashboard']);

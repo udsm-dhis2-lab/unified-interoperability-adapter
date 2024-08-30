@@ -50,8 +50,13 @@ export class LoginService {
 
   //Using Observables to create a service instance
   login(credentials: any): Observable<any> {
-    const basicAuth = btoa(credentials?.username + ':' + credentials?.password);
-    localStorage.setItem('iadapterAuthKey', basicAuth);
+    const basicAuth =
+      credentials?.password && credentials?.password
+        ? btoa(credentials?.username + ':' + credentials?.password)
+        : null;
+    if (basicAuth) {
+      localStorage.setItem('iadapterAuthKey', basicAuth);
+    }
     const httpOptions = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -59,10 +64,9 @@ export class LoginService {
       }),
     };
     return this.httpClient
-      .get<DatasetInterface[]>(this.apiUrl, httpOptions)
+      .post<DatasetInterface[]>(this.apiUrl, httpOptions)
       .pipe(
         map((response: any) => {
-          console.log(response);
           return response;
         }),
         catchError((error: any) => of(error))

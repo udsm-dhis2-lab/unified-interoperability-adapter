@@ -37,10 +37,15 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebSecurity
@@ -60,22 +65,50 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception{
         http
-                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(
-                        "/adapter/**",          // Adapter path
-                        "/static/**",           // Default static resources
-                        "/webjars/**",          // Webjars for bootstrap/jquery
-                        "/resources/**",        // Any other resource paths
-                        "/css/**",              // CSS files
-                        "/js/**",               // JavaScript files
-                        "/images/**"
-                    ).permitAll()
-                .anyRequest().authenticated()
+                        "/",  // Allow the root URL (forwarded to index.html)
+                        "/index.html",    // Allow the main entry point of the SPA
+                        "/static/**",     // Allow static resources like JS, CSS, etc.
+                        "/**/*.js",       // Allow all JS files
+                        "/**/*.css",      // Allow all CSS files
+                        "/**/*.png",      // Allow png image files
+                        "/**/*.jpg",      // Allow jpg image files
+                        "/**/*.jpeg",     // Allow jpeg image files
+                        "/**/*.svg",      // Allow SVG files
+                        "/**/*.html",     // Allow HTML files
+                        "/api/v1/logout"  // Allow logout API
+                ).permitAll()
+//                .antMatchers("/api/v1/login").authenticated()  // Secure API endpoints
+                .anyRequest().authenticated()  // Allow all other requests
                 .and()
                 .httpBasic()
+                .and().csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .and()
-                .logout()
-                .permitAll();
+                .cors().configurationSource(configurationSource())
+                .and()
+                .sessionManagement()
+                .sessionFixation().newSession()  // Create a new session on authentication
+                .maximumSessions(1)  // Limit to one session per user
+                .maxSessionsPreventsLogin(true);
     }
+
+    private CorsConfigurationSource configurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("*");
+        config.setAllowCredentials(true);
+        config.addAllowedHeader("X-Requested-With");
+        config.addAllowedHeader("Content-Type");
+        config.addAllowedMethod(HttpMethod.POST);
+        source.registerCorsConfiguration("/api/v1/logout", config);
+        return source;
+    }
+
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        // Allow static resources to be accessed without authentication
+//        web.ignoring().antMatchers("/index.html","/#/**","/resources/**", "/public/**", "/webui/**");
+//    }
 }

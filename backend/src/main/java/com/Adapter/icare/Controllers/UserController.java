@@ -4,12 +4,15 @@ import com.Adapter.icare.Domains.Group;
 import com.Adapter.icare.Domains.Privilege;
 import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.UserGetDto;
 import com.Adapter.icare.Mappers.Mappers;
 import com.Adapter.icare.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -31,9 +34,18 @@ public class UserController {
     }
 
 
-    @GetMapping("/login")
-    public String logins() {
-        return "OK";
+    @PostMapping(path = "/login")
+    public ResponseEntity<Map<String, Object>> logins() throws IllegalAccessException{
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication.isAuthenticated()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("authenticated", true);
+            return ResponseEntity.ok(response);
+        } else {
+            Map<String, Object> response = new HashMap<>();
+            response.put("authenticated", false);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
     }
 
     @GetMapping("/users/status")
