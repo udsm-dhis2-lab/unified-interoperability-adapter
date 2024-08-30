@@ -120,7 +120,7 @@ public class HDUAPIController {
                                                        @RequestParam(value="department", required = false) String department,
                                                        @RequestParam(value="q",required = false) String q,
                                                        @RequestParam(value="code",required = false) String code,
-                                                       @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                                       @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
                                                        @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, category, department, q, code, page,pageSize);
@@ -131,6 +131,7 @@ public class HDUAPIController {
         Map<String, Object> pager = new HashMap<>();
         pager.put("page", page);
         pager.put("pageSize", pageSize);
+        pager.put("totalPages",pagedDatastoreData.getTotalPages());
         pager.put("total", pagedDatastoreData.getTotalElements());
         returnObject.put("pager",pager);
         returnObject.put("results", namespaceDetails);
@@ -145,7 +146,7 @@ public class HDUAPIController {
                                                                     @RequestParam(value = "category", required = false) String category,
                                                                     @RequestParam(value = "code", required = false) String code,
                                                                     @RequestParam(value = "q", required = false) String q,
-                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                    @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                     @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = null;
@@ -177,6 +178,7 @@ public class HDUAPIController {
                 Map<String, Object> pager = new HashMap<>();
                 pager.put("page", page);
                 pager.put("pageSize", pageSize);
+                pager.put("totalPages",pagedDatastoreData.getTotalPages());
                 pager.put("total", pagedDatastoreData.getTotalElements());
                 List<Datastore> datastoreList = pagedDatastoreData.getContent();
                 List<Map<String,Object>> itemsList = new ArrayList<>();
@@ -242,7 +244,7 @@ public class HDUAPIController {
                                                                       @RequestParam(value = "release", required = false) String release,
                                                                       @RequestParam(value = "code", required = false) String code,
                                                                       @RequestParam(value = "q", required = false) String q,
-                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                      @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                       @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = "LOINC";
@@ -257,6 +259,7 @@ public class HDUAPIController {
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
             pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
             pager.put("total", pagedDatastoreData.getTotalElements());
             returnDataObject.put("results", codes);
             returnDataObject.put("pager",pager);

@@ -6,6 +6,7 @@ import com.Adapter.icare.Services.DatastoreService;
 import com.google.common.collect.Maps;
 import javassist.NotFoundException;
 import org.apache.commons.beanutils.BeanUtils;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -38,8 +39,26 @@ public class DatastoreController {
     }
 
     @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
-    public List<Datastore> getDatastoreByNamespace(@PathVariable("namespace") String namespace) throws Exception {
-        return  datastoreService.getDatastoreNamespaceDetails(namespace);
+    public Map<String, Object> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
+                                                       @RequestParam(value="q", required = false) String q,
+                                                       @RequestParam(value="page", defaultValue = "1") Integer page,
+                                                       @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
+        Map<String, Object> returnObject = new HashMap<>();
+        Page<Datastore> pagedDatastoreData = null;
+        pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page, pageSize);
+        Map<String, Object> pager = new HashMap<>();
+        pager.put("page", page);
+        pager.put("pageSize", pageSize);
+        pager.put("totalPages",pagedDatastoreData.getTotalPages());
+        pager.put("total", pagedDatastoreData.getTotalElements());
+        List<Datastore> datastoreList = pagedDatastoreData.getContent();
+        List<Map<String,Object>> itemsList = new ArrayList<>();
+        for (Datastore datastore: datastoreList) {
+            itemsList.add(datastore.toMap());
+        }
+        returnObject.put("results", itemsList);
+        returnObject.put("pager",pager);
+        return returnObject;
     }
 
     @GetMapping(value="{namespace}/{key}",produces = APPLICATION_JSON_VALUE)
