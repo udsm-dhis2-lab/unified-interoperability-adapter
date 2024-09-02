@@ -205,6 +205,37 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
                                                        String code,
                                                        String q,
                                                        Pageable pageable);
+    @Query(value="SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            "(:key IS NULL OR data_key =:key) AND " +
+            "(:version IS NULL OR JSON_EXTRACT(value, '$.version') =:version) AND " +
+            "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
+            "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code) AND " +
+            "(:chapter IS NULL OR JSON_EXTRACT(value, '$.category.block.chapter.code') =:chapter OR " +
+            "JSON_EXTRACT(value, '$.block.chapter.code') =:chapter OR " +
+            "JSON_EXTRACT(value, '$.chapter.code') =:chapter) AND " +
+            "(:block IS NULL OR JSON_EXTRACT(value, '$.category.block.code') =:block OR " +
+            "JSON_EXTRACT(value, '$.block.code') =:block) AND " +
+            "(:category IS NULL OR JSON_EXTRACT(value, '$.category.code') =:category) AND " +
+            "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
+            "JSON_EXTRACT(value, '$.definitionDescription') LIKE CONCAT('%',:q,'%') OR " +
+            "JSON_EXTRACT(value, '$.code') LIKE CONCAT('%',:q,'%'))",
+            countQuery = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+                    "(:key IS NULL OR data_key =:key) AND " +
+                    "(:version IS NULL OR JSON_EXTRACT(value, '$.version') =:version) AND " +
+                    "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
+                    "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code) AND " +
+                    "(:chapter IS NULL OR JSON_EXTRACT(value, '$.category.block.chapter.code') =:chapter OR " +
+                    "JSON_EXTRACT(value, '$.block.chapter.code') =:chapter OR " +
+                    "JSON_EXTRACT(value, '$.chapter.code') =:chapter) AND " +
+                    "(:block IS NULL OR JSON_EXTRACT(value, '$.category.block.code') =:block OR " +
+                    "JSON_EXTRACT(value, '$.block.code') =:block) AND " +
+                    "(:category IS NULL OR JSON_EXTRACT(value, '$.category.code') =:category) AND " +
+                    "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
+                    "JSON_EXTRACT(value, '$.definitionDescription') LIKE CONCAT('%',:q,'%') OR " +
+                    "JSON_EXTRACT(value, '$.code') LIKE CONCAT('%',:q,'%'))", nativeQuery = true)
+    Page<Datastore> getDatastoreICDDataByParams(String namespace, String key, String version,
+                                                String releaseYear, String chapter, String block, String category, String code,
+                                                String q, Pageable pageable);
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version OR JSON_EXTRACT(value, '$.version') =:version) AND " +

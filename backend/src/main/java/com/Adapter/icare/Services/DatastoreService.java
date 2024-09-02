@@ -180,6 +180,13 @@ public class DatastoreService {
         return datastoreRepository.findDatastoreDataBySpecifiedParams(namespace,key,version,releaseYear,code,q,pageable);
     }
 
+    public Page<Datastore> getDatastoreICDDataByParams(String namespace, String key, String version,
+                                                      String releaseYear, String chapter, String block, String category, String code,
+                                                       String q, Integer page, Integer pageSize) throws Exception {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return datastoreRepository.getDatastoreICDDataByParams(namespace,key,version,releaseYear,chapter, block, category, code,q,pageable);
+    }
+
     public List<Datastore> getICDDataByChapter(String namespace, String chapter, String release, String version) throws Exception {
         return datastoreRepository.getICDDataByChapter(namespace,chapter,release,version);
     }

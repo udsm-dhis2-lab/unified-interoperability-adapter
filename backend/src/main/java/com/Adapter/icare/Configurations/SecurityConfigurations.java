@@ -65,7 +65,15 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception{
         http
+                .csrf().disable()
                 .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .httpBasic()
+                .and()
+                .logout()
+                .permitAll();
+//                .authorizeRequests()
 //                .antMatchers(
 //                        "/",  // Allow the root URL (forwarded to index.html)
 //                        "/index.html",    // Allow the main entry point of the SPA
@@ -80,18 +88,18 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 //                        "/api/v1/logout"  // Allow logout API
 //                ).permitAll()
 //                .antMatchers("/api/v1/login").authenticated()  // Secure API endpoints
-                .anyRequest().authenticated()  // Allow all other requests
-                .and()
-                .httpBasic()
-                .and().csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .and()
-                .cors().configurationSource(configurationSource())
-                .and()
-                .sessionManagement()
-                .sessionFixation().newSession()  // Create a new session on authentication
-                .maximumSessions(1)  // Limit to one session per user
-                .maxSessionsPreventsLogin(true);
+//                .anyRequest().authenticated()  // Allow all other requests
+//                .and()
+//                .httpBasic()
+//                .and().csrf()
+//                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                .and()
+//                .cors().configurationSource(configurationSource())
+//                .and()
+//                .sessionManagement()
+//                .sessionFixation().newSession()  // Create a new session on authentication
+//                .maximumSessions(1)  // Limit to one session per user
+//                .maxSessionsPreventsLogin(true);
     }
 
     private CorsConfigurationSource configurationSource() {

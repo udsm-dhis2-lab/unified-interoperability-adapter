@@ -120,7 +120,7 @@ public class HDUAPIController {
                                                        @RequestParam(value="department", required = false) String department,
                                                        @RequestParam(value="q",required = false) String q,
                                                        @RequestParam(value="code",required = false) String code,
-                                                       @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
+                                                       @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
                                                        @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, category, department, q, code, page,pageSize);
@@ -146,7 +146,7 @@ public class HDUAPIController {
                                                                     @RequestParam(value = "category", required = false) String category,
                                                                     @RequestParam(value = "code", required = false) String code,
                                                                     @RequestParam(value = "q", required = false) String q,
-                                                                    @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
+                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
                                                                     @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = null;
@@ -243,12 +243,140 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value="codeSystems/icd/codes", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getICDCodeSystemsCodes(@RequestParam(value = "version", required = false) String version,
+                                                                    @RequestParam(value = "release", required = false) String release,
+                                                                    @RequestParam(value = "chapter", required = false) String chapter,
+                                                                    @RequestParam(value = "block", required = false) String block,
+                                                                    @RequestParam(value = "category", required = false) String category,
+                                                                    @RequestParam(value = "code", required = false) String code,
+                                                                    @RequestParam(value = "q", required = false) String q,
+                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                    @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+            String namespace = "ICD-CODES";
+            String key = null;
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreICDDataByParams(namespace,key,version,release, chapter, block, category,code,q,page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> codesObject = new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            codesObject.put("pager",pager);
+            codesObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(codesObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value="codeSystems/icd/categories", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getICDCodeSystemsCategories(@RequestParam(value = "version", required = false) String version,
+                                                                      @RequestParam(value = "release", required = false) String release,
+                                                                      @RequestParam(value = "chapter", required = false) String chapter,
+                                                                      @RequestParam(value = "block", required = false) String block,
+                                                                      @RequestParam(value = "category", required = false) String category,
+                                                                      @RequestParam(value = "code", required = false) String code,
+                                                                      @RequestParam(value = "q", required = false) String q,
+                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                      @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+            String namespace = "ICD-CATEGORIES";
+            String key = null;
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreICDDataByParams(namespace,key,version,release, chapter, block, category,code,q,page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> dataObject = new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            dataObject.put("pager",pager);
+            dataObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(dataObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value="codeSystems/icd/blocks", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getICDCodeSystemsBlocks(@RequestParam(value = "version", required = false) String version,
+                                                                           @RequestParam(value = "release", required = false) String release,
+                                                                           @RequestParam(value = "chapter", required = false) String chapter,
+                                                                           @RequestParam(value = "block", required = false) String block,
+                                                                           @RequestParam(value = "category", required = false) String category,
+                                                                           @RequestParam(value = "code", required = false) String code,
+                                                                           @RequestParam(value = "q", required = false) String q,
+                                                                           @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                           @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+            String namespace = "ICD-BLOCKS";
+            String key = null;
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreICDDataByParams(namespace,key,version,release, chapter, block, category,code,q,page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> dataObject = new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            dataObject.put("pager",pager);
+            dataObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(dataObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value="codeSystems/icd/chapters", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getICDCodeSystemsChapters(@RequestParam(value = "version", required = false) String version,
+                                                                       @RequestParam(value = "release", required = false) String release,
+                                                                       @RequestParam(value = "chapter", required = false) String chapter,
+                                                                       @RequestParam(value = "block", required = false) String block,
+                                                                       @RequestParam(value = "category", required = false) String category,
+                                                                       @RequestParam(value = "code", required = false) String code,
+                                                                       @RequestParam(value = "q", required = false) String q,
+                                                                       @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                       @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+            String namespace = "ICD-CHAPTERS";
+            String key = null;
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreICDDataByParams(namespace,key,version,release, chapter, block, category,code,q,page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> dataObject = new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            dataObject.put("pager",pager);
+            dataObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(dataObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @GetMapping(value="codeSystems/loinc", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getLOINCCodeSystemData(@RequestParam(value = "version", required = false) String version,
                                                                       @RequestParam(value = "release", required = false) String release,
                                                                       @RequestParam(value = "code", required = false) String code,
                                                                       @RequestParam(value = "q", required = false) String q,
-                                                                      @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
+                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
                                                                       @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = "LOINC";
