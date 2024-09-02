@@ -202,7 +202,7 @@ public class HDUAPIController {
                     }
                     returnDataObject.put("blocks", blocks);
                 }
-            } else if (block != null) {
+            } else if (block != null && category ==null && code == null) {
                 // TODO: Load specified block and respective categories
                 namespace = "ICD-BLOCKS";
                 List<Map<String, Object>> categories = new ArrayList<>();
@@ -217,7 +217,7 @@ public class HDUAPIController {
                     }
                     returnDataObject.put("categories", categories);
                 }
-            }else if (category != null) {
+            } else if (category != null && code == null) {
                 // TODO: Load specified block and respective categories
                 namespace = "ICD-CATEGORIES";
                 List<Map<String, Object>> codes = new ArrayList<>();
@@ -232,6 +232,10 @@ public class HDUAPIController {
                     }
                     returnDataObject.put("codes", codes);
                 }
+            } else {
+                key = Objects.requireNonNullElse(version, "10").concat("-").concat(code);
+                Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+                returnDataObject = datastore.getValue();
             }
             return ResponseEntity.ok(returnDataObject);
         } catch (Exception e) {

@@ -66,19 +66,19 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception{
         http
                 .authorizeRequests()
-                .antMatchers(
-                        "/",  // Allow the root URL (forwarded to index.html)
-                        "/index.html",    // Allow the main entry point of the SPA
-                        "/static/**",     // Allow static resources like JS, CSS, etc.
-                        "/**/*.js",       // Allow all JS files
-                        "/**/*.css",      // Allow all CSS files
-                        "/**/*.png",      // Allow png image files
-                        "/**/*.jpg",      // Allow jpg image files
-                        "/**/*.jpeg",     // Allow jpeg image files
-                        "/**/*.svg",      // Allow SVG files
-                        "/**/*.html",     // Allow HTML files
-                        "/api/v1/logout"  // Allow logout API
-                ).permitAll()
+//                .antMatchers(
+//                        "/",  // Allow the root URL (forwarded to index.html)
+//                        "/index.html",    // Allow the main entry point of the SPA
+//                        "/static/**",     // Allow static resources like JS, CSS, etc.
+//                        "/**/*.js",       // Allow all JS files
+//                        "/**/*.css",      // Allow all CSS files
+//                        "/**/*.png",      // Allow png image files
+//                        "/**/*.jpg",      // Allow jpg image files
+//                        "/**/*.jpeg",     // Allow jpeg image files
+//                        "/**/*.svg",      // Allow SVG files
+//                        "/**/*.html",     // Allow HTML files
+//                        "/api/v1/logout"  // Allow logout API
+//                ).permitAll()
 //                .antMatchers("/api/v1/login").authenticated()  // Secure API endpoints
                 .anyRequest().authenticated()  // Allow all other requests
                 .and()
