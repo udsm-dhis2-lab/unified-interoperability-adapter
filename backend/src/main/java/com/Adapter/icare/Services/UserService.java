@@ -64,6 +64,7 @@ public class UserService implements UserDetailsService {
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new Exception("Invalid password");
         }
+
         return user.toMap();
     }
 

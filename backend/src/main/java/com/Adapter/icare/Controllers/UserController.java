@@ -41,11 +41,16 @@ public class UserController {
             Map<String, Object> userDetails = userService.authenticate(authHeader);
             // Here, you can return user info or a token, depending on your needs
             Map<String, Object> response = new HashMap<>();
-            response.put("authenticated", true);
-            return ResponseEntity.ok(response);
+            if (userDetails != null) {
+                response.put("authenticated", true);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("authenticated", false);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
-            response.put("authenticated", true);
+            response.put("authenticated", false);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
