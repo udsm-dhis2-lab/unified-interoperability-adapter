@@ -36,27 +36,17 @@ public class UserController {
 
 
     @PostMapping(path = "/login")
-    public ResponseEntity<String> authenticateUser(@RequestHeader("Authorization") String authHeader) throws IllegalAccessException{
-        System.out.println(authHeader);
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        UserDetails user = (UserDetails) authentication.getPrincipal();
-//        System.out.println(user.getUsername());
-//        if (authentication.isAuthenticated()) {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("authenticated", true);
-//            return ResponseEntity.ok(response);
-//        } else {
-//            Map<String, Object> response = new HashMap<>();
-//            response.put("authenticated", false);
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-//        }
-
+    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestHeader("Authorization") String authHeader) throws IllegalAccessException{
         try {
             Map<String, Object> userDetails = userService.authenticate(authHeader);
             // Here, you can return user info or a token, depending on your needs
-            return ResponseEntity.ok("Authenticated as: " + userDetails.get("username"));
+            Map<String, Object> response = new HashMap<>();
+            response.put("authenticated", true);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + e.getMessage());
+            Map<String, Object> response = new HashMap<>();
+            response.put("authenticated", true);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 

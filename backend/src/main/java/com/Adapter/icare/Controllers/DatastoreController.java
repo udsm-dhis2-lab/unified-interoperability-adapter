@@ -33,7 +33,7 @@ public class DatastoreController {
             List<Datastore> datastoreResults = datastoreService.getDatastore();
             returnResultObject.put("results",datastoreResults);
         } else {
-            returnResultObject = (Map<String, Object>) datastoreService.getDatastoreByUuid(uuid);
+            returnResultObject = datastoreService.getDatastoreByUuid(uuid).toMap();
         }
         return returnResultObject;
     }

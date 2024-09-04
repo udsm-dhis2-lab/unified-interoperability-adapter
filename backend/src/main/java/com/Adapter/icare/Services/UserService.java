@@ -35,7 +35,7 @@ public class UserService implements UserDetailsService {
 
     private final GroupRepository groupRepository;
 
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public Map<String, Object> authenticate(String authHeader) throws Exception {
         if (authHeader == null || !authHeader.startsWith("Basic ")) {
@@ -52,7 +52,6 @@ public class UserService implements UserDetailsService {
 
         String username = values[0];
         String password = values[1];
-
         // Load user from database or other source
         User user;
         try {
@@ -63,12 +62,8 @@ public class UserService implements UserDetailsService {
 
         // Check password
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            System.out.println("IN-VALID");
             throw new Exception("Invalid password");
-        } else {
-            System.out.println("VALID");
         }
-        System.out.println(user.getUsername() + user.getPassword());
         return user.toMap();
     }
 
