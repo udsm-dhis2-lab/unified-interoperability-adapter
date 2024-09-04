@@ -36,12 +36,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -62,17 +64,36 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
         return provider;
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception{
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-                .httpBasic()
-                .and()
-                .logout()
-                .permitAll();
+                .antMatchers(
+                        "/",  // Allow the root URL (forwarded to index.html)
+                        "/index.html",    // Allow the main entry point of the SPA
+                        "/assets/**",     // Allow static resources like JS, CSS, etc.  // Allow static resources like JS, CSS, etc.
+                        "/**/*.js",       // Allow all JS files
+                        "/**/*.css",      // Allow all CSS files
+                        "/**/*.png",      // Allow png image files
+                        "/**/*.jpg",      // Allow jpg image files
+                        "/**/*.jpeg",     // Allow jpeg image files
+                        "/**/*.svg",      // Allow SVG files
+                        "/**/*.html",     // Allow HTML files
+                        "/api/v1/login"  // Allow login API
+                ).permitAll()
+                .and().authorizeRequests().anyRequest().authenticated()
+                .and().httpBasic();
 //                .authorizeRequests()
 //                .antMatchers(
 //                        "/",  // Allow the root URL (forwarded to index.html)
@@ -117,6 +138,16 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 //    @Override
 //    public void configure(WebSecurity web) throws Exception {
 //        // Allow static resources to be accessed without authentication
-//        web.ignoring().antMatchers("/index.html","/#/**","/resources/**", "/public/**", "/webui/**");
+//        web.ignoring().antMatchers("/",  // Allow the root URL (forwarded to index.html)
+//                        "/index.html",    // Allow the main entry point of the SPA
+//                        "/assets/**",     // Allow static resources like JS, CSS, etc.
+//                        "/assets/images/**",
+//                        "/**/*.js",       // Allow all JS files
+//                        "/**/*.css",      // Allow all CSS files
+//                        "/**/*.png",      // Allow png image files
+//                        "/**/*.jpg",      // Allow jpg image files
+//                        "/**/*.jpeg",     // Allow jpeg image files
+//                        "/**/*.svg",      // Allow SVG files
+//                        "/**/*.html");
 //    }
 }

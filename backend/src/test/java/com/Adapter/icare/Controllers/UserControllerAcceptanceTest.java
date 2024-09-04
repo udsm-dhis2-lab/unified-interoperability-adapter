@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class UserControllerAcceptanceTest {
     public void getStatusTest() throws Exception {
         mockMvc.perform(
                     get("/api/v1/users/status")
+                            .with(httpBasic("admin","AdminUser"))
                 ).andExpect(status().isOk())
                 .andExpect(content().string(equalTo("OK")));
     }
@@ -44,6 +46,7 @@ public class UserControllerAcceptanceTest {
     public void getUsersTest() throws Exception {
         mockMvc.perform(
                         get("/api/v1/users")
+                                .with(httpBasic("admin","AdminUser"))
                 ).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)));
@@ -60,12 +63,12 @@ public class UserControllerAcceptanceTest {
         user.put("phonenumber","0798762321");
         user.put("disabled",false);
         user.put("middlename","Test");
-//        UUID uuid = UUID.randomUUID();
-//        user.setUuid(uuid.toString());
-//        user.setId(1);
-        System.out.println(user);
+        UUID uuid = UUID.randomUUID();
+        user.put("uuid",uuid);
         mockMvc.perform(
-                        post("/api/v1/users").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(user))
+                        post("/api/v1/users")
+                                .with(httpBasic("admin","AdminUser"))
+                                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(user))
                 ).andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }

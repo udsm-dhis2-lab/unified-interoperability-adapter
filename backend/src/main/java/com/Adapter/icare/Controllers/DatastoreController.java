@@ -41,7 +41,7 @@ public class DatastoreController {
     @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
     public Map<String, Object> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
                                                        @RequestParam(value="q", required = false) String q,
-                                                       @RequestParam(value="page", defaultValue = "1") Integer page,
+                                                       @RequestParam(value="page", defaultValue = "0") Integer page,
                                                        @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnObject = new HashMap<>();
         Page<Datastore> pagedDatastoreData = null;

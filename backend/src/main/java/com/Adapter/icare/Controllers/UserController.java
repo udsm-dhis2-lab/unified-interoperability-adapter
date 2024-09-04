@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -35,16 +36,27 @@ public class UserController {
 
 
     @PostMapping(path = "/login")
-    public ResponseEntity<Map<String, Object>> logins() throws IllegalAccessException{
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication.isAuthenticated()) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("authenticated", true);
-            return ResponseEntity.ok(response);
-        } else {
-            Map<String, Object> response = new HashMap<>();
-            response.put("authenticated", false);
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    public ResponseEntity<String> authenticateUser(@RequestHeader("Authorization") String authHeader) throws IllegalAccessException{
+        System.out.println(authHeader);
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        UserDetails user = (UserDetails) authentication.getPrincipal();
+//        System.out.println(user.getUsername());
+//        if (authentication.isAuthenticated()) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("authenticated", true);
+//            return ResponseEntity.ok(response);
+//        } else {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("authenticated", false);
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+//        }
+
+        try {
+            Map<String, Object> userDetails = userService.authenticate(authHeader);
+            // Here, you can return user info or a token, depending on your needs
+            return ResponseEntity.ok("Authenticated as: " + userDetails.get("username"));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed: " + e.getMessage());
         }
     }
 
@@ -160,7 +172,7 @@ public class UserController {
     @PutMapping("/user/privileges/{uuid}")
     public Map<String,Object> updatePrivilege(@RequestBody Map<String,Object> privilegeMap,@PathVariable String uuid) throws Exception {
         Privilege privilege = Privilege.fromMap(privilegeMap);
-        Privilege updatedPrivilege = userService.updatePrivilage(privilege,uuid);
+        Privilege updatedPrivilege = userService.updatePrivilege(privilege,uuid);
         return updatedPrivilege.toMap(false);
     }
 

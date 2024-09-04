@@ -9,14 +9,20 @@ import com.Adapter.icare.Repository.GroupRepository;
 import com.Adapter.icare.Repository.PrivilegeRepository;
 import com.Adapter.icare.Repository.RoleRepository;
 import com.Adapter.icare.Repository.UserRepository;
+import com.Adapter.icare.Utils.EncryptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -28,6 +34,44 @@ public class UserService implements UserDetailsService {
     private final PrivilegeRepository privilegeRepository;
 
     private final GroupRepository groupRepository;
+
+    private PasswordEncoder passwordEncoder;
+
+    public Map<String, Object> authenticate(String authHeader) throws Exception {
+        if (authHeader == null || !authHeader.startsWith("Basic ")) {
+            throw new Exception("No Basic Authentication header found");
+        }
+
+        String base64Credentials = authHeader.substring(6);
+        String credentials = new String(Base64.getDecoder().decode(base64Credentials));
+        String[] values = credentials.split(":", 2);
+
+        if (values.length != 2) {
+            throw new Exception("Invalid Basic Authentication header");
+        }
+
+        String username = values[0];
+        String password = values[1];
+
+        // Load user from database or other source
+        User user;
+        try {
+            user = userRepository.findByUsername(username);
+        } catch (UsernameNotFoundException e) {
+            throw new Exception("User not found");
+        }
+
+        // Check password
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            System.out.println("IN-VALID");
+            throw new Exception("Invalid password");
+        } else {
+            System.out.println("VALID");
+        }
+        System.out.println(user.getUsername() + user.getPassword());
+        return user.toMap();
+    }
+
     public UserService(UserRepository userRepository,RoleRepository roleRepository, PrivilegeRepository privilegeRepository, GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -78,7 +122,6 @@ public class UserService implements UserDetailsService {
     }
 
     public User getUserByUsername(String username) throws UsernameNotFoundException {
-
         User user = userRepository.findByUsername(username);
         if(user == null){
             throw new UsernameNotFoundException("User Not found");
@@ -138,7 +181,7 @@ public class UserService implements UserDetailsService {
         return privilege;
     }
 
-    public Privilege updatePrivilage(Privilege privilege, String uuid) throws Exception {
+    public Privilege updatePrivilege(Privilege privilege, String uuid) throws Exception {
         Privilege savedPrivilege = this.getPrivilege(uuid);
         privilege.setUuid(savedPrivilege.getUuid());
         return privilegeRepository.save(privilege);

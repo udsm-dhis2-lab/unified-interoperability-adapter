@@ -23,6 +23,7 @@ export class LoginComponent implements OnInit {
     event.stopPropagation();
     this.authenticating = true;
     const creadentials = { username: this.username, password: this.password };
+    console.log(creadentials);
     this.authenticatingUser$ = this.loginService.login(creadentials);
     this.authenticatingUser$.subscribe((response: any) => {
       console.log('response', response);

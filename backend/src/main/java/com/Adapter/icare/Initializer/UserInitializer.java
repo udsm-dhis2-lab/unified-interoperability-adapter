@@ -25,7 +25,7 @@ public class UserInitializer implements ApplicationRunner {
         User user = userRepository.findByUsername("admin");
         if(user == null){
             User userCreate = new User();
-            userCreate.setPassword("iAdapter@123");
+            userCreate.setPassword("AdminUser");
             userCreate.setUsername("admin");
             userService.createUser(userCreate);
         }

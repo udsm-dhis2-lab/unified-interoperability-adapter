@@ -63,8 +63,14 @@ export class LoginService {
         Auth: 'Basic ' + basicAuth,
       }),
     };
+    // console.log(httpOptions);
     return this.httpClient
-      .post<DatasetInterface[]>(this.apiUrl, httpOptions)
+      .post<any>(this.apiUrl, null, {
+        headers: {
+          'Content-Type': 'application/json',
+          Auth: 'Basic ' + basicAuth,
+        },
+      })
       .pipe(
         map((response: any) => {
           return response;
