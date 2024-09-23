@@ -20,13 +20,13 @@ public class ClientRegistryService {
         this.fhirClient = fhirClient;
     }
 
-    public List<Map<String, Object>> getPatients() {
+    public List<Map<String, Object>> getPatients(int page, int pageSize) {
         try {
             List<Map<String, Object>> patients = new ArrayList<>();
-
-            System.out.println(fhirClient.getServerBase());
             Bundle response = fhirClient.search()
                     .forResource(Patient.class)
+                    .count(pageSize)
+                    .offset(page)
                     .returnBundle(Bundle.class)
                     .execute();
 
@@ -34,12 +34,7 @@ public class ClientRegistryService {
                 if (entry.getResource() instanceof Patient) {
                     Patient patientData = (Patient) entry.getResource();
                     patientData.getIdentifier();
-//                Map<String, Object> patient = new HashMap<>();
-//                patient.put("name",patientData.getName().get(0).getNameAsSingleString());
-//                patient.put("dateOfBirth", patientData.getBirthDate().toString());
-//                patients.add(new PatientDTO(patientData));
                     PatientDTO patientDTO =mapToPatientDTO(patientData);
-                    System.out.println(patientDTO.toMap());
                     patients.add(patientDTO.toMap());
                 }
             }
@@ -48,6 +43,15 @@ public class ClientRegistryService {
             e.printStackTrace(); // Log the exception for referencing via logs
             throw new RuntimeException("Failed to retrieve patients from FHIR server", e);
         }
+    }
+
+    public int getTotalPatients() {
+        Bundle response = fhirClient.search()
+                .forResource(Patient.class)
+                .count(1)
+                .returnBundle(Bundle.class)
+                .execute();
+        return response.getTotal();
     }
 
     private PatientDTO mapToPatientDTO(Patient patient) {

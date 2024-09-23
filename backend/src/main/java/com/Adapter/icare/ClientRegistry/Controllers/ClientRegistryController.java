@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,10 +25,21 @@ public class ClientRegistryController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Map<String, Object>>> getPatients() {
+    public ResponseEntity<Map<String, Object>> getPatients(
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "0") int page
+    ) {
         try {
-            List<Map<String, Object>> patients = clientRegistryService.getPatients();
-            return ResponseEntity.ok(patients);
+            Map<String, Object> patientDataResponse = new HashMap<>();
+            List<Map<String, Object>> patients = clientRegistryService.getPatients(page, pageSize);
+            patientDataResponse.put("results", patients);
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
+            pager.put("total", clientRegistryService.getTotalPatients());
+            patientDataResponse.put("pager", pager);
+            return ResponseEntity.ok(patientDataResponse);
         }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
