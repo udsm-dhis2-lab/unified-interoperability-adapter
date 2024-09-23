@@ -27,11 +27,14 @@ public class ClientRegistryController {
     @GetMapping()
     public ResponseEntity<Map<String, Object>> getPatients(
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam( value = "identifier", required = false) String identifier,
+            @RequestParam( value = "identifierType", required = false) String identifierType,
+            @RequestParam( value = "gender", required = false) String gender
     ) {
         try {
             Map<String, Object> patientDataResponse = new HashMap<>();
-            List<Map<String, Object>> patients = clientRegistryService.getPatients(page, pageSize);
+            List<Map<String, Object>> patients = clientRegistryService.getPatients(page, pageSize, identifier, identifierType, gender);
             patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);

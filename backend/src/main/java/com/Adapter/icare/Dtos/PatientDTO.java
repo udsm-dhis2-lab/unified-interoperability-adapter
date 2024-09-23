@@ -3,7 +3,7 @@ package com.Adapter.icare.Dtos;
 import lombok.Getter;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Patient;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -59,16 +59,7 @@ public class PatientDTO {
             mappedPatient.put("gender", this.getGender());
             mappedPatient.put("dateOfBirth", this.getBirthDate());
             mappedPatient.put("fhirName", this.getName());
-            List<Map<String, Object>> identifiers = new ArrayList<>();
-            if (!this.getIdentifiers().isEmpty()) {
-                for (Identifier identifier: this.getIdentifiers()) {
-                    Map<String, Object> id = new HashMap<>();
-                    id.put("id", identifier.getValue());
-                    id.put("system", identifier.getSystem());
-                    id.put("type", identifier.getUse());
-                    identifiers.add(id);
-                }
-            }
+            List<Map<String, Object>> identifiers = getIdentifierMaps();
 
             mappedPatient.put("identifiers", identifiers);
 
@@ -76,5 +67,28 @@ public class PatientDTO {
 
         }
         return mappedPatient;
+    }
+
+    private @NotNull List<Map<String, Object>> getIdentifierMaps() {
+        List<Map<String, Object>> identifiers = new ArrayList<>();
+        if (!this.getIdentifiers().isEmpty()) {
+            for (Identifier identifier: this.getIdentifiers()) {
+                Map<String, Object> id = new HashMap<>();
+                id.put("id", identifier.getValue());
+                id.put("system", identifier.getSystem());
+                id.put("use", identifier.getUse());
+                String type = null;
+                if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
+                    try {
+                       type = identifier.getType().getCoding().get(0).getCode();
+                    } catch (Exception ignored) {
+
+                    }
+                }
+                id.put("type",type);
+                identifiers.add(id);
+            }
+        }
+        return identifiers;
     }
 }

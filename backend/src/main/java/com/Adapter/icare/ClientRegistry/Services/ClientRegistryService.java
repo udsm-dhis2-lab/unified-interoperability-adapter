@@ -20,12 +20,24 @@ public class ClientRegistryService {
         this.fhirClient = fhirClient;
     }
 
-    public List<Map<String, Object>> getPatients(int page, int pageSize) {
+    public List<Map<String, Object>> getPatients(int page,
+                                                 int pageSize,
+                                                 String identifier,
+                                                 String identifierType,
+                                                 String gender) {
         try {
             List<Map<String, Object>> patients = new ArrayList<>();
-            Bundle response = fhirClient.search()
-                    .forResource(Patient.class)
-                    .count(pageSize)
+            Bundle response = new Bundle();
+            // TODO: You might consider enumerating the gender codes
+            var searchClient =  fhirClient.search().forResource(Patient.class);
+            if (identifier != null) {
+                searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
+            }
+            if (gender != null) {
+                searchClient.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
+            }
+
+            response = searchClient.count(pageSize)
                     .offset(page)
                     .returnBundle(Bundle.class)
                     .execute();
