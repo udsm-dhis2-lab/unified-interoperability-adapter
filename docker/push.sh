@@ -1,1 +1,1 @@
-docker push udsmdhis2/unified:1.0.2
+docker push udsmdhis2/unified:2.0.0
