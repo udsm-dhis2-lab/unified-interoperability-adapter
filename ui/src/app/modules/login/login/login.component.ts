@@ -27,7 +27,8 @@ export class LoginComponent implements OnInit {
     this.authenticatingUser$ = this.loginService.login(creadentials);
     this.authenticatingUser$.subscribe((response: any) => {
       console.log('response', response);
-      if (response && response?.authenticated) {
+      this.router.navigate(['/dashboard']);
+      if (response && !response?.authenticated) {
         this.authenticating = false;
         setTimeout(() => {
           this.router.navigate(['/dashboard']);

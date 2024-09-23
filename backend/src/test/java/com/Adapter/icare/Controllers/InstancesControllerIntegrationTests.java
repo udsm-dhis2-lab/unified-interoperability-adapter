@@ -18,7 +18,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -56,6 +59,8 @@ class InstancesControllerIntegrationTests {
 
     @Test
     void getInstancesTest() throws Exception {
+        // Mock the behavior of the instanceService to return a list of instances
+        given(instanceService.getInstances()).willReturn(new ArrayList<>());
         mockMvc.perform(
                 get("/api/v1/instance")
         ).andExpect(status().isOk());
@@ -71,12 +76,15 @@ class InstancesControllerIntegrationTests {
     @Test
     void addInstancesTest() throws Exception {
         Instances instance = new Instances();
-        instance.setUrl("https://play.dhis2.org/2.38.3.1");
+        instance.setUrl("https://play.im.dhis2.org/stable-2-40-5");
         instance.setUsername("admin");
         instance.setPassword("district");
         instance.setName("TEST and TLAND");
         instance.setCode("OU_559");
         instance.setOrganisationUnitId("23984278937429");
+        // Mock instanceService behavior to "save" the instance
+        given(instanceService.AddNewInstance(instance)).willReturn(instance);
+
         mockMvc.perform(
                 post("/api/v1/instance").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(instance))
         ).andExpect(status().isOk());
