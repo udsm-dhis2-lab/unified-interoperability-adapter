@@ -24,7 +24,11 @@ public class ClientRegistryService {
                                                  int pageSize,
                                                  String identifier,
                                                  String identifierType,
-                                                 String gender) {
+                                                 String gender,
+                                                 String firstName,
+                                                 String middleName,
+                                                 String lastName,
+                                                 Date dateOfBirth) {
         try {
             List<Map<String, Object>> patients = new ArrayList<>();
             Bundle response = new Bundle();
@@ -35,6 +39,13 @@ public class ClientRegistryService {
             }
             if (gender != null) {
                 searchClient.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
+            }
+
+            if (lastName != null) {
+                searchClient.where(Patient.FAMILY.matches().value(lastName));
+            }
+            if (firstName != null) {
+                searchClient.where(Patient.GIVEN.matches().value(firstName));
             }
 
             response = searchClient.count(pageSize)

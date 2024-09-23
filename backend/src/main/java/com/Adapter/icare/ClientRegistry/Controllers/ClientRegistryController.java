@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,11 +31,24 @@ public class ClientRegistryController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam( value = "identifier", required = false) String identifier,
             @RequestParam( value = "identifierType", required = false) String identifierType,
-            @RequestParam( value = "gender", required = false) String gender
-    ) {
+            @RequestParam( value = "gender", required = false) String gender,
+            @RequestParam( value = "firstName", required = false) String firstName,
+            @RequestParam( value = "middleName", required = false) String middleName,
+            @RequestParam( value = "lastName", required = false) String lastName,
+            @RequestParam( value = "dateOfBirth", required = false) Date dateOfBirth
+    ) throws Exception {
         try {
             Map<String, Object> patientDataResponse = new HashMap<>();
-            List<Map<String, Object>> patients = clientRegistryService.getPatients(page, pageSize, identifier, identifierType, gender);
+            List<Map<String, Object>> patients = clientRegistryService.getPatients(
+                    page,
+                    pageSize,
+                    identifier,
+                    identifierType,
+                    gender,
+                    firstName,
+                    middleName,
+                    lastName,
+                    dateOfBirth);
             patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
