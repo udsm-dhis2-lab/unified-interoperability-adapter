@@ -1,5 +1,6 @@
 package com.Adapter.icare.ClientRegistry.Services;
 
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import com.Adapter.icare.Dtos.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
@@ -20,8 +21,18 @@ public class ClientRegistryService {
         this.fhirClient = fhirClient;
     }
 
+    public Patient savePatient(Patient patient) throws Exception {
+        return (Patient) fhirClient.create().resource(patient).execute().getResource();
+    }
+
+    public MethodOutcome markPatientAsInActive(Patient patient) {
+        patient.setActive(false);
+        return fhirClient.update().resource(patient).execute();
+    }
+
     public List<Map<String, Object>> getPatients(int page,
                                                  int pageSize,
+                                                 String status,
                                                  String identifier,
                                                  String identifierType,
                                                  String gender,
@@ -34,9 +45,12 @@ public class ClientRegistryService {
             Bundle response = new Bundle();
             // TODO: You might consider enumerating the gender codes
             var searchClient =  fhirClient.search().forResource(Patient.class);
+//            System.out.println(status);
+//            searchClient.where(Patient.DECEASED.isMissing(true));
             if (identifier != null) {
                 searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
             }
+
             if (gender != null) {
                 searchClient.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
             }
@@ -44,8 +58,13 @@ public class ClientRegistryService {
             if (lastName != null) {
                 searchClient.where(Patient.FAMILY.matches().value(lastName));
             }
+
             if (firstName != null) {
                 searchClient.where(Patient.GIVEN.matches().value(firstName));
+            }
+
+            if (dateOfBirth != null) {
+                searchClient.where(Patient.BIRTHDATE.beforeOrEquals().day(dateOfBirth));
             }
 
             response = searchClient.count(pageSize)
@@ -75,6 +94,13 @@ public class ClientRegistryService {
                 .returnBundle(Bundle.class)
                 .execute();
         return response.getTotal();
+    }
+
+    public Patient getPatientById(String id) {
+        return fhirClient.read()
+                .resource(Patient.class)
+                .withId(id)
+                .execute();
     }
 
     private PatientDTO mapToPatientDTO(Patient patient) {
@@ -109,11 +135,13 @@ public class ClientRegistryService {
         String gender = patient.hasGender() ? patient.getGender().toCode() : null;
         Date birthDate = patient.hasBirthDate() ? patient.getBirthDate() : null;
         String patientId = patient.getIdElement() != null ? patient.getIdElement().getIdPart() : null;
+        String status = patient.hasActive() ? patient.getActive() ? "active" : "inactive" : "unknown";
         List<Identifier> identifiers = patient.getIdentifier() != null ? patient.getIdentifier() : null;
 
         // Return the mapped PatientDTO object
         return new PatientDTO(
                 patientId,
+                status,
                 identifiers,
                 nameDTOs,
                 gender,
