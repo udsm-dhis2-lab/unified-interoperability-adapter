@@ -11,6 +11,7 @@ import java.util.*;
 @Setter
 public class PatientDTO {
     private String id;
+    private String status;
     private List<Identifier> identifiers;
     private List<HumanNameDTO> name;
     private String gender;
@@ -20,8 +21,9 @@ public class PatientDTO {
 
     public PatientDTO() {}
 
-    public PatientDTO(String id, List<Identifier> identifiers, List<HumanNameDTO> name, String gender, Date birthDate, List<AddressDTO> address, List<ContactDTO> telecom) {
+    public PatientDTO(String id, String status, List<Identifier> identifiers, List<HumanNameDTO> name, String gender, Date birthDate, List<AddressDTO> address, List<ContactDTO> telecom) {
         this.id = id;
+        this.status = status;
         this.name = name;
         this.gender = gender;
         this.birthDate = birthDate;
@@ -33,6 +35,7 @@ public class PatientDTO {
     public Map<String, Object> toMap() {
         Map<String, Object> mappedPatient = new HashMap<>();
         try {
+            mappedPatient.put("id", this.getId());
             String firstName = null;
             String middleName = null;
             String lastName = null;
@@ -59,6 +62,7 @@ public class PatientDTO {
             mappedPatient.put("gender", this.getGender());
             mappedPatient.put("dateOfBirth", this.getBirthDate());
             mappedPatient.put("fhirName", this.getName());
+            mappedPatient.put("status", this.getStatus());
             List<Map<String, Object>> identifiers = getIdentifierMaps();
 
             mappedPatient.put("identifiers", identifiers);
