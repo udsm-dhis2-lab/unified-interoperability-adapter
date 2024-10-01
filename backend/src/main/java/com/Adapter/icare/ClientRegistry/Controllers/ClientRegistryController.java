@@ -18,6 +18,13 @@ import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+// SWAGGER
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 @RestController
 @RequestMapping("/api/v1/clients")
 public class ClientRegistryController {
@@ -74,8 +81,8 @@ public class ClientRegistryController {
         try {
             Map<String, Object> mergeResponse = new HashMap<>();
             // Get patients
-            Patient patientToKeep = clientRegistryService.getPatientById(String.valueOf(clientsToMerge.getClientOne()));
-            Patient patientToDeActivate = clientRegistryService.getPatientById(String.valueOf(clientsToMerge.getClientTwo()));
+            Patient patientToKeep = clientRegistryService.getPatientByIdentifier(clientsToMerge.getClientOne());
+            Patient patientToDeActivate = clientRegistryService.getPatientByIdentifier(clientsToMerge.getClientTwo());
 
             // Merge identifiers
             List<Identifier> mergedIdentifiers = new ArrayList<>(patientToKeep.getIdentifier());

@@ -103,6 +103,17 @@ public class ClientRegistryService {
                 .execute();
     }
 
+    public Patient getPatientByIdentifier(String identifier) {
+        Patient patient = new Patient();
+        Bundle response = fhirClient.search().forResource(Patient.class).where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier))
+                .returnBundle(Bundle.class)
+                .execute();
+        if (!response.getEntry().isEmpty()) {
+            patient = (Patient) response.getEntry().get(0).getResource();
+        }
+        return patient;
+    }
+
     private PatientDTO mapToPatientDTO(Patient patient) {
         List<HumanNameDTO> nameDTOs = patient.hasName() ?
                 patient.getName().stream()

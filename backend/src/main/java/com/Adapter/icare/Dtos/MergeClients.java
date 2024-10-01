@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 @Setter
 public class MergeClients {
     @NotNull
-    private int clientOne; // client to keep
+    private String clientOne; // client to keep
 
     @NotNull
-    private int clientTwo;
+    private String clientTwo;
 }
