@@ -1,5 +1,6 @@
 package com.Adapter.icare.Controllers;
 
+import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Services.DatastoreService;
@@ -27,10 +28,14 @@ public class HDUAPIController {
     private final boolean shouldUseWorkflowEngine;
     private final String defaultWorkflowEngineCode;
     private final Mediator workflowEngine;
-    public  HDUAPIController(DatastoreService datastoreService, MediatorsService mediatorsService) throws Exception {
+    private final DatastoreConstants datastoreConstants;
+    public  HDUAPIController(DatastoreService datastoreService,
+                             MediatorsService mediatorsService,
+                             DatastoreConstants datastoreConstants) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
-        Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey("CONFIGURATIONS", "defaultWorkflowEngine");
+        this.datastoreConstants = datastoreConstants;
+        Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
             this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
             this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
@@ -187,7 +192,7 @@ public class HDUAPIController {
 
     @PostMapping(value = "configurations",consumes = APPLICATION_JSON_VALUE)
     public Map<String, Object> addConfigurations(@RequestBody Map<String, Object> configurations) throws Exception {
-        String namespace = "CONFIGURATIONS";
+        String namespace = datastoreConstants.ConfigurationsNamespace;
         Map<String, Object> returnObject = new HashMap<>();
         String key = "";
         if (configurations.get("code") == null && configurations.get("key") == null) {
@@ -215,7 +220,7 @@ public class HDUAPIController {
             @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize
     ) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-        String namespace = "CONFIGURATIONS";
+        String namespace = datastoreConstants.ConfigurationsNamespace;
         Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page,pageSize);
         for (Datastore datastore: pagedDatastoreData.getContent()) {
             Map<String, Object> configuration = datastore.getValue();
