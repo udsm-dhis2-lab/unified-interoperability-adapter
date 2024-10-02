@@ -251,6 +251,24 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "schedules")
+    public String getSchedules() throws Exception {
+        if (shouldUseWorkflowEngine && workflowEngine != null) {
+            return mediatorsService.routeToMediator(workflowEngine, "","GET", null);
+        } else {
+            throw new Exception("Can no access route/mediator due to missing configurations");
+        }
+    }
+
+    @PostMapping(value = "schedules")
+    public String addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
+        if (shouldUseWorkflowEngine && workflowEngine != null) {
+            return mediatorsService.routeToMediator(workflowEngine, "", "POST", schedule);
+        } else {
+            throw new Exception("Can no access route/mediator due to missing configurations");
+        }
+    }
+
     // CUSTOM implementation for supporting HDU API temporarily
     @GetMapping(value="codeSystems", produces = APPLICATION_JSON_VALUE)
     public Map<String, Object> getDatastoreByNamespace(@RequestParam(value="q",required = false) String q,
