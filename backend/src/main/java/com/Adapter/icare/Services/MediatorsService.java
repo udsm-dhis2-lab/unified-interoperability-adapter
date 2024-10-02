@@ -96,6 +96,11 @@ public class MediatorsService {
         return sendDataToExternalSystemAsynchronously(mediator,data);
     }
 
+    public String routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
+        // TODO:
+        return "";
+    }
+
     public String sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
         /**
          * TODO: The base url, path and authentication details should be put on configurations

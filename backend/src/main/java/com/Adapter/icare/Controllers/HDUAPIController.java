@@ -111,7 +111,7 @@ public class HDUAPIController {
         /**
          * Send data to Mediator where all the logics will be done.
          */
-       if (shouldUseWorkflowEngine && workflowEngine == null) {
+       if (shouldUseWorkflowEngine && workflowEngine != null) {
            Map<String, Object> payload = new HashMap<>();
            payload.put("code","dataTemplates");
            payload.put("data",data);
@@ -184,6 +184,7 @@ public class HDUAPIController {
         returnObject.put("results", namespaceDetails);
         return returnObject;
     }
+
     @PostMapping(value = "configurations",consumes = APPLICATION_JSON_VALUE)
     public Map<String, Object> addConfigurations(@RequestBody Map<String, Object> configurations) throws Exception {
         String namespace = "CONFIGURATIONS";
@@ -230,6 +231,24 @@ public class HDUAPIController {
         returnObject.put("pager",pager);
         returnObject.put("results", namespaceDetails);
         return returnObject;
+    }
+
+    @GetMapping(value = "processes")
+    public String getWorkflows() throws Exception {
+        if (shouldUseWorkflowEngine && workflowEngine != null) {
+            return mediatorsService.routeToMediator(workflowEngine, "","GET", null);
+        } else {
+            throw new Exception("Can no access route/mediator due to missing configurations");
+        }
+    }
+
+    @PostMapping(value = "processes")
+    public String addProcess(@RequestBody Map<String, Object> process) throws Exception {
+        if (shouldUseWorkflowEngine && workflowEngine != null) {
+            return mediatorsService.routeToMediator(workflowEngine, "", "POST", process);
+        } else {
+            throw new Exception("Can no access route/mediator due to missing configurations");
+        }
     }
 
     // CUSTOM implementation for supporting HDU API temporarily

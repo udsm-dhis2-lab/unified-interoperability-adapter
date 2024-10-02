@@ -2,7 +2,11 @@ package com.Adapter.icare.ClientRegistry.Controllers;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
+import com.Adapter.icare.Domains.Datastore;
+import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Dtos.MergeClients;
+import com.Adapter.icare.Services.DatastoreService;
+import com.Adapter.icare.Services.MediatorsService;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
@@ -26,13 +30,29 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/clients")
+@RequestMapping("/api/v1/hduApi/cr/clients")
 public class ClientRegistryController {
     private final ClientRegistryService clientRegistryService;
+    private final DatastoreService datastoreService;
+    private final MediatorsService mediatorsService;
+    private final boolean shouldUseWorkflowEngine;
+    private final String defaultWorkflowEngineCode;
+    private final Mediator workflowEngine;
 
-    @Autowired
-    public ClientRegistryController(ClientRegistryService clientRegistryService) {
+    public ClientRegistryController(ClientRegistryService clientRegistryService, DatastoreService datastoreService, MediatorsService mediatorsService) throws Exception {
         this.clientRegistryService = clientRegistryService;
+        this.datastoreService = datastoreService;
+        this.mediatorsService = mediatorsService;
+        Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey("CONFIGURATIONS", "defaultWorkflowEngine");
+        if (WESystemConfigurations != null) {
+            this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
+            this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
+            this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
+        } else {
+            this.shouldUseWorkflowEngine = false;
+            this.defaultWorkflowEngineCode = null;
+            this.workflowEngine = null;
+        }
     }
 
     @GetMapping()
@@ -48,6 +68,7 @@ public class ClientRegistryController {
             @RequestParam( value = "lastName", required = false) String lastName,
             @RequestParam( value = "dateOfBirth", required = false) Date dateOfBirth
     ) throws Exception {
+        // TODO: Add support to use configured default workflow engine
         try {
             Map<String, Object> patientDataResponse = new HashMap<>();
             List<Map<String, Object>> patients = clientRegistryService.getPatients(
@@ -68,6 +89,17 @@ public class ClientRegistryController {
             // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
             pager.put("total", clientRegistryService.getTotalPatients());
             patientDataResponse.put("pager", pager);
+            return ResponseEntity.ok(patientDataResponse);
+        }   catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> saveClient(@RequestBody Map<String, Object> client) throws Exception {
+        // TODO: This is just placeholder. Add support to save patient.
+        Map<String, Object> patientDataResponse = new HashMap<>();
+        try {
             return ResponseEntity.ok(patientDataResponse);
         }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
