@@ -113,6 +113,55 @@ public class HDUAPIController {
         return returnObj;
     }
 
+    @GetMapping("generalCodes")
+    public Map<String, Object> getGeneralCodes(@RequestParam(value="namespace",required = false) String namespace,
+                                               @RequestParam(value="key",required = false) String key,
+                                               @RequestParam(value="code",required = false) String code,
+                                               @RequestParam(value="version",required = false) String version,
+                                               @RequestParam(value="q",required = false) String q,
+                                               @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreMatchingParams(namespace, key, version, null, q, code, page,pageSize, "GENERAL-CODES");
+        for (Datastore datastore: pagedDatastoreData.getContent()) {
+            Map<String, Object> generalCodeDetails = datastore.getValue();
+            generalCodeDetails.put("namespace", datastore.getNamespace());
+            generalCodeDetails.put("key", datastore.getDataKey());
+            namespaceDetails.add(generalCodeDetails);
+        }
+        Map<String, Object> returnObject =  new HashMap<>();
+        Map<String, Object> pager = new HashMap<>();
+        pager.put("page", page);
+        pager.put("pageSize", pageSize);
+        pager.put("totalPages",pagedDatastoreData.getTotalPages());
+        pager.put("total", pagedDatastoreData.getTotalElements());
+        returnObject.put("pager",pager);
+        returnObject.put("results", namespaceDetails);
+        return returnObject;
+    }
+
+    @GetMapping("generalCodes/{namespace}")
+    public Map<String, Object> getSpecificCodedItems(@PathVariable("namespace") String namespace,
+                                               @RequestParam(value="code", required = false) String code,
+                                               @RequestParam(value="q",required = false) String q,
+                                               @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, page,pageSize);
+        for (Datastore datastore: pagedDatastoreData.getContent()) {
+            namespaceDetails.add(datastore.getValue());
+        }
+        Map<String, Object> returnObject =  new HashMap<>();
+        Map<String, Object> pager = new HashMap<>();
+        pager.put("page", page);
+        pager.put("pageSize", pageSize);
+        pager.put("totalPages",pagedDatastoreData.getTotalPages());
+        pager.put("total", pagedDatastoreData.getTotalElements());
+        returnObject.put("pager",pager);
+        returnObject.put("results", namespaceDetails);
+        return returnObject;
+    }
+
     // CUSTOM implementation for supporting HDU API temporarily
     @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
     public Map<String, Object> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
@@ -174,7 +223,7 @@ public class HDUAPIController {
                 returnDataObject.put("results", results);
             } else if (version!= null && chapter ==null && block ==null && category ==null && code == null) {
                 namespace = "ICD-CHAPTERS";
-                pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize);
+                pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize, null);
                 Map<String, Object> pager = new HashMap<>();
                 pager.put("page", page);
                 pager.put("pageSize", pageSize);
@@ -383,7 +432,7 @@ public class HDUAPIController {
         try {
             String key = null;
             List<Map<String, Object>> codes = new ArrayList<>();
-            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize);
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingParams(namespace,key,version,release,code,q,page,pageSize, null);
             List<Datastore> datastoreList = pagedDatastoreData.getContent();
             for (Datastore datastore: datastoreList) {
                 codes.add(datastore.getValue());

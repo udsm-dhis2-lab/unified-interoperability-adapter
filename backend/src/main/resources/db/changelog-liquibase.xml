@@ -10,5 +10,30 @@
         <!-- Alter the column type of created_by -->
         <modifyDataType tableName="datastore" columnName="created_by" newDataType="INT"/>
     </changeSet>
+    <changeSet id="2_add_group_column_on_datastore" author="josephat-mwakyusa">
+        <addColumn tableName="datastore">
+            <column name="datastore_group" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="3_update_general_codes" author="josephat-mwakyusa">
+        <update tableName="datastore">
+            <column name="datastore_group" value="GENERAL-CODES"/>
+            <where>namespace = 'insurances'</where>
+        </update>
+    </changeSet>
+    <changeSet id="4_update_general_codes" author="josephat-mwakyusa">
+        <update tableName="datastore">
+            <column name="datastore_group" value="GENERAL-CODES"/>
+            <where>namespace = 'billings'</where>
+        </update>
+    </changeSet>
+    <changeSet id="5_update_general_codes" author="josephat-mwakyusa">
+        <update tableName="datastore">
+            <column name="datastore_group" value="GENERAL-CODES"/>
+            <where>namespace = 'exemptions'</where>
+        </update>
+    </changeSet>
 
 </databaseChangeLog>

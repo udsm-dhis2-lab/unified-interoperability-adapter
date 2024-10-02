@@ -182,6 +182,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     List<Map<String, Object>> getAggregateDataByStartDateAndEndDate(String namespace, String startDate, String endDate);
 
     @Query(value="SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            "(:group IS NULL OR datastore_group = :group ) AND " +
             "(:key IS NULL OR data_key =:key) AND " +
             "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version OR JSON_EXTRACT(value, '$.version') =:version) AND " +
             "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
@@ -190,6 +191,7 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "JSON_EXTRACT(value, '$.definitionDescription') LIKE CONCAT('%',:q,'%') OR " +
             "JSON_EXTRACT(value, '$.code') LIKE CONCAT('%',:q,'%'))",
             countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+                    "(:group IS NULL OR datastore_group = :group ) AND " +
                     "(:key IS NULL OR data_key =:key) AND " +
                     "(:version IS NULL OR JSON_EXTRACT(value, '$.majorVersion') =:version  OR JSON_EXTRACT(value, '$.version') =:version) AND " +
                     "(:releaseYear IS NULL OR JSON_EXTRACT(value, '$.release') =:releaseYear) AND " +
@@ -204,7 +206,8 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
                                                        String releaseYear,
                                                        String code,
                                                        String q,
-                                                       Pageable pageable);
+                                                       Pageable pageable,
+                                                       String group);
     @Query(value="SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             "(:key IS NULL OR data_key =:key) AND " +
             "(:version IS NULL OR JSON_EXTRACT(value, '$.version') =:version) AND " +
