@@ -35,5 +35,12 @@
             <where>namespace = 'exemptions'</where>
         </update>
     </changeSet>
+    <changeSet id="1_add_code_column_on_mediator" author="josephat-mwakyusa">
+        <addColumn tableName="mediator">
+            <column name="code" type="varchar(50)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
 
 </databaseChangeLog>
