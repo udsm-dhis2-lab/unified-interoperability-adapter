@@ -31,9 +31,15 @@ public class HDUAPIController {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey("CONFIGURATIONS", "defaultWorkflowEngine");
-        this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
-        this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
-        this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
+        if (WESystemConfigurations != null) {
+            this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
+            this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
+            this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
+        } else {
+            this.shouldUseWorkflowEngine = false;
+            this.defaultWorkflowEngineCode = null;
+            this.workflowEngine = null;
+        }
     }
 
 
@@ -178,8 +184,8 @@ public class HDUAPIController {
         returnObject.put("results", namespaceDetails);
         return returnObject;
     }
-    @PostMapping("configurations")
-    public Map<String, Object> addConfigurations(Map<String, Object> configurations) throws Exception {
+    @PostMapping(value = "configurations",consumes = APPLICATION_JSON_VALUE)
+    public Map<String, Object> addConfigurations(@RequestBody Map<String, Object> configurations) throws Exception {
         String namespace = "CONFIGURATIONS";
         Map<String, Object> returnObject = new HashMap<>();
         String key = "";
