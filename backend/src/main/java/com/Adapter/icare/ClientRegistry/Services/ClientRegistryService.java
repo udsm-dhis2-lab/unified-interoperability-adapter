@@ -4,10 +4,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import com.Adapter.icare.Dtos.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.PrimitiveType;
+import org.hl7.fhir.r4.model.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -148,7 +145,16 @@ public class ClientRegistryService {
         String patientId = patient.getIdElement() != null ? patient.getIdElement().getIdPart() : null;
         String status = patient.hasActive() ? patient.getActive() ? "active" : "inactive" : "unknown";
         List<Identifier> identifiers = patient.getIdentifier() != null ? patient.getIdentifier() : null;
-
+        Organization organization = patient.getManagingOrganization() != null ? (Organization) patient.getManagingOrganization().getResource() : null;
+        List<ContactPeopleDTO> contactPeople = patient.hasContact() ?
+                patient.getContact().stream()
+                        .map(contact -> new ContactPeopleDTO(
+                                contact.hasName() ? contact.getName().getFamily() : null,
+                                contact.hasTelecom() ? (List<String>) contact.getTelecom().stream().map(telecom -> telecom.getValue().toString()) : null,
+                                contact.hasRelationship() ? contact.getRelationship().get(0).getText() : null
+                        ))
+                        .collect(Collectors.toList()) : new ArrayList<>();
+        String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
         // Return the mapped PatientDTO object
         return new PatientDTO(
                 patientId,
@@ -158,7 +164,10 @@ public class ClientRegistryService {
                 gender,
                 birthDate,
                 addressDTOs,
-                telecomDTOs
+                telecomDTOs,
+                organization,
+                contactPeople,
+                maritalStatus
         );
     }
 }

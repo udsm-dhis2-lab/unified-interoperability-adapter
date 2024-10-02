@@ -2,7 +2,9 @@ package com.Adapter.icare.Dtos;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hl7.fhir.r4.model.BackboneElement;
 import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -18,10 +20,21 @@ public class PatientDTO {
     private Date birthDate;
     private List<AddressDTO> address;
     private List<ContactDTO> telecom;
+    private Organization organization;
+    private List<ContactPeopleDTO> contactPeople;
+    private String maritalStatus;
 
-    public PatientDTO() {}
-
-    public PatientDTO(String id, String status, List<Identifier> identifiers, List<HumanNameDTO> name, String gender, Date birthDate, List<AddressDTO> address, List<ContactDTO> telecom) {
+    public PatientDTO(String id,
+                      String status,
+                      List<Identifier> identifiers,
+                      List<HumanNameDTO> name,
+                      String gender,
+                      Date birthDate,
+                      List<AddressDTO> address,
+                      List<ContactDTO> telecom,
+                      Organization organization,
+                      List<ContactPeopleDTO> contactPeople,
+                      String maritalStatus) {
         this.id = id;
         this.status = status;
         this.name = name;
@@ -30,12 +43,14 @@ public class PatientDTO {
         this.address = address;
         this.telecom = telecom;
         this.identifiers = identifiers;
+        this.organization = organization;
+        this.contactPeople = contactPeople;
+        this.maritalStatus = maritalStatus;
     }
 
     public Map<String, Object> toMap() {
         Map<String, Object> mappedPatient = new HashMap<>();
         try {
-            mappedPatient.put("id", this.getId());
             String firstName = null;
             String middleName = null;
             String lastName = null;
@@ -55,20 +70,28 @@ public class PatientDTO {
                 }
                 lastName = this.getName().get(0).getFamily();
             }
+            // TODO: Add support to retrieve identifier relevant to requesting health facility
+            List<Map<String, Object>> identifiersList = getIdentifierMaps();
+            mappedPatient.put("identifiers", identifiersList);
             mappedPatient.put("firstName",firstName);
             mappedPatient.put("middleName",middleName);
             mappedPatient.put("lastName",lastName);
 
             mappedPatient.put("gender", this.getGender());
             mappedPatient.put("dateOfBirth", this.getBirthDate());
-            mappedPatient.put("fhirName", this.getName());
+//            mappedPatient.put("fhirName", this.getName());
             mappedPatient.put("status", this.getStatus());
-            List<Map<String, Object>> identifiers = getIdentifierMaps();
-
-            mappedPatient.put("identifiers", identifiers);
-
-        } catch (Exception ignored) {
-
+            mappedPatient.put("maritalStatus", getMaritalStatus());
+            mappedPatient.put("contactPeople", this.getContactPeople());
+            Map<String, Object> orgMap = new HashMap<>();
+            if (this.getOrganization() != null) {
+                orgMap = this.getOrganisationMap();
+            } else {
+                orgMap = null;
+            }
+            mappedPatient.put("organisation", orgMap);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return mappedPatient;
     }
@@ -85,8 +108,8 @@ public class PatientDTO {
                 if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
                     try {
                        type = identifier.getType().getCoding().get(0).getCode();
-                    } catch (Exception ignored) {
-
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
                     }
                 }
                 id.put("type",type);
@@ -94,5 +117,51 @@ public class PatientDTO {
             }
         }
         return identifiers;
+    }
+
+    private Map<String, Object> getOrganisationMap() {
+        Map<String, Object> org = new HashMap<>();
+        String name = null;
+        String orgType = null;
+        if (this.getOrganization().getName() != null) {
+            name = this.getOrganization().getName();
+        }
+        if (this.getOrganization().getType() != null && !this.getOrganization().getType().isEmpty()) {
+            orgType =  this.getOrganization().getType().get(0).getText();
+        }
+        org.put("name",name);
+        org.put("type", orgType);
+        List<Map<String, Object>> identifiers = new ArrayList<>();
+        if (!this.getOrganization().getIdentifier().isEmpty()) {
+            for (Identifier identifier: this.getOrganization().getIdentifier()) {
+                Map<String, Object> idObject = new HashMap<>();
+                String id = null;
+                String type = null;
+                String system = null;
+                String use = null;
+                if (identifier.getValue() != null) {
+                    id = identifier.getValue();
+                }
+                if (identifier.getType() != null) {
+                    type = identifier.getType().getText();
+                }
+                if (identifier.getSystem() != null) {
+                    system = identifier.getSystem();
+                }
+                if (identifier.getUse() != null) {
+                    use = identifier.getUse().getDisplay();
+                }
+                idObject.put("id", id);
+                idObject.put("type", type);
+                idObject.put("system", system);
+                idObject.put("use", use);
+                if (identifier.getAssigner() != null) {
+                    idObject.put("assignerOrganisation", identifier.getAssigner().getDisplay());
+                }
+                identifiers.add(idObject);
+            }
+        }
+        org.put("identifiers",identifiers);
+        return org;
     }
 }

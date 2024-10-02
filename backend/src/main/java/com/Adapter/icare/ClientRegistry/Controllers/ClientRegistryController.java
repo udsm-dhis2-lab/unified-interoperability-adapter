@@ -2,6 +2,7 @@ package com.Adapter.icare.ClientRegistry.Controllers;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
+import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Dtos.MergeClients;
@@ -38,12 +39,19 @@ public class ClientRegistryController {
     private final boolean shouldUseWorkflowEngine;
     private final String defaultWorkflowEngineCode;
     private final Mediator workflowEngine;
+    private final DatastoreConstants datastoreConstants;
 
-    public ClientRegistryController(ClientRegistryService clientRegistryService, DatastoreService datastoreService, MediatorsService mediatorsService) throws Exception {
+    public ClientRegistryController(ClientRegistryService clientRegistryService,
+                                    DatastoreService datastoreService,
+                                    MediatorsService mediatorsService,
+                                    DatastoreConstants datastoreConstants) throws Exception {
         this.clientRegistryService = clientRegistryService;
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
-        Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey("CONFIGURATIONS", "defaultWorkflowEngine");
+        this.datastoreConstants = datastoreConstants;
+        Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(
+                datastoreConstants.ConfigurationsNamespace,
+                datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
             this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
             this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();

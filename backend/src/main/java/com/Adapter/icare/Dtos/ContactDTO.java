@@ -5,8 +5,6 @@ public class ContactDTO {
     private String value;
     private String use;
 
-    public ContactDTO() {}
-
     public ContactDTO(String system, String value, String use) {
         this.system = system;
         this.value = value;
