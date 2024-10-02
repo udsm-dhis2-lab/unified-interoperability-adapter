@@ -2,6 +2,7 @@ package com.Adapter.icare.ClientRegistry.Controllers;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
+import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
@@ -40,15 +41,18 @@ public class ClientRegistryController {
     private final String defaultWorkflowEngineCode;
     private final Mediator workflowEngine;
     private final DatastoreConstants datastoreConstants;
+    private final ClientRegistryConstants clientRegistryConstants;
 
     public ClientRegistryController(ClientRegistryService clientRegistryService,
                                     DatastoreService datastoreService,
                                     MediatorsService mediatorsService,
-                                    DatastoreConstants datastoreConstants) throws Exception {
+                                    DatastoreConstants datastoreConstants,
+                                    ClientRegistryConstants clientRegistryConstants) throws Exception {
         this.clientRegistryService = clientRegistryService;
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
         this.datastoreConstants = datastoreConstants;
+        this.clientRegistryConstants = clientRegistryConstants;
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(
                 datastoreConstants.ConfigurationsNamespace,
                 datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
@@ -60,6 +64,27 @@ public class ClientRegistryController {
             this.shouldUseWorkflowEngine = false;
             this.defaultWorkflowEngineCode = null;
             this.workflowEngine = null;
+        }
+    }
+
+    @GetMapping("generateIdentifiers")
+    public ResponseEntity<List<Map<String, Object>>> generateClientIdentifiers(
+            @RequestParam(value = "limit", defaultValue = "1") int limit
+    ) throws Exception {
+        try {
+            String regex = clientRegistryConstants.ClientRegistryIdentifierRegex;
+            if (Boolean.valueOf(clientRegistryConstants.GenerateClientIdentifier)) {
+                List<Map<String,Object>> identifierPayload = new ArrayList<>();
+                for(int count= 0; count < limit; count++) {
+                    // TODO: Add logic for generating ids using the provided pattern
+                }
+                return ResponseEntity.ok(identifierPayload);
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            }
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
