@@ -15,4 +15,7 @@ public interface MediatorsRepository extends JpaRepository<Mediator, Long> {
 
     @Query(value = "SELECT * FROM mediator WHERE category=:category",nativeQuery = true)
     Mediator getMediatorByCategory(String category);
+
+    @Query(value = "SELECT * FROM mediator WHERE code=:code",nativeQuery = true)
+    Mediator getMediatorByCode(String code);
 }

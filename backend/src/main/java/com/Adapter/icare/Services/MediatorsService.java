@@ -4,14 +4,15 @@ import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Repository.MediatorsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -42,6 +43,10 @@ public class MediatorsService {
 
     public Mediator getMediatorByUuid(String uuid) throws Exception {
         return  mediatorsRepository.getMediatorByUuid(uuid);
+    }
+
+    public Mediator getMediatorByCode(String code) throws Exception {
+        return  mediatorsRepository.getMediatorByCode(code);
     }
 
     public Mediator updateMediator(Mediator mediator) throws Exception {
@@ -84,6 +89,11 @@ public class MediatorsService {
         // To be used in case data templates can be stored on FHIR resource
         // TODO: Implement as per FHIR resource
         return  new HashMap<>();
+    }
+
+    public String processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data) throws Exception {
+        Map<String, Object> response = new HashMap<>();
+        return sendDataToExternalSystemAsynchronously(mediator,data);
     }
 
     public String sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
@@ -326,5 +336,60 @@ public class MediatorsService {
             response = datastoreService.saveDatastore(healthFacilitiesData);
         }
         return response;
+    }
+
+    public String sendDataToExternalSystemAsynchronously(Mediator mediator, Map<String, Object> data) throws ConnectException, MalformedURLException {
+        // TODO: Make this valid for async true
+        String authType = mediator.getAuthType();
+        String authToken = mediator.getAuthToken();
+        String baseUrl = mediator.getBaseUrl();
+        String path = mediator.getPath();
+        URL url = null;
+        try {
+            url = new URL(baseUrl + path);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+        BufferedReader reader;
+        String dataLine;
+        StringBuffer responseContent = new StringBuffer();
+        JSONObject responseJsonObject = new JSONObject();
+        String returnStr = "";
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            String authentication = "";
+            if (authType.toLowerCase().equals("basic")) {
+                authentication =  "Basic " + authToken;
+//                        System.out.println(authentication);
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            } else if (authType.toLowerCase().equals("token")) {
+                authentication = "Bearer " + authToken;
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            }
+            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setDoOutput(true);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = mapper.writeValueAsString(data);
+
+            try (OutputStream os = httpURLConnection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((dataLine = reader.readLine()) != null) {
+                responseContent.append(dataLine);
+            }
+            reader.close();
+            // System.out.println(js);
+            responseJsonObject = new JSONObject(responseContent.toString());
+            returnStr  = responseJsonObject.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return responseJsonObject.toString();
     }
 }

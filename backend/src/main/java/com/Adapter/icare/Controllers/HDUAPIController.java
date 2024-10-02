@@ -1,6 +1,7 @@
 package com.Adapter.icare.Controllers;
 
 import com.Adapter.icare.Domains.Datastore;
+import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.google.common.collect.Maps;
@@ -23,10 +24,16 @@ public class HDUAPIController {
 
     private final DatastoreService datastoreService;
     private final MediatorsService mediatorsService;
-
-    public  HDUAPIController(DatastoreService datastoreService, MediatorsService mediatorsService) {
+    private final boolean shouldUseWorkflowEngine;
+    private final String defaultWorkflowEngineCode;
+    private final Mediator workflowEngine;
+    public  HDUAPIController(DatastoreService datastoreService, MediatorsService mediatorsService) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
+        Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey("CONFIGURATIONS", "defaultWorkflowEngine");
+        this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
+        this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
+        this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
     }
 
 
@@ -98,7 +105,17 @@ public class HDUAPIController {
         /**
          * Send data to Mediator where all the logics will be done.
          */
-        return mediatorsService.sendDataToMediatorWorkflow(data);
+       if (shouldUseWorkflowEngine && workflowEngine == null) {
+           Map<String, Object> payload = new HashMap<>();
+           payload.put("code","dataTemplates");
+           payload.put("data",data);
+           return mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload);
+       } else if (!shouldUseWorkflowEngine) {
+           return mediatorsService.sendDataToMediatorWorkflow(data);
+       } else {
+           // TODO: handle warning appropriately
+           return null;
+       }
     }
 
     @DeleteMapping("datastore/{uuid}")
@@ -161,20 +178,42 @@ public class HDUAPIController {
         returnObject.put("results", namespaceDetails);
         return returnObject;
     }
+    @PostMapping("configurations")
+    public Map<String, Object> addConfigurations(Map<String, Object> configurations) throws Exception {
+        String namespace = "CONFIGURATIONS";
+        Map<String, Object> returnObject = new HashMap<>();
+        String key = "";
+        if (configurations.get("code") == null && configurations.get("key") == null) {
+            throw new Exception("code or key is missing on your request");
+        } else {
+            if (configurations.get("key") != null) {
+                key = configurations.get("key").toString();
+            } else {
+                key = configurations.get("code").toString();
+            }
+            Datastore datastore = new Datastore();
+            datastore.setValue(configurations);
+            datastore.setNamespace(namespace);
+            datastore.setDataKey(key);
+            Datastore response = datastoreService.saveDatastore(datastore);
+            returnObject = response.toMap();
+        }
+        return returnObject;
+    }
 
-    // CUSTOM implementation for supporting HDU API temporarily
-    @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
-    public Map<String, Object> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
-                                                       @RequestParam(value="category", required = false) String category,
-                                                       @RequestParam(value="department", required = false) String department,
-                                                       @RequestParam(value="q",required = false) String q,
-                                                       @RequestParam(value="code",required = false) String code,
-                                                       @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
-                                                       @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+    @GetMapping("configurations")
+    public Map<String, Object> getConfigurations(
+            @RequestParam(value="q",required = false) String q,
+            @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+            @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize
+    ) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, category, department, q, code, page,pageSize);
+        String namespace = "CONFIGURATIONS";
+        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page,pageSize);
         for (Datastore datastore: pagedDatastoreData.getContent()) {
-           namespaceDetails.add(datastore.getValue());
+            Map<String, Object> configuration = datastore.getValue();
+            configuration.put("key", datastore.getDataKey());
+            namespaceDetails.add(configuration);
         }
         Map<String, Object> returnObject =  new HashMap<>();
         Map<String, Object> pager = new HashMap<>();
@@ -186,6 +225,31 @@ public class HDUAPIController {
         returnObject.put("results", namespaceDetails);
         return returnObject;
     }
+
+    // CUSTOM implementation for supporting HDU API temporarily
+//    @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
+//    public Map<String, Object> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
+//                                                       @RequestParam(value="category", required = false) String category,
+//                                                       @RequestParam(value="department", required = false) String department,
+//                                                       @RequestParam(value="q",required = false) String q,
+//                                                       @RequestParam(value="code",required = false) String code,
+//                                                       @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+//                                                       @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+//        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+//        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, category, department, q, code, page,pageSize);
+//        for (Datastore datastore: pagedDatastoreData.getContent()) {
+//           namespaceDetails.add(datastore.getValue());
+//        }
+//        Map<String, Object> returnObject =  new HashMap<>();
+//        Map<String, Object> pager = new HashMap<>();
+//        pager.put("page", page);
+//        pager.put("pageSize", pageSize);
+//        pager.put("totalPages",pagedDatastoreData.getTotalPages());
+//        pager.put("total", pagedDatastoreData.getTotalElements());
+//        returnObject.put("pager",pager);
+//        returnObject.put("results", namespaceDetails);
+//        return returnObject;
+//    }
 
     @GetMapping(value="codeSystems/icd", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getICDCodeSystemData(@RequestParam(value = "version", required = false) String version,
