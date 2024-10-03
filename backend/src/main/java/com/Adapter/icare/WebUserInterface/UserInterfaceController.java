@@ -58,6 +58,7 @@ public class UserInterfaceController {
 
     @GetMapping("{appRoute}")
     public String provideUi(@PathVariable String appRoute) {
+        System.out.println(appRoute);
         String appPath = appsRoutesToResourceMap.get(appRoute.toString());
         if (appPath != null) {
             return "forward:" + appPath + "/index.html";
