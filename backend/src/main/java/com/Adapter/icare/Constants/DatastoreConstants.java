@@ -10,4 +10,7 @@ public class DatastoreConstants {
 
     @Value("${DEFAULT_WORKFLOW_ENGINE_CONFIG_KEY:defaultWorkflowEngine}")
     public String DefaultWorkflowEngineConfigurationDatastoreKey;
+
+    @Value("${APPS_NAMESPACE:APPS}")
+    public String AppsNameSpace;
 }
