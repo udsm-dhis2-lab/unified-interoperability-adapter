@@ -23,6 +23,9 @@ public class Datastore  extends BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name="datastore_group")
+    private String datastoreGroup;
+
     @Column(name = "namespace", nullable = false)
     private String namespace;
 

@@ -21,6 +21,9 @@ public class Mediator  extends BaseEntity implements Serializable {
     private String baseUrl;
     private String path;
 
+    @Column(name="code", nullable = true)
+    private String code;
+
     @Column(name = "auth_token", nullable = true)
     private String authToken;
 

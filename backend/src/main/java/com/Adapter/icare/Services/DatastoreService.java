@@ -175,9 +175,9 @@ public class DatastoreService {
     }
 
     public Page<Datastore> getDatastoreMatchingParams(String namespace, String key, String version,
-                                                      String releaseYear, String code, String q, Integer page, Integer pageSize) throws Exception {
+                                                      String releaseYear, String code, String q, Integer page, Integer pageSize, String group) throws Exception {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return datastoreRepository.findDatastoreDataBySpecifiedParams(namespace,key,version,releaseYear,code,q,pageable);
+        return datastoreRepository.findDatastoreDataBySpecifiedParams(namespace,key,version,releaseYear,code,q,pageable, group);
     }
 
     public Page<Datastore> getDatastoreICDDataByParams(String namespace, String key, String version,
