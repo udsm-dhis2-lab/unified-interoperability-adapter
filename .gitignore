@@ -48,6 +48,7 @@ build/
 
 # Node
 /node_modules
+/iadapter-apps/node_modules
 npm-debug.log
 yarn-error.log
 

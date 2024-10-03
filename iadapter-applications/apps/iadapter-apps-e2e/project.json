@@ -1,0 +1,10 @@
+{
+  "name": "iadapter-apps-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/iadapter-apps-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["iadapter-apps"],
+  "// targets": "to see all targets run: nx show project iadapter-apps-e2e --web",
+  "targets": {}
+}

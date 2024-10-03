@@ -1,0 +1,90 @@
+{
+  "name": "workflows-management",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/workflows-management/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/workflows-management",
+        "index": "apps/workflows-management/src/index.html",
+        "browser": "apps/workflows-management/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/workflows-management/tsconfig.app.json",
+        "inlineStyleLanguage": "less",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/workflows-management/public"
+          }
+        ],
+        "styles": ["apps/workflows-management/src/styles.less"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "workflows-management:build:production"
+        },
+        "development": {
+          "buildTarget": "workflows-management:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "workflows-management:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/workflows-management/jest.config.ts"
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "workflows-management:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/workflows-management/browser",
+        "spa": true
+      }
+    }
+  }
+}
