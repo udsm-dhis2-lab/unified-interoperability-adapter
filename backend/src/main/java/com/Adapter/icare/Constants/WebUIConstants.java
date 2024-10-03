@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class WebUIConstants {
-    @Value("${DEFAULT_APPLICATION_UI_ROUTE_PATH:/login/#/}")
+    @Value("${DEFAULT_APPLICATION_UI_ROUTE_PATH:/login/}")
     public String DefaultApplicationUiRoutePath;
 
 }
