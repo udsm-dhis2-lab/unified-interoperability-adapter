@@ -3,24 +3,25 @@ on:
   workflow_dispatch:
     inputs:
       app_names:
-        description: "iAdapter UI apps to build"
+        description: "Comma-separated list of app names to build within the NX workspace"
         default: "login,client-management"
         required: true
         type: string
   push:
     branches:
-      - main
+      - develop
   pull_request:
     branches:
-      - main
+      - develop
 
 jobs:
-  build:
+  build-and-zip:
     runs-on: ubuntu-latest
+
     strategy:
       matrix:
-        # Define a matrix of Node versions (optional, modify as needed)
-        node-version: [16.x, 18.x]
+        # Use a specific Node.js version compatible with your NX workspace
+        node-version: [20.x]
 
     steps:
       # Step 1: Checkout the repository
@@ -33,54 +34,59 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Step 3: Cache Node.js modules
+      # Step 3: Cache Node modules for the NX workspace
       - name: Cache Node modules
         uses: actions/cache@v3
         with:
           path: |
             ~/.npm
             iadapter-applications/node_modules
-          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('iadapter-applications/package-lock.json', 'iadapter-applications/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.node-version }}-
 
-      # Step 4: Install dependencies
+      # Step 4: Install NX workspace dependencies
       - name: Install dependencies
         run: npm install
         working-directory: iadapter-applications
 
-      # Step 5: Build NX applications
+      # Step 5: Build the specified NX apps
       - name: Build NX apps
         run: |
-          # Convert comma-separated list of app names to an array
+          # Get the comma-separated list of apps and convert to an array
           app_names="${{ github.event.inputs.app_names }}"
           IFS=',' read -ra APPS <<< "$app_names"
 
-          # Build each app
+          # Iterate through each app and build it using NX commands
           for app in "${APPS[@]}"; do
-            echo "Building $app..."
-            npx nx build $app --prod
+            echo "Building $app in NX workspace..."
+            npx nx build $app --configuration production
           done
         working-directory: iadapter-applications
 
       # Step 6: Zip the build output of each app
       - name: Zip build outputs
         run: |
-          mkdir -p builds # Create a builds directory if it doesn't exist
+          # Create a directory to store zip files
+          mkdir -p builds
 
-          # Zip each app's build output
+          # Zip the build output of each app
           for app in "${APPS[@]}"; do
-            zip_file="builds/${app}.zip"
             build_dir="dist/apps/${app}"
-            
-            echo "Zipping $app build output..."
-            zip -r "$zip_file" "$build_dir"
+            zip_file="builds/${app}.zip"
+
+            if [ -d "$build_dir" ]; then
+              echo "Zipping $app build output..."
+              zip -r "$zip_file" "$build_dir"
+            else
+              echo "Build directory $build_dir not found, skipping zipping for $app."
+            fi
           done
         working-directory: iadapter-applications
 
-      # Optional: Upload the zipped artifacts
+      # Step 7: Upload the zipped build outputs as artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ui-app-builds
+          name: nx-app-builds
           path: iadapter-applications/builds
