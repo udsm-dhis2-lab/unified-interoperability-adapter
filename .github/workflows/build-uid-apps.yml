@@ -1,0 +1,86 @@
+name: Build UI Apps
+on:
+  workflow_dispatch:
+    inputs:
+      app_names:
+        description: "iAdapter UI apps to build"
+        default: "login,client-management"
+        required: true
+        type: string
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Define a matrix of Node versions (optional, modify as needed)
+        node-version: [16.x, 18.x]
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Step 3: Cache Node.js modules
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            iadapter-applications/node_modules
+          key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.node-version }}-
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: npm install
+        working-directory: iadapter-applications
+
+      # Step 5: Build NX applications
+      - name: Build NX apps
+        run: |
+          # Convert comma-separated list of app names to an array
+          app_names="${{ github.event.inputs.app_names }}"
+          IFS=',' read -ra APPS <<< "$app_names"
+
+          # Build each app
+          for app in "${APPS[@]}"; do
+            echo "Building $app..."
+            npx nx build $app --prod
+          done
+        working-directory: iadapter-applications
+
+      # Step 6: Zip the build output of each app
+      - name: Zip build outputs
+        run: |
+          mkdir -p builds # Create a builds directory if it doesn't exist
+
+          # Zip each app's build output
+          for app in "${APPS[@]}"; do
+            zip_file="builds/${app}.zip"
+            build_dir="dist/apps/${app}"
+            
+            echo "Zipping $app build output..."
+            zip -r "$zip_file" "$build_dir"
+          done
+        working-directory: iadapter-applications
+
+      # Optional: Upload the zipped artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ui-app-builds
+          path: iadapter-applications/builds
