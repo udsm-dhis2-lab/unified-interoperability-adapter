@@ -65,6 +65,13 @@ jobs:
             echo "Building $app in NX workspace..."
             npx nx build $app --configuration production
           done
+
+          # Check if the dist directory was created successfully
+          if [ -d dist ]; then
+            echo "Successfully created 'dist' directory for putting apps."
+          else
+            echo "Failed to create 'dist' directory."
+          fi
         working-directory: iadapter-applications
 
       # Zip the build output of each app
