@@ -4,10 +4,10 @@
       (click)="onRouteTo($event, menu)"
       nz-submenu
       nzTitle="{{ menu?.name }}"
-      nzIcon="user"
+      nzIcon="{{ menu.icon }}"
       *ngFor="let menu of menus"
     >
-      <ul>
+      <ul *ngIf="menu?.subMenus">
         <li
           nz-menu-item
           *ngFor="let subMenu of menu?.subMenus"
@@ -19,6 +19,14 @@
           </nz-space>
         </li>
       </ul>
+      <ng-container *ngIf="!menu?.subMenus">
+        <li nz-menu-item (click)="onRouteTo($event, menu)">
+          <nz-space>
+            <span *nzSpaceItem nz-icon nzType="{{ menu?.icon }}"></span>
+            <a *nzSpaceItem routerLink="">{{ menu?.name }}</a>
+          </nz-space>
+        </li>
+      </ng-container>
     </li>
   </ul>
 </nz-sider>
