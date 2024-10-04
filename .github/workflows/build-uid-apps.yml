@@ -60,6 +60,12 @@ jobs:
           app_names="${{ github.event.inputs.app_names }}"
           IFS=',' read -ra APPS <<< "$app_names"
 
+          # Check if the APPS array is non-empty
+          if [ ${#APPS[@]} -eq 0 ]; then
+            echo "No apps specified to build. Please provide app names."
+            exit 1  # Exit with error status if no apps are specified
+          fi
+
           # Iterate through each app and build it using NX commands
           for app in "${APPS[@]}"; do
             echo "Building $app in NX workspace..."
