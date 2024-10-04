@@ -1,4 +1,5 @@
-name: Build iAdapter UI apps
+ame: Build iAdapter UI apps
+
 on:
   workflow_dispatch:
     inputs:
@@ -22,22 +23,20 @@ jobs:
       matrix:
         # Use a specific Node.js version compatible with your NX workspace
         node-version: [20.x]
+
     env:
       # Default list of apps to build for push and pull request events
       DEFAULT_APP_NAMES: "login,client-management"
 
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Set up Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Install NX globally
       - name: Install NX globally
         run: npm install -g nx@19.8.3
 
@@ -51,12 +50,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.node-version }}-
 
-      # Install NX workspace dependencies
       - name: Install dependencies
         run: npm install --legacy-peer-deps
         working-directory: iadapter-applications
 
-       - name: Determine apps to build, from inputs or env provides apps list
+      - name: Determine apps to build
         id: determine-apps
         run: |
           # Use the app_names input if available, otherwise use the default value
@@ -65,76 +63,50 @@ jobs:
           else
             app_names="${{ env.DEFAULT_APP_NAMES }}"
           fi
-
-          # Print the apps being used
           echo "Apps to build: $app_names"
+          echo "app_names=$app_names" >> $GITHUB_ENV  # Export as environment variable for future steps
 
-          # Set output variable for the rest of the workflow
-          echo "::set-output name=app_names::$app_names"
-      # Build the specified NX apps
       - name: Build NX apps
         run: |
           # Get the comma-separated list of apps and convert to an array
-          # Retrieve app names input and print it for debugging
-          app_names="${{ steps.determine-apps.outputs.app_names }}"
-          echo "Raw app_names input: '$app_names'"
-
-          # Check if app_names is empty
+          echo "Raw app_names input: '${{ env.app_names }}'"
+          app_names="${{ env.app_names }}"
           if [ -z "$app_names" ]; then
             echo "The 'app_names' input is empty. Please provide a list of apps to build."
             exit 1  # Exit with error status if the input is empty
           fi
 
-          # Convert the comma-separated app_names input into an array
           IFS=',' read -ra APPS <<< "$app_names"
-          echo "Apps to build: ${APPS[@]}"  # Print parsed apps list
-
-          # Check if APPS array is empty
           if [ ${#APPS[@]} -eq 0 ]; then
             echo "No apps specified to build. Exiting."
             exit 1
           fi
 
-          # Iterate through each app and build it using NX commands
           for app in "${APPS[@]}"; do
             echo "Building $app in NX workspace..."
-            npx nx build $app --configuration production
+            npx nx build "$app" --configuration production
           done
-
-          # Check if the dist directory was created successfully
           if [ -d dist ]; then
-            echo "Successfully created 'dist' directory for putting apps."
+            echo "Successfully created 'dist' directory."
             ls dist/
           else
             echo "Failed to create 'dist' directory."
           fi
         working-directory: iadapter-applications
 
-      # Zip the build output of each app
       - name: Zip build outputs
         run: |
-          # Create a directory to store zip files
           mkdir -p builds
-          # Check if the builds directory was created successfully
           if [ -d builds ]; then
             echo "Successfully created 'builds' directory."
           else
             echo "Failed to create 'builds' directory."
           fi
-
-          # TODO: Use the APPS variable from prev step
-          app_names="${{ steps.determine-apps.outputs.app_names }}"
-          echo "Raw app_names input: '$app_names'"
-          # Convert the comma-separated app_names input into an array
+          app_names="${{ env.app_names }}"
           IFS=',' read -ra APPS <<< "$app_names"
-          echo "Apps to build: ${APPS[@]}"  # Print parsed apps list
-
-          # Zip the build output of each app
           for app in "${APPS[@]}"; do
             build_dir="dist/apps/${app}/browser"
-            ls dist/apps/${app}/browser/
             zip_file="builds/${app}.zip"
-
             if [ -d "$build_dir" ]; then
               echo "Zipping $app build output..."
               zip -r "$zip_file" "$build_dir"
@@ -142,26 +114,16 @@ jobs:
               echo "Build directory $build_dir not found, skipping zipping for $app."
             fi
           done
-          echo "Zipped files created in builds directory:"
           ls builds/  # List zipped files for debugging
         working-directory: iadapter-applications
 
-      # Move zipped files to the .github/apps-builds folder
       - name: Move zipped files to .github/apps-builds
         run: |
-          mkdir -p .github/apps-builds  # Create the target directory if it doesn't exist
-          if ls iadapter-applications/builds/*.zip 1> /dev/null 2>&1; then  # Check if any zip files exist
-            mv iadapter-applications/builds/*.zip .github/apps-builds/  # Move all zip files to the target directory
+          mkdir -p .github/apps-builds
+          if ls iadapter-applications/builds/*.zip 1> /dev/null 2>&1; then
+            mv iadapter-applications/builds/*.zip .github/apps-builds/
+            echo "Moved zipped files to .github/apps-builds:"
+            ls -al .github/apps-builds/
           else
             echo "No zip files found in builds directory to move."
           fi
-
-      # Optional: Commit the zipped builds to the repository (if desired)
-      - name: Commit zipped builds to repository
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout develop  # Switch to the develop branch or the appropriate branch
-          git add .github/apps-builds
-          git commit -m "Add zipped builds for apps: ${{ github.event.inputs.app_names }}"
-          git push origin develop
