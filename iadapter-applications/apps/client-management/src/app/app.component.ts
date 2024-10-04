@@ -21,42 +21,6 @@ import { Menu } from './shared/models/menu.model';
 })
 export class AppComponent {
   title = 'client-management';
-  menus: Menu[] = [
-    {
-      name: 'Client Management',
-      routeUrl: '/',
-      icon: 'user',
-      category: 'main',
-      subMenus: [
-        {
-          name: 'Clients',
-          routeUrl: '/',
-          icon: 'unordered-list',
-          subMenus: [],
-        },
-        {
-          name: 'Deduplication',
-          routeUrl: '/deduplication',
-          icon: 'merge',
-          subMenus: [],
-        },
-      ],
-    },
-    {
-      name: 'Worflow Management',
-      routeUrl: '/worflowManbagement',
-      icon: 'apartment',
-      category: 'main',
-      subMenus: [
-        {
-          name: 'workflows',
-          routeUrl: '/',
-          icon: 'unordered-list',
-          subMenus: [],
-        },
-      ],
-    },
-  ];
 
   isCollapsed = false;
   handleCollapseChange() {

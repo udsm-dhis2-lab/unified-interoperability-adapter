@@ -1,4 +1,6 @@
 import {
+  ApartmentOutline,
+  DashboardOutline,
   MergeOutline,
   UnorderedListOutline,
   UserOutline,
@@ -8,4 +10,6 @@ export const antDesignIcons: any[] = [
   UserOutline,
   UnorderedListOutline,
   MergeOutline,
+  ApartmentOutline,
+  DashboardOutline,
 ];

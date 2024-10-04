@@ -14,8 +14,48 @@ import { Menu } from './menu.model';
   providers: [{ provide: NZ_ICONS, useValue: icons }],
 })
 export class HduApiNavMenuComponent {
-  @Input()
-  menus!: Menu[];
+  menus: Menu[] = [
+    {
+      name: 'Client Management',
+      routeUrl: '/clientManagement',
+      icon: 'user',
+      category: 'main',
+      subMenus: [
+        {
+          name: 'Clients',
+          routeUrl: '/',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+        {
+          name: 'Deduplication',
+          routeUrl: '/deduplication',
+          icon: 'merge',
+          subMenus: [],
+        },
+      ],
+    },
+    {
+      name: 'Worflow Management',
+      routeUrl: '/worflowManagement',
+      icon: 'apartment',
+      category: 'main',
+      subMenus: [
+        {
+          name: 'workflows',
+          routeUrl: '/',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+      ],
+    },
+    {
+      name: 'Dashboard',
+      routeUrl: '/dashboard',
+      icon: 'dashboard',
+      category: 'main',
+    },
+  ];
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();
 
