@@ -86,7 +86,3 @@ Thumbs.db
 #additional files
 db.json
 proxy.config.json
-
-
-#prettier
-.prettierignore
