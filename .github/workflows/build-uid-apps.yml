@@ -85,13 +85,15 @@ jobs:
               echo "Build directory $build_dir not found, skipping zipping for $app."
             fi
           done
+          echo "Zipped files created in builds directory:"
+          ls builds/  # List zipped files for debugging
         working-directory: iadapter-applications
 
       # Move zipped files to the .github/apps-builds folder
       - name: Move zipped files to .github/apps-builds
         run: |
           mkdir -p .github/apps-builds  # Create the target directory if it doesn't exist
-          mv builds/*.zip .github/apps-builds/  # Move all zip files to the target directory
+          mv builds/* .github/apps-builds/  # Move all zip files to the target directory
         working-directory: iadapter-applications
 
       # Optional: Commit the zipped builds to the repository (if desired)
