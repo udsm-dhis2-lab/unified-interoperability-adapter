@@ -75,7 +75,7 @@ jobs:
 
           # Zip the build output of each app
           for app in "${APPS[@]}"; do
-            build_dir="dist/apps/${app}"
+            build_dir="dist/apps/${app}/browser"
             zip_file="builds/${app}.zip"
 
             if [ -d "$build_dir" ]; then
