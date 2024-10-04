@@ -87,9 +87,19 @@ jobs:
           done
         working-directory: iadapter-applications
 
-      # Upload the zipped build outputs as artifacts
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: nx-app-builds
-          path: iadapter-applications/builds
+      # Move zipped files to the .github/apps-builds folder
+      - name: Move zipped files to .github/apps-builds
+        run: |
+          mkdir -p .github/apps-builds  # Create the target directory if it doesn't exist
+          mv builds/*.zip .github/apps-builds/  # Move all zip files to the target directory
+        working-directory: iadapter-applications
+
+      # Optional: Commit the zipped builds to the repository (if desired)
+      - name: Commit zipped builds to repository
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout develop  # Switch to the develop branch or the appropriate branch
+          git add .github/apps-builds
+          git commit -m "Add zipped builds for apps: ${{ github.event.inputs.app_names }}"
+          git push origin develop
