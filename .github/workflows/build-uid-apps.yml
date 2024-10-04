@@ -86,6 +86,7 @@ jobs:
           # Check if the dist directory was created successfully
           if [ -d dist ]; then
             echo "Successfully created 'dist' directory for putting apps."
+            ls dist/
           else
             echo "Failed to create 'dist' directory."
           fi
@@ -103,9 +104,17 @@ jobs:
             echo "Failed to create 'builds' directory."
           fi
 
+          # TODO: Use the APPS variable from prev step
+          app_names="${{ github.event.inputs.app_names }}"
+          echo "Raw app_names input: '$app_names'"
+          # Convert the comma-separated app_names input into an array
+          IFS=',' read -ra APPS <<< "$app_names"
+          echo "Apps to build: ${APPS[@]}"  # Print parsed apps list
+
           # Zip the build output of each app
           for app in "${APPS[@]}"; do
             build_dir="dist/apps/${app}/browser"
+            ls dist/apps/${app}/browser/
             zip_file="builds/${app}.zip"
 
             if [ -d "$build_dir" ]; then
