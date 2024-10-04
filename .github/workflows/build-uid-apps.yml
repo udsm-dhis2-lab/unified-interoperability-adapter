@@ -1,4 +1,4 @@
-name: Build UI Apps
+name: Build iAdapter UI apps
 on:
   workflow_dispatch:
     inputs:
@@ -24,17 +24,20 @@ jobs:
         node-version: [20.x]
 
     steps:
-      # Step 1: Checkout the repository
+      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Node.js environment
+      # Set up Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Step 3: Cache Node modules for the NX workspace
+      # Install NX globally
+      - name: Install NX globally
+        run: npm install -g nx@19.8.3
+
       - name: Cache Node modules
         uses: actions/cache@v3
         with:
@@ -45,12 +48,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.node-version }}-
 
-      # Step 4: Install NX workspace dependencies
+      # Install NX workspace dependencies
       - name: Install dependencies
         run: npm install
         working-directory: iadapter-applications
 
-      # Step 5: Build the specified NX apps
+      # Build the specified NX apps
       - name: Build NX apps
         run: |
           # Get the comma-separated list of apps and convert to an array
@@ -64,7 +67,7 @@ jobs:
           done
         working-directory: iadapter-applications
 
-      # Step 6: Zip the build output of each app
+      # Zip the build output of each app
       - name: Zip build outputs
         run: |
           # Create a directory to store zip files
@@ -84,7 +87,7 @@ jobs:
           done
         working-directory: iadapter-applications
 
-      # Step 7: Upload the zipped build outputs as artifacts
+      # Upload the zipped build outputs as artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
