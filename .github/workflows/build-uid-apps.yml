@@ -132,12 +132,11 @@ jobs:
       - name: Move zipped files to .github/apps-builds
         run: |
           mkdir -p .github/apps-builds  # Create the target directory if it doesn't exist
-          if ls builds/*.zip 1> /dev/null 2>&1; then  # Check if any zip files exist
-            mv builds/*.zip .github/apps-builds/  # Move all zip files to the target directory
+          if ls iadapter-applications/builds/*.zip 1> /dev/null 2>&1; then  # Check if any zip files exist
+            mv iadapter-applications/builds/*.zip .github/apps-builds/  # Move all zip files to the target directory
           else
             echo "No zip files found in builds directory to move."
           fi
-        working-directory: iadapter-applications
 
       # Optional: Commit the zipped builds to the repository (if desired)
       - name: Commit zipped builds to repository
