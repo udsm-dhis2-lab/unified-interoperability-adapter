@@ -56,12 +56,27 @@ jobs:
         run: npm install --legacy-peer-deps
         working-directory: iadapter-applications
 
+       - name: Determine apps to build, from inputs or env provides apps list
+        id: determine-apps
+        run: |
+          # Use the app_names input if available, otherwise use the default value
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            app_names="${{ github.event.inputs.app_names }}"
+          else
+            app_names="${{ env.DEFAULT_APP_NAMES }}"
+          fi
+
+          # Print the apps being used
+          echo "Apps to build: $app_names"
+
+          # Set output variable for the rest of the workflow
+          echo "::set-output name=app_names::$app_names"
       # Build the specified NX apps
       - name: Build NX apps
         run: |
           # Get the comma-separated list of apps and convert to an array
           # Retrieve app names input and print it for debugging
-          app_names="${{ github.event.inputs.app_names }}"
+          app_names="${{ steps.determine-apps.outputs.app_names }}"
           echo "Raw app_names input: '$app_names'"
 
           # Check if app_names is empty
@@ -108,7 +123,7 @@ jobs:
           fi
 
           # TODO: Use the APPS variable from prev step
-          app_names="${{ github.event.inputs.app_names }}"
+          app_names="${{ steps.determine-apps.outputs.app_names }}"
           echo "Raw app_names input: '$app_names'"
           # Convert the comma-separated app_names input into an array
           IFS=',' read -ra APPS <<< "$app_names"
