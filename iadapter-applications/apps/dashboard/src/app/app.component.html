@@ -1,1 +1,15 @@
-<router-outlet></router-outlet>
+<lib-hdu-api-top-bar-menu></lib-hdu-api-top-bar-menu>
+
+<nz-layout>
+  <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
+    <lib-hdu-api-nav-menu
+      (selectedMenu)="onGetSelectedMenu($event)"
+    ></lib-hdu-api-nav-menu>
+  </nz-sider>
+
+  <nz-content>
+    <div class="inner-content">
+      <router-outlet />
+    </div>
+  </nz-content>
+</nz-layout>
