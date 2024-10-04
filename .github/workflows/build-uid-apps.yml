@@ -72,6 +72,12 @@ jobs:
         run: |
           # Create a directory to store zip files
           mkdir -p builds
+          # Check if the builds directory was created successfully
+          if [ -d builds ]; then
+            echo "Successfully created 'builds' directory."
+          else
+            echo "Failed to create 'builds' directory."
+          fi
 
           # Zip the build output of each app
           for app in "${APPS[@]}"; do
