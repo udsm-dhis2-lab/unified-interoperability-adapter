@@ -1,39 +1,13 @@
 <lib-hdu-api-top-bar-menu></lib-hdu-api-top-bar-menu>
+
 <nz-layout>
   <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
-    <ul nz-menu nzMode="inline">
-      <li nz-submenu nzTitle="Client Management" nzIcon="user">
-        <ul>
-          <li
-            nz-menu-item
-            [routerLinkActive]="'active'"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <nz-space>
-              <span *nzSpaceItem nz-icon nzType="unordered-list"></span>
-              <a *nzSpaceItem routerLink="">Clients</a>
-            </nz-space>
-          </li>
-          <li
-            nz-menu-item
-            [routerLinkActive]="'active'"
-            [routerLinkActiveOptions]="{ exact: true }"
-          >
-            <nz-space>
-              <span *nzSpaceItem nz-icon nzType="merge"></span>
-              <a *nzSpaceItem routerLink="/deduplication">Deduplication</a>
-            </nz-space>
-          </li>
-        </ul>
-      </li>
-      <!-- <li nz-menu-item>
-        <a routerLink="/dashboard">
-          <span nz-icon nzType="dashboard" nzTheme="outline"></span>
-          <span>Client management</span>
-        </a>
-      </li> -->
-    </ul>
+    <lib-hdu-api-nav-menu
+      [menus]="menus"
+      (selectedMenu)="onGetSelectedMenu($event)"
+    ></lib-hdu-api-nav-menu>
   </nz-sider>
+
   <nz-content>
     <div class="inner-content">
       <router-outlet />

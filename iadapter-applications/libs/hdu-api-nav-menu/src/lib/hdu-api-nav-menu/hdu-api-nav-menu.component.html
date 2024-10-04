@@ -1,1 +1,24 @@
-<p>hdu-api-nav-menu works!</p>
+<nz-sider nzTheme="light" nzCollapsible>
+  <ul nz-menu nzMode="inline">
+    <li
+      (click)="onRouteTo($event, menu)"
+      nz-submenu
+      nzTitle="{{ menu?.name }}"
+      nzIcon="user"
+      *ngFor="let menu of menus"
+    >
+      <ul>
+        <li
+          nz-menu-item
+          *ngFor="let subMenu of menu?.subMenus"
+          (click)="onRouteTo($event, subMenu)"
+        >
+          <nz-space>
+            <span *nzSpaceItem nz-icon nzType="{{ subMenu?.icon }}"></span>
+            <a *nzSpaceItem routerLink="">{{ subMenu?.name }}</a>
+          </nz-space>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nz-sider>
