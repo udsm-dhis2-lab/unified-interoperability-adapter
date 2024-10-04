@@ -1,4 +1,4 @@
-ame: Build iAdapter UI apps
+name: Build iAdapter UI apps
 
 on:
   workflow_dispatch:
