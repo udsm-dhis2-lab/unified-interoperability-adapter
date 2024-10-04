@@ -51,10 +51,11 @@ public class UserInterfaceController {
         }
     }
 
-    @GetMapping("/")
-    public RedirectView redirectRouteApplicationPathToLoginUiPath() {
-        return new RedirectView(webUIConstants.DefaultApplicationUiRoutePath);
-    }
+//    @GetMapping("/")
+//    public RedirectView redirectRouteApplicationPathToLoginUiPath() {
+//        System.out.println("TESTING REDIRECTION");
+//        return new RedirectView(webUIConstants.DefaultApplicationUiRoutePath);
+//    }
 
     @GetMapping("{appRoute}")
     public String provideUi(@PathVariable String appRoute) {
