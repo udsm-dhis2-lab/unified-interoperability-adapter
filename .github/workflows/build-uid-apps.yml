@@ -128,8 +128,19 @@ jobs:
       - name: Move zipped files to .github/apps-builds
         run: |
           mkdir -p .github/apps-builds
+
+          # Delete existing contents in .github/apps-builds to ensure a clean state
+          if [ -d ".github/apps-builds" ]; then
+            echo "Clearing existing contents in .github/apps-builds..."
+            rm -rf .github/apps-builds/*
+          fi
+
+          # Check if there are zip files in the builds directory
           if ls iadapter-applications/builds/*.zip 1> /dev/null 2>&1; then
+            echo "Moving new zipped files to .github/apps-builds..."
             mv iadapter-applications/builds/*.zip .github/apps-builds/
+
+            # List the contents of the .github/apps-builds directory for verification
             echo "Moved zipped files to .github/apps-builds:"
             ls -al .github/apps-builds/
           else
