@@ -108,7 +108,8 @@ jobs:
             build_dir="dist/apps/${app}/browser/"
             zip_file="builds/${app}.zip"
             if [ -d "$build_dir" ]; then
-              cd dist/apps/${app}/browser/ || exit 1
+              cd dist/apps/${app}/browser || exit 1
+              ls
               pwd
               echo "Zipping $app build output..."
               zip -r "$zip_file" .
