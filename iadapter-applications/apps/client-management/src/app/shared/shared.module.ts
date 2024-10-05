@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { antDesignModules } from './ant-design.modules';
-import { SearchComponent } from './components/index';
+import { components } from './components/index';
 
 @NgModule({
-  declarations: [SearchComponent],
+  declarations: [...components],
   imports: [CommonModule, ...antDesignModules],
 })
 export class SharedModule {}
