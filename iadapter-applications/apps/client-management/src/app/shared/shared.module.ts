@@ -6,6 +6,6 @@ import { components } from './components/index';
 @NgModule({
   declarations: [...components],
   imports: [CommonModule, ...antDesignModules],
-  exports: [...components]
+  exports: [...components],
 })
 export class SharedModule {}
