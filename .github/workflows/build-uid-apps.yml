@@ -147,3 +147,20 @@ jobs:
           else
             echo "No zip files found in builds directory to move."
           fi
+      - name: Commit zipped builds to repository
+        run: |
+          # Set up Git configuration for commit
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+          # Checkout the branch to commit the changes
+          git checkout ${{ github.ref_name }}  # Checkout to the current branch
+
+          # Add changes to the git index
+          git add .github/apps-builds
+
+          # Commit changes with a message
+          git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
+
+          # Push the changes back to the repository
+          git push origin ${{ github.ref_name }}
