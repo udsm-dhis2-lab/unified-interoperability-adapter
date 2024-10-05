@@ -133,6 +133,7 @@ jobs:
           if [ -d ".github/apps-builds" ]; then
             echo "Clearing existing contents in .github/apps-builds..."
             rm -rf .github/apps-builds/*
+            ls -al .github/apps-builds/
           fi
 
           # Check if there are zip files in the builds directory
