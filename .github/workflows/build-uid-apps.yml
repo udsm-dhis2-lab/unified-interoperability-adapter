@@ -105,11 +105,17 @@ jobs:
           app_names="${{ env.app_names }}"
           IFS=',' read -ra APPS <<< "$app_names"
           for app in "${APPS[@]}"; do
-            build_dir="dist/apps/${app}/browser"
+            build_dir="dist/apps/${app}/browser/"
             zip_file="builds/${app}.zip"
             if [ -d "$build_dir" ]; then
+              cd dist/apps/${app}/browser/ || exit 1
+              pwd
               echo "Zipping $app build output..."
-              zip -r "$zip_file" "$build_dir"
+              zip -r "$zip_file" .
+              echo "Zipped $app build output to $zip_file"
+              # Get back to the directory
+              cd ../../../.. || exit 1
+              pwd
             else
               echo "Build directory $build_dir not found, skipping zipping for $app."
             fi
