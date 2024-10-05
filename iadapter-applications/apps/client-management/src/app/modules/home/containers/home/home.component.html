@@ -1,2 +1,41 @@
-<p>home of client management works!</p>
-<app-search [labelText]="'Search client:'"></app-search>
+<div style="padding: 16px">
+  <div style="margin-bottom: 16px">
+    <app-search [labelText]="'Search client:'"></app-search>
+  </div>
+
+  <nz-table
+    #rowSelectionTable
+    nzShowPagination
+    nzShowSizeChanger
+    [nzData]="listOfData"
+    (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+  >
+    <thead>
+      <tr>
+        <th>Client ID</th>
+        <th>First name</th>
+        <th>Middle name</th>
+        <th>Surname</th>
+        <th>Gender</th>
+        <th>ID number</th>
+        <th>ID tYpe</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (data of listOfCurrentPageData; track data) {
+      <tr>
+        <td>
+          <span style="color: #1890ff">{{ data.clientID }}</span>
+        </td>
+        <td>{{ data.fname }}</td>
+        <td>{{ data.mname }}</td>
+        <td>{{ data.surname }}</td>
+        <td>{{ data.gender }}</td>
+        <td>{{ data.idNUmber }}</td>
+        <td>{{ data.idType }}</td>
+      </tr>
+      }
+    </tbody>
+  </nz-table>
+</div>

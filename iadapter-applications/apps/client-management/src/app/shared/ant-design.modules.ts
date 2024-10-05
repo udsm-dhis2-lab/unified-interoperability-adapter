@@ -7,6 +7,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzTableModule } from 'ng-zorro-antd/table';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -18,4 +19,5 @@ export const antDesignModules = [
   NzGridModule,
   NzInputModule,
   NzButtonModule,
+  NzTableModule,
 ];
