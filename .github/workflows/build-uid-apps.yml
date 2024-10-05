@@ -108,7 +108,7 @@ jobs:
             build_dir="dist/apps/${app}/browser/"
             zip_file="${app}.zip"
             if [ -d "$build_dir" ]; then
-              cp dist/apps/${app}/browser builds/
+              cp -r dist/apps/${app}/browser builds/
               cd builds || exit 1
               mv browser "${app}"
               ls
