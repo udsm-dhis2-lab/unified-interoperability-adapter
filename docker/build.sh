@@ -31,7 +31,7 @@ for zip_file in "$BUILD_DIR"/*.zip; do
         app_name=$(basename "$zip_file" .zip)
 
         # Create a target directory for each app based on the zip file name
-        target_dir="$EXTRACT_DIR/$app_name"
+        target_dir="$EXTRACT_DIR"
         mkdir -p "$target_dir"
 
         # Unzip the file into the target directory, overwriting existing files if necessary
@@ -57,7 +57,7 @@ docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 bash -c "\
     for dir in /app/ui-apps/*; do \
         if [ -d \"$dir\" ]; then \
             app_name=$(basename \"$dir\"); \
-            cp -r \"$dir\" /app/backend/src/main/resources/static/$app_name; \
+            cp -r \"$dir\" /app/backend/src/main/resources/static/$app_name/; \
             echo \"Copied $app_name to /app/backend/src/main/resources/static/$app_name\"; \
         fi; \
     done"
