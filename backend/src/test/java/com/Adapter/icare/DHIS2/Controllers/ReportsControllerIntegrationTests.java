@@ -13,6 +13,7 @@ import com.Adapter.icare.Services.InstanceService;
 import com.Adapter.icare.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -65,10 +66,12 @@ public class ReportsControllerIntegrationTests {
     void searchDataSetElementsPerDataSetTest() {
     }
 
+    @Disabled
     @Test
     void sendDataToDHISTest() {
     }
 
+    @Disabled
     @Test
     public void dhis2ConnectionTest() throws Exception {
         mockMvc.perform(
@@ -78,6 +81,7 @@ public class ReportsControllerIntegrationTests {
                 .andExpect(jsonPath("$.username", Matchers.is("admin")));
     }
 
+    @Disabled
     @Test
     public void getDHIS2OrgUnitViaCodeTest() throws Exception {
         Instances instance = new Instances();

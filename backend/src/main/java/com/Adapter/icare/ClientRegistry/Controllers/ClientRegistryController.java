@@ -43,6 +43,8 @@ public class ClientRegistryController {
     private final DatastoreConstants datastoreConstants;
     private final ClientRegistryConstants clientRegistryConstants;
 
+
+    @Autowired
     public ClientRegistryController(ClientRegistryService clientRegistryService,
                                     DatastoreService datastoreService,
                                     MediatorsService mediatorsService,

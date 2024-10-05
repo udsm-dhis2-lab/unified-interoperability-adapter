@@ -1,10 +1,13 @@
 package com.Adapter.icare.ClientRegistry.Services;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Dtos.*;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -12,10 +15,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class ClientRegistryService {
-    private final IGenericClient fhirClient;
 
-    public ClientRegistryService(IGenericClient fhirClient) {
-        this.fhirClient = fhirClient;
+    private final IGenericClient fhirClient;
+    private final FHIRConstants fhirConstants;
+
+    @Autowired
+    public ClientRegistryService(FHIRConstants fhirConstants) {
+        this.fhirConstants = fhirConstants;
+
+        FhirContext fhirContext = FhirContext.forR4();
+        this.fhirClient =  fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
     }
 
     public Patient savePatient(Patient patient) throws Exception {

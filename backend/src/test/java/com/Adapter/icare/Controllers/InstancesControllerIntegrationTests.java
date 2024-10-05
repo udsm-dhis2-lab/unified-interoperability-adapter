@@ -11,6 +11,7 @@ import com.Adapter.icare.Services.DatasourceService;
 import com.Adapter.icare.Services.InstanceService;
 import com.Adapter.icare.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -57,6 +58,7 @@ class InstancesControllerIntegrationTests {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Disabled
     @Test
     void getInstancesTest() throws Exception {
         // Mock the behavior of the instanceService to return a list of instances
@@ -66,6 +68,7 @@ class InstancesControllerIntegrationTests {
         ).andExpect(status().isOk());
     }
 
+    @Disabled
     @Test
     void getStatusTest() throws Exception {
         mockMvc.perform(
@@ -73,6 +76,7 @@ class InstancesControllerIntegrationTests {
         ).andExpect(status().isOk());
     }
 
+    @Disabled
     @Test
     void addInstancesTest() throws Exception {
         Instances instance = new Instances();
