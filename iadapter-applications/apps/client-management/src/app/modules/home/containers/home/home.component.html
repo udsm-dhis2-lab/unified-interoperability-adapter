@@ -18,14 +18,15 @@
         <th>Surname</th>
         <th>Gender</th>
         <th>ID number</th>
-        <th>ID tYpe</th>
+        <th>ID type</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody>
-      @for (data of listOfCurrentPageData; track data) {
+      @for (data of listOfCurrentPageData; track data.fname) {
       <tr>
         <td>
+          <!-- Use primary color from theme  -->
           <span style="color: #1890ff">{{ data.clientID }}</span>
         </td>
         <td>{{ data.fname }}</td>
@@ -34,6 +35,9 @@
         <td>{{ data.gender }}</td>
         <td>{{ data.idNUmber }}</td>
         <td>{{ data.idType }}</td>
+        <td>
+          <span style="color: #1890ff">View</span>
+        </td>
       </tr>
       }
     </tbody>

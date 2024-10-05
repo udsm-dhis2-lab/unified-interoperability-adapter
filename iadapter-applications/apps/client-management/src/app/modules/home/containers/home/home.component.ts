@@ -20,7 +20,6 @@ interface ItemData {
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
-  indeterminate = false;
   listOfCurrentPageData: readonly ItemData[] = [];
   listOfData: readonly ItemData[] = [];
 

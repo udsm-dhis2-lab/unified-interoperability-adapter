@@ -3,12 +3,8 @@ import { CommonModule } from '@angular/common';
 
 import { DeduplicationRoutingModule } from './deduplication-routing.module';
 
-
 @NgModule({
   declarations: [],
-  imports: [
-    CommonModule,
-    DeduplicationRoutingModule
-  ]
+  imports: [CommonModule, DeduplicationRoutingModule],
 })
-export class DeduplicationModule { }
+export class DeduplicationModule {}
