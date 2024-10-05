@@ -114,7 +114,7 @@ jobs:
               ls
               pwd
               echo "Zipping $app build output..."
-              zip -r "$zip_file" "${app}"
+              zip -r "$zip_file" "${app}"/*
               cd ..
               echo "Zipped $app build output to $zip_file"
               pwd
