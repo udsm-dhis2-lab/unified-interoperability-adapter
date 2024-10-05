@@ -106,16 +106,17 @@ jobs:
           IFS=',' read -ra APPS <<< "$app_names"
           for app in "${APPS[@]}"; do
             build_dir="dist/apps/${app}/browser/"
-            zip_file="builds/${app}.zip"
+            zip_file="${app}.zip"
             if [ -d "$build_dir" ]; then
-              cd dist/apps/${app}/browser || exit 1
+              cp dist/apps/${app}/browser builds/
+              cd builds || exit 1
+              mv browser "${app}"
               ls
               pwd
               echo "Zipping $app build output..."
-              zip -r "$zip_file" .
+              zip -r "$zip_file" "${app}"
+              cd ..
               echo "Zipped $app build output to $zip_file"
-              # Get back to the directory
-              cd ../../../.. || exit 1
               pwd
             else
               echo "Build directory $build_dir not found, skipping zipping for $app."
