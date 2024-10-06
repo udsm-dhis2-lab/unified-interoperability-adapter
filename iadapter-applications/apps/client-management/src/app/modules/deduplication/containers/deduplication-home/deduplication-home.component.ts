@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
+import { Router } from '@angular/router';
 
 interface ItemData {
   sn: number;
@@ -25,6 +26,8 @@ export class DeduplicationHomeComponent {
   listOfCurrentPageData: readonly ItemData[] = [];
   listOfData: readonly ItemData[] = [];
 
+  constructor(private router: Router) {}
+
   onCurrentPageDataChange($event: readonly ItemData[]): void {
     this.listOfCurrentPageData = $event;
   }
@@ -43,5 +46,7 @@ export class DeduplicationHomeComponent {
     }));
   }
 
-  onView() {}
+  onView() {
+    this.router.navigate(['/deduplication/deduplication-details']);
+  }
 }
