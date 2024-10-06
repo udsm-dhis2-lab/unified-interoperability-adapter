@@ -12,6 +12,7 @@
   >
     <thead>
       <tr>
+        <th>SN</th>
         <th>Client ID</th>
         <th>First name</th>
         <th>Middle name</th>
@@ -26,6 +27,7 @@
     <tbody>
       @for (data of listOfCurrentPageData; track data.fname) {
       <tr>
+        <td>{{ data.sn }}</td>
         <td>
           <!-- Use primary color from theme  -->
           <span style="color: #1890ff">{{ data.clientID }}</span>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 
 interface ItemData {
+  sn: number;
   clientID: string;
   fname: string;
   mname: string;
@@ -30,6 +31,7 @@ export class DeduplicationHomeComponent {
 
   ngOnInit(): void {
     this.listOfData = new Array(200).fill(0).map((_, index) => ({
+      sn: index + 1,
       clientID: `CL_${index}78989`,
       fname: `Edward ${index}`,
       mname: `Justin ${index}`,
