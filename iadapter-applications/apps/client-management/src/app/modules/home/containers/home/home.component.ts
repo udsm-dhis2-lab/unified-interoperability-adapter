@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
+import { Router } from '@angular/router';
 
 interface ItemData {
   clientID: string;
@@ -23,6 +24,8 @@ export class HomeComponent {
   listOfCurrentPageData: readonly ItemData[] = [];
   listOfData: readonly ItemData[] = [];
 
+  constructor(private router: Router) {}
+
   onCurrentPageDataChange($event: readonly ItemData[]): void {
     this.listOfCurrentPageData = $event;
   }
@@ -37,5 +40,9 @@ export class HomeComponent {
       idNUmber: `${index}7898-75383238378946${index}`,
       idType: 'NIDA',
     }));
+  }
+
+  navigateToClientDetails() {
+    this.router.navigate(['/client-management/client-details']);
   }
 }
