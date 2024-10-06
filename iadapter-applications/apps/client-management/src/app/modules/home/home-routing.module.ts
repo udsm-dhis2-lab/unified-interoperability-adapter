@@ -7,6 +7,10 @@ const routes: Routes = [
     path: '',
     component: HomeComponent,
   },
+  {
+    path: 'client-details',
+    component: HomeComponent,
+  },
 ];
 
 @NgModule({
