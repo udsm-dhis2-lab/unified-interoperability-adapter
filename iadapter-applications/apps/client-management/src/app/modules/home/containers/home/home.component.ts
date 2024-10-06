@@ -44,7 +44,7 @@ export class HomeComponent {
     }));
   }
 
-  navigateToClientDetails() {
-    this.router.navigate(['/client-management/client-details']);
+  onView() {
+    this.router.navigate(['/client-details']);
   }
 }

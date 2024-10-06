@@ -42,4 +42,6 @@ export class DeduplicationHomeComponent {
       associatedDuplicates: 2 + index,
     }));
   }
+
+  onView() {}
 }
