@@ -4,6 +4,7 @@ import { SharedModule } from 'apps/client-management/src/app/shared/shared.modul
 import { Router } from '@angular/router';
 
 interface ItemData {
+  sn: number;
   clientID: string;
   fname: string;
   mname: string;
@@ -32,6 +33,7 @@ export class HomeComponent {
 
   ngOnInit(): void {
     this.listOfData = new Array(200).fill(0).map((_, index) => ({
+      sn: index + 1,
       clientID: `CL_${index}78989`,
       fname: `Edward ${index}`,
       mname: `Justin ${index}`,
