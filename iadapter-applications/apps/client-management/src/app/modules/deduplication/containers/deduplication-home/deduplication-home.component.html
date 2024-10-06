@@ -40,9 +40,14 @@
         <td>{{ data.idType }}</td>
         <td style="text-align: center">{{ data.associatedDuplicates }}</td>
         <td>
-          <span style="color: #1890ff; cursor: pointer" (click)="onView()"
-            >View</span
+          <button
+            nz-button
+            nzType="text"
+            style="color: #1890ff"
+            (click)="onView()"
           >
+            View
+          </button>
         </td>
       </tr>
       }
