@@ -16,6 +16,12 @@ import { Menu } from './menu.model';
 export class HduApiNavMenuComponent {
   menus: Menu[] = [
     {
+      name: 'Dashboard',
+      routeUrl: '/dashboard',
+      icon: 'dashboard',
+      category: 'main',
+    },
+    {
       name: 'Client Management',
       routeUrl: '/clientManagement',
       icon: 'user',
@@ -49,12 +55,7 @@ export class HduApiNavMenuComponent {
         },
       ],
     },
-    {
-      name: 'Dashboard',
-      routeUrl: '/dashboard',
-      icon: 'dashboard',
-      category: 'main',
-    },
+  
   ];
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();

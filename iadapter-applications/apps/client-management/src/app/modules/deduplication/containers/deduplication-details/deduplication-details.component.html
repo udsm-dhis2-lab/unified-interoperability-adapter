@@ -1,0 +1,55 @@
+<div style="padding: 16px">
+  <button nz-button nzType="default" (click)="backToList()">
+    Back to List
+  </button>
+  <nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
+    <div nz-row [nzGutter]="16">
+      <div nz-col nzSpan="8">
+        <nz-card style="min-height: 60vh">
+          <ul class="no-bullets">
+            <li *ngFor="let key of objectKeys(basicInfo)">
+              {{ key }}: {{ basicInfo[key] }}
+            </li>
+          </ul>
+        </nz-card>
+      </div>
+      <div nz-col nzSpan="16">
+        <nz-card style="min-height: 60vh">
+          <h3>Associated duplicates</h3>
+          <nz-table #basicTable [nzData]="listOfData">
+            <thead>
+              <tr>
+                <th>Client ID</th>
+                <th>ID number</th>
+                <th>Full name</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of basicTable.data; track data) {
+              <tr>
+                <td>
+                  <span style="color: #1890ff"> {{ data.clientID }}</span>
+                </td>
+                <td>{{ data.iDNumber }}</td>
+                <td>{{ data.fullName }}</td>
+                <td>*****</td>
+              </tr>
+              }
+            </tbody>
+          </nz-table>
+          <div nz-row nzJustify="end" [nzGutter]="16">
+            <div style="margin-right: 16px">
+              <button nz-button nzType="default" (click)="success()">
+                Request For Merge
+              </button>
+            </div>
+            <button nz-button nzType="primary" (click)="warning()">
+              Merge
+            </button>
+          </div>
+        </nz-card>
+      </div>
+    </div>
+  </nz-card>
+</div>
