@@ -1,32 +1,33 @@
-<nz-sider nzTheme="light" nzCollapsible>
-  <ul nz-menu nzMode="inline">
-    <li
-      (click)="onRouteTo($event, menu)"
-      nz-submenu
-      nzTitle="{{ menu?.name }}"
-      nzIcon="{{ menu.icon }}"
-      *ngFor="let menu of menus"
-    >
-      <ul *ngIf="menu?.subMenus">
-        <li
-          nz-menu-item
-          *ngFor="let subMenu of menu?.subMenus"
-          (click)="onRouteTo($event, subMenu)"
-        >
-          <nz-space>
-            <span *nzSpaceItem nz-icon nzType="{{ subMenu?.icon }}"></span>
-            <a *nzSpaceItem routerLink="">{{ subMenu?.name }}</a>
-          </nz-space>
-        </li>
-      </ul>
-      <ng-container *ngIf="!menu?.subMenus">
-        <li nz-menu-item (click)="onRouteTo($event, menu)">
-          <nz-space>
-            <span *nzSpaceItem nz-icon nzType="{{ menu?.icon }}"></span>
-            <a *nzSpaceItem routerLink="">{{ menu?.name }}</a>
-          </nz-space>
-        </li>
-      </ng-container>
-    </li>
-  </ul>
-</nz-sider>
+<!-- <nz-sider nzTheme="light" nzCollapsible> -->
+<ul nz-menu nzMode="inline">
+  <li
+    (click)="onRouteTo($event, menu)"
+    nz-submenu
+    nzTitle="{{ menu?.name }}"
+    nzIcon="{{ menu.icon }}"
+    *ngFor="let menu of menus"
+    nzOpen
+  >
+    <ul *ngIf="menu?.subMenus">
+      <li
+        nz-menu-item
+        *ngFor="let subMenu of menu?.subMenus"
+        (click)="onRouteTo($event, subMenu)"
+      >
+        <nz-space>
+          <span *nzSpaceItem nz-icon nzType="{{ subMenu?.icon }}"></span>
+          <a *nzSpaceItem routerLink="">{{ subMenu?.name }}</a>
+        </nz-space>
+      </li>
+    </ul>
+    <ng-container *ngIf="!menu?.subMenus">
+      <li nz-menu-item (click)="onRouteTo($event, menu)">
+        <nz-space>
+          <span *nzSpaceItem nz-icon nzType="{{ menu?.icon }}"></span>
+          <a *nzSpaceItem routerLink="">{{ menu?.name }}</a>
+        </nz-space>
+      </li>
+    </ng-container>
+  </li>
+</ul>
+<!-- </nz-sider> -->
