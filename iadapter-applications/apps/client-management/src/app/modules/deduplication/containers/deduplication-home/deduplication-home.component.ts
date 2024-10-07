@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 
@@ -18,7 +17,7 @@ interface ItemData {
 @Component({
   selector: 'app-deduplication-home',
   standalone: true,
-  imports: [CommonModule, SharedModule],
+  imports: [SharedModule],
   templateUrl: './deduplication-home.component.html',
   styleUrl: './deduplication-home.component.css',
 })

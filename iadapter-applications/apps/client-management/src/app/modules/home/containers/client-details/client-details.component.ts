@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 
@@ -15,7 +14,7 @@ interface ExtraInfoSection {
 @Component({
   selector: 'app-client-details',
   standalone: true,
-  imports: [CommonModule, SharedModule],
+  imports: [SharedModule],
   templateUrl: './client-details.component.html',
   styleUrl: './client-details.component.css',
 })

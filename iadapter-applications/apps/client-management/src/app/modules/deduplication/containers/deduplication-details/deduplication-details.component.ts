@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 interface BasicInfo {
   [key: string]: string;
@@ -16,7 +16,8 @@ interface Deduplication {
 @Component({
   selector: 'app-deduplication-details',
   standalone: true,
-  imports: [CommonModule, SharedModule],
+  imports: [SharedModule],
+  animations: [],
   templateUrl: './deduplication-details.component.html',
   styleUrl: './deduplication-details.component.css',
 })
@@ -47,9 +48,24 @@ export class DeduplicationDetailsComponent {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private modal: NzModalService) {}
   backToList() {
     this.router.navigate(['']);
+  }
+
+  warning(): void {
+    this.modal.warning({
+      nzTitle: 'Warning',
+      nzContent:
+        'Are you sure you want to proceed merging this clients details',
+    });
+  }
+
+  success(): void {
+    this.modal.success({
+      nzTitle: 'Request for merge has been sent successfully',
+      nzContent: 'you will be notified once its done',
+    });
   }
 
   objectKeys(obj: any): string[] {

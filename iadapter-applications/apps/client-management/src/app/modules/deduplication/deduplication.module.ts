@@ -5,7 +5,6 @@ import { DeduplicationRoutingModule } from './deduplication-routing.module';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
-  declarations: [],
   imports: [CommonModule, DeduplicationRoutingModule, SharedModule],
 })
 export class DeduplicationModule {}

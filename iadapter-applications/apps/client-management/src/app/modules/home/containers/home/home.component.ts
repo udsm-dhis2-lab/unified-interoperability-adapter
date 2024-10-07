@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 
@@ -17,7 +16,7 @@ interface ItemData {
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, SharedModule],
+  imports: [SharedModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
