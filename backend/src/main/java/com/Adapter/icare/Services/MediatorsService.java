@@ -1,10 +1,14 @@
 package com.Adapter.icare.Services;
 
+import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Repository.MediatorsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -23,10 +27,24 @@ import java.util.*;
 public class MediatorsService {
     private final MediatorsRepository mediatorsRepository;
     private final DatastoreService datastoreService;
+    private final Authentication authentication;
+    private final User authenticatedUser;
+    private final UserService userService;
 
-    public MediatorsService(MediatorsRepository mediatorsRepository, DatastoreService datastoreService) {
+    public MediatorsService(
+            MediatorsRepository mediatorsRepository,
+            DatastoreService datastoreService,
+            UserService userService) {
         this.mediatorsRepository = mediatorsRepository;
         this.datastoreService = datastoreService;
+        this.userService = userService;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        } else {
+            this.authenticatedUser = null;
+            // TODO: Redirect to login page
+        }
     }
 
     public Mediator saveMediatorConfigs(Mediator mediator) throws Exception {
