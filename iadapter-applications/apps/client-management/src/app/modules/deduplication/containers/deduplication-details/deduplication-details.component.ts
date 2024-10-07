@@ -58,6 +58,8 @@ export class DeduplicationDetailsComponent {
       nzTitle: 'Warning',
       nzContent:
         'Are you sure you want to proceed merging this clients details',
+      nzCancelText: 'Cancel',
+      nzOkText: 'Yes',
     });
   }
 
@@ -65,6 +67,7 @@ export class DeduplicationDetailsComponent {
     this.modal.success({
       nzTitle: 'Request for merge has been sent successfully',
       nzContent: 'you will be notified once its done',
+      nzOkText: 'Done',
     });
   }
 
