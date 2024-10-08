@@ -3,11 +3,16 @@ package com.Adapter.icare.ClientRegistry.Services;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.FHIRConstants;
+import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Services.UserService;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -18,13 +23,24 @@ public class ClientRegistryService {
 
     private final IGenericClient fhirClient;
     private final FHIRConstants fhirConstants;
+    private final UserService userService;
+    private final Authentication authentication;
+    private final User authenticatedUser;
 
     @Autowired
-    public ClientRegistryService(FHIRConstants fhirConstants) {
+    public ClientRegistryService(FHIRConstants fhirConstants, UserService userService) {
         this.fhirConstants = fhirConstants;
 
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirClient =  fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
+        this.userService = userService;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        } else {
+            this.authenticatedUser = null;
+            // TODO: Redirect to login page
+        }
     }
 
     public Patient savePatient(Patient patient) throws Exception {

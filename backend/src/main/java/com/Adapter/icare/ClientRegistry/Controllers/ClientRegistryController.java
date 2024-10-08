@@ -2,13 +2,16 @@ package com.Adapter.icare.ClientRegistry.Controllers;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
+import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.MergeClients;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
+import com.Adapter.icare.Services.UserService;
 import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
@@ -17,6 +20,8 @@ import org.hl7.fhir.r4.model.codesystems.AdministrativeGender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -42,17 +47,28 @@ public class ClientRegistryController {
     private final Mediator workflowEngine;
     private final DatastoreConstants datastoreConstants;
     private final ClientRegistryConstants clientRegistryConstants;
-
+    private final Authentication authentication;
+    private final UserService userService;
+    private final User authenticatedUser;
 
     @Autowired
     public ClientRegistryController(ClientRegistryService clientRegistryService,
                                     DatastoreService datastoreService,
                                     MediatorsService mediatorsService,
                                     DatastoreConstants datastoreConstants,
-                                    ClientRegistryConstants clientRegistryConstants) throws Exception {
+                                    ClientRegistryConstants clientRegistryConstants,
+                                    UserService userService) throws Exception {
         this.clientRegistryService = clientRegistryService;
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
+        this.userService =  userService;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        } else {
+            this.authenticatedUser = null;
+            // TODO: Redirect to login page
+        }
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryConstants = clientRegistryConstants;
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(

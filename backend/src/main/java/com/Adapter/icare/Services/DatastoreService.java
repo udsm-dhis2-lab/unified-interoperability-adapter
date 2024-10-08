@@ -20,10 +20,19 @@ import java.util.*;
 public class DatastoreService {
     private final DatastoreRepository datastoreRepository;
     private final UserService userService;
+    private final Authentication authentication;
+    private final User authenticatedUser;
 
     public DatastoreService(DatastoreRepository datastoreRepository, UserService userService) {
         this.datastoreRepository = datastoreRepository;
         this.userService = userService;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        } else {
+            this.authenticatedUser = null;
+            // TODO: Redirect to login page
+        }
     }
 
     public Datastore saveDatastore(Datastore datastore) throws Exception {
@@ -31,9 +40,7 @@ public class DatastoreService {
             UUID uuid = UUID.randomUUID();
             datastore.setUuid(uuid.toString());
         }
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            User authenticatedUser = userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        if (this.authenticatedUser != null) {
             datastore.setCreatedBy(authenticatedUser);
         }
         return datastoreRepository.save(datastore);

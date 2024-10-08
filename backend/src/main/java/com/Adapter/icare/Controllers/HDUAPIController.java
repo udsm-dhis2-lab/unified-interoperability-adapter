@@ -1,16 +1,21 @@
 package com.Adapter.icare.Controllers;
 
+import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
+import com.Adapter.icare.Services.UserService;
 import com.google.common.collect.Maps;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -29,12 +34,25 @@ public class HDUAPIController {
     private final String defaultWorkflowEngineCode;
     private final Mediator workflowEngine;
     private final DatastoreConstants datastoreConstants;
+    private final UserService userService;
+    private final Authentication authentication;
+    private final User authenticatedUser;
+
     public  HDUAPIController(DatastoreService datastoreService,
                              MediatorsService mediatorsService,
-                             DatastoreConstants datastoreConstants) throws Exception {
+                             DatastoreConstants datastoreConstants,
+                             UserService userService) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
         this.datastoreConstants = datastoreConstants;
+        this.userService = userService;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        } else {
+            this.authenticatedUser = null;
+            // TODO: Redirect to login page
+        }
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
             this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
