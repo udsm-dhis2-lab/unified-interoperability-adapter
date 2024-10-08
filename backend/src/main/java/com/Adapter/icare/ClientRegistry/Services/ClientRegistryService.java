@@ -67,8 +67,6 @@ public class ClientRegistryService {
             Bundle response = new Bundle();
             // TODO: You might consider enumerating the gender codes
             var searchClient =  fhirClient.search().forResource(Patient.class);
-//            System.out.println(status);
-//            searchClient.where(Patient.DECEASED.isMissing(true));
             if (identifier != null) {
                 searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
             }
@@ -98,7 +96,7 @@ public class ClientRegistryService {
                 if (entry.getResource() instanceof Patient) {
                     Patient patientData = (Patient) entry.getResource();
                     patientData.getIdentifier();
-                    PatientDTO patientDTO =mapToPatientDTO(patientData);
+                    PatientDTO patientDTO = mapToPatientDTO(patientData);
                     patients.add(patientDTO.toMap());
                 }
             }
@@ -136,7 +134,7 @@ public class ClientRegistryService {
         return patient;
     }
 
-    private PatientDTO mapToPatientDTO(Patient patient) {
+    public PatientDTO mapToPatientDTO(Patient patient) {
         List<HumanNameDTO> nameDTOs = patient.hasName() ?
                 patient.getName().stream()
                         .map(name -> new HumanNameDTO(

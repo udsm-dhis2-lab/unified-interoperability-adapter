@@ -2,13 +2,11 @@ package com.Adapter.icare.Dtos;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hl7.fhir.r4.model.BackboneElement;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter

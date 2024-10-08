@@ -5,18 +5,24 @@ import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Services.UserService;
+import com.Adapter.icare.SharedHealthRecords.Services.SharedHealthRecordsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-@RestController("/api/v1/hduApi/shr/sharedRecords")
+@RestController
+@RequestMapping("/api/v1/hduApi/shr/sharedRecords")
 public class SharedHealthRecordsController {
+    private final SharedHealthRecordsService sharedHealthRecordsService;
     private final DatastoreConstants datastoreConstants;
     private final ClientRegistryConstants clientRegistryConstants;
     private final Authentication authentication;
@@ -26,7 +32,9 @@ public class SharedHealthRecordsController {
     public SharedHealthRecordsController(
             DatastoreConstants datastoreConstants,
             ClientRegistryConstants clientRegistryConstants,
-            UserService userService) {
+            UserService userService,
+            SharedHealthRecordsService sharedHealthRecordsService) {
+        this.sharedHealthRecordsService = sharedHealthRecordsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryConstants = clientRegistryConstants;
         this.userService = userService;
@@ -45,7 +53,14 @@ public class SharedHealthRecordsController {
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
     ) throws Exception {
         try {
-            return ResponseEntity.ok(null);
+            Map<String,Object> sharedRecordsResponse = new HashMap<>();
+            List<Map<String,Object>> sharedRecords = this.sharedHealthRecordsService.getSharedRecords(page,pageSize);
+            sharedRecordsResponse.put("results", sharedRecords);
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            sharedRecordsResponse.put("pager",pager);
+            return ResponseEntity.ok(sharedRecordsResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
