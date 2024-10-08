@@ -1,1 +1,1 @@
-export * from './lib/hdu-api-http-client/hdu-api-http-client.component';
+export { HduHttpService } from './lib/services/hdu-http.service';
