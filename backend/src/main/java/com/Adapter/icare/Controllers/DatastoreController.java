@@ -7,6 +7,8 @@ import com.google.common.collect.Maps;
 import javassist.NotFoundException;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigInteger;
@@ -27,43 +29,55 @@ public class DatastoreController {
     }
 
     @GetMapping()
-    public Map<String, Object> getDatastoreList(@RequestParam(value = "uuid", required = false) String uuid) throws Exception {
-        Map<String, Object> returnResultObject = new HashMap<>();
-        if (uuid == null) {
-            List<Datastore> datastoreResults = datastoreService.getDatastore();
-            returnResultObject.put("results",datastoreResults);
-        } else {
-            returnResultObject = datastoreService.getDatastoreByUuid(uuid).toMap();
+    public ResponseEntity<Map<String, Object>> getDatastoreList(@RequestParam(value = "uuid", required = false) String uuid) throws Exception {
+        try {
+            Map<String, Object> returnResultObject = new HashMap<>();
+            if (uuid == null) {
+                List<Datastore> datastoreResults = datastoreService.getDatastore();
+                returnResultObject.put("results",datastoreResults);
+            } else {
+                returnResultObject = datastoreService.getDatastoreByUuid(uuid).toMap();
+            }
+            return ResponseEntity.ok(returnResultObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return returnResultObject;
     }
 
     @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
-    public Map<String, Object> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
+    public ResponseEntity<Map<String, Object>> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
                                                        @RequestParam(value="q", required = false) String q,
                                                        @RequestParam(value="page", defaultValue = "0") Integer page,
                                                        @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
-        Map<String, Object> returnObject = new HashMap<>();
-        Page<Datastore> pagedDatastoreData = null;
-        pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page, pageSize);
-        Map<String, Object> pager = new HashMap<>();
-        pager.put("page", page);
-        pager.put("pageSize", pageSize);
-        pager.put("totalPages",pagedDatastoreData.getTotalPages());
-        pager.put("total", pagedDatastoreData.getTotalElements());
-        List<Datastore> datastoreList = pagedDatastoreData.getContent();
-        List<Map<String,Object>> itemsList = new ArrayList<>();
-        for (Datastore datastore: datastoreList) {
-            itemsList.add(datastore.toMap());
+        try {
+            Map<String, Object> returnObject = new HashMap<>();
+            Page<Datastore> pagedDatastoreData = null;
+            pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page, pageSize);
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            List<Datastore> datastoreList = pagedDatastoreData.getContent();
+            List<Map<String,Object>> itemsList = new ArrayList<>();
+            for (Datastore datastore: datastoreList) {
+                itemsList.add(datastore.toMap());
+            }
+            returnObject.put("results", itemsList);
+            returnObject.put("pager",pager);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        returnObject.put("results", itemsList);
-        returnObject.put("pager",pager);
-        return returnObject;
     }
 
     @GetMapping(value="{namespace}/{key}",produces = APPLICATION_JSON_VALUE)
-    public Map<String, Object> getDatastoreByNamespaceAndKey(@PathVariable("namespace") String namespace, @PathVariable("key") String dataKey) throws Exception {
-        return  datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey).toMap();
+    public ResponseEntity<Map<String, Object>> getDatastoreByNamespaceAndKey(@PathVariable("namespace") String namespace, @PathVariable("key") String dataKey) throws Exception {
+        try {
+            return  ResponseEntity.ok(datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey).toMap());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
 
