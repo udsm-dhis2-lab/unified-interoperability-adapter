@@ -1,1 +1,1 @@
-export * from './client.model';
+export * from './hdu-client.model';

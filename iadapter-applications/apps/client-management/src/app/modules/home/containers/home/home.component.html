@@ -4,11 +4,14 @@
   </div>
 
   <nz-table
-    #rowSelectionTable
-    nzShowPagination
     nzShowSizeChanger
-    [nzData]="listOfData"
-    (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+    [nzData]="listOfHduClients"
+    [nzFrontPagination]="false"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    (nzQueryParams)="onQueryParamsChange($event)"
   >
     <thead>
       <tr>
@@ -24,9 +27,9 @@
       </tr>
     </thead>
     <tbody>
-      @for (data of listOfCurrentPageData; track data.fname) {
+      @for (data of listOfHduClients; track data.fname; let i = $index ) {
       <tr>
-        <td>{{ data.sn }}</td>
+        <td>{{ i + 1 }}</td>
         <td>
           <!-- Use primary color from theme  -->
           <span style="color: #1890ff">{{ data.clientID }}</span>
@@ -42,7 +45,7 @@
             nz-button
             nzType="text"
             style="color: #1890ff"
-            (click)="onView()"
+            (click)="viewClientDetails()"
           >
             View
           </button>

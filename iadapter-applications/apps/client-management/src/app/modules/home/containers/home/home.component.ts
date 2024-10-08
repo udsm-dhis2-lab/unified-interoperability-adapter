@@ -1,49 +1,59 @@
 import { Component } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
-
-interface ItemData {
-  sn: number;
-  clientID: string;
-  fname: string;
-  mname: string;
-  surname: string;
-  gender: string;
-  idNUmber: string;
-  idType: string;
-}
+import { HduClient } from '../../models';
+import { ClientManagement } from '../../services/client-management';
+import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, HttpClientModule],
+  providers: [ClientManagement],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent {
-  listOfCurrentPageData: readonly ItemData[] = [];
-  listOfData: readonly ItemData[] = [];
+  total = 1;
+  listOfHduClients: HduClient[] = [];
+  loading = true;
+  pageSize = 10;
+  pageIndex = 1;
+  filterKey = [{}];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private hduClientService: ClientManagement
+  ) {}
 
-  onCurrentPageDataChange($event: readonly ItemData[]): void {
-    this.listOfCurrentPageData = $event;
+  loadHduClientsFromServer(
+    pageIndex: number,
+    pageSize: number,
+    filter: Array<{ key: string; value: string[] }>
+  ): void {
+    this.loading = true;
+    this.hduClientService
+      .getHduClients(pageIndex, pageSize, filter)
+      .subscribe((data: any) => {
+        this.loading = false;
+        this.total = 200; // mock the total data here
+        this.listOfHduClients = data.results;
+      });
+  }
+
+  onQueryParamsChange(params: NzTableQueryParams): void {
+    console.log(params);
+    const { pageSize, pageIndex, filter } = params;
+
+    this.loadHduClientsFromServer(pageIndex, pageSize, filter);
   }
 
   ngOnInit(): void {
-    this.listOfData = new Array(200).fill(0).map((_, index) => ({
-      sn: index + 1,
-      clientID: `CL_${index}78989`,
-      fname: `Edward ${index}`,
-      mname: `Justin ${index}`,
-      surname: `Bezos ${index}`,
-      gender: 'Male',
-      idNUmber: `${index}7898-75383238378946${index}`,
-      idType: 'NIDA',
-    }));
+    this.loadHduClientsFromServer(this.pageIndex, this.pageSize, []);
   }
 
-  onView() {
+  viewClientDetails() {
     this.router.navigate(['/client-details']);
   }
 }

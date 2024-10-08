@@ -1,4 +1,4 @@
-export interface Client {
+export interface HduClient {
   clientID: string;
   fname: string;
   mname: string;

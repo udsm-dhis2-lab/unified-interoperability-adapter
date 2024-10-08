@@ -8,7 +8,6 @@ import { Observable } from 'rxjs';
 export class HduHttpService {
   constructor(private httpClient: HttpClient) {}
 
-  // Wrapper for HttpClient.get
   get<T>(
     url: string,
     options?: { headers?: HttpHeaders; params?: HttpParams }
@@ -16,7 +15,6 @@ export class HduHttpService {
     return this.httpClient.get<T>(url, options);
   }
 
-  // Wrapper for HttpClient.post
   post<T>(
     url: string,
     body: any,
@@ -25,7 +23,6 @@ export class HduHttpService {
     return this.httpClient.post<T>(url, body, options);
   }
 
-  // Wrapper for HttpClient.put
   put<T>(
     url: string,
     body: any,
@@ -34,7 +31,6 @@ export class HduHttpService {
     return this.httpClient.put<T>(url, body, options);
   }
 
-  // Wrapper for HttpClient.delete
   delete<T>(
     url: string,
     options?: { headers?: HttpHeaders; params?: HttpParams }
@@ -42,7 +38,6 @@ export class HduHttpService {
     return this.httpClient.delete<T>(url, options);
   }
 
-  // Wrapper for HttpClient.patch
   patch<T>(
     url: string,
     body: any,
