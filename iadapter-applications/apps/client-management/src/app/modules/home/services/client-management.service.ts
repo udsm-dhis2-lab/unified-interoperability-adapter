@@ -6,7 +6,7 @@ import { catchError, delay, Observable, of } from 'rxjs';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable()
-export class ClientManagement {
+export class ClientManagementService {
   hduClientUrl = '';
 
   mockClients: HduClient[] = [

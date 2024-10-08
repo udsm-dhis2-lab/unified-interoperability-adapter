@@ -9,7 +9,7 @@ export class DeduplicationManagementService {
 
   deduplicationData: Deduplication[] = [
     {
-      clientID: '1',
+      clientID: 'OHJGF1',
       fname: 'John',
       mname: 'A',
       surname: 'Doe',
@@ -19,7 +19,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 2,
     },
     {
-      clientID: '2',
+      clientID: 'OBJGF4',
       fname: 'Jane',
       mname: 'B',
       surname: 'Smith',
@@ -29,7 +29,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 1,
     },
     {
-      clientID: '3',
+      clientID: 'ODJGFV',
       fname: 'Alice',
       mname: 'C',
       surname: 'Johnson',
@@ -39,7 +39,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 3,
     },
     {
-      clientID: '4',
+      clientID: 'OXJGF3',
       fname: 'Bob',
       mname: 'D',
       surname: 'Brown',
@@ -49,7 +49,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 0,
     },
     {
-      clientID: '5',
+      clientID: 'DHJNF6',
       fname: 'Charlie',
       mname: 'E',
       surname: 'Davis',
@@ -59,7 +59,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 4,
     },
     {
-      clientID: '6',
+      clientID: 'XDJGF4',
       fname: 'Diana',
       mname: 'F',
       surname: 'Miller',
@@ -69,7 +69,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 2,
     },
     {
-      clientID: '7',
+      clientID: 'OJGFM4',
       fname: 'Eve',
       mname: 'G',
       surname: 'Wilson',
@@ -79,7 +79,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 1,
     },
     {
-      clientID: '8',
+      clientID: 'LHJGF1',
       fname: 'Frank',
       mname: 'H',
       surname: 'Moore',
@@ -89,7 +89,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 3,
     },
     {
-      clientID: '9',
+      clientID: 'MHJGFI',
       fname: 'Grace',
       mname: 'I',
       surname: 'Taylor',
@@ -99,7 +99,7 @@ export class DeduplicationManagementService {
       associatedDuplicates: 0,
     },
     {
-      clientID: '10',
+      clientID: 'OBJGFR',
       fname: 'Henry',
       mname: 'J',
       surname: 'Anderson',

@@ -1,51 +1,59 @@
 import { Component } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
-
-interface ItemData {
-  sn: number;
-  clientID: string;
-  fname: string;
-  mname: string;
-  surname: string;
-  gender: string;
-  idNUmber: string;
-  idType: string;
-  associatedDuplicates: number;
-}
+import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { Deduplication } from '../../models/deduplication.model';
+import { DeduplicationManagementService } from '../../services/deduplication-management.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-deduplication-home',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, HttpClientModule],
+  providers: [DeduplicationManagementService],
   templateUrl: './deduplication-home.component.html',
   styleUrl: './deduplication-home.component.css',
 })
 export class DeduplicationHomeComponent {
-  listOfCurrentPageData: readonly ItemData[] = [];
-  listOfData: readonly ItemData[] = [];
+  total = 1;
+  listOfDeduplications: Deduplication[] = [];
+  loading = true;
+  pageSize = 10;
+  pageIndex = 1;
+  filterKey = [{}];
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private dedupicationManagementService: DeduplicationManagementService
+  ) {}
 
-  onCurrentPageDataChange($event: readonly ItemData[]): void {
-    this.listOfCurrentPageData = $event;
+  loadHduClientsFromServer(
+    pageIndex: number,
+    pageSize: number,
+    filter: Array<{ key: string; value: string[] }>
+  ): void {
+    this.loading = true;
+    this.dedupicationManagementService
+      .getDeduplicationClients(pageIndex, pageSize, filter)
+      .subscribe((data: any) => {
+        this.loading = false;
+        this.total = 200; // mock the total data here
+        this.listOfDeduplications = data.results;
+      });
+  }
+
+  onQueryParamsChange(params: NzTableQueryParams): void {
+    console.log(params);
+    const { pageSize, pageIndex, filter } = params;
+
+    this.loadHduClientsFromServer(pageIndex, pageSize, filter);
   }
 
   ngOnInit(): void {
-    this.listOfData = new Array(200).fill(0).map((_, index) => ({
-      sn: index + 1,
-      clientID: `CL_${index}78989`,
-      fname: `Edward ${index}`,
-      mname: `Justin ${index}`,
-      surname: `Bezos ${index}`,
-      gender: 'Male',
-      idNUmber: `${index}7898-75383238378946${index}`,
-      idType: 'NIDA',
-      associatedDuplicates: 2 + index,
-    }));
+    this.loadHduClientsFromServer(this.pageIndex, this.pageSize, []);
   }
 
-  onView() {
-    this.router.navigate(['/deduplication/deduplication-details']);
+  viewClientDetails() {
+    this.router.navigate(['/client-details']);
   }
 }

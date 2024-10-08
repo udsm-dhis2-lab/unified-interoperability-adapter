@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 import { HduClient } from '../../models';
-import { ClientManagement } from '../../services/client-management';
+import { ClientManagementService } from '../../services/client-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 
@@ -10,7 +10,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
   selector: 'app-home',
   standalone: true,
   imports: [SharedModule, HttpClientModule],
-  providers: [ClientManagement],
+  providers: [ClientManagementService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -24,7 +24,7 @@ export class HomeComponent {
 
   constructor(
     private router: Router,
-    private hduClientService: ClientManagement
+    private clientManagementService: ClientManagementService
   ) {}
 
   loadHduClientsFromServer(
@@ -33,7 +33,7 @@ export class HomeComponent {
     filter: Array<{ key: string; value: string[] }>
   ): void {
     this.loading = true;
-    this.hduClientService
+    this.clientManagementService
       .getHduClients(pageIndex, pageSize, filter)
       .subscribe((data: any) => {
         this.loading = false;
