@@ -1,41 +1,32 @@
 .logo {
-    margin-top: 3vw;
-    margin-left: 3vw;
-    height: 100px;
-    width: 120px;
+  margin: 3vw;
+  height: 100px;
+  width: 120px;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
-}
-
-.center {
-    display: flex;
-    flex-direction: column; 
-    justify-content: center;
-    align-items: center;
+  max-width: 100%;
+  height: auto;
 }
 
 .form-input {
-    margin-top: 28px;
-    width: 300px;
+  margin-top: 28px;
+  width: 300px;
 }
 
 .icon-style {
-    color: var(--primary-color)
+  color: var(--primary-color);
 }
 
-.horizontal-container {
-    display: flex;
-    align-items: center;
+.form-title {
+  display: flex;
+  align-items: center;
 }
 
 .form-elements-container {
-    width: 300px;
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start;
-    height: auto;
-  }
-
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: auto;
+}
