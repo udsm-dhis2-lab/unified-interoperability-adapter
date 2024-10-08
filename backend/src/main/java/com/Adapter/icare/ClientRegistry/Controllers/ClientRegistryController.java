@@ -159,7 +159,7 @@ public class ClientRegistryController {
     public ResponseEntity<Map<String, Object>> getPotentialDuplicates(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "key") String key) throws Exception {
+            @RequestParam(value = "key", required = false) String key) throws Exception {
         // TODO: Replace with FHIR implementation
         try {
             List<Map<String, Object>> namespaceDetails = new ArrayList<>();
