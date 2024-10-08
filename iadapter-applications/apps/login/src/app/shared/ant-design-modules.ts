@@ -1,6 +1,11 @@
-
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzGridModule } from 'ng-zorro-antd/grid';
 
-export const antDesignModules = [NzInputModule, NzIconModule, NzButtonModule];
+export const antDesignModules = [
+  NzInputModule,
+  NzIconModule,
+  NzButtonModule,
+  NzGridModule,
+];
