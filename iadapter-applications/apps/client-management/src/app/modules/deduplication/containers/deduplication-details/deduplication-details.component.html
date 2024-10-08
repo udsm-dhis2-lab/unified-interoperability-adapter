@@ -11,14 +11,51 @@
               {{ key }}: {{ basicInfo[key] }}
             </li>
           </ul>
+          <nz-card style="margin-top: 16px; margin-bottom: 16px">
+            <div
+              *ngFor="let section of extraInfo"
+              style="margin-top: 16px; margin-bottom: 16px"
+            >
+              <h4>
+                <strong>{{ section.sectionTitle }}</strong>
+              </h4>
+              <ul class="no-bullets">
+                <li *ngFor="let key of objectKeys(section.info)">
+                  <div nz-row>
+                    <div nz-col nzSpan="12">
+                      {{ key }}
+                    </div>
+                    <div nz-col nzSpan="12">
+                      <div nz-row nzJustify="end">
+                        {{ section.info[key] }}
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </nz-card>
+
+          <h4>
+            <strong>Associated health records: 16</strong>
+          </h4>
         </nz-card>
       </div>
       <div nz-col nzSpan="16">
         <nz-card style="min-height: 60vh">
-          <h3>Associated duplicates</h3>
-          <nz-table #basicTable [nzData]="listOfData">
+          <h3>Associated duplicates (3)</h3>
+          <nz-table
+            #basicTable
+            [nzData]="listOfData"
+            (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+          >
             <thead>
               <tr>
+                <th
+                  [(nzChecked)]="checked"
+                  [nzIndeterminate]="indeterminate"
+                  (nzCheckedChange)="onAllChecked($event)"
+                ></th>
                 <th>Client ID</th>
                 <th>ID number</th>
                 <th>Full name</th>
@@ -28,23 +65,57 @@
             <tbody>
               @for (data of basicTable.data; track data) {
               <tr>
+                <td
+                  [nzChecked]="setOfCheckedId.has(data.id)"
+                  (nzCheckedChange)="onItemChecked(data.id, $event)"
+                ></td>
                 <td>
                   <span style="color: #1890ff"> {{ data.clientID }}</span>
                 </td>
                 <td>{{ data.iDNumber }}</td>
                 <td>{{ data.fullName }}</td>
-                <td>*****</td>
+                <td>
+                  <a
+                    nz-dropdown
+                    nzTrigger="click"
+                    [nzDropdownMenu]="menu"
+                  >
+                    <Strong>...</Strong>
+                  </a>
+                </td>
               </tr>
               }
+              <nz-dropdown-menu #menu="nzDropdownMenu">
+                <ul nz-menu>
+                  <li nz-menu-item>View</li>
+                  <li nz-menu-item>Add primary client</li>
+                </ul>
+              </nz-dropdown-menu>
             </tbody>
           </nz-table>
           <div nz-row nzJustify="end" [nzGutter]="16">
             <div style="margin-right: 16px">
-              <button nz-button nzType="default" (click)="success()">
+              <button
+                nz-button
+                nzType="default"
+                (click)="
+                  warning(
+                    'Are you sure you want to proceed with  merging request for  these selected clients details?'
+                  )
+                "
+              >
                 Request For Merge
               </button>
             </div>
-            <button nz-button nzType="primary" (click)="warning()">
+            <button
+              nz-button
+              nzType="primary"
+              (click)="
+                warning(
+                  'Are you sure you want to proceed with  merging this clients details?'
+                )
+              "
+            >
               Merge
             </button>
           </div>
