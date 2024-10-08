@@ -180,6 +180,9 @@ public class ClientRegistryService {
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
         String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
+        List<Patient> linkedClients = patient.hasLink() ? (List<Patient>) patient.getLink().stream().map(link -> link.hasOther() ? (Patient) link.getOther().getResource(): null) : null;
+        List<String> clientTypes = patient.hasLink() ? (List<String>) patient.getLink().stream().map(link -> link.hasType() ? link.getType().getDisplay(): null) : null;
+
         // Return the mapped PatientDTO object
         return new PatientDTO(
                 patientId,
@@ -192,7 +195,9 @@ public class ClientRegistryService {
                 telecomDTOs,
                 organization,
                 contactPeople,
-                maritalStatus
+                maritalStatus,
+                linkedClients,
+                clientTypes
         );
     }
 }

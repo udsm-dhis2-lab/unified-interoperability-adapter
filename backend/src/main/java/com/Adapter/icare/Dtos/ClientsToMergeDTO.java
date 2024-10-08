@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @Setter
-public class MergeClients {
+public class ClientsToMergeDTO {
     @NotNull
     private String clientOne; // client to keep
 
