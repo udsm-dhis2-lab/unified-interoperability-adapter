@@ -15,6 +15,9 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@iadapter-applications/hdu-api-http-client": [
+        "libs/hdu-api-http-client/src/index.ts"
+      ],
       "@iadapter-applications/hdu-api-nav-menu": [
         "libs/hdu-api-nav-menu/src/index.ts"
       ],
