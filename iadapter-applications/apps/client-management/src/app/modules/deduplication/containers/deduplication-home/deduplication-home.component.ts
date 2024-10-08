@@ -52,7 +52,7 @@ export class DeduplicationHomeComponent {
     this.loadHduClientsFromServer(this.pageIndex, this.pageSize, []);
   }
 
-  viewClientDetails() {
+  viewDeduplicationDetails() {
     this.router.navigate(['/client-details']);
   }
 }
