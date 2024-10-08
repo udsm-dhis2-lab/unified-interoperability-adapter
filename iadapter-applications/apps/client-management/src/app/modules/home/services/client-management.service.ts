@@ -102,7 +102,8 @@ export class ClientManagementService {
     },
   ];
 
-  constructor(private httpClient: HttpClient) {}
+
+  constructor(private httpClient: HduHttpService) {}
 
   getHduClients(
     pageIndex: number,

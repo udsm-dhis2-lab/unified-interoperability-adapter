@@ -4,12 +4,11 @@ import { Router } from '@angular/router';
 import { HduClient } from '../../models';
 import { ClientManagementService } from '../../services/client-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SharedModule, HttpClientModule],
+  imports: [SharedModule],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',

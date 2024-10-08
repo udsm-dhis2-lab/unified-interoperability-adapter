@@ -18,7 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //        registry.addResourceHandler("/login/**")
 //                .addResourceLocations("classpath:/static/login/");
 //
-//        registry.addResourceHandler("/clientManagement/**")
-//                .addResourceLocations("classpath:/static/clientManagement/");
+//        registry.addResourceHandler("/ClientManagementService/**")
+//                .addResourceLocations("classpath:/static/ClientManagementService/");
     }
 }

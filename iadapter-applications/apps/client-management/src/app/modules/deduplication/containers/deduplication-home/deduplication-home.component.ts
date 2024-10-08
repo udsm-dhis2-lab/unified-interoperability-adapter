@@ -4,12 +4,11 @@ import { Router } from '@angular/router';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Deduplication } from '../../models/deduplication.model';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
-import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-deduplication-home',
   standalone: true,
-  imports: [SharedModule, HttpClientModule],
+  imports: [SharedModule],
   providers: [DeduplicationManagementService],
   templateUrl: './deduplication-home.component.html',
   styleUrl: './deduplication-home.component.css',
