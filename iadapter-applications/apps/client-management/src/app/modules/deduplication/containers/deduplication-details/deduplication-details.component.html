@@ -74,9 +74,23 @@
                 </td>
                 <td>{{ data.iDNumber }}</td>
                 <td>{{ data.fullName }}</td>
-                <td><strong>...</strong></td>
+                <td>
+                  <a
+                    nz-dropdown
+                    nzTrigger="click"
+                    [nzDropdownMenu]="menu"
+                  >
+                    <Strong>...</Strong>
+                  </a>
+                </td>
               </tr>
               }
+              <nz-dropdown-menu #menu="nzDropdownMenu">
+                <ul nz-menu>
+                  <li nz-menu-item>View</li>
+                  <li nz-menu-item>Add primary client</li>
+                </ul>
+              </nz-dropdown-menu>
             </tbody>
           </nz-table>
           <div nz-row nzJustify="end" [nzGutter]="16">
