@@ -36,7 +36,8 @@ export class HomeComponent {
       .getHduClients(pageIndex, pageSize, filter)
       .subscribe((data: any) => {
         this.loading = false;
-        this.total = 200; // mock the total data here
+        this.total = 200;
+        this.pageIndex = pageIndex;
         this.listOfHduClients = data.results;
       });
   }

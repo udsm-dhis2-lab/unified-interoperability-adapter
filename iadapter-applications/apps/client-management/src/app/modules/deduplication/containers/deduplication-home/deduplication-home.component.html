@@ -30,7 +30,7 @@
     <tbody>
       @for (data of listOfDeduplications; track data.fname; let i = $index;) {
       <tr>
-        <td>{{ i + 1 }}</td>
+        <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
         <td>
           <!-- Use primary color from theme  -->
           <span style="color: #1890ff">{{ data.clientID }}</span>

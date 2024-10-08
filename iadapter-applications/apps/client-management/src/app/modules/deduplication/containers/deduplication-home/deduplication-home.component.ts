@@ -36,7 +36,8 @@ export class DeduplicationHomeComponent {
       .getDeduplicationClients(pageIndex, pageSize, filter)
       .subscribe((data: any) => {
         this.loading = false;
-        this.total = 200; // mock the total data here
+        this.total = 200;
+        this.pageIndex = pageIndex;
         this.listOfDeduplications = data.results;
       });
   }
@@ -53,6 +54,6 @@ export class DeduplicationHomeComponent {
   }
 
   viewDeduplicationDetails() {
-    this.router.navigate(['/client-details']);
+    this.router.navigate(['/deduplication/deduplication-details']);
   }
 }
