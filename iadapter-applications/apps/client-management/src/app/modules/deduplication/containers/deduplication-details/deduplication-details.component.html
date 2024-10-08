@@ -44,9 +44,18 @@
       <div nz-col nzSpan="16">
         <nz-card style="min-height: 60vh">
           <h3>Associated duplicates (3)</h3>
-          <nz-table #basicTable [nzData]="listOfData">
+          <nz-table
+            #basicTable
+            [nzData]="listOfData"
+            (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+          >
             <thead>
               <tr>
+                <th
+                  [(nzChecked)]="checked"
+                  [nzIndeterminate]="indeterminate"
+                  (nzCheckedChange)="onAllChecked($event)"
+                ></th>
                 <th>Client ID</th>
                 <th>ID number</th>
                 <th>Full name</th>
@@ -56,6 +65,10 @@
             <tbody>
               @for (data of basicTable.data; track data) {
               <tr>
+                <td
+                  [nzChecked]="setOfCheckedId.has(data.id)"
+                  (nzCheckedChange)="onItemChecked(data.id, $event)"
+                ></td>
                 <td>
                   <span style="color: #1890ff"> {{ data.clientID }}</span>
                 </td>
