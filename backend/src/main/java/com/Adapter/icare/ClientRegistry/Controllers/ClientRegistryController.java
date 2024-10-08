@@ -18,6 +18,7 @@ import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -153,6 +154,36 @@ public class ClientRegistryController {
         try {
             return ResponseEntity.ok(patientDataResponse);
         }   catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "potentialDuplicates", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getPotentialDuplicates(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "key") String key) throws Exception {
+        // TODO: Replace with FHIR implementation
+        try {
+            List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+            String namespace = datastoreConstants.DefaultNameSpaceForPotentialClientDuplicates;
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsUsingPagination(namespace, page, pageSize, key);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                Map<String, Object> generalCodeDetails = datastore.getValue();
+                generalCodeDetails.put("namespace", datastore.getNamespace());
+                generalCodeDetails.put("key", datastore.getDataKey());
+                namespaceDetails.add(generalCodeDetails);
+            }
+            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            returnObject.put("pager",pager);
+            returnObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

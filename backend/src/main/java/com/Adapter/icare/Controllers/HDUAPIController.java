@@ -67,7 +67,8 @@ public class HDUAPIController {
 
 
     @GetMapping("dataTemplates")
-    public ResponseEntity<Map<String, Object>> getDataTemplatesList (@RequestParam(value = "id", required = false) String id, @RequestParam(value = "uuid", required = false) String uuid) throws Exception {
+    public ResponseEntity<Map<String, Object>> getDataTemplatesList (@RequestParam(value = "id", required = false) String id,
+                                                                     @RequestParam(value = "uuid", required = false) String uuid) throws Exception {
         // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
 //        System.out.println(this.authentication.isAuthenticated());
         try {
@@ -109,7 +110,8 @@ public class HDUAPIController {
     }
 
     @GetMapping("dataTemplates/examples")
-    public ResponseEntity<Map<String, Object>> getDataTemplatesExamples (@RequestParam(value = "id", required = false) String id) throws Exception {
+    public ResponseEntity<Map<String, Object>> getDataTemplatesExamples (
+            @RequestParam(value = "id", required = false) String id) throws Exception {
         // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
         try {
             List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplatesExamples");
