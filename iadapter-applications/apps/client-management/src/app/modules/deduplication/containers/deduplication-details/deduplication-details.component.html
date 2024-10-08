@@ -10,6 +10,33 @@
             <li *ngFor="let key of objectKeys(basicInfo)">
               {{ key }}: {{ basicInfo[key] }}
             </li>
+
+            <div
+              *ngFor="let section of extraInfo"
+              style="margin-top: 16px; margin-bottom: 16px"
+            >
+              <h4>
+                <strong>{{ section.sectionTitle }}</strong>
+              </h4>
+              <ul class="no-bullets">
+                <li *ngFor="let key of objectKeys(section.info)">
+                  <div nz-row>
+                    <div nz-col nzSpan="12">
+                      {{ key }}
+                    </div>
+                    <div nz-col nzSpan="12">
+                      <div nz-row nzJustify="end">
+                        {{ section.info[key] }}
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+
+              <h4>
+                <strong>Associated health records: 16</strong>
+              </h4>
+            </div>
           </ul>
         </nz-card>
       </div>

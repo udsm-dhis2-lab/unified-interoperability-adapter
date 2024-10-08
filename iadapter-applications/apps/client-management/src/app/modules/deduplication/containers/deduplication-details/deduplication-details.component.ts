@@ -13,6 +13,11 @@ interface Deduplication {
   fullName: string;
 }
 
+interface ExtraInfoSection {
+  sectionTitle: string;
+  info: { [key: string]: string };
+}
+
 @Component({
   selector: 'app-deduplication-details',
   standalone: true,
@@ -45,6 +50,38 @@ export class DeduplicationDetailsComponent {
       clientID: 'IBS_00297209',
       iDNumber: '97782H',
       fullName: 'Herman Moshi Moshi',
+    },
+  ];
+
+  extraInfo: ExtraInfoSection[] = [
+    {
+      sectionTitle: 'Contact Information',
+      info: {
+        'Phone Number': '+255-456-7890',
+        Email: 'john.doe@example.com',
+        'Permanet address': 'Dar es salaam, Tanzania',
+        'Current address': 'Morogoro, Tanzania',
+        Occupation: 'Software Engineer',
+        Nationality: 'Tanzanian',
+      },
+    },
+    {
+      sectionTitle: 'Next of Kin',
+      info: {
+        'Full name': 'Herman Moshi Moshi',
+        Relationship: 'Brother',
+        'Phone number': '+255-456-7890',
+      },
+    },
+    {
+      sectionTitle: 'Insurance Type',
+      info: {
+        'Insuarance Provider': 'NSSF',
+        'Insuarance Number': 'IBS_00297209',
+        'Policy Number': 'IBS_00297209',
+        'Group Number': 'IBS_00297209',
+        Region: 'Tanzania',
+      },
     },
   ];
 
