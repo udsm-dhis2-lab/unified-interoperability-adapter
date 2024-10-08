@@ -1,1 +1,15 @@
-<app-nx-welcome></app-nx-welcome> <router-outlet></router-outlet>
+<lib-hdu-api-top-bar-menu></lib-hdu-api-top-bar-menu>
+
+<nz-layout>
+    <!-- Sidebar / Navigation -->
+    <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
+        <lib-hdu-api-nav-menu (selectedMenu)="onMenuItemClick($event)"></lib-hdu-api-nav-menu>
+    </nz-sider>
+
+    <!-- Main Content Area -->
+    <nz-content>
+        <div class="inner-content">
+            <router-outlet></router-outlet>
+        </div>
+    </nz-content>
+</nz-layout>
