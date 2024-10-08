@@ -10,7 +10,8 @@
             <li *ngFor="let key of objectKeys(basicInfo)">
               {{ key }}: {{ basicInfo[key] }}
             </li>
-
+          </ul>
+          <nz-card style="margin-top: 16px; margin-bottom: 16px">
             <div
               *ngFor="let section of extraInfo"
               style="margin-top: 16px; margin-bottom: 16px"
@@ -32,17 +33,17 @@
                   </div>
                 </li>
               </ul>
-
-              <h4>
-                <strong>Associated health records: 16</strong>
-              </h4>
             </div>
-          </ul>
+          </nz-card>
+
+          <h4>
+            <strong>Associated health records: 16</strong>
+          </h4>
         </nz-card>
       </div>
       <div nz-col nzSpan="16">
         <nz-card style="min-height: 60vh">
-          <h3>Associated duplicates</h3>
+          <h3>Associated duplicates (3)</h3>
           <nz-table #basicTable [nzData]="listOfData">
             <thead>
               <tr>
@@ -60,18 +61,34 @@
                 </td>
                 <td>{{ data.iDNumber }}</td>
                 <td>{{ data.fullName }}</td>
-                <td>*****</td>
+                <td><strong>...</strong></td>
               </tr>
               }
             </tbody>
           </nz-table>
           <div nz-row nzJustify="end" [nzGutter]="16">
             <div style="margin-right: 16px">
-              <button nz-button nzType="default" (click)="success()">
+              <button
+                nz-button
+                nzType="default"
+                (click)="
+                  warning(
+                    'Are you sure you want to proceed with  merging request for  these selected clients details?'
+                  )
+                "
+              >
                 Request For Merge
               </button>
             </div>
-            <button nz-button nzType="primary" (click)="warning()">
+            <button
+              nz-button
+              nzType="primary"
+              (click)="
+                warning(
+                  'Are you sure you want to proceed with  merging this clients details?'
+                )
+              "
+            >
               Merge
             </button>
           </div>

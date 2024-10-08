@@ -90,11 +90,10 @@ export class DeduplicationDetailsComponent {
     this.router.navigate(['']);
   }
 
-  warning(): void {
+  warning(content: string): void {
     this.modal.warning({
       nzTitle: 'Warning',
-      nzContent:
-        'Are you sure you want to proceed merging this clients details',
+      nzContent: content,
       nzCancelText: 'Cancel',
       nzOkText: 'Yes',
     });
