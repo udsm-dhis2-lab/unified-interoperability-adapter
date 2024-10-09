@@ -1,7 +1,7 @@
 {
   "/api/": {
-    "target": "http://iadapter.dhis2.udsm.ac.tz/",
-    "secure": false,
-    "changeOrigin": "true"
+    "target": "https://iadapter.dhis2.udsm.ac.tz",
+    "secure": true,
+    "changeOrigin": true
   }
 }

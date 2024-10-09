@@ -15,8 +15,8 @@ export class LoginService {
 
   constructor(private httpClient: HduHttpService) {}
 
-  login(userName: string, password: string): Observable<any> {
-    const body = { userName, password };
+  login(username: string, password: string): Observable<any> {
+    const body = { username, password };
     return this.httpClient.post<any>(this.loginUrl, body).pipe(
       catchError((error: any) => {
         console.log('login error from root service', error);
