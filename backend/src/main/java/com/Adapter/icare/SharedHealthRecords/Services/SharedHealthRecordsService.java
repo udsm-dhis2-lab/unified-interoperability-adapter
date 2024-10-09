@@ -66,7 +66,6 @@ public class SharedHealthRecordsService {
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
-        System.out.println(onlyLinkedClients);
         if (onlyLinkedClients != null) {
             // TODO replace hardcoded ids with dynamic ones
             searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));

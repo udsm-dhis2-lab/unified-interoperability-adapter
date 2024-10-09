@@ -13,7 +13,9 @@ public class IdentifierDTO {
     private String value;
     private String use;
 
-    public IdentifierDTO(String system, String value, String use) {
+    public IdentifierDTO(String system,
+                         String value,
+                         String use) {
         this.system = system;
         this.value = value;
         this.use = use;

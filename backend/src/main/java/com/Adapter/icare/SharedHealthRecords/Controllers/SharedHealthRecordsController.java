@@ -64,6 +64,8 @@ public class SharedHealthRecordsController {
             List<Map<String,Object>> sharedRecords = this.sharedHealthRecordsService.getSharedRecords(page,pageSize, identifier, identifierType, onlyLinkedClients, firstName);
             sharedRecordsResponse.put("results", sharedRecords);
             Map<String, Object> pager = new HashMap<>();
+            pager.put("total", sharedRecords.size());
+            pager.put("totalPages", null);
             pager.put("page", page);
             pager.put("pageSize", pageSize);
             sharedRecordsResponse.put("pager",pager);

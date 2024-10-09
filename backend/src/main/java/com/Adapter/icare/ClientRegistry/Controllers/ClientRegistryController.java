@@ -136,6 +136,8 @@ public class ClientRegistryController {
                     onlyLinkedClients);
             patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
+            pager.put("total", patients.size());
+            pager.put("totalPages", null);
             pager.put("page", page);
             pager.put("pageSize", pageSize);
             // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
@@ -180,6 +182,8 @@ public class ClientRegistryController {
                     true);
             patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
+            pager.put("total", patients.size());
+            pager.put("totalPages", null);
             pager.put("page", page);
             pager.put("pageSize", pageSize);
             // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)

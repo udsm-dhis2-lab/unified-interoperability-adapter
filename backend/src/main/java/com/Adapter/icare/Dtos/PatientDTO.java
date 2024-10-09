@@ -122,7 +122,7 @@ public class PatientDTO {
         return mappedPatient;
     }
 
-    private @NotNull List<Map<String, Object>> getIdentifierMaps() {
+    public @NotNull List<Map<String, Object>> getIdentifierMaps() {
         List<Map<String, Object>> identifiers = new ArrayList<>();
         if (!this.getIdentifiers().isEmpty()) {
             for (Identifier identifier: this.getIdentifiers()) {
