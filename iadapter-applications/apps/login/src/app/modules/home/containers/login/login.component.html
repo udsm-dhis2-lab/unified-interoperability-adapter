@@ -45,7 +45,20 @@
         </nz-input-group>
       </nz-form-control>
     </nz-form-item>
-    <button nz-button [nzType]="'primary'">Log in</button>
+    <nz-spin [nzSpinning]="isLoading">
+      <button nz-button [nzType]="'primary'" class="login-form-button">
+        Log in
+      </button>
+    </nz-spin>
+
+    <nz-alert
+      nzCloseable
+      *ngIf="alert.show"
+      [nzType]="alert.type === 'success' ? 'success' : 'error'"
+      [nzMessage]="alert.message"
+      (nzOnClose)="afterClose()"
+      nzShowIcon
+    ></nz-alert>
   </form>
 </div>
 
