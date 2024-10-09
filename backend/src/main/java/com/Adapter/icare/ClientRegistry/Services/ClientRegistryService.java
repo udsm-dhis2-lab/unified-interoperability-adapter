@@ -178,8 +178,18 @@ public class ClientRegistryService {
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
         String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
-        List<Patient> linkedClients = patient.hasLink() ? (List<Patient>) patient.getLink().stream().map(link -> link.hasOther() ? (Patient) link.getOther().getResource(): null) : null;
-        List<String> clientTypes = patient.hasLink() ? (List<String>) patient.getLink().stream().map(link -> link.hasType() ? link.getType().getDisplay(): null) : null;
+        List<Patient.PatientLinkComponent> patientLinkComponents = patient.getLink();
+        List<Map<String,Object>> relatedClients = new ArrayList();
+        for (Patient.PatientLinkComponent patientLinkComponent: patientLinkComponents) {
+            if (patientLinkComponent.hasType() && patientLinkComponent.hasOther()) {
+                Map<String,Object> relatedClientsByType = new HashMap<>();
+                relatedClientsByType.put("type","potential_duplicate");
+                relatedClientsByType.put("patient", (Patient) patientLinkComponent.getOther().getResource() );
+                relatedClients.add(relatedClientsByType);
+            }
+        }
+//        List<Patient> linkedClients = patient.hasLink() ? (List<Patient>) patient.getLink().stream().map(link -> link.hasOther() ? (Patient) link.getOther().getResource(): null) : null;
+//        List<String> clientTypes = patient.hasLink() ? (List<String>) patient.getLink().stream().map(link -> link.hasType() ? link.getType().getDisplay(): null) : null;
 
         // Return the mapped PatientDTO object
         return new PatientDTO(
@@ -194,8 +204,7 @@ public class ClientRegistryService {
                 organization,
                 contactPeople,
                 maritalStatus,
-                linkedClients,
-                clientTypes
+                relatedClients
         );
     }
 }

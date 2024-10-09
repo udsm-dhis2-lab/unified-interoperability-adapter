@@ -70,17 +70,25 @@ public class SharedHealthRecordsService {
                 Map<String, Object> templateData = new HashMap<>();
                 Patient patient = (Patient) entry.getResource();
                 PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
+                templateData.put("id", patientDTO.getId());
                 templateData.put("demographicDetails", patientDTO.toMap());
+                templateData.put("facilityDetails", patientDTO.toMap().get("organisation"));
+                templateData.put("paymentDetails", null);
 
-                Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getId().toString(), null);
+                Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), null);
                 Map<String,Object> visitDetails = new HashMap<>();
                 if (encounter != null) {
+                    visitDetails.put("id", null);
                     visitDetails.put("visitDate", encounter.getPeriod().getStart());
-                    visitDetails.put("visitClosedDate", encounter.getPeriod().getEnd());
+                    visitDetails.put("closedDate", encounter.getPeriod().getEnd());
+                    visitDetails.put("newThisYear", null);
+                    visitDetails.put("new", null);
                 } else {
                     visitDetails = null;
                 }
                 templateData.put("visitDetails", visitDetails);
+
+                templateData.put("diagnosisDetails", null);
 
                 sharedRecords.add(templateData);
             }

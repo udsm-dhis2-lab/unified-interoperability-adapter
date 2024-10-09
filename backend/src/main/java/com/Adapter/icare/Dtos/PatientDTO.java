@@ -22,8 +22,7 @@ public class PatientDTO {
     private Organization organization;
     private List<ContactPeopleDTO> contactPeople;
     private String maritalStatus;
-    private List<Patient> linkedClients;
-    private List<String> clientTypes;
+    private List<Map<String,Object>> relatedClients;
 
     public PatientDTO(String id,
                       String status,
@@ -36,8 +35,7 @@ public class PatientDTO {
                       Organization organization,
                       List<ContactPeopleDTO> contactPeople,
                       String maritalStatus,
-                      List<Patient> linkedClients,
-                      List<String> clientTypes) {
+                      List<Map<String,Object>> relatedClients) {
         this.id = id;
         this.status = status;
         this.name = name;
@@ -49,8 +47,7 @@ public class PatientDTO {
         this.organization = organization;
         this.contactPeople = contactPeople;
         this.maritalStatus = maritalStatus;
-        this.linkedClients = linkedClients;
-        this.clientTypes = clientTypes;
+        this.relatedClients = relatedClients;
     }
 
     public Map<String, Object> toMap() {
@@ -96,17 +93,20 @@ public class PatientDTO {
             }
             mappedPatient.put("organisation", orgMap);
             List<Map<String,Object>> relatedClientsList = new ArrayList<>();
-            if (this.linkedClients != null && !this.linkedClients.isEmpty()) {
-                for (Patient client: this.linkedClients) {
+            if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
+                for (Map<String,Object> clientDetails: this.relatedClients) {
                     Map<String, Object> clientData = new HashMap<>();
-                    clientData.put("id", client.getId());
-                    clientData.put("names", client.getName());
-                    clientData.put("identifiers", client.getIdentifier());
+                    clientData.put("type",clientDetails.get("type"));
+                    if (clientDetails.get("patient") != null && clientDetails.get("patient") instanceof Patient) {
+                        Patient patientData = (Patient) clientDetails.get("patient");
+                        clientData.put("id", patientData.getId());
+                        clientData.put("names", patientData.getName());
+                        clientData.put("identifiers", patientData.getIdentifier());
+                    }
                     relatedClientsList.add(clientData);
                 }
             }
             mappedPatient.put("relatedClients", relatedClientsList);
-            mappedPatient.put("clientTypes", this.clientTypes);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
