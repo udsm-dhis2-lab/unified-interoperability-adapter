@@ -9,24 +9,10 @@ img {
   height: auto;
 }
 
-.form-input {
-  margin-top: 28px;
+.login-form {
   width: 300px;
 }
 
-.icon-style {
-  color: var(--primary-color);
-}
-
-.form-title {
-  display: flex;
-  align-items: center;
-}
-
-.form-elements-container {
-  width: 300px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  height: auto;
+.login-form-margin {
+  margin-bottom: 16px;
 }

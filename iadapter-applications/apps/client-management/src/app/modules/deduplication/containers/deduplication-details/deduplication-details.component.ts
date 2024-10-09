@@ -144,6 +144,7 @@ export class DeduplicationDetailsComponent {
       nzContent: content,
       nzCancelText: 'Cancel',
       nzOkText: 'Yes',
+      nzOnOk: () => this.success(),
     });
   }
 
