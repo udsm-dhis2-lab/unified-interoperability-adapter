@@ -74,6 +74,7 @@ public class PatientDTO {
             }
             // TODO: Add support to retrieve identifier relevant to requesting health facility
             List<Map<String, Object>> identifiersList = getIdentifierMaps();
+            mappedPatient.put("id", this.id);
             mappedPatient.put("identifiers", identifiersList);
             mappedPatient.put("firstName",firstName);
             mappedPatient.put("middleName",middleName);
@@ -97,12 +98,20 @@ public class PatientDTO {
                 for (Map<String,Object> clientDetails: this.relatedClients) {
                     Map<String, Object> clientData = new HashMap<>();
                     clientData.put("type",clientDetails.get("type"));
+                    clientData.put("display", clientData.get("patientDisplay"));
+                    Map<String,Object> clientRelated = new HashMap<>();
                     if (clientDetails.get("patient") != null && clientDetails.get("patient") instanceof Patient) {
                         Patient patientData = (Patient) clientDetails.get("patient");
-                        clientData.put("id", patientData.getId());
-                        clientData.put("names", patientData.getName());
-                        clientData.put("identifiers", patientData.getIdentifier());
+                        // TODO: return client registry identifier
+                        List<String> identifiersListForRelatedClient  = new ArrayList<>();
+                        clientRelated.put("id", patientData.getIdElement().getIdPart());
+                        for(Identifier identifier: patientData.getIdentifier()) {
+//                            System.out.println(identifier.getValue().toString());
+                            identifiersListForRelatedClient.add(identifier.getValue().toString());
+                        }
+                        clientRelated.put("identifiers",identifiersListForRelatedClient);
                     }
+                    clientData.put("client", clientRelated);
                     relatedClientsList.add(clientData);
                 }
             }

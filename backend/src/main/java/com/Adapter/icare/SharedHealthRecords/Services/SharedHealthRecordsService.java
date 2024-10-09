@@ -4,7 +4,9 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
+import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.FHIRConstants;
@@ -15,6 +17,7 @@ import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.codesystems.LinkType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -54,11 +57,28 @@ public class SharedHealthRecordsService {
 
     public List<Map<String, Object>> getSharedRecords(
             Integer page,
-            Integer pageSize
+            Integer pageSize,
+            String identifier,
+            String identifierType,
+            Boolean onlyLinkedClients,
+            String firstName
     ) throws Exception {
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
+        System.out.println(onlyLinkedClients);
+        if (onlyLinkedClients != null) {
+            // TODO replace hardcoded ids with dynamic ones
+            searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
+        }
+//                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
+        if (identifier != null) {
+            searchRecords.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
+        }
+
+        if (firstName != null) {
+            searchRecords.where(Patient.GIVEN.matches().value(firstName));
+        }
 
         response = searchRecords.count(pageSize)
                 .offset(page)

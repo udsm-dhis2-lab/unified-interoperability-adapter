@@ -115,9 +115,11 @@ public class ClientRegistryController {
             @RequestParam( value = "firstName", required = false) String firstName,
             @RequestParam( value = "middleName", required = false) String middleName,
             @RequestParam( value = "lastName", required = false) String lastName,
-            @RequestParam( value = "dateOfBirth", required = false) Date dateOfBirth
+            @RequestParam( value = "dateOfBirth", required = false) Date dateOfBirth,
+            @RequestParam( value = "onlyLinkedClients", required = false) Boolean onlyLinkedClients
     ) throws Exception {
         // TODO: Add support to use configured default workflow engine
+
         try {
             Map<String, Object> patientDataResponse = new HashMap<>();
             List<Map<String, Object>> patients = clientRegistryService.getPatients(
@@ -130,7 +132,8 @@ public class ClientRegistryController {
                     firstName,
                     middleName,
                     lastName,
-                    dateOfBirth);
+                    dateOfBirth,
+                    onlyLinkedClients);
             patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
@@ -162,25 +165,28 @@ public class ClientRegistryController {
             @RequestParam(value = "key", required = false) String key) throws Exception {
         // TODO: Replace with FHIR implementation
         try {
-            List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-            String namespace = datastoreConstants.DefaultNameSpaceForPotentialClientDuplicates;
-            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsUsingPagination(namespace, page, pageSize, key);
-            for (Datastore datastore: pagedDatastoreData.getContent()) {
-                Map<String, Object> generalCodeDetails = datastore.getValue();
-                generalCodeDetails.put("namespace", datastore.getNamespace());
-                generalCodeDetails.put("key", datastore.getDataKey());
-                namespaceDetails.add(generalCodeDetails);
-            }
-            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> patientDataResponse = new HashMap<>();
+            List<Map<String, Object>> patients = clientRegistryService.getPatients(
+                    page,
+                    pageSize,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    true);
+            patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
             pager.put("pageSize", pageSize);
-            pager.put("totalPages",pagedDatastoreData.getTotalPages());
-            pager.put("total", pagedDatastoreData.getTotalElements());
-            returnObject.put("pager",pager);
-            returnObject.put("results", namespaceDetails);
-            return ResponseEntity.ok(returnObject);
-        } catch (Exception e) {
+            // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
+            pager.put("total", clientRegistryService.getTotalPatients());
+            patientDataResponse.put("pager", pager);
+            return ResponseEntity.ok(patientDataResponse);
+        }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

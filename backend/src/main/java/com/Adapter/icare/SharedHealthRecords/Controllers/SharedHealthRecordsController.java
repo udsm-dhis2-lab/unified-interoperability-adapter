@@ -50,11 +50,18 @@ public class SharedHealthRecordsController {
     @GetMapping
     public ResponseEntity<Map<String, Object>> getSharedRecords (
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam( value = "identifier", required = false) String identifier,
+            @RequestParam( value = "identifierType", required = false) String identifierType,
+            @RequestParam( value = "onlyLinkedClients", required = false) Boolean onlyLinkedClients,
+            @RequestParam( value = "gender", required = false) String gender,
+            @RequestParam( value = "firstName", required = false) String firstName,
+            @RequestParam( value = "middleName", required = false) String middleName,
+            @RequestParam( value = "lastName", required = false) String lastName
     ) throws Exception {
         try {
             Map<String,Object> sharedRecordsResponse = new HashMap<>();
-            List<Map<String,Object>> sharedRecords = this.sharedHealthRecordsService.getSharedRecords(page,pageSize);
+            List<Map<String,Object>> sharedRecords = this.sharedHealthRecordsService.getSharedRecords(page,pageSize, identifier, identifierType, onlyLinkedClients, firstName);
             sharedRecordsResponse.put("results", sharedRecords);
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);

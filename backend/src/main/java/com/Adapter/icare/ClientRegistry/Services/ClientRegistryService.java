@@ -61,7 +61,8 @@ public class ClientRegistryService {
                                                  String firstName,
                                                  String middleName,
                                                  String lastName,
-                                                 Date dateOfBirth) {
+                                                 Date dateOfBirth,
+                                                 Boolean onlyLinkedClients) {
         try {
             List<Map<String, Object>> patients = new ArrayList<>();
             Bundle response = new Bundle();
@@ -69,6 +70,11 @@ public class ClientRegistryService {
             var searchClient =  fhirClient.search().forResource(Patient.class);
             if (identifier != null) {
                 searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
+            }
+
+            if (onlyLinkedClients) {
+                // TODO replace hardcoded ids with dynamic ones
+                searchClient.where(Patient.LINK.hasAnyOfIds("299","152"));
             }
 
             if (gender != null) {
@@ -183,7 +189,8 @@ public class ClientRegistryService {
         for (Patient.PatientLinkComponent patientLinkComponent: patientLinkComponents) {
             if (patientLinkComponent.hasType() && patientLinkComponent.hasOther()) {
                 Map<String,Object> relatedClientsByType = new HashMap<>();
-                relatedClientsByType.put("type","potential_duplicate");
+                relatedClientsByType.put("type",patientLinkComponent.getType().toCode());
+                relatedClientsByType.put("patientDisplay",patientLinkComponent.getOther().getDisplay());
                 relatedClientsByType.put("patient", (Patient) patientLinkComponent.getOther().getResource() );
                 relatedClients.add(relatedClientsByType);
             }
