@@ -19,7 +19,6 @@ export class LoginService {
     const body = { username, password };
     return this.httpClient.post<any>(this.loginUrl, body).pipe(
       catchError((error: any) => {
-        console.log('login error from root service', error);
         if (error.status === 401) {
           throw new UnAuothorizedException('Invalid username or password');
         } else {

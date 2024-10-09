@@ -34,16 +34,22 @@ export class DeduplicationHomeComponent {
     this.loading = true;
     this.dedupicationManagementService
       .getDeduplicationClients(pageIndex, pageSize, filter)
-      .subscribe((data: any) => {
-        this.loading = false;
-        this.total = 200;
-        this.pageIndex = pageIndex;
-        this.listOfDeduplications = data.results;
+      .subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          //TODO: Set total from data after it's support in fhir is implemented
+          this.total = 200; //data.total;
+          this.pageIndex = data.pageIndex;
+          this.listOfDeduplications = data.data;
+        },
+        error: (error) => {
+          this.loading = false;
+          //TODO: Implement error handling
+        },
       });
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
-    console.log(params);
     const { pageSize, pageIndex, filter } = params;
 
     this.loadHduClientsFromServer(pageIndex, pageSize, filter);

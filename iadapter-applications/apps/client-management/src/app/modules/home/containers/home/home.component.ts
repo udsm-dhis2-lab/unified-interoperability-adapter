@@ -43,7 +43,6 @@ export class HomeComponent {
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
-    console.log(params);
     const { pageSize, pageIndex, filter } = params;
 
     this.loadHduClientsFromServer(pageIndex, pageSize, filter);

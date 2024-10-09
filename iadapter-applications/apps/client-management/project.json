@@ -64,7 +64,8 @@
           "buildTarget": "client-management:build:production"
         },
         "development": {
-          "buildTarget": "client-management:build:development"
+          "buildTarget": "client-management:build:development",
+          "proxyConfig": "apps/client-management/proxy-config.json"
         }
       },
       "defaultConfiguration": "development"
