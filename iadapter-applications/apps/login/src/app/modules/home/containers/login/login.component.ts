@@ -36,6 +36,7 @@ export class LoginComponent implements OnDestroy {
     userName: FormControl<string>;
     password: FormControl<string>;
   }>;
+
   loginSubcription!: Subscription;
   constructor(
     @Inject(NonNullableFormBuilder) private fb: NonNullableFormBuilder,
@@ -70,26 +71,28 @@ export class LoginComponent implements OnDestroy {
 
   login(userName: string, password: string): void {
     this.isLoading = true;
-    this.loginSubcription = this.loginService
-      .login(userName, password)
-      .subscribe({
-        next: (response: any) => {
-          this.isLoading = false;
-          this.alert = {
-            show: true,
-            type: 'success',
-            message: 'Login Successful',
-          };
-        },
-        error: (error) => {
-          this.isLoading = false;
-          this.alert = {
-            show: true,
-            type: 'error',
-            message: error.message,
-          };
-        },
-      });
+    if (!this.loginSubcription) {
+      this.loginSubcription = this.loginService
+        .login(userName, password)
+        .subscribe({
+          next: (response: any) => {
+            this.isLoading = false;
+            this.alert = {
+              show: true,
+              type: 'success',
+              message: 'Login Successful',
+            };
+          },
+          error: (error) => {
+            this.isLoading = false;
+            this.alert = {
+              show: true,
+              type: 'error',
+              message: error.message,
+            };
+          },
+        });
+    }
   }
 
   afterClose() {

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 import { HduClient } from '../../models';
 import { ClientManagementService } from '../../services/client-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -13,7 +14,7 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent {
+export class HomeComponent implements OnDestroy {
   total = 1;
   listOfHduClients: HduClient[] = [];
   loading = true;
@@ -25,6 +26,13 @@ export class HomeComponent {
     private router: Router,
     private clientManagementService: ClientManagementService
   ) {}
+  ngOnDestroy(): void {
+    if (this.loadHduClientsSubscription) {
+      this.loadHduClientsSubscription.unsubscribe();
+    }
+  }
+
+  loadHduClientsSubscription!: Subscription;
 
   loadHduClientsFromServer(
     pageIndex: number,
@@ -32,21 +40,23 @@ export class HomeComponent {
     filter: Array<{ key: string; value: string[] }>
   ): void {
     this.loading = true;
-    this.clientManagementService
-      .getHduClients(pageIndex, pageSize, filter)
-      .subscribe({
-        next: (data: any) => {
-          this.loading = false;
-          //TODO: Set total from data after it's support in fhir is implemented
-          this.total = 200; //data.total;
-          this.pageIndex = data.pageIndex;
-          this.listOfHduClients = data.listOfClients;
-        },
-        error: (error) => {
-          this.loading = false;
-          //TODO: Implement error handling
-        },
-      });
+    if (!this.loadHduClientsSubscription) {
+      this.loadHduClientsSubscription = this.clientManagementService
+        .getHduClients(pageIndex, pageSize, filter)
+        .subscribe({
+          next: (data: any) => {
+            this.loading = false;
+            //TODO: Set total from data after it's support in fhir is implemented
+            this.total = 200; //data.total;
+            this.pageIndex = data.pageIndex;
+            this.listOfHduClients = data.listOfClients;
+          },
+          error: (error) => {
+            this.loading = false;
+            //TODO: Implement error handling
+          },
+        });
+    }
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
