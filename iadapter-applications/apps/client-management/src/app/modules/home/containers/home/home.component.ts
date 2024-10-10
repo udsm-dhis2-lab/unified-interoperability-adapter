@@ -49,7 +49,7 @@ export class HomeComponent implements OnDestroy {
         next: (data: any) => {
           this.loading = false;
           //TODO: Set total from data after it's support in fhir is implemented
-          this.total = 200; //data.total;
+          this.total = 4000; //data.total;
           this.pageIndex = data.pageIndex;
           this.listOfHduClients = data.listOfClients;
         },

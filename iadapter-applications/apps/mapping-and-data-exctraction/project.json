@@ -1,0 +1,90 @@
+{
+  "name": "mapping-and-data-exctraction",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/mapping-and-data-exctraction/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/mapping-and-data-exctraction",
+        "index": "apps/mapping-and-data-exctraction/src/index.html",
+        "browser": "apps/mapping-and-data-exctraction/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/mapping-and-data-exctraction/tsconfig.app.json",
+        "inlineStyleLanguage": "less",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/mapping-and-data-exctraction/public"
+          }
+        ],
+        "styles": ["apps/mapping-and-data-exctraction/src/styles.less"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "mapping-and-data-exctraction:build:production"
+        },
+        "development": {
+          "buildTarget": "mapping-and-data-exctraction:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "mapping-and-data-exctraction:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/mapping-and-data-exctraction/jest.config.ts"
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "mapping-and-data-exctraction:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/mapping-and-data-exctraction/browser",
+        "spa": true
+      }
+    }
+  }
+}

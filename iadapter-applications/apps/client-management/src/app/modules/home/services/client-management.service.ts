@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
-import { ClientUrls, HduClient } from '../models';
+import { ClientUrls } from '../models';
 import { catchError, map, Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import { UnAuothorizedException, UnknownException } from '@models';
@@ -36,7 +36,6 @@ export class ClientManagementService {
           return ClientPage.fromJson(response);
         }),
         catchError((error: any) => {
-          console.log(error, 'ERRORRRRRRRRRRRRRRRRRRRRRRRR');
           if (error.status === 401) {
             throw new UnAuothorizedException('Invalid username or password');
           } else {
