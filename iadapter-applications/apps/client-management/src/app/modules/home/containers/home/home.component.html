@@ -27,6 +27,7 @@
       </tr>
     </thead>
     <tbody>
+      <!-- TODO: track list items using cientID  -->
       @for (data of listOfHduClients; track data.fname; let i = $index ) {
       <tr>
         <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
