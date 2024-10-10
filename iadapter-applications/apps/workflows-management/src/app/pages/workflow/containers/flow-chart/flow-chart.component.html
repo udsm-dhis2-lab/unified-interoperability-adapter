@@ -1,0 +1,127 @@
+<main>
+  <div
+    id="canvas"
+    ngFlowchartCanvas
+    [ngFlowchartOptions]="options"
+    [ngFlowchartCallbacks]="callbacks"
+    [disabled]="disabled"
+  ></div>
+
+  <!-- <ng-template #normalStep let-data>
+    <div
+      class="card"
+      [ngClass]="{
+        'selected-class': selectedFlowItem === data.id,
+        'deselected-class': selectedFlowItem !== data.id
+      }"
+      [attr.name]="data.data.name"
+      #card
+      tabindex="0"
+      role="button"
+      (click)="onSelectingItem(data.id)"
+      (click)="onDelete(data.id)"
+      (keydown)="onKeydown($event, data.id)"
+    >
+      <span>{{ data.data.name }}</span>
+      
+    </div>
+    <button
+        *ngIf="selectedFlowItem === data.id"
+        nz-button
+        nzType="primary"
+        nzShape="circle"
+      >
+        <span nz-icon nzType="download"></span>
+      </button>
+  </ng-template> -->
+
+  <ng-template #normalStep let-data>
+    <div
+      nz-row
+      nzGutter="16"
+      class="card-container"
+      [ngClass]="{
+        'selected-class': selectedFlowItem === data.id,
+        'deselected-class': selectedFlowItem !== data.id
+      }"
+      [attr.name]="data.data.name"
+      tabindex="0"
+      role="button"
+      (click)="onSelectingItem(data.id)"
+      (keydown)="onKeydown($event, data.id)"
+    >
+      <!-- Item Name -->
+      <div nz-col nzSpan="16" class="item-content">
+        <span>{{ data.data.name }}</span>
+      </div>
+    </div>
+
+    <!-- Add New Button -->
+    <div
+      *ngIf="selectedFlowItem === data.id && !isFlowChartHasChildren"
+      class="add-new-button"
+    >
+      <button nz-button nzType="dashed" nzBlock (click)="onAddNew()">
+        <i nz-icon nzType="plus"></i>
+        Add New Item
+      </button>
+    </div>
+  </ng-template>
+
+  <div id="palette">
+    <div>
+      <nz-select
+        [(ngModel)]="selectedGap"
+        (ngModelChange)="onGapChanged($event)"
+        placeholder="Select Step Gap"
+        class="full-width-select"
+      >
+        <nz-option
+          *ngFor="let gap of stepGaps"
+          [nzValue]="gap"
+          [nzLabel]="'Step Gap ' + gap"
+        ></nz-option>
+      </nz-select>
+    </div>
+    <br />
+
+    <div *ngIf="!isProcessRunning" class="full-width-select">
+      <button
+        (click)="onRunningProcess()"
+        class="full-width-select"
+        nz-button
+        nzType="primary"
+      >
+        Run Process
+      </button>
+    </div>
+
+    <div *ngIf="isProcessRunning">
+      <button class="full-width-select" nz-button nzType="primary" nzLoading>
+        <span nz-icon nzType="poweroff"></span>
+        Running
+      </button>
+    </div>
+
+    <!-- <section>
+            <div class="sub-section">
+                <label for="sequential">Sequential</label>
+                <input type="checkbox" name="sequential" (change)="onSequentialChange($event)" />
+            </div>
+            <div class="sub-section">
+                <label for="orientation">Horizontal Orientation</label>
+                <input type="checkbox" name="orientation" (change)="onOrientationChange($event)" />
+            </div>
+            <div class="sub-section">
+                <label for="disabled">Disabled</label>
+                <input type="checkbox" name="disabled" (change)="disabled = $any($event).target.checked" />
+            </div>
+        </section>
+
+        <section>
+            <button (click)="onGrow()">+</button>
+            <button (click)="onShrink()">-</button>
+            <button (click)="onReset()">Reset</button>
+        </section> -->
+  </div>
+</main>
