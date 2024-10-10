@@ -34,11 +34,18 @@ export class HomeComponent {
     this.loading = true;
     this.clientManagementService
       .getHduClients(pageIndex, pageSize, filter)
-      .subscribe((data: any) => {
-        this.loading = false;
-        this.total = 200;
-        this.pageIndex = pageIndex;
-        this.listOfHduClients = data.results;
+      .subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          //TODO: Set total from data after it's support in fhir is implemented
+          this.total = 200; //data.total;
+          this.pageIndex = data.pageIndex;
+          this.listOfHduClients = data.listOfClients;
+        },
+        error: (error) => {
+          this.loading = false;
+          //TODO: Implement error handling
+        },
       });
   }
 

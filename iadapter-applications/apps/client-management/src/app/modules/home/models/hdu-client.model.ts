@@ -14,8 +14,12 @@ export class HduClient {
     hduClient.mname = json['middleName'];
     hduClient.surname = json['lastName'];
     hduClient.gender = json['gender'];
-    hduClient.idNumber = json['identifiers'][0]['id'];
-    hduClient.idType = json['identifiers'][0]['type'];
+    hduClient.idNumber = json['identifiers'][0]
+      ? json['identifiers'][0]['id']
+      : '';
+    hduClient.idType = json['identifiers'][0]
+      ? json['identifiers'][0]['type']
+      : '';
     return hduClient;
   }
 }
