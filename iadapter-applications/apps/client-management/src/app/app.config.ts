@@ -13,11 +13,13 @@ import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { BrowserModule } from '@angular/platform-browser';
+import { provideHttpClient } from '@angular/common/http';
 
 registerLocaleData(en);
 const icons: IconDefinition[] = [...antDesignIcons];
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(),
     importProvidersFrom(BrowserModule),
     importProvidersFrom(BrowserAnimationsModule),
     provideZoneChangeDetection({ eventCoalescing: true }),

@@ -4,11 +4,14 @@
   </div>
 
   <nz-table
-    #rowSelectionTable
-    nzShowPagination
     nzShowSizeChanger
-    [nzData]="listOfData"
-    (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
+    [nzData]="listOfDeduplications"
+    [nzFrontPagination]="false"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    (nzQueryParams)="onQueryParamsChange($event)"
   >
     <thead>
       <tr>
@@ -25,9 +28,9 @@
       </tr>
     </thead>
     <tbody>
-      @for (data of listOfCurrentPageData; track data.fname) {
+      @for (data of listOfDeduplications; track data.fname; let i = $index;) {
       <tr>
-        <td>{{ data.sn }}</td>
+        <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
         <td>
           <!-- Use primary color from theme  -->
           <span style="color: #1890ff">{{ data.clientID }}</span>
@@ -36,7 +39,7 @@
         <td>{{ data.mname }}</td>
         <td>{{ data.surname }}</td>
         <td>{{ data.gender }}</td>
-        <td>{{ data.idNUmber }}</td>
+        <td>{{ data.idNumber }}</td>
         <td>{{ data.idType }}</td>
         <td style="text-align: center">{{ data.associatedDuplicates }}</td>
         <td>
@@ -44,7 +47,7 @@
             nz-button
             nzType="text"
             style="color: #1890ff"
-            (click)="onView()"
+            (click)="viewDeduplicationDetails()"
           >
             View
           </button>
