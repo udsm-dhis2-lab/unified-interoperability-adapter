@@ -72,7 +72,7 @@ public class ClientRegistryService {
                 searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
             }
 
-            if (onlyLinkedClients) {
+            if (onlyLinkedClients != null) {
                 // TODO replace hardcoded ids with dynamic ones
                 searchClient.where(Patient.LINK.hasAnyOfIds("299","152"));
             }
@@ -119,6 +119,7 @@ public class ClientRegistryService {
                 .count(1)
                 .returnBundle(Bundle.class)
                 .execute();
+        System.out.println(response.getEntry().size());
         return response.getTotal();
     }
 
