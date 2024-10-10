@@ -34,7 +34,6 @@ export class DeduplicationManagementService {
       })
       .pipe(
         map((response: { results: any }) => {
-          console.log(response, 'TESTING RESPONSE');
           return DeduplicationPage.fromJson(response);
         }),
         catchError((error: any) => {

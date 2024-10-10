@@ -74,7 +74,6 @@ export class LoginComponent implements OnDestroy {
       .login(userName, password)
       .subscribe({
         next: (response: any) => {
-          console.log('login successful');
           this.isLoading = false;
           this.alert = {
             show: true,
@@ -83,7 +82,6 @@ export class LoginComponent implements OnDestroy {
           };
         },
         error: (error) => {
-          console.log('login unsuccessful', error);
           this.isLoading = false;
           this.alert = {
             show: true,
