@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { icons } from './ant-design-icons.constants';
 import { antDesignModules } from './ant-design.modules';
-import { Menu } from './menu.model';
+import { Menu } from './models/menu.model';
 
 @Component({
   selector: 'lib-hdu-api-nav-menu',
@@ -49,7 +49,7 @@ export class HduApiNavMenuComponent {
       subMenus: [
         {
           name: 'workflows',
-          routeUrl: '/',
+          routeUrl: '/home',
           icon: 'unordered-list',
           subMenus: [],
         },
