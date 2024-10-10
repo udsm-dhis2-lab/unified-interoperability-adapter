@@ -1,4 +1,96 @@
-.top-header-bar-container {
+.hdu-menu-container {
+  display: flex;
+  position: fixed;
+  align-items: center;
   height: 50px;
-  background-color: #1890ff;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  right: 0;
+  justify-content: space-between;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: #fff;
+  -webkit-box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.05),
+    0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  -moz-box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.05),
+    0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 1px -1px rgba(0, 0, 0, 0.05),
+    0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 3px 0 rgba(0, 0, 0, 0.12);
+}
+
+.hdu-left-header {
+  display: flex;
+  align-items: center;
+}
+
+.hdu-header {
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+}
+
+.hdu-header a {
+  text-decoration: none;
+  color: #000000;
+}
+
+.hdu-logo {
+  margin-right: 10px;
+  text-decoration: none;
+}
+
+.hdu-logo img {
+  height: 30px;
+}
+
+.hdu-right-header {
+  display: flex;
+  align-items: center;
+}
+
+.hdu-user-profile-circle {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #dddddd;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.hdu-user-profile-container,
+.hdu-apps-container {
+  position: absolute;
+  z-index: 1100;
+  top: 58px;
+  right: 20px;
+  border-radius: 2px;
+}
+
+.hdu-apps-container {
+  width: 350px;
+  padding: 10px;
+  max-height: auto;
+  border-radius: 15px;
+}
+
+.hdu-user-profile-container {
+  min-width: 300px;
+  border-radius: 15px;
+}
+
+.hdu-right-header a {
+  text-decoration: none;
+  color: black;
+}
+
+.hdu-user-profile-name {
+  margin-right: 10px;
+  font-weight: bold;
+  color: #000;
 }
