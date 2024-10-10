@@ -34,9 +34,11 @@ export class AppComponent {
 
   onMenuItemClick(menu: Menu): void {
     if (menu?.category === 'main') {
-      window.open('../../..' + menu.routeUrl, '_self');
+      // window.open('../../..' + menu.routeUrl, '_self');
     } else {
-      this.router.navigate([menu.routeUrl]);
+      // console.log("THIS IS HANDLED");
+      console.log("THIS IS MORE::: ", menu.routeUrl);
+      this.router.navigate(['/' + menu.routeUrl]);
     }
   }
 }
