@@ -56,7 +56,6 @@ export class LoginComponent implements OnDestroy {
     if (this.validateForm.valid) {
       const { userName, password } = this.validateForm.value;
       if (userName && password) {
-        console.log('login credentials', userName, password);
         this.login(userName, password);
       }
     } else {
