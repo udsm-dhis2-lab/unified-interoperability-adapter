@@ -2,12 +2,11 @@ package com.Adapter.icare.Dtos;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hl7.fhir.r4.model.BackboneElement;
-import org.hl7.fhir.r4.model.Identifier;
-import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -23,6 +22,7 @@ public class PatientDTO {
     private Organization organization;
     private List<ContactPeopleDTO> contactPeople;
     private String maritalStatus;
+    private List<Map<String,Object>> relatedClients;
 
     public PatientDTO(String id,
                       String status,
@@ -34,7 +34,8 @@ public class PatientDTO {
                       List<ContactDTO> telecom,
                       Organization organization,
                       List<ContactPeopleDTO> contactPeople,
-                      String maritalStatus) {
+                      String maritalStatus,
+                      List<Map<String,Object>> relatedClients) {
         this.id = id;
         this.status = status;
         this.name = name;
@@ -46,6 +47,7 @@ public class PatientDTO {
         this.organization = organization;
         this.contactPeople = contactPeople;
         this.maritalStatus = maritalStatus;
+        this.relatedClients = relatedClients;
     }
 
     public Map<String, Object> toMap() {
@@ -72,6 +74,7 @@ public class PatientDTO {
             }
             // TODO: Add support to retrieve identifier relevant to requesting health facility
             List<Map<String, Object>> identifiersList = getIdentifierMaps();
+            mappedPatient.put("id", this.id);
             mappedPatient.put("identifiers", identifiersList);
             mappedPatient.put("firstName",firstName);
             mappedPatient.put("middleName",middleName);
@@ -90,13 +93,36 @@ public class PatientDTO {
                 orgMap = null;
             }
             mappedPatient.put("organisation", orgMap);
+            List<Map<String,Object>> relatedClientsList = new ArrayList<>();
+            if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
+                for (Map<String,Object> clientDetails: this.relatedClients) {
+                    Map<String, Object> clientData = new HashMap<>();
+                    clientData.put("type",clientDetails.get("type"));
+                    clientData.put("display", clientData.get("patientDisplay"));
+                    Map<String,Object> clientRelated = new HashMap<>();
+                    if (clientDetails.get("patient") != null && clientDetails.get("patient") instanceof Patient) {
+                        Patient patientData = (Patient) clientDetails.get("patient");
+                        // TODO: return client registry identifier
+                        List<String> identifiersListForRelatedClient  = new ArrayList<>();
+                        clientRelated.put("id", patientData.getIdElement().getIdPart());
+                        for(Identifier identifier: patientData.getIdentifier()) {
+//                            System.out.println(identifier.getValue().toString());
+                            identifiersListForRelatedClient.add(identifier.getValue().toString());
+                        }
+                        clientRelated.put("identifiers",identifiersListForRelatedClient);
+                    }
+                    clientData.put("client", clientRelated);
+                    relatedClientsList.add(clientData);
+                }
+            }
+            mappedPatient.put("relatedClients", relatedClientsList);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return mappedPatient;
     }
 
-    private @NotNull List<Map<String, Object>> getIdentifierMaps() {
+    public @NotNull List<Map<String, Object>> getIdentifierMaps() {
         List<Map<String, Object>> identifiers = new ArrayList<>();
         if (!this.getIdentifiers().isEmpty()) {
             for (Identifier identifier: this.getIdentifiers()) {

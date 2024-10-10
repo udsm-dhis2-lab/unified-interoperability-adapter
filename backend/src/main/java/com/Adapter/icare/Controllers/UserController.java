@@ -1,9 +1,11 @@
 package com.Adapter.icare.Controllers;
 
+import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Group;
 import com.Adapter.icare.Domains.Privilege;
 import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.LoginDTO;
 import com.Adapter.icare.Mappers.Mappers;
 import com.Adapter.icare.Services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,11 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,22 +32,35 @@ import java.util.Map;
 public class UserController {
     private final UserService userService;
     private Mappers mappers;
+    private Authentication authentication;
+    private final AuthenticationManager authenticationManager;
+    private User authenticatedUser;
 
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    private HttpServletRequest request;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
     }
 
 
     @PostMapping(path = "/login")
-    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestHeader("Authorization") String authHeader) throws IllegalAccessException{
+    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody LoginDTO loginData) throws IllegalAccessException{
         try {
-            Map<String, Object> userDetails = userService.authenticate(authHeader);
+            Map<String, Object> userDetails = userService.authenticate(loginData);
             // Here, you can return user info or a token, depending on your needs
             Map<String, Object> response = new HashMap<>();
             if (userDetails != null) {
+                this.authentication = authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(loginData.getUsername(),
+                                loginData.getPassword()));
+                SecurityContextHolder.getContext().setAuthentication(this.authentication);
+                this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+                response = this.authenticatedUser.toMap();
                 response.put("authenticated", true);
                 return ResponseEntity.ok(response);
             } else {
@@ -52,6 +71,26 @@ public class UserController {
             Map<String, Object> response = new HashMap<>();
             response.put("authenticated", false);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+    }
+
+    @GetMapping("/logout")
+    public String logout() {
+        // TODO: Implement logout features
+        return "OK";
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Map<String, Object>> getLoggedInUser() throws Exception {
+        try {
+            if (authentication != null) {
+                User authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+                return ResponseEntity.ok(authenticatedUser.toMap());
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
 
@@ -103,6 +142,9 @@ public class UserController {
         List<Map<String,Object>> createdRoles = new ArrayList<>();
         for(Map<String, Object> roleMap: rolesMap){
             Role role = Role.fromMap(roleMap);
+            if (this.authenticatedUser != null) {
+                role.setCreatedBy(this.authenticatedUser);
+            }
             Role createdRole = userService.saveRole(role);
             createdRoles.add(createdRole.toMap(false));
         }
@@ -131,6 +173,9 @@ public class UserController {
     @PutMapping("/users/roles/{uuid}")
     public Map<String,Object> updateRole(@RequestBody Map<String,Object> roleMap,@PathVariable String uuid) throws Exception {
         Role role = Role.fromMap(roleMap);
+        if (this.authenticatedUser != null) {
+            role.setLastUpdatedBy(this.authenticatedUser);
+        }
         Role updateRole = userService.updateRole(role,uuid);
         return updateRole.toMap(true);
     }
@@ -140,6 +185,9 @@ public class UserController {
         List<Map<String,Object>> createdPrivileges = new ArrayList<>();
         for(Map<String,Object> priviligeMap : privilegesMap){
             Privilege privilege = Privilege.fromMap(priviligeMap);
+            if (this.authenticatedUser != null) {
+                privilege.setCreatedBy(this.authenticatedUser);
+            }
             Privilege savedPrivilege = userService.savePrivilege(privilege);
             createdPrivileges.add(savedPrivilege.toMap(false));
         }
@@ -176,6 +224,9 @@ public class UserController {
         List<Map<String,Object>> savedGroupsMap = new ArrayList<>();
         for(Map<String,Object> groupMap : groupsMap){
             Group group = Group.fromMap(groupMap);
+            if (this.authenticatedUser != null) {
+                group.setCreatedBy(this.authenticatedUser);
+            }
             Group savedGroup = userService.createGroup(group);
             savedGroupsMap.add(savedGroup.toMap(false));
         }

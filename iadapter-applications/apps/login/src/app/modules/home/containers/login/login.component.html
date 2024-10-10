@@ -1,37 +1,72 @@
-<div>
+<div nz-row nzJustify="space-between">
   <div class="logo">
     <img src="images/national-flag.png" alt="logo" />
   </div>
-
-  <div class="center">
-    <div class="horizontal-container">
-      <div>
-        <span><h2>HDU API</h2></span>
-      </div>
-    </div>
-    <div class="form-elements-container">
-      <div class="form-input">
-        <nz-input-group [nzPrefix]="suffixTemplateUser">
-          <input type="text" nz-input placeholder="User name" />
-        </nz-input-group>
-      </div>
-      <div class="form-input">
-        <nz-input-group [nzPrefix]="suffixTemplateLock">
-          <input type="password" nz-input placeholder="Password" />
-        </nz-input-group>
-      </div>
-      <div style="margin-top: 28px">
-        <button nz-button nzType="primary">Sign in</button>
-      </div>
-    </div>
+  <div class="logo">
+    <img src="images/court-of-arms.png" alt="logo" />
   </div>
 </div>
 
-<ng-template #suffixTemplateUser>
+<div nz-row nzJustify="center">
+  <div class="form-title; login-form-margin">
+    <span><h2>HDU API</h2></span>
+  </div>
+</div>
+
+<div nz-row nzJustify="center">
+  <form
+    nz-form
+    [formGroup]="validateForm"
+    class="login-form"
+    (ngSubmit)="submitForm()"
+  >
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Please input your username!">
+        <nz-input-group [nzPrefix]="prefixTemplateUser">
+          <input
+            type="text"
+            nz-input
+            formControlName="userName"
+            placeholder="Username"
+          />
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+
+    <nz-form-item>
+      <nz-form-control nzErrorTip="Please input your Password!">
+        <nz-input-group [nzPrefix]="prefixTemplateLock">
+          <input
+            type="password"
+            nz-input
+            formControlName="password"
+            placeholder="Password"
+          />
+        </nz-input-group>
+      </nz-form-control>
+    </nz-form-item>
+    <nz-spin [nzSpinning]="isLoading">
+      <button nz-button [nzType]="'primary'" class="login-form-button">
+        Log in
+      </button>
+    </nz-spin>
+
+    <nz-alert
+      nzCloseable
+      *ngIf="alert.show"
+      [nzType]="alert.type === 'success' ? 'success' : 'error'"
+      [nzMessage]="alert.message"
+      (nzOnClose)="afterClose()"
+      nzShowIcon
+    ></nz-alert>
+  </form>
+</div>
+
+<ng-template #prefixTemplateUser>
   <!-- Use primary color property  -->
   <span nz-icon nzType="user" nzTheme="outline" style="color: #1890ff"></span>
 </ng-template>
 
-<ng-template #suffixTemplateLock>
+<ng-template #prefixTemplateLock>
   <span nz-icon nzType="lock" nzTheme="outline" style="color: #1890ff"></span>
 </ng-template>

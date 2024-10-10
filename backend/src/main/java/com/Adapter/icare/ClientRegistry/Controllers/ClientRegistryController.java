@@ -8,7 +8,7 @@ import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.MergeClients;
+import com.Adapter.icare.Dtos.ClientsToMergeDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -16,8 +16,8 @@ import org.hl7.fhir.r4.model.Address;
 import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.codesystems.AdministrativeGender;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -30,8 +30,6 @@ import java.util.stream.Collectors;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 // SWAGGER
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -75,7 +73,7 @@ public class ClientRegistryController {
                 datastoreConstants.ConfigurationsNamespace,
                 datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
-            this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
+            this.shouldUseWorkflowEngine = (Boolean) WESystemConfigurations.getValue().get("active");
             this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
             this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
         } else {
@@ -117,9 +115,11 @@ public class ClientRegistryController {
             @RequestParam( value = "firstName", required = false) String firstName,
             @RequestParam( value = "middleName", required = false) String middleName,
             @RequestParam( value = "lastName", required = false) String lastName,
-            @RequestParam( value = "dateOfBirth", required = false) Date dateOfBirth
+            @RequestParam( value = "dateOfBirth", required = false) Date dateOfBirth,
+            @RequestParam( value = "onlyLinkedClients", required = false) Boolean onlyLinkedClients
     ) throws Exception {
         // TODO: Add support to use configured default workflow engine
+
         try {
             Map<String, Object> patientDataResponse = new HashMap<>();
             List<Map<String, Object>> patients = clientRegistryService.getPatients(
@@ -132,9 +132,12 @@ public class ClientRegistryController {
                     firstName,
                     middleName,
                     lastName,
-                    dateOfBirth);
+                    dateOfBirth,
+                    onlyLinkedClients);
             patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
+            pager.put("total", patients.size());
+            pager.put("totalPages", null);
             pager.put("page", page);
             pager.put("pageSize", pageSize);
             // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
@@ -157,9 +160,44 @@ public class ClientRegistryController {
         }
     }
 
+    @GetMapping(value = "potentialDuplicates", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getPotentialDuplicates(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "key", required = false) String key) throws Exception {
+        // TODO: Replace with FHIR implementation
+        try {
+            Map<String, Object> patientDataResponse = new HashMap<>();
+            List<Map<String, Object>> patients = clientRegistryService.getPatients(
+                    page,
+                    pageSize,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    null,
+                    true);
+            patientDataResponse.put("results", patients);
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("total", patients.size());
+            pager.put("totalPages", null);
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
+            pager.put("total", clientRegistryService.getTotalPatients());
+            patientDataResponse.put("pager", pager);
+            return ResponseEntity.ok(patientDataResponse);
+        }   catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping(value = "merge",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> mergePatients(
-            @RequestBody MergeClients clientsToMerge
+            @RequestBody ClientsToMergeDTO clientsToMerge
     ) throws Exception {
         try {
             Map<String, Object> mergeResponse = new HashMap<>();

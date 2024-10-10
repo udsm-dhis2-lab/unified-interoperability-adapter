@@ -23,7 +23,7 @@ export class HduApiNavMenuComponent {
     },
     {
       name: 'Client Management',
-      routeUrl: '/clientManagement',
+      routeUrl: '/ClientManagementService',
       icon: 'user',
       category: 'main',
       subMenus: [
@@ -55,7 +55,6 @@ export class HduApiNavMenuComponent {
         },
       ],
     },
-  
   ];
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();

@@ -22,6 +22,14 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
     List<Datastore> getDatastoreByNamespace(String namespace);
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+            " (:key IS NULL OR data_key = :key )",
+            countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
+                    " (:key IS NULL OR data_key = :key ) ",nativeQuery = true)
+    Page<Datastore> getDatastoreByNamespaceByPagination(String namespace,
+                                                        Pageable pageable,
+                                                        String key);
+
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
             "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
             "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +

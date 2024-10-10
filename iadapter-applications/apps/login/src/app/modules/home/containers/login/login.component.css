@@ -1,41 +1,23 @@
 .logo {
-    margin-top: 3vw;
-    margin-left: 3vw;
-    height: 100px;
-    width: 120px;
+  margin: 3vw;
+  height: 100px;
+  width: 120px;
 }
 
 img {
-    max-width: 100%;
-    height: auto;
+  max-width: 100%;
+  height: auto;
 }
 
-.center {
-    display: flex;
-    flex-direction: column; 
-    justify-content: center;
-    align-items: center;
+.login-form {
+  width: 300px;
 }
 
-.form-input {
-    margin-top: 28px;
-    width: 300px;
+.login-form-margin {
+  margin-bottom: 16px;
 }
 
-.icon-style {
-    color: var(--primary-color)
+.login-form-button {
+  width: 100%;
+  margin-bottom: 16px;
 }
-
-.horizontal-container {
-    display: flex;
-    align-items: center;
-}
-
-.form-elements-container {
-    width: 300px;
-    display: flex;
-    flex-direction: column; 
-    align-items: flex-start;
-    height: auto;
-  }
-

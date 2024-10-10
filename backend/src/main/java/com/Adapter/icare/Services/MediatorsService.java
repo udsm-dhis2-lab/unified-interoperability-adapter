@@ -110,13 +110,29 @@ public class MediatorsService {
     }
 
     public String processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data) throws Exception {
-        Map<String, Object> response = new HashMap<>();
-        return sendDataToExternalSystemAsynchronously(mediator,data);
+        try {
+            Map<String, Object> response = new HashMap<>();
+            return sendDataToExternalSystem(mediator,data);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
     }
 
     public String routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
-        // TODO:
-        return "";
+        try {
+            if (method == null || method.equals("GET")) {
+                return getDataFromExternalSystem(mediator, apiPath);
+            } else if (method.equals("POST")) {
+                return sendDataToExternalSystem(mediator,payload);
+            } else {
+                // TODO: Add support for delete, patch and update
+                return null;
+            }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
     }
 
     public String sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
@@ -361,7 +377,57 @@ public class MediatorsService {
         return response;
     }
 
-    public String sendDataToExternalSystemAsynchronously(Mediator mediator, Map<String, Object> data) throws ConnectException, MalformedURLException {
+    public String getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
+        String response = new String();
+        String authType = mediator.getAuthType();
+        String authToken = mediator.getAuthToken();
+        String baseUrl = mediator.getBaseUrl();
+        String path = mediator.getPath();
+        URL url = null;
+
+        try {
+            url = new URL(baseUrl + path + apiPath);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        BufferedReader reader;
+        String dataLine;
+        StringBuffer responseContent = new StringBuffer();
+        JSONObject responseJsonObject = new JSONObject();
+
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            String authentication = "";
+
+            if (authType.toLowerCase().equals("basic")) {
+                authentication = "Basic " + authToken;
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            } else if (authType.toLowerCase().equals("token")) {
+                authentication = "Bearer " + authToken;
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            }
+
+            // Set the request method to GET
+            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setRequestProperty("Accept", "application/json");
+
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((dataLine = reader.readLine()) != null) {
+                responseContent.append(dataLine);
+            }
+            reader.close();
+
+            responseJsonObject = new JSONObject(responseContent.toString());
+            response = responseJsonObject.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace(); // Print any exception details
+        }
+        return response;
+    }
+    public String sendDataToExternalSystem(Mediator mediator, Map<String, Object> data) throws Exception {
         // TODO: Make this valid for async true
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -412,6 +478,7 @@ public class MediatorsService {
             returnStr  = responseJsonObject.toString();
         } catch (Exception e) {
             e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
         return responseJsonObject.toString();
     }
