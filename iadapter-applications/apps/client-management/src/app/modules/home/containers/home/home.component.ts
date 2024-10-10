@@ -22,6 +22,8 @@ export class HomeComponent implements OnDestroy {
   pageIndex = 1;
   filterKey = [{}];
 
+  isFirstLoad = true;
+
   constructor(
     private router: Router,
     private clientManagementService: ClientManagementService
@@ -40,28 +42,29 @@ export class HomeComponent implements OnDestroy {
     filter: Array<{ key: string; value: string[] }>
   ): void {
     this.loading = true;
-    if (!this.loadHduClientsSubscription) {
-      this.loadHduClientsSubscription = this.clientManagementService
-        .getHduClients(pageIndex, pageSize, filter)
-        .subscribe({
-          next: (data: any) => {
-            this.loading = false;
-            //TODO: Set total from data after it's support in fhir is implemented
-            this.total = 200; //data.total;
-            this.pageIndex = data.pageIndex;
-            this.listOfHduClients = data.listOfClients;
-          },
-          error: (error) => {
-            this.loading = false;
-            //TODO: Implement error handling
-          },
-        });
-    }
+    this.loadHduClientsSubscription = this.clientManagementService
+      .getHduClients(pageIndex, pageSize, filter)
+      .subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          //TODO: Set total from data after it's support in fhir is implemented
+          this.total = 200; //data.total;
+          this.pageIndex = data.pageIndex;
+          this.listOfHduClients = data.listOfClients;
+        },
+        error: (error) => {
+          this.loading = false;
+          //TODO: Implement error handling
+        },
+      });
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
+    if (this.isFirstLoad) {
+      this.isFirstLoad = false;
+      return;
+    }
     const { pageSize, pageIndex, filter } = params;
-
     this.loadHduClientsFromServer(pageIndex, pageSize, filter);
   }
 

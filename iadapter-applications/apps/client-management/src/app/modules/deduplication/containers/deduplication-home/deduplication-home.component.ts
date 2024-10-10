@@ -22,6 +22,8 @@ export class DeduplicationHomeComponent implements OnDestroy {
   pageIndex = 1;
   filterKey = [{}];
 
+  isFirstLoad = true;
+
   loadHduClientsSubscription!: Subscription;
 
   constructor(
@@ -40,28 +42,29 @@ export class DeduplicationHomeComponent implements OnDestroy {
     filter: Array<{ key: string; value: string[] }>
   ): void {
     this.loading = true;
-    if (!this.loadHduClientsSubscription) {
-      this.loadHduClientsSubscription = this.dedupicationManagementService
-        .getDeduplicationClients(pageIndex, pageSize, filter)
-        .subscribe({
-          next: (data: any) => {
-            this.loading = false;
-            //TODO: Set total from data after it's support in fhir is implemented
-            this.total = 200; //data.total;
-            this.pageIndex = data.pageIndex;
-            this.listOfDeduplications = data.data;
-          },
-          error: (error) => {
-            this.loading = false;
-            //TODO: Implement error handling
-          },
-        });
-    }
+    this.loadHduClientsSubscription = this.dedupicationManagementService
+      .getDeduplicationClients(pageIndex, pageSize, filter)
+      .subscribe({
+        next: (data: any) => {
+          this.loading = false;
+          //TODO: Set total from data after it's support in fhir is implemented
+          this.total = 200; //data.total;
+          this.pageIndex = data.pageIndex;
+          this.listOfDeduplications = data.data;
+        },
+        error: (error) => {
+          this.loading = false;
+          //TODO: Implement error handling
+        },
+      });
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
+    if (this.isFirstLoad) {
+      this.isFirstLoad = false;
+      return;
+    }
     const { pageSize, pageIndex, filter } = params;
-
     this.loadHduClientsFromServer(pageIndex, pageSize, filter);
   }
 
