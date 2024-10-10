@@ -1,0 +1,45 @@
+.full-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    /* Full height of the viewport */
+}
+
+.header {
+    height: 50px;
+    /* Set height for header */
+    background-color: #001529;
+    color: white;
+}
+
+.main-layout {
+    display: flex;
+    flex: 1;
+    /* Fills the available space between header and footer */
+    overflow: hidden;
+    /* Prevents main-layout itself from scrolling */
+}
+
+.sider {
+    width: 200px;
+    /* Set width for the sidebar */
+    background-color: #f0f2f5;
+}
+
+.content {
+    flex: 1;
+    padding: 4px;
+    overflow-y: auto;
+    /* Enables vertical scrolling within content */
+    background-color: #fff;
+    height: 100%;
+    /* Ensure it stretches the height */
+}
+
+.footer {
+    height: 64px;
+    /* Set height for footer */
+    background-color: #001529;
+    color: white;
+    text-align: center;
+}

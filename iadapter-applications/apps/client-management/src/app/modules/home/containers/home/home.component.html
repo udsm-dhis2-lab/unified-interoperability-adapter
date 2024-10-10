@@ -1,58 +1,62 @@
-<div style="padding: 16px">
-  <div style="margin-bottom: 16px">
-    <app-search [labelText]="'Search client:'"></app-search>
-  </div>
+<nz-layout>
+  <nz-content>
+    <nz-breadcrumb class="breadcrumb">
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/home']">Home</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/workflows']">Client</a>
+      </nz-breadcrumb-item>
+    </nz-breadcrumb>
 
-  <nz-table
-    nzShowSizeChanger
-    [nzData]="listOfHduClients"
-    [nzFrontPagination]="false"
-    [nzLoading]="loading"
-    [nzTotal]="total"
-    [nzPageSize]="pageSize"
-    [nzPageIndex]="pageIndex"
-    (nzQueryParams)="onQueryParamsChange($event)"
-  >
-    <thead>
-      <tr>
-        <th>SN</th>
-        <th>Client ID</th>
-        <th>First name</th>
-        <th>Middle name</th>
-        <th>Surname</th>
-        <th>Gender</th>
-        <th>ID number</th>
-        <th>ID type</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- TODO: track list items using cientID  -->
-      @for (data of listOfHduClients; track data.fname; let i = $index ) {
-      <tr>
-        <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
-        <td>
-          <!-- Use primary color from theme  -->
-          <span style="color: #1890ff">{{ data.clientID }}</span>
-        </td>
-        <td>{{ data.fname }}</td>
-        <td>{{ data.mname }}</td>
-        <td>{{ data.surname }}</td>
-        <td>{{ data.gender }}</td>
-        <td>{{ data.idNumber }}</td>
-        <td>{{ data.idType }}</td>
-        <td>
-          <button
-            nz-button
-            nzType="text"
-            (click)="viewClientDetails()"
-            class="view-button"
-          >
-            View
-          </button>
-        </td>
-      </tr>
-      }
-    </tbody>
-  </nz-table>
-</div>
+    <div class="inner-content">
+      <div nz-row>
+        <div style="padding: 16px; width: 100%;">
+          <div style="margin-bottom: 16px">
+            <app-search [labelText]="'Search client:'"></app-search>
+          </div>
+
+          <nz-table nzShowSizeChanger [nzData]="listOfHduClients" [nzFrontPagination]="false" [nzLoading]="loading"
+            [nzTotal]="total" [nzPageSize]="pageSize" [nzPageIndex]="pageIndex"
+            (nzQueryParams)="onQueryParamsChange($event)">
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Client ID</th>
+                <th>First name</th>
+                <th>Middle name</th>
+                <th>Surname</th>
+                <th>Gender</th>
+                <th>ID number</th>
+                <th>ID type</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of listOfHduClients; track data.fname; let i = $index ) {
+              <tr>
+                <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
+                <td>
+                  <!-- Use primary color from theme  -->
+                  <span style="color: #1890ff">{{ data.clientID }}</span>
+                </td>
+                <td>{{ data.fname }}</td>
+                <td>{{ data.mname }}</td>
+                <td>{{ data.surname }}</td>
+                <td>{{ data.gender }}</td>
+                <td>{{ data.idNUmber }}</td>
+                <td>{{ data.idType }}</td>
+                <td>
+                  <button nz-button nzType="text" style="color: #1890ff" (click)="viewClientDetails()">
+                    View
+                  </button>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+    </div>
+  </nz-content>
+</nz-layout>
