@@ -55,9 +55,10 @@ public class HDUAPIController {
         }
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
-            this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
+            this.shouldUseWorkflowEngine = (Boolean) WESystemConfigurations.getValue().get("active");
             this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
             this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
+            System.out.println(workflowEngine.getBaseUrl());
         } else {
             this.shouldUseWorkflowEngine = false;
             this.defaultWorkflowEngineCode = null;
@@ -148,6 +149,7 @@ public class HDUAPIController {
         /**
          * Send data to Mediator where all the logics will be done.
          */
+        System.out.println(workflowEngine);
        try {
            if (shouldUseWorkflowEngine && workflowEngine != null) {
                Map<String, Object> payload = new HashMap<>();
@@ -298,7 +300,7 @@ public class HDUAPIController {
     public ResponseEntity<String> getWorkflows() throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "","GET", null));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes","GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -311,7 +313,7 @@ public class HDUAPIController {
     public ResponseEntity<String> addProcess(@RequestBody Map<String, Object> process) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "", "POST", process));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes", "POST", process));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -324,7 +326,7 @@ public class HDUAPIController {
     public ResponseEntity<String> getSchedules() throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "","GET", null));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules","GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -337,7 +339,7 @@ public class HDUAPIController {
     public ResponseEntity<String> addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "", "POST", schedule));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules", "POST", schedule));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }

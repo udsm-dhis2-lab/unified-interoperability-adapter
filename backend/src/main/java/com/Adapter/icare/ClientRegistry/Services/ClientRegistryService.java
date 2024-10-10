@@ -119,7 +119,6 @@ public class ClientRegistryService {
                 .count(1)
                 .returnBundle(Bundle.class)
                 .execute();
-        System.out.println(response.getEntry().size());
         return response.getTotal();
     }
 

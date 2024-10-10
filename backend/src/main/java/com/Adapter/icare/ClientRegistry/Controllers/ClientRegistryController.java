@@ -73,7 +73,7 @@ public class ClientRegistryController {
                 datastoreConstants.ConfigurationsNamespace,
                 datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
-            this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
+            this.shouldUseWorkflowEngine = (Boolean) WESystemConfigurations.getValue().get("active");
             this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
             this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
         } else {
