@@ -1,7 +1,7 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable, model } from '@angular/core';
 import { catchError, map, Observable, tap } from 'rxjs';
-import { DeduplicationUrls } from '../../../shared/constants';
+import { DeduplicationUrls } from '../models';
 import { DeduplicationPage } from '../models';
 import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
 import { UnAuothorizedException, UnknownException } from '@models';
