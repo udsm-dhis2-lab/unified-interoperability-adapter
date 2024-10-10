@@ -4,12 +4,12 @@ export const appRoutes: Route[] = [
     {
         path: '',
         loadChildren: () =>
-            import('../app/pages/home/home.module').then((m) => m.HomeModule),
+            import('../app/pages/workflow/workflow.module').then((m) => m.WorkflowModule),
     },
     {
         path: 'home',
         loadChildren: () =>
-            import('../app/pages/home/home.module').then((m) => m.HomeModule),
+            import('../app/pages/workflow/workflow.module').then((m) => m.WorkflowModule),
     },
     // {
     //   path: 'deduplication',

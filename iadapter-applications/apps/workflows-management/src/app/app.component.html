@@ -1,15 +1,14 @@
-<lib-hdu-api-top-bar-menu></lib-hdu-api-top-bar-menu>
+<nz-layout nzTheme="light" class="full-layout">
+    <lib-hdu-api-top-bar-menu class="header"></lib-hdu-api-top-bar-menu>
 
-<nz-layout>
-    <!-- Sidebar / Navigation -->
-    <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
-        <lib-hdu-api-nav-menu (selectedMenu)="onMenuItemClick($event)"></lib-hdu-api-nav-menu>
-    </nz-sider>
-
-    <!-- Main Content Area -->
-    <nz-content>
-        <div class="inner-content">
+    <nz-layout class="main-layout">
+        <nz-sider nzTheme="light" class="sider" nzCollapsible nzWidth="15vw">
+            <lib-hdu-api-nav-menu (selectedMenu)="onMenuItemClick($event)"></lib-hdu-api-nav-menu>
+        </nz-sider>
+        <nz-content class="content">
             <router-outlet></router-outlet>
-        </div>
-    </nz-content>
+        </nz-content>
+    </nz-layout>
+
+    <!-- <nz-footer class="footer">Footer</nz-footer> -->
 </nz-layout>

@@ -9,6 +9,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -22,4 +23,5 @@ export const antDesignModules = [
   NzButtonModule,
   NzTableModule,
   NzModalModule,
+  NzBreadCrumbModule
 ];
