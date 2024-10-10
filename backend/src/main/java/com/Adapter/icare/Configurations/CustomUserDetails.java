@@ -1,5 +1,6 @@
 package com.Adapter.icare.Configurations;
 
+import com.Adapter.icare.Domains.Privilege;
 import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,8 +23,14 @@ public class CustomUserDetails implements UserDetails {
         Set<Role> roles = user.getRoles();
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        for (Role role : roles) {
-            authorities.add(new SimpleGrantedAuthority(role.getRoleName()));
+        if (!roles.isEmpty()) {
+            for (Role role : roles) {
+                if (!role.getPrivileges().isEmpty()) {
+                    for (Privilege privilege: role.getPrivileges()) {
+                        authorities.add(new SimpleGrantedAuthority(privilege.getPrivilegeName()));
+                    }
+                }
+            }
         }
 
         return authorities;

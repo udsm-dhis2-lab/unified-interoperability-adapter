@@ -5,6 +5,7 @@ import com.Adapter.icare.Domains.Group;
 import com.Adapter.icare.Domains.Privilege;
 import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.LoginDTO;
 import com.Adapter.icare.Repository.GroupRepository;
 import com.Adapter.icare.Repository.PrivilegeRepository;
 import com.Adapter.icare.Repository.RoleRepository;
@@ -19,11 +20,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -37,21 +36,13 @@ public class UserService implements UserDetailsService {
 
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public Map<String, Object> authenticate(String authHeader) throws Exception {
-        if (authHeader == null || !authHeader.startsWith("Basic ")) {
-            throw new Exception("No Basic Authentication header found");
+    public Map<String, Object> authenticate(LoginDTO loginDTO) throws Exception {
+        if (loginDTO.getPassword() == null || loginDTO.getUsername() == null) {
+            throw new Exception("Credentials not well defined");
         }
 
-        String base64Credentials = authHeader.substring(6);
-        String credentials = new String(Base64.getDecoder().decode(base64Credentials));
-        String[] values = credentials.split(":", 2);
-
-        if (values.length != 2) {
-            throw new Exception("Invalid Basic Authentication header");
-        }
-
-        String username = values[0];
-        String password = values[1];
+        String username = loginDTO.getUsername();
+        String password = loginDTO.getPassword();
         // Load user from database or other source
         User user;
         try {
@@ -59,8 +50,6 @@ public class UserService implements UserDetailsService {
         } catch (UsernameNotFoundException e) {
             throw new Exception("User not found");
         }
-
-        // Check password
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new Exception("Invalid password");
         }
@@ -79,28 +68,54 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
+    @Transactional
     public User createUser(User user) throws Exception {
-        User createdUser = new User();
         try {
+            // Generate UUID for the new user
             UUID uuid = UUID.randomUUID();
             user.setUuid(uuid.toString());
 
-            //Password encoding
-            BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            // Encode the user's password
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            // Get the currently authenticated user to set as the creator
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null) {
-                User authenticatedUser = this.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                String username = ((CustomUserDetails) authentication.getPrincipal()).getUsername();
+                User authenticatedUser = this.getUserByUsername(username);
                 if (authenticatedUser != null) {
                     user.setCreatedBy(authenticatedUser);
                 }
             }
-            createdUser = userRepository.save(user);
-        } catch (Exception e) {
-            System.out.println("Error while creating user" + e);
-        }
+            // Handle roles: either fetch existing roles or create new ones if needed
+            Set<Role> attachedRoles = new HashSet<>();
+            if (user.getRoles() != null) {
+                for (Role role : user.getRoles()) {
+                    Role existingRole = roleRepository.findByUuid(role.getUuid());
+                    if (existingRole == null) {
+                        // If role does not exist, create a new one
+                        if (role.getRoleName() != null) {
+                            role.setUuid(UUID.randomUUID().toString());
+                            attachedRoles.add(roleRepository.save(role));
+                        }
+                    } else {
+                        attachedRoles.add(existingRole);
+                    }
+                }
+            }
+            user.setRoles(attachedRoles);
 
-        return createdUser;
+            // Save the user with the associated roles
+            User createdUser = userRepository.save(user);
+
+            return createdUser;
+
+        } catch (Exception e) {
+            // Log and rethrow the exception
+            System.err.println("Error while creating user: " + e.getMessage());
+            throw new Exception("Failed to create user", e);
+        }
     }
 
     public User updateUser(User user) {
@@ -135,6 +150,10 @@ public class UserService implements UserDetailsService {
         return  roleRepository.findAll();
     }
 
+    public Role getRoleByName(String name){
+        return  roleRepository.findByName(name);
+    }
+
     public Privilege savePrivilege(Privilege privilege){
         UUID uuid = UUID.randomUUID();
         privilege.setUuid(uuid.toString());
@@ -143,6 +162,10 @@ public class UserService implements UserDetailsService {
 
     public List<Privilege> getPrivileges(){
         return privilegeRepository.findAll();
+    }
+
+    public Privilege getPrivilegeByName(String name){
+        return privilegeRepository.findByName(name);
     }
 
     public User getUSer(String uuid) throws Exception {
@@ -173,7 +196,6 @@ public class UserService implements UserDetailsService {
         if(privilege == null){
             throw new Exception("Privilege with uuid "+uuid+" does not exist");
         }
-
         return privilege;
     }
 

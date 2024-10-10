@@ -61,16 +61,20 @@ public class ClientRegistryService {
                                                  String firstName,
                                                  String middleName,
                                                  String lastName,
-                                                 Date dateOfBirth) {
+                                                 Date dateOfBirth,
+                                                 Boolean onlyLinkedClients) {
         try {
             List<Map<String, Object>> patients = new ArrayList<>();
             Bundle response = new Bundle();
             // TODO: You might consider enumerating the gender codes
             var searchClient =  fhirClient.search().forResource(Patient.class);
-//            System.out.println(status);
-//            searchClient.where(Patient.DECEASED.isMissing(true));
             if (identifier != null) {
                 searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
+            }
+
+            if (onlyLinkedClients != null) {
+                // TODO replace hardcoded ids with dynamic ones
+                searchClient.where(Patient.LINK.hasAnyOfIds("299","152"));
             }
 
             if (gender != null) {
@@ -98,7 +102,7 @@ public class ClientRegistryService {
                 if (entry.getResource() instanceof Patient) {
                     Patient patientData = (Patient) entry.getResource();
                     patientData.getIdentifier();
-                    PatientDTO patientDTO =mapToPatientDTO(patientData);
+                    PatientDTO patientDTO = mapToPatientDTO(patientData);
                     patients.add(patientDTO.toMap());
                 }
             }
@@ -136,7 +140,7 @@ public class ClientRegistryService {
         return patient;
     }
 
-    private PatientDTO mapToPatientDTO(Patient patient) {
+    public PatientDTO mapToPatientDTO(Patient patient) {
         List<HumanNameDTO> nameDTOs = patient.hasName() ?
                 patient.getName().stream()
                         .map(name -> new HumanNameDTO(
@@ -180,6 +184,20 @@ public class ClientRegistryService {
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
         String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
+        List<Patient.PatientLinkComponent> patientLinkComponents = patient.getLink();
+        List<Map<String,Object>> relatedClients = new ArrayList();
+        for (Patient.PatientLinkComponent patientLinkComponent: patientLinkComponents) {
+            if (patientLinkComponent.hasType() && patientLinkComponent.hasOther()) {
+                Map<String,Object> relatedClientsByType = new HashMap<>();
+                relatedClientsByType.put("type",patientLinkComponent.getType().toCode());
+                relatedClientsByType.put("patientDisplay",patientLinkComponent.getOther().getDisplay());
+                relatedClientsByType.put("patient", (Patient) patientLinkComponent.getOther().getResource() );
+                relatedClients.add(relatedClientsByType);
+            }
+        }
+//        List<Patient> linkedClients = patient.hasLink() ? (List<Patient>) patient.getLink().stream().map(link -> link.hasOther() ? (Patient) link.getOther().getResource(): null) : null;
+//        List<String> clientTypes = patient.hasLink() ? (List<String>) patient.getLink().stream().map(link -> link.hasType() ? link.getType().getDisplay(): null) : null;
+
         // Return the mapped PatientDTO object
         return new PatientDTO(
                 patientId,
@@ -192,7 +210,8 @@ public class ClientRegistryService {
                 telecomDTOs,
                 organization,
                 contactPeople,
-                maritalStatus
+                maritalStatus,
+                relatedClients
         );
     }
 }

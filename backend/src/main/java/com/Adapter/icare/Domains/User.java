@@ -10,6 +10,7 @@ import scala.math.BigInt;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -100,6 +101,30 @@ public class User extends BaseEntity implements Serializable {
         if(userMap.get("surname") != null){
             user.setSurname(userMap.get("surname").toString());
         }
+
+        // Populate roles
+        if (userMap.get("roles") instanceof List) {
+            List<Map<String, Object>> rolesList = (List<Map<String, Object>>) userMap.get("roles");
+            Set<Role> roles = rolesList.stream().map(roleMap -> {
+                Role role = new Role();
+                role.setUuid(roleMap.get("uuid").toString());
+                return role;
+            }).collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+
+        // Populate groups
+        if (userMap.get("groups") instanceof List) {
+            List<Map<String, Object>> groupsList = (List<Map<String, Object>>) userMap.get("groups");
+            Set<Group> groups = groupsList.stream().map(groupMap -> {
+                Group group = new Group();
+                group.setUuid(groupMap.get("uuid").toString());
+                return group;
+            }).collect(Collectors.toSet());
+            user.setGroups(groups);
+        }
+
+        // Add support to capture roles and groups
         return user;
     }
 
@@ -146,10 +171,15 @@ public class User extends BaseEntity implements Serializable {
         if(this.getAccountExpiry() != null){
             userMap.put("accountExpiry",this.getAccountExpiry());
         }
+        List authorities = new ArrayList<String>();
         if(this.getRoles() != null){
             List<Map<String,Object>> rolesMap = new ArrayList<>();
             for( Role role : this.getRoles()){
                 rolesMap.add(role.toMap(false));
+                // Get privileges
+                for (Privilege privilege: role.getPrivileges()) {
+                    authorities.add(privilege.getPrivilegeName());
+                }
             }
             userMap.put("roles",rolesMap);
         }
@@ -161,10 +191,10 @@ public class User extends BaseEntity implements Serializable {
             }
             userMap.put("groups",groupsMap);
         }
-
         if(this.getSharing() != null){
             userMap.put("sharing",this.getSharing());
         }
+        userMap.put("authorities",authorities);
         return userMap;
     }
 

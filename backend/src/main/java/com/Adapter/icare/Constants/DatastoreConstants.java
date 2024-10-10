@@ -13,4 +13,7 @@ public class DatastoreConstants {
 
     @Value("${APPS_NAMESPACE:APPS}")
     public String AppsNameSpace;
+
+    @Value("${DEFAULT_NAMESPACE_FOR_POTENTIAL_CLIENT_DUPLICATES:CLIENT-DUPLICATES}")
+    public String DefaultNameSpaceForPotentialClientDuplicates;
 }

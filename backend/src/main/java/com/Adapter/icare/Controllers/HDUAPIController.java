@@ -55,9 +55,10 @@ public class HDUAPIController {
         }
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
-            this.shouldUseWorkflowEngine = Boolean.valueOf(WESystemConfigurations.getValue().get("status").toString());
+            this.shouldUseWorkflowEngine = (Boolean) WESystemConfigurations.getValue().get("active");
             this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
             this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
+            System.out.println(workflowEngine.getBaseUrl());
         } else {
             this.shouldUseWorkflowEngine = false;
             this.defaultWorkflowEngineCode = null;
@@ -67,100 +68,123 @@ public class HDUAPIController {
 
 
     @GetMapping("dataTemplates")
-    public Map<String, Object> getDataTemplatesList (@RequestParam(value = "id", required = false) String id, @RequestParam(value = "uuid", required = false) String uuid) throws Exception {
+    public ResponseEntity<Map<String, Object>> getDataTemplatesList (@RequestParam(value = "id", required = false) String id,
+                                                                     @RequestParam(value = "uuid", required = false) String uuid) throws Exception {
         // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
-        Map<String, Object> dataTemplatesResults = new HashMap<>();
-        if (uuid == null) {
-            List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
-            List<Map<String, Object>> dataTemplates = new ArrayList<>();
-            for(Datastore datastore: dataTemplateNameSpaceDetails) {
-                Map<String, Object> dataTemplate = datastore.getValue();
-                if (id != null) {
-                    if ( ((Map<String, Object>) dataTemplate.get("templateDetails")).get("id").equals(id)) {
+//        System.out.println(this.authentication.isAuthenticated());
+        try {
+            Map<String, Object> dataTemplatesResults = new HashMap<>();
+            if (uuid == null) {
+                List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
+                List<Map<String, Object>> dataTemplates = new ArrayList<>();
+                for(Datastore datastore: dataTemplateNameSpaceDetails) {
+                    Map<String, Object> dataTemplate = datastore.getValue();
+                    if (id != null) {
+                        if ( ((Map<String, Object>) dataTemplate.get("templateDetails")).get("id").equals(id)) {
+                            dataTemplate.put("uuid", datastore.getUuid());
+                            dataTemplates.add(dataTemplate);
+                        }
+                    } else {
                         dataTemplate.put("uuid", datastore.getUuid());
                         dataTemplates.add(dataTemplate);
                     }
-                } else {
-                    dataTemplate.put("uuid", datastore.getUuid());
-                    dataTemplates.add(dataTemplate);
                 }
-            }
-            if (id != null) {
-                if (!dataTemplates.isEmpty()) {
-                    dataTemplatesResults =dataTemplates.get(0);
+                if (id != null) {
+                    if (!dataTemplates.isEmpty()) {
+                        dataTemplatesResults =dataTemplates.get(0);
+                    }
+                } else {
+                    dataTemplatesResults.put("results", dataTemplates);
                 }
             } else {
-                dataTemplatesResults.put("results", dataTemplates);
+                Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+                Map<String, Object> dataTemplate = datastore.getValue();
+                dataTemplate.put("uuid", datastore.getUuid());
+                dataTemplatesResults = dataTemplate;
             }
-        } else {
-            Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
-            Map<String, Object> dataTemplate = datastore.getValue();
-            dataTemplate.put("uuid", datastore.getUuid());
-            dataTemplatesResults = dataTemplate;
-        }
 
-        return  dataTemplatesResults;
+            return  ResponseEntity.ok(dataTemplatesResults);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
     }
+
     @GetMapping("dataTemplates/examples")
-    public Map<String, Object> getDataTemplatesExamples (@RequestParam(value = "id", required = false) String id) throws Exception {
+    public ResponseEntity<Map<String, Object>> getDataTemplatesExamples (
+            @RequestParam(value = "id", required = false) String id) throws Exception {
         // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
-        List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplatesExamples");
-        Map<String, Object> dataTemplatesExampleObject = new HashMap<>();
-        List<Map<String, Object>> dataTemplatesExamples = new ArrayList<>();
-        for(Datastore datastore: dataTemplateNameSpaceDetails) {
-            Map<String, Object> dataTemplateExample = datastore.getValue();
-            if (id != null) {
-                if ( datastore.getDataKey().equals(id)) {
+        try {
+            List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplatesExamples");
+            Map<String, Object> dataTemplatesExampleObject = new HashMap<>();
+            List<Map<String, Object>> dataTemplatesExamples = new ArrayList<>();
+            for(Datastore datastore: dataTemplateNameSpaceDetails) {
+                Map<String, Object> dataTemplateExample = datastore.getValue();
+                if (id != null) {
+                    if ( datastore.getDataKey().equals(id)) {
+                        dataTemplateExample.put("uuid", datastore.getUuid());
+                        dataTemplatesExamples.add(dataTemplateExample);
+                    }
+                } else {
                     dataTemplateExample.put("uuid", datastore.getUuid());
                     dataTemplatesExamples.add(dataTemplateExample);
                 }
+            }
+            if (id != null) {
+                if (!dataTemplatesExamples.isEmpty()) {
+                    dataTemplatesExampleObject =dataTemplatesExamples.get(0);
+                }
             } else {
-                dataTemplateExample.put("uuid", datastore.getUuid());
-                dataTemplatesExamples.add(dataTemplateExample);
+                dataTemplatesExampleObject.put("results", dataTemplatesExamples);
             }
+            return ResponseEntity.ok(dataTemplatesExampleObject);
+        }catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        if (id != null) {
-            if (!dataTemplatesExamples.isEmpty()) {
-                dataTemplatesExampleObject =dataTemplatesExamples.get(0);
-            }
-        } else {
-            dataTemplatesExampleObject.put("results", dataTemplatesExamples);
-        }
-        return dataTemplatesExampleObject;
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public String passDataToMediator(@RequestBody Map<String, Object> data) throws Exception {
+    public ResponseEntity<String> passDataToMediator(@RequestBody Map<String, Object> data) throws Exception {
         /**
          * Send data to Mediator where all the logics will be done.
          */
-       if (shouldUseWorkflowEngine && workflowEngine != null) {
-           Map<String, Object> payload = new HashMap<>();
-           payload.put("code","dataTemplates");
-           payload.put("data",data);
-           return mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload);
-       } else if (!shouldUseWorkflowEngine) {
-           return mediatorsService.sendDataToMediatorWorkflow(data);
-       } else {
-           // TODO: handle warning appropriately
-           return null;
+        System.out.println(workflowEngine);
+       try {
+           if (shouldUseWorkflowEngine && workflowEngine != null) {
+               Map<String, Object> payload = new HashMap<>();
+               payload.put("code","dataTemplates");
+               payload.put("data",data);
+               return ResponseEntity.ok(mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload));
+           } else if (!shouldUseWorkflowEngine) {
+               return ResponseEntity.ok(mediatorsService.sendDataToMediatorWorkflow(data));
+           } else {
+               // TODO: handle warning appropriately
+               return null;
+           }
+       } catch (Exception e) {
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
        }
     }
 
     @DeleteMapping("datastore/{uuid}")
     public Map<String, Object> deleteDatastore(@PathVariable("uuid") String uuid) throws Exception {
-        Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
-        Map<String, Object> returnObj = new HashMap<>();
-        returnObj.put("uuid", uuid);
-        returnObj.put("dataKey", datastore.getDataKey());
-        returnObj.put("namespace", datastore.getNamespace());
-        returnObj.put("message", "Successful deleted");
-        datastoreService.deleteDatastore(uuid);
-        return returnObj;
+        try {
+            Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+            Map<String, Object> returnObj = new HashMap<>();
+            returnObj.put("uuid", uuid);
+            returnObj.put("dataKey", datastore.getDataKey());
+            returnObj.put("namespace", datastore.getNamespace());
+            returnObj.put("message", "Successful deleted");
+            datastoreService.deleteDatastore(uuid);
+            return returnObj;
+        } catch (Exception e) {
+            throw new Exception("Issue with deleting");
+        }
     }
 
     @GetMapping("generalCodes")
-    public Map<String, Object> getGeneralCodes(@RequestParam(value="namespace",required = false) String namespace,
+    public ResponseEntity<Map<String, Object>> getGeneralCodes(@RequestParam(value="namespace",required = false) String namespace,
                                                @RequestParam(value="key",required = false) String key,
                                                @RequestParam(value="code",required = false) String code,
                                                @RequestParam(value="version",required = false) String version,
@@ -168,151 +192,212 @@ public class HDUAPIController {
                                                @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
                                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreMatchingParams(namespace, key, version, null, q, code, page,pageSize, "GENERAL-CODES");
-        for (Datastore datastore: pagedDatastoreData.getContent()) {
-            Map<String, Object> generalCodeDetails = datastore.getValue();
-            generalCodeDetails.put("namespace", datastore.getNamespace());
-            generalCodeDetails.put("key", datastore.getDataKey());
-            namespaceDetails.add(generalCodeDetails);
+        try {
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreMatchingParams(namespace, key, version, null, q, code, page,pageSize, "GENERAL-CODES");
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                Map<String, Object> generalCodeDetails = datastore.getValue();
+                generalCodeDetails.put("namespace", datastore.getNamespace());
+                generalCodeDetails.put("key", datastore.getDataKey());
+                namespaceDetails.add(generalCodeDetails);
+            }
+            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            returnObject.put("pager",pager);
+            returnObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Map<String, Object> returnObject =  new HashMap<>();
-        Map<String, Object> pager = new HashMap<>();
-        pager.put("page", page);
-        pager.put("pageSize", pageSize);
-        pager.put("totalPages",pagedDatastoreData.getTotalPages());
-        pager.put("total", pagedDatastoreData.getTotalElements());
-        returnObject.put("pager",pager);
-        returnObject.put("results", namespaceDetails);
-        return returnObject;
     }
 
     @GetMapping("generalCodes/{namespace}")
-    public Map<String, Object> getSpecificCodedItems(@PathVariable("namespace") String namespace,
+    public ResponseEntity<Map<String, Object>> getSpecificCodedItems(@PathVariable("namespace") String namespace,
                                                @RequestParam(value="code", required = false) String code,
                                                @RequestParam(value="q",required = false) String q,
                                                @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
                                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, page,pageSize);
-        for (Datastore datastore: pagedDatastoreData.getContent()) {
-            namespaceDetails.add(datastore.getValue());
+        try {
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            returnObject.put("pager",pager);
+            returnObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Map<String, Object> returnObject =  new HashMap<>();
-        Map<String, Object> pager = new HashMap<>();
-        pager.put("page", page);
-        pager.put("pageSize", pageSize);
-        pager.put("totalPages",pagedDatastoreData.getTotalPages());
-        pager.put("total", pagedDatastoreData.getTotalElements());
-        returnObject.put("pager",pager);
-        returnObject.put("results", namespaceDetails);
-        return returnObject;
     }
 
     @PostMapping(value = "configurations",consumes = APPLICATION_JSON_VALUE)
-    public Map<String, Object> addConfigurations(@RequestBody Map<String, Object> configurations) throws Exception {
-        String namespace = datastoreConstants.ConfigurationsNamespace;
-        Map<String, Object> returnObject = new HashMap<>();
-        String key = "";
-        if (configurations.get("code") == null && configurations.get("key") == null) {
-            throw new Exception("code or key is missing on your request");
-        } else {
-            if (configurations.get("key") != null) {
-                key = configurations.get("key").toString();
+    public ResponseEntity<Map<String, Object>> addConfigurations(@RequestBody Map<String, Object> configurations) throws Exception {
+        try {
+            String namespace = datastoreConstants.ConfigurationsNamespace;
+            Map<String, Object> returnObject = new HashMap<>();
+            String key = "";
+            if (configurations.get("code") == null && configurations.get("key") == null) {
+                throw new Exception("code or key is missing on your request");
             } else {
-                key = configurations.get("code").toString();
+                if (configurations.get("key") != null) {
+                    key = configurations.get("key").toString();
+                } else {
+                    key = configurations.get("code").toString();
+                }
+                Datastore datastore = new Datastore();
+                datastore.setValue(configurations);
+                datastore.setNamespace(namespace);
+                datastore.setDataKey(key);
+                Datastore response = datastoreService.saveDatastore(datastore);
+                returnObject = response.toMap();
             }
-            Datastore datastore = new Datastore();
-            datastore.setValue(configurations);
-            datastore.setNamespace(namespace);
-            datastore.setDataKey(key);
-            Datastore response = datastoreService.saveDatastore(datastore);
-            returnObject = response.toMap();
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return returnObject;
     }
 
     @GetMapping("configurations")
-    public Map<String, Object> getConfigurations(
+    public ResponseEntity<Map<String, Object>> getConfigurations(
             @RequestParam(value="q",required = false) String q,
             @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
             @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize
     ) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-        String namespace = datastoreConstants.ConfigurationsNamespace;
-        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page,pageSize);
-        for (Datastore datastore: pagedDatastoreData.getContent()) {
-            Map<String, Object> configuration = datastore.getValue();
-            configuration.put("key", datastore.getDataKey());
-            namespaceDetails.add(configuration);
+        try {
+            String namespace = datastoreConstants.ConfigurationsNamespace;
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                Map<String, Object> configuration = datastore.getValue();
+                configuration.put("key", datastore.getDataKey());
+                namespaceDetails.add(configuration);
+            }
+            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            returnObject.put("pager",pager);
+            returnObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Map<String, Object> returnObject =  new HashMap<>();
-        Map<String, Object> pager = new HashMap<>();
-        pager.put("page", page);
-        pager.put("pageSize", pageSize);
-        pager.put("totalPages",pagedDatastoreData.getTotalPages());
-        pager.put("total", pagedDatastoreData.getTotalElements());
-        returnObject.put("pager",pager);
-        returnObject.put("results", namespaceDetails);
-        return returnObject;
+    }
+    @GetMapping(value = "workflows")
+    public ResponseEntity<String> getWorkflows() throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows","GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping(value = "workflows")
+    public ResponseEntity<String> addWorkflow(@RequestBody Map<String, Object> process) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows", "POST", process));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping(value = "processes")
-    public String getWorkflows() throws Exception {
-        if (shouldUseWorkflowEngine && workflowEngine != null) {
-            return mediatorsService.routeToMediator(workflowEngine, "","GET", null);
-        } else {
-            throw new Exception("Can no access route/mediator due to missing configurations");
+    public ResponseEntity<String> getProcesses() throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes","GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping(value = "processes")
-    public String addProcess(@RequestBody Map<String, Object> process) throws Exception {
-        if (shouldUseWorkflowEngine && workflowEngine != null) {
-            return mediatorsService.routeToMediator(workflowEngine, "", "POST", process);
-        } else {
-            throw new Exception("Can no access route/mediator due to missing configurations");
+    public ResponseEntity<String> addProcess(@RequestBody Map<String, Object> process) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes", "POST", process));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @GetMapping(value = "schedules")
-    public String getSchedules() throws Exception {
-        if (shouldUseWorkflowEngine && workflowEngine != null) {
-            return mediatorsService.routeToMediator(workflowEngine, "","GET", null);
-        } else {
-            throw new Exception("Can no access route/mediator due to missing configurations");
+    public ResponseEntity<String> getSchedules() throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules","GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping(value = "schedules")
-    public String addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
-        if (shouldUseWorkflowEngine && workflowEngine != null) {
-            return mediatorsService.routeToMediator(workflowEngine, "", "POST", schedule);
-        } else {
-            throw new Exception("Can no access route/mediator due to missing configurations");
+    public ResponseEntity<String> addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules", "POST", schedule));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     // CUSTOM implementation for supporting HDU API temporarily
     @GetMapping(value="codeSystems", produces = APPLICATION_JSON_VALUE)
-    public Map<String, Object> getDatastoreByNamespace(@RequestParam(value="q",required = false) String q,
+    public ResponseEntity<Map<String, Object>> getDatastoreByNamespace(@RequestParam(value="q",required = false) String q,
                                                        @RequestParam(value="code",required = false) String code,
                                                        @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
                                                        @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
-        String namespace = "codeSystems";
-        Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, page,pageSize);
-        for (Datastore datastore: pagedDatastoreData.getContent()) {
-           namespaceDetails.add(datastore.getValue());
+        try {
+            String namespace = "codeSystems";
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            returnObject.put("pager",pager);
+            returnObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        Map<String, Object> returnObject =  new HashMap<>();
-        Map<String, Object> pager = new HashMap<>();
-        pager.put("page", page);
-        pager.put("pageSize", pageSize);
-        pager.put("totalPages",pagedDatastoreData.getTotalPages());
-        pager.put("total", pagedDatastoreData.getTotalElements());
-        returnObject.put("pager",pager);
-        returnObject.put("results", namespaceDetails);
-        return returnObject;
     }
 
     @GetMapping(value="codeSystems/icd", produces = APPLICATION_JSON_VALUE)
@@ -579,67 +664,84 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "datastore", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Map<String, Object> saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {
+    public ResponseEntity<Map<String, Object>> saveDatastore(@RequestBody Datastore datastore, @RequestParam(value="update",required = false) Boolean update) throws Exception {
         String namespace = datastore.getNamespace();
         String dataKey = datastore.getDataKey();
         // Check if exists provided update is set to true
-        if (update != null && update.equals(true)) {
-            Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
-            if (existingDatastore != null) {
-                existingDatastore.setValue(datastore.getValue());
-                return datastoreService.updateDatastore(existingDatastore).toMap();
+        try {
+            if (update != null && update.equals(true)) {
+                Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
+                if (existingDatastore != null) {
+                    existingDatastore.setValue(datastore.getValue());
+                    return ResponseEntity.ok(datastoreService.updateDatastore(existingDatastore).toMap());
+                } else {
+                    return ResponseEntity.ok(datastoreService.saveDatastore(datastore).toMap());
+                }
             } else {
-                return datastoreService.saveDatastore(datastore).toMap();
+                return ResponseEntity.ok(datastoreService.saveDatastore(datastore).toMap());
             }
-        } else {
-            return datastoreService.saveDatastore(datastore).toMap();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @GetMapping("clientsVisitsByNamespace/{namespace}")
-    public List<Map<String,Object>> getClientsVisitsDataByNamespace(@PathVariable("namespace") String namespace) throws Exception {
-        List<Map<String, Object>> clientDetails = new ArrayList<>();
-        for (Datastore datastore: datastoreService.getClientsVisitsDataByNameSpace(namespace)) {
-            clientDetails.add(datastore.toMap());
+    public ResponseEntity<List<Map<String,Object>>> getClientsVisitsDataByNamespace(@PathVariable("namespace") String namespace) throws Exception {
+        try {
+            List<Map<String, Object>> clientDetails = new ArrayList<>();
+            for (Datastore datastore: datastoreService.getClientsVisitsDataByNameSpace(namespace)) {
+                clientDetails.add(datastore.toMap());
+            }
+            return ResponseEntity.ok(clientDetails);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return clientDetails;
     }
 
     @GetMapping("clientsVisitsByKey/{key}")
-    public List<Map<String,Object>> getClientsVisitsDataByKey(@PathVariable("key") String key) throws Exception {
-        List<Map<String, Object>> clientDetails = new ArrayList<>();
-        for (Datastore datastore: datastoreService.getClientsVisitsDataByKey(key)) {
-            clientDetails.add(datastore.toMap());
+    public ResponseEntity<List<Map<String,Object>>> getClientsVisitsDataByKey(@PathVariable("key") String key) throws Exception {
+        try {
+            List<Map<String, Object>> clientDetails = new ArrayList<>();
+            for (Datastore datastore: datastoreService.getClientsVisitsDataByKey(key)) {
+                clientDetails.add(datastore.toMap());
+            }
+            return ResponseEntity.ok(clientDetails);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return clientDetails;
     }
 
     @GetMapping("clientsVisits")
-    public List<Map<String,Object>> getClientsVisits(@RequestParam(value = "key") String key,
+    public ResponseEntity<List<Map<String,Object>>> getClientsVisits(@RequestParam(value = "key") String key,
                                             @RequestParam(value = "ageType") String ageType,
                                             @RequestParam(value = "startAge") Integer startAge,
                                             @RequestParam(value = "endAge") Integer endAge,
                                             @RequestParam(value = "gender", required = false) String gender,
                                             @RequestParam(value = "diagnosis", required = false) String diagnosis) throws Exception {
-        List<Map<String,Object>> mappedData = new ArrayList<>();
-        for(Datastore datastore: datastoreService.getClientsVisits(key, ageType, startAge, endAge, gender, diagnosis)) {
-            mappedData.add(datastore.toMap());
+        try {
+            List<Map<String,Object>> mappedData = new ArrayList<>();
+            for(Datastore datastore: datastoreService.getClientsVisits(key, ageType, startAge, endAge, gender, diagnosis)) {
+                mappedData.add(datastore.toMap());
+            }
+            return ResponseEntity.ok(mappedData);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return mappedData;
     }
 
     @PostMapping(value = "generateAggregateData",produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
-    public Map<String, Object> getAggregateVisits(@RequestBody Map<String, Object> requestParams) throws Exception {
-        Map<String, Object> results = new HashMap<>();
-        List<Map<String, Object>> data = new ArrayList<>();
-        String pattern = "yyyy-MM-dd";
-        Map<String, Object> mappings = (Map<String, Object>) requestParams.get("mappings");
-        Map<String, Object> orgUnit = (Map<String, Object>) requestParams.get("orgUnit");
-        String mappingsNamespace = mappings.get("namespace").toString();
-        List<Datastore> storedToolMappings = datastoreService.getDatastoreNamespaceDetails(mappingsNamespace);
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-        for (Datastore storedToolMapping: storedToolMappings) {
-            String mappingsKey = storedToolMapping.getDataKey();
+    public ResponseEntity<Map<String, Object>> getAggregateVisits(@RequestBody Map<String, Object> requestParams) throws Exception {
+        try {
+            Map<String, Object> results = new HashMap<>();
+            List<Map<String, Object>> data = new ArrayList<>();
+            String pattern = "yyyy-MM-dd";
+            Map<String, Object> mappings = (Map<String, Object>) requestParams.get("mappings");
+            Map<String, Object> orgUnit = (Map<String, Object>) requestParams.get("orgUnit");
+            String mappingsNamespace = mappings.get("namespace").toString();
+            List<Datastore> storedToolMappings = datastoreService.getDatastoreNamespaceDetails(mappingsNamespace);
+            SimpleDateFormat formatter = new SimpleDateFormat(pattern);
+            for (Datastore storedToolMapping: storedToolMappings) {
+                String mappingsKey = storedToolMapping.getDataKey();
                 for(Map<String, Object> requestParam: (List<Map<String, Object>>) storedToolMapping.getValue().get("params")) {
                     Map<String, Object> dataValue = new HashMap<>();
                     List<Map<String, Object>> requestedData = List.of();
@@ -734,20 +836,27 @@ public class HDUAPIController {
                     dataValue.put("categoryOptionCombo", requestParam.get("co"));
                     data.add(dataValue);
                 }
+            }
+            results.put("data", data);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        results.put("data", data);
-        return results;
     }
 
     @GetMapping("aggregatedData")
-    public Map<String, Object> getAggregateDataByStartDateAndEndDate(@RequestParam(value = "id") String id,
+    public ResponseEntity<Map<String, Object>> getAggregateDataByStartDateAndEndDate(@RequestParam(value = "id") String id,
                                                                      @RequestParam(value = "startDate") String startDate,
                                                                      @RequestParam(value = "endDate") String endDate
     ) throws Exception {
-        Map<String, Object> results = Maps.newHashMap();
-        List<Map<String, Object>> dailyAggregatedDataList =  datastoreService.getAggregateDataFromDailyAggregatedData(id,startDate,endDate);
-        results.put("data", dailyAggregatedDataList);
-        return results;
+        try {
+            Map<String, Object> results = Maps.newHashMap();
+            List<Map<String, Object>> dailyAggregatedDataList =  datastoreService.getAggregateDataFromDailyAggregatedData(id,startDate,endDate);
+            results.put("data", dailyAggregatedDataList);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     private List<Map<String, Object>> formatDatastoreObject(List<Datastore> datastoreList) throws Exception {

@@ -30,8 +30,6 @@ public class CustomErrorController implements ErrorController {
 
         // Set the HTTP status code
         HttpStatus status = getStatus(request);
-        System.out.println("TESTING");
-        System.out.println(status.value());
         model.addAttribute("status", status.value());
         model.addAttribute("error", errorAttributes.get("error"));
         model.addAttribute("message", errorAttributes.get("message"));
