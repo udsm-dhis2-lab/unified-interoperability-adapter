@@ -55,6 +55,26 @@ export class HduApiNavMenuComponent {
         },
       ],
     },
+    {
+      name: 'Mapping and Data Extraction',
+      routeUrl: '/mapping-and-data-extraction',
+      icon: 'apartment',
+      category: 'main',
+      subMenus: [
+        {
+          name: 'datasets',
+          routeUrl: '',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+        {
+          name: 'dataset mapping',
+          routeUrl: '/dataset-mapping',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+      ],
+    },
   ];
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();
