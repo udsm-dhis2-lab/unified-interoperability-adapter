@@ -53,11 +53,9 @@ public class DataSetElement extends BaseEntity{
     private String SqlQuery;
 
     @ManyToOne
-    @Column(name="datasets_id")
     private Dataset datasets;
 
     @ManyToOne
-    @Column(name="datasource_id")
     private Datasource datasource;
 
     @Transient

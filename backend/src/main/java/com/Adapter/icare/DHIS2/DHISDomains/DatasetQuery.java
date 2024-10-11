@@ -13,7 +13,7 @@ import java.util.Map;
 @Setter
 @Entity
 @Table(uniqueConstraints={
-        @UniqueConstraint(columnNames = {"data_set_id", "instance_id"})
+        @UniqueConstraint(columnNames = {"data_sets_id", "instances_id"})
 })
 public class DatasetQuery extends BaseEntity implements Serializable  {
     @Id
@@ -21,17 +21,14 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
     private Long id;
 
     @ManyToOne
-    @Column(name = "data_set_id")
     private Dataset dataSets;
 
     private String sqlQuery;
 
     @ManyToOne
-    @Column(name = "instance_id")
     private Instance instances;
 
     @ManyToOne
-    @Column(name = "data_source_id")
     private Datasource dataSource;
 
     @Lob

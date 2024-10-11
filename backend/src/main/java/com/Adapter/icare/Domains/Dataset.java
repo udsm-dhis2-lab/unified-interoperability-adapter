@@ -71,7 +71,6 @@ public class Dataset extends BaseEntity implements Serializable {
     private String datasetFields;
     
     @ManyToOne
-    @Column(name = "instances_id")
     private Instance instances;
 
     public Map<String,Object> toMap() {
