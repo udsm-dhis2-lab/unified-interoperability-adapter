@@ -10,8 +10,10 @@ import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.FHIRConstants;
+import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.PatientDTO;
+import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Encounter;
@@ -36,14 +38,17 @@ public class SharedHealthRecordsService {
     private final Authentication authentication;
     private final User authenticatedUser;
     private final ClientRegistryService clientRegistryService;
+    private final MediatorsService mediatorsService;
 
     public SharedHealthRecordsService(
             FHIRConstants fhirConstants,
             UserService userService,
-            ClientRegistryService clientRegistryService) {
+            ClientRegistryService clientRegistryService,
+            MediatorsService mediatorsService) {
         this.fhirConstants = fhirConstants;
         this.userService = userService;
         this.clientRegistryService = clientRegistryService;
+        this.mediatorsService = mediatorsService;
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirClient =  fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -66,7 +71,8 @@ public class SharedHealthRecordsService {
             String middleName,
             String lastName,
             String hfrCode,
-            boolean includeDeceased
+            boolean includeDeceased,
+            Integer numberOfVisits
     ) throws Exception {
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
@@ -108,6 +114,7 @@ public class SharedHealthRecordsService {
                 if (hfrCode !=null) {
                     organization = (Organization) fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode));
                 }
+                // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
                 Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
                 Map<String,Object> visitDetails = new HashMap<>();
                 if (encounter != null) {
@@ -116,8 +123,10 @@ public class SharedHealthRecordsService {
                     visitDetails.put("closedDate", encounter.getPeriod().getEnd());
                     visitDetails.put("newThisYear", null);
                     visitDetails.put("new", null);
-                } else {
+                    // TODO: Add history when numberOfVisits > 1
+                } else if (organization != null) {
                     // TODO: Request visit from facility provided
+                } else {
                     visitDetails = null;
                 }
                 templateData.put("visitDetails", visitDetails);
@@ -144,5 +153,28 @@ public class SharedHealthRecordsService {
             return (Encounter) results.getEntry().get(0).getResource();
         }
         return null;
+    }
+
+    public List<Map<String,Object>> requestDataFromHealthFacility(Map<String,Object> requestPayload) throws Exception {
+        try {
+            List<Map<String,Object>> dataFromHealthFacility =  new ArrayList<>();
+            // TODO: Perform all logic to get visits from health facility
+            /**
+             * 1. Get Mediator (auth details for the health facility) using the HFR Code
+             * 2. Perform post request
+             * 3. Save the data to FHIR server (Workflow/process is preferred)
+             * 4. Return the requested data to client
+             */
+            // 1.
+            Mediator mediator = mediatorsService.getMediatorByCode(requestPayload.get("hfrCode").toString());
+            if (mediator != null) {
+                // 2. Request data
+            } else {
+                throw new Exception("Missing configurations for provided health facility");
+            }
+            return  dataFromHealthFacility;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 }

@@ -59,7 +59,8 @@ public class SharedHealthRecordsController {
             @RequestParam( value = "middleName", required = false) String middleName,
             @RequestParam( value = "lastName", required = false) String lastName,
             @RequestParam( value = "hfrCode", required = false) String hfrCode,
-            @RequestParam( value = "includeDeceased", defaultValue = "false") boolean includeDeceased
+            @RequestParam( value = "includeDeceased", defaultValue = "false") boolean includeDeceased,
+            @RequestParam( value = "numberOfVisits", defaultValue = "1") Integer numberOfVisits
     ) throws Exception {
         try {
             Map<String,Object> sharedRecordsResponse = new HashMap<>();
@@ -74,7 +75,8 @@ public class SharedHealthRecordsController {
                     middleName,
                     lastName,
                     hfrCode,
-                    includeDeceased);
+                    includeDeceased,
+                    numberOfVisits);
             sharedRecordsResponse.put("results", sharedRecords);
             Map<String, Object> pager = new HashMap<>();
             pager.put("total", null);
