@@ -130,6 +130,7 @@ public class MediatorsService {
     public String routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
+                System.out.println(apiPath);
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
                 return sendDataToExternalSystem(mediator,payload, method);

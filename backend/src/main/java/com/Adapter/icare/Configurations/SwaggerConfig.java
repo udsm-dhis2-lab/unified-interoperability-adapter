@@ -24,7 +24,8 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         // List of servers
         List<Server> servers = Arrays.asList(
-                new Server().url("https://iadapter.dhis2.udsm.ac.tz").description("Development Server")
+                new Server().url("https://iadapter.dhis2.udsm.ac.tz").description("Development Server"),
+        new Server().url("http://localhost:8091").description("Local Development Server")
         );
 
         return new OpenAPI().info(new Info().title("iAdapter/HDU API Documentation")
