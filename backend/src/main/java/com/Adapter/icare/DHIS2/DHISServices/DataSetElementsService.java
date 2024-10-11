@@ -65,11 +65,8 @@ public class DataSetElementsService {
 
         String dataElement = dataSetElement.getDataElement();
         String categoryOptionCombo = dataSetElement.getCategoryOptionCombo();
-        String dataset = dataSetElement.getDataset().getId();
+        String dataset = dataSetElement.getDatasets().getId();
 
         return dataSetElementsRepository.searchExistingDataSetElements(dataElement,categoryOptionCombo,dataset);
     }
-
-    
-
 }

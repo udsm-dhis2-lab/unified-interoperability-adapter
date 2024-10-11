@@ -51,7 +51,7 @@ public class DatasetQueryService {
         DatasetQuery existingDataSetQuery = datasetQueryRepository.getDatasetQueryByUuid(datasetQuery.getUuid());
         existingDataSetQuery.setSqlQuery(datasetQuery.getSqlQuery().toString());
         existingDataSetQuery.setDataSource(datasetQuery.getDataSource());
-        existingDataSetQuery.setInstance(datasetQuery.getInstance());
+        existingDataSetQuery.setInstances(datasetQuery.getInstances());
         existingDataSetQuery.setMappings(datasetQuery.getMappings());
         return datasetQueryRepository.save(existingDataSetQuery);
 //        return datasetQueryRepository.updateDataSetQuery(datasetQuery.getSqlQuery().toString(), datasetQuery.getDataSource().getId(), datasetQuery.getInstance().getId(), datasetQuery.getUuid());

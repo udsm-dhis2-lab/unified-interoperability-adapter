@@ -78,16 +78,16 @@ public class ReportsService {
         Dataset dataset= dataSetsRepository.getDatasetInstanceByUuid(datasetId);
         JSONObject jsObject = new JSONObject();
         String status = "";
-        String orgUnit = dataset.getInstance().getCode();
+        String orgUnit = dataset.getInstances().getCode();
         dhisAggregateValues.setOrgUnit(orgUnit);
         dhisAggregateValues.setDataSet(dataset.getId());
 
 //        Map<String, Object> response = null;
         try {
 
-            String instanceUrl = dataset.getInstance().getUrl();
-            String username = dataset.getInstance().getUsername();
-            String password = dataset.getInstance().getPassword();
+            String instanceUrl = dataset.getInstances().getUrl();
+            String username = dataset.getInstances().getUsername();
+            String password = dataset.getInstances().getPassword();
             if (instanceUrl.substring(instanceUrl.length() -1).equals("/")) {
                 url = new URL(instanceUrl.concat("api/dataValueSets.json?orgUnitIdScheme=code"));
             } else {

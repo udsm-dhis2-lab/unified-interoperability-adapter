@@ -287,7 +287,7 @@ public class DataSetsService {
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        long instanceId = dataset.getInstance().getId();
+        long instanceId = dataset.getInstances().getId();
         Optional<Instance> instance = instancesRepository.findById(instanceId);
 
         try {
