@@ -547,7 +547,14 @@ public class HDUAPIController {
     @GetMapping(value = "mappings/{uuid}")
     public ResponseEntity<Map<String,Object>> getMappingsByUuid(@PathVariable(value = "uuid") String uuid) throws Exception {
         try {
-            Map<String,Object> response = datastoreService.getDatastoreByUuid(uuid).getValue();
+            Map<String,Object> response = new HashMap<>();
+            Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+            response.put("uuid", datastore.getUuid());
+            response.put("dataKey", datastore.getDataKey());
+            response.put("namespace", datastore.getNamespace());
+            response.put("group", datastore.getDatastoreGroup());
+            response.put("description", datastore.getDescription());
+            response.put("mapping", datastore.getValue());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
