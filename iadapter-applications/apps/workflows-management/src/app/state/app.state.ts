@@ -1,15 +1,15 @@
 /* eslint-disable no-constant-condition */
 import { ActionReducerMap, MetaReducer } from '@ngrx/store';
-import {
-    workflowFeatureKey,
-    WorkflowReducer,
-} from '../pages/workflow/state/workflow.reducer';
+import { InjectionToken } from '@angular/core';
+import { WorkflowEffects } from '../features/workflow/state/workflow.effects';
 import {
     initialWorkflowState,
     WorkflowState,
-} from '../pages/workflow/state/workflow.state';
-import { InjectionToken } from '@angular/core';
-import { WorkflowEffects } from '../pages/workflow/state/workflow.effects';
+} from '../features/workflow/state/workflow.state';
+import {
+    workflowFeatureKey,
+    WorkflowReducer,
+} from '../features/workflow/state/workflow.reducer';
 
 export interface AppState {
     [workflowFeatureKey]: WorkflowState;
