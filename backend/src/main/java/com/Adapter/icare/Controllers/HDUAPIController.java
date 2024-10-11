@@ -521,7 +521,14 @@ public class HDUAPIController {
             Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingNamespaceFilterByPagination(
                     namespaceFilter, key,q,code,page,pageSize);
             for (Datastore datastore: pagedDatastoreData.getContent()) {
-                namespaceDetails.add(datastore.getValue());
+                Map<String,Object> mapping = new HashMap<>();
+                mapping.put("uuid", datastore.getUuid());
+                mapping.put("dataKey", datastore.getDataKey());
+                mapping.put("namespace", datastore.getNamespace());
+                mapping.put("group", datastore.getDatastoreGroup());
+                mapping.put("description", datastore.getDescription());
+                mapping.put("mapping", datastore.getValue());
+                namespaceDetails.add(mapping);
             }
             Map<String, Object> response = new HashMap<>();
             Map<String, Object> pager = new HashMap<>();
