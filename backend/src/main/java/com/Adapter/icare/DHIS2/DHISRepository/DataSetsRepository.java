@@ -32,6 +32,8 @@
 package com.Adapter.icare.DHIS2.DHISRepository;
 
 import com.Adapter.icare.Domains.Dataset;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.Query;
@@ -40,6 +42,15 @@ public interface DataSetsRepository extends JpaRepository<Dataset,String> {
 
     @Query(value = "SELECT * FROM datasets WHERE uuid=:uuid",nativeQuery = true)
     Dataset getDatasetInstanceByUuid(String uuid);
+
     @Query(value = "SELECT * FROM datasets WHERE id=:id",nativeQuery = true)
     Dataset getDatasetInstanceById(String id);
+
+    @Query(value = "SELECT * FROM datasets WHERE (:code IS NULL OR code=:code) " +
+            " AND (:formType IS NULL OR form_type=:formType) " +
+            " AND (:q IS NULL OR display_name LIKE CONCAT('%',:q,'%')",
+            countQuery = "SELECT COUNT(*) FROM mediator WHERE (:code IS NULL OR code = :code ) " +
+                    " AND (:formType IS NULL OR form_type=:formType) " +
+                    " AND (:q IS NULL OR display_name LIKE CONCAT('%',:q,'%')", nativeQuery = true)
+    Page<Dataset> getDatasetsListByPagination(String code, String formType, String q, Pageable pageable);
 }

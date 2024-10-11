@@ -40,6 +40,9 @@ import java.util.*;
 import com.Adapter.icare.Domains.Dataset;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.Adapter.icare.DHIS2.DHISDomains.RemoteDatasets;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetsRepository;
@@ -59,27 +62,44 @@ public class DataSetsService {
         this.instancesRepository = instancesRepository;
     }
 
-    public List<Dataset> GetAllDataSets() {
+    public List<Dataset> getAllDataSets() {
         return dataSetsRepository.findAll();
     }
 
-    public List<RemoteDatasets> getDhis2DataSets(long instanceId) {
-        
+    public Page<Dataset> getDatasetsByPagination(Integer page,
+                                                 Integer pageSize,
+                                                 String code,
+                                                 String formType,
+                                                 String q) throws Exception {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return dataSetsRepository.getDatasetsListByPagination(code,formType,q,pageable);
+    }
+
+    public Map<String,Object> getDhis2DataSets(
+            long instanceId,
+            Integer page,
+            Integer pageSize,
+            String q) throws Exception {
         URL url;
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        //ObjectMapper objectMapper = new ObjectMapper();
+        Map<String,Object> response = new HashMap<>();
         List<RemoteDatasets> remoteDataSetsList = new ArrayList<RemoteDatasets>();
-        Optional<Instance> instance = instancesRepository.findById(instanceId);
-
+        JSONObject pagerInfo = new JSONObject();
         try {
-
-            String instanceurl = instance.get().getUrl();
+            Optional<Instance> instance = instancesRepository.findById(instanceId);
+            String instanceUrl = instance.get().getUrl();
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
-
-            url = new URL(instanceurl.concat("/api/dataSets?fields=id,code,shortName,name,displayName,formType,version,timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size"));
+            String path = "/api/dataSets?fields=id,code,shortName,name,displayName,formType,version," +
+                    "timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally," +
+                    "renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size" +
+                    "&page=" + page + "&pageSize=" + pageSize;
+            if (q != null) {
+                path += path + "&filter=name:ilike:" + q;
+            }
+            url = new URL(instanceUrl.concat(path));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
 
@@ -89,22 +109,111 @@ public class DataSetsService {
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Content-Type","application/json");
 
-            //int status = httpURLConnection.getResponseCode();
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+            reader.close();
+            JSONObject jsObject = new JSONObject(responseContent.toString());
+             pagerInfo = jsObject.getJSONObject("pager");
+            JSONArray js = jsObject.getJSONArray("dataSets");
+            for (Object ab : js) {
+                JSONObject ourDsObject = new JSONObject(ab.toString());
+                Map<String, Object> remoteDataSetMap = new HashMap<String, Object>();
+                remoteDataSetMap.put("id", ourDsObject.getString("id"));
+                remoteDataSetMap.put("displayName", ourDsObject.getString("displayName"));
+
+                if(ourDsObject.has("formType")){
+                    remoteDataSetMap.put("formType", ourDsObject.getString("formType"));
+                }
+
+                if(ourDsObject.has("code")){
+                    remoteDataSetMap.put("code", ourDsObject.getString("code"));
+                }
+                if(ourDsObject.has("shortName")){
+                    remoteDataSetMap.put("shortName",ourDsObject.getString("shortName"));
+                }
+
+                if(ourDsObject.has("periodType")){
+                    remoteDataSetMap.put("periodType",ourDsObject.getString("periodType"));
+                }
+
+                if(ourDsObject.has("dataSetElements")){
+                    remoteDataSetMap.put("dataSetElements",ourDsObject.getInt("dataSetElements"));
+                }
+
+                if(ourDsObject.has("version")){
+                    remoteDataSetMap.put("version",ourDsObject.getInt("version"));
+                }
+
+                if(ourDsObject.has("expiryDays")){
+                    remoteDataSetMap.put("expiryDays",ourDsObject.getInt("expiryDays"));
+                }
+
+                if(ourDsObject.has("timelyDays")){
+                    remoteDataSetMap.put("timelyDays",ourDsObject.getInt("timelyDays"));
+                }
+
+                if(ourDsObject.has("openFuturePeriods")){
+                    remoteDataSetMap.put("openFuturePeriods",ourDsObject.getInt("openFuturePeriods"));
+                }
+
+                if(ourDsObject.has("renderAsTabs")){
+                    remoteDataSetMap.put("renderAsTabs",ourDsObject.getBoolean("renderAsTabs"));
+                }
+
+                if(ourDsObject.has("renderHorizontally")){
+                    remoteDataSetMap.put("renderHorizontally",ourDsObject.getBoolean("renderHorizontally"));
+                }
+
+                if(ourDsObject.has("compulsoryFieldsCompleteOnly")){
+                    remoteDataSetMap.put("compulsoryFieldsCompleteOnly",ourDsObject.getBoolean("compulsoryFieldsCompleteOnly"));
+                }
+
+                RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
+                remoteDataSetsList.add(remoteDataSetToAdd);
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+
+        response.put("dataSets",remoteDataSetsList );
+        response.put("pager", pagerInfo);
+        return response;
+    }
+
+    public RemoteDatasets getDhis2DataSetsByUuid(String uuid, String instanceUuid) {
+        URL url;
+        BufferedReader reader;
+        String line;
+        StringBuffer responseContent = new StringBuffer();
+        RemoteDatasets remoteDataSetToAdd = new RemoteDatasets();
+        Instance instance = instancesRepository.getInstanceByUuid(instanceUuid);
+        try {
+
+            String instanceUrl = instance.getUrl();
+            String username = instance.getUsername();
+            String password = instance.getPassword();
+
+            url = new URL(instanceUrl.concat("/api/dataSets/" + uuid + "?fields=id,code,shortName,name,displayName,formType,version,timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size"));
+
+            HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
+
+            String userCredentials = username.concat(":").concat(password);
+            String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+            httpURLConnection.setRequestProperty("Authorization", basicAuth);
+            httpURLConnection.setRequestMethod("GET");
+            httpURLConnection.setRequestProperty("Content-Type","application/json");
 
             reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             while ((line = reader.readLine()) != null) {
                 responseContent.append(line);
-                
+
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
-//            System.out.println(jsObject);
-            JSONArray js = jsObject.getJSONArray("dataSets"); 
-            //System.out.println(js);
-
-
+            JSONArray js = jsObject.getJSONArray("dataSets");
             for (Object ab : js) {
-               // System.out.println(ab);
 
                 JSONObject ourDsObject = new JSONObject(ab.toString());
 
@@ -159,16 +268,14 @@ public class DataSetsService {
                     remoteDataSetMap.put("compulsoryFieldsCompleteOnly",ourDsObject.getBoolean("compulsoryFieldsCompleteOnly"));
                 }
 
-                RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
-                remoteDataSetsList.add(remoteDataSetToAdd);
+                remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
 
             }
-            
+
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        return remoteDataSetsList; 
+        return remoteDataSetToAdd;
     }
 
     public Dataset AddDataSets(Dataset dataset) {
