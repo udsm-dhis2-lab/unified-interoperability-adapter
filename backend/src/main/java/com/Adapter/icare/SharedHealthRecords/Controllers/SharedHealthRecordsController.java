@@ -51,20 +51,33 @@ public class SharedHealthRecordsController {
     public ResponseEntity<Map<String, Object>> getSharedRecords (
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam( value = "identifier", required = false) String identifier,
-            @RequestParam( value = "identifierType", required = false) String identifierType,
-            @RequestParam( value = "onlyLinkedClients", required = false) Boolean onlyLinkedClients,
+            @RequestParam( value = "id", required = false) String id,
+            @RequestParam( value = "idType", required = false) String idType,
+            @RequestParam( value = "onlyLinkedClients", required = false) boolean onlyLinkedClients,
             @RequestParam( value = "gender", required = false) String gender,
             @RequestParam( value = "firstName", required = false) String firstName,
             @RequestParam( value = "middleName", required = false) String middleName,
-            @RequestParam( value = "lastName", required = false) String lastName
+            @RequestParam( value = "lastName", required = false) String lastName,
+            @RequestParam( value = "hfrCode", required = false) String hfrCode,
+            @RequestParam( value = "includeDeceased", defaultValue = "false") boolean includeDeceased
     ) throws Exception {
         try {
             Map<String,Object> sharedRecordsResponse = new HashMap<>();
-            List<Map<String,Object>> sharedRecords = this.sharedHealthRecordsService.getSharedRecords(page,pageSize, identifier, identifierType, onlyLinkedClients, firstName);
+            List<Map<String,Object>> sharedRecords = this.sharedHealthRecordsService.getSharedRecords(
+                    page,
+                    pageSize,
+                    id,
+                    idType,
+                    onlyLinkedClients,
+                    gender,
+                    firstName,
+                    middleName,
+                    lastName,
+                    hfrCode,
+                    includeDeceased);
             sharedRecordsResponse.put("results", sharedRecords);
             Map<String, Object> pager = new HashMap<>();
-            pager.put("total", sharedRecords.size());
+            pager.put("total", null);
             pager.put("totalPages", null);
             pager.put("page", page);
             pager.put("pageSize", pageSize);

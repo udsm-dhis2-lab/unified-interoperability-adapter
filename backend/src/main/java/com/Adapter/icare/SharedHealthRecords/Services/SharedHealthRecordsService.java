@@ -60,15 +60,25 @@ public class SharedHealthRecordsService {
             Integer pageSize,
             String identifier,
             String identifierType,
-            Boolean onlyLinkedClients,
-            String firstName
+            boolean onlyLinkedClients,
+            String gender,
+            String firstName,
+            String middleName,
+            String lastName,
+            String hfrCode,
+            boolean includeDeceased
     ) throws Exception {
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
-        if (onlyLinkedClients != null) {
+        if (onlyLinkedClients) {
             // TODO replace hardcoded ids with dynamic ones
             searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
+        }
+
+        // TODO: Review the deceased concept
+        if (!includeDeceased) {
+            searchRecords.where(Patient.DECEASED.isMissing(true));
         }
 //                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
         if (identifier != null) {
@@ -90,11 +100,15 @@ public class SharedHealthRecordsService {
                 Patient patient = (Patient) entry.getResource();
                 PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
                 templateData.put("id", patientDTO.getId());
+                // TODO: Provided HFR code is provided find a way to return relevant identifiers
                 templateData.put("demographicDetails", patientDTO.toMap());
                 templateData.put("facilityDetails", patientDTO.toMap().get("organisation"));
                 templateData.put("paymentDetails", null);
-
-                Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), null);
+                Organization organization = null;
+                if (hfrCode !=null) {
+                    organization = (Organization) fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode));
+                }
+                Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
                 Map<String,Object> visitDetails = new HashMap<>();
                 if (encounter != null) {
                     visitDetails.put("id", null);
@@ -103,6 +117,7 @@ public class SharedHealthRecordsService {
                     visitDetails.put("newThisYear", null);
                     visitDetails.put("new", null);
                 } else {
+                    // TODO: Request visit from facility provided
                     visitDetails = null;
                 }
                 templateData.put("visitDetails", visitDetails);
@@ -116,10 +131,13 @@ public class SharedHealthRecordsService {
     }
 
     public Encounter getLatestEncounterUsingPatientAndOrganisation(String id, Organization organization) throws Exception {
-        Bundle results = fhirClient.search()
-                .forResource(Encounter.class)
-                .where(new ReferenceClientParam("patient").hasId(id))
-                .sort(new SortSpec("date").setOrder(SortOrderEnum.DESC))
+        Bundle results = new Bundle();
+        var encounterSearch = fhirClient.search().forResource(Encounter.class)
+                .where(new ReferenceClientParam("patient").hasId(id));
+        if (organization != null) {
+            encounterSearch.where(Encounter.SERVICE_PROVIDER.hasAnyOfIds(organization.getId()));
+        }
+        results = encounterSearch.sort(new SortSpec("date").setOrder(SortOrderEnum.DESC))
                 .returnBundle(Bundle.class)
                 .execute();
         if (results.hasEntry() && !results.getEntry().isEmpty()) {
