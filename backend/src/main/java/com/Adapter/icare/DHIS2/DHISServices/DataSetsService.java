@@ -180,7 +180,12 @@ public class DataSetsService {
         }
 
         response.put("dataSets",remoteDataSetsList );
-        response.put("pager", pagerInfo);
+        Map<String,Object> pager = new HashMap<>();
+        pager.put("page", pagerInfo.getInt("page"));
+        pager.put("total", pagerInfo.getInt("total"));
+        pager.put("pageSize", pagerInfo.getInt("pageSize"));
+        pager.put("totalPages", pagerInfo.getInt("pageCount"));
+        response.put("pager", pager);
         return response;
     }
 

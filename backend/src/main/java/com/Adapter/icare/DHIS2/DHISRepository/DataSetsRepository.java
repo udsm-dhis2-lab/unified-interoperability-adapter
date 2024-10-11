@@ -50,11 +50,11 @@ public interface DataSetsRepository extends JpaRepository<Dataset,String> {
 
     @Query(value = "SELECT * FROM datasets WHERE (:code IS NULL OR code=:code) " +
             " AND (:formType IS NULL OR form_type=:formType) " +
-            " AND (:instance IS NULL OR instance=:instance) " +
+            " AND (:instance IS NULL OR instances_id=:instance) " +
             " AND (:q IS NULL OR display_name LIKE CONCAT('%',:q,'%'))",
             countQuery = "SELECT COUNT(*) FROM datasets WHERE (:code IS NULL OR code = :code ) " +
                     " AND (:formType IS NULL OR form_type=:formType) " +
-                    " AND (:instance IS NULL OR instances=:instance) " +
+                    " AND (:instance IS NULL OR instances_id=:instance) " +
                     " AND (:q IS NULL OR display_name LIKE CONCAT('%',:q,'%'))", nativeQuery = true)
     Page<Dataset> getDatasetsListByPagination(String code, String formType, String q, BigInteger instance, Pageable pageable);
 }

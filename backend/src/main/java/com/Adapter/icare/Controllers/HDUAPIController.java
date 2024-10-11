@@ -511,9 +511,9 @@ public class HDUAPIController {
     public ResponseEntity<Map<String,Object>> getMappings(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "q", defaultValue = "10") String q,
-            @RequestParam(value = "code", defaultValue = "10") String code,
-            @RequestParam(value = "key", defaultValue = "10") String key
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "code", required = false) String code,
+            @RequestParam(value = "key", required = false) String key
     ) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -523,15 +523,15 @@ public class HDUAPIController {
             for (Datastore datastore: pagedDatastoreData.getContent()) {
                 namespaceDetails.add(datastore.getValue());
             }
-            Map<String, Object> codesObject = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
             pager.put("pageSize", pageSize);
             pager.put("totalPages",pagedDatastoreData.getTotalPages());
             pager.put("total", pagedDatastoreData.getTotalElements());
-            codesObject.put("pager",pager);
-            codesObject.put("results", namespaceDetails);
-            return ResponseEntity.ok(codesObject);
+            response.put("pager",pager);
+            response.put("results", namespaceDetails);
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
