@@ -39,8 +39,8 @@ public class InstanceService {
        return instancesRepository.findAll();
     }
 
-    public Page<Instance> getInstancesByPagination(Integer page, Integer pageSize, String code, String url, String ouUid, String q) throws Exception {
-        Pageable pageable = PageRequest.of(page, pageSize);
+    public Page<Instance> getInstancesByPagination(Integer page, Integer pageSize, boolean paging, String code, String url, String ouUid, String q) throws Exception {
+        Pageable pageable = paging ? PageRequest.of(page, pageSize): null;
         return instancesRepository.getInstancesListByPagination(code,ouUid,url,q,pageable);
     }
 
