@@ -295,6 +295,7 @@ public class HDUAPIController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     @GetMapping(value = "workflows")
     public ResponseEntity<String> getWorkflows() throws Exception {
         try {
@@ -308,11 +309,56 @@ public class HDUAPIController {
         }
     }
 
-    @PostMapping(value = "workflows")
-    public ResponseEntity<String> addWorkflow(@RequestBody Map<String, Object> process) throws Exception {
+    @GetMapping(value = "workflows/{id}")
+    public ResponseEntity<String> getWorkflowById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows", "POST", process));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping(value = "workflows")
+    public ResponseEntity<String> addWorkflow(@RequestBody Map<String, Object> workflow) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows", "POST", workflow));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(value = "workflows/{id}")
+    public ResponseEntity<String> updateWorkflow(
+            @RequestBody Map<String, Object> workflow,
+            @PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id, "PUT", workflow));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "workflows/{id}")
+    public ResponseEntity<String> deleteWorkflowById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id,"DELETE", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -334,11 +380,56 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "processes/{id}")
+    public ResponseEntity<String> getProcessById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping(value = "processes")
     public ResponseEntity<String> addProcess(@RequestBody Map<String, Object> process) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes", "POST", process));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(value = "processes/{id}")
+    public ResponseEntity<String> updateProcess(
+            @RequestBody Map<String, Object> process,
+            @PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id, "PUT", process));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "processes/{id}")
+    public ResponseEntity<String> deleteProcessById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id,"DELETE", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -360,11 +451,56 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "schedules/{id}")
+    public ResponseEntity<String> getScheduleById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping(value = "schedules")
     public ResponseEntity<String> addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules", "POST", schedule));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(value = "schedules/{id}")
+    public ResponseEntity<String> addSchedule(
+            @RequestBody Map<String, Object> schedule,
+            @PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules/" + id, "PUT", schedule));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "schedules/{id}")
+    public ResponseEntity<String> deleteScheduleById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules/" + id,"DELETE", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
