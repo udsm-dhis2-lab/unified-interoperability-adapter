@@ -1,15 +1,18 @@
 import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, map, Observable } from 'rxjs';
-import { DatasetPage, MappingsUrls } from '../models';
+import { DatasetPage, InstancePage, MappingsUrls } from '../models';
 import { HttpParams } from '@angular/common/http';
 import { UnAuothorizedException, UnknownException } from '@models';
+import { error } from 'console';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetManagementService {
   dataSetUrl: string = MappingsUrls.GET_DATASETS;
+
+  instanceUrl: string = MappingsUrls.GET_INSTANCES;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -18,14 +21,7 @@ export class DatasetManagementService {
     pageSize: number,
     filters: Array<{ key: string; value: string[] }>
   ): Observable<DatasetPage> {
-    let params = new HttpParams()
-      .append('page', `${pageIndex}`)
-      .append('results', `${pageSize}`);
-    filters.forEach((filter) => {
-      filter.value.forEach((value) => {
-        params = params.append(filter.key, value);
-      });
-    });
+    const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
 
     return this.httpClient
       .get<{ results: any }>(`${this.dataSetUrl}`, {
@@ -35,15 +31,57 @@ export class DatasetManagementService {
         map((response: { results: any }) => {
           return DatasetPage.fromJson(response);
         }),
-        catchError((error: any) => {
-          if (error.status === 401) {
-            throw new UnAuothorizedException('Invalid username or password');
-          } else {
-            throw new UnknownException(
-              'An unexpected error occurred. Please try again later.'
-            );
-          }
-        })
+        catchError((error: any) => this.handleError(error))
       );
+  }
+
+  getInstances(
+    pageIndex: number,
+    pageSize: number,
+    paging: boolean,
+    filters: Array<{ key: string; value: string[] }>
+  ) {
+    const params = this.buildHttpParams(pageIndex, pageSize, paging, filters);
+
+    return this.httpClient
+      .get<{ results: any }>(`${this.instanceUrl}`, {
+        params,
+      })
+      .pipe(
+        map((response: { results: any }) => {
+          return InstancePage.fromJson(response);
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  private handleError(error: any): never {
+    if (error.status === 401) {
+      throw new UnAuothorizedException('Invalid username or password');
+    } else {
+      throw new UnknownException(
+        'An unexpected error occurred. Please try again later.'
+      );
+    }
+  }
+
+  private buildHttpParams(
+    pageIndex: number,
+    pageSize: number,
+    paging: boolean = true,
+    filters: Array<{ key: string; value: string[] }>
+  ): HttpParams {
+    let params = new HttpParams()
+      .append('page', `${pageIndex}`)
+      .append('results', `${pageSize}`)
+      .append('paging', `${paging}`);
+
+    filters.forEach((filter) => {
+      filter.value.forEach((value) => {
+        params = params.append(filter.key, value);
+      });
+    });
+
+    return params;
   }
 }
