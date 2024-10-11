@@ -51,11 +51,11 @@ public interface InstancesRepository extends JpaRepository<Instance,Long> {
 
     @Query(value = "SELECT * FROM instances WHERE (:code IS NULL OR code=:code) " +
             " AND (:url IS NULL OR url=:url) " +
-            " AND (ouUid: IS NULL OR url=:ouUid) " +
-            " AND (q: IS NULL OR name LIKE CONCAT('%',:ouUid,'%')",
+            " AND (:ouUid IS NULL OR url=:ouUid) " +
+            " AND (:q IS NULL OR name LIKE CONCAT('%',:q,'%')",
             countQuery = "SELECT COUNT(*) FROM mediator WHERE (:code IS NULL OR code = :code ) " +
                     " AND (:url IS NULL OR url=:url) " +
-                    " AND (ouUid: IS NULL OR url=:ouUid) " +
-                    " AND (q: IS NULL OR name LIKE CONCAT('%',:ouUid,'%')",nativeQuery = true)
+                    " AND (:ouUid IS NULL OR url=:ouUid) " +
+                    " AND (:q IS NULL OR name LIKE CONCAT('%',:q,'%')",nativeQuery = true)
     Page<Instance> getInstancesListByPagination(String code, String ouUid, String url, String q, Pageable pageable);
 }
