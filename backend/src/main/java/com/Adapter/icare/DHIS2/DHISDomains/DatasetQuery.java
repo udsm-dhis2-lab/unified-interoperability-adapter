@@ -21,14 +21,17 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
     private Long id;
 
     @ManyToOne
-    private Dataset dataSet;
+    @Column(name = "data_set_id")
+    private Dataset dataSets;
 
     private String sqlQuery;
 
     @ManyToOne
-    private Instance instance;
+    @Column(name = "instance_id")
+    private Instance instances;
 
     @ManyToOne
+    @Column(name = "data_source_id")
     private Datasource dataSource;
 
     @Lob
@@ -55,8 +58,8 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
         HashMap<String, Object> dataSetsQueries = (new HashMap<String, Object>());
         dataSetsQueries.put("uuid",this.getUuid());
         dataSetsQueries.put("sqlQuery",this.getSqlQuery());
-        dataSetsQueries.put("dataSetInstance",this.getDataSet());
-        dataSetsQueries.put("instance",this.getInstance());
+        dataSetsQueries.put("dataSetInstance",this.getDataSets());
+        dataSetsQueries.put("instance",this.getInstances());
         dataSetsQueries.put("dataSource", this.getDataSource());
         dataSetsQueries.put("mappings", this.getMappings());
         return dataSetsQueries;

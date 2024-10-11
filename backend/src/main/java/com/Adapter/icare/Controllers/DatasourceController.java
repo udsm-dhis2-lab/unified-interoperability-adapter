@@ -58,11 +58,6 @@ public class DatasourceController {
         return datasourceService.getDatasources();
     }
 
-    @GetMapping("/status")
-    public String getStatus() {
-        return "OK";
-    }
-
     @PostMapping
     public Datasource addDatasource(@RequestBody Datasource datasource) throws Exception {
         return datasourceService.AddNewDataSource(datasource);

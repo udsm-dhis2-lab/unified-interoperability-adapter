@@ -31,6 +31,7 @@
 
 package com.Adapter.icare.DHIS2.Controllers;
 
+import java.math.BigInteger;
 import java.util.*;
 
 import com.Adapter.icare.Domains.Instance;
@@ -74,20 +75,25 @@ public class DataSetsController {
             @RequestParam(value="q",required = false ) String q
     ){
         try {
-            List<Map<String, Object>> mediatorsList = new ArrayList<>();
-            Page<Dataset> pagedDataSetsData =  dataSetsService.getDatasetsByPagination(page,pageSize,code,formType,q);
-            for (Dataset dataset: pagedDataSetsData.getContent()) {
-                mediatorsList.add(dataset.toMap());
+            Instance instanceDetails = instanceService.getInstanceByUuid(instance);
+            if (instanceDetails != null) {
+                List<Map<String, Object>> mediatorsList = new ArrayList<>();
+                Page<Dataset> pagedDataSetsData =  dataSetsService.getDatasetsByPagination(page,pageSize,code,formType,q, BigInteger.valueOf(instanceDetails.getId()));
+                for (Dataset dataset: pagedDataSetsData.getContent()) {
+                    mediatorsList.add(dataset.toMap());
+                }
+                Map<String, Object> returnObject =  new HashMap<>();
+                Map<String, Object> pager = new HashMap<>();
+                pager.put("page", page);
+                pager.put("pageSize", pageSize);
+                pager.put("totalPages",pagedDataSetsData.getTotalPages());
+                pager.put("total", pagedDataSetsData.getTotalElements());
+                returnObject.put("pager",pager);
+                returnObject.put("results", mediatorsList);
+                return ResponseEntity.ok(returnObject);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
-            Map<String, Object> returnObject =  new HashMap<>();
-            Map<String, Object> pager = new HashMap<>();
-            pager.put("page", page);
-            pager.put("pageSize", pageSize);
-            pager.put("totalPages",pagedDataSetsData.getTotalPages());
-            pager.put("total", pagedDataSetsData.getTotalElements());
-            returnObject.put("pager",pager);
-            returnObject.put("results", mediatorsList);
-            return ResponseEntity.ok(returnObject);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

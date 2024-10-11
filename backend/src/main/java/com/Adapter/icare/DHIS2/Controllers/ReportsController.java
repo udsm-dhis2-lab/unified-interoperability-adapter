@@ -129,7 +129,7 @@ public class ReportsController {
         dataSet.put("uuid", datasetInstanceDetails.getId());
         dataSet.put("code", datasetInstanceDetails.getCode());
         dataSet.put("name", datasetInstanceDetails.getDisplayName());
-        dataSet.put("instanceUuid", datasetInstanceDetails.getInstance().getUuid());
+        dataSet.put("instanceUuid", datasetInstanceDetails.getInstances().getUuid());
         jsonObjectForDatastore.put("dataSet",dataSet);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();

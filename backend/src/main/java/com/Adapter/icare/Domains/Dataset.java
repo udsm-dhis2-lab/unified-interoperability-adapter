@@ -71,7 +71,8 @@ public class Dataset extends BaseEntity implements Serializable {
     private String datasetFields;
     
     @ManyToOne
-    private Instance instance;
+    @Column(name = "instances_id")
+    private Instance instances;
 
     public Map<String,Object> toMap() {
         Map<String,Object> dataSetMap = new HashMap<>();
@@ -85,7 +86,7 @@ public class Dataset extends BaseEntity implements Serializable {
         dataSetMap.put("timelyDays", this.getTimelyDays());
         dataSetMap.put("expiryDays", this.getExpiryDays());
         dataSetMap.put("datasetFields", this.getDatasetFields());
-        dataSetMap.put("instance", this.getInstance().toMap());
+        dataSetMap.put("instance", this.getInstances().toMap());
 
         Map<String, Object> createdBy = new HashMap<>();
         if (this.getCreatedBy() != null) {

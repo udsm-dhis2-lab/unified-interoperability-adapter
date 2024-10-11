@@ -31,13 +31,8 @@
 
 package com.Adapter.icare.Domains;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -56,10 +51,13 @@ public class DataSetElement extends BaseEntity{
     private String dataElement;
     private String categoryOptionCombo;
     private String SqlQuery;
-    @ManyToOne
-    private Dataset dataset;
 
     @ManyToOne
+    @Column(name="datasets_id")
+    private Dataset datasets;
+
+    @ManyToOne
+    @Column(name="datasource_id")
     private Datasource datasource;
 
     @Transient

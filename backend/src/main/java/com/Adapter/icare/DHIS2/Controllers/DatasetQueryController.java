@@ -62,8 +62,8 @@ public class DatasetQueryController {
     public DatasetQuery saveDataSetQuery(@RequestBody Map<String, Object> datasetQueryMap) throws Exception {
         //Manipulating the received request
         DatasetQuery datasetQuery = new DatasetQuery();
-        datasetQuery.setDataSet(dataSetsService.getDataSetInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSetInstance")).get("uuid").toString()));
-        datasetQuery.setInstance(instanceService.getInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("instance")).get("uuid").toString()));
+        datasetQuery.setDataSets(dataSetsService.getDataSetInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSetInstance")).get("uuid").toString()));
+        datasetQuery.setInstances(instanceService.getInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("instance")).get("uuid").toString()));
         datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSource")).get("uuid").toString()));
         datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
         datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());
@@ -74,8 +74,8 @@ public class DatasetQueryController {
     @PutMapping
     public DatasetQuery updateDataSetQuery(@RequestBody Map<String, Object> datasetQueryMap) throws Exception {
         DatasetQuery datasetQuery = new DatasetQuery();
-        datasetQuery.setDataSet(dataSetsService.getDataSetInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSetInstance")).get("uuid").toString()));
-        datasetQuery.setInstance(instanceService.getInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("instance")).get("uuid").toString()));
+        datasetQuery.setDataSets(dataSetsService.getDataSetInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSetInstance")).get("uuid").toString()));
+        datasetQuery.setInstances(instanceService.getInstanceByUuid(((Map<String, Object>) datasetQueryMap.get("instance")).get("uuid").toString()));
         datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryMap.get("dataSource")).get("uuid").toString()));
         datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
         datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());
@@ -174,8 +174,8 @@ public class DatasetQueryController {
         for (Map<String, Object> datasetQueryMap : (List<Map<String, Object>>) datasetQueryImportMap.get("dataSetQueries")) {
             DatasetQuery datasetQuery = new DatasetQuery();
             Dataset dataset = dataSetsService.getDataSetInstanceByDataSetId(datasetQueryMap.get("dataSetUuid").toString());
-            datasetQuery.setDataSet(dataset);
-            datasetQuery.setInstance(dataset.getInstance());
+            datasetQuery.setDataSets(dataset);
+            datasetQuery.setInstances(dataset.getInstances());
             datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(((Map<String, Object>) datasetQueryImportMap.get("dataSource")).get("uuid").toString()));
             datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
             datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());
@@ -199,8 +199,8 @@ public class DatasetQueryController {
             datasetQueryInfo.put("sqlQuery", datasetQuery.getSqlQuery());
             datasetQueryInfo.put("uuid", datasetQuery.getUuid());
             datasetQueryInfo.put("mappings", datasetQuery.getMappings());
-            datasetQueryInfo.put("instance", datasetQuery.getInstance().getUuid());
-            datasetQueryInfo.put("dataSetUuid", datasetQuery.getDataSet().getUuid());
+            datasetQueryInfo.put("instance", datasetQuery.getInstances().getUuid());
+            datasetQueryInfo.put("dataSetUuid", datasetQuery.getDataSets().getUuid());
             datasetQueryInfo.put("dataSource", datasetQuery.getDataSource().getUuid());
             datasetQueriesData.add(datasetQueryInfo);
         }
@@ -257,8 +257,8 @@ public class DatasetQueryController {
                                 System.out.println("Instance UUID matches for dataset query: " + datasetQueryMap.get("uuid"));
                                 DatasetQuery datasetQuery = new DatasetQuery();
                                 Dataset dataset = dataSetsService.getDataSetInstanceByDataSetId(datasetQueryMap.get("dataSetUuid").toString());
-                                datasetQuery.setDataSet(dataset);
-                                datasetQuery.setInstance(dataset.getInstance());
+                                datasetQuery.setDataSets(dataset);
+                                datasetQuery.setInstances(dataset.getInstances());
                                 datasetQuery.setDataSource(datasourceService.getDataSourceByUuid(datasetQueryMap.get("dataSourceUuid").toString()));
                                 datasetQuery.setSqlQuery(datasetQueryMap.get("sqlQuery").toString());
                                 datasetQuery.setMappings(datasetQueryMap.get("mappings").toString());

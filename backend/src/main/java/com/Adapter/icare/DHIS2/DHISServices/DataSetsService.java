@@ -33,6 +33,7 @@ package com.Adapter.icare.DHIS2.DHISServices;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -70,9 +71,10 @@ public class DataSetsService {
                                                  Integer pageSize,
                                                  String code,
                                                  String formType,
-                                                 String q) throws Exception {
+                                                 String q,
+                                                 BigInteger instance) throws Exception {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return dataSetsRepository.getDatasetsListByPagination(code,formType,q,pageable);
+        return dataSetsRepository.getDatasetsListByPagination(code,formType,q,instance,pageable);
     }
 
     public Map<String,Object> getDhis2DataSets(
