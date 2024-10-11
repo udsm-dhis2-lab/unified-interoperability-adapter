@@ -1,3 +1,9 @@
+.view-button {
+  padding-left: 0;
+  margin-left: 0;
+  color: #1890ff;
+}
+
 /* The nz-content container needs to take full height of the viewport */
 nz-content {
     display: flex;
