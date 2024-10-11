@@ -549,6 +549,24 @@ public class HDUAPIController {
         }
     }
 
+    @DeleteMapping(value = "mappings/{uuid}")
+    public ResponseEntity<Map<String,Object>> deleteMappings(@PathVariable(value="uuid") String uuid) throws Exception {
+        try {
+            Datastore mappingsToUpdate = datastoreService.getDatastoreByUuid(uuid);
+            Map<String,Object> response = new HashMap<>();
+            if (mappingsToUpdate != null) {
+                datastoreService.deleteDatastore(uuid);
+                response.put("message","Mapping with uuid " + uuid +" has been deleted");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message","Mapping with uuid " + uuid + " does not exists");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PutMapping(value = "mappings/{uuid}")
     public ResponseEntity<Map<String,Object>> updateMappingsByUuid(
             @PathVariable(value = "uuid") String uuid,
