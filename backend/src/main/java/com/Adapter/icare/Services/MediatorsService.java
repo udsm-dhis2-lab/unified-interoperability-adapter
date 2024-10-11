@@ -6,7 +6,10 @@ import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Repository.MediatorsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
 import org.json.JSONObject;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -57,6 +60,11 @@ public class MediatorsService {
 
     public List<Mediator> getMediatorsConfigs() throws Exception {
         return mediatorsRepository.findAll();
+    }
+
+    public Page<Mediator> getMediatorsByPagination(Integer page, Integer pageSize, String code, String category) throws Exception {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return mediatorsRepository.getMediatorsListByPagination(code,category,pageable);
     }
 
     public Mediator getMediatorByUuid(String uuid) throws Exception {
