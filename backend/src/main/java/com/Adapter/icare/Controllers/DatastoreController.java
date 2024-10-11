@@ -157,6 +157,9 @@ public class DatastoreController {
             if (datastore.getUuid() == null) {
                 datastore.setUuid(uuid);
             }
+            if (authenticatedUser != null) {
+                datastore.setLastUpdatedBy(authenticatedUser);
+            }
             return ResponseEntity.ok(datastoreService.updateDatastore(datastore).toMap());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);

@@ -509,6 +509,68 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value="mappings", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String,Object>> getMappings(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "q", defaultValue = "10") String q,
+            @RequestParam(value = "code", defaultValue = "10") String code,
+            @RequestParam(value = "key", defaultValue = "10") String key
+    ) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+            String namespaceFilter = datastoreConstants.MappingsNamespaceFilter;
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingNamespaceFilterByPagination(
+                    namespaceFilter, key,q,code,page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> codesObject = new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            codesObject.put("pager",pager);
+            codesObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(codesObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "mappings/{uuid}")
+    public ResponseEntity<Map<String,Object>> getMappingsByUuid(@PathVariable(value = "uuid") String uuid) throws Exception {
+        try {
+            Map<String,Object> response = datastoreService.getDatastoreByUuid(uuid).getValue();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(value = "mappings/{uuid}")
+    public ResponseEntity<Map<String,Object>> updateMappingsByUuid(
+            @PathVariable(value = "uuid") String uuid,
+            @RequestBody Datastore datastore) throws Exception {
+        try {
+            Datastore mappingsToUpdate = datastoreService.getDatastoreByUuid(uuid);
+            if (mappingsToUpdate != null) {
+                mappingsToUpdate.setValue(datastore.getValue());
+                if (authenticatedUser != null) {
+                    mappingsToUpdate.setLastUpdatedBy(authenticatedUser);
+                }
+                return ResponseEntity.ok(datastoreService.updateDatastore(mappingsToUpdate).toMap());
+            } else {
+                Map<String,Object> response  = new HashMap<>();
+                response.put("message","Mapping with uuid " + uuid + " does not exists");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     // CUSTOM implementation for supporting HDU API temporarily
     @GetMapping(value="codeSystems", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getDatastoreByNamespace(@RequestParam(value="q",required = false) String q,

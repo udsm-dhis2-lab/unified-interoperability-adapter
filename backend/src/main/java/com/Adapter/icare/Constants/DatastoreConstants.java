@@ -17,6 +17,6 @@ public class DatastoreConstants {
     @Value("${DEFAULT_NAMESPACE_FOR_POTENTIAL_CLIENT_DUPLICATES:CLIENT-DUPLICATES}")
     public String DefaultNameSpaceForPotentialClientDuplicates;
 
-    @Value("${DATASTORE_MAPPINGS_NAMESPACE:MAPPINGS}")
-    public String MappingsNamespace;
+    @Value("${DATASTORE_MAPPINGS_NAMESPACE_FILTER:MAPPINGS-}")
+    public String MappingsNamespaceFilter;
 }
