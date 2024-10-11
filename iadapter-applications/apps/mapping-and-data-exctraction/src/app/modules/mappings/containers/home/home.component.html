@@ -1,1 +1,66 @@
-<p>home works!</p>
+<!-- TODO: Remove margin top after fixing app bar overlaying content behavior -->
+<div style="margin-top: 52px">
+  <nz-layout>
+    <nz-content>
+      <div class="inner-content">
+        <div nz-row>
+          <div style="padding: 16px; width: 100%">
+            <div style="margin-bottom: 16px">
+              <search-bar [labelText]="'Search client:'"></search-bar>
+            </div>
+
+            <nz-table
+              nzShowSizeChanger
+              [nzData]="listOfDatasets"
+              [nzFrontPagination]="false"
+              [nzLoading]="loading"
+              [nzTotal]="total"
+              [nzPageSize]="pageSize"
+              [nzPageIndex]="pageIndex"
+              (nzQueryParams)="onQueryParamsChange($event)"
+            >
+              <thead>
+                <tr>
+                  <th>SN</th>
+                  <th>Code</th>
+                  <th>Display name</th>
+                  <th>Created by</th>
+                  <th>Period type</th>
+                  <th>Created on</th>
+                  <th>Expiry days</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (data of listOfDatasets; track data.code; let i = $index )
+                {
+                <tr>
+                  <td>
+                    {{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}
+                  </td>
+                  <td>{{ data.code }}</td>
+                  <td>{{ data.displayName }}</td>
+                  <td>{{ data.createdBy }}</td>
+                  <td>{{ data.periodType }}</td>
+                  <td>{{ data.createdOn }}</td>
+                  <td>{{ data.expiryDays }}</td>
+                  <td>
+                    <button
+                      nz-button
+                      nzType="text"
+                      class="view-button"
+                      (click)="goToDataSetMapping()"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </nz-table>
+          </div>
+        </div>
+      </div>
+    </nz-content>
+  </nz-layout>
+</div>

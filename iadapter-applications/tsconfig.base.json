@@ -24,7 +24,8 @@
       "@iadapter-applications/hdu-api-top-bar-menu": [
         "libs/hdu-api-top-bar-menu/src/index.ts"
       ],
-      "@models": ["libs/models/src/index.ts"]
+      "@models": ["libs/models/src/index.ts"],
+      "search-bar": ["libs/search-bar/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

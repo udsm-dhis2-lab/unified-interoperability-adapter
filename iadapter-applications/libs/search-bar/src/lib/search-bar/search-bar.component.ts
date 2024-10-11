@@ -1,11 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { antDesignModules } from './ant-design-modules';
 
 @Component({
-  selector: 'lib-search-bar',
+  selector: 'search-bar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ...antDesignModules],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css',
 })
-export class SearchBarComponent {}
+export class SearchBarComponent {
+  @Input({
+    required: true,
+  })
+  labelText: string = '';
+}
