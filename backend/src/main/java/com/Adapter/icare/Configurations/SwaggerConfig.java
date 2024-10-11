@@ -27,7 +27,7 @@ public class SwaggerConfig {
                 new Server().url("https://iadapter.dhis2.udsm.ac.tz").description("Development Server")
         );
 
-        return new OpenAPI().info(new Info().title("iAdapterAPI")
+        return new OpenAPI().info(new Info().title("iAdapter API")
                         .description("This is an API documentation for iAdapter")
                         .version("v1.0.0"))
                 .servers(servers);
