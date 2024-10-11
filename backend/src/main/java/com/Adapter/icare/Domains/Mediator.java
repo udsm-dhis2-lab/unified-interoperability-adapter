@@ -15,7 +15,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
-@Table
+@Table(name = "mediator")
 public class Mediator  extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

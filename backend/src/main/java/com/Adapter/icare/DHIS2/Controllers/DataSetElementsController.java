@@ -45,7 +45,7 @@ import com.Adapter.icare.Domains.Datasource;
 import com.Adapter.icare.Repository.DatasourceRepository;
 
 @RestController
-@RequestMapping("/api/v1/datasetElements")
+@RequestMapping("/api/v1/dataSetElements")
 public class DataSetElementsController {
     
     private final DataSetElementsService dataSetElementsService;
@@ -114,7 +114,7 @@ public class DataSetElementsController {
        return rs.getString(1);   
     }
 
-    @PostMapping("/testquerylist")
+    @PostMapping("/testQueryList")
     public List<Map<String,Object>> queryList(@RequestBody Map<String,Object> queryMap) throws Exception {
 
        String query = queryMap.get("sql").toString();

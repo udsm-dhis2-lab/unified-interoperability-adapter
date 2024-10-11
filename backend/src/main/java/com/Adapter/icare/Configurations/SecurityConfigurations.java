@@ -56,13 +56,14 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         "/",
                         "/error",
+                        "/login",
                         "/login/**",
                         "/customError",
-                        "/swagger-ui/**",         // Allow Swagger UI access without authentication
-                        "/swagger-ui/index.html", // Allow direct access to Swagger UI index
-                        "/v3/api-docs/**",        // Allow OpenAPI docs access without authentication
-                        "/swagger-resources/**",  // Allow Swagger resources access without authentication
-                        "/webjars/**"             // Allow webjars resources for Swagger UI
+                        "/swagger-ui/**",
+                        "/swagger-ui/index.html",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
                 ).permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/login")
                 .permitAll()

@@ -68,8 +68,4 @@ public class DataSetElement extends BaseEntity{
     private String periodStart;
     @Transient  
     private String periodEnd;
-
-    
-    
-
 }

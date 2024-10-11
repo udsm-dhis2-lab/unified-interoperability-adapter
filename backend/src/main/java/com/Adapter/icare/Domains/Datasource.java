@@ -47,7 +47,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table
+@Table(name = "datasource")
 public class Datasource extends BaseEntity implements Serializable{
 
     @Id
