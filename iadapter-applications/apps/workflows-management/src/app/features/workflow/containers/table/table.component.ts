@@ -30,9 +30,18 @@ import { WorkflowState } from '../../state/workflow.state';
 import { select, Store } from '@ngrx/store';
 import { WorkflowActions } from '../../state/workflow.actions';
 import { WorkflowService } from '../../services/workflow/workflow.service';
-import { getWorkflows } from '../../state/workflow.selectors';
-import { Workflow } from '../../models/workflow.model';
+import {
+  getAddedWorkflowStatus,
+  getUpdatedWorkflowStatus,
+  getWorkflows,
+} from '../../state/workflow.selectors';
+import {
+  Workflow,
+  WorkflowFormCreate,
+  WorkflowTable,
+} from '../../models/workflow.model';
 import { defaultIfEmpty } from 'rxjs';
+import { EditComponent } from '../edit/edit.component';
 
 type TableScroll = 'unset' | 'scroll' | 'fixed';
 
@@ -86,38 +95,12 @@ export class TableComponent implements OnInit {
   scrollY: string | null = null;
   settingValue: Setting;
 
-  currentPageDataChange($event: readonly Workflow[]): void {
-    this.workflowsData = $event;
-    // this.displayData = $event;
-    this.refreshStatus();
-  }
-
-  refreshStatus(): void {
-    const validData = this.workflowsData.filter((value) => !value.disabled);
-    const allChecked =
-      validData.length > 0 &&
-      validData.every((value) => value.checked === true);
-    const allUnChecked = validData.every((value) => !value.checked);
-    this.allChecked = allChecked;
-    this.indeterminate = !allChecked && !allUnChecked;
-  }
-
-  checkAll(value: boolean): void {
-    this.workflowsData.forEach((data) => {
-      if (!data.disabled) {
-        data.checked = value;
-      }
-    });
-    this.refreshStatus();
-  }
-
-  workflows: readonly Workflow[] = [];
-  workflowsData: readonly Workflow[] = [];
-
   constructor(
     private formBuilder: NonNullableFormBuilder,
-    private nzModalService: NzModalService,
-    private workFlowState: Store<WorkflowState>
+    private addWorkflowNzModalService: NzModalService,
+    private editWorkflowNzModalService: NzModalService,
+    private workFlowState: Store<WorkflowState>,
+    private deleteflowNzModalService: NzModalService
   ) {
     this.settingForm = this.formBuilder.group({
       bordered: [false],
@@ -143,6 +126,34 @@ export class TableComponent implements OnInit {
     this.settingValue = this.settingForm.value as Setting;
   }
 
+  currentPageDataChange($event: readonly WorkflowTable[]): void {
+    this.workflowsData = $event;
+    // this.displayData = $event;
+    this.refreshStatus();
+  }
+
+  refreshStatus(): void {
+    const validData = this.workflowsData.filter((value) => !value.disabled);
+    const allChecked =
+      validData.length > 0 &&
+      validData.every((value) => value.checked === true);
+    const allUnChecked = validData.every((value) => !value.checked);
+    this.allChecked = allChecked;
+    this.indeterminate = !allChecked && !allUnChecked;
+  }
+
+  checkAll(value: boolean): void {
+    this.workflowsData.forEach((data) => {
+      if (!data.disabled) {
+        data.checked = value;
+      }
+    });
+    this.refreshStatus();
+  }
+
+  workflows: readonly WorkflowTable[] = [];
+  workflowsData: readonly WorkflowTable[] = [];
+
   ngOnInit(): void {
     this.workFlowState.dispatch(WorkflowActions.loadWorkflows());
 
@@ -155,7 +166,7 @@ export class TableComponent implements OnInit {
             checked: false,
             expand: false,
           };
-        });
+        }) as WorkflowTable[];
       });
 
     this.settingForm.valueChanges.subscribe((value) => {
@@ -171,47 +182,138 @@ export class TableComponent implements OnInit {
   }
 
   onAddWorkflow() {
-    // Programmatically create modal
-    const modalRef: NzModalRef<AddComponent> = this.nzModalService.create({
-      nzTitle: 'Add Workflow',
-      nzContent: AddComponent,
-      // nzComponentParams: {
-      //   title: 'Hello, this is the title',
-      //   content: 'This is the content passed to the modal component'
-      // },
-      nzMaskClosable: false, // Prevent closing by clicking outside
-      nzClosable: false, // Hide the "X" close icon
-      nzStyle: {
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '80vh',
-        width: '80vh',
-      },
-      nzBodyStyle: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'stretch', // Allow content to stretch the full width
-      },
-      nzWidth: '50vw', // Set modal width to 70% of viewport width
-      nzFooter: [
-        {
-          label: 'Close',
-          onClick: () => {
-            modalRef.destroy(); // Close the modal
-          },
+    const modalRef: NzModalRef<AddComponent> =
+      this.addWorkflowNzModalService.create({
+        nzTitle: 'Add Workflow',
+        nzContent: AddComponent,
+        nzMaskClosable: false,
+        nzClosable: false,
+        nzStyle: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '80vh',
+          width: '80vh',
         },
-        {
-          label: 'Save Workflow',
-          type: 'primary',
-          onClick: () => {
-            // const instance = modalRef.getContentComponent();
-            // instance?.handleCustomAction();
-            modalRef.destroy();
-          },
+        nzBodyStyle: {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'stretch',
         },
-      ],
-    });
+        nzWidth: '50vw',
+        nzFooter: [
+          {
+            label: 'Close',
+            onClick: () => {
+              modalRef.destroy();
+            },
+          },
+          {
+            label: 'Save Workflow',
+            type: 'primary',
+            onClick: () => {
+              const instance = modalRef.getContentComponent();
+              const workflowFormCreate: WorkflowFormCreate | null =
+                instance?.submitForm();
+
+              this.workFlowState.dispatch(
+                WorkflowActions.addWorkflow({
+                  workflow: workflowFormCreate as Workflow,
+                })
+              );
+
+              this.workFlowState
+                .pipe(select(getAddedWorkflowStatus))
+                .subscribe((status: boolean) => {
+                  if (status) {
+                    modalRef.destroy();
+                  }
+                });
+            },
+          },
+        ],
+      });
+  }
+
+  onDeleteWorkflow(workflowTable: WorkflowTable) {
+    if (workflowTable && workflowTable.id) {
+      this.deleteflowNzModalService.confirm({
+        nzTitle: `Are you sure you want to delete <strong>${workflowTable?.name}</strong>?`,
+        nzContent:
+          '<p style="font-size: 16px; color: #333; margin-bottom: 20px;">This action <span style="color: #f0ad4e; font-weight: bold;">cannot be undone</span>, and all associated data will be <span style="color: #d9534f; font-weight: bold;">permanently removed</span>. </p>',
+        nzOkText: 'Yes',
+        nzOkType: 'primary',
+        nzOkDanger: true,
+        nzOnOk: () => {
+          this.workFlowState.dispatch(
+            WorkflowActions.deleteWorkflow({ workflow: workflowTable })
+          );
+        },
+        nzCancelText: 'No',
+        nzOnCancel: () => console.log('Cancel'),
+      });
+    }
+  }
+
+  onEditWorkflow(workflowTable: WorkflowTable) {
+    if (workflowTable && workflowTable.id) {
+      this.workFlowState.dispatch(
+        WorkflowActions.setEditedWorkflow({ workflow: workflowTable })
+      );
+
+      const modalRef: NzModalRef<EditComponent> =
+        this.editWorkflowNzModalService.create({
+          nzTitle: 'Edit Workflow',
+          nzContent: EditComponent,
+          nzMaskClosable: false,
+          nzClosable: false,
+          nzStyle: {
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            minHeight: '80vh',
+            width: '80vh',
+          },
+          nzBodyStyle: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'stretch',
+          },
+          nzWidth: '50vw',
+          nzFooter: [
+            {
+              label: 'Close',
+              onClick: () => {
+                modalRef.destroy();
+              },
+            },
+            {
+              label: 'Update Workflow',
+              type: 'primary',
+              onClick: () => {
+                const instance = modalRef.getContentComponent();
+                const workflowFormCreate: WorkflowFormCreate | null =
+                  instance?.updateWorkflow();
+
+                this.workFlowState.dispatch(
+                  WorkflowActions.updateWorkflow({
+                    workflow: workflowFormCreate as Workflow,
+                  })
+                );
+
+                this.workFlowState
+                  .pipe(select(getUpdatedWorkflowStatus))
+                  .subscribe((status: boolean) => {
+                    if (status) {
+                      modalRef.destroy();
+                    }
+                  });
+              },
+            },
+          ],
+        });
+    }
   }
 }

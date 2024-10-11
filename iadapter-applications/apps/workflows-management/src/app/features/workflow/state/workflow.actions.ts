@@ -10,6 +10,7 @@ import {
 export const WorkflowActions = createActionGroup({
   source: 'Workflow',
   events: {
+    'Set Edited Workflow': props<{ workflow: Workflow }>(),
     'Load Workflow': props<{ id: string }>(),
     'Load Workflow Success': props<{ workflow: Workflow }>(),
     'Load Workflow Failure': props<{ httpErrorResponse: HttpErrorResponse }>(),

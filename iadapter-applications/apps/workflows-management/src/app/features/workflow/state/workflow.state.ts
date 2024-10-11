@@ -22,6 +22,7 @@ export interface WorkflowState extends EntityState<Workflow> {
     deletingWorkflow: boolean;
     deletedWorkflow: boolean;
     httpErrorResponse: HttpErrorResponse | null;
+    editedWorkflow: Workflow | null,
     pager: Pager;
 }
 
@@ -39,6 +40,7 @@ export const defaultWorkflow: WorkflowState = {
     deletingWorkflow: false,
     deletedWorkflow: false,
     httpErrorResponse: null,
+    editedWorkflow: null,
     pager: pagerInitialState
 };
 

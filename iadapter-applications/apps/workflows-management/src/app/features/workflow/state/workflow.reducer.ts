@@ -27,6 +27,7 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse: null,
+      editedWorkflow: null,
     };
   }),
   on(
@@ -45,6 +46,7 @@ const workflowReducer = createReducer(
         deletingWorkflow: false,
         deletedWorkflow: false,
         httpErrorResponse: null,
+        editedWorkflow: null,
       });
     }
   ),
@@ -63,6 +65,7 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse,
+      editedWorkflow: null,
     })
   ),
   on(WorkflowActions.loadWorkflow, (state: WorkflowState) => {
@@ -79,6 +82,7 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse: null,
+      editedWorkflow: null,
     };
   }),
   on(
@@ -97,6 +101,7 @@ const workflowReducer = createReducer(
         deletingWorkflow: false,
         deletedWorkflow: false,
         httpErrorResponse: null,
+        editedWorkflow: null,
       });
     }
   ),
@@ -115,6 +120,7 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse,
+      editedWorkflow: null,
     })
   ),
   on(WorkflowActions.loadWorkflows, (state: WorkflowState) => {
@@ -132,6 +138,7 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse: null,
       pager: pagerInitialState,
+      editedWorkflow: null,
     };
   }),
   on(
@@ -150,6 +157,7 @@ const workflowReducer = createReducer(
         deletingWorkflow: false,
         deletedWorkflow: false,
         httpErrorResponse: null,
+        editedWorkflow: null,
         pager: updateInitialPagerState(state.pager, workflowAPIResult),
       });
     }
@@ -170,6 +178,7 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse,
       pager: pagerInitialState,
+      editedWorkflow: null,
     })
   ),
   on(WorkflowActions.updateWorkflow, (state: WorkflowState, { workflow }) => {
@@ -186,6 +195,7 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse: null,
+      editedWorkflow: null,
     };
   }),
   on(
@@ -204,6 +214,7 @@ const workflowReducer = createReducer(
         deletingWorkflow: false,
         deletedWorkflow: false,
         httpErrorResponse: null,
+        editedWorkflow: null,
       });
     }
   ),
@@ -222,6 +233,7 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse,
+      editedWorkflow: null,
     })
   ),
   on(WorkflowActions.deleteWorkflow, (state: WorkflowState, { workflow }) => {
@@ -238,6 +250,7 @@ const workflowReducer = createReducer(
       deletingWorkflow: true,
       deletedWorkflow: false,
       httpErrorResponse: null,
+      editedWorkflow: null,
     };
   }),
   on(
@@ -256,6 +269,7 @@ const workflowReducer = createReducer(
         deletingWorkflow: false,
         deletedWorkflow: true,
         httpErrorResponse: null,
+        editedWorkflow: null,
       });
     }
   ),
@@ -274,6 +288,24 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse,
+      editedWorkflow: null,
+    })
+  ),
+  on(
+    WorkflowActions.setEditedWorkflow,
+    (state: WorkflowState, { workflow }) => ({
+      ...state,
+      loading: false,
+      loaded: false,
+      loadingWorkflow: false,
+      loadedWorkflow: false,
+      addingWorkflow: false,
+      addedWorkflow: false,
+      updatingWorkflow: false,
+      updatedWorkflow: false,
+      deletingWorkflow: false,
+      deletedWorkflow: false,
+      editedWorkflow: workflow,
     })
   )
 );

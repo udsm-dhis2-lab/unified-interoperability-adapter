@@ -1,0 +1,11 @@
+[nz-row] {
+    background-color: rgba(128, 128, 128, 0.08);
+    width: 40vw;
+    height: 12vh;
+    padding: 15px;
+    margin: 10px;
+}
+
+.form-input-container {
+    width: 100%;
+}

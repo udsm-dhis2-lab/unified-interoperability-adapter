@@ -7,6 +7,14 @@ export interface WorkflowAPIResult {
 
 export interface Workflow {
     id: string;
+    created?: string;
+    updated?: string;
+    name: string;
+    description: string;
+}
+
+export interface WorkflowTable {
+    id: string;
     created: string;
     updated: string;
     name: string;
@@ -14,6 +22,11 @@ export interface Workflow {
     checked: boolean;
     expand: boolean
     disabled: boolean
+}
+
+export interface WorkflowFormCreate {
+    name: string;
+    description: string;
 }
 
 export interface DeleteResponse {

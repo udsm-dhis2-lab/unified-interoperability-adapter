@@ -1,13 +1,12 @@
-<div nz-row>
-    <div nz-col nzFlex="2">
-        <div class="tabset-container">
-            <input nz-input placeholder="Name" type="text" />
-            <br />
-            <br />
-            <input nz-input placeholder="Description" type="text" />
-            <br />
-            <br />
+<form [formGroup]="workflowForm" (ngSubmit)="submitForm()">
+    <div nz-row>
+        <div class="form-input-container">
+            <!-- Name Input -->
+            <input nz-input placeholder="Name" formControlName="name" type="text" />
+            <br /><br />
+            <!-- Description Input -->
+            <input nz-input placeholder="Description" formControlName="description" type="text" />
+            <br /><br />
         </div>
     </div>
-    <div nz-col nzFlex="3"></div>
-</div>
+</form>

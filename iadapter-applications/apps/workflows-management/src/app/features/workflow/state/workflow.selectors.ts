@@ -83,3 +83,8 @@ export const getPagerTotal = createSelector(
     getWorkflowFeature,
     (state: WorkflowState) => state.pager.total
 );
+
+export const getEditedWorkflow = createSelector(
+    getWorkflowFeature,
+    (state: WorkflowState) => state.editedWorkflow
+);
