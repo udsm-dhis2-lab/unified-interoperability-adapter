@@ -64,7 +64,8 @@
           "buildTarget": "workflows-management:build:production"
         },
         "development": {
-          "buildTarget": "workflows-management:build:development"
+          "buildTarget": "workflows-management:build:development",
+          "proxyConfig": "apps/workflows-management/proxy-config.json"
         }
       },
       "defaultConfiguration": "development"
