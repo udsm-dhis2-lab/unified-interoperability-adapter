@@ -17,16 +17,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
-import org.springframework.security.web.context.SecurityContextRepository;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -63,55 +53,27 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/")
-                .permitAll()
-                .antMatchers("/error")
-                .permitAll()
-                .antMatchers("/login/**")
-                .permitAll()
-                .antMatchers("/customError")
-                .permitAll()
-                .antMatchers("/login")
-                .permitAll()
+                .antMatchers(
+                        "/",
+                        "/error",
+                        "/login/**",
+                        "/customError",
+                        "/swagger-ui/**",         // Allow Swagger UI access without authentication
+                        "/swagger-ui/index.html", // Allow direct access to Swagger UI index
+                        "/v3/api-docs/**",        // Allow OpenAPI docs access without authentication
+                        "/swagger-resources/**",  // Allow Swagger resources access without authentication
+                        "/webjars/**"             // Allow webjars resources for Swagger UI
+                ).permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/login")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/login")
-                .permitAll()
-                .antMatchers("/swagger-ui/**")
-                .permitAll()
-                .antMatchers("/swagger-ui/index.html")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .httpBasic();
-//        SecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
-//        http
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.GET, "/error").permitAll()
-//                .antMatchers(HttpMethod.GET, "/customError").permitAll()
-//                .antMatchers(HttpMethod.GET, "/login/**").permitAll()
-//                .antMatchers(HttpMethod.GET, "/**/**.js", "/**.js").permitAll()
-//                .antMatchers(HttpMethod.GET, "/**/**.css", "/**.css").permitAll()
-//                .antMatchers(HttpMethod.POST, "/api/v1/login").permitAll()
-//                .antMatchers(HttpMethod.GET, "/api/v1/login").permitAll()
-//                .anyRequest().authenticated()
-//                .and()
-//                .httpBasic()
-//                .and()
-//                .sessionManagement(session -> session
-//                        .sessionFixation().migrateSession()
-//                        .maximumSessions(1)
-//                        .maxSessionsPreventsLogin(true));
-//        return http.build();
-
-//        http
-//                .formLogin()
-//                .loginPage("/login")
-//                .successHandler(new CustomAuthSuccessHandler());
-//        return http.build();
     }
-
+}
 //    @Bean
 //    public CorsConfigurationSource corsConfigurationSource() {
 //        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -123,4 +85,3 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 //        source.registerCorsConfiguration("/**", config);
 //        return source;
 //    }
-}
