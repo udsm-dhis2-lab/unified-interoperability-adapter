@@ -62,7 +62,7 @@
         },
         "development": {
           "buildTarget": "login:build:development",
-          "proxyConfig": "apps/login/proxy.conf.json"
+          "proxyConfig": "apps/login/proxy-config.json"
         }
       },
       "defaultConfiguration": "development"
