@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.UUID;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

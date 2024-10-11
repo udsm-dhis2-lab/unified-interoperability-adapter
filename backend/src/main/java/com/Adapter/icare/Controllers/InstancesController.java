@@ -55,20 +55,20 @@ public class InstancesController {
         this.instanceService = instanceService;
     }
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<Map<String,Object>> getInstances(
             @RequestParam(value = "page", defaultValue = "0") Integer page,
-            @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "url", required = false) String url,
-            @RequestParam(value="ouUid",required = false ) String ouUuid,
-            @RequestParam(value="q",required = false ) String q
+            @RequestParam(value = "ouUid",required = false ) String ouUid,
+            @RequestParam(value = "q",required = false ) String q
     ) {
         try {
-            List<Map<String, Object>> mediatorsList = new ArrayList<>();
-            Page<Instance> pagedInstanceData = instanceService.getInstancesByPagination(page,pageSize,code,url,ouUuid,q);
+            List<Map<String, Object>> instancesList = new ArrayList<>();
+            Page<Instance> pagedInstanceData = instanceService.getInstancesByPagination(page,pageSize,code,url,ouUid,q);
             for (Instance instance: pagedInstanceData.getContent()) {
-                mediatorsList.add(instance.toMap());
+                instancesList.add(instance.toMap());
             }
             Map<String, Object> returnObject =  new HashMap<>();
             Map<String, Object> pager = new HashMap<>();
@@ -77,7 +77,7 @@ public class InstancesController {
             pager.put("totalPages",pagedInstanceData.getTotalPages());
             pager.put("total", pagedInstanceData.getTotalElements());
             returnObject.put("pager",pager);
-            returnObject.put("results", mediatorsList);
+            returnObject.put("results", instancesList);
             return ResponseEntity.ok(returnObject);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
