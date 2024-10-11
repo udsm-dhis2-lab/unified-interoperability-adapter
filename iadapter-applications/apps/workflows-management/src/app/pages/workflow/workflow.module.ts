@@ -8,7 +8,7 @@ import { WorkflowRoutingModule } from './workflow-routing.module';
   declarations: [],
   imports: [
     CommonModule,
-    WorkflowRoutingModule
-  ]
+    WorkflowRoutingModule,
+  ],
 })
 export class WorkflowModule { }
