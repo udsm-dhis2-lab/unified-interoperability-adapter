@@ -1,0 +1,105 @@
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="action-container">
+    <!-- Search input with a button -->
+    <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton" style="flex: 1;">
+      <input type="text" nz-input placeholder="Search Workflows" />
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+      <button nz-button nzType="primary" nzSearch>
+        <span nz-icon nzType="search"></span>
+      </button>
+    </ng-template>
+  
+    <!-- Action button -->
+    <button (click)="onAddWorkflow()" nz-button nzType="default" style="margin-left: 10px;">
+      Add Workflow
+      <!-- <span nz-icon nzType="plus"></span> -->
+    </button>
+  </div>
+  
+<nz-table
+  #dynamicTable
+  [nzScroll]="{ x: scrollX, y: scrollY }"
+  [nzData]="workflows"
+  [nzPageSize]="12"
+  [nzTableLayout]="settingValue.tableLayout"
+  [nzBordered]="settingValue.bordered"
+  [nzSimple]="settingValue.simple"
+  [nzLoading]="settingValue.loading"
+  [nzPaginationType]="settingValue.paginationType"
+  [nzPaginationPosition]="settingValue.position"
+  [nzShowSizeChanger]="settingValue.sizeChanger"
+  [nzFrontPagination]="settingValue.pagination"
+  [nzShowPagination]="settingValue.pagination"
+  [nzFooter]="settingValue.footer ? 'Workflow Management' : null"
+  [nzTitle]="settingValue.title ? 'Workflow Management' : null"
+  [nzSize]="settingValue.size"
+  (nzCurrentPageDataChange)="currentPageDataChange($event)"
+>
+  <thead>
+    @if (settingValue.header) {
+    <tr>
+      @if (settingValue.expandable) {
+      <th nzWidth="40px" [nzLeft]="fixedColumn"></th>
+      } @if (settingValue.checkbox) {
+      <th
+        nzWidth="60px"
+        [(nzChecked)]="allChecked"
+        [nzLeft]="fixedColumn"
+        [nzIndeterminate]="indeterminate"
+        (nzCheckedChange)="checkAll($event)"
+      ></th>
+      }
+      <th [nzLeft]="fixedColumn">Name</th>
+      <th>Description</th>
+      <th>Create</th>
+      <th>Updated</th>
+      <th [nzRight]="fixedColumn">Status</th>
+      <th [nzRight]="fixedColumn">Action</th>
+    </tr>
+    }
+  </thead>
+  <tbody>
+    @for (data of dynamicTable.data; track data) {
+    <tr>
+      @if (settingValue.expandable) {
+      <td [nzLeft]="fixedColumn" [(nzExpand)]="data.expand"></td>
+      } @if (settingValue.checkbox) {
+      <td
+        [nzLeft]="fixedColumn"
+        [(nzChecked)]="data.checked"
+        (nzCheckedChange)="refreshStatus()"
+      ></td>
+      }
+      <td [nzLeft]="fixedColumn">{{ data.name }}</td>
+      <td>{{ data.description }}</td>
+      <td [nzEllipsis]="settingValue.ellipsis">{{ data.created | date: 'fullDate' }}</td>
+      <td [nzEllipsis]="settingValue.ellipsis">{{ data.updated | date: 'fullDate' }}</td>
+      <td [nzRight]="fixedColumn" [nzEllipsis]="settingValue.ellipsis">
+        <button nz-button nzType="default">Not Started</button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button nz-button nzType="primary" [nzLoading]="true" nzWarning>
+          Running
+        </button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button nz-button nzType="default" nzDanger>Stopped</button>
+        <nz-divider nzType="vertical"></nz-divider>
+        <button nz-button nzType="primary" nzDanger>Failed</button>
+      </td>
+      <td [nzRight]="fixedColumn" [nzEllipsis]="settingValue.ellipsis">
+        <a href="#">Run</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a href="#">View Logs</a>
+        <nz-divider nzType="vertical"></nz-divider>
+        <a href="#">View Process</a>
+      </td>
+    </tr>
+    @if (settingValue.expandable) {
+    <tr [nzExpand]="data.expand">
+      <span>{{ data.description }}</span>
+    </tr>
+    } }
+  </tbody>
+</nz-table>
+
+
