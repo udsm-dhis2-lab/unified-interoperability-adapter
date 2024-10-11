@@ -39,7 +39,7 @@ export class LoginComponent implements OnDestroy {
 
   loginSubcription!: Subscription;
   constructor(
-    @Inject(NonNullableFormBuilder) private fb: NonNullableFormBuilder,
+    private fb: NonNullableFormBuilder,
     private loginService: LoginService
   ) {
     this.validateForm = this.fb.group({
