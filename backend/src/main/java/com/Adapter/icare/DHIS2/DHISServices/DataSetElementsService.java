@@ -32,10 +32,10 @@
 package com.Adapter.icare.DHIS2.DHISServices;
 
 
+import com.Adapter.icare.Domains.DataSetElement;
 import org.springframework.stereotype.Service;
 
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetElementsRepository;
-import com.Adapter.icare.Domains.DataSetElements;
 
 import java.util.UUID;
 
@@ -48,24 +48,24 @@ public class DataSetElementsService {
         this.dataSetElementsRepository = dataSetElementsRepository;
     }
 
-    public void addDataSetElements(DataSetElements dataSetElements) {
-        if (dataSetElements.getUuid() == null) {
+    public void addDataSetElements(DataSetElement dataSetElement) {
+        if (dataSetElement.getUuid() == null) {
             UUID uuid = UUID.randomUUID();
-            dataSetElements.setUuid(uuid.toString());
+            dataSetElement.setUuid(uuid.toString());
         }
-        dataSetElementsRepository.save(dataSetElements);    
+        dataSetElementsRepository.save(dataSetElement);
     }
 
-    public DataSetElements SearchExistingDataSetElements(DataSetElements dataSetElements) {
+    public DataSetElement SearchExistingDataSetElements(DataSetElement dataSetElement) {
         //Manipulating the received dataset element request
-        String dataElementsCategoryOptionCombString = dataSetElements.getDataElementCategoryOptionCombo();
+        String dataElementsCategoryOptionCombString = dataSetElement.getDataElementCategoryOptionCombo();
         String[] stringArray = dataElementsCategoryOptionCombString.split("-");
-        dataSetElements.setDataElement(stringArray[0]);
-        dataSetElements.setCategoryOptionCombo(stringArray[1]);
+        dataSetElement.setDataElement(stringArray[0]);
+        dataSetElement.setCategoryOptionCombo(stringArray[1]);
 
-        String dataElement = dataSetElements.getDataElement();
-        String categoryOptionCombo = dataSetElements.getCategoryOptionCombo();
-        String dataset = dataSetElements.getDatasets().getId();
+        String dataElement = dataSetElement.getDataElement();
+        String categoryOptionCombo = dataSetElement.getCategoryOptionCombo();
+        String dataset = dataSetElement.getDataset().getId();
 
         return dataSetElementsRepository.searchExistingDataSetElements(dataElement,categoryOptionCombo,dataset);
     }

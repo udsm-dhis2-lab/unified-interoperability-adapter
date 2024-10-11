@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.Adapter.icare.DHIS2.DHISDomains.RemoteDatasets;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
-import com.Adapter.icare.Domains.Datasets;
+import com.Adapter.icare.Domains.Dataset;
 
 @RestController
 @RequestMapping("/api/v1/datasets")
@@ -56,13 +56,13 @@ public class DataSetsController {
     }
 
     @GetMapping
-    public List<Datasets> GetAllDataSets(){
+    public List<Dataset> GetAllDataSets(){
 
         return dataSetsService.GetAllDataSets();
     }
 
     @GetMapping("/single")
-    public Optional<Datasets> GetSingleDataSet(@RequestParam String datasetId) {
+    public Optional<Dataset> GetSingleDataSet(@RequestParam String datasetId) {
 
         return dataSetsService.GetSingleDataSet(datasetId);
     }
@@ -80,9 +80,9 @@ public class DataSetsController {
     }
 
     @PostMapping
-    public Datasets AddDataSets(@RequestBody Datasets datasets){
+    public Dataset AddDataSets(@RequestBody Dataset dataset){
 
-        return dataSetsService.AddDataSets(datasets);
+        return dataSetsService.AddDataSets(dataset);
     }
 
     @DeleteMapping("/{datasetId}")

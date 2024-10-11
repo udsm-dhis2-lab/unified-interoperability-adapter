@@ -37,13 +37,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 
+import com.Adapter.icare.Domains.Dataset;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import com.Adapter.icare.DHIS2.DHISDomains.RemoteDatasets;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetsRepository;
-import com.Adapter.icare.Domains.Datasets;
-import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.Instance;
 import com.Adapter.icare.Repository.InstancesRepository;
 
 
@@ -59,7 +59,7 @@ public class DataSetsService {
         this.instancesRepository = instancesRepository;
     }
 
-    public List<Datasets> GetAllDataSets() {
+    public List<Dataset> GetAllDataSets() {
         return dataSetsRepository.findAll();
     }
 
@@ -71,7 +71,7 @@ public class DataSetsService {
         StringBuffer responseContent = new StringBuffer();
         //ObjectMapper objectMapper = new ObjectMapper();
         List<RemoteDatasets> remoteDataSetsList = new ArrayList<RemoteDatasets>();
-        Optional<Instances> instance = instancesRepository.findById(instanceId);
+        Optional<Instance> instance = instancesRepository.findById(instanceId);
 
         try {
 
@@ -171,15 +171,15 @@ public class DataSetsService {
         return remoteDataSetsList; 
     }
 
-    public Datasets AddDataSets(Datasets datasets) {
+    public Dataset AddDataSets(Dataset dataset) {
 
         //Inserting the HTML CODE
         URL url;
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        long instanceId = datasets.getInstances().getId();
-        Optional<Instances> instance = instancesRepository.findById(instanceId);
+        long instanceId = dataset.getInstance().getId();
+        Optional<Instance> instance = instancesRepository.findById(instanceId);
 
         try {
 
@@ -187,7 +187,7 @@ public class DataSetsService {
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
 
-            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
+            url = new URL(instanceUrl.concat("/api/dataSets/"+ dataset.getId()+"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -207,31 +207,31 @@ public class DataSetsService {
             JSONObject jsObject = new JSONObject(responseContent.toString());
             if(jsObject.has("formType")) {
                 String formType = jsObject.getString("formType");
-                datasets.setFormType(formType);
+                dataset.setFormType(formType);
             }
             //String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
             if(jsObject.has("periodType")) {
                 String periodType = jsObject.getString("periodType");
-                datasets.setPeriodType(periodType);
+                dataset.setPeriodType(periodType);
             }
 
             if(jsObject.has("timelyDays")) {
                 int timelyDays = jsObject.getInt("timelyDays");
-                datasets.setTimelyDays(timelyDays);
+                dataset.setTimelyDays(timelyDays);
             }
 
             if (jsObject.has("expiryDays")) {
                 int expiryDays = jsObject.getInt("expiryDays");
-                datasets.setExpiryDays(expiryDays);
+                dataset.setExpiryDays(expiryDays);
             }
 
             if(jsObject.has("code")) {
                 String code = jsObject.getString("code");
-                datasets.setCode(code);
+                dataset.setCode(code);
             }
 
-            datasets.setDatasetFields(jsObject.toString());
-            //datasets.setFormDesignCode(htmlForm);
+            dataset.setDatasetFields(jsObject.toString());
+            //dataset.setFormDesignCode(htmlForm);
 
 
             //System.out.println(js);
@@ -240,19 +240,19 @@ public class DataSetsService {
             System.out.println(e.getMessage());
         }
         UUID uuid = UUID.randomUUID();
-        datasets.setUuid(uuid.toString());
-        return dataSetsRepository.save(datasets);
+        dataset.setUuid(uuid.toString());
+        return dataSetsRepository.save(dataset);
     }
 
-    public Optional<Datasets> GetSingleDataSet(String datasetId) {
+    public Optional<Dataset> GetSingleDataSet(String datasetId) {
         return dataSetsRepository.findById(datasetId);
     }
 
-    public Datasets getDataSetInstanceByUuid(String uuid) {
+    public Dataset getDataSetInstanceByUuid(String uuid) {
         return dataSetsRepository.getDatasetInstanceByUuid(uuid);
     }
 
-    public Datasets getDataSetInstanceByDataSetId(String dhis2Uid) {
+    public Dataset getDataSetInstanceByDataSetId(String dhis2Uid) {
         return dataSetsRepository.getDatasetInstanceById(dhis2Uid);
     }
 
@@ -273,7 +273,7 @@ public class DataSetsService {
        String line;
        StringBuffer responseContent = new StringBuffer();
        List<RemoteDatasets> remoteDataSetsList = new ArrayList<RemoteDatasets>();
-       Optional<Instances> instance = instancesRepository.findById(instanceId);
+       Optional<Instance> instance = instancesRepository.findById(instanceId);
 
        try {
 

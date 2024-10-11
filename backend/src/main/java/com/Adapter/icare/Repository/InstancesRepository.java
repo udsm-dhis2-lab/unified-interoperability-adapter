@@ -33,18 +33,29 @@ package com.Adapter.icare.Repository;
 
 import java.util.List;
 
-import com.Adapter.icare.Domains.Datasets;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.Instance;
 
 @Repository
-public interface InstancesRepository extends JpaRepository<Instances,Long> {
+public interface InstancesRepository extends JpaRepository<Instance,Long> {
 
-    List<Instances> findAll();
+    List<Instance> findAll();
 
     @Query(value = "SELECT * FROM instances WHERE uuid=:uuid",nativeQuery = true)
-    Instances getInstanceByUuid(String uuid);
+    Instance getInstanceByUuid(String uuid);
+
+    @Query(value = "SELECT * FROM instances WHERE (:code IS NULL OR code=:code) " +
+            " AND (:url IS NULL OR url=:url) " +
+            " AND (ouUid: IS NULL OR url=:ouUid) " +
+            " AND (q: IS NULL OR name LIKE CONCAT('%',:ouUid,'%')",
+            countQuery = "SELECT COUNT(*) FROM mediator WHERE (:code IS NULL OR code = :code ) " +
+                    " AND (:url IS NULL OR url=:url) " +
+                    " AND (ouUid: IS NULL OR url=:ouUid) " +
+                    " AND (q: IS NULL OR name LIKE CONCAT('%',:ouUid,'%')",nativeQuery = true)
+    Page<Instance> getInstancesListByPagination(String code, String ouUid, String url, String q, Pageable pageable);
 }

@@ -2,11 +2,10 @@ package com.Adapter.icare.DHIS2.DHISServices;
 
 import com.Adapter.icare.DHIS2.DHISDomains.DatasetQuery;
 import com.Adapter.icare.DHIS2.DHISRepository.DatasetQueryRepository;
-import com.Adapter.icare.Domains.Datasets;
-import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.Dataset;
+import com.Adapter.icare.Domains.Instance;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,12 +26,12 @@ public class DatasetQueryService {
         return datasetQueryRepository.getDatasetQueryByUuid(uuid);
     }
 
-    public DatasetQuery getDataSetQueriesByDataSetInstanceId(Datasets dataset) {
+    public DatasetQuery getDataSetQueriesByDataSetInstanceId(Dataset dataset) {
         String id =  dataset.getId();
         return datasetQueryRepository.getDatasetQueriesByDataSetInstance(id);
     }
 
-    public List<DatasetQuery> getDataSetQueriesByInstanceId(Instances instance) {
+    public List<DatasetQuery> getDataSetQueriesByInstanceId(Instance instance) {
         Long instanceId =  instance.getId();
         return datasetQueryRepository.getDataSetQueriesByInstanceId(instanceId);
     }

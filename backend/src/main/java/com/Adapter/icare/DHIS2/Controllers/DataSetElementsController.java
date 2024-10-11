@@ -34,13 +34,13 @@ package com.Adapter.icare.DHIS2.Controllers;
 import java.sql.*;
 import java.util.*;
 
+import com.Adapter.icare.Domains.DataSetElement;
 import com.Adapter.icare.Utils.EncryptionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetElementsService;
-import com.Adapter.icare.Domains.DataSetElements;
 import com.Adapter.icare.Domains.Datasource;
 import com.Adapter.icare.Repository.DatasourceRepository;
 
@@ -58,18 +58,18 @@ public class DataSetElementsController {
     }
 
     @PostMapping
-    public DataSetElements addDataSetElements(@RequestBody DataSetElements dataSetElements) throws Exception {
+    public DataSetElement addDataSetElements(@RequestBody DataSetElement dataSetElement) throws Exception {
 
         //Manipulating the received request
-        String dataElementsCategoryOptionCombString = dataSetElements.getDataElementCategoryOptionCombo();
+        String dataElementsCategoryOptionCombString = dataSetElement.getDataElementCategoryOptionCombo();
         String [] stringArray = dataElementsCategoryOptionCombString.split("-");
-        dataSetElements.setDataElement(stringArray[0]);
-        dataSetElements.setCategoryOptionCombo(stringArray[1]);
-        Long dataSourceId = dataSetElements.getDatasource().getId();
+        dataSetElement.setDataElement(stringArray[0]);
+        dataSetElement.setCategoryOptionCombo(stringArray[1]);
+        Long dataSourceId = dataSetElement.getDatasource().getId();
         Optional<Datasource> datasource = datasourceRepository.findById(dataSourceId);
         
-        //Obtaining the data from dataSetElements
-        String SqlQuery = dataSetElements.getSqlQuery();
+        //Obtaining the data from dataSetElement
+        String SqlQuery = dataSetElement.getSqlQuery();
         String dataSourceUrl = datasource.get().getUrl();
         String decryptedPassword = EncryptionUtils.decrypt(datasource.get().getPassword());
         String dataSourcePassword = decryptedPassword;
@@ -85,23 +85,23 @@ public class DataSetElementsController {
         ResultSet rs = con.prepareStatement(newQuery).executeQuery();
 
         while (rs.next()) {
-        dataSetElementsService.addDataSetElements(dataSetElements);     
+        dataSetElementsService.addDataSetElements(dataSetElement);
         }
-        return dataSetElements;    
+        return dataSetElement;
     }
 
     @PostMapping("/testQuery")
-    public String testQuery(@RequestBody DataSetElements dataSetElements) throws Exception {
+    public String testQuery(@RequestBody DataSetElement dataSetElement) throws Exception {
 
-       Long dataSourceId = dataSetElements.getDatasource().getId();
+       Long dataSourceId = dataSetElement.getDatasource().getId();
        Optional<Datasource> datasource = datasourceRepository.findById(dataSourceId);
        String dataSourceUrl = datasource.get().getUrl();
        String decryptedPassword = EncryptionUtils.decrypt(datasource.get().getPassword());
        String dataSourcePassword = decryptedPassword;
        String dataSourceUserName = datasource.get().getUsername();
-       String query = dataSetElements.getSqlQuery();
-       String periodStart = dataSetElements.getPeriodStart();
-       String periodEnd = dataSetElements.getPeriodEnd();
+       String query = dataSetElement.getSqlQuery();
+       String periodStart = dataSetElement.getPeriodStart();
+       String periodEnd = dataSetElement.getPeriodEnd();
 
        //Query manipulation
        String newQuery = query.replaceAll("\\$\\{period-start\\}",periodStart).replaceAll("\\$\\{period-end\\}",periodEnd);
@@ -154,9 +154,9 @@ public class DataSetElementsController {
     }
 
     @PostMapping("/searchDataSetElements")
-    public DataSetElements SearchExistingDataSetElements(@RequestBody DataSetElements dataSetElements){
+    public DataSetElement SearchExistingDataSetElements(@RequestBody DataSetElement dataSetElement){
         
-       return dataSetElementsService.SearchExistingDataSetElements(dataSetElements);
+       return dataSetElementsService.SearchExistingDataSetElements(dataSetElement);
     }
 
     

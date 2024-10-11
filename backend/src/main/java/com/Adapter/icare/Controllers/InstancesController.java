@@ -31,22 +31,22 @@
 
 package com.Adapter.icare.Controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.Adapter.icare.Domains.Mediator;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.Adapter.icare.Domains.Instances;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.Adapter.icare.Domains.Instance;
 import com.Adapter.icare.Services.InstanceService;
 
 @RestController
-@RequestMapping("/api/v1/instance")
+@RequestMapping("/api/v1/instances")
 public class InstancesController {
 
     private final InstanceService instanceService;
@@ -56,27 +56,78 @@ public class InstancesController {
     }
 
     @GetMapping
-    public List<Instances> getInstances() {
-        return instanceService.getInstances();
-    }
-
-    @GetMapping("/status")
-    public String getStatus() {
-        return "OK";
+    public ResponseEntity<Map<String,Object>> getInstances(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "code", required = false) String code,
+            @RequestParam(value = "url", required = false) String url,
+            @RequestParam(value="ouUid",required = false ) String ouUuid,
+            @RequestParam(value="q",required = false ) String q
+    ) {
+        try {
+            List<Map<String, Object>> mediatorsList = new ArrayList<>();
+            Page<Instance> pagedInstanceData = instanceService.getInstancesByPagination(page,pageSize,code,url,ouUuid,q);
+            for (Instance instance: pagedInstanceData.getContent()) {
+                mediatorsList.add(instance.toMap());
+            }
+            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedInstanceData.getTotalPages());
+            pager.put("total", pagedInstanceData.getTotalElements());
+            returnObject.put("pager",pager);
+            returnObject.put("results", mediatorsList);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Instances addInstances(@RequestBody Instances instances) {
-        return instanceService.AddNewInstance(instances);
+    public ResponseEntity<Map<String,Object>> addInstances(
+            @RequestBody Instance instance) throws Exception {
+        try {
+            return ResponseEntity.ok(instanceService.AddNewInstance(instance).toMap());
+        } catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
     }
 
-    @DeleteMapping("/{instanceId}")
-    public void deleteInstance(@PathVariable("instanceId") Long instanceId) {
-        instanceService.deleteInstance(instanceId);
+    @PutMapping("/{uuid}")
+    public ResponseEntity<Map<String,Object>> updateInstance(
+            @RequestBody Map<String,Object> instance,
+            @PathVariable(value = "uuid") String uuid) throws Exception {
+        try {
+            Instance instanceToUpdate = instanceService.getInstanceByUuid(uuid);
+            Map<String,Object> response = new HashMap<>();
+            if (instanceToUpdate != null) {
+                response = instanceService.updateInstances(instanceToUpdate).toMap();
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message", "Instance with uuid " + uuid + " does not exists");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
     }
 
-    @PutMapping
-    public Instances updateInstances(@RequestBody Instances instances) {
-        return instanceService.updateInstances(instances);
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Map<String,Object>> deleteInstance(@PathVariable("uuid") String uuid) throws Exception {
+        try {
+            Instance instance = instanceService.getInstanceByUuid(uuid);
+            Map<String,Object> response = new HashMap<>();
+            if (instance !=null) {
+                response.put("message", "Instance with uuid " + uuid + " has been deleted");
+                instanceService.deleteInstance(instance.getId());
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message", "Instance with uuid " + uuid + " does not exists");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            throw new Exception("Issue with deleting resource");
+        }
     }
 }

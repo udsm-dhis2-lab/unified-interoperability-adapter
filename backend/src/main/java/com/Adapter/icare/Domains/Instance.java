@@ -31,13 +31,14 @@
 
 package com.Adapter.icare.Domains;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,28 +49,46 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table
-public class DataSetElements extends BaseEntity{
+@Table(name = "instances")
+public class Instance extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String dataElement;
-    private String categoryOptionCombo;
-    private String SqlQuery;
-    @ManyToOne
-    private Datasets datasets;
+    private String url;
+    private String username;
+    private String password;
+    private String name;
+    private String organisationUnitId;
+    private String code;
 
-    @ManyToOne
-    private Datasource datasource;
+    public Map<String,Object> toMap() {
+        Map<String, Object> instanceMap = new HashMap<>();
+        instanceMap.put("uuid", this.getUuid());
+        instanceMap.put("code", this.getCode());
+        instanceMap.put("name", this.getName());
+        instanceMap.put("url",this.getUrl());
+        instanceMap.put("ouUid",this.getOrganisationUnitId());
+        instanceMap.put("createdOn", this.getCreatedOn());
+        Map<String, Object> createdBy = new HashMap<>();
+        if (this.getCreatedBy() != null) {
+            createdBy.put("uuid", this.getCreatedBy().getUuid());
+            createdBy.put("username", this.getCreatedBy().getUsername());
+            createdBy.put("names", this.getCreatedBy().getFirstName() + " " + this.getCreatedBy().getSurname());
+        } else {
+            createdBy = null;
+        }
+        instanceMap.put("createdBy",createdBy);
 
-    @Transient
-    private String dataElementCategoryOptionCombo;
-    @Transient
-    private String periodStart;
-    @Transient  
-    private String periodEnd;
-
-    
-    
-
+        Map<String, Object> lastUpdatedBy = new HashMap<>();
+        if (this.getLastUpdatedBy() != null) {
+            lastUpdatedBy.put("uuid", this.getLastUpdatedBy().getUuid());
+            lastUpdatedBy.put("username", this.getLastUpdatedBy().getUsername());
+            lastUpdatedBy.put("names", this.getLastUpdatedBy().getFirstName() + " " + this.getLastUpdatedBy().getSurname());
+        } else {
+            lastUpdatedBy = null;
+        }
+        instanceMap.put("lastUpdatedOn", this.getLastUpdatedOn());
+        instanceMap.put("lastUpdatedBy",lastUpdatedBy);
+        return instanceMap;
+    }
 }

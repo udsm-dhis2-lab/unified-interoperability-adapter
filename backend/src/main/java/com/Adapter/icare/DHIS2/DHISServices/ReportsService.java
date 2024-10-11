@@ -47,8 +47,8 @@ import com.Adapter.icare.DHIS2.DHISDomains.DhisAggregateValues;
 import com.Adapter.icare.DHIS2.DHISDomains.ReportValuesSent;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetElementsRepository;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetsRepository;
-import com.Adapter.icare.Domains.DataSetElements;
-import com.Adapter.icare.Domains.Datasets;
+import com.Adapter.icare.Domains.DataSetElement;
+import com.Adapter.icare.Domains.Dataset;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -63,7 +63,7 @@ public class ReportsService {
         this.dataSetsRepository = dataSetsRepository;
     }
 
-    public List<DataSetElements> SearchDataSetElementsPerDataSet(ReportValuesSent reportValuesSent) {
+    public List<DataSetElement> SearchDataSetElementsPerDataSet(ReportValuesSent reportValuesSent) {
         
         String dsId = reportValuesSent.getDatasetId();
         return dataSetElementsRepository.searchExistingDataSetElementsPerDataSet(dsId);
@@ -75,19 +75,19 @@ public class ReportsService {
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        Datasets dataset= dataSetsRepository.getDatasetInstanceByUuid(datasetId);
+        Dataset dataset= dataSetsRepository.getDatasetInstanceByUuid(datasetId);
         JSONObject jsObject = new JSONObject();
         String status = "";
-        String orgUnit = dataset.getInstances().getCode();
+        String orgUnit = dataset.getInstance().getCode();
         dhisAggregateValues.setOrgUnit(orgUnit);
         dhisAggregateValues.setDataSet(dataset.getId());
 
 //        Map<String, Object> response = null;
         try {
 
-            String instanceUrl = dataset.getInstances().getUrl();
-            String username = dataset.getInstances().getUsername();
-            String password = dataset.getInstances().getPassword();
+            String instanceUrl = dataset.getInstance().getUrl();
+            String username = dataset.getInstance().getUsername();
+            String password = dataset.getInstance().getPassword();
             if (instanceUrl.substring(instanceUrl.length() -1).equals("/")) {
                 url = new URL(instanceUrl.concat("api/dataValueSets.json?orgUnitIdScheme=code"));
             } else {

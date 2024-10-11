@@ -5,12 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetElementsService;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
 import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
-import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.Instance;
 import com.Adapter.icare.Repository.DatasourceRepository;
 import com.Adapter.icare.Services.DatasourceService;
 import com.Adapter.icare.Services.InstanceService;
 import com.Adapter.icare.Services.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest
-class InstancesControllerIntegrationTests {
+class InstanceControllerIntegrationTests {
 
     @Autowired
     private MockMvc mockMvc;
@@ -79,7 +77,7 @@ class InstancesControllerIntegrationTests {
     @Disabled
     @Test
     void addInstancesTest() throws Exception {
-        Instances instance = new Instances();
+        Instance instance = new Instance();
         instance.setUrl("https://play.im.dhis2.org/stable-2-40-5");
         instance.setUsername("admin");
         instance.setPassword("district");

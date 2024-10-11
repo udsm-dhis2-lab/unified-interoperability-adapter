@@ -6,9 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -23,12 +21,12 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
     private Long id;
 
     @ManyToOne
-    private Datasets dataSet;
+    private Dataset dataSet;
 
     private String sqlQuery;
 
     @ManyToOne
-    private Instances instance;
+    private Instance instance;
 
     @ManyToOne
     private Datasource dataSource;
@@ -48,7 +46,7 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
 
         if (datasetQueryMap.get("dataSet") !=null) {
             String uuid = ((Map<String, Object>) datasetQueryMap.get("dataSet")).get("uuid").toString();
-            Datasets datasets = new Datasets();
+            Dataset dataset = new Dataset();
 //            datasetQuery.setDataSet(datasetQueryMap.get("dataSet"));
         }
         return  datasetQuery;
