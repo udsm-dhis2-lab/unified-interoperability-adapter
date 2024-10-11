@@ -11,6 +11,7 @@ import {
 } from '@angular/forms';
 import { LoginService } from '../../services/login.service';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -36,10 +37,12 @@ export class LoginComponent implements OnDestroy {
     userName: FormControl<string>;
     password: FormControl<string>;
   }>;
+
   loginSubcription!: Subscription;
   constructor(
-    @Inject(NonNullableFormBuilder) private fb: NonNullableFormBuilder,
-    private loginService: LoginService
+    private fb: NonNullableFormBuilder,
+    private loginService: LoginService,
+    private router: Router
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -80,6 +83,7 @@ export class LoginComponent implements OnDestroy {
             type: 'success',
             message: 'Login Successful',
           };
+          this.router.navigate(['/dashboard']);
         },
         error: (error) => {
           this.isLoading = false;
