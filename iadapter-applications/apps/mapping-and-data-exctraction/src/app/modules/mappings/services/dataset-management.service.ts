@@ -4,7 +4,6 @@ import { catchError, map, Observable } from 'rxjs';
 import { DatasetPage, InstancePage, MappingsUrls } from '../models';
 import { HttpParams } from '@angular/common/http';
 import { UnAuothorizedException, UnknownException } from '@models';
-import { error } from 'console';
 
 @Injectable({
   providedIn: 'root',

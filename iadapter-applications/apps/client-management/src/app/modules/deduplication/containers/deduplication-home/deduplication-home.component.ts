@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
@@ -15,7 +15,7 @@ import { SearchBarComponent } from 'search-bar';
   templateUrl: './deduplication-home.component.html',
   styleUrl: './deduplication-home.component.css',
 })
-export class DeduplicationHomeComponent implements OnDestroy {
+export class DeduplicationHomeComponent implements OnDestroy, OnInit {
   total = 1;
   listOfDeduplications: Deduplication[] = [];
   loading = true;

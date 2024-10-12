@@ -1,4 +1,11 @@
-import { Component } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  OnDestroy,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from 'search-bar';
 import { Subscription } from 'rxjs';
@@ -14,7 +21,10 @@ import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/s
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent {
+export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
+  @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
+  @ViewChild(SearchBarComponent) searchBarComponent!: SearchBarComponent;
+
   total = 1;
   listOfDatasets: Dataset[] = [];
   loading = true;
@@ -25,6 +35,9 @@ export class HomeComponent {
   isFirstLoad = true;
 
   constructor(private dataSetManagementService: DatasetManagementService) {}
+  ngAfterViewInit(): void {
+    this.searchBarComponent.setAdditionalContent(this.additionalContent);
+  }
 
   ngOnDestroy(): void {
     if (this.loadDatasetsSubscription) {

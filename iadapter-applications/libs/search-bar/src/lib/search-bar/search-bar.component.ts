@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { antDesignModules } from './ant-design-modules';
 
@@ -14,4 +14,10 @@ export class SearchBarComponent {
     required: true,
   })
   labelText: string = '';
+
+  additionalContent: TemplateRef<any> | null = null;
+
+  setAdditionalContent(content: TemplateRef<any>) {
+    this.additionalContent = content;
+  }
 }

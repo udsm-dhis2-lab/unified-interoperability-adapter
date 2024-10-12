@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router, RouterModule } from '@angular/router';
 import { HduClient } from '../../models';
@@ -15,7 +15,7 @@ import { SearchBarComponent } from 'search-bar';
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
-export class HomeComponent implements OnDestroy {
+export class HomeComponent implements OnDestroy, OnInit {
   total = 1;
   listOfHduClients: HduClient[] = [];
   loading = true;

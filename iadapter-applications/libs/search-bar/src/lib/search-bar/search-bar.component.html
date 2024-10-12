@@ -12,10 +12,18 @@
     </div>
     <div nz-col nzSpan="12">
       <div nz-row nzJustify="start">
-        <button nz-button nzType="primary">
-          <span nz-icon nzType="search"></span>
-          Search
-        </button>
+        <ng-container *ngIf="additionalContent">
+          <div nz-col nzSpan="18">
+            <!-- Render additional content here -->
+            <ng-container *ngTemplateOutlet="additionalContent"></ng-container>
+          </div>
+        </ng-container>
+        <div nz-col [nzSpan]="additionalContent ? 6 : 24">
+          <button nz-button nzType="primary">
+            <span nz-icon nzType="search"></span>
+            Search
+          </button>
+        </div>
       </div>
     </div>
   </div>
