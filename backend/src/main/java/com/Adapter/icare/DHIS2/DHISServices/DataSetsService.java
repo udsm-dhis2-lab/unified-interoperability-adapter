@@ -89,7 +89,7 @@ public class DataSetsService {
                                                  String formType,
                                                  String q,
                                                  BigInteger instance) throws Exception {
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize);
         return dataSetsRepository.getDatasetsListByPagination(code,formType,q,instance,pageable);
     }
 
@@ -461,6 +461,14 @@ public class DataSetsService {
        }
 
        return remoteDataSetsList;
+    }
+
+    private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
+        if (page < 1) {
+            throw new Exception("Page can not be less than zero");
+        } else {
+            return PageRequest.of(page-1, pageSize);
+        }
     }
     
 }

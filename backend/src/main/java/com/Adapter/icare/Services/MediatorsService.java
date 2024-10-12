@@ -63,7 +63,7 @@ public class MediatorsService {
     }
 
     public Page<Mediator> getMediatorsByPagination(Integer page, Integer pageSize, String code, String category) throws Exception {
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize);
         return mediatorsRepository.getMediatorsListByPagination(code,category,pageable);
     }
 
@@ -546,5 +546,13 @@ public class MediatorsService {
         }
 
         return response;
+    }
+
+    private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
+        if (page < 1) {
+            throw new Exception("Page can not be less than zero");
+        } else {
+            return PageRequest.of(page-1, pageSize);
+        }
     }
 }

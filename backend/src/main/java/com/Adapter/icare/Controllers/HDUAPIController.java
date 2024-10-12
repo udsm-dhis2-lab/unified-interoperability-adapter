@@ -187,8 +187,8 @@ public class HDUAPIController {
                                                @RequestParam(value="code",required = false) String code,
                                                @RequestParam(value="version",required = false) String version,
                                                @RequestParam(value="q",required = false) String q,
-                                               @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
-                                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreMatchingParams(namespace, key, version, null, q, code, page,pageSize, "GENERAL-CODES");
@@ -216,7 +216,7 @@ public class HDUAPIController {
     public ResponseEntity<Map<String, Object>> getSpecificCodedItems(@PathVariable("namespace") String namespace,
                                                @RequestParam(value="code", required = false) String code,
                                                @RequestParam(value="q",required = false) String q,
-                                               @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                               @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
                                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -268,7 +268,7 @@ public class HDUAPIController {
     @GetMapping("configurations")
     public ResponseEntity<Map<String, Object>> getConfigurations(
             @RequestParam(value="q",required = false) String q,
-            @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+            @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize
     ) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
@@ -509,7 +509,7 @@ public class HDUAPIController {
 
     @GetMapping(value="mappings", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String,Object>> getMappings(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "q", required = false) String q,
             @RequestParam(value = "code", required = false) String code,
@@ -605,7 +605,7 @@ public class HDUAPIController {
     @GetMapping(value="codeSystems", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getDatastoreByNamespace(@RequestParam(value="q",required = false) String q,
                                                        @RequestParam(value="code",required = false) String code,
-                                                       @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                                       @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
                                                        @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -636,7 +636,7 @@ public class HDUAPIController {
                                                                     @RequestParam(value = "category", required = false) String category,
                                                                     @RequestParam(value = "code", required = false) String code,
                                                                     @RequestParam(value = "q", required = false) String q,
-                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                    @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                     @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = null;
@@ -741,8 +741,8 @@ public class HDUAPIController {
                                                                     @RequestParam(value = "category", required = false) String category,
                                                                     @RequestParam(value = "code", required = false) String code,
                                                                     @RequestParam(value = "q", required = false) String q,
-                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
-                                                                    @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+                                                                    @RequestParam(value="page", defaultValue = "1") Integer page,
+                                                                    @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String namespace = "ICD-CODES";
@@ -773,8 +773,8 @@ public class HDUAPIController {
                                                                       @RequestParam(value = "category", required = false) String category,
                                                                       @RequestParam(value = "code", required = false) String code,
                                                                       @RequestParam(value = "q", required = false) String q,
-                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
-                                                                      @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+                                                                      @RequestParam(value="page", defaultValue = "1") Integer page,
+                                                                      @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String namespace = "ICD-CATEGORIES";
@@ -805,7 +805,7 @@ public class HDUAPIController {
                                                                            @RequestParam(value = "category", required = false) String category,
                                                                            @RequestParam(value = "code", required = false) String code,
                                                                            @RequestParam(value = "q", required = false) String q,
-                                                                           @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                           @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                            @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -837,7 +837,7 @@ public class HDUAPIController {
                                                                        @RequestParam(value = "category", required = false) String category,
                                                                        @RequestParam(value = "code", required = false) String code,
                                                                        @RequestParam(value = "q", required = false) String q,
-                                                                       @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                       @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                        @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -866,7 +866,7 @@ public class HDUAPIController {
                                                                       @RequestParam(value = "release", required = false) String release,
                                                                       @RequestParam(value = "code", required = false) String code,
                                                                       @RequestParam(value = "q", required = false) String q,
-                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                      @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                       @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = "LOINC";

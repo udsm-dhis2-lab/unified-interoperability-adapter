@@ -40,7 +40,7 @@ public class InstanceService {
     }
 
     public Page<Instance> getInstancesByPagination(Integer page, Integer pageSize, boolean paging, String code, String url, String ouUid, String q) throws Exception {
-        Pageable pageable = paging ? PageRequest.of(page, pageSize): null;
+        Pageable pageable = paging ? createPageable(page, pageSize): null;
         return instancesRepository.getInstancesListByPagination(code,ouUid,url,q,pageable);
     }
 
@@ -70,4 +70,11 @@ public class InstanceService {
         return instancesRepository.save(instance);
     }
 
+    private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
+        if (page < 1) {
+            throw new Exception("Page can not be less than zero");
+        } else {
+            return PageRequest.of(page-1, pageSize);
+        }
+    }
 }

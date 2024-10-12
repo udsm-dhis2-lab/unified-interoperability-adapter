@@ -44,26 +44,26 @@ public class DatastoreController {
         }
     }
 
-    @GetMapping()
-    public ResponseEntity<Map<String, Object>> getDatastoreList(@RequestParam(value = "uuid", required = false) String uuid) throws Exception {
-        try {
-            Map<String, Object> returnResultObject = new HashMap<>();
-            if (uuid == null) {
-                List<Datastore> datastoreResults = datastoreService.getDatastore();
-                returnResultObject.put("results",datastoreResults);
-            } else {
-                returnResultObject = datastoreService.getDatastoreByUuid(uuid).toMap();
-            }
-            return ResponseEntity.ok(returnResultObject);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
+//    @GetMapping()
+//    public ResponseEntity<Map<String, Object>> getDatastoreList(@RequestParam(value = "uuid", required = false) String uuid) throws Exception {
+//        try {
+//            Map<String, Object> returnResultObject = new HashMap<>();
+//            if (uuid == null) {
+//                List<Datastore> datastoreResults = datastoreService.getDatastore();
+//                returnResultObject.put("results",datastoreResults);
+//            } else {
+//                returnResultObject = datastoreService.getDatastoreByUuid(uuid).toMap();
+//            }
+//            return ResponseEntity.ok(returnResultObject);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+//        }
+//    }
 
     @GetMapping(value="{namespace}", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getDatastoreByNamespace(@PathVariable("namespace") String namespace,
                                                        @RequestParam(value="q", required = false) String q,
-                                                       @RequestParam(value="page", defaultValue = "0") Integer page,
+                                                       @RequestParam(value="page", defaultValue = "1") Integer page,
                                                        @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         try {
             Map<String, Object> returnObject = new HashMap<>();

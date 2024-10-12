@@ -49,7 +49,7 @@ public class SharedHealthRecordsController {
 
     @GetMapping
     public ResponseEntity<Map<String, Object>> getSharedRecords (
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam( value = "id", required = false) String id,
             @RequestParam( value = "idType", required = false) String idType,
