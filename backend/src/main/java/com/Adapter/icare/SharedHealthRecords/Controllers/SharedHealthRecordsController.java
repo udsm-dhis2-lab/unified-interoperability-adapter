@@ -5,15 +5,13 @@ import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Services.UserService;
+import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
 import com.Adapter.icare.SharedHealthRecords.Services.SharedHealthRecordsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,4 +87,15 @@ public class SharedHealthRecordsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @PostMapping()
+    public ResponseEntity<Map<String,Object>> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
+        try {
+            return ResponseEntity.ok(sharedHealthRecordsService.processSharedRecords(sharedRecordsPayload));
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }

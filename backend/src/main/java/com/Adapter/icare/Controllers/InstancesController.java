@@ -59,7 +59,7 @@ public class InstancesController {
 
     @GetMapping()
     public ResponseEntity<Map<String,Object>> getInstances(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "paging", defaultValue = "true") boolean paging,
             @RequestParam(value = "code", required = false) String code,

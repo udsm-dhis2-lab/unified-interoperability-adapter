@@ -4,22 +4,21 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
-import ca.uhn.fhir.rest.gclient.ICriterion;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
-import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.DemographicDetailsDTO;
 import com.Adapter.icare.Dtos.PatientDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
+import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Organization;
 import org.hl7.fhir.r4.model.Patient;
-import org.hl7.fhir.r4.model.codesystems.LinkType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -176,5 +175,13 @@ public class SharedHealthRecordsService {
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
+    }
+
+    public Map<String,Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload) throws Exception {
+        Map<String,Object> response = new HashMap<>();
+        DemographicDetailsDTO demographicDetails = sharedRecordPayload.getDemographicDetails();
+        // Check if patient exists
+        // TODO: Add all logics to handle processing shared health record
+        return response;
     }
 }
