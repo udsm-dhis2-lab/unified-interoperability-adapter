@@ -8,8 +8,14 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from 'search-bar';
-import { Subscription } from 'rxjs';
-import { Dataset, DatasetPage } from '../../models';
+import {
+  BehaviorSubject,
+  debounceTime,
+  Observable,
+  Subscription,
+  switchMap,
+} from 'rxjs';
+import { Dataset, DatasetPage, Instance, InstancePage } from '../../models';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
@@ -33,6 +39,16 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   filterKey = [{}];
 
   isFirstLoad = true;
+
+  searchInstanceChange$ = new BehaviorSubject('');
+  instancesOptionList: Instance[] = [];
+  selectedInstance?: string;
+  isInstanceFetchingLoading = false;
+
+  onInstanceSearch(value: string): void {
+    this.isInstanceFetchingLoading = true;
+    this.searchInstanceChange$.next(value);
+  }
 
   constructor(private dataSetManagementService: DatasetManagementService) {}
   ngAfterViewInit(): void {
@@ -80,7 +96,23 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
-    this.loadDatasetsFromServer(this.pageIndex, this.pageSize, []);
+    // this.loadDatasetsFromServer(this.pageIndex, this.pageSize, []);
+    this.searchInstances();
+  }
+
+  searchInstances() {
+    const optionList$: Observable<InstancePage> = this.searchInstanceChange$
+      .asObservable()
+      .pipe(debounceTime(500))
+      .pipe(
+        switchMap((value: string) =>
+          this.dataSetManagementService.getInstances(1, 10, true, [])
+        )
+      );
+    optionList$.subscribe((data) => {
+      this.instancesOptionList = data.listOfInstances;
+      this.isInstanceFetchingLoading = false;
+    });
   }
 
   goToDataSetMapping() {}

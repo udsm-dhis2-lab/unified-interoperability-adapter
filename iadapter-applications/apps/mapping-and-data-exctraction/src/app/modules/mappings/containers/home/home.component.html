@@ -6,9 +6,35 @@
         <div nz-row>
           <div style="padding: 16px; width: 100%">
             <div style="margin-bottom: 16px">
-              <search-bar [labelText]="'Search client:'">
+              <search-bar [labelText]="'Search Dataset:'">
                 <ng-template #additionalContent>
-                  <span>Additional Content</span>
+                  <!-- Additional filter content -->
+                  <nz-select
+                    nzMode="multiple"
+                    nzPlaceHolder="Select Instance"
+                    nzAllowClear
+                    nzShowSearch
+                    nzServerSearch
+                    [(ngModel)]="selectedInstance"
+                    (nzOnSearch)="onInstanceSearch($event)"
+                  >
+                    @if (!isInstanceFetchingLoading) { @for (instance of
+                    instancesOptionList; track instance.uuid) {
+                    <nz-option
+                      [nzValue]="instance.uuid"
+                      [nzLabel]="instance.name"
+                    ></nz-option>
+                    } } @else {
+                    <nz-option nzDisabled nzCustomContent>
+                      <span
+                        nz-icon
+                        nzType="loading"
+                        class="loading-icon"
+                      ></span>
+                      Loading Instances...
+                    </nz-option>
+                    }
+                  </nz-select>
                 </ng-template>
               </search-bar>
             </div>
