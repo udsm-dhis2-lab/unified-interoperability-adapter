@@ -34,6 +34,7 @@ package com.Adapter.icare.DHIS2.Controllers;
 import java.math.BigInteger;
 import java.util.*;
 
+import com.Adapter.icare.DHIS2.Dtos.DataSetInstance;
 import com.Adapter.icare.Domains.Instance;
 import com.Adapter.icare.Services.InstanceService;
 import org.springframework.data.domain.Page;
@@ -99,6 +100,16 @@ public class DataSetsController {
         }
     }
 
+    @PostMapping
+    public ResponseEntity<Map<String,Object>> addDataSet(@RequestBody DataSetInstance dataSetInstance) throws Exception {
+        try {
+            Dataset dataSet = dataSetsService.addDataSets(dataSetInstance.getId(), dataSetInstance.getInstance());
+            return ResponseEntity.ok(dataSet.toMap());
+        }catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
     @GetMapping("/{uuid}")
     public ResponseEntity<Map<String,Object>> getDataSetByUuid(@PathVariable(value="uuid") String uuid) throws Exception {
         try {
@@ -114,7 +125,9 @@ public class DataSetsController {
             @RequestParam(value="instance") String instance,
             @RequestParam(value="page", defaultValue = "1") Integer page,
             @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize,
-            @RequestParam(value = "q", required = false) String q) throws Exception {
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "formType", required = false) String formType,
+            @RequestParam(value = "periodType", required = false) String periodType) throws Exception {
         try {
             Instance instanceDetails = instanceService.getInstanceByUuid(instance);
             if (instanceDetails != null) {
@@ -122,7 +135,10 @@ public class DataSetsController {
                 Map<String,Object> remoteDatasetsPayload = dataSetsService.getDhis2DataSets(
                         instanceDetails.getId(),
                         page,
-                        pageSize,q);
+                        pageSize,
+                        q,
+                        formType,
+                        periodType);
                 Map<String,Object> pager = new HashMap<>();
                 pager.put("page", page);
                 pager.put("pageSize", pageSize);
@@ -139,33 +155,21 @@ public class DataSetsController {
         }
     }
 
-    @GetMapping(value = "/remote/{uuid}/{instance}")
+    @GetMapping(value = "/remote/{dataSet}/{instance}")
     public ResponseEntity<Map<String,Object>> getDHIS2DataSetByUuid(
-            @PathVariable(value="uuid") String uuid,
+            @PathVariable(value="dataSet") String dataSet,
             @PathVariable(value="instance") String instance) throws Exception {
         try {
-            RemoteDatasets remoteDatasets = dataSetsService.getDhis2DataSetsByUuid(uuid, instance);
+            RemoteDatasets remoteDatasets = dataSetsService.getDhis2DataSetsByUuid(dataSet, instance);
             return ResponseEntity.ok(remoteDatasets.toMap());
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
     }
-//
-//    @GetMapping("/remote/{instanceId}/{searchTerm}")
-//    public List<RemoteDatasets> getSearchedDataset(@PathVariable("instanceId") long instanceId,@PathVariable("searchTerm") String searchTerm){
-//
-//        return dataSetsService.getSearchedDataset(instanceId,searchTerm);
-//    }
-//
-//    @PostMapping
-//    public Dataset AddDataSets(@RequestBody Dataset dataset){
-//
-//        return dataSetsService.AddDataSets(dataset);
-//    }
-//
-//    @DeleteMapping("/{datasetId}")
-//    public void DeleteDataSets(@PathVariable("datasetId") String datasetId){
-//        dataSetsService.deleteDataSets(datasetId);
-//    }
+
+    @DeleteMapping("/{uuid}")
+    public void DeleteDataSet(@PathVariable("uuid") String uuid){
+        dataSetsService.deleteDataSet(uuid);
+    }
 
 }

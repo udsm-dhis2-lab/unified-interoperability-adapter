@@ -38,29 +38,45 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 
+import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Dataset;
+import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Services.UserService;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.Adapter.icare.DHIS2.DHISDomains.RemoteDatasets;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetsRepository;
 import com.Adapter.icare.Domains.Instance;
 import com.Adapter.icare.Repository.InstancesRepository;
 
-
-
 @Service
 public class DataSetsService {
-    
+    // TODO: This service requires total refactoring
     private final DataSetsRepository dataSetsRepository;
     private final InstancesRepository instancesRepository;
+    private final UserService userService;
+    private final Authentication authentication;
+    private final User authenticatedUser;
 
-    public DataSetsService(DataSetsRepository dataSetsRepository,InstancesRepository instancesRepository) {
+    public DataSetsService(DataSetsRepository dataSetsRepository,
+                           InstancesRepository instancesRepository,
+                           UserService userService) {
         this.dataSetsRepository = dataSetsRepository;
         this.instancesRepository = instancesRepository;
+        this.userService = userService;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        } else {
+            this.authenticatedUser = null;
+            // TODO: Redirect to login page
+        }
     }
 
     public List<Dataset> getAllDataSets() {
@@ -81,7 +97,9 @@ public class DataSetsService {
             long instanceId,
             Integer page,
             Integer pageSize,
-            String q) throws Exception {
+            String q,
+            String formType,
+            String periodType) throws Exception {
         URL url;
         BufferedReader reader;
         String line;
@@ -100,6 +118,12 @@ public class DataSetsService {
                     "&page=" + page + "&pageSize=" + pageSize;
             if (q != null) {
                 path += path + "&filter=name:ilike:" + q;
+            }
+            if (formType != null) {
+                path += path + "&filter=formType:eq:" + formType;
+            }
+            if (periodType != null) {
+                path += path + "&filter=periodType:eq:" + periodType;
             }
             url = new URL(instanceUrl.concat(path));
 
@@ -189,7 +213,7 @@ public class DataSetsService {
         return response;
     }
 
-    public RemoteDatasets getDhis2DataSetsByUuid(String uuid, String instanceUuid) {
+    public RemoteDatasets getDhis2DataSetsByUuid(String dataSet, String instanceUuid) {
         URL url;
         BufferedReader reader;
         String line;
@@ -202,7 +226,9 @@ public class DataSetsService {
             String username = instance.getUsername();
             String password = instance.getPassword();
 
-            url = new URL(instanceUrl.concat("/api/dataSets/" + uuid + "?fields=id,code,shortName,name,displayName,formType,version,timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size"));
+            url = new URL(instanceUrl.concat("/api/dataSets/" + dataSet + "?fields=id,code,shortName,name,displayName,formType,version," +
+                    "timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays," +
+                    "dataSetElements[dataElement[id,name,code,valueType,aggregationType,categoryCombo[id,name,categoryOptionCombos[id,name,code]]]]"));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
 
@@ -244,7 +270,7 @@ public class DataSetsService {
                 }
 
                 if(ourDsObject.has("dataSetElements")){
-                    remoteDataSetMap.put("dataSetElements",ourDsObject.getInt("dataSetElements"));
+                    remoteDataSetMap.put("dataSetElements",ourDsObject.getJSONArray("dataSetElements"));
                 }
 
                 if(ourDsObject.has("version")){
@@ -285,76 +311,79 @@ public class DataSetsService {
         return remoteDataSetToAdd;
     }
 
-    public Dataset AddDataSets(Dataset dataset) {
-
-        //Inserting the HTML CODE
+    public Dataset addDataSets(String id, String instance) throws Exception {
         URL url;
         BufferedReader reader;
         String line;
+        Dataset dataset = new Dataset();
         StringBuffer responseContent = new StringBuffer();
-        long instanceId = dataset.getInstances().getId();
-        Optional<Instance> instance = instancesRepository.findById(instanceId);
 
         try {
+            Instance instanceDetails = instancesRepository.getInstanceByUuid(instance);
+            if (instanceDetails != null) {
+                dataset.setInstances(instanceDetails);
+                dataset.setId(id);
+                String instanceUrl = instanceDetails.getUrl();
+                String username = instanceDetails.getUsername();
+                String password = instanceDetails.getPassword();
 
-            String instanceUrl = instance.get().getUrl();
-            String username = instance.get().getUsername();
-            String password = instance.get().getPassword();
+                url = new URL(instanceUrl.concat("/api/dataSets/"+ id +"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
 
-            url = new URL(instanceUrl.concat("/api/dataSets/"+ dataset.getId()+"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+                String userCredentials = username.concat(":").concat(password);
+                String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+                httpURLConnection.setRequestProperty("Authorization", basicAuth);
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json");
 
-            String userCredentials = username.concat(":").concat(password);
-            String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
-            httpURLConnection.setRequestProperty("Authorization", basicAuth);
-            httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+                // int status = httpURLConnection.getResponseCode();
 
-            // int status = httpURLConnection.getResponseCode();
+                reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    responseContent.append(line);
+                }
+                reader.close();
+                JSONObject jsObject = new JSONObject(responseContent.toString());
+                if(jsObject.has("formType")) {
+                    String formType = jsObject.getString("formType");
+                    dataset.setFormType(formType);
+                }
 
-            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            while ((line = reader.readLine()) != null) {
-                responseContent.append(line);
+                if(jsObject.has("periodType")) {
+                    String periodType = jsObject.getString("periodType");
+                    dataset.setPeriodType(periodType);
+                }
+
+                if(jsObject.has("timelyDays")) {
+                    int timelyDays = jsObject.getInt("timelyDays");
+                    dataset.setTimelyDays(timelyDays);
+                }
+
+                if (jsObject.has("expiryDays")) {
+                    int expiryDays = jsObject.getInt("expiryDays");
+                    dataset.setExpiryDays(expiryDays);
+                }
+
+                if(jsObject.has("code")) {
+                    String code = jsObject.getString("code");
+                    dataset.setCode(code);
+                }
+
+                dataset.setDatasetFields(jsObject.toString());
+            } else {
+                throw new Exception("Instance provided does not exists");
             }
-            reader.close();
-            JSONObject jsObject = new JSONObject(responseContent.toString());
-            if(jsObject.has("formType")) {
-                String formType = jsObject.getString("formType");
-                dataset.setFormType(formType);
-            }
-            //String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
-            if(jsObject.has("periodType")) {
-                String periodType = jsObject.getString("periodType");
-                dataset.setPeriodType(periodType);
-            }
-
-            if(jsObject.has("timelyDays")) {
-                int timelyDays = jsObject.getInt("timelyDays");
-                dataset.setTimelyDays(timelyDays);
-            }
-
-            if (jsObject.has("expiryDays")) {
-                int expiryDays = jsObject.getInt("expiryDays");
-                dataset.setExpiryDays(expiryDays);
-            }
-
-            if(jsObject.has("code")) {
-                String code = jsObject.getString("code");
-                dataset.setCode(code);
-            }
-
-            dataset.setDatasetFields(jsObject.toString());
-            //dataset.setFormDesignCode(htmlForm);
-
-
-            //System.out.println(js);
 
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.err.println(e.getMessage());
+            throw new Exception(e.getMessage());
         }
         UUID uuid = UUID.randomUUID();
         dataset.setUuid(uuid.toString());
+        if (this.authenticatedUser != null) {
+            dataset.setCreatedBy(authenticatedUser);
+        }
         return dataSetsRepository.save(dataset);
     }
 
@@ -370,13 +399,13 @@ public class DataSetsService {
         return dataSetsRepository.getDatasetInstanceById(dhis2Uid);
     }
 
-    public void deleteDataSets(String datasetId)  {
+    public void deleteDataSet(String uuid)  {
 
-        boolean exists = dataSetsRepository.existsById(datasetId);
-        if (!exists) {
-            throw new IllegalStateException("The instance with id " + datasetId + " does not exist");
+        Dataset dataSet = dataSetsRepository.getDatasetInstanceByUuid(uuid);
+        if (dataSet == null) {
+            throw new IllegalStateException("The dataset instance with uuid " + uuid + " does not exist");
         }
-        dataSetsRepository.deleteById(datasetId);
+        dataSetsRepository.deleteById(dataSet.getId());
     }
 
     public List<RemoteDatasets> getSearchedDataset(long instanceId, String searchTerm) {
