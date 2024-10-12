@@ -4,6 +4,7 @@ import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -12,4 +13,5 @@ export const antDesignModules = [
   NzPageHeaderModule,
   NzTableModule,
   NzSelectModule,
+  NzButtonModule,
 ];

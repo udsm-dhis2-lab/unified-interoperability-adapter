@@ -15,7 +15,13 @@ import {
   Subscription,
   switchMap,
 } from 'rxjs';
-import { Dataset, DatasetPage, Instance, InstancePage } from '../../models';
+import {
+  Dataset,
+  DatasetPage,
+  Instance,
+  InstancePage,
+  MappingsUrls,
+} from '../../models';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
@@ -28,6 +34,8 @@ import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/s
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
+  dataSetRemoteUrl: string = MappingsUrls.GET_DATASETS_REMOTE;
+
   @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
   @ViewChild(SearchBarComponent) searchBarComponent!: SearchBarComponent;
 
@@ -66,16 +74,17 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   loadDatasetsFromServer(
     pageIndex: number,
     pageSize: number,
+    dataSetsUrl: string,
     filter: Array<{ key: string; value: string[] }>
   ): void {
     this.loading = true;
     this.loadDatasetsSubscription = this.dataSetManagementService
-      .getDatasets(pageIndex, pageSize, filter)
+      .getDatasets(pageIndex, pageSize, dataSetsUrl, filter)
       .subscribe({
         next: (data: DatasetPage) => {
           this.loading = false;
           //TODO: Set total from data after it's support in fhir is implemented
-          this.total = 4000; //data.total;
+          this.total = data.total; //data.total;
           this.pageIndex = data.pageIndex;
           this.listOfDatasets = data.listOfDatasets;
         },
@@ -92,7 +101,14 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       return;
     }
     const { pageSize, pageIndex, filter } = params;
-    this.loadDatasetsFromServer(pageIndex, pageSize, filter);
+
+    filter.concat({ key: 'owner', value: [this.selectedInstance!] });
+    this.loadDatasetsFromServer(
+      pageIndex,
+      pageSize,
+      this.dataSetRemoteUrl,
+      filter
+    );
   }
 
   ngOnInit(): void {
@@ -105,12 +121,16 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .asObservable()
       .pipe(debounceTime(500))
       .pipe(
-        switchMap((value: string) =>
-          this.dataSetManagementService.getInstances(1, 10, true, [])
-        )
+        switchMap((value: string) => {
+          return this.dataSetManagementService.getInstances(0, 10, true, []);
+        })
       );
     optionList$.subscribe((data) => {
       this.instancesOptionList = data.listOfInstances;
+      this.selectedInstance = this.instancesOptionList[0].uuid;
+      this.loadDatasetsFromServer(1, 10, this.dataSetRemoteUrl, [
+        { key: 'instance', value: [this.selectedInstance!] },
+      ]);
       this.isInstanceFetchingLoading = false;
     });
   }

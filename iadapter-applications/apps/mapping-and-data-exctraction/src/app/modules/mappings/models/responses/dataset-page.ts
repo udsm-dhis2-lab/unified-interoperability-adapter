@@ -8,9 +8,9 @@ export class DatasetPage {
 
   static fromJson(json: any): DatasetPage {
     let datasetPage = new DatasetPage();
-    datasetPage.total = json.total;
-    datasetPage.pageSize = json.pageSize;
-    datasetPage.pageIndex = json.pageIndex;
+    datasetPage.total = json?.pager?.total ?? 0;
+    datasetPage.pageSize = json?.pager?.pageSize ?? 0;
+    datasetPage.pageIndex = json?.pager?.page ?? 0;
     datasetPage.listOfDatasets = (json?.results ?? []).map((item: any) =>
       Dataset.fromJson(item)
     );

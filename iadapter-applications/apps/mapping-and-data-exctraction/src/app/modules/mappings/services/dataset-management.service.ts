@@ -9,8 +9,6 @@ import { UnAuothorizedException, UnknownException } from '@models';
   providedIn: 'root',
 })
 export class DatasetManagementService {
-  dataSetUrl: string = MappingsUrls.GET_DATASETS;
-
   instanceUrl: string = MappingsUrls.GET_INSTANCES;
 
   constructor(private httpClient: HduHttpService) {}
@@ -18,12 +16,13 @@ export class DatasetManagementService {
   getDatasets(
     pageIndex: number,
     pageSize: number,
+    dataSetUrl: string,
     filters: Array<{ key: string; value: string[] }>
   ): Observable<DatasetPage> {
     const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
 
     return this.httpClient
-      .get<{ results: any }>(`${this.dataSetUrl}`, {
+      .get<{ results: any }>(`${dataSetUrl}`, {
         params,
       })
       .pipe(

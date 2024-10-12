@@ -10,7 +10,6 @@
                 <ng-template #additionalContent>
                   <!-- Additional filter content -->
                   <nz-select
-                    nzMode="multiple"
                     nzPlaceHolder="Select Instance"
                     nzAllowClear
                     nzShowSearch
@@ -54,9 +53,8 @@
                   <th>SN</th>
                   <th>Code</th>
                   <th>Display name</th>
-                  <th>Created by</th>
                   <th>Period type</th>
-                  <th>Created on</th>
+                  <th>Form type</th>
                   <th>Expiry days</th>
                   <th>Action</th>
                 </tr>
@@ -70,9 +68,8 @@
                   </td>
                   <td>{{ data.code }}</td>
                   <td>{{ data.displayName }}</td>
-                  <td>{{ data.createdBy }}</td>
                   <td>{{ data.periodType }}</td>
-                  <td>{{ data.createdOn }}</td>
+                  <td>{{ data.formType }}</td>
                   <td>{{ data.expiryDays }}</td>
                   <td>
                     <button

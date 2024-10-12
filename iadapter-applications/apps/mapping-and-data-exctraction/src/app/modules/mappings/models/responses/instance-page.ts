@@ -8,9 +8,9 @@ export class InstancePage {
 
   static fromJson(json: any): InstancePage {
     const instancePage = new InstancePage();
-    instancePage.pageIndex = json.pager.page;
-    instancePage.pageSize = json.pager.pageSize;
-    instancePage.total = json.pager.total;
+    instancePage.pageIndex = json?.pager?.page ?? 0;
+    instancePage.pageSize = json?.pager?.pageSize ?? 0;
+    instancePage.total = json?.pager?.total ?? 0;
     instancePage.listOfInstances = (json.results ?? []).map((item: any) =>
       Instance.fromJson(item)
     );
