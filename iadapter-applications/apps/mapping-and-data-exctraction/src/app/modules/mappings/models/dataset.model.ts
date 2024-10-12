@@ -1,4 +1,5 @@
 export class Dataset {
+  id!: string;
   code!: string;
   displayName!: string;
   periodType!: string;
@@ -7,6 +8,7 @@ export class Dataset {
 
   static fromJson(json: any): Dataset {
     let dataset = new Dataset();
+    dataset.id = json['id'] ?? '';
     dataset.code = json['code'] ?? '';
     dataset.displayName = json['displayName'] ?? '';
     dataset.periodType = json['periodType'] ?? '';

@@ -1,4 +1,10 @@
-import { Component, Input, TemplateRef } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  TemplateRef,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { antDesignModules } from './ant-design-modules';
 
@@ -15,7 +21,13 @@ export class SearchBarComponent {
   })
   labelText: string = '';
 
+  @Output() search: EventEmitter<string> = new EventEmitter();
+
   additionalContent: TemplateRef<any> | null = null;
+
+  onSearch(value: string) {
+    this.search.emit(value);
+  }
 
   setAdditionalContent(content: TemplateRef<any>) {
     this.additionalContent = content;

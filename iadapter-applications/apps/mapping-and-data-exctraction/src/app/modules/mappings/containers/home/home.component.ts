@@ -34,7 +34,7 @@ import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/s
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
-  dataSetRemoteUrl: string = MappingsUrls.GET_DATASETS_REMOTE;
+  selectedInstanceFetchingMechanism: string = 'remoteDatasets';
 
   @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
   @ViewChild(SearchBarComponent) searchBarComponent!: SearchBarComponent;
@@ -53,12 +53,23 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   selectedInstance?: string;
   isInstanceFetchingLoading = false;
 
+  constructor(private dataSetManagementService: DatasetManagementService) {}
+
   onInstanceSearch(value: string): void {
     this.isInstanceFetchingLoading = true;
     this.searchInstanceChange$.next(value);
   }
 
-  constructor(private dataSetManagementService: DatasetManagementService) {}
+  setDataSetUrl(fetchMechanism: string): string {
+    switch (fetchMechanism) {
+      case 'remoteDatasets':
+        return MappingsUrls.GET_DATASETS_REMOTE;
+      case 'selectedDatasets':
+        return MappingsUrls.GET_DATASETS_SELECTED;
+      default:
+        return '';
+    }
+  }
   ngAfterViewInit(): void {
     this.searchBarComponent.setAdditionalContent(this.additionalContent);
   }
@@ -102,17 +113,20 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     }
     const { pageSize, pageIndex, filter } = params;
 
-    filter.concat({ key: 'owner', value: [this.selectedInstance!] });
+    const queryFilter = [
+      ...filter,
+      { key: 'instance', value: [this.selectedInstance!] },
+    ];
+
     this.loadDatasetsFromServer(
       pageIndex,
       pageSize,
-      this.dataSetRemoteUrl,
-      filter
+      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+      queryFilter
     );
   }
 
   ngOnInit(): void {
-    // this.loadDatasetsFromServer(this.pageIndex, this.pageSize, []);
     this.searchInstances();
   }
 
@@ -128,11 +142,26 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     optionList$.subscribe((data) => {
       this.instancesOptionList = data.listOfInstances;
       this.selectedInstance = this.instancesOptionList[0].uuid;
-      this.loadDatasetsFromServer(1, 10, this.dataSetRemoteUrl, [
-        { key: 'instance', value: [this.selectedInstance!] },
-      ]);
+      this.loadDatasetsFromServer(
+        1,
+        10,
+        this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+        [{ key: 'instance', value: [this.selectedInstance!] }]
+      );
       this.isInstanceFetchingLoading = false;
     });
+  }
+
+  onDatasetsSearch() {
+    // TODO: Remove this page variable when all api starts at page 1
+    const page =
+      this.selectedInstanceFetchingMechanism === 'selectedDatasets' ? 0 : 1;
+    this.loadDatasetsFromServer(
+      page,
+      10,
+      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+      [{ key: 'instance', value: [this.selectedInstance!] }]
+    );
   }
 
   goToDataSetMapping() {}

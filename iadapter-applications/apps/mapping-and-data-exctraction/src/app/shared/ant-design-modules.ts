@@ -5,6 +5,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzGridModule } from 'ng-zorro-antd/grid';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -14,4 +15,5 @@ export const antDesignModules = [
   NzTableModule,
   NzSelectModule,
   NzButtonModule,
+  NzGridModule,
 ];
