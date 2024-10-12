@@ -73,6 +73,7 @@ public class SharedHealthRecordsService {
             boolean includeDeceased,
             Integer numberOfVisits
     ) throws Exception {
+        System.out.println(identifier);
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
@@ -83,7 +84,7 @@ public class SharedHealthRecordsService {
 
         // TODO: Review the deceased concept
         if (!includeDeceased) {
-            searchRecords.where(Patient.DECEASED.isMissing(true));
+//            searchRecords.where(Patient.DECEASED.isMissing(true));
         }
 //                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
         if (identifier != null) {
@@ -95,44 +96,48 @@ public class SharedHealthRecordsService {
         }
 
         response = searchRecords.count(pageSize)
-                .offset(page)
+                .offset(page -1)
                 .returnBundle(Bundle.class)
                 .execute();
 
-        for (Bundle.BundleEntryComponent entry : response.getEntry()) {
-            if (entry.getResource() instanceof Patient) {
-                Map<String, Object> templateData = new HashMap<>();
-                Patient patient = (Patient) entry.getResource();
-                PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
-                templateData.put("id", patientDTO.getId());
-                // TODO: Provided HFR code is provided find a way to return relevant identifiers
-                templateData.put("demographicDetails", patientDTO.toMap());
-                templateData.put("facilityDetails", patientDTO.toMap().get("organisation"));
-                templateData.put("paymentDetails", null);
-                Organization organization = null;
-                if (hfrCode !=null) {
-                    organization = (Organization) fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode));
-                }
-                // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
-                Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
-                Map<String,Object> visitDetails = new HashMap<>();
-                if (encounter != null) {
-                    visitDetails.put("id", null);
-                    visitDetails.put("visitDate", encounter.getPeriod().getStart());
-                    visitDetails.put("closedDate", encounter.getPeriod().getEnd());
-                    visitDetails.put("newThisYear", null);
-                    visitDetails.put("new", null);
-                    // TODO: Add history when numberOfVisits > 1
-                } else if (organization != null) {
-                    // TODO: Request visit from facility provided
-                } else {
-                    visitDetails = null;
-                }
-                templateData.put("visitDetails", visitDetails);
+        if (!response.getEntry().isEmpty()) {
+            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                    Map<String, Object> templateData = new HashMap<>();
+                    Patient patient = (Patient) entry.getResource();
+                    PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
+                    templateData.put("id", patientDTO.getId());
+                    // TODO: Provided HFR code is provided find a way to return relevant identifiers
+                    templateData.put("demographicDetails", patientDTO.toMap());
 
-                templateData.put("diagnosisDetails", null);
+                    templateData.put("facilityDetails", patientDTO.toMap().get("organisation"));
+                    templateData.put("paymentDetails", null);
+                    Organization organization = null;
+                    if (hfrCode !=null) {
+                        organization = (Organization) fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode));
+                    }
+                    // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
+                    Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
+                    Map<String,Object> visitDetails = new HashMap<>();
+                    if (encounter != null) {
+                        visitDetails.put("id", null);
+                        visitDetails.put("visitDate", encounter.getPeriod().getStart());
+                        visitDetails.put("closedDate", encounter.getPeriod().getEnd());
+                        visitDetails.put("newThisYear", null);
+                        visitDetails.put("new", null);
+                        // TODO: Add history when numberOfVisits > 1
+                    } else if (organization != null) {
+                        // TODO: Request visit from facility provided
+                        visitDetails = null;
+                    } else {
+                        visitDetails = null;
+                    }
+                    templateData.put("visitDetails", visitDetails);
 
-                sharedRecords.add(templateData);
+                    templateData.put("diagnosisDetails", null);
+
+                    sharedRecords.add(templateData);
+                }
             }
         }
         return sharedRecords;
