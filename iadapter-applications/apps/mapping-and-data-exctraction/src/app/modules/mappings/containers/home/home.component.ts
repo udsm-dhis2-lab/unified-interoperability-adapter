@@ -6,7 +6,6 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { SearchBarComponent } from 'search-bar';
 import {
   BehaviorSubject,
@@ -25,11 +24,12 @@ import {
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, SearchBarComponent, SharedModule],
+  imports: [SearchBarComponent, SharedModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -53,7 +53,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   selectedInstance?: string;
   isInstanceFetchingLoading = false;
 
-  constructor(private dataSetManagementService: DatasetManagementService) {}
+  constructor(
+    private dataSetManagementService: DatasetManagementService,
+    private router: Router
+  ) {}
 
   onInstanceSearch(value: string): void {
     this.isInstanceFetchingLoading = true;
@@ -136,33 +139,38 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .pipe(debounceTime(500))
       .pipe(
         switchMap((value: string) => {
-          return this.dataSetManagementService.getInstances(0, 10, true, []);
+          return this.dataSetManagementService.getInstances(1, 10, true, []);
         })
       );
-    optionList$.subscribe((data) => {
-      this.instancesOptionList = data.listOfInstances;
-      this.selectedInstance = this.instancesOptionList[0].uuid;
-      this.loadDatasetsFromServer(
-        1,
-        10,
-        this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
-        [{ key: 'instance', value: [this.selectedInstance!] }]
-      );
-      this.isInstanceFetchingLoading = false;
+    optionList$.subscribe({
+      next: (data: any) => {
+        this.instancesOptionList = data.listOfInstances;
+        this.selectedInstance = this.instancesOptionList[0].uuid;
+        this.loadDatasetsFromServer(
+          1,
+          10,
+          this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+          [{ key: 'instance', value: [this.selectedInstance!] }]
+        );
+        this.isInstanceFetchingLoading = false;
+      },
+      error: (error: any) => {
+        // TODO: Implement error handling
+        this.loading = false;
+      },
     });
   }
 
   onDatasetsSearch() {
-    // TODO: Remove this page variable when all api starts at page 1
-    const page =
-      this.selectedInstanceFetchingMechanism === 'selectedDatasets' ? 0 : 1;
     this.loadDatasetsFromServer(
-      page,
+      1,
       10,
       this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
       [{ key: 'instance', value: [this.selectedInstance!] }]
     );
   }
 
-  goToDataSetMapping() {}
+  goToDataSetMapping() {
+    this.router.navigate(['/dataset-mapping']);
+  }
 }

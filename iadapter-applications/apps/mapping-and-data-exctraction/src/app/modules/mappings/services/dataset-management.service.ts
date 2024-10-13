@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, map, Observable } from 'rxjs';
-import { DatasetPage, InstancePage, MappingsUrls } from '../models';
+import { Dataset, DatasetPage, InstancePage, MappingsUrls } from '../models';
 import { HttpParams } from '@angular/common/http';
 import { UnAuothorizedException, UnknownException } from '@models';
 
@@ -10,6 +10,7 @@ import { UnAuothorizedException, UnknownException } from '@models';
 })
 export class DatasetManagementService {
   instanceUrl: string = MappingsUrls.GET_INSTANCES;
+  dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -28,6 +29,17 @@ export class DatasetManagementService {
       .pipe(
         map((response: { results: any }) => {
           return DatasetPage.fromJson(response);
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  getInstanceById(uuid: string): Observable<Dataset> {
+    return this.httpClient
+      .get<{ results: any }>(`${this.dataSetByIdUrl}/${uuid}`)
+      .pipe(
+        map((response: { results: any }) => {
+          return Dataset.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );
