@@ -1,18 +1,20 @@
-<nz-card style="width: 100%">
-  <div nz-row style="margin-top: 50px" [nzGutter]="16">
-    <div nz-col nzSpan="16">
-      <nz-card style="width: 100%">
-        <p>Card content</p>
-        <p>Card content</p>
-        <p>Card content</p>
-      </nz-card>
-    </div>
-    <div nz-col nzSpan="8">
-      <nz-card style="width: 100%">
-        <p>Card content</p>
-        <p>Card content</p>
-        <p>Card content</p>
-      </nz-card>
-    </div>
+<nz-spin [nzSpinning]="isLoading">
+  <div class="inner-content">
+    <nz-card style="width: 100%">
+      <div nz-row [nzGutter]="16">
+        <div nz-col nzSpan="16">
+          <nz-card style="width: 100%">
+            <div [innerHTML]="datasetFormContent"></div>
+          </nz-card>
+        </div>
+        <div nz-col nzSpan="8">
+          <nz-card style="width: 100%">
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+          </nz-card>
+        </div>
+      </div>
+    </nz-card>
   </div>
-</nz-card>
+</nz-spin>

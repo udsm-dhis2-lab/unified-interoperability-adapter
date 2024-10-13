@@ -2,110 +2,106 @@
 <div style="margin-top: 52px">
   <nz-layout>
     <nz-content>
-      <div class="inner-content">
-        <div nz-row>
-          <div style="padding: 16px; width: 100%">
-            <div style="margin-bottom: 16px">
-              <search-bar
-                [labelText]="'Search Dataset:'"
-                (search)="onDatasetsSearch()"
-              >
-                <ng-template #additionalContent>
-                  <!-- Additional filter content -->
-                  <div nz-row [nzGutter]="16">
-                    <div nz-col nzSpan="12">
-                      <nz-select
-                        nzPlaceHolder="Select Instance"
-                        nzAllowClear
-                        nzShowSearch
-                        nzServerSearch
-                        [(ngModel)]="selectedInstance"
-                        (nzOnSearch)="onInstanceSearch($event)"
-                      >
-                        @if (!isInstanceFetchingLoading) { @for (instance of
-                        instancesOptionList; track instance.uuid) {
-                        <nz-option
-                          [nzValue]="instance.uuid"
-                          [nzLabel]="instance.name"
-                        ></nz-option>
-                        } } @else {
-                        <nz-option nzDisabled nzCustomContent>
-                          <span
-                            nz-icon
-                            nzType="loading"
-                            class="loading-icon"
-                          ></span>
-                          Loading Instances...
-                        </nz-option>
-                        }
-                      </nz-select>
-                    </div>
-                    <div nz-col nzSpan="12">
-                      <nz-select
-                        [(ngModel)]="selectedInstanceFetchingMechanism"
-                      >
-                        <nz-option
-                          nzValue="remoteDatasets"
-                          nzLabel="From remote"
-                        ></nz-option>
-                        <nz-option
-                          nzValue="selectedDatasets"
-                          nzLabel="Selected"
-                        ></nz-option>
-                      </nz-select>
-                    </div>
-                  </div>
-                </ng-template>
-              </search-bar>
-            </div>
-
-            <nz-table
-              nzShowSizeChanger
-              [nzData]="listOfDatasets"
-              [nzFrontPagination]="false"
-              [nzLoading]="loading"
-              [nzTotal]="total"
-              [nzPageSize]="pageSize"
-              [nzPageIndex]="pageIndex"
-              (nzQueryParams)="onQueryParamsChange($event)"
+      <div nz-row>
+        <div style="padding: 16px; width: 100%">
+          <div style="margin-bottom: 16px">
+            <search-bar
+              [labelText]="'Search Dataset:'"
+              (search)="onDatasetsSearch()"
             >
-              <thead>
-                <tr>
-                  <th>SN</th>
-                  <th>Code</th>
-                  <th>Display name</th>
-                  <th>Period type</th>
-                  <th>Form type</th>
-                  <th>Expiry days</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (data of listOfDatasets; track data.id; let i = $index ) {
-                <tr>
-                  <td>
-                    {{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}
-                  </td>
-                  <td>{{ data.code }}</td>
-                  <td>{{ data.displayName ?? data.name }}</td>
-                  <td>{{ data.periodType }}</td>
-                  <td>{{ data.formType }}</td>
-                  <td>{{ data.expiryDays }}</td>
-                  <td>
-                    <button
-                      nz-button
-                      nzType="text"
-                      class="view-button"
-                      (click)="goToDataSetMapping(data.uuid ?? data.id)"
+              <ng-template #additionalContent>
+                <!-- Additional filter content -->
+                <div nz-row [nzGutter]="16">
+                  <div nz-col nzSpan="12">
+                    <nz-select
+                      nzPlaceHolder="Select Instance"
+                      nzAllowClear
+                      nzShowSearch
+                      nzServerSearch
+                      [(ngModel)]="selectedInstance"
+                      (nzOnSearch)="onInstanceSearch($event)"
                     >
-                      View
-                    </button>
-                  </td>
-                </tr>
-                }
-              </tbody>
-            </nz-table>
+                      @if (!isInstanceFetchingLoading) { @for (instance of
+                      instancesOptionList; track instance.uuid) {
+                      <nz-option
+                        [nzValue]="instance.uuid"
+                        [nzLabel]="instance.name"
+                      ></nz-option>
+                      } } @else {
+                      <nz-option nzDisabled nzCustomContent>
+                        <span
+                          nz-icon
+                          nzType="loading"
+                          class="loading-icon"
+                        ></span>
+                        Loading Instances...
+                      </nz-option>
+                      }
+                    </nz-select>
+                  </div>
+                  <div nz-col nzSpan="12">
+                    <nz-select [(ngModel)]="selectedInstanceFetchingMechanism">
+                      <nz-option
+                        nzValue="remoteDatasets"
+                        nzLabel="From remote"
+                      ></nz-option>
+                      <nz-option
+                        nzValue="selectedDatasets"
+                        nzLabel="Selected"
+                      ></nz-option>
+                    </nz-select>
+                  </div>
+                </div>
+              </ng-template>
+            </search-bar>
           </div>
+
+          <nz-table
+            nzShowSizeChanger
+            [nzData]="listOfDatasets"
+            [nzFrontPagination]="false"
+            [nzLoading]="loading"
+            [nzTotal]="total"
+            [nzPageSize]="pageSize"
+            [nzPageIndex]="pageIndex"
+            (nzQueryParams)="onQueryParamsChange($event)"
+          >
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Code</th>
+                <th>Display name</th>
+                <th>Period type</th>
+                <th>Form type</th>
+                <th>Expiry days</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (data of listOfDatasets; track data.id; let i = $index ) {
+              <tr>
+                <td>
+                  {{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}
+                </td>
+                <td>{{ data.code }}</td>
+                <td>{{ data.displayName ?? data.name }}</td>
+                <td>{{ data.periodType }}</td>
+                <td>{{ data.formType }}</td>
+                <td>{{ data.expiryDays }}</td>
+                <td>
+                  <button
+                    nz-button
+                    nzType="text"
+                    class="view-button"
+                    (click)="goToDataSetMapping(data.uuid ?? data.id)"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </nz-table>
         </div>
       </div>
     </nz-content>

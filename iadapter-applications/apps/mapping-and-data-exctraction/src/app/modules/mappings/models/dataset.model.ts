@@ -7,6 +7,7 @@ export class Dataset {
   formType!: string;
   name!: string;
   uuid!: string;
+  datasetFields!: string;
 
   static fromJson(json: any): Dataset {
     let dataset = new Dataset();
@@ -18,6 +19,7 @@ export class Dataset {
     dataset.periodType = json['periodType'] ?? '';
     dataset.formType = json['formType'] ?? '';
     dataset.expiryDays = json['expiryDays'] ?? '';
+    dataset.datasetFields = json['datasetFields'] ?? '';
     return dataset;
   }
 }
