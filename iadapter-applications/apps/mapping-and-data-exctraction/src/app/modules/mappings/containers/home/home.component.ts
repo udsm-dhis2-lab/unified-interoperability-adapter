@@ -170,7 +170,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     );
   }
 
-  goToDataSetMapping() {
-    this.router.navigate(['/dataset-mapping']);
+  goToDataSetMapping(uuid: string) {
+    this.router.navigate(['/dataset-mapping', uuid]);
   }
 }
