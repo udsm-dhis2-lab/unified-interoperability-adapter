@@ -1,1 +1,20 @@
-<p>dataset-mapping works!</p>
+<nz-spin [nzSpinning]="isLoading">
+  <div class="inner-content">
+    <nz-card style="width: 100%">
+      <div nz-row [nzGutter]="16">
+        <div nz-col nzSpan="16">
+          <nz-card style="width: 100%">
+            <div [innerHTML]="sanitizedContent"></div>
+          </nz-card>
+        </div>
+        <div nz-col nzSpan="8">
+          <nz-card style="width: 100%">
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+          </nz-card>
+        </div>
+      </div>
+    </nz-card>
+  </div>
+</nz-spin>

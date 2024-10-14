@@ -4,6 +4,7 @@ import {
   MergeOutline,
   UnorderedListOutline,
   UserOutline,
+  SearchOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const antDesignIcons: any[] = [
@@ -12,4 +13,5 @@ export const antDesignIcons: any[] = [
   MergeOutline,
   ApartmentOutline,
   DashboardOutline,
+  SearchOutline,
 ];

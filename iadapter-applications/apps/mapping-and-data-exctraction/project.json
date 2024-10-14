@@ -62,7 +62,8 @@
           "buildTarget": "mapping-and-data-exctraction:build:production"
         },
         "development": {
-          "buildTarget": "mapping-and-data-exctraction:build:development"
+          "buildTarget": "mapping-and-data-exctraction:build:development",
+          "proxyConfig": "apps/mapping-and-data-exctraction/proxy-config.json"
         }
       },
       "defaultConfiguration": "development"
