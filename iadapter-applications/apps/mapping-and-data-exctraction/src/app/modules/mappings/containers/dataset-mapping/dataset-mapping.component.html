@@ -13,16 +13,39 @@
             <button
               nz-button
               nzType="default"
-              (click)="onCollapseRightClick()"
+              (click)="onCollapse()"
               class="collapse-button"
             >
               <span
                 nz-icon
-                [nzType]="leftColumnSpan === 0 ? 'right' : 'left'"
+                [nzType]="leftColumnSpan === 8 ? 'right' : 'left'"
                 nzTheme="outline"
               ></span>
             </button>
 
+            <!-- selecting configurations options -->
+            <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
+              <div nz-col nzSpan="12">
+                <custom-select
+                  [placeHolder]="placeHolderForConfigurationSelect"
+                  [isLoading]="isLoadingConfigurations"
+                  [optionList]="configurationOptionList"
+                  [selectedItem]="selectedConfiguration"
+                  (onSearchChange)="onSearchConfiguration($event)"
+                ></custom-select>
+              </div>
+              <div nz-col nzSpan="12">
+                <custom-select
+                  [placeHolder]="placeHolderForIcdCodeSelect"
+                  [isLoading]="isLoadingIcdCodes"
+                  [optionList]="icdCodeOptionList"
+                  [selectedItem]="selectedConfiguration"
+                  (onSearchChange)="onSearchIcdCode($event)"
+                ></custom-select>
+              </div>
+            </div>
+
+            <!-- table  -->
             <div class="column">
               <nz-table
                 [nzData]="mappingData.dataElements"

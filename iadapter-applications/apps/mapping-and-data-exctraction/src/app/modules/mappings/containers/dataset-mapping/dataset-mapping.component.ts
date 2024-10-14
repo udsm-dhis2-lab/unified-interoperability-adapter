@@ -9,6 +9,8 @@ import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/s
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
+import { BehaviorSubject } from 'rxjs';
 
 export interface MappingsData {
   dataElements: string[];
@@ -19,7 +21,7 @@ export interface MappingsData {
 @Component({
   selector: 'app-dataset-mapping',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, SelectComponent],
   templateUrl: './dataset-mapping.component.html',
   styleUrl: './dataset-mapping.component.css',
 })
@@ -33,6 +35,44 @@ export class DatasetMappingComponent implements OnInit {
   sanitizedContent!: SafeHtml;
 
   selectedInputId: string = '';
+
+  searchConfigurationChange$ = new BehaviorSubject('');
+  placeHolderForConfigurationSelect: string = 'Select configuration';
+  isLoadingConfigurations: boolean = false;
+  selectedConfiguration?: string;
+  configurationOptionList: any[] = [
+    {
+      value: 'AgeTYpe: Days',
+      label: 'AgeTYpe: Days',
+    },
+    {
+      value: 'AgeGroup: Under 5',
+      label: 'AgeGroup: Under 5',
+    },
+  ];
+  onSearchConfiguration(value: string): void {
+    this.isLoadingConfigurations = true;
+    this.searchConfigurationChange$.next(value);
+  }
+
+  searchIcdCodeChange$ = new BehaviorSubject('');
+  placeHolderForIcdCodeSelect: string = 'Select ICD Code';
+  isLoadingIcdCodes: boolean = false;
+  selectedIcdCode?: string;
+  icdCodeOptionList: any[] = [
+    {
+      value: 'AgeTYpe: Days',
+      label: 'AgeTYpe: Days',
+    },
+    {
+      value: 'AgeGroup: Under 5',
+      label: 'AgeGroup: Under 5',
+    },
+  ];
+  onSearchIcdCode(value: string): void {
+    this.isLoadingIcdCodes = true;
+    this.searchIcdCodeChange$.next(value);
+  }
 
   mappingData: MappingsData = {
     dataElements: [
@@ -89,17 +129,12 @@ export class DatasetMappingComponent implements OnInit {
     const inputElement = event.target as HTMLInputElement;
     const inputId = inputElement.id;
     this.selectedInputId = inputId;
-    // if (!isDisabled) {
-    //   this.renderer.setStyle(inputElement, 'background-color', '#2C6693');
-    //   this.renderer.setProperty(inputElement, 'disabled', true);
-
-    // }
   }
 
-  onCollapseRightClick() {
+  onCollapse() {
     if (this.leftColumnSpan === 16) {
-      this.leftColumnSpan = 0;
-      this.rightColumnSpan = 24;
+      this.leftColumnSpan = 8;
+      this.rightColumnSpan = 16;
     } else {
       this.leftColumnSpan = 16;
       this.rightColumnSpan = 8;

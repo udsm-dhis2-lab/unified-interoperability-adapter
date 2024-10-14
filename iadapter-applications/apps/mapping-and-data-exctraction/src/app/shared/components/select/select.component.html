@@ -1,0 +1,18 @@
+<nz-select
+  nzMode="multiple"
+  [nzPlaceHolder]="placeHolder"
+  nzAllowClear
+  nzShowSearch
+  nzServerSearch
+  [(ngModel)]="selectedItem"
+  (nzOnSearch)="onSearch($event)"
+>
+  @if (!isLoading) { @for (option of optionList; track option) {
+  <nz-option [nzValue]="option.value" [nzLabel]="option.label"></nz-option>
+  } } @else {
+  <nz-option nzDisabled nzCustomContent>
+    <span nz-icon nzType="loading" class="loading-icon"></span>
+    Loading Data...
+  </nz-option>
+  }
+</nz-select>
