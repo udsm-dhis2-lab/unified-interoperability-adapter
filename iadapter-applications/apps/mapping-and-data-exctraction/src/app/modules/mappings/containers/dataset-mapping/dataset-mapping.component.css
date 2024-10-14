@@ -2,3 +2,8 @@
   padding: 16px;
   margin-top: 50px;
 }
+
+.form-container {
+  height: 75vh;
+  overflow: auto;
+}
