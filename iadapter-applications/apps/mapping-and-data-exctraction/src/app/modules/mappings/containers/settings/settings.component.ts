@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule],
+  imports: [SharedModule],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css',
 })

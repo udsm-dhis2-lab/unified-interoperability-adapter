@@ -67,6 +67,12 @@ export class HduApiNavMenuComponent {
           icon: 'unordered-list',
           subMenus: [],
         },
+        {
+          name: 'Settings',
+          routeUrl: '/settings',
+          icon: 'setting',
+          subMenus: [],
+        },
       ],
     },
   ];
