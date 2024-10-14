@@ -3,10 +3,10 @@ package com.Adapter.icare.Dtos;
 import lombok.Getter;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.*;
-import org.jetbrains.annotations.NotNull;
+
+import javax.validation.constraints.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter

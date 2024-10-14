@@ -5,6 +5,7 @@ import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.DatastoreConfigurationsDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -238,24 +239,27 @@ public class HDUAPIController {
         }
     }
 
-    @PostMapping(value = "configurations",consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> addConfigurations(@RequestBody Map<String, Object> configurations) throws Exception {
+    @PostMapping(value = "configurations", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> addConfigurations(@RequestBody DatastoreConfigurationsDTO configurations) throws Exception {
         try {
             String namespace = datastoreConstants.ConfigurationsNamespace;
             Map<String, Object> returnObject = new HashMap<>();
             String key = "";
-            if (configurations.get("code") == null && configurations.get("key") == null) {
+            if (configurations.getKey() == null && configurations.getValue().get("key").toString() == null) {
                 throw new Exception("code or key is missing on your request");
             } else {
-                if (configurations.get("key") != null) {
-                    key = configurations.get("key").toString();
+                if (configurations.getKey() != null) {
+                    key = configurations.getKey();
                 } else {
-                    key = configurations.get("code").toString();
+                    key = configurations.getValue().get("code").toString();
                 }
                 Datastore datastore = new Datastore();
-                datastore.setValue(configurations);
+                datastore.setValue(configurations.getValue());
                 datastore.setNamespace(namespace);
                 datastore.setDataKey(key);
+                if (configurations.getGroup() != null) {
+                    datastore.setDatastoreGroup(configurations.getGroup());
+                }
                 Datastore response = datastoreService.saveDatastore(datastore);
                 returnObject = response.toMap();
             }
@@ -265,7 +269,61 @@ public class HDUAPIController {
         }
     }
 
-    @GetMapping("configurations")
+    @PutMapping(value = "configurations/{uuid}", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> updateConfigurations(@RequestBody DatastoreConfigurationsDTO configurations,
+                                                                    @PathVariable(value = "uuid") String uuid) throws Exception {
+        try {
+            Datastore existingConfigs = datastoreService.getDatastoreByUuid(uuid);
+            if (existingConfigs != null && existingConfigs.getNamespace() .equals(datastoreConstants.ConfigurationsNamespace)) {
+                String namespace = datastoreConstants.ConfigurationsNamespace;
+                Map<String, Object> returnObject = new HashMap<>();
+                String key = "";
+                if (configurations.getKey() == null && configurations.getValue().get("key").toString() == null) {
+                    throw new Exception("code or key is missing on your request");
+                } else {
+                    if (configurations.getKey() != null) {
+                        key = configurations.getKey();
+                    } else {
+                        key = configurations.getValue().get("code").toString();
+                    }
+                    existingConfigs.setValue(configurations.getValue());
+                    existingConfigs.setNamespace(namespace);
+                    existingConfigs.setDataKey(key);
+                    if (configurations.getGroup() != null) {
+                        existingConfigs.setDatastoreGroup(configurations.getGroup());
+                    }
+                    Datastore response = datastoreService.updateDatastore(existingConfigs);
+                    returnObject = response.toMap();
+                }
+                return ResponseEntity.ok(returnObject);
+            } else {
+                Map<String,Object> response = new HashMap<>();
+                response.put("message","Configurations with uuid " + uuid + " does not exists");
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+        return null;
+    }
+
+    @GetMapping(value = "configurations/{uuid}", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> getConfigurations(@PathVariable(value = "uuid") String uuid) throws Exception {
+        Map<String,Object> response = new HashMap<>();
+        try {
+            Datastore configurations = datastoreService.getDatastoreByUuid(uuid);
+            if (configurations != null) {
+                return ResponseEntity.ok(configurations.toMap());
+            } else {
+                response.put("message","Configurations with uuid " + uuid + " does not exists");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "configurations", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getConfigurations(
             @RequestParam(value="q",required = false) String q,
             @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
@@ -278,6 +336,7 @@ public class HDUAPIController {
             for (Datastore datastore: pagedDatastoreData.getContent()) {
                 Map<String, Object> configuration = datastore.getValue();
                 configuration.put("key", datastore.getDataKey());
+                configuration.put("uuid", datastore.getUuid());
                 namespaceDetails.add(configuration);
             }
             Map<String, Object> returnObject =  new HashMap<>();
@@ -292,6 +351,25 @@ public class HDUAPIController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @DeleteMapping(value = "configurations/{uuid}")
+    public ResponseEntity<Map<String,Object>> deleteConfigurations(@PathVariable(value = "uuid") String uuid) throws Exception {
+        Map<String,Object> response = new HashMap<>();
+        try {
+            if (datastoreService.getDatastoreByUuid(uuid) != null) {
+                datastoreService.deleteDatastore(uuid);
+                response.put("message", "Configurations with uuid " + uuid + " has successfully been deleted");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message","Configurations with uuid " + uuid + " does not exists");
+                ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+        return null;
     }
 
     @GetMapping(value = "workflows")
