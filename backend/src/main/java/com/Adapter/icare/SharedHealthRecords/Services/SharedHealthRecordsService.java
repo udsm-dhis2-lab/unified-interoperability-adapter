@@ -88,7 +88,7 @@ public class SharedHealthRecordsService {
         }
 //                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
         if (identifier != null) {
-            searchRecords.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
+            searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
         }
 
         if (firstName != null) {
@@ -103,6 +103,7 @@ public class SharedHealthRecordsService {
         if (!response.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
+                    // System.out.println("TESTING");
                     Map<String, Object> templateData = new HashMap<>();
                     Patient patient = (Patient) entry.getResource();
                     PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);

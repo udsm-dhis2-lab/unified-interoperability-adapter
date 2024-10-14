@@ -69,7 +69,7 @@ public class ClientRegistryService {
             // TODO: You might consider enumerating the gender codes
             var searchClient =  fhirClient.search().forResource(Patient.class);
             if (identifier != null) {
-                searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
+                searchClient.where(Patient.IDENTIFIER.exactly().identifier(identifier));
             }
 
             if (onlyLinkedClients != null) {
