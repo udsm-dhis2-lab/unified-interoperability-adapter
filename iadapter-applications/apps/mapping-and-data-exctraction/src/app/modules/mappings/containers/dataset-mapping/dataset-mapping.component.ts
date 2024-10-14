@@ -10,6 +10,12 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
+export interface MappingsData {
+  dataElements: string[];
+  configurations: string[];
+  icdCodes: string[];
+}
+
 @Component({
   selector: 'app-dataset-mapping',
   standalone: true,
@@ -18,12 +24,27 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  leftColumnSpan: number = 16;
+  rightColumnSpan: number = 8;
+
   dataSetUuid: string = '';
   isLoading: boolean = true;
   datasetFormContent: string = '';
   sanitizedContent!: SafeHtml;
 
   selectedInputId: string = '';
+
+  mappingData: MappingsData = {
+    dataElements: [
+      'AttDwO4xCIu-val',
+      'QInmZugn9JO-val',
+      'QInmZugn9JO-val',
+      'QInmZugn9JO-val',
+      'Q8U3fXSfxY8-val',
+    ],
+    configurations: ['AgeTYpe: Days', 'AgeGroup: Under 5'],
+    icdCodes: ['ICD10: I10', 'ICD10: I10', 'ICD10: I10'],
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -73,5 +94,15 @@ export class DatasetMappingComponent implements OnInit {
     //   this.renderer.setProperty(inputElement, 'disabled', true);
 
     // }
+  }
+
+  onCollapseRightClick() {
+    if (this.leftColumnSpan === 16) {
+      this.leftColumnSpan = 0;
+      this.rightColumnSpan = 24;
+    } else {
+      this.leftColumnSpan = 16;
+      this.rightColumnSpan = 8;
+    }
   }
 }

@@ -3,7 +3,17 @@
   margin-top: 50px;
 }
 
-.form-container {
-  height: 75vh;
+.column {
+  height: 74vh;
   overflow: auto;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.collapse-button {
+  margin-bottom: 16px;
 }
