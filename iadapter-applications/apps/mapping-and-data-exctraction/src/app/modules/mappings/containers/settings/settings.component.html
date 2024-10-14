@@ -1,5 +1,41 @@
-<nz-card style="width: 100%; margin-top: 50px">
+<nz-card style="width: 100%; margin-top: 50px; padding: 16px">
   <div>
     <h3>Settings</h3>
   </div>
+
+  <nz-table
+    nzShowSizeChanger
+    [nzData]="listOfConfigurations"
+    [nzFrontPagination]="false"
+    [nzLoading]="loading"
+    [nzTotal]="total"
+    [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex"
+    (nzQueryParams)="onQueryParamsChange($event)"
+  >
+    <thead>
+      <tr>
+        <th>SN</th>
+        <th>Group</th>
+        <th>Code</th>
+        <th>Name</th>
+        <th>Options</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (data of listOfConfigurations; track data.key; let i = $index ) {
+      <tr>
+        <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
+        <td>{{ data.group }}</td>
+        <td>{{ data.value.code }}</td>
+        <td>{{ data.value.name }}</td>
+        <td>
+          @for (option of data.value.options; track option.code) {
+          <nz-tag style="margin-right: 16px">{{ option.name }}</nz-tag>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </nz-table>
 </nz-card>

@@ -77,6 +77,7 @@ export class DatasetManagementService {
     pageSize: number,
     filters: Array<{ key: string; value: string[] }>
   ) {
+    console.log('DATAAAA', 'CALLED');
     const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
 
     return this.httpClient
@@ -90,6 +91,7 @@ export class DatasetManagementService {
   }
 
   private handleError(error: any): never {
+    console.log('ERRORRR', error);
     if (error.status === 401) {
       throw new UnAuothorizedException('Invalid username or password');
     } else {

@@ -6,8 +6,10 @@ export class Configuration {
   value!: ConfigurationValue;
 
   static fromJson(json: any): Configuration {
+    console.log('JSONNN', json);
     const configuration = new Configuration();
     configuration.key = json['key'];
+    console.log('KEY', json['key']);
     configuration.group = json['group'];
     configuration.value = ConfigurationValue.fromJson(json['value']);
     return configuration;
