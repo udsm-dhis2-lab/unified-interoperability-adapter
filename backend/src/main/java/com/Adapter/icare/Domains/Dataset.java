@@ -70,6 +70,15 @@ public class Dataset extends BaseEntity implements Serializable {
 
     @Column(columnDefinition = "json", nullable = false)
     @Convert(converter = HashMapConverter.class)
+    private Map<String,Object> categoryCombo;
+
+
+    @Column(columnDefinition = "json", nullable = false)
+    @Convert(converter = HashMapConverter.class)
+    private Map<String,Object> dataElements;
+
+    @Column(columnDefinition = "json", nullable = false)
+    @Convert(converter = HashMapConverter.class)
     private Map<String, Object> datasetFields;
     
     @ManyToOne
@@ -86,6 +95,8 @@ public class Dataset extends BaseEntity implements Serializable {
         dataSetMap.put("formDesignCode", this.getFormDesignCode());
         dataSetMap.put("timelyDays", this.getTimelyDays());
         dataSetMap.put("expiryDays", this.getExpiryDays());
+        dataSetMap.put("categoryCombo", this.getCategoryCombo());
+        dataSetMap.put("dataElements", this.getDataElements());
         dataSetMap.put("datasetFields", this.getDatasetFields());
         dataSetMap.put("instance", this.getInstances().toMap());
 

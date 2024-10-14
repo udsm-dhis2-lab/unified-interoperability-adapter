@@ -100,10 +100,10 @@ public class DataSetsController {
         }
     }
 
-    @PostMapping
+    @PostMapping()
     public ResponseEntity<Map<String,Object>> addDataSet(@RequestBody DataSetInstance dataSetInstance) throws Exception {
         try {
-            Dataset dataSet = dataSetsService.addDataSets(dataSetInstance.getId(), dataSetInstance.getInstance());
+            Dataset dataSet = dataSetsService.addDataSet(dataSetInstance.getDataSet(), dataSetInstance.getInstance());
             return ResponseEntity.ok(dataSet.toMap());
         }catch (Exception e) {
             throw new Exception(e.getMessage());
@@ -130,23 +130,19 @@ public class DataSetsController {
             @RequestParam(value = "periodType", required = false) String periodType) throws Exception {
         try {
             Instance instanceDetails = instanceService.getInstanceByUuid(instance);
+            Map<String,Object> response = new HashMap<>();
             if (instanceDetails != null) {
-                Map<String,Object> response = new HashMap<>();
                 Map<String,Object> remoteDatasetsPayload = dataSetsService.getDhis2DataSets(
-                        instanceDetails.getId(),
+                        instance,
                         page,
                         pageSize,
                         q,
                         formType,
                         periodType);
-                Map<String,Object> pager = new HashMap<>();
-                pager.put("page", page);
-                pager.put("pageSize", pageSize);
-                response.put("results", (List) remoteDatasetsPayload.get("dataSets"));
+                response.put("results", remoteDatasetsPayload.get("dataSets"));
                 response.put("pager", remoteDatasetsPayload.get("pager"));
                 return ResponseEntity.ok(response);
             } else {
-                Map<String, Object> response = new HashMap<>();
                 response.put("message", "Instance with uuid " + instance + " is not set");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }

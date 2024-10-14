@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DataSetInstance {
-    private String id;
+    private String dataSet;
     private String instance;
 }
