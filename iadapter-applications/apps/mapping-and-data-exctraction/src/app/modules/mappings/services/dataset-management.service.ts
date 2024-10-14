@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, map, Observable } from 'rxjs';
-import { Dataset, DatasetPage, InstancePage, MappingsUrls } from '../models';
+import {
+  ConfigurationPage,
+  Dataset,
+  DatasetPage,
+  InstancePage,
+  MappingsUrls,
+} from '../models';
 import { HttpParams } from '@angular/common/http';
 import { UnAuothorizedException, UnknownException } from '@models';
 
@@ -11,6 +17,7 @@ import { UnAuothorizedException, UnknownException } from '@models';
 export class DatasetManagementService {
   instanceUrl: string = MappingsUrls.GET_INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
+  configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -23,7 +30,7 @@ export class DatasetManagementService {
     const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
 
     return this.httpClient
-      .get<{ results: any }>(`${dataSetUrl}`, {
+      .get<{ results: any }>(dataSetUrl, {
         params,
       })
       .pipe(
@@ -54,12 +61,29 @@ export class DatasetManagementService {
     const params = this.buildHttpParams(pageIndex, pageSize, paging, filters);
 
     return this.httpClient
-      .get<{ results: any }>(`${this.instanceUrl}`, {
+      .get<{ results: any }>(this.instanceUrl, {
         params,
       })
       .pipe(
         map((response: { results: any }) => {
           return InstancePage.fromJson(response);
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  getConfigurations(
+    pageIndex: number,
+    pageSize: number,
+    filters: Array<{ key: string; value: string[] }>
+  ) {
+    const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
+
+    return this.httpClient
+      .get<{ results: any }>(this.configurationUrl, { params })
+      .pipe(
+        map((response: { results: any }) => {
+          return ConfigurationPage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );
