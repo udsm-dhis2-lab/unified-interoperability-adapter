@@ -1,16 +1,13 @@
 import {
-  AfterViewInit,
   ChangeDetectorRef,
   Component,
   ElementRef,
   OnInit,
   Renderer2,
-  ViewChild,
 } from '@angular/core';
 import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { ActivatedRoute } from '@angular/router';
-import { Dataset } from '../../models';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
@@ -71,7 +68,6 @@ export class DatasetMappingComponent implements OnInit {
     const inputElement = event.target as HTMLInputElement;
     const inputId = inputElement.id;
     this.selectedInputId = inputId;
-    const isDisabled = inputElement.disabled;
     // if (!isDisabled) {
     //   this.renderer.setStyle(inputElement, 'background-color', '#2C6693');
     //   this.renderer.setProperty(inputElement, 'disabled', true);
