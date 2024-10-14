@@ -344,7 +344,7 @@ public class DataSetsService {
                     responseContent.append(line);
                 }
                 reader.close();
-                JSONObject jsObject = new JSONObject(responseContent.toString());
+                JSONObject jsObject = new JSONObject(responseContent);
                 if(jsObject.has("formType")) {
                     String formType = jsObject.getString("formType");
                     dataset.setFormType(formType);
@@ -370,7 +370,7 @@ public class DataSetsService {
                     dataset.setCode(code);
                 }
 
-                dataset.setDatasetFields(jsObject.toString());
+                dataset.setDatasetFields(jsObject.toMap());
             } else {
                 throw new Exception("Instance provided does not exists");
             }

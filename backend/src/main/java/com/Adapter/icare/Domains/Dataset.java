@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.*;
 
+import com.Adapter.icare.Utils.HashMapConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,8 +68,9 @@ public class Dataset extends BaseEntity implements Serializable {
 
     private String code;
 
-    @Lob
-    private String datasetFields;
+    @Column(columnDefinition = "json", nullable = false)
+    @Convert(converter = HashMapConverter.class)
+    private Map<String, Object> datasetFields;
     
     @ManyToOne
     private Instance instances;
