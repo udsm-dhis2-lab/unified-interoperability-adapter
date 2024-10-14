@@ -107,7 +107,7 @@ public class ClientRegistryController {
     @GetMapping()
     public ResponseEntity<Map<String, Object>> getPatients(
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1") int page,
             @RequestParam(value = "status", defaultValue = "true") String status,
             @RequestParam( value = "identifier", required = false) String identifier,
             @RequestParam( value = "identifierType", required = false) String identifierType,
@@ -162,7 +162,7 @@ public class ClientRegistryController {
 
     @GetMapping(value = "potentialDuplicates", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getPotentialDuplicates(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "key", required = false) String key) throws Exception {
         // TODO: Replace with FHIR implementation

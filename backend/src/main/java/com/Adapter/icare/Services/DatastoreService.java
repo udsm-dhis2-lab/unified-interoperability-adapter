@@ -95,13 +95,18 @@ public class DatastoreService {
 
 
     public Page<Datastore> getDatastoreNamespaceDetailsUsingPagination(String namespace, Integer page, Integer pageSize, String key) throws Exception {
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize);
         return datastoreRepository.getDatastoreByNamespaceByPagination(namespace, pageable, key);
     }
 
     public Page<Datastore> getDatastoreNamespaceDetailsByPagination(String namespace, String category, String department, String q, String code, Integer page, Integer pageSize) throws Exception {
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize);
         return datastoreRepository.getDatastoreByNamespaceWithPagination(namespace, category, department, q, code, pageable);
+    }
+
+    public Page<Datastore> getDatastoreMatchingNamespaceFilterByPagination(String namespaceFilter, String key, String q, String code, Integer page, Integer pageSize) throws Exception {
+        Pageable pageable = createPageable(page, pageSize);
+        return datastoreRepository.getDatastoreMatchingNamespaceFilterByPagination(namespaceFilter, key, q, code, pageable);
     }
 
     public List<Datastore> getClientsVisitsDataByNameSpace(String namespace) throws Exception {
@@ -189,14 +194,14 @@ public class DatastoreService {
 
     public Page<Datastore> getDatastoreMatchingParams(String namespace, String key, String version,
                                                       String releaseYear, String code, String q, Integer page, Integer pageSize, String group) throws Exception {
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize);
         return datastoreRepository.findDatastoreDataBySpecifiedParams(namespace,key,version,releaseYear,code,q,pageable, group);
     }
 
     public Page<Datastore> getDatastoreICDDataByParams(String namespace, String key, String version,
                                                       String releaseYear, String chapter, String block, String category, String code,
                                                        String q, Integer page, Integer pageSize) throws Exception {
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize);
         return datastoreRepository.getDatastoreICDDataByParams(namespace,key,version,releaseYear,chapter, block, category, code,q,pageable);
     }
 
@@ -210,5 +215,13 @@ public class DatastoreService {
 
     public List<Datastore> getICDDataByCategory(String namespace, String category, String release, String version) throws Exception {
         return datastoreRepository.getICDDataByCategory(namespace,category,release,version);
+    }
+
+    private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
+        if (page < 1) {
+            throw new Exception("Page can not be less than zero");
+        } else {
+            return PageRequest.of(page-1, pageSize);
+        }
     }
 }

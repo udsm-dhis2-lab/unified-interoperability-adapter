@@ -31,12 +31,8 @@
 
 package com.Adapter.icare.Domains;
 
-import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,15 +43,25 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table
-public class Instances extends BaseEntity implements Serializable {
+@Table(name = "data_set_elements")
+public class DataSetElement extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String url;
-    private String username;
-    private String password;
-    private String name;
-    private String organisationUnitId;
-    private String code;
+    private String dataElement;
+    private String categoryOptionCombo;
+    private String SqlQuery;
+
+    @ManyToOne
+    private Dataset datasets;
+
+    @ManyToOne
+    private Datasource datasource;
+
+    @Transient
+    private String dataElementCategoryOptionCombo;
+    @Transient
+    private String periodStart;
+    @Transient  
+    private String periodEnd;
 }

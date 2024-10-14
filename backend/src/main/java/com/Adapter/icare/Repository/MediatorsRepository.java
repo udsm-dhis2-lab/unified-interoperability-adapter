@@ -1,6 +1,8 @@
 package com.Adapter.icare.Repository;
 
 import com.Adapter.icare.Domains.Mediator;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -18,4 +20,8 @@ public interface MediatorsRepository extends JpaRepository<Mediator, Long> {
 
     @Query(value = "SELECT * FROM mediator WHERE code=:code",nativeQuery = true)
     Mediator getMediatorByCode(String code);
+
+    @Query(value = "SELECT * FROM mediator WHERE (:code IS NULL OR code=:code) AND (:category IS NULL OR category=:category)",
+            countQuery = "SELECT COUNT(*) FROM mediator WHERE (:code IS NULL OR code = :code ) AND (:category IS NULL OR category=:category)",nativeQuery = true)
+    Page<Mediator> getMediatorsListByPagination(String code, String category, Pageable pageable);
 }

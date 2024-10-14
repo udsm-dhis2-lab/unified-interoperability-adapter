@@ -94,11 +94,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users/status")
-    public String getStatus() {
-        return "OK";
-    }
-
     @GetMapping(path = "/users")
     public List<Map<String,Object>> getUsers() throws Exception{
         List<Map<String,Object>> usersMap = new ArrayList<>();
@@ -126,7 +121,7 @@ public class UserController {
 
     }
 
-    @GetMapping("users/{uuid}")
+    @GetMapping("/users/{uuid}")
     public Map<String,Object> getUser(@PathVariable String uuid) throws Exception {
         User user = userService.getUSer(uuid);
         return user.toMap();

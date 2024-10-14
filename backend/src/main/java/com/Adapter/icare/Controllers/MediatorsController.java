@@ -8,6 +8,7 @@ import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,28 +48,46 @@ public class MediatorsController {
 
 
     @GetMapping("mediators")
-    public ResponseEntity<List<Mediator>> getMediators() throws Exception {
+    public ResponseEntity<Map<String,Object>> getMediators(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "code", required = false) String code,
+            @RequestParam(value = "category", required = false) String category
+    ) throws Exception {
         try {
-            return ResponseEntity.ok(mediatorsService.getMediatorsConfigs());
+            List<Map<String, Object>> mediatorsList = new ArrayList<>();
+            Page<Mediator> pagedMediatorData = mediatorsService.getMediatorsByPagination( page, pageSize, code, category);
+            for (Mediator mediator: pagedMediatorData.getContent()) {
+                mediatorsList.add(mediator.toMap());
+            }
+            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedMediatorData.getTotalPages());
+            pager.put("total", pagedMediatorData.getTotalElements());
+            returnObject.put("pager",pager);
+            returnObject.put("results", mediatorsList);
+            return ResponseEntity.ok(returnObject);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PostMapping("mediators")
-    public ResponseEntity<Mediator> saveMediator(@RequestBody Mediator mediator) throws Exception {
+    public ResponseEntity<Map<String,Object>> saveMediator(@RequestBody Mediator mediator) throws Exception {
         try {
             if (this.authentication != null && this.authenticatedUser != null) {
                 mediator.setCreatedBy(this.authenticatedUser);
             }
-            return ResponseEntity.ok(mediatorsService.saveMediatorConfigs(mediator));
+            return ResponseEntity.ok(mediatorsService.saveMediatorConfigs(mediator).toMap());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
     @PutMapping("mediators/{uuid}")
-    public ResponseEntity<Mediator> updateMediator(@PathVariable("uuid") String uuid, @RequestBody Mediator mediator) throws Exception {
+    public ResponseEntity<Map<String,Object>> updateMediator(@PathVariable("uuid") String uuid, @RequestBody Mediator mediator) throws Exception {
         try {
             if (mediator.getUuid() == null) {
                 mediator.setUuid(uuid);
@@ -76,7 +95,7 @@ public class MediatorsController {
                     mediator.setLastUpdatedBy(this.authenticatedUser);
                 }
             }
-            return ResponseEntity.ok(mediatorsService.updateMediator(mediator));
+            return ResponseEntity.ok(mediatorsService.updateMediator(mediator).toMap());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -85,58 +104,14 @@ public class MediatorsController {
     @DeleteMapping("mediators/{uuid}")
     public void deleteMediator(@PathVariable("uuid") String uuid) throws Exception {
          try {
-             mediatorsService.deleteMediator(uuid);
+             Mediator mediator = mediatorsService.getMediatorByUuid(uuid);
+             if (mediator !=null) {
+                 mediatorsService.deleteMediator(uuid);
+             } else {
+                 throw new Exception("Mediator with uuid " + uuid + " does not exists");
+             }
          } catch (Exception e) {
              throw new Exception("Issue with deleting resource");
          }
-    }
-
-    @GetMapping("dataTemplates")
-    public ResponseEntity<List<Map<String, Object>>> getDataTemplatesList (@RequestParam(required = false) String id) throws Exception {
-        // NB: Since data templates are JSON type metadata stored on datastore, then dataTemplates namespace has been used to retrieve the configs
-        try {
-            List<Datastore> dataTemplateNameSpaceDetails = datastoreService.getDatastoreNamespaceDetails("dataTemplates");
-            List<Map<String, Object>> dataTemplates = new ArrayList<>();
-            for(Datastore datastore: dataTemplateNameSpaceDetails) {
-                Map<String, Object> dataTemplate = datastore.getValue();
-                if (id != null) {
-                    if ( ((Map<String, Object>) dataTemplate.get("templateDetails")).get("id").equals(id)) {
-                        dataTemplate.put("uuid", datastore.getUuid());
-                        dataTemplates.add(dataTemplate);
-                    }
-                } else {
-                    dataTemplate.put("uuid", datastore.getUuid());
-                    dataTemplates.add(dataTemplate);
-                }
-            }
-            return ResponseEntity.ok(dataTemplates);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
-    @GetMapping("dataTemplates/{uuid}")
-    public ResponseEntity<Map<String, Object>> getDataTemplateByUuid(@PathVariable("uuid") String uuid) throws Exception {
-        try {
-            Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
-            if (datastore == null) {
-                throw new Exception("Data template for the uuid " + uuid + " does not exists");
-            }
-            return ResponseEntity.ok(datastore.getValue());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
-    @PostMapping(value = "dataTemplates", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String passDataToMediator(@RequestBody Map<String, Object> data) throws Exception {
-        /**
-         * Send data to Mediator where all the logics will be done.
-         */
-        try {
-            return mediatorsService.sendDataToMediatorWorkflow(data);
-        } catch (Exception e) {
-            throw new Exception("Issue with adding data template");
-        }
     }
 }

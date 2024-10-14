@@ -6,7 +6,10 @@ import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Repository.MediatorsRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.data.domain.Page;
 import org.json.JSONObject;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -57,6 +60,11 @@ public class MediatorsService {
 
     public List<Mediator> getMediatorsConfigs() throws Exception {
         return mediatorsRepository.findAll();
+    }
+
+    public Page<Mediator> getMediatorsByPagination(Integer page, Integer pageSize, String code, String category) throws Exception {
+        Pageable pageable = createPageable(page, pageSize);
+        return mediatorsRepository.getMediatorsListByPagination(code,category,pageable);
     }
 
     public Mediator getMediatorByUuid(String uuid) throws Exception {
@@ -112,7 +120,7 @@ public class MediatorsService {
     public String processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data) throws Exception {
         try {
             Map<String, Object> response = new HashMap<>();
-            return sendDataToExternalSystem(mediator,data);
+            return sendDataToExternalSystem(mediator,data, "POST");
         } catch (Exception e) {
             System.err.println(e.getMessage());
             throw new Exception(e.getMessage());
@@ -122,11 +130,15 @@ public class MediatorsService {
     public String routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
+                System.out.println(apiPath);
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
-                return sendDataToExternalSystem(mediator,payload);
+                return sendDataToExternalSystem(mediator,payload, method);
+            } else if (method.equals("PUT")) {
+                return sendDataToExternalSystem(mediator,payload, method);
+            } else if (method.equals("DELETE")){
+                return deleteResourceFromExternalSystem(mediator,apiPath);
             } else {
-                // TODO: Add support for delete, patch and update
                 return null;
             }
         } catch (Exception e) {
@@ -427,7 +439,8 @@ public class MediatorsService {
         }
         return response;
     }
-    public String sendDataToExternalSystem(Mediator mediator, Map<String, Object> data) throws Exception {
+
+    public String sendDataToExternalSystem(Mediator mediator, Map<String, Object> data, String method) throws Exception {
         // TODO: Make this valid for async true
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -455,7 +468,7 @@ public class MediatorsService {
                 authentication = "Bearer " + authToken;
                 httpURLConnection.setRequestProperty("Authorization", authentication);
             }
-            httpURLConnection.setRequestMethod("POST");
+            httpURLConnection.setRequestMethod(method);
             httpURLConnection.setRequestProperty("Content-Type", "application/json");
             httpURLConnection.setRequestProperty("Accept", "application/json");
             httpURLConnection.setDoOutput(true);
@@ -481,5 +494,65 @@ public class MediatorsService {
             throw new Exception(e.getMessage());
         }
         return responseJsonObject.toString();
+    }
+
+    public String deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
+        String response = new String();
+        String authType = mediator.getAuthType();
+        String authToken = mediator.getAuthToken();
+        String baseUrl = mediator.getBaseUrl();
+        String path = mediator.getPath();
+        URL url = null;
+
+        try {
+            // Construct the URL for the DELETE request
+            url = new URL(baseUrl + path + apiPath);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        BufferedReader reader;
+        String dataLine;
+        StringBuffer responseContent = new StringBuffer();
+        JSONObject responseJsonObject = new JSONObject();
+
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            String authentication = "";
+
+            if (authType.toLowerCase().equals("basic")) {
+                authentication = "Basic " + authToken;
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            } else if (authType.toLowerCase().equals("token")) {
+                authentication = "Bearer " + authToken;
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            }
+
+            httpURLConnection.setRequestMethod("DELETE");
+            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setRequestProperty("Accept", "application/json");
+
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((dataLine = reader.readLine()) != null) {
+                responseContent.append(dataLine);
+            }
+            reader.close();
+
+            responseJsonObject = new JSONObject(responseContent.toString());
+            response = responseJsonObject.toString();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
+        if (page < 1) {
+            throw new Exception("Page can not be less than zero");
+        } else {
+            return PageRequest.of(page-1, pageSize);
+        }
     }
 }

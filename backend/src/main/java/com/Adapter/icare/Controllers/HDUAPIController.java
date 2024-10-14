@@ -10,9 +10,7 @@ import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.google.common.collect.Maps;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -189,8 +187,8 @@ public class HDUAPIController {
                                                @RequestParam(value="code",required = false) String code,
                                                @RequestParam(value="version",required = false) String version,
                                                @RequestParam(value="q",required = false) String q,
-                                               @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
-                                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreMatchingParams(namespace, key, version, null, q, code, page,pageSize, "GENERAL-CODES");
@@ -218,7 +216,7 @@ public class HDUAPIController {
     public ResponseEntity<Map<String, Object>> getSpecificCodedItems(@PathVariable("namespace") String namespace,
                                                @RequestParam(value="code", required = false) String code,
                                                @RequestParam(value="q",required = false) String q,
-                                               @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                               @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
                                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -270,7 +268,7 @@ public class HDUAPIController {
     @GetMapping("configurations")
     public ResponseEntity<Map<String, Object>> getConfigurations(
             @RequestParam(value="q",required = false) String q,
-            @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+            @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize
     ) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
@@ -295,6 +293,7 @@ public class HDUAPIController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
     @GetMapping(value = "workflows")
     public ResponseEntity<String> getWorkflows() throws Exception {
         try {
@@ -308,11 +307,56 @@ public class HDUAPIController {
         }
     }
 
-    @PostMapping(value = "workflows")
-    public ResponseEntity<String> addWorkflow(@RequestBody Map<String, Object> process) throws Exception {
+    @GetMapping(value = "workflows/{id}")
+    public ResponseEntity<String> getWorkflowById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows", "POST", process));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping(value = "workflows")
+    public ResponseEntity<String> addWorkflow(@RequestBody Map<String, Object> workflow) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows", "POST", workflow));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(value = "workflows/{id}")
+    public ResponseEntity<String> updateWorkflow(
+            @RequestBody Map<String, Object> workflow,
+            @PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id, "PUT", workflow));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "workflows/{id}")
+    public ResponseEntity<String> deleteWorkflowById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id,"DELETE", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -334,11 +378,56 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "processes/{id}")
+    public ResponseEntity<String> getProcessById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping(value = "processes")
     public ResponseEntity<String> addProcess(@RequestBody Map<String, Object> process) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes", "POST", process));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(value = "processes/{id}")
+    public ResponseEntity<String> updateProcess(
+            @RequestBody Map<String, Object> process,
+            @PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id, "PUT", process));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "processes/{id}")
+    public ResponseEntity<String> deleteProcessById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id,"DELETE", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -360,6 +449,21 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "schedules/{id}")
+    public ResponseEntity<String> getScheduleById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping(value = "schedules")
     public ResponseEntity<String> addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
         try {
@@ -373,11 +477,135 @@ public class HDUAPIController {
         }
     }
 
+    @PutMapping(value = "schedules/{id}")
+    public ResponseEntity<String> addSchedule(
+            @RequestBody Map<String, Object> schedule,
+            @PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules/" + id, "PUT", schedule));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "schedules/{id}")
+    public ResponseEntity<String> deleteScheduleById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules/" + id,"DELETE", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value="mappings", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String,Object>> getMappings(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "code", required = false) String code,
+            @RequestParam(value = "key", required = false) String key
+    ) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+            String namespaceFilter = datastoreConstants.MappingsNamespaceFilter;
+            Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingNamespaceFilterByPagination(
+                    namespaceFilter, key,q,code,page,pageSize);
+            for (Datastore datastore: pagedDatastoreData.getContent()) {
+                Map<String,Object> mapping = new HashMap<>();
+                mapping.put("uuid", datastore.getUuid());
+                mapping.put("dataKey", datastore.getDataKey());
+                mapping.put("namespace", datastore.getNamespace());
+                mapping.put("group", datastore.getDatastoreGroup());
+                mapping.put("description", datastore.getDescription());
+                mapping.put("mapping", datastore.getValue());
+                namespaceDetails.add(mapping);
+            }
+            Map<String, Object> response = new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages",pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            response.put("pager",pager);
+            response.put("results", namespaceDetails);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "mappings/{uuid}")
+    public ResponseEntity<Map<String,Object>> getMappingsByUuid(@PathVariable(value = "uuid") String uuid) throws Exception {
+        try {
+            Map<String,Object> response = new HashMap<>();
+            Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+            response.put("uuid", datastore.getUuid());
+            response.put("dataKey", datastore.getDataKey());
+            response.put("namespace", datastore.getNamespace());
+            response.put("group", datastore.getDatastoreGroup());
+            response.put("description", datastore.getDescription());
+            response.put("mapping", datastore.getValue());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "mappings/{uuid}")
+    public ResponseEntity<Map<String,Object>> deleteMappings(@PathVariable(value="uuid") String uuid) throws Exception {
+        try {
+            Datastore mappingsToUpdate = datastoreService.getDatastoreByUuid(uuid);
+            Map<String,Object> response = new HashMap<>();
+            if (mappingsToUpdate != null) {
+                datastoreService.deleteDatastore(uuid);
+                response.put("message","Mapping with uuid " + uuid +" has been deleted");
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("message","Mapping with uuid " + uuid + " does not exists");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PutMapping(value = "mappings/{uuid}")
+    public ResponseEntity<Map<String,Object>> updateMappingsByUuid(
+            @PathVariable(value = "uuid") String uuid,
+            @RequestBody Datastore datastore) throws Exception {
+        try {
+            Datastore mappingsToUpdate = datastoreService.getDatastoreByUuid(uuid);
+            if (mappingsToUpdate != null) {
+                mappingsToUpdate.setValue(datastore.getValue());
+                if (authenticatedUser != null) {
+                    mappingsToUpdate.setLastUpdatedBy(authenticatedUser);
+                }
+                return ResponseEntity.ok(datastoreService.updateDatastore(mappingsToUpdate).toMap());
+            } else {
+                Map<String,Object> response  = new HashMap<>();
+                response.put("message","Mapping with uuid " + uuid + " does not exists");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     // CUSTOM implementation for supporting HDU API temporarily
     @GetMapping(value="codeSystems", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getDatastoreByNamespace(@RequestParam(value="q",required = false) String q,
                                                        @RequestParam(value="code",required = false) String code,
-                                                       @RequestParam(value = "page", required = true, defaultValue = "0") Integer page,
+                                                       @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
                                                        @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -408,7 +636,7 @@ public class HDUAPIController {
                                                                     @RequestParam(value = "category", required = false) String category,
                                                                     @RequestParam(value = "code", required = false) String code,
                                                                     @RequestParam(value = "q", required = false) String q,
-                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                    @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                     @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = null;
@@ -513,8 +741,8 @@ public class HDUAPIController {
                                                                     @RequestParam(value = "category", required = false) String category,
                                                                     @RequestParam(value = "code", required = false) String code,
                                                                     @RequestParam(value = "q", required = false) String q,
-                                                                    @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
-                                                                    @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+                                                                    @RequestParam(value="page", defaultValue = "1") Integer page,
+                                                                    @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String namespace = "ICD-CODES";
@@ -545,8 +773,8 @@ public class HDUAPIController {
                                                                       @RequestParam(value = "category", required = false) String category,
                                                                       @RequestParam(value = "code", required = false) String code,
                                                                       @RequestParam(value = "q", required = false) String q,
-                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
-                                                                      @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+                                                                      @RequestParam(value="page", defaultValue = "1") Integer page,
+                                                                      @RequestParam(value="pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String namespace = "ICD-CATEGORIES";
@@ -577,7 +805,7 @@ public class HDUAPIController {
                                                                            @RequestParam(value = "category", required = false) String category,
                                                                            @RequestParam(value = "code", required = false) String code,
                                                                            @RequestParam(value = "q", required = false) String q,
-                                                                           @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                           @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                            @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -609,7 +837,7 @@ public class HDUAPIController {
                                                                        @RequestParam(value = "category", required = false) String category,
                                                                        @RequestParam(value = "code", required = false) String code,
                                                                        @RequestParam(value = "q", required = false) String q,
-                                                                       @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                       @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                        @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
@@ -638,7 +866,7 @@ public class HDUAPIController {
                                                                       @RequestParam(value = "release", required = false) String release,
                                                                       @RequestParam(value = "code", required = false) String code,
                                                                       @RequestParam(value = "q", required = false) String q,
-                                                                      @RequestParam(value="page", required = true, defaultValue = "0") Integer page,
+                                                                      @RequestParam(value="page", required = true, defaultValue = "1") Integer page,
                                                                       @RequestParam(value="pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         Map<String, Object> returnDataObject = new HashMap<>();
         String namespace = "LOINC";

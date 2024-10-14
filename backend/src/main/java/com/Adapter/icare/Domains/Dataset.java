@@ -32,6 +32,8 @@
 package com.Adapter.icare.Domains;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import javax.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -44,8 +46,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table
-public class Datasets extends BaseEntity implements Serializable {
+@Table(name = "datasets")
+public class Dataset extends BaseEntity implements Serializable {
 
     @Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,6 +71,43 @@ public class Datasets extends BaseEntity implements Serializable {
     private String datasetFields;
     
     @ManyToOne
-    private Instances instances;
+    private Instance instances;
+
+    public Map<String,Object> toMap() {
+        Map<String,Object> dataSetMap = new HashMap<>();
+
+        dataSetMap.put("uuid", this.getUuid());
+        dataSetMap.put("code", this.getCode());
+        dataSetMap.put("name", this.getDisplayName());
+        dataSetMap.put("formType", this.getFormType());
+        dataSetMap.put("periodType", this.getPeriodType());
+        dataSetMap.put("formDesignCode", this.getFormDesignCode());
+        dataSetMap.put("timelyDays", this.getTimelyDays());
+        dataSetMap.put("expiryDays", this.getExpiryDays());
+        dataSetMap.put("datasetFields", this.getDatasetFields());
+        dataSetMap.put("instance", this.getInstances().toMap());
+
+        Map<String, Object> createdBy = new HashMap<>();
+        if (this.getCreatedBy() != null) {
+            createdBy.put("uuid", this.getCreatedBy().getUuid());
+            createdBy.put("username", this.getCreatedBy().getUsername());
+            createdBy.put("names", this.getCreatedBy().getFirstName() + " " + this.getCreatedBy().getSurname());
+        } else {
+            createdBy = null;
+        }
+        dataSetMap.put("createdBy",createdBy);
+
+        Map<String, Object> lastUpdatedBy = new HashMap<>();
+        if (this.getLastUpdatedBy() != null) {
+            lastUpdatedBy.put("uuid", this.getLastUpdatedBy().getUuid());
+            lastUpdatedBy.put("username", this.getLastUpdatedBy().getUsername());
+            lastUpdatedBy.put("names", this.getLastUpdatedBy().getFirstName() + " " + this.getLastUpdatedBy().getSurname());
+        } else {
+            lastUpdatedBy = null;
+        }
+        dataSetMap.put("lastUpdatedOn", this.getLastUpdatedOn());
+        dataSetMap.put("lastUpdatedBy",lastUpdatedBy);
+        return dataSetMap;
+    }
     
 }

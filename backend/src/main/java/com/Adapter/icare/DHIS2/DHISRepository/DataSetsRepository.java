@@ -31,16 +31,30 @@
 
 package com.Adapter.icare.DHIS2.DHISRepository;
 
-import com.Adapter.icare.Domains.DataSetElements;
+import com.Adapter.icare.Domains.Dataset;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.Adapter.icare.Domains.Datasets;
 import org.springframework.data.jpa.repository.Query;
 
-public interface DataSetsRepository extends JpaRepository<Datasets,String> {
+import java.math.BigInteger;
+
+public interface DataSetsRepository extends JpaRepository<Dataset,String> {
 
     @Query(value = "SELECT * FROM datasets WHERE uuid=:uuid",nativeQuery = true)
-    Datasets getDatasetInstanceByUuid(String uuid);
+    Dataset getDatasetInstanceByUuid(String uuid);
+
     @Query(value = "SELECT * FROM datasets WHERE id=:id",nativeQuery = true)
-    Datasets getDatasetInstanceById(String id);
+    Dataset getDatasetInstanceById(String id);
+
+    @Query(value = "SELECT * FROM datasets WHERE (:code IS NULL OR code=:code) " +
+            " AND (:formType IS NULL OR form_type=:formType) " +
+            " AND (:instance IS NULL OR instances_id=:instance) " +
+            " AND (:q IS NULL OR display_name LIKE CONCAT('%',:q,'%'))",
+            countQuery = "SELECT COUNT(*) FROM datasets WHERE (:code IS NULL OR code = :code ) " +
+                    " AND (:formType IS NULL OR form_type=:formType) " +
+                    " AND (:instance IS NULL OR instances_id=:instance) " +
+                    " AND (:q IS NULL OR display_name LIKE CONCAT('%',:q,'%'))", nativeQuery = true)
+    Page<Dataset> getDatasetsListByPagination(String code, String formType, String q, BigInteger instance, Pageable pageable);
 }

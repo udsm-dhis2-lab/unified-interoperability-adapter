@@ -33,53 +33,99 @@ package com.Adapter.icare.DHIS2.DHISServices;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
 
+import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Domains.Dataset;
+import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Services.UserService;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import com.Adapter.icare.DHIS2.DHISDomains.RemoteDatasets;
 import com.Adapter.icare.DHIS2.DHISRepository.DataSetsRepository;
-import com.Adapter.icare.Domains.Datasets;
-import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.Instance;
 import com.Adapter.icare.Repository.InstancesRepository;
-
-
 
 @Service
 public class DataSetsService {
-    
+    // TODO: This service requires total refactoring
     private final DataSetsRepository dataSetsRepository;
     private final InstancesRepository instancesRepository;
+    private final UserService userService;
+    private final Authentication authentication;
+    private final User authenticatedUser;
 
-    public DataSetsService(DataSetsRepository dataSetsRepository,InstancesRepository instancesRepository) {
+    public DataSetsService(DataSetsRepository dataSetsRepository,
+                           InstancesRepository instancesRepository,
+                           UserService userService) {
         this.dataSetsRepository = dataSetsRepository;
         this.instancesRepository = instancesRepository;
+        this.userService = userService;
+        this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+        } else {
+            this.authenticatedUser = null;
+            // TODO: Redirect to login page
+        }
     }
 
-    public List<Datasets> GetAllDataSets() {
+    public List<Dataset> getAllDataSets() {
         return dataSetsRepository.findAll();
     }
 
-    public List<RemoteDatasets> getDhis2DataSets(long instanceId) {
-        
+    public Page<Dataset> getDatasetsByPagination(Integer page,
+                                                 Integer pageSize,
+                                                 String code,
+                                                 String formType,
+                                                 String q,
+                                                 BigInteger instance) throws Exception {
+        Pageable pageable = createPageable(page, pageSize);
+        return dataSetsRepository.getDatasetsListByPagination(code,formType,q,instance,pageable);
+    }
+
+    public Map<String,Object> getDhis2DataSets(
+            long instanceId,
+            Integer page,
+            Integer pageSize,
+            String q,
+            String formType,
+            String periodType) throws Exception {
         URL url;
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        //ObjectMapper objectMapper = new ObjectMapper();
+        Map<String,Object> response = new HashMap<>();
         List<RemoteDatasets> remoteDataSetsList = new ArrayList<RemoteDatasets>();
-        Optional<Instances> instance = instancesRepository.findById(instanceId);
-
+        JSONObject pagerInfo = new JSONObject();
         try {
-
-            String instanceurl = instance.get().getUrl();
+            Optional<Instance> instance = instancesRepository.findById(instanceId);
+            String instanceUrl = instance.get().getUrl();
             String username = instance.get().getUsername();
             String password = instance.get().getPassword();
-
-            url = new URL(instanceurl.concat("/api/dataSets?fields=id,code,shortName,name,displayName,formType,version,timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size"));
+            String path = "/api/dataSets?fields=id,code,shortName,name,displayName,formType,version," +
+                    "timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally," +
+                    "renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size" +
+                    "&page=" + page + "&pageSize=" + pageSize;
+            if (q != null) {
+                path += path + "&filter=name:ilike:" + q;
+            }
+            if (formType != null) {
+                path += path + "&filter=formType:eq:" + formType;
+            }
+            if (periodType != null) {
+                path += path + "&filter=periodType:eq:" + periodType;
+            }
+            url = new URL(instanceUrl.concat(path));
 
             HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
 
@@ -89,25 +135,16 @@ public class DataSetsService {
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Content-Type","application/json");
 
-            //int status = httpURLConnection.getResponseCode();
-
             reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             while ((line = reader.readLine()) != null) {
                 responseContent.append(line);
-                
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
-//            System.out.println(jsObject);
-            JSONArray js = jsObject.getJSONArray("dataSets"); 
-            //System.out.println(js);
-
-
+             pagerInfo = jsObject.getJSONObject("pager");
+            JSONArray js = jsObject.getJSONArray("dataSets");
             for (Object ab : js) {
-               // System.out.println(ab);
-
                 JSONObject ourDsObject = new JSONObject(ab.toString());
-
                 Map<String, Object> remoteDataSetMap = new HashMap<String, Object>();
                 remoteDataSetMap.put("id", ourDsObject.getString("id"));
                 remoteDataSetMap.put("displayName", ourDsObject.getString("displayName"));
@@ -161,108 +198,214 @@ public class DataSetsService {
 
                 RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
                 remoteDataSetsList.add(remoteDataSetToAdd);
-
             }
-            
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            throw new Exception(e.getMessage());
         }
 
-        return remoteDataSetsList; 
+        response.put("dataSets",remoteDataSetsList );
+        Map<String,Object> pager = new HashMap<>();
+        pager.put("page", pagerInfo.getInt("page"));
+        pager.put("total", pagerInfo.getInt("total"));
+        pager.put("pageSize", pagerInfo.getInt("pageSize"));
+        pager.put("totalPages", pagerInfo.getInt("pageCount"));
+        response.put("pager", pager);
+        return response;
     }
 
-    public Datasets AddDataSets(Datasets datasets) {
-
-        //Inserting the HTML CODE
+    public RemoteDatasets getDhis2DataSetsByUuid(String dataSet, String instanceUuid) {
         URL url;
         BufferedReader reader;
         String line;
         StringBuffer responseContent = new StringBuffer();
-        long instanceId = datasets.getInstances().getId();
-        Optional<Instances> instance = instancesRepository.findById(instanceId);
-
+        RemoteDatasets remoteDataSetToAdd = new RemoteDatasets();
+        Instance instance = instancesRepository.getInstanceByUuid(instanceUuid);
         try {
 
-            String instanceUrl = instance.get().getUrl();
-            String username = instance.get().getUsername();
-            String password = instance.get().getPassword();
+            String instanceUrl = instance.getUrl();
+            String username = instance.getUsername();
+            String password = instance.getPassword();
 
-            url = new URL(instanceUrl.concat("/api/dataSets/"+datasets.getId()+"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
+            url = new URL(instanceUrl.concat("/api/dataSets/" + dataSet + "?fields=id,code,shortName,name,displayName,formType,version," +
+                    "timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays," +
+                    "dataSetElements[dataElement[id,name,code,valueType,aggregationType,categoryCombo[id,name,categoryOptionCombos[id,name,code]]]]"));
 
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection httpURLConnection = (HttpURLConnection)url.openConnection();
 
             String userCredentials = username.concat(":").concat(password);
             String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
             httpURLConnection.setRequestProperty("Authorization", basicAuth);
             httpURLConnection.setRequestMethod("GET");
-            httpURLConnection.setRequestProperty("Content-Type", "application/json");
-
-            // int status = httpURLConnection.getResponseCode();
+            httpURLConnection.setRequestProperty("Content-Type","application/json");
 
             reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             while ((line = reader.readLine()) != null) {
                 responseContent.append(line);
+
             }
             reader.close();
             JSONObject jsObject = new JSONObject(responseContent.toString());
-            if(jsObject.has("formType")) {
-                String formType = jsObject.getString("formType");
-                datasets.setFormType(formType);
+            JSONArray js = jsObject.getJSONArray("dataSets");
+            for (Object ab : js) {
+
+                JSONObject ourDsObject = new JSONObject(ab.toString());
+
+                Map<String, Object> remoteDataSetMap = new HashMap<String, Object>();
+                remoteDataSetMap.put("id", ourDsObject.getString("id"));
+                remoteDataSetMap.put("displayName", ourDsObject.getString("displayName"));
+
+                if(ourDsObject.has("formType")){
+                    remoteDataSetMap.put("formType", ourDsObject.getString("formType"));
+                }
+
+                if(ourDsObject.has("code")){
+                    remoteDataSetMap.put("code", ourDsObject.getString("code"));
+                }
+                if(ourDsObject.has("shortName")){
+                    remoteDataSetMap.put("shortName",ourDsObject.getString("shortName"));
+                }
+
+                if(ourDsObject.has("periodType")){
+                    remoteDataSetMap.put("periodType",ourDsObject.getString("periodType"));
+                }
+
+                if(ourDsObject.has("dataSetElements")){
+                    remoteDataSetMap.put("dataSetElements",ourDsObject.getJSONArray("dataSetElements"));
+                }
+
+                if(ourDsObject.has("version")){
+                    remoteDataSetMap.put("version",ourDsObject.getInt("version"));
+                }
+
+                if(ourDsObject.has("expiryDays")){
+                    remoteDataSetMap.put("expiryDays",ourDsObject.getInt("expiryDays"));
+                }
+
+                if(ourDsObject.has("timelyDays")){
+                    remoteDataSetMap.put("timelyDays",ourDsObject.getInt("timelyDays"));
+                }
+
+                if(ourDsObject.has("openFuturePeriods")){
+                    remoteDataSetMap.put("openFuturePeriods",ourDsObject.getInt("openFuturePeriods"));
+                }
+
+                if(ourDsObject.has("renderAsTabs")){
+                    remoteDataSetMap.put("renderAsTabs",ourDsObject.getBoolean("renderAsTabs"));
+                }
+
+                if(ourDsObject.has("renderHorizontally")){
+                    remoteDataSetMap.put("renderHorizontally",ourDsObject.getBoolean("renderHorizontally"));
+                }
+
+                if(ourDsObject.has("compulsoryFieldsCompleteOnly")){
+                    remoteDataSetMap.put("compulsoryFieldsCompleteOnly",ourDsObject.getBoolean("compulsoryFieldsCompleteOnly"));
+                }
+
+                remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
+
             }
-            //String htmlForm = jsObject.getJSONObject("dataEntryForm").getString("htmlCode");
-            if(jsObject.has("periodType")) {
-                String periodType = jsObject.getString("periodType");
-                datasets.setPeriodType(periodType);
-            }
-
-            if(jsObject.has("timelyDays")) {
-                int timelyDays = jsObject.getInt("timelyDays");
-                datasets.setTimelyDays(timelyDays);
-            }
-
-            if (jsObject.has("expiryDays")) {
-                int expiryDays = jsObject.getInt("expiryDays");
-                datasets.setExpiryDays(expiryDays);
-            }
-
-            if(jsObject.has("code")) {
-                String code = jsObject.getString("code");
-                datasets.setCode(code);
-            }
-
-            datasets.setDatasetFields(jsObject.toString());
-            //datasets.setFormDesignCode(htmlForm);
-
-
-            //System.out.println(js);
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        UUID uuid = UUID.randomUUID();
-        datasets.setUuid(uuid.toString());
-        return dataSetsRepository.save(datasets);
+        return remoteDataSetToAdd;
     }
 
-    public Optional<Datasets> GetSingleDataSet(String datasetId) {
+    public Dataset addDataSets(String id, String instance) throws Exception {
+        URL url;
+        BufferedReader reader;
+        String line;
+        Dataset dataset = new Dataset();
+        StringBuffer responseContent = new StringBuffer();
+
+        try {
+            Instance instanceDetails = instancesRepository.getInstanceByUuid(instance);
+            if (instanceDetails != null) {
+                dataset.setInstances(instanceDetails);
+                dataset.setId(id);
+                String instanceUrl = instanceDetails.getUrl();
+                String username = instanceDetails.getUsername();
+                String password = instanceDetails.getPassword();
+
+                url = new URL(instanceUrl.concat("/api/dataSets/"+ id +"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
+
+                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+                String userCredentials = username.concat(":").concat(password);
+                String basicAuth = "Basic " + new String(Base64.getEncoder().encode(userCredentials.getBytes()));
+                httpURLConnection.setRequestProperty("Authorization", basicAuth);
+                httpURLConnection.setRequestMethod("GET");
+                httpURLConnection.setRequestProperty("Content-Type", "application/json");
+
+                // int status = httpURLConnection.getResponseCode();
+
+                reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+                while ((line = reader.readLine()) != null) {
+                    responseContent.append(line);
+                }
+                reader.close();
+                JSONObject jsObject = new JSONObject(responseContent.toString());
+                if(jsObject.has("formType")) {
+                    String formType = jsObject.getString("formType");
+                    dataset.setFormType(formType);
+                }
+
+                if(jsObject.has("periodType")) {
+                    String periodType = jsObject.getString("periodType");
+                    dataset.setPeriodType(periodType);
+                }
+
+                if(jsObject.has("timelyDays")) {
+                    int timelyDays = jsObject.getInt("timelyDays");
+                    dataset.setTimelyDays(timelyDays);
+                }
+
+                if (jsObject.has("expiryDays")) {
+                    int expiryDays = jsObject.getInt("expiryDays");
+                    dataset.setExpiryDays(expiryDays);
+                }
+
+                if(jsObject.has("code")) {
+                    String code = jsObject.getString("code");
+                    dataset.setCode(code);
+                }
+
+                dataset.setDatasetFields(jsObject.toString());
+            } else {
+                throw new Exception("Instance provided does not exists");
+            }
+
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+            throw new Exception(e.getMessage());
+        }
+        UUID uuid = UUID.randomUUID();
+        dataset.setUuid(uuid.toString());
+        if (this.authenticatedUser != null) {
+            dataset.setCreatedBy(authenticatedUser);
+        }
+        return dataSetsRepository.save(dataset);
+    }
+
+    public Optional<Dataset> GetSingleDataSet(String datasetId) {
         return dataSetsRepository.findById(datasetId);
     }
 
-    public Datasets getDataSetInstanceByUuid(String uuid) {
+    public Dataset getDataSetInstanceByUuid(String uuid) {
         return dataSetsRepository.getDatasetInstanceByUuid(uuid);
     }
 
-    public Datasets getDataSetInstanceByDataSetId(String dhis2Uid) {
+    public Dataset getDataSetInstanceByDataSetId(String dhis2Uid) {
         return dataSetsRepository.getDatasetInstanceById(dhis2Uid);
     }
 
-    public void deleteDataSets(String datasetId)  {
+    public void deleteDataSet(String uuid)  {
 
-        boolean exists = dataSetsRepository.existsById(datasetId);
-        if (!exists) {
-            throw new IllegalStateException("The instance with id " + datasetId + " does not exist");
+        Dataset dataSet = dataSetsRepository.getDatasetInstanceByUuid(uuid);
+        if (dataSet == null) {
+            throw new IllegalStateException("The dataset instance with uuid " + uuid + " does not exist");
         }
-        dataSetsRepository.deleteById(datasetId);
+        dataSetsRepository.deleteById(dataSet.getId());
     }
 
     public List<RemoteDatasets> getSearchedDataset(long instanceId, String searchTerm) {
@@ -273,7 +416,7 @@ public class DataSetsService {
        String line;
        StringBuffer responseContent = new StringBuffer();
        List<RemoteDatasets> remoteDataSetsList = new ArrayList<RemoteDatasets>();
-       Optional<Instances> instance = instancesRepository.findById(instanceId);
+       Optional<Instance> instance = instancesRepository.findById(instanceId);
 
        try {
 
@@ -318,6 +461,14 @@ public class DataSetsService {
        }
 
        return remoteDataSetsList;
+    }
+
+    private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
+        if (page < 1) {
+            throw new Exception("Page can not be less than zero");
+        } else {
+            return PageRequest.of(page-1, pageSize);
+        }
     }
     
 }

@@ -32,6 +32,8 @@
 package com.Adapter.icare.Domains;
 
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -47,7 +49,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table
+@Table(name = "datasource")
 public class Datasource extends BaseEntity implements Serializable{
 
     @Id
@@ -74,7 +76,33 @@ public class Datasource extends BaseEntity implements Serializable{
             return value;
         }
     }
-    
 
-    
+    public Map<String,Object> toMap() {
+        Map<String, Object> datasourceMap = new HashMap<>();
+
+        datasourceMap.put("uuid", this.getUuid());
+        datasourceMap.put("type", this.getType());
+        datasourceMap.put("url", this.getUrl());
+        Map<String, Object> createdBy = new HashMap<>();
+        if (this.getCreatedBy() != null) {
+            createdBy.put("uuid", this.getCreatedBy().getUuid());
+            createdBy.put("username", this.getCreatedBy().getUsername());
+            createdBy.put("names", this.getCreatedBy().getFirstName() + " " + this.getCreatedBy().getSurname());
+        } else {
+            createdBy = null;
+        }
+        datasourceMap.put("createdBy",createdBy);
+
+        Map<String, Object> lastUpdatedBy = new HashMap<>();
+        if (this.getLastUpdatedBy() != null) {
+            lastUpdatedBy.put("uuid", this.getLastUpdatedBy().getUuid());
+            lastUpdatedBy.put("username", this.getLastUpdatedBy().getUsername());
+            lastUpdatedBy.put("names", this.getLastUpdatedBy().getFirstName() + " " + this.getLastUpdatedBy().getSurname());
+        } else {
+            lastUpdatedBy = null;
+        }
+        datasourceMap.put("lastUpdatedOn", this.getLastUpdatedOn());
+        datasourceMap.put("lastUpdatedBy",lastUpdatedBy);
+        return datasourceMap;
+    }
 }
