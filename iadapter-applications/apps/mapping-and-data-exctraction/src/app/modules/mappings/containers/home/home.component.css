@@ -1,0 +1,13 @@
+nz-select {
+  width: 100%;
+}
+
+.loading-icon {
+  margin-right: 8px;
+}
+
+.view-button {
+  padding-left: 0;
+  margin-left: 0;
+  color: #1890ff;
+}

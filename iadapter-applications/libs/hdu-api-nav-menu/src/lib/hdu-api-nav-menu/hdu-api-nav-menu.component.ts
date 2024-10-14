@@ -48,7 +48,7 @@ export class HduApiNavMenuComponent {
       category: 'main',
       subMenus: [
         {
-          name: 'workflows',
+          name: 'Workflows',
           routeUrl: '/home',
           icon: 'unordered-list',
           subMenus: [],
@@ -62,14 +62,8 @@ export class HduApiNavMenuComponent {
       category: 'main',
       subMenus: [
         {
-          name: 'datasets',
+          name: 'Datasets',
           routeUrl: '',
-          icon: 'unordered-list',
-          subMenus: [],
-        },
-        {
-          name: 'dataset mapping',
-          routeUrl: '/dataset-mapping',
           icon: 'unordered-list',
           subMenus: [],
         },
