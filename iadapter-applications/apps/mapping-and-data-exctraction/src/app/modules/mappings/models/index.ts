@@ -6,3 +6,5 @@ export * from './responses/instance-page';
 export * from './options.model';
 export * from './configuration.model';
 export * from './responses/configuration-page';
+export * from './icd-code.model';
+export * from './responses/icd-code-page';
