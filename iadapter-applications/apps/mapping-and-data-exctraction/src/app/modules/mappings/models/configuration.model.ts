@@ -14,6 +14,14 @@ export class Configuration {
     configuration.value = ConfigurationValue.fromJson(json['value']);
     return configuration;
   }
+
+  toJson (): any {
+    return {
+      key: this.key,
+      group: this.group,
+      value: this.value.toJson(),
+    };
+  }
 }
 
 export class ConfigurationValue {
@@ -31,5 +39,14 @@ export class ConfigurationValue {
       Option.fromJson(option)
     );
     return configurationValue;
+  }
+
+  toJson(): any {
+    return {
+      code: this.code,
+      name: this.name,
+      key: this.key,
+      options: this.options.map((option) => option.toJson()),
+    };
   }
 }

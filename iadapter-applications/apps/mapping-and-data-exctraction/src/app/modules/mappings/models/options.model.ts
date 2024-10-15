@@ -8,4 +8,11 @@ export class Option {
     option.name = json['name'];
     return option;
   }
+
+  toJson(): any {
+    return {
+      code: this.code,
+      name: this.name,
+    };
+  }
 }

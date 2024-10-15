@@ -90,6 +90,10 @@ export class DatasetManagementService {
       );
   }
 
+  addConfiguration () {
+    
+  }
+
   private handleError(error: any): never {
     console.log('ERRORRR', error);
     if (error.status === 401) {
