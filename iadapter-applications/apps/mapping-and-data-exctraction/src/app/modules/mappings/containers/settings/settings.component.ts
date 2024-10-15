@@ -21,7 +21,8 @@ import {
 export class SettingsComponent implements OnDestroy, OnInit {
   settingsForm!: FormGroup;
   optionForm!: FormGroup;
-  options: string[] = [];
+  options: { name: string; code: string }[] = [];
+  isSubmitting = false;
 
   total = 1;
   listOfConfigurations: Configuration[] = [];
@@ -111,8 +112,11 @@ export class SettingsComponent implements OnDestroy, OnInit {
     if (this.optionForm.valid) {
       const optionName = this.optionForm.get('optionName')!.value;
       const optionCode = this.optionForm.get('optionCode')!.value;
-      this.options.push(`${optionName} (${optionCode})`);
-      this.settingsForm.get('options')!.setValue(this.options.join(', '));
+      this.options.push({ name: optionName, code: optionCode });
+      const formattedOptions = this.options
+        .map((option) => `{name: ${option.name}, code: ${option.code}}`)
+        .join(', ');
+      this.settingsForm.get('options')!.setValue(formattedOptions);
       this.optionForm.reset();
     } else {
       console.log('Option form is invalid');
@@ -121,7 +125,30 @@ export class SettingsComponent implements OnDestroy, OnInit {
 
   onSubmit(): void {
     if (this.settingsForm.valid) {
-      console.log(this.settingsForm.value);
+      this.isSubmitting = true;
+      const json = {
+        group: 'MAPPINGS-SETTINGS',
+        key: this.settingsForm.get('configurationCode')!.value,
+        value: {
+          key: this.settingsForm.get('configurationCode')!.value,
+          code: this.settingsForm.get('configurationCode')!.value,
+          name: this.settingsForm.get('configurationName')!.value,
+          options: [...this.options],
+        },
+      };
+
+      this.dataSetManagementService
+        .addConfiguration(Configuration.fromJson(json))
+        .subscribe({
+          next: (repsonse: any) => {
+            this.isSubmitting = false;
+            console.log('RESPONSE SUBMITTING SETTINGS: ', repsonse);
+          },
+          error: (err) => {
+            this.isSubmitting = false;
+            // TODO: Implement error handling
+          },
+        });
     } else {
       console.log('Configuration form is invalid');
     }
