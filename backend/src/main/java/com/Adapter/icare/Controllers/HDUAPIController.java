@@ -5,6 +5,7 @@ import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.DataTemplateDTO;
 import com.Adapter.icare.Dtos.DatastoreConfigurationsDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
@@ -147,19 +148,18 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> passDataToMediator(@RequestBody Map<String, Object> data) throws Exception {
+    public ResponseEntity<String> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
         /**
          * Send data to Mediator where all the logics will be done.
          */
-        System.out.println(workflowEngine);
        try {
            if (shouldUseWorkflowEngine && workflowEngine != null) {
                Map<String, Object> payload = new HashMap<>();
                payload.put("code","dataTemplates");
-               payload.put("data",data);
+               payload.put("payload",dataTemplate.getData());
                return ResponseEntity.ok(mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload));
            } else if (!shouldUseWorkflowEngine) {
-               return ResponseEntity.ok(mediatorsService.sendDataToMediatorWorkflow(data));
+               return ResponseEntity.ok(mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
            } else {
                // TODO: handle warning appropriately
                return null;

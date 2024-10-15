@@ -119,7 +119,6 @@ public class MediatorsService {
 
     public String processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data) throws Exception {
         try {
-            Map<String, Object> response = new HashMap<>();
             return sendDataToExternalSystem(mediator,data, "POST");
         } catch (Exception e) {
             System.err.println(e.getMessage());
