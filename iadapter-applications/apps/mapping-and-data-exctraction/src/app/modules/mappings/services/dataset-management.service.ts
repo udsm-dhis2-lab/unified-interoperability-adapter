@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, map, Observable } from 'rxjs';
 import {
+  Configuration,
   ConfigurationPage,
   Dataset,
   DatasetPage,
@@ -90,8 +91,13 @@ export class DatasetManagementService {
       );
   }
 
-  addConfiguration () {
-    
+  addConfiguration(configuration: Configuration): Observable<any> {
+    return this.httpClient
+      .post<any>(this.configurationUrl, configuration.toJson())
+      .pipe(
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
   }
 
   private handleError(error: any): never {
