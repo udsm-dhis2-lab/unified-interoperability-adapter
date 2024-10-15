@@ -40,8 +40,8 @@
         @for (data of listOfConfigurations; track data.key; let i = $index ) {
         <tr>
           <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
-          <td>{{ data.value.code }}</td>
-          <td>{{ data.value.name }}</td>
+          <td>{{ data.code }}</td>
+          <td>{{ data.name }}</td>
           <td>
             @for (option of data.options; track option.code) {
             <nz-tag style="margin-right: 16px">{{ option.name }}</nz-tag>

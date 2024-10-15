@@ -8,11 +8,11 @@ export class IcdCodePage {
 
   static fromJson(json: any): IcdCodePage {
     const icdCodePage = new IcdCodePage();
-    icdCodePage.total = json.total;
-    icdCodePage.pageIndex = json.pageIndex;
-    icdCodePage.pageSize = json.pageSize;
-    icdCodePage.listOfIcdCodes = json.listOfIcdCodes.map((icdCode: any) =>
-      IcdCode.fromJson(icdCode)
+    icdCodePage.total = json?.pager?.total ?? 0;
+    icdCodePage.pageIndex = json?.pager?.page ?? 0;
+    icdCodePage.pageSize = json?.pager?.pageSize ?? 0;
+    icdCodePage.listOfIcdCodes = (json?.results ?? []).map((item: any) =>
+      IcdCode.fromJson(item)
     );
     return icdCodePage;
   }

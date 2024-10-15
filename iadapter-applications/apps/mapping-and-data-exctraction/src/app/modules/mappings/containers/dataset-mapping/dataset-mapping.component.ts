@@ -10,7 +10,8 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
+import { IcdCodePage } from '../../models';
 
 export interface MappingsData {
   dataElements: string[];
@@ -88,7 +89,7 @@ export class DatasetMappingComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private dataSettementService: DatasetManagementService,
+    private dataSetManagementService: DatasetManagementService,
     private sanitizer: DomSanitizer,
     private renderer: Renderer2,
     private elRef: ElementRef,
@@ -97,11 +98,12 @@ export class DatasetMappingComponent implements OnInit {
 
   ngOnInit(): void {
     this.dataSetUuid = this.route.snapshot.params['uuid'];
+    this.searchIcdCode();
     this.loadDatasetByIdFromServer(this.dataSetUuid);
   }
 
   loadDatasetByIdFromServer(uuid: string) {
-    this.dataSettementService.getInstanceById(uuid).subscribe({
+    this.dataSetManagementService.getInstanceById(uuid).subscribe({
       next: (data: any) => {
         this.isLoading = false;
         const datasetFields = JSON.parse(data.datasetFields);
@@ -139,5 +141,34 @@ export class DatasetMappingComponent implements OnInit {
       this.leftColumnSpan = 16;
       this.rightColumnSpan = 8;
     }
+  }
+
+  searchIcdCode() {
+    const icdList$: Observable<IcdCodePage> = this.searchIcdCodeChange$
+      .asObservable()
+      .pipe(debounceTime(500))
+      .pipe(
+        switchMap((value: string) => {
+          return this.dataSetManagementService.getIcdCodes(1, 10, [
+            { key: 'q', value: [value] },
+          ]);
+        })
+      );
+    icdList$.subscribe({
+      next: (data: any) => {
+        this.isLoadingIcdCodes = false;
+        this.icdCodeOptionList =
+          data?.listOfIcdCodes?.map((item: any) => {
+            return {
+              value: item.code,
+              label: `${item.code}-${item.name}`,
+            };
+          }) ?? [];
+      },
+      error: (error: any) => {
+        // TODO: Implement error handling
+        this.isLoadingIcdCodes = false;
+      },
+    });
   }
 }
