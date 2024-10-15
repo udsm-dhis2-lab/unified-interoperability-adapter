@@ -117,6 +117,30 @@ export class DatasetManagementService {
       );
   }
 
+  selectDatasetForMapping(
+    instanceUuid: string,
+    datasetUuid: string
+  ): Observable<any> {
+    return this.httpClient
+      .post<any>(MappingsUrls.SELECT_DATASET_FOR_MAPPING, {
+        instanceUuid,
+        datasetUuid,
+      })
+      .pipe(
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  removeDatasetForMapping(datasetUuid: string) {
+    return this.httpClient
+      .post<any>(`${MappingsUrls.REMOVE_DATASET_FROM_MAPPING}/${datasetUuid}`, {})
+      .pipe(
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
   private handleError(error: any): never {
     console.log('ERRORRR', error);
     if (error.status === 401) {

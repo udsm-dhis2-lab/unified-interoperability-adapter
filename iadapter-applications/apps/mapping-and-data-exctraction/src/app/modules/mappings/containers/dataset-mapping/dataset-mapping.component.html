@@ -47,8 +47,8 @@
 
             <!-- table  -->
             <div class="column">
-              <!-- <nz-table
-                [nzData]="mappingData.dataElements"
+              <nz-table
+                [nzData]="mappingsData.dataElements"
                 [nzFrontPagination]="false"
               >
                 <thead>
@@ -59,24 +59,24 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (data of mappingData.dataElements; track data) {
+                  @for (data of mappingsData.dataElements; track data) {
                   <tr>
                     <td>{{ data }}</td>
                     <td>
-                      @for (config of mappingData.configurations; track config)
+                      @for (config of mappingsData.configurations; track config)
                       {
                       <p>{{ config }}</p>
                       }
                     </td>
                     <td>
-                      @for (code of mappingData.icdCodes; track code) {
+                      @for (code of mappingsData.icdCodes; track code) {
                       <p>{{ code }}</p>
                       }
                     </td>
                   </tr>
                   }
                 </tbody>
-              </nz-table> -->
+              </nz-table>
             </div>
           </nz-card>
         </div>

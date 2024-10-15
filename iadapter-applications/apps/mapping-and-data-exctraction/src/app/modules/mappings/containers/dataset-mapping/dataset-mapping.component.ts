@@ -11,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { IcdCodePage } from '../../models';
+import { ConfigurationPage, IcdCodePage, Option } from '../../models';
 
 export interface MappingsData {
   dataElements: string[];
@@ -41,16 +41,8 @@ export class DatasetMappingComponent implements OnInit {
   placeHolderForConfigurationSelect: string = 'Select configuration';
   isLoadingConfigurations: boolean = false;
   selectedConfiguration?: string;
-  configurationOptionList: any[] = [
-    {
-      value: 'AgeTYpe: Days',
-      label: 'AgeTYpe: Days',
-    },
-    {
-      value: 'AgeGroup: Under 5',
-      label: 'AgeGroup: Under 5',
-    },
-  ];
+  configurationOptionList: any[] = [];
+
   onSearchConfiguration(value: string): void {
     this.isLoadingConfigurations = true;
     this.searchConfigurationChange$.next(value);
@@ -60,31 +52,17 @@ export class DatasetMappingComponent implements OnInit {
   placeHolderForIcdCodeSelect: string = 'Select ICD Code';
   isLoadingIcdCodes: boolean = false;
   selectedIcdCode?: string;
-  icdCodeOptionList: any[] = [
-    {
-      value: 'AgeTYpe: Days',
-      label: 'AgeTYpe: Days',
-    },
-    {
-      value: 'AgeGroup: Under 5',
-      label: 'AgeGroup: Under 5',
-    },
-  ];
+  icdCodeOptionList: any[] = [];
+
   onSearchIcdCode(value: string): void {
     this.isLoadingIcdCodes = true;
     this.searchIcdCodeChange$.next(value);
   }
 
-  mappingData: MappingsData = {
-    dataElements: [
-      'AttDwO4xCIu-val',
-      'QInmZugn9JO-val',
-      'QInmZugn9JO-val',
-      'QInmZugn9JO-val',
-      'Q8U3fXSfxY8-val',
-    ],
-    configurations: ['AgeTYpe: Days', 'AgeGroup: Under 5'],
-    icdCodes: ['ICD10: I10', 'ICD10: I10', 'ICD10: I10'],
+  mappingsData: MappingsData = {
+    dataElements: [],
+    configurations: [],
+    icdCodes: [],
   };
 
   constructor(
@@ -99,6 +77,7 @@ export class DatasetMappingComponent implements OnInit {
   ngOnInit(): void {
     this.dataSetUuid = this.route.snapshot.params['uuid'];
     this.searchIcdCode();
+    this.searchConfigurations();
     this.loadDatasetByIdFromServer(this.dataSetUuid);
   }
 
@@ -106,9 +85,13 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetManagementService.getInstanceById(uuid).subscribe({
       next: (data: any) => {
         this.isLoading = false;
-        const datasetFields = JSON.parse(data.datasetFields);
+        console.log(
+          'DATA SET FIELDS',
+          data.datasetFields.dataEntryForm.htmlCode
+        );
+        // const datasetFields = JSON.parse(data.datasetFields);
         this.sanitizedContent = this.sanitizer.bypassSecurityTrustHtml(
-          datasetFields.dataEntryForm.htmlCode
+          data.datasetFields.dataEntryForm.htmlCode
         );
         this.cdr.detectChanges();
         this.addFocusListeners();
@@ -118,6 +101,34 @@ export class DatasetMappingComponent implements OnInit {
         // TODO: Implement error handling
       },
     });
+  }
+
+  selectDatasetForMapping(datasetUuid: string, instanceUuid: string) {
+    this.dataSetManagementService
+      .selectDatasetForMapping(instanceUuid, datasetUuid)
+      .subscribe({
+        next: (data: any) => {
+          // TODO: Handle success
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          // TODO: Implement error handling
+        },
+      });
+  }
+
+  removeDatasetFromMapping(datasetUuid: string) {
+    this.dataSetManagementService
+      .removeDatasetForMapping(datasetUuid)
+      .subscribe({
+        next: (data: any) => {
+          // TODO: Handle success
+        },
+        error: (error: any) => {
+          this.isLoading = false;
+          // TODO: Implement error handling
+        },
+      });
   }
 
   addFocusListeners(): void {
@@ -168,6 +179,39 @@ export class DatasetMappingComponent implements OnInit {
       error: (error: any) => {
         // TODO: Implement error handling
         this.isLoadingIcdCodes = false;
+      },
+    });
+  }
+
+  searchConfigurations() {
+    const configurationsList$: Observable<ConfigurationPage> =
+      this.searchConfigurationChange$
+        .asObservable()
+        .pipe(debounceTime(500))
+        .pipe(
+          switchMap((value: string) => {
+            return this.dataSetManagementService.getConfigurations(1, 10, [
+              { key: 'q', value: [value] },
+            ]);
+          })
+        );
+    configurationsList$.subscribe({
+      next: (data: ConfigurationPage) => {
+        this.isLoadingConfigurations = false;
+        this.configurationOptionList =
+          data?.listOfConfigurations?.map((configuration: any) => {
+            configuration.options.map((option: Option) => {
+              return {
+                value: option.code,
+                label: `${option.code}-${option.name}`,
+              };
+            });
+          }) ?? [];
+      },
+      error: (error: any) => {
+        console.log('ERRROOOORRRRR', error);
+        // TODO: Implement error handling
+        this.isLoadingConfigurations = false;
       },
     });
   }
