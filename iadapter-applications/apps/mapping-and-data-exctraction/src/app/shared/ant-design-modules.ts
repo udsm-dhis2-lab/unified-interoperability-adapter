@@ -9,6 +9,8 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { NzInputModule } from 'ng-zorro-antd/input';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -22,4 +24,6 @@ export const antDesignModules = [
   NzCardModule,
   NzSpinModule,
   NzTagModule,
+  NzDrawerModule,
+  NzInputModule,
 ];

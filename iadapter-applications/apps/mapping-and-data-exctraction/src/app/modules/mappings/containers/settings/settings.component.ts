@@ -4,15 +4,25 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { Configuration, ConfigurationPage } from '../../models';
 import { Subscription } from 'rxjs';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import {
+  FormGroup,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, ReactiveFormsModule],
   templateUrl: './settings.component.html',
   styleUrl: './settings.component.css',
 })
 export class SettingsComponent implements OnDestroy, OnInit {
+  settingsForm!: FormGroup;
+  optionForm!: FormGroup;
+  options: string[] = [];
+
   total = 1;
   listOfConfigurations: Configuration[] = [];
   loading = true;
@@ -20,9 +30,25 @@ export class SettingsComponent implements OnDestroy, OnInit {
   pageIndex = 1;
   filterKey = [{ key: '', value: [] }];
 
+  isDrwawerVisible = false;
+
   isFirstLoad = true;
 
-  constructor(private dataSetManagementService: DatasetManagementService) {}
+  constructor(
+    private dataSetManagementService: DatasetManagementService,
+    private fb: NonNullableFormBuilder
+  ) {
+    this.settingsForm = this.fb.group({
+      configurationName: ['', Validators.required],
+      configurationCode: ['', Validators.required],
+      options: ['', Validators.required],
+    });
+
+    this.optionForm = this.fb.group({
+      optionName: ['', Validators.required],
+      optionCode: ['', Validators.required],
+    });
+  }
 
   ngOnInit(): void {
     this.loadConfigurationsFromServer(
@@ -71,5 +97,33 @@ export class SettingsComponent implements OnDestroy, OnInit {
     const { pageSize, pageIndex, filter } = params;
 
     this.loadConfigurationsFromServer(pageIndex, pageSize, filter);
+  }
+
+  onOpenSideDrawer(): void {
+    this.isDrwawerVisible = true;
+  }
+
+  onCloseSideDrawer(): void {
+    this.isDrwawerVisible = false;
+  }
+
+  onAddOption(): void {
+    if (this.optionForm.valid) {
+      const optionName = this.optionForm.get('optionName')!.value;
+      const optionCode = this.optionForm.get('optionCode')!.value;
+      this.options.push(`${optionName} (${optionCode})`);
+      this.settingsForm.get('options')!.setValue(this.options.join(', '));
+      this.optionForm.reset();
+    } else {
+      console.log('Option form is invalid');
+    }
+  }
+
+  onSubmit(): void {
+    if (this.settingsForm.valid) {
+      console.log(this.settingsForm.value);
+    } else {
+      console.log('Configuration form is invalid');
+    }
   }
 }
