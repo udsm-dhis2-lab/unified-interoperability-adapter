@@ -93,9 +93,14 @@
                     nz-button
                     nzType="text"
                     class="view-button"
-                    (click)="goToDataSetMapping(data.uuid ?? data.id)"
+                    (click)="
+                      dataSetAction({
+                        dataSetInstance: data.dataSetInstance,
+                        dataSetId: data.id
+                      })
+                    "
                   >
-                    View
+                    {{ getButtonText(data.dataSetInstance) }}
                   </button>
                 </td>
               </tr>

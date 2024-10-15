@@ -52,10 +52,14 @@ export class SettingsComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
+    const customFilters = [
+      ...this.filterKey,
+      { key: 'group', value: ['MAPPINGS-SETTINGS'] },
+    ];
     this.loadConfigurationsFromServer(
       this.pageIndex,
       this.pageSize,
-      this.filterKey
+      customFilters
     );
   }
 
@@ -96,8 +100,11 @@ export class SettingsComponent implements OnDestroy, OnInit {
       return;
     }
     const { pageSize, pageIndex, filter } = params;
-
-    this.loadConfigurationsFromServer(pageIndex, pageSize, filter);
+    const customFilters = [
+      ...filter,
+      { key: 'group', value: ['MAPPINGS-SETTINGS'] },
+    ];
+    this.loadConfigurationsFromServer(pageIndex, pageSize, customFilters);
   }
 
   onOpenSideDrawer(): void {

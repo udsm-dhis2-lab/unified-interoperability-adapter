@@ -12,6 +12,7 @@ import {
 } from '../models';
 import { HttpParams } from '@angular/common/http';
 import { UnAuothorizedException, UnknownException } from '@models';
+import { CategoryOptionCombo } from '../models/category-option-combo.model';
 
 @Injectable({
   providedIn: 'root',
@@ -123,8 +124,8 @@ export class DatasetManagementService {
   ): Observable<any> {
     return this.httpClient
       .post<any>(MappingsUrls.SELECT_DATASET_FOR_MAPPING, {
-        instanceUuid,
-        datasetUuid,
+        dataSet: datasetUuid,
+        instance: instanceUuid,
       })
       .pipe(
         map((response: any) => console.log(response)),
@@ -134,9 +135,28 @@ export class DatasetManagementService {
 
   removeDatasetForMapping(datasetUuid: string) {
     return this.httpClient
-      .post<any>(`${MappingsUrls.REMOVE_DATASET_FROM_MAPPING}/${datasetUuid}`, {})
+      .delete<any>(
+        `${MappingsUrls.REMOVE_DATASET_FROM_MAPPING}/${datasetUuid}`,
+        {}
+      )
       .pipe(
         map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  getCategoryOptionCombos(dataElementId: string) {
+    return this.httpClient
+      .get<any>(`${MappingsUrls.GET_CATEGORY_OPTION_COMBO}/${dataElementId}`)
+      .pipe(
+        map((response: any) => {
+          console.log('CATEGORY OPTION COMBO', response);
+          return response['categoryCombo']['categoryOptionCombos'].map(
+            (categoryOptionCombo: any) => {
+              return CategoryOptionCombo.fromJson(categoryOptionCombo);
+            }
+          );
+        }),
         catchError((error: any) => this.handleError(error))
       );
   }

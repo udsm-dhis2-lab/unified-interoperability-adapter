@@ -16,6 +16,7 @@ import {
 } from 'rxjs';
 import {
   Dataset,
+  DataSetInstance,
   DatasetPage,
   Instance,
   InstancePage,
@@ -170,7 +171,54 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     );
   }
 
+  dataSetAction(event: {
+    dataSetInstance?: DataSetInstance;
+    dataSetId: string;
+  }) {
+    if (this.selectedInstanceFetchingMechanism === 'selectedDatasets') {
+      this.goToDataSetMapping(event?.dataSetInstance?.uuid!);
+    } else if (event.dataSetInstance) {
+      this.removeDatasetFromMapping(event?.dataSetInstance?.uuid!);
+    } else {
+      this.selectDatasetForMapping(event.dataSetId, this.selectedInstance!);
+    }
+  }
+
+  getButtonText(dataSetInstance?: DataSetInstance): string {
+    if (this.selectedInstanceFetchingMechanism === 'selectedDataset') {
+      return 'View';
+    } else {
+      return dataSetInstance ? 'Remove' : 'Select';
+    }
+  }
+
   goToDataSetMapping(uuid: string) {
     this.router.navigate(['/dataset-mapping', uuid]);
+  }
+
+  selectDatasetForMapping(datasetUuid: string, instanceUuid: string) {
+    this.dataSetManagementService
+      .selectDatasetForMapping(instanceUuid, datasetUuid)
+      .subscribe({
+        next: (data: any) => {
+          // TODO: Handle success
+        },
+        error: (error: any) => {
+          // TODO: Implement error handling
+        },
+      });
+  }
+
+  removeDatasetFromMapping(datasetUuid: string) {
+    this.dataSetManagementService
+      .removeDatasetForMapping(datasetUuid)
+      .subscribe({
+        next: (data: any) => {
+          // TODO: Handle success
+        },
+        error: (error: any) => {
+          // TODO: Implement error handling
+        },
+      });
   }
 }

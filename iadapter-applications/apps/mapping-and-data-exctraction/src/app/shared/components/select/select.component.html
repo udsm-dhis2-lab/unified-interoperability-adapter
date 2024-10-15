@@ -6,6 +6,7 @@
   nzServerSearch
   [(ngModel)]="selectedItem"
   (nzOnSearch)="onSearch($event)"
+  (ngModelChange)="onSelect($event)"
 >
   @if (!isLoading) { @for (option of optionList; track option) {
   <nz-option [nzValue]="option.value" [nzLabel]="option.label"></nz-option>

@@ -11,10 +11,15 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { ConfigurationPage, IcdCodePage, Option } from '../../models';
+import {
+  CategoryOptionCombo,
+  ConfigurationPage,
+  IcdCodePage,
+  Option,
+} from '../../models';
 
 export interface MappingsData {
-  dataElements: string[];
+  disagregations: CategoryOptionCombo[];
   configurations: string[];
   icdCodes: string[];
 }
@@ -27,6 +32,13 @@ export interface MappingsData {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  mappingsData: MappingsData = {
+    disagregations: [],
+    configurations: [],
+    icdCodes: [],
+  };
+
+  isLoadingDisaggregation: boolean = false;
   leftColumnSpan: number = 16;
   rightColumnSpan: number = 8;
 
@@ -48,6 +60,10 @@ export class DatasetMappingComponent implements OnInit {
     this.searchConfigurationChange$.next(value);
   }
 
+  onConfigurationSelect(value: string) {
+    console.log('SELECTED CONFIGURATION', value);
+  }
+
   searchIcdCodeChange$ = new BehaviorSubject('');
   placeHolderForIcdCodeSelect: string = 'Select ICD Code';
   isLoadingIcdCodes: boolean = false;
@@ -59,11 +75,9 @@ export class DatasetMappingComponent implements OnInit {
     this.searchIcdCodeChange$.next(value);
   }
 
-  mappingsData: MappingsData = {
-    dataElements: [],
-    configurations: [],
-    icdCodes: [],
-  };
+  onIcdCodeSelect(value: string) {
+    this.mappingsData.icdCodes = [value];
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -103,34 +117,6 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
-  selectDatasetForMapping(datasetUuid: string, instanceUuid: string) {
-    this.dataSetManagementService
-      .selectDatasetForMapping(instanceUuid, datasetUuid)
-      .subscribe({
-        next: (data: any) => {
-          // TODO: Handle success
-        },
-        error: (error: any) => {
-          this.isLoading = false;
-          // TODO: Implement error handling
-        },
-      });
-  }
-
-  removeDatasetFromMapping(datasetUuid: string) {
-    this.dataSetManagementService
-      .removeDatasetForMapping(datasetUuid)
-      .subscribe({
-        next: (data: any) => {
-          // TODO: Handle success
-        },
-        error: (error: any) => {
-          this.isLoading = false;
-          // TODO: Implement error handling
-        },
-      });
-  }
-
   addFocusListeners(): void {
     const inputElements = this.elRef.nativeElement.querySelectorAll('input');
     inputElements.forEach((input: HTMLInputElement) => {
@@ -139,9 +125,23 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   onInputFocus(event: FocusEvent): void {
+    this.isLoadingDisaggregation = true;
     const inputElement = event.target as HTMLInputElement;
-    const inputId = inputElement.id;
-    this.selectedInputId = inputId;
+    this.selectedInputId = inputElement.id.split('-')[0];
+    this.dataSetManagementService
+      .getCategoryOptionCombos(this.selectedInputId)
+      .subscribe({
+        next: (data: any) => {
+          this.mappingsData.disagregations = [];
+          this.isLoadingDisaggregation = false;
+          this.mappingsData.disagregations = data;
+        },
+        error: (error: any) => {
+          this.isLoadingDisaggregation = false;
+          // TODO: Handle error
+        },
+      });
+    console.log('SELECTED ID*****', this.selectedInputId);
   }
 
   onCollapse() {
@@ -192,6 +192,7 @@ export class DatasetMappingComponent implements OnInit {
           switchMap((value: string) => {
             return this.dataSetManagementService.getConfigurations(1, 10, [
               { key: 'q', value: [value] },
+              { key: 'group', value: ['MAPPINGS-SETTINGS'] },
             ]);
           })
         );
@@ -199,11 +200,11 @@ export class DatasetMappingComponent implements OnInit {
       next: (data: ConfigurationPage) => {
         this.isLoadingConfigurations = false;
         this.configurationOptionList =
-          data?.listOfConfigurations?.map((configuration: any) => {
-            configuration.options.map((option: Option) => {
+          data?.listOfConfigurations?.flatMap((configuration: any) => {
+            return configuration.options.map((option: Option) => {
               return {
                 value: option.code,
-                label: `${option.code}-${option.name}`,
+                label: `${option.code} - ${option.name}`,
               };
             });
           }) ?? [];

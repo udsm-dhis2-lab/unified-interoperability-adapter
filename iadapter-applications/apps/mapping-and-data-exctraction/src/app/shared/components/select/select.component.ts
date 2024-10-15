@@ -14,12 +14,13 @@ export class SelectComponent {
   })
   placeHolder: string = '';
 
-  @Input({
-    required: true,
-  })
+  // @Input({
+  //   required: true,
+  // })
   selectedItem?: string;
 
   @Output() onSearchChange: EventEmitter<string> = new EventEmitter<string>();
+  @Output() onSelectChange = new EventEmitter<string>();
 
   @Input({
     required: true,
@@ -33,5 +34,9 @@ export class SelectComponent {
 
   onSearch(value: string) {
     this.onSearchChange.emit(value);
+  }
+
+  onSelect(value: string): void {
+    this.onSelectChange.emit(value);
   }
 }

@@ -8,3 +8,4 @@ export * from './configuration.model';
 export * from './responses/configuration-page';
 export * from './icd-code.model';
 export * from './responses/icd-code-page';
+export * from './category-option-combo.model';
