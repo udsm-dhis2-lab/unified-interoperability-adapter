@@ -65,68 +65,6 @@
   nzTitle="Create configuration"
   (nzOnClose)="onCloseSideDrawer()"
 >
-  <!-- <form
-    nz-form
-    *nzDrawerContent
-    [formGroup]="settingsForm"
-    (ngSubmit)="onSubmit()"
-  >
-    <div nz-row [nzGutter]="16">
-      <div nz-col nzSpan="12">
-        <nz-form-item>
-          <nz-form-label>Name</nz-form-label>
-          <nz-form-control>
-            <input nz-input placeholder="Enter Configuration name" />
-          </nz-form-control>
-        </nz-form-item>
-      </div>
-      <div nz-col nzSpan="12">
-        <nz-form-item>
-          <nz-form-label>Code</nz-form-label>
-          <nz-form-control>
-            <input nz-input placeholder="Enter Configuration code" />
-          </nz-form-control>
-        </nz-form-item>
-      </div>
-    </div>
-    <div nz-row [nzGutter]="16" style="margin-top: 16px" nzAlign="bottom">
-      <div nz-col nzSpan="8">
-        <nz-form-item>
-          <nz-form-label>Name</nz-form-label>
-          <nz-form-control>
-            <input nz-input placeholder="Enter option name" />
-          </nz-form-control>
-        </nz-form-item>
-      </div>
-      <div nz-col nzSpan="8">
-        <nz-form-item>
-          <nz-form-label>Code</nz-form-label>
-          <nz-form-control>
-            <input nz-input placeholder="Enter option code" />
-          </nz-form-control>
-        </nz-form-item>
-      </div>
-      <div nz-col nzSpan="8">
-        <div nz-row nzJustify="end">
-          <button nz-button>Add option</button>
-        </div>
-      </div>
-    </div>
-    <div nz-row [nzGutter]="8" style="margin-top: 16px">
-      <div nz-col nzSpan="24">
-        <nz-form-item>
-          <nz-form-label>Options</nz-form-label>
-          <nz-form-control>
-            <textarea
-              nz-input
-              placeholder="Please add options above"
-              [nzAutosize]="{ minRows: 4, maxRows: 4 }"
-            ></textarea>
-          </nz-form-control>
-        </nz-form-item>
-      </div>
-    </div>
-  </form> -->
   <div *nzDrawerContent>
     <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
       <div nz-row [nzGutter]="16">
@@ -164,6 +102,7 @@
                 nz-input
                 formControlName="options"
                 placeholder="Options will be populated here"
+                [nzAutosize]="{ minRows: 4 }"
                 readonly
               ></textarea>
             </nz-form-control>
