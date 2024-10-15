@@ -73,7 +73,7 @@ public class SharedHealthRecordsService {
             boolean includeDeceased,
             Integer numberOfVisits
     ) throws Exception {
-        System.out.println(identifier);
+//        System.out.println(identifier);
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
@@ -121,7 +121,7 @@ public class SharedHealthRecordsService {
                     Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
                     Map<String,Object> visitDetails = new HashMap<>();
                     if (encounter != null) {
-                        visitDetails.put("id", null);
+                        visitDetails.put("id", encounter.getIdElement().getIdPart());
                         visitDetails.put("visitDate", encounter.getPeriod().getStart());
                         visitDetails.put("closedDate", encounter.getPeriod().getEnd());
                         visitDetails.put("newThisYear", null);
