@@ -224,7 +224,7 @@ public class HDUAPIController {
                                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
-            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, page,pageSize);
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, null, page,pageSize);
             for (Datastore datastore: pagedDatastoreData.getContent()) {
                 namespaceDetails.add(datastore.getValue());
             }
@@ -302,12 +302,11 @@ public class HDUAPIController {
             } else {
                 Map<String,Object> response = new HashMap<>();
                 response.put("message","Configurations with uuid " + uuid + " does not exists");
-                ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
-        return null;
     }
 
     @GetMapping(value = "configurations/{uuid}", produces = APPLICATION_JSON_VALUE)
@@ -329,13 +328,15 @@ public class HDUAPIController {
     @GetMapping(value = "configurations", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getConfigurations(
             @RequestParam(value="q",required = false) String q,
+            @RequestParam(value="group",required = false) String group,
             @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize
     ) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String namespace = datastoreConstants.ConfigurationsNamespace;
-            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, page,pageSize);
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(
+                    namespace, null, null, q, null, group, page,pageSize);
             for (Datastore datastore: pagedDatastoreData.getContent()) {
                 Map<String, Object> configuration = datastore.getValue();
                 configuration.put("key", datastore.getDataKey());
@@ -691,7 +692,7 @@ public class HDUAPIController {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String namespace = "codeSystems";
-            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, page,pageSize);
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, null, page,pageSize);
             for (Datastore datastore: pagedDatastoreData.getContent()) {
                 namespaceDetails.add(datastore.getValue());
             }
