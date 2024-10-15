@@ -4,4 +4,5 @@ export enum MappingsUrls {
   GET_INSTANCES = 'instances',
   GET_DATASET_BY_ID = 'dataSets',
   GET_CONFIGURATIONS = 'hduApi/configurations',
+  GET_ICD_CODES = 'hduApi/codeSystems/icd/codes',
 }

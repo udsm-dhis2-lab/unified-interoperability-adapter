@@ -6,6 +6,7 @@ import {
   ConfigurationPage,
   Dataset,
   DatasetPage,
+  IcdCodePage,
   InstancePage,
   MappingsUrls,
 } from '../models';
@@ -78,7 +79,6 @@ export class DatasetManagementService {
     pageSize: number,
     filters: Array<{ key: string; value: string[] }>
   ) {
-    console.log('DATAAAA', 'CALLED');
     const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
 
     return this.httpClient
@@ -96,6 +96,23 @@ export class DatasetManagementService {
       .post<any>(this.configurationUrl, configuration.toJson())
       .pipe(
         map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  getIcdCodes(
+    pageIndex: number,
+    pageSize: number,
+    filters: Array<{ key: string; value: string[] }>
+  ): Observable<any> {
+    const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
+
+    return this.httpClient
+      .get<any>(MappingsUrls.GET_ICD_CODES, { params })
+      .pipe(
+        map((response: { results: any }) => {
+          return IcdCodePage.fromJson(response);
+        }),
         catchError((error: any) => this.handleError(error))
       );
   }
