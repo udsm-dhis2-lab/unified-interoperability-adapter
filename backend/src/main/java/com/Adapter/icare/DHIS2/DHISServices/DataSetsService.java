@@ -198,11 +198,14 @@ public class DataSetsService {
                     remoteDataSetMap.put("compulsoryFieldsCompleteOnly",ourDsObject.getBoolean("compulsoryFieldsCompleteOnly"));
                 }
                 // Check if datasets already selected
-                Dataset dataset = dataSetsRepository.getDatasetInstanceById(ourDsObject.getString("id"));
-                if (dataset != null){
-                    remoteDataSetMap.put("selected", Boolean.TRUE);
+                Dataset datasetInstance = dataSetsRepository.getDatasetInstanceById(ourDsObject.getString("id"));
+                if (datasetInstance != null){
+                    Map<String,Object> dataSetObject = new HashMap<>();
+                    dataSetObject.put("uuid", datasetInstance.getUuid());
+                    dataSetObject.put("name", datasetInstance.getDisplayName());
+                    remoteDataSetMap.put("dataSetInstance", dataSetObject);
                 } else {
-                    remoteDataSetMap.put("selected", Boolean.FALSE);
+                    remoteDataSetMap.put("dataSetInstance", null);
                 }
 
                 RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
