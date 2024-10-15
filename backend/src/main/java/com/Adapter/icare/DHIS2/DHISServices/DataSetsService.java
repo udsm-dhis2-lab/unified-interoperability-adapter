@@ -197,6 +197,13 @@ public class DataSetsService {
                 if(ourDsObject.has("compulsoryFieldsCompleteOnly")){
                     remoteDataSetMap.put("compulsoryFieldsCompleteOnly",ourDsObject.getBoolean("compulsoryFieldsCompleteOnly"));
                 }
+                // Check if datasets already selected
+                Dataset dataset = dataSetsRepository.getDatasetInstanceById(ourDsObject.getString("id"));
+                if (dataset != null){
+                    remoteDataSetMap.put("selected", Boolean.TRUE);
+                } else {
+                    remoteDataSetMap.put("selected", Boolean.FALSE);
+                }
 
                 RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
                 remoteDataSetsList.add(remoteDataSetToAdd);

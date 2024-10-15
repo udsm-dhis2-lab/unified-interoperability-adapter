@@ -67,6 +67,8 @@ public class RemoteDatasets {
 
     private String code;
 
+    private boolean selected;
+
     public static RemoteDatasets fromMap(Map<String, Object> RemoteDataSetMap) {
         RemoteDatasets newRemoteDataSet = new RemoteDatasets();
         newRemoteDataSet.setId((String) RemoteDataSetMap.get("id"));
@@ -119,6 +121,9 @@ public class RemoteDatasets {
             newRemoteDataSet.setCompulsoryFieldsCompleteOnly((boolean) RemoteDataSetMap.get("compulsoryFieldsCompleteOnly"));
         }
 
+        if(RemoteDataSetMap.get("selected") != null) {
+            newRemoteDataSet.setSelected( Boolean.valueOf(RemoteDataSetMap.get("selected").toString()));
+        }
         return newRemoteDataSet;
     }
 
