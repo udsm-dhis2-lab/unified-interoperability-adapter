@@ -143,7 +143,6 @@ public class ClientRegistryController {
                     onlyLinkedClients);
             patientDataResponse.put("results", patients);
             Map<String, Object> pager = new HashMap<>();
-            pager.put("total", patients.size());
             pager.put("totalPages", null);
             pager.put("page", page);
             pager.put("pageSize", pageSize);
