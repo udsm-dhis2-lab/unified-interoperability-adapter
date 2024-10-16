@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/hduApi/cr/clients")
+@RequestMapping("/api/v1/hduApi/cr")
 public class ClientRegistryController {
     private final ClientRegistryService clientRegistryService;
     private final DatastoreService datastoreService;
@@ -87,7 +87,7 @@ public class ClientRegistryController {
         }
     }
 
-    @GetMapping("generateIdentifiers")
+    @GetMapping("/generateIdentifiers")
     public ResponseEntity<List<Map<String, Object>>> generateClientIdentifiers(
             @RequestParam(value = "limit", defaultValue = "1") int limit
     ) throws Exception {
@@ -108,7 +108,7 @@ public class ClientRegistryController {
         }
     }
 
-    @GetMapping()
+    @GetMapping("/clients")
     public ResponseEntity<Map<String, Object>> getPatients(
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "1") int page,
@@ -153,7 +153,7 @@ public class ClientRegistryController {
         }
     }
 
-    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/clients", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> saveClient(@RequestBody Map<String, Object> client) throws Exception {
         // TODO: This is just placeholder. Add support to save patient.
         Map<String, Object> patientDataResponse = new HashMap<>();
@@ -164,7 +164,7 @@ public class ClientRegistryController {
         }
     }
 
-    @GetMapping(value = "potentialDuplicates", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/clients/potentialDuplicates", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getPotentialDuplicates(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
@@ -199,7 +199,7 @@ public class ClientRegistryController {
         }
     }
 
-    @PostMapping(value = "merge",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/clients/merge",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> mergePatients(
             @RequestBody ClientsToMergeDTO clientsToMerge
     ) throws Exception {
@@ -245,6 +245,15 @@ public class ClientRegistryController {
 
             return ResponseEntity.ok(mergeResponse);
         } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "/clientsWithNoIdentifier")
+    public ResponseEntity<List<Map<String,Object>>> deleteClientsWithNoIdentifiers() throws Exception {
+        try {
+            return ResponseEntity.ok(this.clientRegistryService.deleteClientsWithNoIdentifiers());
+        }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

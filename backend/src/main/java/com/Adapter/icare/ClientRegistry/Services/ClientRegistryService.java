@@ -158,6 +158,26 @@ public class ClientRegistryService {
         return patient;
     }
 
+    public List<Map<String,Object>> deleteClientsWithNoIdentifiers() throws Exception {
+        Bundle resourceBundle = new Bundle();
+        List<Map<String,Object>> deleteClients = new ArrayList<>();
+        var searchClient =  fhirClient.search().forResource(Patient.class)
+                .where(Patient.IDENTIFIER.isMissing(true));
+        resourceBundle = searchClient.returnBundle(Bundle.class).execute();
+        if (!resourceBundle.getEntry().isEmpty()) {
+            for (Bundle.BundleEntryComponent entry : resourceBundle.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                   Patient patient = (Patient) entry.getResource();
+                   MethodOutcome methodOutcome = fhirClient.delete().resource(patient).execute();
+                   Map<String,Object> client = new HashMap<>();
+                   client.put("id", patient.getIdElement().getIdPart());
+                   deleteClients.add(client);
+                }
+            }
+        }
+        return deleteClients;
+    }
+
     public PatientDTO mapToPatientDTO(Patient patient) {
         List<HumanNameDTO> nameDTOs = patient.hasName() ?
                 patient.getName().stream()
