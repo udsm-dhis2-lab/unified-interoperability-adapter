@@ -247,10 +247,13 @@ export class DatasetMappingComponent implements OnInit {
         this.isLoadingConfigurations = false;
         this.configurationOptionList =
           data?.listOfConfigurations?.flatMap((configuration: any) => {
-            return configuration.options.map((option: Option) => {
+            return configuration.options.map((option: any) => {
+              const label = Object.entries(option)
+                .map(([key, value]) => `${key}: ${value}`)
+                .join(', ');
               return {
-                value: option.code,
-                label: `${option.code} - ${option.name}`,
+                value: label,
+                label: label,
               };
             });
           }) ?? [];

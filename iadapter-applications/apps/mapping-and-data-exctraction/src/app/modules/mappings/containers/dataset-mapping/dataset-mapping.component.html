@@ -39,6 +39,7 @@
               <div nz-col nzSpan="12">
                 <custom-select
                   [placeHolder]="placeHolderForConfigurationSelect"
+                  [isMultiple]="true"
                   [isLoading]="isLoadingConfigurations"
                   [optionList]="configurationOptionList"
                   (onSearchChange)="onSearchConfiguration($event)"
@@ -48,6 +49,7 @@
               <div *ngIf="useIcdCodes" nz-col nzSpan="12">
                 <custom-select
                   [placeHolder]="placeHolderForIcdCodeSelect"
+                  [isMultiple]="false"
                   [isLoading]="isLoadingIcdCodes"
                   [optionList]="icdCodeOptionList"
                   (onSearchChange)="onSearchIcdCode($event)"

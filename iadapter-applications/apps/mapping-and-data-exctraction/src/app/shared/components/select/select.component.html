@@ -1,5 +1,5 @@
 <nz-select
-  nzMode="multiple"
+  [nzMode]="isMultiple ? 'multiple' : 'default'"
   [nzPlaceHolder]="placeHolder"
   nzAllowClear
   nzShowSearch

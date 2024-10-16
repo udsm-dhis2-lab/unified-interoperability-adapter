@@ -43,9 +43,11 @@
           <td>{{ data.code }}</td>
           <td>{{ data.name }}</td>
           <td>
-            @for (option of data.options; track option.code) {
-            <nz-tag style="margin-right: 16px">{{ option.name }}</nz-tag>
-            }
+            <ng-container *ngFor="let option of data.options">
+              <ng-container *ngFor="let key of getKeys(option)">
+                <nz-tag style="margin-right: 16px">{{ key }}: {{ option[key] }}</nz-tag>
+              </ng-container>
+            </ng-container>
           </td>
         </tr>
         }
@@ -64,6 +66,7 @@
   (nzOnClose)="onCloseSideDrawer()"
 >
   <div *nzDrawerContent>
+    <!-- configuration form  -->
     <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
       <div nz-row [nzGutter]="16">
         <div nz-col nzSpan="12">
@@ -100,7 +103,7 @@
                 nz-input
                 formControlName="options"
                 placeholder="Options will be populated here"
-                [nzAutosize]="{ minRows: 4 }"
+                [nzAutosize]="{ minRows: 4, maxRows: 8 }"
                 readonly
               ></textarea>
             </nz-form-control>
@@ -116,15 +119,16 @@
       </div>
     </form>
 
-    <form [formGroup]="optionForm" (ngSubmit)="onAddOption()">
+    <!-- option element form  -->
+    <form [formGroup]="optionElementForm" (ngSubmit)="onAddOptionElement()">
       <div nz-row [nzGutter]="16" style="margin-top: 16px" nzAlign="bottom">
         <div nz-col nzSpan="8">
           <nz-form-item>
-            <nz-form-label>Option Name</nz-form-label>
+            <nz-form-label>Key</nz-form-label>
             <nz-form-control nzErrorTip="Option name is required">
               <input
                 nz-input
-                formControlName="optionName"
+                formControlName="key"
                 placeholder="Enter option name"
               />
             </nz-form-control>
@@ -132,11 +136,11 @@
         </div>
         <div nz-col nzSpan="8">
           <nz-form-item>
-            <nz-form-label>Option Code</nz-form-label>
+            <nz-form-label>Value</nz-form-label>
             <nz-form-control nzErrorTip="Option code is required">
               <input
                 nz-input
-                formControlName="optionCode"
+                formControlName="value"
                 placeholder="Enter option code"
               />
             </nz-form-control>
@@ -144,9 +148,36 @@
         </div>
         <div nz-col nzSpan="8">
           <div nz-row nzJustify="end">
-            <button nz-button [disabled]="!optionForm.valid">Add option</button>
+            <button nz-button [disabled]="!optionElementForm.valid">
+              Add Option element
+            </button>
           </div>
         </div>
+      </div>
+    </form>
+
+    <!-- option form -->
+    <form [formGroup]="optionForm" (ngSubmit)="onAddOption()">
+      <div nz-row [nzGutter]="16" style="margin-top: 16px">
+        <div nz-col nzSpan="24">
+          <nz-form-item>
+            <nz-form-label>Construct option</nz-form-label>
+            <nz-form-control nzErrorTip="Option is required">
+              <textarea
+                nz-input
+                formControlName="option"
+                placeholder="Option is constructed here"
+                [nzAutosize]="{ minRows: 4, maxRows: 6 }"
+                readonly
+              ></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      </div>
+      <div nz-row nzJustify="end" style="margin-top: 16px">
+        <button nz-button nzType="primary" [disabled]="!optionForm.valid">
+          Add option
+        </button>
       </div>
     </form>
   </div>

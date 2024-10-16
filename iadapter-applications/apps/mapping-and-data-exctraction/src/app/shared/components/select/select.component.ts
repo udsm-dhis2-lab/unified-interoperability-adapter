@@ -32,13 +32,21 @@ export class SelectComponent {
   })
   optionList: any[] = [];
 
+  @Input()
+  isMultiple: boolean = true;
+
   onSearch(value: string) {
     this.onSearchChange.emit(value);
   }
 
-  onSelect(value: string[]): void {
-    // Filter out empty strings and ensure only valid selected items are emitted
-    const filteredValue = value.filter((item) => item && item.trim() !== '');
+  onSelect(value: any): void {
+    if (!this.isMultiple) {
+      this.onSelectChange.emit([value]);
+      return;
+    }
+    const filteredValue = value.filter(
+      (item: any) => item && item.trim() !== ''
+    );
     this.onSelectChange.emit(filteredValue);
   }
 }

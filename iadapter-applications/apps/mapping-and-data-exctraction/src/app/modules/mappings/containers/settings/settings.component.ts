@@ -20,8 +20,10 @@ import {
 })
 export class SettingsComponent implements OnDestroy, OnInit {
   settingsForm!: FormGroup;
+  optionElementForm!: FormGroup;
   optionForm!: FormGroup;
-  options: { name: string; code: string }[] = [];
+  options: {}[] = [];
+  optionElements: { [key: string]: string }[] = [];
   isSubmitting = false;
 
   total = 1;
@@ -45,9 +47,13 @@ export class SettingsComponent implements OnDestroy, OnInit {
       options: ['', Validators.required],
     });
 
+    this.optionElementForm = this.fb.group({
+      key: ['', Validators.required],
+      value: ['', Validators.required],
+    });
+
     this.optionForm = this.fb.group({
-      optionName: ['', Validators.required],
-      optionCode: ['', Validators.required],
+      option: ['', Validators.required],
     });
   }
 
@@ -115,16 +121,31 @@ export class SettingsComponent implements OnDestroy, OnInit {
     this.isDrwawerVisible = false;
   }
 
+  onAddOptionElement(): void {
+    if (this.optionElementForm.valid) {
+      const optionElementKey = this.optionElementForm.get('key')!.value;
+      const optionElementValue = this.optionElementForm.get('value')!.value;
+      this.optionElements = {
+        ...this.optionElements,
+        [optionElementKey]: optionElementValue,
+      };
+      const formattedOption = this.optionElements;
+
+      const optionString = JSON.stringify(formattedOption, null, 2);
+      this.optionForm.get('option')!.setValue(optionString);
+      this.optionElementForm.reset();
+    } else {
+      console.log('Option form is invalid');
+    }
+  }
+
   onAddOption(): void {
     if (this.optionForm.valid) {
-      const optionName = this.optionForm.get('optionName')!.value;
-      const optionCode = this.optionForm.get('optionCode')!.value;
-      this.options.push({ name: optionName, code: optionCode });
-      const formattedOptions = this.options
-        .map((option) => `{name: ${option.name}, code: ${option.code}}`)
-        .join(', ');
-      this.settingsForm.get('options')!.setValue(formattedOptions);
+      this.options.push(this.optionElements);
       this.optionForm.reset();
+      this.optionElements = [];
+      const formattedOptions = JSON.stringify(this.options, null, 2);
+      this.settingsForm.get('options')!.setValue(formattedOptions);
     } else {
       console.log('Option form is invalid');
     }
@@ -159,5 +180,9 @@ export class SettingsComponent implements OnDestroy, OnInit {
     } else {
       console.log('Configuration form is invalid');
     }
+  }
+
+  getKeys(obj: any): string[] {
+    return Object.keys(obj);
   }
 }
