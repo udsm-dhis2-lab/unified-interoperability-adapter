@@ -20,7 +20,7 @@ export class SelectComponent {
   selectedItem?: string;
 
   @Output() onSearchChange: EventEmitter<string> = new EventEmitter<string>();
-  @Output() onSelectChange = new EventEmitter<string>();
+  @Output() onSelectChange = new EventEmitter<string[]>();
 
   @Input({
     required: true,
@@ -36,7 +36,9 @@ export class SelectComponent {
     this.onSearchChange.emit(value);
   }
 
-  onSelect(value: string): void {
-    this.onSelectChange.emit(value);
+  onSelect(value: string[]): void {
+    // Filter out empty strings and ensure only valid selected items are emitted
+    const filteredValue = value.filter((item) => item && item.trim() !== '');
+    this.onSelectChange.emit(filteredValue);
   }
 }

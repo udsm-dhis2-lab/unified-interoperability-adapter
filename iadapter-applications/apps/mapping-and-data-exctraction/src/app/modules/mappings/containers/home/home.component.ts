@@ -172,11 +172,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   dataSetAction(event: {
+    dataSetUuid?: string;
     dataSetInstance?: DataSetInstance;
     dataSetId: string;
   }) {
     if (this.selectedInstanceFetchingMechanism === 'selectedDatasets') {
-      this.goToDataSetMapping(event?.dataSetInstance?.uuid!);
+      this.goToDataSetMapping(event.dataSetUuid!);
     } else if (event.dataSetInstance) {
       this.removeDatasetFromMapping(event?.dataSetInstance?.uuid!);
     } else {

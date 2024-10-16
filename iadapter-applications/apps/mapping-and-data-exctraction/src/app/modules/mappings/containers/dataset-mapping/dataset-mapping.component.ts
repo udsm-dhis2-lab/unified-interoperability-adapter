@@ -20,8 +20,6 @@ import {
 
 export interface MappingsData {
   disagregations: CategoryOptionCombo[];
-  configurations: string[];
-  icdCodes: string[];
 }
 
 @Component({
@@ -32,11 +30,47 @@ export interface MappingsData {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  useIcdCodes = false;
+
   mappingsData: MappingsData = {
     disagregations: [],
-    configurations: [],
-    icdCodes: [],
   };
+
+  selectedICdCodes: string[] = [];
+
+  disaggregationRowChecked = false;
+  indeterminate = false;
+  setOfCheckedId = new Set<string>();
+
+  updateCheckedSet(id: string, checked: boolean): void {
+    if (checked) {
+      this.setOfCheckedId.add(id);
+    } else {
+      this.setOfCheckedId.delete(id);
+    }
+  }
+
+  onDisaggregationRowChecked(id: string, checked: boolean): void {
+    this.updateCheckedSet(id, checked);
+    this.refreshDisaggregationCheckedStatus();
+  }
+
+  onAllDisaggregationRowsChecked(value: boolean): void {
+    this.mappingsData.disagregations.forEach((item) =>
+      this.updateCheckedSet(item.id, value)
+    );
+    this.refreshDisaggregationCheckedStatus();
+  }
+
+  refreshDisaggregationCheckedStatus(): void {
+    this.disaggregationRowChecked = this.mappingsData.disagregations.every(
+      (item) => this.setOfCheckedId.has(item.id)
+    );
+    this.indeterminate =
+      this.mappingsData.disagregations.some((item) =>
+        this.setOfCheckedId.has(item.id)
+      ) && !this.disaggregationRowChecked;
+  }
 
   isLoadingDisaggregation: boolean = false;
   leftColumnSpan: number = 16;
@@ -60,8 +94,19 @@ export class DatasetMappingComponent implements OnInit {
     this.searchConfigurationChange$.next(value);
   }
 
-  onConfigurationSelect(value: string) {
-    console.log('SELECTED CONFIGURATION', value);
+  onConfigurationSelect(value: string[]) {
+    this.assignConfigurationToSelectedDisaggregation(value);
+  }
+
+  assignConfigurationToSelectedDisaggregation(configuration: string[]): void {
+    this.mappingsData.disagregations.forEach((item) => {
+      if (this.setOfCheckedId.has(item.id)) {
+        if (!item.configurations) {
+          item.configurations = [];
+        }
+        item.configurations = configuration;
+      }
+    });
   }
 
   searchIcdCodeChange$ = new BehaviorSubject('');
@@ -75,8 +120,8 @@ export class DatasetMappingComponent implements OnInit {
     this.searchIcdCodeChange$.next(value);
   }
 
-  onIcdCodeSelect(value: string) {
-    this.mappingsData.icdCodes = [value];
+  onIcdCodeSelect(value: string[]) {
+    this.selectedICdCodes = value;
   }
 
   constructor(
@@ -135,6 +180,7 @@ export class DatasetMappingComponent implements OnInit {
           this.mappingsData.disagregations = [];
           this.isLoadingDisaggregation = false;
           this.mappingsData.disagregations = data;
+          this.refreshDisaggregationCheckedStatus();
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;

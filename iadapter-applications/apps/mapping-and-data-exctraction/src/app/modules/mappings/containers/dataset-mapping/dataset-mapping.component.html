@@ -8,55 +8,71 @@
           </nz-card>
         </div>
         <div nz-col [nzSpan]="rightColumnSpan">
-          <nz-card class="card">
-            <!-- collapse button  -->
-            <button
-              nz-button
-              nzType="default"
-              (click)="onCollapse()"
-              class="collapse-button"
-            >
-              <span
-                nz-icon
-                [nzType]="leftColumnSpan === 8 ? 'right' : 'left'"
-                nzTheme="outline"
-              ></span>
-            </button>
+          <div nz-row nzJustify="space-between">
+            <div nz-col nzSpan="12">
+              <!-- collapse button  -->
+              <button
+                nz-button
+                nzType="default"
+                (click)="onCollapse()"
+                class="collapse-button"
+              >
+                <span
+                  nz-icon
+                  [nzType]="leftColumnSpan === 8 ? 'right' : 'left'"
+                  nzTheme="outline"
+                ></span>
+              </button>
+            </div>
+            <div nz-col nzSpan="12">
+              <div nz-row nzJustify="end">
+                <label nz-checkbox [(ngModel)]="useIcdCodes"
+                  >Use Icd codes</label
+                >
+              </div>
+            </div>
+          </div>
 
+          <nz-card class="card">
             <!-- selecting configurations options -->
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
-                <!-- <custom-select
+                <custom-select
                   [placeHolder]="placeHolderForConfigurationSelect"
                   [isLoading]="isLoadingConfigurations"
                   [optionList]="configurationOptionList"
-                  [selectedItem]="selectedConfiguration"
                   (onSearchChange)="onSearchConfiguration($event)"
-                ></custom-select> -->
-                <custom-select
-                [placeHolder]="placeHolderForConfigurationSelect"
-                [isLoading]="isLoadingConfigurations"
-                [optionList]="configurationOptionList"
-                (onSearchChange)="onSearchConfiguration($event)"
-                (onSelectChange)="onConfigurationSelect($event)"
-              ></custom-select>
+                  (onSelectChange)="onConfigurationSelect($event)"
+                ></custom-select>
               </div>
-              <div nz-col nzSpan="12">
-                <!-- <custom-select
+              <div *ngIf="useIcdCodes" nz-col nzSpan="12">
+                <custom-select
                   [placeHolder]="placeHolderForIcdCodeSelect"
                   [isLoading]="isLoadingIcdCodes"
                   [optionList]="icdCodeOptionList"
-                  [selectedItem]="selectedConfiguration"
                   (onSearchChange)="onSearchIcdCode($event)"
-                ></custom-select> -->
-                <custom-select
-                [placeHolder]="placeHolderForIcdCodeSelect"
-                [isLoading]="isLoadingIcdCodes"
-                [optionList]="icdCodeOptionList"
-                (onSearchChange)="onSearchIcdCode($event)"
-                (onSelectChange)="onIcdCodeSelect($event)"
-              ></custom-select>
+                  (onSelectChange)="onIcdCodeSelect($event)"
+                ></custom-select>
               </div>
+            </div>
+
+            <!-- list of selected icd codes  -->
+            <div
+              *ngIf="useIcdCodes"
+              nz-row
+              style="margin-top: 16px; margin-bottom: 16px"
+            >
+              <nz-card style="width: 100%">
+                @for (icdCode of selectedICdCodes?? []; track $index) {
+                <nz-tag>{{ icdCode ?? '' }}</nz-tag>
+                }
+              </nz-card>
+              <!-- <nz-collapse-panel
+                nzHeader="Selected ICD codes"
+                [nzActive]="useIcdCodes"
+              >
+               
+              </nz-collapse-panel> -->
             </div>
 
             <!-- table  -->
@@ -68,24 +84,28 @@
               >
                 <thead>
                   <tr>
+                    <th
+                      [(nzChecked)]="disaggregationRowChecked"
+                      [nzIndeterminate]="indeterminate"
+                      (nzCheckedChange)="onAllDisaggregationRowsChecked($event)"
+                    ></th>
                     <th>Disaggregation</th>
                     <th>Configurations</th>
-                    <th>ICD Codes</th>
                   </tr>
                 </thead>
                 <tbody>
                   @for (data of mappingsData.disagregations; track data.id) {
                   <tr>
+                    <td
+                      [nzChecked]="setOfCheckedId.has(data.id)"
+                      (nzCheckedChange)="
+                        onDisaggregationRowChecked(data.id, $event)
+                      "
+                    ></td>
                     <td>{{ data.name }}</td>
                     <td>
-                      @for (config of mappingsData.configurations; track config)
-                      {
-                      <p>{{ config ?? '' }}</p>
-                      }
-                    </td>
-                    <td>
-                      @for (code of mappingsData.icdCodes; track code) {
-                      <p>{{ code ?? '' }}</p>
+                      @for (config of data.configurations ?? []; track $index) {
+                      <nz-tag>{{ config ?? '' }}</nz-tag>
                       }
                     </td>
                   </tr>
