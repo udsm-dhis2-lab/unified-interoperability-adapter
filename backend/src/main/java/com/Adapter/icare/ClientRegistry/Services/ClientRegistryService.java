@@ -163,6 +163,7 @@ public class ClientRegistryService {
         List<Map<String,Object>> deleteClients = new ArrayList<>();
         List<Map<String,Object>> clientsFailed = new ArrayList<>();
         var searchClient =  fhirClient.search().forResource(Patient.class);
+        // TODO: ENsure the number of clients to be loaded is dynamic
         resourceBundle = searchClient.count(1000).returnBundle(Bundle.class).execute();
         if (!resourceBundle.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : resourceBundle.getEntry()) {
@@ -183,6 +184,7 @@ public class ClientRegistryService {
                            clientsFailed.add(client);
                            e.printStackTrace();  // This will log the internal server error details
                        }
+                       Thread.sleep(100);
                    }
                 }
             }
