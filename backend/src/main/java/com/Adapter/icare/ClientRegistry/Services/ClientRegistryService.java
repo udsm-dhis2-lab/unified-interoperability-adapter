@@ -98,7 +98,7 @@ public class ClientRegistryService {
             }
 
             response = searchClient.count(pageSize)
-                    .offset(page)
+                    .offset(page-1)
                     .returnBundle(Bundle.class)
                     .execute();
             Bundle clientTotalBundle = searchClient

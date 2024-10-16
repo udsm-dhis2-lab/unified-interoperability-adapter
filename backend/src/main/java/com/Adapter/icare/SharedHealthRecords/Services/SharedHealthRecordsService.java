@@ -5,6 +5,7 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
+import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
@@ -60,6 +61,121 @@ public class SharedHealthRecordsService {
             this.authenticatedUser = null;
             // TODO: Redirect to login page
         }
+    }
+
+    public Map<String, Object> getSharedRecordsWithPagination(
+            Integer page,
+            Integer pageSize,
+            String identifier,
+            String identifierType,
+            boolean onlyLinkedClients,
+            String gender,
+            String firstName,
+            String middleName,
+            String lastName,
+            String hfrCode,
+            boolean includeDeceased,
+            Integer numberOfVisits
+    ) throws Exception {
+        List<Map<String,Object>> sharedRecords =  new ArrayList<>();
+        Bundle response = new Bundle();
+        var searchRecords =  fhirClient.search().forResource(Patient.class);
+        if (onlyLinkedClients) {
+            // TODO replace hardcoded ids with dynamic ones
+            searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
+        }
+
+        // TODO: Review the deceased concept
+        if (!includeDeceased) {
+//            searchRecords.where(Patient.DECEASED.isMissing(true));
+        }
+//                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
+        if (identifier != null) {
+            searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
+        }
+
+        if (firstName != null) {
+            searchRecords.where(Patient.GIVEN.matches().value(firstName));
+        }
+
+        response = searchRecords.count(pageSize)
+                .offset(page -1)
+                .returnBundle(Bundle.class)
+                .execute();
+        Bundle clientTotalBundle = searchRecords
+                .summaryMode(SummaryEnum.COUNT)
+                .returnBundle(Bundle.class)
+                .execute();
+
+        if (!response.getEntry().isEmpty()) {
+            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                    Map<String, Object> templateData = new HashMap<>();
+                    Patient patient = (Patient) entry.getResource();
+                    try {
+                        PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
+                        templateData.put("id", patientDTO.getId());
+                        // TODO: Provided HFR code is provided find a way to return relevant identifiers
+                        templateData.put("demographicDetails", patientDTO.toMap());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    templateData.put("paymentDetails", null);
+                    Organization organization = null;
+                    if (hfrCode !=null) {
+                        try {
+                            Bundle bundle = new Bundle();
+                            bundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode)).returnBundle(Bundle.class)
+                                    .execute();
+                            for (Bundle.BundleEntryComponent bundleEntryComponent : bundle.getEntry()) {
+                                if (bundleEntryComponent.getResource() instanceof Organization) {
+                                    organization = (Organization) bundleEntryComponent.getResource();
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    templateData.put("facilityDetails", organization != null ?
+                            new OrganizationDTO(
+                                    organization.getId(),
+                                    organization.getIdentifier(),
+                                    organization.getName(),
+                                    organization.getActive()).toSummary(): null);
+
+                    // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
+                    Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
+                    Map<String,Object> visitDetails = new HashMap<>();
+                    if (encounter != null) {
+                        visitDetails.put("id", encounter.getIdElement().getIdPart());
+                        visitDetails.put("visitDate", encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ?  encounter.getPeriod().getStart(): null);
+                        visitDetails.put("closedDate", encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd(): null);
+                        visitDetails.put("newThisYear", null);
+                        visitDetails.put("new", null);
+                        // TODO: Add history when numberOfVisits > 1
+                    } else if (organization != null) {
+                        // TODO: Request visit from facility provided
+                        visitDetails = null;
+                    } else {
+                        visitDetails = null;
+                    }
+                    templateData.put("visitDetails", visitDetails);
+
+                    templateData.put("diagnosisDetails", null);
+
+                    sharedRecords.add(templateData);
+                }
+            }
+        }
+        Map<String,Object> sharedRecordsResponse = new HashMap<>();
+        sharedRecordsResponse.put("results", sharedRecords);
+        Map<String, Object> pager = new HashMap<>();
+        pager.put("total", clientTotalBundle.getTotal());
+        pager.put("totalPages", null);
+        pager.put("page", page);
+        pager.put("pageSize", pageSize);
+        sharedRecordsResponse.put("pager",pager);
+        return sharedRecordsResponse;
     }
 
     public List<Map<String, Object>> getSharedRecords(

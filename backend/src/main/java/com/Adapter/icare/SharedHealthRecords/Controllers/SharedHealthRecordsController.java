@@ -61,8 +61,7 @@ public class SharedHealthRecordsController {
             @RequestParam( value = "numberOfVisits", defaultValue = "1") Integer numberOfVisits
     ) throws Exception {
         try {
-            Map<String,Object> sharedRecordsResponse = new HashMap<>();
-            List<Map<String,Object>> sharedRecords = this.sharedHealthRecordsService.getSharedRecords(
+            Map<String,Object> sharedRecordsResponse = this.sharedHealthRecordsService.getSharedRecordsWithPagination(
                     page,
                     pageSize,
                     id,
@@ -75,13 +74,6 @@ public class SharedHealthRecordsController {
                     hfrCode,
                     includeDeceased,
                     numberOfVisits);
-            sharedRecordsResponse.put("results", sharedRecords);
-            Map<String, Object> pager = new HashMap<>();
-            pager.put("total", null);
-            pager.put("totalPages", null);
-            pager.put("page", page);
-            pager.put("pageSize", pageSize);
-            sharedRecordsResponse.put("pager",pager);
             return ResponseEntity.ok(sharedRecordsResponse);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
