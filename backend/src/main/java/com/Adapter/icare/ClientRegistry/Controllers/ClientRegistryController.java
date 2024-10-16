@@ -253,7 +253,7 @@ public class ClientRegistryController {
     }
 
     @DeleteMapping(value = "/clientsWithNoIdentifier")
-    public ResponseEntity<List<Map<String,Object>>> deleteClientsWithNoIdentifiers() throws Exception {
+    public ResponseEntity<Map<String,Object>> deleteClientsWithNoIdentifiers() throws Exception {
         try {
             return ResponseEntity.ok(this.clientRegistryService.deleteClientsWithNoIdentifiers());
         }   catch (Exception e) {
