@@ -53,6 +53,81 @@ public class ClientRegistryService {
         return fhirClient.update().resource(patient).execute();
     }
 
+    public Map<String,Object> getPatientsWithPagination(
+            int page,
+            int pageSize,
+            String status,
+            String identifier,
+            String identifierType,
+            String gender,
+            String firstName,
+            String middleName,
+            String lastName,
+            Date dateOfBirth,
+            Boolean onlyLinkedClients
+    ) throws Exception {
+        Map<String,Object> patientDataResponse = new HashMap<>();
+        try {
+            List<Map<String, Object>> patients = new ArrayList<>();
+            Bundle response = new Bundle();
+            // TODO: You might consider enumerating the gender codes
+            var searchClient =  fhirClient.search().forResource(Patient.class);
+            if (identifier != null) {
+                searchClient.where(Patient.IDENTIFIER.exactly().identifier(identifier));
+            }
+
+            if (onlyLinkedClients != null) {
+                // TODO replace hardcoded ids with dynamic ones
+                searchClient.where(Patient.LINK.hasAnyOfIds("299","152"));
+            }
+
+            if (gender != null) {
+                searchClient.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
+            }
+
+            if (lastName != null) {
+                searchClient.where(Patient.FAMILY.matches().value(lastName));
+            }
+
+            if (firstName != null) {
+                searchClient.where(Patient.GIVEN.matches().value(firstName));
+            }
+
+            if (dateOfBirth != null) {
+                searchClient.where(Patient.BIRTHDATE.beforeOrEquals().day(dateOfBirth));
+            }
+
+            response = searchClient.count(pageSize)
+                    .offset(page)
+                    .returnBundle(Bundle.class)
+                    .execute();
+            Bundle clientTotalBundle = searchClient
+                    .summaryMode(SummaryEnum.COUNT)
+                    .returnBundle(Bundle.class)
+                    .execute();
+
+            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                    Patient patientData = (Patient) entry.getResource();
+                    patientData.getIdentifier();
+                    PatientDTO patientDTO = mapToPatientDTO(patientData);
+                    patients.add(patientDTO.toMap());
+                }
+            }
+            patientDataResponse.put("results", patients);
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("totalPages", null);
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("total", clientTotalBundle.getTotal());
+            patientDataResponse.put("pager", pager);
+            return patientDataResponse;
+        }  catch (Exception e) {
+            e.printStackTrace(); // Log the exception for referencing via logs
+            throw new RuntimeException("Failed to retrieve patients from FHIR server", e);
+        }
+    }
+
     public List<Map<String, Object>> getPatients(int page,
                                                  int pageSize,
                                                  String status,
@@ -96,6 +171,10 @@ public class ClientRegistryService {
 
             response = searchClient.count(pageSize)
                     .offset(page)
+                    .returnBundle(Bundle.class)
+                    .execute();
+            Bundle clientTotalBundle = searchClient
+                    .summaryMode(SummaryEnum.COUNT)
                     .returnBundle(Bundle.class)
                     .execute();
 

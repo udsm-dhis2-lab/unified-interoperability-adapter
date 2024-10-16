@@ -128,8 +128,7 @@ public class ClientRegistryController {
         // TODO: Add support to use configured default workflow engine
 
         try {
-            Map<String, Object> patientDataResponse = new HashMap<>();
-            List<Map<String, Object>> patients = clientRegistryService.getPatients(
+            Map<String, Object> patientDataResponse = clientRegistryService.getPatientsWithPagination(
                     page,
                     pageSize,
                     status,
@@ -141,14 +140,6 @@ public class ClientRegistryController {
                     lastName,
                     dateOfBirth,
                     onlyLinkedClients);
-            patientDataResponse.put("results", patients);
-            Map<String, Object> pager = new HashMap<>();
-            pager.put("totalPages", null);
-            pager.put("page", page);
-            pager.put("pageSize", pageSize);
-            // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
-            pager.put("total", clientRegistryService.getTotalPatients());
-            patientDataResponse.put("pager", pager);
             return ResponseEntity.ok(patientDataResponse);
         }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
