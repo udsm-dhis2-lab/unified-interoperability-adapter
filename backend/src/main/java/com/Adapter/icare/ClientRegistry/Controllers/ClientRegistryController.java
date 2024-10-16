@@ -93,10 +93,11 @@ public class ClientRegistryController {
     ) throws Exception {
         try {
             String regex = clientRegistryConstants.ClientRegistryIdentifierRegex;
-            if (Boolean.valueOf(clientRegistryConstants.GenerateClientIdentifier)) {
+            if (Boolean.parseBoolean(clientRegistryConstants.GenerateClientIdentifier)) {
                 List<Map<String,Object>> identifierPayload = new ArrayList<>();
                 for(int count= 0; count < limit; count++) {
                     // TODO: Add logic for generating ids using the provided pattern
+
                 }
                 return ResponseEntity.ok(identifierPayload);
             } else {
@@ -255,6 +256,19 @@ public class ClientRegistryController {
             return ResponseEntity.ok(this.clientRegistryService.deleteClientsWithNoIdentifiers());
         }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "/clients/metaData")
+    public ResponseEntity<Map<String,Object>> getClientsMetaData() throws Exception {
+        try {
+            String namespace = datastoreConstants.ResourcesMetadataNamespace;
+            String key = datastoreConstants.ClientsMetadataKey;
+            Datastore datastore =datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+            return ResponseEntity.ok(datastore.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
     }
 }

@@ -147,6 +147,19 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "dataTemplates/metaData", produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String,Object>> getDataTemplatesMetaData() throws Exception {
+        try {
+            String namespace = datastoreConstants.ResourcesMetadataNamespace;
+            String key = datastoreConstants.DataTemplateMetadataKey;
+            Datastore datastore =datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+            return ResponseEntity.ok(datastore.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
+
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<String> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
         /**

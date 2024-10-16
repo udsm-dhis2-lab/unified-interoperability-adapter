@@ -19,4 +19,13 @@ public class DatastoreConstants {
 
     @Value("${DATASTORE_MAPPINGS_NAMESPACE_FILTER:MAPPINGS-}")
     public String MappingsNamespaceFilter;
+
+    @Value("${DATASTORE_RESOURCE_METADATA_NAMESPACE:METADATA}")
+    public String ResourcesMetadataNamespace;
+
+    @Value("${DATASTORE_KEY_FOR_CLIENT_METADATA:CLIENTS}")
+    public String ClientsMetadataKey;
+
+    @Value("${DATASTORE_KEY_FOR_DATA_TEMPLATE_METADATA:DATA-TEMPLATE}")
+    public String DataTemplateMetadataKey;
 }
