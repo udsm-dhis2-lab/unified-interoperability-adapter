@@ -1,28 +1,28 @@
 package com.Adapter.icare.SharedHealthRecords.Services;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.DemographicDetailsDTO;
-import com.Adapter.icare.Dtos.PatientDTO;
+import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
-import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Encounter;
-import org.hl7.fhir.r4.model.Organization;
-import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import javax.security.auth.Subject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +33,7 @@ public class SharedHealthRecordsService {
 
     private final IGenericClient fhirClient;
     private final FHIRConstants fhirConstants;
+    private final ClientRegistryConstants clientRegistryConstants;
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
@@ -43,11 +44,13 @@ public class SharedHealthRecordsService {
             FHIRConstants fhirConstants,
             UserService userService,
             ClientRegistryService clientRegistryService,
-            MediatorsService mediatorsService) {
+            MediatorsService mediatorsService,
+            ClientRegistryConstants clientRegistryConstants) {
         this.fhirConstants = fhirConstants;
         this.userService = userService;
         this.clientRegistryService = clientRegistryService;
         this.mediatorsService = mediatorsService;
+        this.clientRegistryConstants = clientRegistryConstants;
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirClient =  fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -73,7 +76,6 @@ public class SharedHealthRecordsService {
             boolean includeDeceased,
             Integer numberOfVisits
     ) throws Exception {
-//        System.out.println(identifier);
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
@@ -103,27 +105,47 @@ public class SharedHealthRecordsService {
         if (!response.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
-                    // System.out.println("TESTING");
                     Map<String, Object> templateData = new HashMap<>();
                     Patient patient = (Patient) entry.getResource();
-                    PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
-                    templateData.put("id", patientDTO.getId());
-                    // TODO: Provided HFR code is provided find a way to return relevant identifiers
-                    templateData.put("demographicDetails", patientDTO.toMap());
+                    try {
+                        PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
+                        templateData.put("id", patientDTO.getId());
+                        // TODO: Provided HFR code is provided find a way to return relevant identifiers
+                        templateData.put("demographicDetails", patientDTO.toMap());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
 
-                    templateData.put("facilityDetails", patientDTO.toMap().get("organisation"));
                     templateData.put("paymentDetails", null);
                     Organization organization = null;
                     if (hfrCode !=null) {
-                        organization = (Organization) fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode));
+                        try {
+                            Bundle bundle = new Bundle();
+                            bundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode)).returnBundle(Bundle.class)
+                                    .execute();
+                            for (Bundle.BundleEntryComponent bundleEntryComponent : bundle.getEntry()) {
+                                if (bundleEntryComponent.getResource() instanceof Organization) {
+                                    organization = (Organization) bundleEntryComponent.getResource();
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
+                    templateData.put("facilityDetails", organization != null ?
+                            new OrganizationDTO(
+                                    organization.getId(),
+                                    organization.getIdentifier(),
+                                    organization.getName(),
+                                    organization.getActive()).toSummary(): null);
+
                     // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
                     Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
                     Map<String,Object> visitDetails = new HashMap<>();
                     if (encounter != null) {
                         visitDetails.put("id", encounter.getIdElement().getIdPart());
-                        visitDetails.put("visitDate", encounter.getPeriod().getStart());
-                        visitDetails.put("closedDate", encounter.getPeriod().getEnd());
+                        visitDetails.put("visitDate", encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ?  encounter.getPeriod().getStart(): null);
+                        visitDetails.put("closedDate", encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd(): null);
                         visitDetails.put("newThisYear", null);
                         visitDetails.put("new", null);
                         // TODO: Add history when numberOfVisits > 1
@@ -149,7 +171,7 @@ public class SharedHealthRecordsService {
         var encounterSearch = fhirClient.search().forResource(Encounter.class)
                 .where(new ReferenceClientParam("patient").hasId(id));
         if (organization != null) {
-            encounterSearch.where(Encounter.SERVICE_PROVIDER.hasAnyOfIds(organization.getId()));
+            encounterSearch.where(Encounter.SERVICE_PROVIDER.hasAnyOfIds(organization.getIdElement().getIdPart()));
         }
         results = encounterSearch.sort(new SortSpec("date").setOrder(SortOrderEnum.DESC))
                 .returnBundle(Bundle.class)
@@ -186,8 +208,65 @@ public class SharedHealthRecordsService {
     public Map<String,Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload) throws Exception {
         Map<String,Object> response = new HashMap<>();
         DemographicDetailsDTO demographicDetails = sharedRecordPayload.getDemographicDetails();
+        FacilityDetailsDTO facilityDetails = sharedRecordPayload.getFacilityDetails();
+        VisitDetailsDTO visitDetails = sharedRecordPayload.getVisitDetails();
         // Check if patient exists
+        List<IdentifierDTO> identifiers = demographicDetails.getIdentifiers();
+        Patient patient = new Patient();
+        String defaultIdentifierType = this.clientRegistryConstants.DefaultIdentifierType;
+        for (IdentifierDTO identifier: identifiers) {
+            patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getValue());
+            if (patient != null) {
+                break;
+            }
+        }
+
+        if (patient == null) {
+            //Create patient
+            patient.setActive(Boolean.TRUE);
+            List<Identifier> identifiersList = new ArrayList<>();
+
+            for (IdentifierDTO identifierDTO: identifiers) {
+                Identifier identifier = new Identifier();
+                Reference reference = new Reference();
+                identifier.setAssigner(reference);
+                CodeableConcept type = createCodeableConceptPayload(identifierDTO.getType());
+                identifier.setType(type);
+                identifiersList.add(identifier);
+            }
+            patient.setIdentifier(identifiersList);
+            Organization organization = new Organization();
+            organization.setName(facilityDetails.getName());
+            patient.setManagingOrganization(null);
+        }
+        // Create encounter
+        Encounter encounter = new Encounter();
+        String id = facilityDetails.getCode() + "-" + visitDetails.getId();
+        encounter.setId(id);
+        encounter.setStatus(Encounter.EncounterStatus.INPROGRESS);
+        Period period = new Period();
+        period.setEnd(visitDetails.getClosedDate());
+        period.setStart(visitDetails.getVisitDate());
+        Reference patientReference  = new Reference();
+        patientReference.setType("Patient");
+        patientReference.setReference("Patient/" + patient.getIdElement().getIdPart());
+        encounter.setSubject(patientReference);
+        encounter.setPeriod(period);
+        MethodOutcome encounterOutcome = fhirClient.update().resource(encounter).execute();
+        String encounterId = encounterOutcome.getId().getIdPart();
+
         // TODO: Add all logics to handle processing shared health record
+        response.put("enounter", encounterId);
         return response;
+    }
+
+    public CodeableConcept createCodeableConceptPayload(String code) {
+        CodeableConcept codeableConcept = new CodeableConcept();
+        List<Coding> codings = new ArrayList<>();
+        Coding coding = new Coding();
+        coding.setCode(code);
+        codings.add(coding);
+        codeableConcept.setCoding(codings);
+        return codeableConcept;
     }
 }

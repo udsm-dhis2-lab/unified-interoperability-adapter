@@ -33,7 +33,18 @@ public class OrganizationDTO {
         mappedOrganization.put("name", this.name);
         mappedOrganization.put("active", this.active);
         mappedOrganization.put("identifiers", this.identifiers.stream().map(identifier -> new IdentifierDTO(
-                identifier.getSystem(), identifier.getValue(), identifier.getUse().toString()).toMap()));
+                identifier.getSystem(), identifier.getValue(), identifier.getUse().toString(), identifier.getType().toString()).toMap()));
+        return mappedOrganization;
+    }
+
+    public Map<String,Object> toSummary() {
+        Map<String, Object> mappedOrganization = new HashMap<>();
+        mappedOrganization.put("name", this.name);
+        String code = "";
+        if (!this.identifiers.isEmpty()) {
+           code = this.identifiers.get(0).getValue();
+        }
+        mappedOrganization.put("code", code);
         return mappedOrganization;
     }
 }

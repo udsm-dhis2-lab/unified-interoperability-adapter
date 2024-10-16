@@ -140,6 +140,24 @@ public class ClientRegistryService {
         return patient;
     }
 
+    public Patient getPatientUsingIdentifier(String identifier) throws Exception {
+        Bundle response = new Bundle();
+        Patient patient = new Patient();
+        var searchClient =  fhirClient.search().forResource(Patient.class)
+                .where(Patient.IDENTIFIER.exactly().identifier(identifier));
+        response = searchClient.returnBundle(Bundle.class).execute();
+
+        if (!response.getEntry().isEmpty()) {
+            // TODO: Handle potential duplicate
+            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                    patient = (Patient) entry.getResource();
+                }
+            }
+        }
+        return patient;
+    }
+
     public PatientDTO mapToPatientDTO(Patient patient) {
         List<HumanNameDTO> nameDTOs = patient.hasName() ?
                 patient.getName().stream()

@@ -10,4 +10,7 @@ public class ClientRegistryConstants {
 
     @Value("${CLIENT_REGISTRY_IDENTIFIER_REGEX:^CR-\\\\d{4}-\\\\d{3}$}")
     public String ClientRegistryIdentifierRegex;
+
+    @Value("${DEFAULT_IDENTIFIER_TYPE:NIDA}")
+    public String DefaultIdentifierType;
 }
