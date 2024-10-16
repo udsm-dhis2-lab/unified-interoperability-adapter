@@ -92,9 +92,11 @@ public class ClientRegistryController {
             @RequestParam(value = "limit", defaultValue = "1") int limit
     ) throws Exception {
         try {
-            String regex = clientRegistryConstants.ClientRegistryIdentifierRegex;
+//            String regex = clientRegistryConstants.ClientRegistryIdentifierRegex;
             if (Boolean.parseBoolean(clientRegistryConstants.GenerateClientIdentifier)) {
                 List<Map<String,Object>> identifierPayload = new ArrayList<>();
+                // 1. Get latest client
+                Patient patient;
                 for(int count= 0; count < limit; count++) {
                     // TODO: Add logic for generating ids using the provided pattern
 

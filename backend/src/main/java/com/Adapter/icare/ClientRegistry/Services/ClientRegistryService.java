@@ -131,7 +131,7 @@ public class ClientRegistryService {
 
     public Patient getPatientByIdentifier(String identifier) {
         Patient patient = new Patient();
-        Bundle response = fhirClient.search().forResource(Patient.class).where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier))
+        Bundle response = fhirClient.search().forResource(Patient.class).where(Patient.IDENTIFIER.exactly().identifier(identifier))
                 .returnBundle(Bundle.class)
                 .execute();
         if (!response.getEntry().isEmpty()) {
@@ -158,24 +158,39 @@ public class ClientRegistryService {
         return patient;
     }
 
-    public List<Map<String,Object>> deleteClientsWithNoIdentifiers() throws Exception {
+    public Map<String,Object> deleteClientsWithNoIdentifiers() throws Exception {
         Bundle resourceBundle = new Bundle();
         List<Map<String,Object>> deleteClients = new ArrayList<>();
-        var searchClient =  fhirClient.search().forResource(Patient.class)
-                .where(Patient.IDENTIFIER.isMissing(true));
-        resourceBundle = searchClient.returnBundle(Bundle.class).execute();
+        List<Map<String,Object>> clientsFailed = new ArrayList<>();
+        var searchClient =  fhirClient.search().forResource(Patient.class);
+        resourceBundle = searchClient.count(1000).returnBundle(Bundle.class).execute();
         if (!resourceBundle.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : resourceBundle.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
                    Patient patient = (Patient) entry.getResource();
-                   MethodOutcome methodOutcome = fhirClient.delete().resource(patient).execute();
-                   Map<String,Object> client = new HashMap<>();
-                   client.put("id", patient.getIdElement().getIdPart());
-                   deleteClients.add(client);
+                   if (patient.getIdentifier().isEmpty()) {
+                       try {
+                           Map<String,Object> client = new HashMap<>();
+                           client.put("id", patient.getIdElement().getIdPart());
+                           client.put("name", patient.getName());
+                           deleteClients.add(client);
+                           MethodOutcome methodOutcome = fhirClient.delete().resource(patient).execute();
+                       } catch (Exception e) {
+                           Map<String,Object> client = new HashMap<>();
+                           client.put("id", patient.getIdElement().getIdPart());
+                           client.put("name", patient.getName());
+                           client.put("reason", e.getMessage());
+                           clientsFailed.add(client);
+                           e.printStackTrace();  // This will log the internal server error details
+                       }
+                   }
                 }
             }
         }
-        return deleteClients;
+        Map<String,Object> response = new HashMap<>();
+        response.put("deleteClients", deleteClients);
+        response.put("clientsFailed", clientsFailed);
+        return response;
     }
 
     public PatientDTO mapToPatientDTO(Patient patient) {
