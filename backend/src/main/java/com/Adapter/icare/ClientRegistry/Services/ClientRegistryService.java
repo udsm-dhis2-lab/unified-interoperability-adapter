@@ -2,6 +2,7 @@ package com.Adapter.icare.ClientRegistry.Services;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.FHIRConstants;
@@ -116,7 +117,7 @@ public class ClientRegistryService {
     public int getTotalPatients() {
         Bundle response = fhirClient.search()
                 .forResource(Patient.class)
-                .count(1)
+                .summaryMode(SummaryEnum.COUNT)  // Request only the total count
                 .returnBundle(Bundle.class)
                 .execute();
         return response.getTotal();
