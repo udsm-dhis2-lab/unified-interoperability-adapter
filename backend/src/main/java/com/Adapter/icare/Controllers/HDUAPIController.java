@@ -7,6 +7,7 @@ import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.DataTemplateDTO;
 import com.Adapter.icare.Dtos.DatastoreConfigurationsDTO;
+import com.Adapter.icare.Dtos.MappingsDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -691,6 +692,22 @@ public class HDUAPIController {
                 response.put("message","Mapping with uuid " + uuid + " does not exists");
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @PostMapping(value = "mappings")
+    public ResponseEntity<Map<String,Object>> addMappings(
+            @RequestBody MappingsDTO mappings) throws Exception {
+        try {
+            Datastore datastore = new Datastore();
+            datastore.setNamespace(mappings.getNamespace());
+            datastore.setDataKey(mappings.getDataKey());
+            datastore.setDatastoreGroup(mappings.getGroup());
+            datastore.setValue(mappings.getMapping());
+            datastore.setDescription(mappings.getDescription());
+            return ResponseEntity.ok(datastoreService.saveDatastore(datastore).toMap());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
