@@ -214,6 +214,7 @@ public class SharedHealthRecordsService {
         List<IdentifierDTO> identifiers = demographicDetails.getIdentifiers();
         Patient patient = new Patient();
         String defaultIdentifierType = this.clientRegistryConstants.DefaultIdentifierType;
+        // TODO: Find a way to use default identifier type to get client
         for (IdentifierDTO identifier: identifiers) {
             patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getValue());
             if (patient != null) {
@@ -223,7 +224,8 @@ public class SharedHealthRecordsService {
 
         if (patient == null) {
             //Create patient
-            patient.setActive(Boolean.TRUE);
+            Patient patientToCreate = new Patient();
+            patientToCreate.setActive(Boolean.TRUE);
             List<Identifier> identifiersList = new ArrayList<>();
 
             for (IdentifierDTO identifierDTO: identifiers) {
@@ -234,10 +236,12 @@ public class SharedHealthRecordsService {
                 identifier.setType(type);
                 identifiersList.add(identifier);
             }
-            patient.setIdentifier(identifiersList);
+            patientToCreate.setIdentifier(identifiersList);
             Organization organization = new Organization();
             organization.setName(facilityDetails.getName());
-            patient.setManagingOrganization(null);
+            patientToCreate.setManagingOrganization(null);
+            MethodOutcome patientOutcome = fhirClient.create().resource(patientToCreate).execute();
+            patient = (Patient) patientOutcome.getResource();
         }
         // Create encounter
         Encounter encounter = new Encounter();
@@ -253,10 +257,17 @@ public class SharedHealthRecordsService {
         encounter.setSubject(patientReference);
         encounter.setPeriod(period);
         MethodOutcome encounterOutcome = fhirClient.update().resource(encounter).execute();
+        Reference serviceProviderReference = new Reference();
+        serviceProviderReference.setType("Organization");
+        serviceProviderReference.setReference("Organization/" + facilityDetails.getCode());
+        encounter.setServiceProvider(serviceProviderReference);
         String encounterId = encounterOutcome.getId().getIdPart();
 
         // TODO: Add all logics to handle processing shared health record
-        response.put("enounter", encounterId);
+        Map<String,Object> visitData = new HashMap<>();
+        visitData.put("id", encounterId);
+        response.put("visit", visitData);
+        response.put("patient", clientRegistryService.mapToPatientDTO(patient).toMap());
         return response;
     }
 
