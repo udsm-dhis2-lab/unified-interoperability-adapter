@@ -149,7 +149,9 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   addFocusListeners(): void {
-    const inputElements = this.elRef.nativeElement.querySelectorAll('input');
+    const inputElements = this.elRef.nativeElement.querySelectorAll(
+      'input[name="entryfield"]'
+    );
     inputElements.forEach((input: HTMLInputElement) => {
       this.renderer.listen(input, 'focus', (event) => this.onInputFocus(event));
     });
@@ -252,12 +254,66 @@ export class DatasetMappingComponent implements OnInit {
         item.configurations?.forEach((config) => {
           if (config.name === event.settingName) {
             config.selectedValue = event.value;
-            console.log('KEY TO USE IN PAYLOAD', config.keyToUseInPayload);
+            if (config.name === 'Gender') {
+              config.keyToUseInPayload = 'gender';
+            }
+            if (config.name === 'Agetype') {
+              config.keyToUseInPayload = 'ageType';
+            }
+            if (config.name === 'TEST') {
+              config.keyToUseInPayload = 'test';
+            }
           }
         });
       }
     });
   }
 
-  onSubmitMappings() {}
+  createMappingsPayload() {
+    const payLoad = {
+      mapping: {
+        mappings: [
+          this.selectedICdCodes.map((item) => {
+            return {
+              code: item,
+            };
+          }),
+        ],
+        dataElement: {
+          id: this.selectedInputId,
+          name: '',
+          code: '',
+        },
+        type: '',
+        params: [
+          this.mappingsData.disagregations.map((item) => {
+            return {
+              co: item.categoryOptionComboId,
+              ...(item.configurations ?? []).reduce((acc, config: Setting) => {
+                if (config.name === 'Agegroup') {
+                  const startingAge = config.selectedValue?.split('-')[0];
+                  const endingAge = config.selectedValue?.split('-')[1];
+                  acc['startAge'] = startingAge;
+                  acc['endAge'] = endingAge;
+                } else {
+                  acc[config.keyToUseInPayload as string] =
+                    config.selectedValue;
+                }
+                return acc;
+              }, {} as { [key: string]: any }),
+            };
+          }),
+        ],
+      },
+      dataKey: '',
+      namespace: '',
+      description: '',
+      group: '',
+    };
+    console.log('MAPPING PAYLOAD', payLoad);
+  }
+
+  onSubmitMappings() {
+    this.createMappingsPayload();
+  }
 }
