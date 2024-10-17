@@ -20,7 +20,14 @@ export interface MappingsData {
 interface Setting {
   name: string;
   selectedValue?: string;
+  keyToUseInPayload?: string;
   options: any;
+}
+
+interface SelectedSettingOption {
+  value: string;
+  categoryOptionComboId: string;
+  settingName: string;
 }
 
 class Disaggregation {
@@ -49,40 +56,6 @@ export class DatasetMappingComponent implements OnInit {
   };
 
   selectedICdCodes: string[] = [];
-
-  disaggregationRowChecked = false;
-  indeterminate = false;
-  setOfCheckedId = new Set<string>();
-
-  updateCheckedSet(id: string, checked: boolean): void {
-    if (checked) {
-      this.setOfCheckedId.add(id);
-    } else {
-      this.setOfCheckedId.delete(id);
-    }
-  }
-
-  onDisaggregationRowChecked(id: string, checked: boolean): void {
-    this.updateCheckedSet(id, checked);
-    this.refreshDisaggregationCheckedStatus();
-  }
-
-  onAllDisaggregationRowsChecked(value: boolean): void {
-    this.mappingsData.disagregations.forEach((item) =>
-      this.updateCheckedSet(item.categoryOptionComboId, value)
-    );
-    this.refreshDisaggregationCheckedStatus();
-  }
-
-  refreshDisaggregationCheckedStatus(): void {
-    this.disaggregationRowChecked = this.mappingsData.disagregations.every(
-      (item) => this.setOfCheckedId.has(item.categoryOptionComboId)
-    );
-    this.indeterminate =
-      this.mappingsData.disagregations.some((item) =>
-        this.setOfCheckedId.has(item.categoryOptionComboId)
-      ) && !this.disaggregationRowChecked;
-  }
 
   isLoadingDisaggregation: boolean = false;
   leftColumnSpan: number = 16;
@@ -138,8 +111,8 @@ export class DatasetMappingComponent implements OnInit {
     this.searchIcdCodeChange$.next(value);
   }
 
-  onIcdCodeSelect(value: string[]) {
-    this.selectedICdCodes = value;
+  onIcdCodeSelect(value: string) {
+    this.selectedICdCodes = [...this.selectedICdCodes, value];
   }
 
   constructor(
@@ -162,7 +135,6 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetManagementService.getInstanceById(uuid).subscribe({
       next: (data: any) => {
         this.isLoading = false;
-        // const datasetFields = JSON.parse(data.datasetFields);
         this.sanitizedContent = this.sanitizer.bypassSecurityTrustHtml(
           data.datasetFields.dataEntryForm.htmlCode
         );
@@ -196,7 +168,6 @@ export class DatasetMappingComponent implements OnInit {
           this.mappingsData.disagregations = data.map(
             (item: any) => new Disaggregation(item.id, item.name)
           );
-          this.refreshDisaggregationCheckedStatus();
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
@@ -275,8 +246,17 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
-  onSelectMappingSetting(event: string) {
-    console.log('THIS WAS GIVEN SETTING', event);
+  onSelectMappingSetting(event: SelectedSettingOption) {
+    this.mappingsData.disagregations.forEach((item) => {
+      if (item.categoryOptionComboId === event.categoryOptionComboId) {
+        item.configurations?.forEach((config) => {
+          if (config.name === event.settingName) {
+            config.selectedValue = event.value;
+            console.log('KEY TO USE IN PAYLOAD', config.keyToUseInPayload);
+          }
+        });
+      }
+    });
   }
 
   onSubmitMappings() {}
