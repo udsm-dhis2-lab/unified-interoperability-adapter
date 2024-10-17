@@ -355,6 +355,7 @@ public class HDUAPIController {
                 Map<String, Object> configuration = datastore.getValue();
                 configuration.put("key", datastore.getDataKey());
                 configuration.put("uuid", datastore.getUuid());
+                configuration.put("group", datastore.getDatastoreGroup());
                 namespaceDetails.add(configuration);
             }
             Map<String, Object> returnObject =  new HashMap<>();
