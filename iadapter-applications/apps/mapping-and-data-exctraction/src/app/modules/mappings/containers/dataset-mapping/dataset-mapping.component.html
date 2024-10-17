@@ -2,16 +2,119 @@
   <div class="inner-content">
     <nz-card style="width: 100%">
       <div nz-row [nzGutter]="16">
-        <div nz-col nzSpan="16">
-          <nz-card style="width: 100%">
-            <div [innerHTML]="sanitizedContent"></div>
+        <div nz-col [nzSpan]="leftColumnSpan">
+          <nz-card class="card">
+            <div class="column" [innerHTML]="sanitizedContent"></div>
           </nz-card>
         </div>
-        <div nz-col nzSpan="8">
-          <nz-card style="width: 100%">
-            <p>Card content</p>
-            <p>Card content</p>
-            <p>Card content</p>
+        <div nz-col [nzSpan]="rightColumnSpan">
+          <div nz-row nzJustify="space-between">
+            <div nz-col nzSpan="12">
+              <!-- collapse button  -->
+              <button
+                nz-button
+                nzType="default"
+                (click)="onCollapse()"
+                class="collapse-button"
+              >
+                <span
+                  nz-icon
+                  [nzType]="leftColumnSpan === 8 ? 'right' : 'left'"
+                  nzTheme="outline"
+                ></span>
+              </button>
+            </div>
+            <div nz-col nzSpan="12">
+              <div nz-row nzJustify="end">
+                <label nz-checkbox [(ngModel)]="useIcdCodes"
+                  >Use Icd codes</label
+                >
+              </div>
+            </div>
+          </div>
+
+          <nz-card class="card">
+            <!-- selecting configurations options -->
+            <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
+              <div nz-col nzSpan="12">
+                <custom-select
+                  [placeHolder]="placeHolderForConfigurationSelect"
+                  [isMultiple]="true"
+                  [isLoading]="isLoadingConfigurations"
+                  [optionList]="configurationOptionList"
+                  (onSearchChange)="onSearchConfiguration($event)"
+                  (onSelectChange)="onConfigurationSelect($event)"
+                ></custom-select>
+              </div>
+              <div *ngIf="useIcdCodes" nz-col nzSpan="12">
+                <custom-select
+                  [placeHolder]="placeHolderForIcdCodeSelect"
+                  [isMultiple]="false"
+                  [isLoading]="isLoadingIcdCodes"
+                  [optionList]="icdCodeOptionList"
+                  (onSearchChange)="onSearchIcdCode($event)"
+                  (onSelectChange)="onIcdCodeSelect($event)"
+                ></custom-select>
+              </div>
+            </div>
+
+            <!-- list of selected icd codes  -->
+            <div
+              *ngIf="useIcdCodes"
+              nz-row
+              style="margin-top: 16px; margin-bottom: 16px"
+            >
+              <nz-card style="width: 100%">
+                @for (icdCode of selectedICdCodes?? []; track $index) {
+                <nz-tag>{{ icdCode ?? '' }}</nz-tag>
+                }
+              </nz-card>
+            </div>
+
+            <!-- table  -->
+            <div class="column">
+              <nz-table
+                [nzData]="mappingsData.disagregations"
+                [nzFrontPagination]="false"
+                [nzLoading]="isLoadingDisaggregation"
+              >
+                <thead>
+                  <tr>
+                    <th
+                      [(nzChecked)]="disaggregationRowChecked"
+                      [nzIndeterminate]="indeterminate"
+                      (nzCheckedChange)="onAllDisaggregationRowsChecked($event)"
+                    ></th>
+                    <th>Disaggregation</th>
+                    <th>Configurations</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (data of mappingsData.disagregations; track
+                  data.categoryOptionComboId) {
+                  <tr>
+                    <td
+                      [nzChecked]="
+                        setOfCheckedId.has(data.categoryOptionComboId)
+                      "
+                      (nzCheckedChange)="
+                        onDisaggregationRowChecked(
+                          data.categoryOptionComboId,
+                          $event
+                        )
+                      "
+                    ></td>
+                    <td>{{ data.categoryOptionComboName }}</td>
+                    <td>
+                      @for (config of data.configurations ?? []; track $index) {
+                     
+                      }
+                    </td>
+                  </tr>
+                  }
+                </tbody>
+              </nz-table>
+            </div>
           </nz-card>
         </div>
       </div>

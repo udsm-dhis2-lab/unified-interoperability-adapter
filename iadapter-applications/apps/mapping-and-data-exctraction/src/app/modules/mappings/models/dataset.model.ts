@@ -8,6 +8,8 @@ export class Dataset {
   name!: string;
   uuid!: string;
   datasetFields!: string;
+  selected!: boolean;
+  dataSetInstance?: DataSetInstance;
 
   static fromJson(json: any): Dataset {
     let dataset = new Dataset();
@@ -20,6 +22,22 @@ export class Dataset {
     dataset.formType = json['formType'] ?? '';
     dataset.expiryDays = json['expiryDays'] ?? '';
     dataset.datasetFields = json['datasetFields'] ?? '';
+    dataset.selected = json['selected'] ?? false;
+    dataset.dataSetInstance = json['dataSetInstance']
+      ? DataSetInstance.fromJson(json['dataSetInstance'])
+      : undefined;
     return dataset;
+  }
+}
+
+export class DataSetInstance {
+  name?: string;
+  uuid!: string;
+
+  static fromJson(json: any): DataSetInstance {
+    let instance = new DataSetInstance();
+    instance.uuid = json['uuid'] ?? '';
+    instance.name = json['name'];
+    return instance;
   }
 }
