@@ -117,9 +117,9 @@ public class MediatorsService {
         return  new HashMap<>();
     }
 
-    public String processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data) throws Exception {
+    public String processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data, String api) throws Exception {
         try {
-            return sendDataToExternalSystem(mediator,data, "POST");
+            return sendDataToExternalSystem(mediator,data, "POST", api);
         } catch (Exception e) {
             System.err.println(e.getMessage());
             throw new Exception(e.getMessage());
@@ -132,9 +132,9 @@ public class MediatorsService {
                 System.out.println(apiPath);
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
-                return sendDataToExternalSystem(mediator,payload, method);
+                return sendDataToExternalSystem(mediator,payload, method, null);
             } else if (method.equals("PUT")) {
-                return sendDataToExternalSystem(mediator,payload, method);
+                return sendDataToExternalSystem(mediator,payload, method, null);
             } else if (method.equals("DELETE")){
                 return deleteResourceFromExternalSystem(mediator,apiPath);
             } else {
@@ -439,7 +439,7 @@ public class MediatorsService {
         return response;
     }
 
-    public String sendDataToExternalSystem(Mediator mediator, Map<String, Object> data, String method) throws Exception {
+    public String sendDataToExternalSystem(Mediator mediator, Map<String, Object> data, String method, String api) throws Exception {
         // TODO: Make this valid for async true
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -447,7 +447,7 @@ public class MediatorsService {
         String path = mediator.getPath();
         URL url = null;
         try {
-            url = new URL(baseUrl + path);
+            url = new URL(baseUrl + path + api);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

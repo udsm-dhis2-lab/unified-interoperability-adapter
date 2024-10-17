@@ -171,7 +171,7 @@ public class HDUAPIController {
                Map<String, Object> payload = new HashMap<>();
                payload.put("code","dataTemplates");
                payload.put("payload",dataTemplate.getData());
-               return ResponseEntity.ok(mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload));
+               return ResponseEntity.ok(mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
            } else if (!shouldUseWorkflowEngine) {
                return ResponseEntity.ok(mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
            } else {
