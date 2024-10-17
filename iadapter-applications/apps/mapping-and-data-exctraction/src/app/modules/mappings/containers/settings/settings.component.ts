@@ -135,7 +135,7 @@ export class SettingsComponent implements OnDestroy, OnInit {
       this.optionForm.get('option')!.setValue(optionString);
       this.optionElementForm.reset();
     } else {
-      console.log('Option form is invalid');
+      // TODO: Show error
     }
   }
 
@@ -147,7 +147,7 @@ export class SettingsComponent implements OnDestroy, OnInit {
       const formattedOptions = JSON.stringify(this.options, null, 2);
       this.settingsForm.get('options')!.setValue(formattedOptions);
     } else {
-      console.log('Option form is invalid');
+      // TODO: Show error
     }
   }
 
@@ -165,20 +165,17 @@ export class SettingsComponent implements OnDestroy, OnInit {
         },
       };
 
-      this.dataSetManagementService
-        .addConfiguration(Configuration.fromJson(json))
-        .subscribe({
-          next: (repsonse: any) => {
-            this.isSubmitting = false;
-            console.log('RESPONSE SUBMITTING SETTINGS: ', repsonse);
-          },
-          error: (err) => {
-            this.isSubmitting = false;
-            // TODO: Implement error handling
-          },
-        });
+      this.dataSetManagementService.addConfiguration(json).subscribe({
+        next: (repsonse: any) => {
+          this.isSubmitting = false;
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          // TODO: Implement error handling
+        },
+      });
     } else {
-      console.log('Configuration form is invalid');
+      // TODO: Show error
     }
   }
 

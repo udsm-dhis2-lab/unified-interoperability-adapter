@@ -15,11 +15,21 @@ import {
   CategoryOptionCombo,
   ConfigurationPage,
   IcdCodePage,
-  Option,
 } from '../../models';
 
 export interface MappingsData {
-  disagregations: CategoryOptionCombo[];
+  disagregations: Disaggregation[];
+}
+
+class Disaggregation {
+  categoryOptionComboId!: string;
+  categoryOptionComboName!: string;
+  configurations?: any[];
+
+  constructor(categoryOptionComboId: string, categoryOptionComboName: string) {
+    this.categoryOptionComboId = categoryOptionComboId;
+    this.categoryOptionComboName = categoryOptionComboName;
+  }
 }
 
 @Component({
@@ -57,18 +67,18 @@ export class DatasetMappingComponent implements OnInit {
 
   onAllDisaggregationRowsChecked(value: boolean): void {
     this.mappingsData.disagregations.forEach((item) =>
-      this.updateCheckedSet(item.id, value)
+      this.updateCheckedSet(item.categoryOptionComboId, value)
     );
     this.refreshDisaggregationCheckedStatus();
   }
 
   refreshDisaggregationCheckedStatus(): void {
     this.disaggregationRowChecked = this.mappingsData.disagregations.every(
-      (item) => this.setOfCheckedId.has(item.id)
+      (item) => this.setOfCheckedId.has(item.categoryOptionComboId)
     );
     this.indeterminate =
       this.mappingsData.disagregations.some((item) =>
-        this.setOfCheckedId.has(item.id)
+        this.setOfCheckedId.has(item.categoryOptionComboId)
       ) && !this.disaggregationRowChecked;
   }
 
@@ -100,7 +110,7 @@ export class DatasetMappingComponent implements OnInit {
 
   assignConfigurationToSelectedDisaggregation(configuration: string[]): void {
     this.mappingsData.disagregations.forEach((item) => {
-      if (this.setOfCheckedId.has(item.id)) {
+      if (this.setOfCheckedId.has(item.categoryOptionComboId)) {
         if (!item.configurations) {
           item.configurations = [];
         }
@@ -144,10 +154,6 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetManagementService.getInstanceById(uuid).subscribe({
       next: (data: any) => {
         this.isLoading = false;
-        console.log(
-          'DATA SET FIELDS',
-          data.datasetFields.dataEntryForm.htmlCode
-        );
         // const datasetFields = JSON.parse(data.datasetFields);
         this.sanitizedContent = this.sanitizer.bypassSecurityTrustHtml(
           data.datasetFields.dataEntryForm.htmlCode
@@ -179,7 +185,9 @@ export class DatasetMappingComponent implements OnInit {
         next: (data: any) => {
           this.mappingsData.disagregations = [];
           this.isLoadingDisaggregation = false;
-          this.mappingsData.disagregations = data;
+          this.mappingsData.disagregations = data.map(
+            (item: any) => new Disaggregation(item.id, item.name)
+          );
           this.refreshDisaggregationCheckedStatus();
         },
         error: (error: any) => {
@@ -187,7 +195,6 @@ export class DatasetMappingComponent implements OnInit {
           // TODO: Handle error
         },
       });
-    console.log('SELECTED ID*****', this.selectedInputId);
   }
 
   onCollapse() {
@@ -246,23 +253,19 @@ export class DatasetMappingComponent implements OnInit {
       next: (data: ConfigurationPage) => {
         this.isLoadingConfigurations = false;
         this.configurationOptionList =
-          data?.listOfConfigurations?.flatMap((configuration: any) => {
-            return configuration.options.map((option: any) => {
-              const label = Object.entries(option)
-                .map(([key, value]) => `${key}: ${value}`)
-                .join(', ');
-              return {
-                value: label,
-                label: label,
-              };
-            });
+          data?.listOfConfigurations?.map((configuration: any) => {
+            return {
+              value: configuration.options,
+              label: configuration.name,
+            };
           }) ?? [];
       },
       error: (error: any) => {
-        console.log('ERRROOOORRRRR', error);
         // TODO: Implement error handling
         this.isLoadingConfigurations = false;
       },
     });
   }
+
+  onSubmitMappings() {}
 }

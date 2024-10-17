@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, map, Observable } from 'rxjs';
 import {
-  Configuration,
   ConfigurationPage,
   Dataset,
   DatasetPage,
@@ -92,13 +91,12 @@ export class DatasetManagementService {
       );
   }
 
-  addConfiguration(configuration: Configuration): Observable<any> {
-    return this.httpClient
-      .post<any>(this.configurationUrl, configuration.toJson())
-      .pipe(
-        map((response: any) => console.log(response)),
-        catchError((error: any) => this.handleError(error))
-      );
+  addConfiguration(json: any): Observable<any> {
+    return this.httpClient.post<any>(this.configurationUrl, json).pipe(
+      // TODO: return response 
+      map((response: any) => console.log(response)),
+      catchError((error: any) => this.handleError(error))
+    );
   }
 
   getIcdCodes(
@@ -128,6 +126,7 @@ export class DatasetManagementService {
         instance: instanceUuid,
       })
       .pipe(
+         // TODO: return response 
         map((response: any) => console.log(response)),
         catchError((error: any) => this.handleError(error))
       );
@@ -140,6 +139,7 @@ export class DatasetManagementService {
         {}
       )
       .pipe(
+         // TODO: return response 
         map((response: any) => console.log(response)),
         catchError((error: any) => this.handleError(error))
       );
@@ -150,7 +150,6 @@ export class DatasetManagementService {
       .get<any>(`${MappingsUrls.GET_CATEGORY_OPTION_COMBO}/${dataElementId}`)
       .pipe(
         map((response: any) => {
-          console.log('CATEGORY OPTION COMBO', response);
           return response['categoryCombo']['categoryOptionCombos'].map(
             (categoryOptionCombo: any) => {
               return CategoryOptionCombo.fromJson(categoryOptionCombo);

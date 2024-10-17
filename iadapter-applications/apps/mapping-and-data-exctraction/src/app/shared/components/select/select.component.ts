@@ -14,10 +14,7 @@ export class SelectComponent {
   })
   placeHolder: string = '';
 
-  // @Input({
-  //   required: true,
-  // })
-  selectedItem?: string;
+  selectedItem?: any;
 
   @Output() onSearchChange: EventEmitter<string> = new EventEmitter<string>();
   @Output() onSelectChange = new EventEmitter<string[]>();
@@ -44,9 +41,7 @@ export class SelectComponent {
       this.onSelectChange.emit([value]);
       return;
     }
-    const filteredValue = value.filter(
-      (item: any) => item && item.trim() !== ''
-    );
+    const filteredValue = value.filter((item: any) => item !== '');
     this.onSelectChange.emit(filteredValue);
   }
 }

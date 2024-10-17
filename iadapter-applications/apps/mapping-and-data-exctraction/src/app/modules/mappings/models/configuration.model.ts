@@ -16,7 +16,6 @@ export class Configuration {
       try {
         configuration.options = JSON.parse(json['options']);
       } catch (e) {
-        console.error('Error parsing options:', e);
         configuration.options = [];
       }
     } else {

@@ -69,12 +69,6 @@
                 <nz-tag>{{ icdCode ?? '' }}</nz-tag>
                 }
               </nz-card>
-              <!-- <nz-collapse-panel
-                nzHeader="Selected ICD codes"
-                [nzActive]="useIcdCodes"
-              >
-               
-              </nz-collapse-panel> -->
             </div>
 
             <!-- table  -->
@@ -96,18 +90,24 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @for (data of mappingsData.disagregations; track data.id) {
+                  @for (data of mappingsData.disagregations; track
+                  data.categoryOptionComboId) {
                   <tr>
                     <td
-                      [nzChecked]="setOfCheckedId.has(data.id)"
+                      [nzChecked]="
+                        setOfCheckedId.has(data.categoryOptionComboId)
+                      "
                       (nzCheckedChange)="
-                        onDisaggregationRowChecked(data.id, $event)
+                        onDisaggregationRowChecked(
+                          data.categoryOptionComboId,
+                          $event
+                        )
                       "
                     ></td>
-                    <td>{{ data.name }}</td>
+                    <td>{{ data.categoryOptionComboName }}</td>
                     <td>
                       @for (config of data.configurations ?? []; track $index) {
-                      <nz-tag>{{ config ?? '' }}</nz-tag>
+                     
                       }
                     </td>
                   </tr>
