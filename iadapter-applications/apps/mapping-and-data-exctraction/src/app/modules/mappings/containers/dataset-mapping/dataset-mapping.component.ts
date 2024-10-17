@@ -11,20 +11,22 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import {
-  CategoryOptionCombo,
-  ConfigurationPage,
-  IcdCodePage,
-} from '../../models';
+import { ConfigurationPage, IcdCodePage } from '../../models';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
 }
 
+interface Setting {
+  name: string;
+  selectedValue?: string;
+  options: any;
+}
+
 class Disaggregation {
   categoryOptionComboId!: string;
   categoryOptionComboName!: string;
-  configurations?: any[];
+  configurations?: Setting[];
 
   constructor(categoryOptionComboId: string, categoryOptionComboName: string) {
     this.categoryOptionComboId = categoryOptionComboId;
@@ -104,18 +106,24 @@ export class DatasetMappingComponent implements OnInit {
     this.searchConfigurationChange$.next(value);
   }
 
-  onConfigurationSelect(value: string[]) {
+  onConfigurationSelect(value: any) {
+    console.log('SELECTED CONFIGURATION', value);
     this.assignConfigurationToSelectedDisaggregation(value);
   }
 
-  assignConfigurationToSelectedDisaggregation(configuration: string[]): void {
+  assignConfigurationToSelectedDisaggregation(configuration: any[]): void {
     this.mappingsData.disagregations.forEach((item) => {
-      if (this.setOfCheckedId.has(item.categoryOptionComboId)) {
-        if (!item.configurations) {
-          item.configurations = [];
-        }
-        item.configurations = configuration;
+      if (!item.configurations) {
+        item.configurations = [];
       }
+      item.configurations = [
+        ...item.configurations,
+        {
+          name: configuration[0],
+          selectedValue: '',
+          options: configuration[1],
+        },
+      ];
     });
   }
 
@@ -255,7 +263,7 @@ export class DatasetMappingComponent implements OnInit {
         this.configurationOptionList =
           data?.listOfConfigurations?.map((configuration: any) => {
             return {
-              value: configuration.options,
+              value: [configuration.name, configuration.options],
               label: configuration.name,
             };
           }) ?? [];
@@ -265,6 +273,10 @@ export class DatasetMappingComponent implements OnInit {
         this.isLoadingConfigurations = false;
       },
     });
+  }
+
+  onSelectMappingSetting(event: string) {
+    console.log('THIS WAS GIVEN SETTING', event);
   }
 
   onSubmitMappings() {}

@@ -39,7 +39,7 @@
               <div nz-col nzSpan="12">
                 <custom-select
                   [placeHolder]="placeHolderForConfigurationSelect"
-                  [isMultiple]="true"
+                  [isMultiple]="false"
                   [isLoading]="isLoadingConfigurations"
                   [optionList]="configurationOptionList"
                   (onSearchChange)="onSearchConfiguration($event)"
@@ -80,11 +80,11 @@
               >
                 <thead>
                   <tr>
-                    <th
+                    <!-- <th
                       [(nzChecked)]="disaggregationRowChecked"
                       [nzIndeterminate]="indeterminate"
                       (nzCheckedChange)="onAllDisaggregationRowsChecked($event)"
-                    ></th>
+                    ></th> -->
                     <th>Disaggregation</th>
                     <th>Configurations</th>
                   </tr>
@@ -93,7 +93,7 @@
                   @for (data of mappingsData.disagregations; track
                   data.categoryOptionComboId) {
                   <tr>
-                    <td
+                    <!-- <td
                       [nzChecked]="
                         setOfCheckedId.has(data.categoryOptionComboId)
                       "
@@ -103,11 +103,23 @@
                           $event
                         )
                       "
-                    ></td>
+                    ></td> -->
                     <td>{{ data.categoryOptionComboName }}</td>
                     <td>
                       @for (config of data.configurations ?? []; track $index) {
-                     
+                      <nz-select ngModel="default" (ngModelChange)="onSelectMappingSetting($event)" style="margin-right: 16px">
+                        @for (option of config.options ?? []; track $index) {
+                        <nz-option
+                          [nzValue]="option.code"
+                          [nzLabel]="option.name"
+                        ></nz-option>
+                        }
+                        <nz-option
+                          nzValue="default"
+                          nzLabel="Select"
+                          nzHide
+                        ></nz-option>
+                      </nz-select>
                       }
                     </td>
                   </tr>
