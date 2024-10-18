@@ -23,6 +23,8 @@ ENV SAMPLE_APP_CONFIG=${APP_DATA_FOLDER}/config/
 #Move over the War file from previous build step
 WORKDIR /usr/local/tomcat/webapps/
 #COPY --from=maven /usr/src/app/target/icare-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
+COPY ./backend/src/config/application.properties /opt/config/application.properties
+
 COPY ./backend/target/icare-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 #COPY --from=ui /app/dist /usr/local/tomcat/webapps/ROOT
 #COPY ./ui/dist /usr/local/tomcat/webapps/ROOT
