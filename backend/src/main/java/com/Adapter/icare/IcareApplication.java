@@ -36,12 +36,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
+import java.util.Collections;
+
 @SpringBootApplication(scanBasePackages = "com.Adapter.icare")
 public class IcareApplication extends SpringBootServletInitializer
 {
 
 	public static void main(String[] args) {
-		SpringApplication.run(IcareApplication.class, args);
+		SpringApplication app = new SpringApplication(IcareApplication.class);
+		app.setDefaultProperties(Collections.singletonMap("spring.config.location", "file:src/config/"));
+		app.run(args);
 	}
 
 }
