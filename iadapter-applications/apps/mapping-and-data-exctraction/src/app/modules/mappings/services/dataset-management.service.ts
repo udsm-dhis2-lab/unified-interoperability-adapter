@@ -20,6 +20,7 @@ export class DatasetManagementService {
   instanceUrl: string = MappingsUrls.GET_INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
   configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
+  addMappingsUrl: string = MappingsUrls.ADD_MAPPINGS;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -91,9 +92,9 @@ export class DatasetManagementService {
       );
   }
 
-  addConfiguration(json: any): Observable<any> {
-    return this.httpClient.post<any>(this.configurationUrl, json).pipe(
-      // TODO: return response 
+  addConfiguration(payLoad: any): Observable<any> {
+    return this.httpClient.post<any>(this.configurationUrl, payLoad).pipe(
+      // TODO: return response
       map((response: any) => console.log(response)),
       catchError((error: any) => this.handleError(error))
     );
@@ -126,7 +127,7 @@ export class DatasetManagementService {
         instance: instanceUuid,
       })
       .pipe(
-         // TODO: return response 
+        // TODO: return response
         map((response: any) => console.log(response)),
         catchError((error: any) => this.handleError(error))
       );
@@ -139,7 +140,7 @@ export class DatasetManagementService {
         {}
       )
       .pipe(
-         // TODO: return response 
+        // TODO: return response
         map((response: any) => console.log(response)),
         catchError((error: any) => this.handleError(error))
       );
@@ -169,6 +170,14 @@ export class DatasetManagementService {
         'An unexpected error occurred. Please try again later.'
       );
     }
+  }
+
+  addMappings(payLoad: any): Observable<any> {
+    return this.httpClient.post<any>(this.addMappingsUrl, payLoad).pipe(
+      // TODO: return response
+      map((response: any) => console.log(response)),
+      catchError((error: any) => this.handleError(error))
+    );
   }
 
   private buildHttpParams(

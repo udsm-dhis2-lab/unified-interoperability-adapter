@@ -131,10 +131,16 @@
                 </tbody>
               </nz-table>
 
-              <div nz-row nzJustify="end" style="margin-top: 16px">
-                <button nz-button nzType="primary" (click)="onSubmitMappings()">
-                  Save mappings
-                </button>
+              <div nz-row nzJustify="end" style="margin-top: 16">
+                <nz-spin [nzSpinning]="isSubmittingMapping">
+                  <button
+                    nz-button
+                    nzType="primary"
+                    (click)="onSubmitMappings()"
+                  >
+                    Save mappings
+                  </button>
+                </nz-spin>
               </div>
             </div>
           </nz-card>

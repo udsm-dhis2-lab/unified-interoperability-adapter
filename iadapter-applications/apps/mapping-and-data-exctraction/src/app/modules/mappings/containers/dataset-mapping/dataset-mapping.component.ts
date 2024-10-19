@@ -49,6 +49,8 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  isSubmittingMapping: boolean = false;
+
   useIcdCodes = false;
 
   mappingsData: MappingsData = {
@@ -80,7 +82,6 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   onConfigurationSelect(value: any) {
-    console.log('SELECTED CONFIGURATION', value);
     this.assignConfigurationToSelectedDisaggregation(value);
   }
 
@@ -305,15 +306,26 @@ export class DatasetMappingComponent implements OnInit {
           }),
         ],
       },
-      dataKey: '',
-      namespace: '',
+      dataKey: this.selectedInputId,
+      namespace: `MAPPINGS-${this.selectedInputId}`,
       description: '',
       group: '',
     };
-    console.log('MAPPING PAYLOAD', payLoad);
+    return payLoad;
   }
 
   onSubmitMappings() {
-    this.createMappingsPayload();
+    this.isSubmittingMapping = true;
+    const payLoad: any = this.createMappingsPayload();
+    this.dataSetManagementService.addMappings(payLoad).subscribe({
+      next: (data: any) => {
+        this.isSubmittingMapping = false;
+        // TODO: Handle response
+      },
+      error: (error: any) => {
+        this.isSubmittingMapping = false;
+        // TODO: Handle error
+      },
+    });
   }
 }
