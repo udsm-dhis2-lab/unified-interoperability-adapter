@@ -68,6 +68,7 @@ export class DatasetMappingComponent implements OnInit {
   datasetFormContent: string = '';
   sanitizedContent!: SafeHtml;
 
+  inputElements: HTMLInputElement[] = [];
   selectedInputId: string = '';
 
   searchConfigurationChange$ = new BehaviorSubject('');
@@ -150,10 +151,10 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   addFocusListeners(): void {
-    const inputElements = this.elRef.nativeElement.querySelectorAll(
+    this.inputElements = this.elRef.nativeElement.querySelectorAll(
       'input[name="entryfield"]'
     );
-    inputElements.forEach((input: HTMLInputElement) => {
+    this.inputElements.forEach((input: HTMLInputElement) => {
       this.renderer.listen(input, 'focus', (event) => this.onInputFocus(event));
     });
   }
@@ -167,10 +168,27 @@ export class DatasetMappingComponent implements OnInit {
       .subscribe({
         next: (data: any) => {
           this.mappingsData.disagregations = [];
-          this.isLoadingDisaggregation = false;
-          this.mappingsData.disagregations = data.map(
-            (item: any) => new Disaggregation(item.id, item.name)
+
+          const preSelectedInputs = this.elRef.nativeElement.querySelectorAll(
+            'input[name="entryfield"][style*="background-color: green"]'
           );
+          preSelectedInputs.forEach((input: HTMLInputElement) => {
+            this.renderer.removeAttribute(input, 'disabled');
+            this.renderer.removeStyle(input, 'background-color');
+          });
+
+          this.isLoadingDisaggregation = false;
+
+          this.mappingsData.disagregations = data.map((item: any) => {
+            const matchingInputs = this.elRef.nativeElement.querySelectorAll(
+              `input[name="entryfield"][id*="${this.selectedInputId}-${item.id}"]`
+            );
+            matchingInputs.forEach((input: HTMLInputElement) => {
+              this.renderer.setAttribute(input, 'disabled', 'true');
+              this.renderer.setStyle(input, 'background-color', 'green');
+            });
+            return new Disaggregation(item.id, item.name);
+          });
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
