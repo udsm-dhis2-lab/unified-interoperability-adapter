@@ -8,6 +8,7 @@ import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.ClientRegistrationDTO;
 import com.Adapter.icare.Dtos.ClientsToMergeDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
@@ -17,7 +18,6 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -147,7 +147,7 @@ public class ClientRegistryController {
     }
 
     @PostMapping(value = "/clients", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> saveClient(@RequestBody Map<String, Object> client) throws Exception {
+    public ResponseEntity<Map<String, Object>> saveClient(@RequestBody ClientRegistrationDTO client) throws Exception {
         // TODO: This is just placeholder. Add support to save patient.
         Map<String, Object> patientDataResponse = new HashMap<>();
         try {
