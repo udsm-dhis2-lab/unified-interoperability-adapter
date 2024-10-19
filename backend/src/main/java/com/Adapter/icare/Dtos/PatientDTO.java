@@ -159,7 +159,7 @@ public class PatientDTO {
                 identifierDTO.setSystem(identifier.getSystem());
                 if (identifier.getAssigner() != null) {
                     FacilityDetailsDTO facilityDetails = getFacilityDetailsDTO(identifier);
-                    identifierDTO.setOrganisation(facilityDetails);
+                    identifierDTO.setOrganization(facilityDetails);
                 }
                 identifiers.add(identifierDTO);
             }
