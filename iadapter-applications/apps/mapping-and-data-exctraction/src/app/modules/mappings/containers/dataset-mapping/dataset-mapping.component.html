@@ -39,7 +39,7 @@
               <div nz-col nzSpan="12">
                 <custom-select
                   [placeHolder]="placeHolderForConfigurationSelect"
-                  [isMultiple]="true"
+                  [isMultiple]="false"
                   [isLoading]="isLoadingConfigurations"
                   [optionList]="configurationOptionList"
                   (onSearchChange)="onSearchConfiguration($event)"
@@ -80,11 +80,6 @@
               >
                 <thead>
                   <tr>
-                    <th
-                      [(nzChecked)]="disaggregationRowChecked"
-                      [nzIndeterminate]="indeterminate"
-                      (nzCheckedChange)="onAllDisaggregationRowsChecked($event)"
-                    ></th>
                     <th>Disaggregation</th>
                     <th>Configurations</th>
                   </tr>
@@ -93,27 +88,60 @@
                   @for (data of mappingsData.disagregations; track
                   data.categoryOptionComboId) {
                   <tr>
-                    <td
-                      [nzChecked]="
-                        setOfCheckedId.has(data.categoryOptionComboId)
-                      "
-                      (nzCheckedChange)="
-                        onDisaggregationRowChecked(
-                          data.categoryOptionComboId,
-                          $event
-                        )
-                      "
-                    ></td>
                     <td>{{ data.categoryOptionComboName }}</td>
                     <td>
-                      @for (config of data.configurations ?? []; track $index) {
-                     
-                      }
+                      <ng-container
+                        *ngFor="
+                          let config of data.configurations ?? [];
+                          let i = index
+                        "
+                      >
+                        <nz-select
+                          ngModel="default"
+                          (ngModelChange)="
+                            onSelectMappingSetting({
+                              value: $event,
+                              categoryOptionComboId: data.categoryOptionComboId,
+                              settingName: config.name
+                            })
+                          "
+                          style="margin-right: 16px"
+                        >
+                          <ng-container
+                            *ngFor="
+                              let option of config.options ?? [];
+                              let j = index
+                            "
+                          >
+                            <nz-option
+                              [nzValue]="option.code"
+                              [nzLabel]="option.name"
+                            ></nz-option>
+                          </ng-container>
+                          <nz-option
+                            nzValue="default"
+                            nzLabel="Select"
+                            nzHide
+                          ></nz-option>
+                        </nz-select>
+                      </ng-container>
                     </td>
                   </tr>
                   }
                 </tbody>
               </nz-table>
+
+              <div nz-row nzJustify="end" style="margin-top: 16">
+                <nz-spin [nzSpinning]="isSubmittingMapping">
+                  <button
+                    nz-button
+                    nzType="primary"
+                    (click)="onSubmitMappings()"
+                  >
+                    Save mappings
+                  </button>
+                </nz-spin>
+              </div>
             </div>
           </nz-card>
         </div>
