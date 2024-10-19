@@ -20,6 +20,8 @@ public class SharedHealthRecordsDTO {
     private ReportDetailsDTO reportDetails;
     private DemographicDetailsDTO demographicDetails;
 
+    private List<PaymentDetailsDTO> paymentDetails;
+
     @NotNull(message = "value cannot be null")
     private VisitDetailsDTO visitDetails;
 
@@ -30,4 +32,12 @@ public class SharedHealthRecordsDTO {
     private List<ChronicConditionsDTO> chronicConditions;
 
     private LifeStyleInformationDTO lifeStyleInformation;
+
+    private List<InvestigationDetailsDTO> investigationDetails;
+
+    private List<LabInvestigationDetailsDTO> labInvestigationDetails;
+
+    private List<DiagnosisDetailsDTO> diagnosisDetails;
+
+    private List<MedicationDetailsDTO> medicationDetails;
 }

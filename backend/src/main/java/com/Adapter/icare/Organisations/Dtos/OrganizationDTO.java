@@ -1,5 +1,6 @@
 package com.Adapter.icare.Organisations.Dtos;
 
+import com.Adapter.icare.Dtos.FacilityDetailsDTO;
 import com.Adapter.icare.Dtos.IdentifierDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -47,14 +48,14 @@ public class OrganizationDTO {
         return mappedOrganization;
     }
 
-    public Map<String,Object> toSummary() {
-        Map<String, Object> mappedOrganization = new HashMap<>();
-        mappedOrganization.put("name", this.name);
+    public FacilityDetailsDTO toSummary() {
+        FacilityDetailsDTO mappedOrganization = new FacilityDetailsDTO();
+        mappedOrganization.setName(this.name);
         String code = "";
         if (!this.identifiers.isEmpty()) {
            code = this.identifiers.get(0).getValue();
         }
-        mappedOrganization.put("code", code);
+        mappedOrganization.setCode(code);
         return mappedOrganization;
     }
 }

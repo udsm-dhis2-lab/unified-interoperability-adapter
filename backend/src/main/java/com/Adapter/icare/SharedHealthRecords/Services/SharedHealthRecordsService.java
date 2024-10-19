@@ -77,7 +77,7 @@ public class SharedHealthRecordsService {
             boolean includeDeceased,
             Integer numberOfVisits
     ) throws Exception {
-        List<Map<String,Object>> sharedRecords =  new ArrayList<>();
+        List<SharedHealthRecordsDTO> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
         if (onlyLinkedClients) {
@@ -110,17 +110,17 @@ public class SharedHealthRecordsService {
         if (!response.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
-                    Map<String, Object> templateData = new HashMap<>();
+                    SharedHealthRecordsDTO templateData = new SharedHealthRecordsDTO();
                     Patient patient = (Patient) entry.getResource();
                     try {
                         PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
-                        templateData.put("id", patientDTO.getId());
                         // TODO: Provided HFR code is provided find a way to return relevant identifiers
-                        templateData.put("demographicDetails", patientDTO.toMap());
+                        templateData.setDemographicDetails(patientDTO.toMap());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    templateData.put("paymentDetails", null);
+
+                    templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
                     Organization organization = null;
                     if (hfrCode !=null) {
                         try {
@@ -136,7 +136,7 @@ public class SharedHealthRecordsService {
                             e.printStackTrace();
                         }
                     }
-                    templateData.put("facilityDetails", organization != null ?
+                    templateData.setFacilityDetails(organization != null ?
                             new OrganizationDTO(
                                     organization.getId(),
                                     organization.getIdentifier(),
@@ -145,13 +145,14 @@ public class SharedHealthRecordsService {
 
                     // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
                     Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
-                    Map<String,Object> visitDetails = new HashMap<>();
+                    VisitDetailsDTO visitDetails = new VisitDetailsDTO();
                     if (encounter != null) {
-                        visitDetails.put("id", encounter.getIdElement().getIdPart());
-                        visitDetails.put("visitDate", encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ?  encounter.getPeriod().getStart(): null);
-                        visitDetails.put("closedDate", encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd(): null);
-                        visitDetails.put("newThisYear", null);
-                        visitDetails.put("new", null);
+                        visitDetails.setId(encounter.getIdElement().getIdPart());
+                        visitDetails.setVisitDate(encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ?  encounter.getPeriod().getStart(): null);
+                        visitDetails.setClosedDate(encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd(): null);
+                        // TODO: Find a way to retrieve these from resource
+                        visitDetails.setNewThisYear(Boolean.FALSE);
+                        visitDetails.setNew(Boolean.FALSE);
                         // TODO: Add history when numberOfVisits > 1
                     } else if (organization != null) {
                         // TODO: Request visit from facility provided
@@ -159,10 +160,7 @@ public class SharedHealthRecordsService {
                     } else {
                         visitDetails = null;
                     }
-                    templateData.put("visitDetails", visitDetails);
-
-                    templateData.put("diagnosisDetails", null);
-
+                    templateData.setVisitDetails(visitDetails);
                     sharedRecords.add(templateData);
                 }
             }
@@ -176,110 +174,6 @@ public class SharedHealthRecordsService {
         pager.put("pageSize", pageSize);
         sharedRecordsResponse.put("pager",pager);
         return sharedRecordsResponse;
-    }
-
-    public List<Map<String, Object>> getSharedRecords(
-            Integer page,
-            Integer pageSize,
-            String identifier,
-            String identifierType,
-            boolean onlyLinkedClients,
-            String gender,
-            String firstName,
-            String middleName,
-            String lastName,
-            String hfrCode,
-            boolean includeDeceased,
-            Integer numberOfVisits
-    ) throws Exception {
-        List<Map<String,Object>> sharedRecords =  new ArrayList<>();
-        Bundle response = new Bundle();
-        var searchRecords =  fhirClient.search().forResource(Patient.class);
-        if (onlyLinkedClients) {
-            // TODO replace hardcoded ids with dynamic ones
-            searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
-        }
-
-        // TODO: Review the deceased concept
-        if (!includeDeceased) {
-//            searchRecords.where(Patient.DECEASED.isMissing(true));
-        }
-//                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
-        if (identifier != null) {
-            searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
-        }
-
-        if (firstName != null) {
-            searchRecords.where(Patient.GIVEN.matches().value(firstName));
-        }
-
-        response = searchRecords.count(pageSize)
-                .offset(page -1)
-                .returnBundle(Bundle.class)
-                .execute();
-
-        if (!response.getEntry().isEmpty()) {
-            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
-                if (entry.getResource() instanceof Patient) {
-                    Map<String, Object> templateData = new HashMap<>();
-                    Patient patient = (Patient) entry.getResource();
-                    try {
-                        PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
-                        templateData.put("id", patientDTO.getId());
-                        // TODO: Provided HFR code is provided find a way to return relevant identifiers
-                        templateData.put("demographicDetails", patientDTO.toMap());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    templateData.put("paymentDetails", null);
-                    Organization organization = null;
-                    if (hfrCode !=null) {
-                        try {
-                            Bundle bundle = new Bundle();
-                            bundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode)).returnBundle(Bundle.class)
-                                    .execute();
-                            for (Bundle.BundleEntryComponent bundleEntryComponent : bundle.getEntry()) {
-                                if (bundleEntryComponent.getResource() instanceof Organization) {
-                                    organization = (Organization) bundleEntryComponent.getResource();
-                                }
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    templateData.put("facilityDetails", organization != null ?
-                            new OrganizationDTO(
-                                    organization.getId(),
-                                    organization.getIdentifier(),
-                                    organization.getName(),
-                                    organization.getActive()).toSummary(): null);
-
-                    // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
-                    Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
-                    Map<String,Object> visitDetails = new HashMap<>();
-                    if (encounter != null) {
-                        visitDetails.put("id", encounter.getIdElement().getIdPart());
-                        visitDetails.put("visitDate", encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ?  encounter.getPeriod().getStart(): null);
-                        visitDetails.put("closedDate", encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd(): null);
-                        visitDetails.put("newThisYear", null);
-                        visitDetails.put("new", null);
-                        // TODO: Add history when numberOfVisits > 1
-                    } else if (organization != null) {
-                        // TODO: Request visit from facility provided
-                        visitDetails = null;
-                    } else {
-                        visitDetails = null;
-                    }
-                    templateData.put("visitDetails", visitDetails);
-
-                    templateData.put("diagnosisDetails", null);
-
-                    sharedRecords.add(templateData);
-                }
-            }
-        }
-        return sharedRecords;
     }
 
     public Encounter getLatestEncounterUsingPatientAndOrganisation(String id, Organization organization) throws Exception {
@@ -395,5 +289,32 @@ public class SharedHealthRecordsService {
         codings.add(coding);
         codeableConcept.setCoding(codings);
         return codeableConcept;
+    }
+
+    public List<PaymentDetailsDTO> getPaymentDetailsViaCoverage(Patient patient) throws Exception {
+        try {
+            List<PaymentDetailsDTO> paymentDetailsList = new ArrayList<>();
+            var coverageSearch = fhirClient.search().forResource(Coverage.class);
+            coverageSearch.where(Coverage.BENEFICIARY.hasAnyOfIds(patient.getIdElement().getIdPart()));
+            Bundle coverageBundle = coverageSearch
+                    .returnBundle(Bundle.class)
+                    .execute();
+
+            if (!coverageBundle.getEntry().isEmpty()) {
+                for (Bundle.BundleEntryComponent entry : coverageBundle.getEntry()) {
+                    if (entry.getResource() instanceof Coverage) {
+                        Coverage coverage = (Coverage) entry.getResource();
+                        PaymentDetailsDTO paymentDetails = new PaymentDetailsDTO();
+                        paymentDetails.setStatus(coverage.getStatus().getDisplay());
+                        paymentDetails.setInsuranceId(coverage.getId());
+                        paymentDetailsList.add(paymentDetails);
+                    }
+                }
+            }
+            return paymentDetailsList;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return List.of();
     }
 }
