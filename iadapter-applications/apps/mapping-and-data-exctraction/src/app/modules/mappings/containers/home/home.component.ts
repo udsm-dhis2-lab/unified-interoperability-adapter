@@ -204,6 +204,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.reLoadDataSets();
         },
         error: (error: any) => {
           // TODO: Implement error handling
@@ -217,10 +218,20 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.reLoadDataSets();
         },
         error: (error: any) => {
           // TODO: Implement error handling
         },
       });
+  }
+
+  reLoadDataSets() {
+    this.loadDatasetsFromServer(
+      1,
+      10,
+      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+      [{ key: 'instance', value: [this.selectedInstance!] }]
+    );
   }
 }
