@@ -11,20 +11,29 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import {
-  CategoryOptionCombo,
-  ConfigurationPage,
-  IcdCodePage,
-} from '../../models';
+import { ConfigurationPage, IcdCodePage } from '../../models';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
 }
 
+interface Setting {
+  name: string;
+  selectedValue?: string;
+  keyToUseInPayload?: string;
+  options: any;
+}
+
+interface SelectedSettingOption {
+  value: string;
+  categoryOptionComboId: string;
+  settingName: string;
+}
+
 class Disaggregation {
   categoryOptionComboId!: string;
   categoryOptionComboName!: string;
-  configurations?: any[];
+  configurations?: Setting[];
 
   constructor(categoryOptionComboId: string, categoryOptionComboName: string) {
     this.categoryOptionComboId = categoryOptionComboId;
@@ -40,6 +49,8 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  isSubmittingMapping: boolean = false;
+
   useIcdCodes = false;
 
   mappingsData: MappingsData = {
@@ -47,40 +58,6 @@ export class DatasetMappingComponent implements OnInit {
   };
 
   selectedICdCodes: string[] = [];
-
-  disaggregationRowChecked = false;
-  indeterminate = false;
-  setOfCheckedId = new Set<string>();
-
-  updateCheckedSet(id: string, checked: boolean): void {
-    if (checked) {
-      this.setOfCheckedId.add(id);
-    } else {
-      this.setOfCheckedId.delete(id);
-    }
-  }
-
-  onDisaggregationRowChecked(id: string, checked: boolean): void {
-    this.updateCheckedSet(id, checked);
-    this.refreshDisaggregationCheckedStatus();
-  }
-
-  onAllDisaggregationRowsChecked(value: boolean): void {
-    this.mappingsData.disagregations.forEach((item) =>
-      this.updateCheckedSet(item.categoryOptionComboId, value)
-    );
-    this.refreshDisaggregationCheckedStatus();
-  }
-
-  refreshDisaggregationCheckedStatus(): void {
-    this.disaggregationRowChecked = this.mappingsData.disagregations.every(
-      (item) => this.setOfCheckedId.has(item.categoryOptionComboId)
-    );
-    this.indeterminate =
-      this.mappingsData.disagregations.some((item) =>
-        this.setOfCheckedId.has(item.categoryOptionComboId)
-      ) && !this.disaggregationRowChecked;
-  }
 
   isLoadingDisaggregation: boolean = false;
   leftColumnSpan: number = 16;
@@ -104,18 +81,23 @@ export class DatasetMappingComponent implements OnInit {
     this.searchConfigurationChange$.next(value);
   }
 
-  onConfigurationSelect(value: string[]) {
+  onConfigurationSelect(value: any) {
     this.assignConfigurationToSelectedDisaggregation(value);
   }
 
-  assignConfigurationToSelectedDisaggregation(configuration: string[]): void {
+  assignConfigurationToSelectedDisaggregation(configuration: any[]): void {
     this.mappingsData.disagregations.forEach((item) => {
-      if (this.setOfCheckedId.has(item.categoryOptionComboId)) {
-        if (!item.configurations) {
-          item.configurations = [];
-        }
-        item.configurations = configuration;
+      if (!item.configurations) {
+        item.configurations = [];
       }
+      item.configurations = [
+        ...item.configurations,
+        {
+          name: configuration[0],
+          selectedValue: '',
+          options: configuration[1],
+        },
+      ];
     });
   }
 
@@ -130,8 +112,8 @@ export class DatasetMappingComponent implements OnInit {
     this.searchIcdCodeChange$.next(value);
   }
 
-  onIcdCodeSelect(value: string[]) {
-    this.selectedICdCodes = value;
+  onIcdCodeSelect(value: string) {
+    this.selectedICdCodes = [...this.selectedICdCodes, value];
   }
 
   constructor(
@@ -154,7 +136,6 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetManagementService.getInstanceById(uuid).subscribe({
       next: (data: any) => {
         this.isLoading = false;
-        // const datasetFields = JSON.parse(data.datasetFields);
         this.sanitizedContent = this.sanitizer.bypassSecurityTrustHtml(
           data.datasetFields.dataEntryForm.htmlCode
         );
@@ -169,7 +150,9 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   addFocusListeners(): void {
-    const inputElements = this.elRef.nativeElement.querySelectorAll('input');
+    const inputElements = this.elRef.nativeElement.querySelectorAll(
+      'input[name="entryfield"]'
+    );
     inputElements.forEach((input: HTMLInputElement) => {
       this.renderer.listen(input, 'focus', (event) => this.onInputFocus(event));
     });
@@ -188,7 +171,6 @@ export class DatasetMappingComponent implements OnInit {
           this.mappingsData.disagregations = data.map(
             (item: any) => new Disaggregation(item.id, item.name)
           );
-          this.refreshDisaggregationCheckedStatus();
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
@@ -255,7 +237,7 @@ export class DatasetMappingComponent implements OnInit {
         this.configurationOptionList =
           data?.listOfConfigurations?.map((configuration: any) => {
             return {
-              value: configuration.options,
+              value: [configuration.name, configuration.options],
               label: configuration.name,
             };
           }) ?? [];
@@ -267,5 +249,83 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
-  onSubmitMappings() {}
+  onSelectMappingSetting(event: SelectedSettingOption) {
+    this.mappingsData.disagregations.forEach((item) => {
+      if (item.categoryOptionComboId === event.categoryOptionComboId) {
+        item.configurations?.forEach((config) => {
+          if (config.name === event.settingName) {
+            config.selectedValue = event.value;
+            if (config.name === 'Gender') {
+              config.keyToUseInPayload = 'gender';
+            }
+            if (config.name === 'Agetype') {
+              config.keyToUseInPayload = 'ageType';
+            }
+            if (config.name === 'TEST') {
+              config.keyToUseInPayload = 'test';
+            }
+          }
+        });
+      }
+    });
+  }
+
+  createMappingsPayload() {
+    const payLoad = {
+      mapping: {
+        mappings: [
+          this.selectedICdCodes.map((item) => {
+            return {
+              code: item,
+            };
+          }),
+        ],
+        dataElement: {
+          id: this.selectedInputId,
+          name: '',
+          code: '',
+        },
+        type: '',
+        params: [
+          this.mappingsData.disagregations.map((item) => {
+            return {
+              co: item.categoryOptionComboId,
+              ...(item.configurations ?? []).reduce((acc, config: Setting) => {
+                if (config.name === 'Agegroup') {
+                  const startingAge = config.selectedValue?.split('-')[0];
+                  const endingAge = config.selectedValue?.split('-')[1];
+                  acc['startAge'] = startingAge;
+                  acc['endAge'] = endingAge;
+                } else {
+                  acc[config.keyToUseInPayload as string] =
+                    config.selectedValue;
+                }
+                return acc;
+              }, {} as { [key: string]: any }),
+            };
+          }),
+        ],
+      },
+      dataKey: this.selectedInputId,
+      namespace: `MAPPINGS-${this.selectedInputId}`,
+      description: '',
+      group: '',
+    };
+    return payLoad;
+  }
+
+  onSubmitMappings() {
+    this.isSubmittingMapping = true;
+    const payLoad: any = this.createMappingsPayload();
+    this.dataSetManagementService.addMappings(payLoad).subscribe({
+      next: (data: any) => {
+        this.isSubmittingMapping = false;
+        // TODO: Handle response
+      },
+      error: (error: any) => {
+        this.isSubmittingMapping = false;
+        // TODO: Handle error
+      },
+    });
+  }
 }

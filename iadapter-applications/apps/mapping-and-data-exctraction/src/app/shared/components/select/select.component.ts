@@ -17,7 +17,7 @@ export class SelectComponent {
   selectedItem?: any;
 
   @Output() onSearchChange: EventEmitter<string> = new EventEmitter<string>();
-  @Output() onSelectChange = new EventEmitter<string[]>();
+  @Output() onSelectChange = new EventEmitter<any>();
 
   @Input({
     required: true,
@@ -38,7 +38,7 @@ export class SelectComponent {
 
   onSelect(value: any): void {
     if (!this.isMultiple) {
-      this.onSelectChange.emit([value]);
+      this.onSelectChange.emit(value);
       return;
     }
     const filteredValue = value.filter((item: any) => item !== '');
