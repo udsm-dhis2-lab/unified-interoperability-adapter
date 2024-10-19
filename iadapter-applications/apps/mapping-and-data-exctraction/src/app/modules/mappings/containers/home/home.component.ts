@@ -102,6 +102,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
           this.total = data.total; //data.total;
           this.pageIndex = data.pageIndex;
           this.listOfDatasets = data.listOfDatasets;
+          console.log('LOADED DATASETS', this.listOfDatasets);
         },
         error: (error) => {
           this.loading = false;

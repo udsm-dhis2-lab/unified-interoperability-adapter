@@ -101,7 +101,13 @@
                       })
                     "
                   >
-                    {{ getButtonText(data.dataSetInstance) }}
+                    {{
+                      selectedInstanceFetchingMechanism === 'selectedDatasets'
+                        ? 'Map'
+                        : data.dataSetInstance !== undefined
+                        ? 'Remove'
+                        : 'Select'
+                    }}
                   </button>
                 </td>
               </tr>
