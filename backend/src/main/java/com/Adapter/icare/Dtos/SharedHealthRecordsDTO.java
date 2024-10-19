@@ -40,4 +40,18 @@ public class SharedHealthRecordsDTO {
     private List<DiagnosisDetailsDTO> diagnosisDetails;
 
     private List<MedicationDetailsDTO> medicationDetails;
+
+    private TreatmentDetailsDTO treatmentDetails;
+
+    private List<RadiologyDetailsDTO> radiologyDetails;
+
+    private AdmissionDetailsDTO admissionDetails;
+
+    private OutcomeDetailsDTO outcomeDetails;
+
+    private CausesOfDeathDetailsDTO causesOfDeathDetails;
+
+    private List<BillingsDetailsDTO> billingsDetails;
+
+    private ReferralDetailsDTO referralDetails;
 }
