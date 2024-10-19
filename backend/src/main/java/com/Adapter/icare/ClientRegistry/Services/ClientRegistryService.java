@@ -68,7 +68,7 @@ public class ClientRegistryService {
     ) throws Exception {
         Map<String,Object> patientDataResponse = new HashMap<>();
         try {
-            List<Map<String, Object>> patients = new ArrayList<>();
+            List<ClientRegistrationDTO> patients = new ArrayList<>();
             Bundle response = new Bundle();
             // TODO: You might consider enumerating the gender codes
             var searchClient =  fhirClient.search().forResource(Patient.class);
@@ -108,10 +108,24 @@ public class ClientRegistryService {
 
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
-                    Patient patientData = (Patient) entry.getResource();
-                    patientData.getIdentifier();
-                    PatientDTO patientDTO = mapToPatientDTO(patientData);
-                    patients.add(patientDTO.toMap());
+                    try {
+                        Patient patientData = (Patient) entry.getResource();
+                        patientData.getIdentifier();
+                        PatientDTO patientDTO = mapToPatientDTO(patientData);
+                        ClientRegistrationDTO clientDetails = new ClientRegistrationDTO();
+                        clientDetails.setDemographicDetails(patientDTO.toMap());
+                        Organization managingOrganization = new Organization();
+                        FacilityDetailsDTO facilityDetails = new FacilityDetailsDTO();
+                        managingOrganization = (Organization) patientData.getManagingOrganization().getResource();
+                        if (managingOrganization != null && managingOrganization.getIdElement() != null) {
+                            facilityDetails.setCode(managingOrganization.getIdElement().getIdPart());
+                            facilityDetails.setName(managingOrganization.getName());
+                        }
+                        clientDetails.setFacilityDetails(facilityDetails);
+                        patients.add(clientDetails);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
             patientDataResponse.put("results", patients);
@@ -128,7 +142,7 @@ public class ClientRegistryService {
         }
     }
 
-    public List<Map<String, Object>> getPatients(int page,
+    public List<DemographicDetailsDTO> getPatients(int page,
                                                  int pageSize,
                                                  String status,
                                                  String identifier,
@@ -140,7 +154,7 @@ public class ClientRegistryService {
                                                  Date dateOfBirth,
                                                  Boolean onlyLinkedClients) {
         try {
-            List<Map<String, Object>> patients = new ArrayList<>();
+            List<DemographicDetailsDTO> patients = new ArrayList<>();
             Bundle response = new Bundle();
             // TODO: You might consider enumerating the gender codes
             var searchClient =  fhirClient.search().forResource(Patient.class);

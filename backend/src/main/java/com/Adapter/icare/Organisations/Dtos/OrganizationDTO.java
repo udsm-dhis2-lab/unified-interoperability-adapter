@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Organization;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +33,17 @@ public class OrganizationDTO {
         Map<String, Object> mappedOrganization = new HashMap<>();
         mappedOrganization.put("name", this.name);
         mappedOrganization.put("active", this.active);
-        mappedOrganization.put("identifiers", this.identifiers.stream().map(identifier -> new IdentifierDTO(
-                identifier.getSystem(), identifier.getValue(), identifier.getUse().toString(), identifier.getType().toString()).toMap()));
+        List<IdentifierDTO> identifierDTOs = new ArrayList<>();
+        if (!this.getIdentifiers().isEmpty()) {
+            for(Identifier identifier: this.getIdentifiers()) {
+                IdentifierDTO identifierDTO = new IdentifierDTO();
+                identifierDTO.setId(identifier.getIdElement().getId());
+                identifierDTO.setType(identifier.getType().getText());
+                identifierDTO.setUse(identifier.getUse().getDisplay());
+                identifierDTOs.add(identifierDTO);
+            }
+        }
+        mappedOrganization.put("identifiers", identifierDTOs);
         return mappedOrganization;
     }
 

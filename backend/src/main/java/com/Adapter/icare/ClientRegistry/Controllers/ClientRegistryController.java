@@ -10,6 +10,7 @@ import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.ClientRegistrationDTO;
 import com.Adapter.icare.Dtos.ClientsToMergeDTO;
+import com.Adapter.icare.Dtos.DemographicDetailsDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -165,7 +166,7 @@ public class ClientRegistryController {
         // TODO: Replace with FHIR implementation
         try {
             Map<String, Object> patientDataResponse = new HashMap<>();
-            List<Map<String, Object>> patients = clientRegistryService.getPatients(
+            List<DemographicDetailsDTO> patients = clientRegistryService.getPatients(
                     page,
                     pageSize,
                     null,

@@ -5,11 +5,13 @@ import lombok.Setter;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
 public class DemographicDetailsDTO {
     private String mrn;
+    private String id;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -24,4 +26,5 @@ public class DemographicDetailsDTO {
     private List<IdentifierDTO> identifiers;
     private List<ContactPeopleDTO> contactPeople;
     private List<PaymentDetailsDTO> paymentDetails;
+    private List<Map<String,Object>> relatedClients;
 }

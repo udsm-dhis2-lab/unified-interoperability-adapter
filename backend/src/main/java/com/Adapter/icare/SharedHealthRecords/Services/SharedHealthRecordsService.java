@@ -332,7 +332,7 @@ public class SharedHealthRecordsService {
         String defaultIdentifierType = this.clientRegistryConstants.DefaultIdentifierType;
         // TODO: Find a way to use default identifier type to get client
         for (IdentifierDTO identifier: identifiers) {
-            patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getValue());
+            patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getId());
             if (patient != null) {
                 break;
             }
