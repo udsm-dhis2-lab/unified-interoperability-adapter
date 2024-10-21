@@ -1,5 +1,6 @@
 package com.Adapter.icare.Domains;
 
+import com.Adapter.icare.Dtos.MediatorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -62,6 +63,18 @@ public class Mediator  extends BaseEntity implements Serializable {
             return value;
         }
     }
+
+    public Mediator fromMap(MediatorDTO mediatorDTO) {
+        Mediator mediator = new Mediator();
+        mediator.setBaseUrl(mediatorDTO.getBaseUrl());
+        mediator.setPath(mediatorDTO.getPath());
+        mediator.setCode(mediatorDTO.getCode());
+        mediator.setCategory(mediatorDTO.getCategory());
+        mediator.setAuthToken(mediatorDTO.getAuthToken());
+        mediator.setAuthType(mediatorDTO.getAuthType());
+        return mediator;
+    }
+
     public Map<String,Object> toMap() {
         Map<String,Object> mappedMediator = new HashMap<>();
         mappedMediator.put("uuid", this.getUuid());
