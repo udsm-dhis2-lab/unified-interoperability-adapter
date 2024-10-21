@@ -78,11 +78,10 @@ public class ClientRegistryController {
         if (WESystemConfigurations != null) {
             Map<String, Object> weSystemConfigValue = WESystemConfigurations.getValue();
             if (weSystemConfigValue != null) {
-                Object activeConfig = weSystemConfigValue.get("active");
-                this.shouldUseWorkflowEngine = activeConfig != null && activeConfig instanceof Boolean ? (Boolean) activeConfig : false;
+                String activeConfig = weSystemConfigValue.get("active") != null ? weSystemConfigValue.get("active").toString(): null;
+                this.shouldUseWorkflowEngine = weSystemConfigValue.get("active") != null ? Boolean.parseBoolean(weSystemConfigValue.get("active").toString()): false;
 
-                Object codeConfig = weSystemConfigValue.get("code");
-                this.defaultWorkflowEngineCode = codeConfig != null ? codeConfig.toString() : null;
+                this.defaultWorkflowEngineCode = weSystemConfigValue.get("code") != null ? weSystemConfigValue.get("code").toString(): null;
 
                 if (this.defaultWorkflowEngineCode != null) {
                     this.workflowEngine = mediatorsService.getMediatorByCode(this.defaultWorkflowEngineCode);

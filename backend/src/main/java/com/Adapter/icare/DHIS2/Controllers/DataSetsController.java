@@ -144,6 +144,7 @@ public class DataSetsController {
                 return ResponseEntity.ok(response);
             } else {
                 response.put("message", "Instance with uuid " + instance + " is not set");
+                response.put("statusCode",HttpStatus.NOT_FOUND.value());
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {

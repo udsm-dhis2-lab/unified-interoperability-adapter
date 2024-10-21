@@ -65,11 +65,9 @@ public class HDUAPIController {
         if (WESystemConfigurations != null) {
             Map<String, Object> weSystemConfigValue = WESystemConfigurations.getValue();
             if (weSystemConfigValue != null) {
-                Object activeConfig = weSystemConfigValue.get("active");
-                this.shouldUseWorkflowEngine = activeConfig != null && activeConfig instanceof Boolean ? (Boolean) activeConfig : false;
+                this.shouldUseWorkflowEngine = weSystemConfigValue.get("active") != null ? Boolean.parseBoolean(weSystemConfigValue.get("active").toString()): false;
 
-                Object codeConfig = weSystemConfigValue.get("code");
-                this.defaultWorkflowEngineCode = codeConfig != null ? codeConfig.toString() : null;
+                this.defaultWorkflowEngineCode = weSystemConfigValue.get("code") != null ? weSystemConfigValue.get("code").toString(): null;
 
                 if (this.defaultWorkflowEngineCode != null) {
                     this.workflowEngine = mediatorsService.getMediatorByCode(this.defaultWorkflowEngineCode);
@@ -193,9 +191,11 @@ public class HDUAPIController {
                List<Map<String,Object>> recordsWithIssues = new ArrayList<>();
                if (clientRegistryConstants.ValidateDataTemplate) {
                    // validate data Template
+
                    DataTemplateDataDTO validatedDataTemplate = new DataTemplateDataDTO();
                    List<SharedHealthRecordsDTO> listGrid = dataTemplate.getData().getListGrid();
-                   List<SharedHealthRecordsDTO> validatedListGrid = dataTemplate.getData().getListGrid();
+                   List<SharedHealthRecordsDTO> validatedListGrid = new ArrayList<>();
+
                    for (SharedHealthRecordsDTO sharedHealthRecordsDTO: listGrid) {
                        DemographicDetailsDTO demographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
                        String mrn = sharedHealthRecordsDTO.getMrn();
@@ -206,10 +206,10 @@ public class HDUAPIController {
                            for (IdentifierDTO identifier: identifiers) {
                                patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getId());
                                if (patient != null) {
-                                   DemographicDetailsDTO demographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
-                                   demographicDetailsDTO.setId(patient.getId());
+                                   DemographicDetailsDTO newDemographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
+                                   newDemographicDetails.setId(patient.getId());
                                    SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
-                                   newSharedRecord.setDemographicDetails(demographicDetailsDTO);
+                                   newSharedRecord.setDemographicDetails(newDemographicDetails);
                                    validatedListGrid.add(newSharedRecord);
                                    break;
                                }
@@ -225,18 +225,18 @@ public class HDUAPIController {
                                recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
                                recordsWithIssues.add(recordWithIssue);
                            } else {
-                               DemographicDetailsDTO demographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
-                               demographicDetailsDTO.setId(patient.getId());
+                               DemographicDetailsDTO newDemographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
+                               newDemographicDetailsDTO.setId(patient.getId());
                                SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
-                               newSharedRecord.setDemographicDetails(demographicDetailsDTO);
+                               newSharedRecord.setDemographicDetails(newDemographicDetailsDTO);
                                validatedListGrid.add(newSharedRecord);
                            }
                        } else {
                            Map<String,Object> recordWithIssue = new HashMap<>();
                            Map<String,Object> patientDetails = new HashMap<>();
-                           VisitDetailsDTO visitDetails = sharedHealthRecordsDTO.getVisitDetails();
+                           VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
                            recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
-                           recordWithIssue.put("visitDetails", visitDetails);
+                           recordWithIssue.put("visitDetails", visitDetailsDTO);
                            recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
                            recordsWithIssues.add(recordWithIssue);
                        }
@@ -265,6 +265,7 @@ public class HDUAPIController {
                return null;
            }
        } catch (Exception e) {
+           e.printStackTrace();
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
        }
     }

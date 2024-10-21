@@ -10,7 +10,7 @@ import java.util.List;
 public interface ClientRegistryIdsRepository extends JpaRepository<ClientRegistryIdPool, Long> {
     List<ClientRegistryIdPool> findAll();
 
-    @Query(value = "SELECT * FROM client_registry_id_pool WHERE is_used=false LIMIT= :limit",nativeQuery = true)
+    @Query(value = "SELECT * FROM client_registry_id_pool WHERE is_used=false LIMIT :limit",nativeQuery = true)
     List<ClientRegistryIdPool> getIds(Integer limit);
 
 //    @Query(value = "SELECT COUNT(cridp) FROM client_registry_id_pool cridp WHERE is_used = true ")
