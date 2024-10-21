@@ -70,7 +70,7 @@
               <tr>
                 <th>SN</th>
                 <th>Code</th>
-                <th>Display name</th>
+                <th>Dataset</th>
                 <th>Period type</th>
                 <th>Form type</th>
                 <th>Expiry days</th>
@@ -84,7 +84,7 @@
                   {{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}
                 </td>
                 <td>{{ data.code }}</td>
-                <td>{{ data.displayName ?? data.name }}</td>
+                <td>{{ data.displayName }}</td>
                 <td>{{ data.periodType }}</td>
                 <td>{{ data.formType }}</td>
                 <td>{{ data.expiryDays }}</td>

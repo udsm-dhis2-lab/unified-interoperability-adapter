@@ -17,7 +17,11 @@ export class Dataset {
     dataset.name = json['name'];
     dataset.uuid = json['uuid'] ?? '';
     dataset.code = json['code'] ?? '';
-    dataset.displayName = json['displayName'];
+    dataset.displayName =
+      json['displayName'] ??
+      (json['formType'] === 'CUSTOM'
+        ? json['datasetFields']['dataEntryForm']['name']
+        : json['datasetFields']['displayName'] ?? '');
     dataset.periodType = json['periodType'] ?? '';
     dataset.formType = json['formType'] ?? '';
     dataset.expiryDays = json['expiryDays'] ?? '';
