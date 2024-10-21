@@ -49,7 +49,7 @@ public class MediatorsController {
 
     @GetMapping("mediators")
     public ResponseEntity<Map<String,Object>> getMediators(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "category", required = false) String category
