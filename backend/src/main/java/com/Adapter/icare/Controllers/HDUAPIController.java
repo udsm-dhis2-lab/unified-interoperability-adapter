@@ -190,7 +190,6 @@ public class HDUAPIController {
                Map<String, Object> payload = new HashMap<>();
                payload.put("code","dataTemplates");
                List<IdentifierDTO> clientIds = new ArrayList<>();
-               clientIds = clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
                List<Map<String,Object>> recordsWithIssues = new ArrayList<>();
                if (clientRegistryConstants.ValidateDataTemplate) {
                    // validate data Template
@@ -243,12 +242,14 @@ public class HDUAPIController {
                        }
                    }
                    validatedDataTemplate.setListGrid(validatedListGrid);
+                   clientIds = clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
                    validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
                    validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
                    validatedDataTemplate.setClientIdentifiersPool(clientIds);
                    payload.put("payload",validatedDataTemplate);
                } else {
                    DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
+                   clientIds = clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
                    updatedDataTemplateData.setClientIdentifiersPool(clientIds);
                    payload.put("payload", updatedDataTemplateData);
                }
