@@ -240,15 +240,15 @@ public class SharedHealthRecordsService {
                 }
             } else if (mrn != null) {
                 patient = this.clientRegistryService.getPatientUsingIdentifier(mrn);
-            } else {
-                patient = null;
-                throw new Exception("Client with MRN " + mrn + " does not exists and MRN is not enough to register the client on CR. Please provide demographic details");
+                if (patient == null) {
+                    throw new Exception("Client with MRN " + mrn + " does not exists and MRN is not enough to register the client on CR. Please provide demographic details");
+                }
             }
 
             if (patient == null) {
                 // 1. Check if mandatory IDs are found to register the client
                 if (mandatoryClientRegistryIdTypes == null) {
-                    throw new Exception("Mandatory Identifier types have not been set");
+                    throw new Exception("Mandatory Identifier types have not been set. Contact ICT team");
                 }
                 //2. Create patient
                 Patient patientToCreate = new Patient();

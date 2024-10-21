@@ -1,17 +1,18 @@
 package com.Adapter.icare.Controllers;
 
+import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.DataTemplateDTO;
-import com.Adapter.icare.Dtos.DatastoreConfigurationsDTO;
-import com.Adapter.icare.Dtos.MappingsDTO;
+import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.google.common.collect.Maps;
+import org.hl7.fhir.r4.model.Patient;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,15 +39,21 @@ public class HDUAPIController {
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
+    private final ClientRegistryService clientRegistryService;
+    private final ClientRegistryConstants clientRegistryConstants;
 
     public  HDUAPIController(DatastoreService datastoreService,
                              MediatorsService mediatorsService,
                              DatastoreConstants datastoreConstants,
-                             UserService userService) throws Exception {
+                             UserService userService,
+                             ClientRegistryService clientRegistryService,
+                             ClientRegistryConstants clientRegistryConstants) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
         this.datastoreConstants = datastoreConstants;
+        this.clientRegistryService = clientRegistryService;
         this.userService = userService;
+        this.clientRegistryConstants = clientRegistryConstants;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
@@ -173,18 +180,80 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
+    public ResponseEntity<Map<String,Object>> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
         /**
          * Send data to Mediator where all the logics will be done.
          */
+        Map<String,Object> response = new HashMap<>();
        try {
            if (shouldUseWorkflowEngine && workflowEngine != null) {
                Map<String, Object> payload = new HashMap<>();
                payload.put("code","dataTemplates");
-               payload.put("payload",dataTemplate.getData());
-               return ResponseEntity.ok(mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
+               List<Map<String,Object>> recordsWithIssues = new ArrayList<>();
+               if (clientRegistryConstants.ValidateDataTemplate) {
+                   // validate data Template
+                   DataTemplateDataDTO validatedDataTemplate = new DataTemplateDataDTO();
+                   List<SharedHealthRecordsDTO> listGrid = dataTemplate.getData().getListGrid();
+                   List<SharedHealthRecordsDTO> validatedListGrid = dataTemplate.getData().getListGrid();
+                   for (SharedHealthRecordsDTO sharedHealthRecordsDTO: listGrid) {
+                       DemographicDetailsDTO demographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
+                       String mrn = sharedHealthRecordsDTO.getMrn();
+                       // Check if mandatory identifier types are there or the CR ID
+                       List<IdentifierDTO> identifiers = demographicDetails != null ? demographicDetails.getIdentifiers(): null;
+                       Patient patient = new Patient();
+                       if (identifiers != null && !identifiers.isEmpty()) {
+                           for (IdentifierDTO identifier: identifiers) {
+                               patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getId());
+                               if (patient != null) {
+                                   DemographicDetailsDTO demographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
+                                   demographicDetailsDTO.setId(patient.getId());
+                                   SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
+                                   newSharedRecord.setDemographicDetails(demographicDetailsDTO);
+                                   validatedListGrid.add(newSharedRecord);
+                                   break;
+                               }
+                           }
+                       } else if (mrn != null) {
+                           patient = this.clientRegistryService.getPatientUsingIdentifier(mrn);
+                           if (patient == null) {
+                               Map<String,Object> recordWithIssue = new HashMap<>();
+                               Map<String,Object> patientDetails = new HashMap<>();
+                               VisitDetailsDTO visitDetails = sharedHealthRecordsDTO.getVisitDetails();
+                               recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
+                               recordWithIssue.put("visitDetails", visitDetails);
+                               recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
+                               recordsWithIssues.add(recordWithIssue);
+                           } else {
+                               DemographicDetailsDTO demographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
+                               demographicDetailsDTO.setId(patient.getId());
+                               SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
+                               newSharedRecord.setDemographicDetails(demographicDetailsDTO);
+                               validatedListGrid.add(newSharedRecord);
+                           }
+                       } else {
+                           Map<String,Object> recordWithIssue = new HashMap<>();
+                           Map<String,Object> patientDetails = new HashMap<>();
+                           VisitDetailsDTO visitDetails = sharedHealthRecordsDTO.getVisitDetails();
+                           recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
+                           recordWithIssue.put("visitDetails", visitDetails);
+                           recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
+                           recordsWithIssues.add(recordWithIssue);
+                       }
+                   }
+                   validatedDataTemplate.setListGrid(validatedListGrid);
+                   validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
+                   validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
+                   payload.put("payload",validatedDataTemplate);
+               } else {
+                   payload.put("payload", dataTemplate.getData());
+               }
+               response.put("response",mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
+               response.put("recordsWithIssues", recordsWithIssues);
+               return ResponseEntity.ok(response);
            } else if (!shouldUseWorkflowEngine) {
-               return ResponseEntity.ok(mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
+               // TODO: Review send data to mediator (OpenFN)
+               response.put("response", mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
+               return ResponseEntity.ok(response);
            } else {
                // TODO: handle warning appropriately
                return null;

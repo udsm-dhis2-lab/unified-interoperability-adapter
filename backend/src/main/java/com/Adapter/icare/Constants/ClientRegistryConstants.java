@@ -13,4 +13,7 @@ public class ClientRegistryConstants {
 
     @Value("${DEFAULT_IDENTIFIER_TYPE:NIDA}")
     public String DefaultIdentifierType;
+
+    @Value("${VALIDATE_DATA_TEMPLATE_PRIOR_TO_WORKFLOW_ENGINE:true}")
+    public Boolean ValidateDataTemplate;
 }

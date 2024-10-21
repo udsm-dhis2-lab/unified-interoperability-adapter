@@ -10,6 +10,6 @@ import java.util.Map;
 @Setter
 public class DataTemplateDataDTO {
     private FacilityDetailsDTO facilityDetails;
-    private List<Map<String,Object>> listGrid;
+    private List<SharedHealthRecordsDTO> listGrid;
     private ReportDetailsDTO reportDetails;
 }
