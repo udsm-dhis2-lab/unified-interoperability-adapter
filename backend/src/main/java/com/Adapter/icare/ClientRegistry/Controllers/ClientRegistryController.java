@@ -1,6 +1,8 @@
 package com.Adapter.icare.ClientRegistry.Controllers;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import com.Adapter.icare.ClientRegistry.Domains.ClientRegistryIdPool;
+import com.Adapter.icare.ClientRegistry.Dtos.ClientRegistryIdDTO;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
@@ -99,27 +101,35 @@ public class ClientRegistryController {
         }
     }
 
-    @GetMapping("/generateIdentifiers")
-    public ResponseEntity<List<Map<String, Object>>> generateClientIdentifiers(
-            @RequestParam(value = "limit", defaultValue = "1") int limit
-    ) throws Exception {
+    @PostMapping(value = "/generateIdentifiers", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> generateClientRegistryIdentifiers(
+            @RequestBody ClientRegistryIdDTO clientRegistryIdDTO) throws Exception {
+        Map<String,Object> response = new HashMap<>();
         try {
-//            String regex = clientRegistryConstants.ClientRegistryIdentifierRegex;
-            if (Boolean.parseBoolean(clientRegistryConstants.GenerateClientIdentifier)) {
-                List<Map<String,Object>> identifierPayload = new ArrayList<>();
-                // 1. Get latest client
-                Patient patient;
-                for(int count= 0; count < limit; count++) {
-                    // TODO: Add logic for generating ids using the provided pattern
-
-                }
-                return ResponseEntity.ok(identifierPayload);
+            if (clientRegistryIdDTO.getLimit() > 0) {
+                boolean hasGenerated = clientRegistryService.generateClientRegistryIdentifiers(
+                        clientRegistryIdDTO.getStart(),
+                        clientRegistryIdDTO.getLimit(),
+                        clientRegistryConstants.ClientRegistryIdentifierRegex);
+                response.put("message", "Ids have been generated into the pool");
+                return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+                response.put("message", "limit not valid");
+                response.put("statusCode", HttpStatus.EXPECTATION_FAILED.value());
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
             }
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("/identifiersPool/count")
+    public Integer countOfIdentifiers(@RequestParam (value = "category", required = false) ClientRegistryIdPool.IdSearchCategory idSearchCategory) throws Exception {
+        try {
+            return clientRegistryService.getCountOfIdentifiersBySearchCategory(idSearchCategory);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
     }
 

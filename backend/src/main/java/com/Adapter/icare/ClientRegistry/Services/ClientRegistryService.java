@@ -4,6 +4,8 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import com.Adapter.icare.ClientRegistry.Domains.ClientRegistryIdPool;
+import com.Adapter.icare.ClientRegistry.Repository.ClientRegistryIdsRepository;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Domains.User;
@@ -12,12 +14,15 @@ import com.Adapter.icare.Services.UserService;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static kotlin.reflect.jvm.internal.impl.builtins.StandardNames.FqNames.number;
 
 @Service
 public class ClientRegistryService {
@@ -27,10 +32,14 @@ public class ClientRegistryService {
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
+    private final ClientRegistryIdsRepository clientRegistryIdsRepository;
 
     @Autowired
-    public ClientRegistryService(FHIRConstants fhirConstants, UserService userService) {
+    public ClientRegistryService(FHIRConstants fhirConstants,
+                                 UserService userService,
+                                 ClientRegistryIdsRepository clientRegistryIdsRepository) {
         this.fhirConstants = fhirConstants;
+        this.clientRegistryIdsRepository = clientRegistryIdsRepository;
 
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirClient =  fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
@@ -287,6 +296,55 @@ public class ClientRegistryService {
         response.put("deleteClients", deleteClients);
         response.put("clientsFailed", clientsFailed);
         return response;
+    }
+
+    public boolean generateClientRegistryIdentifiers(Integer start,
+                                                     Integer limit,
+                                                     String regex) throws Exception {
+        try {
+            List<ClientRegistryIdPool> clientRegistryIdPools = new ArrayList<>();
+            for (Integer count = start; count <= limit; count++) {
+                ClientRegistryIdPool clientRegistryIdPool = new ClientRegistryIdPool();
+                String id = createIdentifier(count, regex);
+                clientRegistryIdPool.setIdentifier(id);
+                clientRegistryIdPools.add(clientRegistryIdPool);
+            }
+            List<ClientRegistryIdPool> saved = clientRegistryIdsRepository.saveAll(clientRegistryIdPools);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Boolean.FALSE;
+        }
+    }
+
+    public Integer getCountOfIdentifiersBySearchCategory(
+            ClientRegistryIdPool.IdSearchCategory idSearchCategory) throws Exception {
+        if (idSearchCategory.equals(ClientRegistryIdPool.IdSearchCategory.UNUSED)) {
+            return Math.toIntExact(clientRegistryIdsRepository.countByUsedFalse());
+        } else if (idSearchCategory.equals(ClientRegistryIdPool.IdSearchCategory.USED)) {
+            return Math.toIntExact(clientRegistryIdsRepository.countByUsedTrue());
+        } else {
+            return Math.toIntExact(clientRegistryIdsRepository.count());
+        }
+    }
+
+    private String createIdentifier(Integer idNumber, String regex) throws Exception {
+        return String.format(regex.replace("^","").replace("$",""), idNumber);
+    }
+
+    public List<IdentifierDTO> getClientRegistryIdentifiers(Integer countOfIdentifiers) throws Exception {
+        List<IdentifierDTO> identifierDTOS = new ArrayList<>();
+        List<ClientRegistryIdPool> clientRegistryIdPools = clientRegistryIdsRepository.getIds(countOfIdentifiers);
+        for(ClientRegistryIdPool clientRegistryIdPool: clientRegistryIdPools) {
+            IdentifierDTO identifierDTO = new IdentifierDTO();
+            identifierDTO.setId(clientRegistryIdPool.getIdentifier());
+            identifierDTO.setType("HDU-API-ID");
+            FacilityDetailsDTO facilityDetailsDTO = new FacilityDetailsDTO();
+            facilityDetailsDTO.setCode("HDUAPI");
+            facilityDetailsDTO.setName("HDUAPI");
+            identifierDTO.setOrganization(facilityDetailsDTO);
+        }
+        return identifierDTOS;
     }
 
     public PatientDTO mapToPatientDTO(Patient patient) {
