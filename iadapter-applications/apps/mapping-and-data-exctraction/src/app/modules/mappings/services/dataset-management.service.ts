@@ -10,7 +10,11 @@ import {
   MappingsUrls,
 } from '../models';
 import { HttpParams } from '@angular/common/http';
-import { UnAuothorizedException, UnknownException } from '@models';
+import {
+  UnAuothorizedException,
+  UnknownException,
+  InternalServerException,
+} from '@models';
 import { CategoryOptionCombo } from '../models/category-option-combo.model';
 
 @Injectable({
@@ -161,17 +165,6 @@ export class DatasetManagementService {
       );
   }
 
-  private handleError(error: any): never {
-    console.log('ERRORRR', error);
-    if (error.status === 401) {
-      throw new UnAuothorizedException('Invalid username or password');
-    } else {
-      throw new UnknownException(
-        'An unexpected error occurred. Please try again later.'
-      );
-    }
-  }
-
   addMappings(payLoad: any): Observable<any> {
     return this.httpClient.post<any>(this.addMappingsUrl, payLoad).pipe(
       // TODO: return response
@@ -198,5 +191,21 @@ export class DatasetManagementService {
     });
 
     return params;
+  }
+
+  private handleError(error: any): never {
+    console.log('ERRORRR', error);
+    if (error.status === 401) {
+      throw new UnAuothorizedException('Invalid username or password');
+    }
+    if (error.status === 500) {
+      throw new InternalServerException(
+        'Something on our end went wrong. Please try again later.'
+      );
+    } else {
+      throw new UnknownException(
+        'An unexpected error occurred. Please try again later.'
+      );
+    }
   }
 }

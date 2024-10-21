@@ -3,8 +3,13 @@
   margin-top: 50px;
 }
 
-.column {
+.left-column {
   height: 74vh;
+  overflow: auto;
+}
+
+.right-column {
+  height: 54vh;
   overflow: auto;
 }
 

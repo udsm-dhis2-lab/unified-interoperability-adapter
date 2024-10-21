@@ -98,8 +98,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: DatasetPage) => {
           this.loading = false;
-          //TODO: Set total from data after it's support in fhir is implemented
-          this.total = data.total; //data.total;
+          this.total = data.total;
           this.pageIndex = data.pageIndex;
           this.listOfDatasets = data.listOfDatasets;
         },
@@ -185,24 +184,13 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     }
   }
 
-  getButtonText(dataSetInstance?: DataSetInstance): string {
-    if (this.selectedInstanceFetchingMechanism === 'selectedDataset') {
-      return 'View';
-    } else {
-      return dataSetInstance ? 'Remove' : 'Select';
-    }
-  }
-
-  goToDataSetMapping(uuid: string) {
-    this.router.navigate(['/dataset-mapping', uuid]);
-  }
-
   selectDatasetForMapping(datasetUuid: string, instanceUuid: string) {
     this.dataSetManagementService
       .selectDatasetForMapping(instanceUuid, datasetUuid)
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.reLoadDataSets();
         },
         error: (error: any) => {
           // TODO: Implement error handling
@@ -216,10 +204,24 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.reLoadDataSets();
         },
         error: (error: any) => {
           // TODO: Implement error handling
         },
       });
+  }
+
+  reLoadDataSets() {
+    this.loadDatasetsFromServer(
+      1,
+      10,
+      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+      [{ key: 'instance', value: [this.selectedInstance!] }]
+    );
+  }
+
+  goToDataSetMapping(uuid: string) {
+    this.router.navigate(['/dataset-mapping', uuid]);
   }
 }

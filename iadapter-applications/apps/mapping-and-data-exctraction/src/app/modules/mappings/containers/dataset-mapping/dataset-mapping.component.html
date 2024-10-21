@@ -4,7 +4,7 @@
       <div nz-row [nzGutter]="16">
         <div nz-col [nzSpan]="leftColumnSpan">
           <nz-card class="card">
-            <div class="column" [innerHTML]="sanitizedContent"></div>
+            <div class="left-column" [innerHTML]="sanitizedContent"></div>
           </nz-card>
         </div>
         <div nz-col [nzSpan]="rightColumnSpan">
@@ -33,7 +33,7 @@
             </div>
           </div>
 
-          <nz-card class="card">
+          <nz-card>
             <!-- selecting configurations options -->
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
@@ -72,7 +72,7 @@
             </div>
 
             <!-- table  -->
-            <div class="column">
+            <div class="right-column">
               <nz-table
                 [nzData]="mappingsData.disagregations"
                 [nzFrontPagination]="false"
@@ -130,20 +130,30 @@
                   }
                 </tbody>
               </nz-table>
-
-              <div nz-row nzJustify="end" style="margin-top: 16">
-                <nz-spin [nzSpinning]="isSubmittingMapping">
-                  <button
-                    nz-button
-                    nzType="primary"
-                    (click)="onSubmitMappings()"
-                  >
-                    Save mappings
-                  </button>
-                </nz-spin>
-              </div>
             </div>
           </nz-card>
+
+          <div
+            nz-row
+            nzJustify="end"
+            style="margin-top: 16; margin-bottom: 16px"
+          >
+            <nz-spin [nzSpinning]="isSubmittingMapping">
+              <button nz-button nzType="primary" (click)="onSubmitMappings()">
+                Save mappings
+              </button>
+            </nz-spin>
+          </div>
+
+          <!-- Alert  -->
+          <nz-alert
+            nzCloseable
+            *ngIf="alert.show"
+            [nzType]="alert.type === 'success' ? 'success' : 'error'"
+            [nzMessage]="alert.message"
+            (nzOnClose)="onCloseAlert()"
+            nzShowIcon
+          ></nz-alert>
         </div>
       </div>
     </nz-card>

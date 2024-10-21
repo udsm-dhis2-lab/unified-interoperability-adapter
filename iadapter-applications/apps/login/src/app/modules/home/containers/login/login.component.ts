@@ -96,7 +96,7 @@ export class LoginComponent implements OnDestroy {
       });
   }
 
-  afterClose() {
+  onCloseAlert() {
     this.alert = {
       show: false,
       type: '',
