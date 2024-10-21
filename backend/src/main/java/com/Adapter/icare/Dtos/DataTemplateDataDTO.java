@@ -12,4 +12,5 @@ public class DataTemplateDataDTO {
     private FacilityDetailsDTO facilityDetails;
     private List<SharedHealthRecordsDTO> listGrid;
     private ReportDetailsDTO reportDetails;
+    private List<IdentifierDTO> clientIdentifiersPool;
 }

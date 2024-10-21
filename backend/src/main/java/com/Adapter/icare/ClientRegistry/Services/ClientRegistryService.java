@@ -343,6 +343,8 @@ public class ClientRegistryService {
             facilityDetailsDTO.setCode("HDUAPI");
             facilityDetailsDTO.setName("HDUAPI");
             identifierDTO.setOrganization(facilityDetailsDTO);
+            clientRegistryIdPool.setUsed(true);
+            clientRegistryIdsRepository.save(clientRegistryIdPool);
         }
         return identifierDTOS;
     }

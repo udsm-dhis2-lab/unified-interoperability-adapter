@@ -189,6 +189,8 @@ public class HDUAPIController {
            if (shouldUseWorkflowEngine && workflowEngine != null) {
                Map<String, Object> payload = new HashMap<>();
                payload.put("code","dataTemplates");
+               List<IdentifierDTO> clientIds = new ArrayList<>();
+               clientIds = clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
                List<Map<String,Object>> recordsWithIssues = new ArrayList<>();
                if (clientRegistryConstants.ValidateDataTemplate) {
                    // validate data Template
@@ -243,9 +245,12 @@ public class HDUAPIController {
                    validatedDataTemplate.setListGrid(validatedListGrid);
                    validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
                    validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
+                   validatedDataTemplate.setClientIdentifiersPool(clientIds);
                    payload.put("payload",validatedDataTemplate);
                } else {
-                   payload.put("payload", dataTemplate.getData());
+                   DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
+                   updatedDataTemplateData.setClientIdentifiersPool(clientIds);
+                   payload.put("payload", updatedDataTemplateData);
                }
                response.put("response",mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
                response.put("recordsWithIssues", recordsWithIssues);
