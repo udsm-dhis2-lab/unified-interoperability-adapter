@@ -216,69 +216,86 @@ public class SharedHealthRecordsService {
     }
 
     public Map<String,Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload) throws Exception {
-        Map<String,Object> response = new HashMap<>();
-        DemographicDetailsDTO demographicDetails = sharedRecordPayload.getDemographicDetails();
-        FacilityDetailsDTO facilityDetails = sharedRecordPayload.getFacilityDetails();
-        VisitDetailsDTO visitDetails = sharedRecordPayload.getVisitDetails();
-        // Check if patient exists
-        List<IdentifierDTO> identifiers = demographicDetails.getIdentifiers();
-        Patient patient = new Patient();
-        String defaultIdentifierType = this.clientRegistryConstants.DefaultIdentifierType;
-        // TODO: Find a way to use default identifier type to get client
-        for (IdentifierDTO identifier: identifiers) {
-            patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getId());
-            if (patient != null) {
-                break;
+        try {
+            Map<String,Object> response = new HashMap<>();
+            DemographicDetailsDTO demographicDetails = sharedRecordPayload.getDemographicDetails();
+            FacilityDetailsDTO facilityDetails = sharedRecordPayload.getFacilityDetails();
+            VisitDetailsDTO visitDetails = sharedRecordPayload.getVisitDetails();
+            String mrn = sharedRecordPayload.getMrn();
+            // Check if patient exists
+            Patient patient = new Patient();
+
+            List<IdentifierDTO> identifiers = demographicDetails != null ? demographicDetails.getIdentifiers(): null;
+            String defaultIdentifierType = this.clientRegistryConstants.DefaultIdentifierType;
+            // TODO: Find a way to use default identifier type to get client
+            if (identifiers != null && !identifiers.isEmpty()) {
+                for (IdentifierDTO identifier: identifiers) {
+                    patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getId());
+                    if (patient != null) {
+                        break;
+                    }
+                }
+            } else if (mrn != null) {
+                patient = this.clientRegistryService.getPatientUsingIdentifier(mrn);
+            } else {
+                patient = null;
+                throw new Exception("Client with MRN " + mrn + " does not exists and MRN is not enough to register the client on CR. Please provide demographic details");
             }
-        }
 
-        if (patient == null) {
-            //Create patient
-            Patient patientToCreate = new Patient();
-            patientToCreate.setActive(Boolean.TRUE);
-            List<Identifier> identifiersList = new ArrayList<>();
+            if (patient == null) {
+                // 1. Check if mandatory IDs are found to register the client
+                //2. Create patient
+                Patient patientToCreate = new Patient();
+                patientToCreate.setActive(Boolean.TRUE);
+                List<Identifier> identifiersList = new ArrayList<>();
 
-            for (IdentifierDTO identifierDTO: identifiers) {
-                Identifier identifier = new Identifier();
-                Reference reference = new Reference();
-                identifier.setAssigner(reference);
-                CodeableConcept type = createCodeableConceptPayload(identifierDTO.getType());
-                identifier.setType(type);
-                identifiersList.add(identifier);
+                for (IdentifierDTO identifierDTO: identifiers) {
+                    Identifier identifier = new Identifier();
+                    Reference reference = new Reference();
+                    identifier.setAssigner(reference);
+                    CodeableConcept type = createCodeableConceptPayload(identifierDTO.getType());
+                    identifier.setType(type);
+                    identifiersList.add(identifier);
+                }
+                patientToCreate.setIdentifier(identifiersList);
+                Organization organization = new Organization();
+                organization.setName(facilityDetails.getName());
+                patientToCreate.setManagingOrganization(null);
+                MethodOutcome patientOutcome = fhirClient.create().resource(patientToCreate).execute();
+                patient = (Patient) patientOutcome.getResource();
             }
-            patientToCreate.setIdentifier(identifiersList);
-            Organization organization = new Organization();
-            organization.setName(facilityDetails.getName());
-            patientToCreate.setManagingOrganization(null);
-            MethodOutcome patientOutcome = fhirClient.create().resource(patientToCreate).execute();
-            patient = (Patient) patientOutcome.getResource();
-        }
-        // Create encounter
-        Encounter encounter = new Encounter();
-        String id = facilityDetails.getCode() + "-" + visitDetails.getId();
-        encounter.setId(id);
-        encounter.setStatus(Encounter.EncounterStatus.INPROGRESS);
-        Period period = new Period();
-        period.setEnd(visitDetails.getClosedDate());
-        period.setStart(visitDetails.getVisitDate());
-        Reference patientReference  = new Reference();
-        patientReference.setType("Patient");
-        patientReference.setReference("Patient/" + patient.getIdElement().getIdPart());
-        encounter.setSubject(patientReference);
-        encounter.setPeriod(period);
-        MethodOutcome encounterOutcome = fhirClient.update().resource(encounter).execute();
-        Reference serviceProviderReference = new Reference();
-        serviceProviderReference.setType("Organization");
-        serviceProviderReference.setReference("Organization/" + facilityDetails.getCode());
-        encounter.setServiceProvider(serviceProviderReference);
-        String encounterId = encounterOutcome.getId().getIdPart();
+            // Create encounter
+            Encounter encounter = new Encounter();
+            String id = facilityDetails.getCode() + "-" + visitDetails.getId();
+            encounter.setId(id);
+            encounter.setStatus(Encounter.EncounterStatus.INPROGRESS);
+            Period period = new Period();
+            period.setEnd(visitDetails.getClosedDate());
+            period.setStart(visitDetails.getVisitDate());
+            Reference patientReference  = new Reference();
+            patientReference.setType("Patient");
+            patientReference.setReference("Patient/" + patient.getIdElement().getIdPart());
+            encounter.setSubject(patientReference);
+            encounter.setPeriod(period);
+            MethodOutcome encounterOutcome = fhirClient.update().resource(encounter).execute();
+            Reference serviceProviderReference = new Reference();
+            serviceProviderReference.setType("Organization");
+            serviceProviderReference.setReference("Organization/" + facilityDetails.getCode());
+            encounter.setServiceProvider(serviceProviderReference);
+            String encounterId = encounterOutcome.getId().getIdPart();
 
-        // TODO: Add all logics to handle processing shared health record
-        Map<String,Object> visitData = new HashMap<>();
-        visitData.put("id", encounterId);
-        response.put("visit", visitData);
-        response.put("patient", clientRegistryService.mapToPatientDTO(patient).toMap());
-        return response;
+            // TODO: Add all logics to handle processing shared health record
+            Map<String,Object> visitData = new HashMap<>();
+            visitData.put("id", encounterId);
+            response.put("visit", visitData);
+            Map<String,Object> patientObj = new HashMap<>();
+            patientObj.put("id", patient.getId());
+            response.put("patient",patientObj);
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
     }
 
     public CodeableConcept createCodeableConceptPayload(String code) {
@@ -316,5 +333,11 @@ public class SharedHealthRecordsService {
             e.printStackTrace();
         }
         return List.of();
+    }
+
+    public Observation createObservationPayload() throws Exception {
+        Observation observation = new Observation();
+
+        return observation;
     }
 }

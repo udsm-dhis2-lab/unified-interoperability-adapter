@@ -16,5 +16,5 @@ public class TreatmentDetailsDTO {
     private List<Map<String,Object>> hormoneTherapy;
     private String symptomatic;
     private String alternativeTreatment;
-    private Map<String,Object> medicalProcedureDetails;
+    private List<MedicalProcedureDetailsDTO> medicalProcedureDetails;
 }

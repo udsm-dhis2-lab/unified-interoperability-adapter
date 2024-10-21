@@ -53,5 +53,9 @@ public class SharedHealthRecordsDTO {
 
     private List<BillingsDetailsDTO> billingsDetails;
 
+    private VisitMainPaymentDetailsDTO visitMainPaymentDetails;
+
+    private OtherInformationDTO otherInformation;
+
     private ReferralDetailsDTO referralDetails;
 }

@@ -17,8 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @RestController
-@RequestMapping("/api/v1/hduApi/shr/sharedRecords")
+@RequestMapping("/api/v1/hduApi/shr")
 public class SharedHealthRecordsController {
     private final SharedHealthRecordsService sharedHealthRecordsService;
     private final DatastoreConstants datastoreConstants;
@@ -45,7 +47,7 @@ public class SharedHealthRecordsController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/sharedRecords")
     public ResponseEntity<Map<String, Object>> getSharedRecords (
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
@@ -80,13 +82,18 @@ public class SharedHealthRecordsController {
         }
     }
 
-    @PostMapping()
+    @PostMapping(value = "/sharedRecords", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String,Object>> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
         try {
+            System.out.println("INSIDE");
             return ResponseEntity.ok(sharedHealthRecordsService.processSharedRecords(sharedRecordsPayload));
         } catch (Exception e) {
-            System.err.println(e.getMessage());
-            throw new Exception(e.getMessage());
+            e.printStackTrace();
+            Map<String,Object> response = new HashMap<>();
+            response.put("message",e.getMessage());
+            response.put("statusCode",HttpStatus.BAD_REQUEST.value());
+            response.put("reason",HttpStatus.BAD_REQUEST.getReasonPhrase());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
