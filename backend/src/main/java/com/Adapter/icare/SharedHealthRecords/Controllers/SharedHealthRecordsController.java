@@ -3,7 +3,9 @@ package com.Adapter.icare.SharedHealthRecords.Controllers;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
+import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.UserService;
 import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
 import com.Adapter.icare.SharedHealthRecords.Services.SharedHealthRecordsService;
@@ -28,16 +30,31 @@ public class SharedHealthRecordsController {
     private final Authentication authentication;
     private final UserService userService;
     private final User authenticatedUser;
+    private Map<String,Object> mandatoryClientRegistryIdTypes;
+    private DatastoreService datastoreService;
 
     public SharedHealthRecordsController(
             DatastoreConstants datastoreConstants,
             ClientRegistryConstants clientRegistryConstants,
             UserService userService,
-            SharedHealthRecordsService sharedHealthRecordsService) {
+            SharedHealthRecordsService sharedHealthRecordsService,
+            DatastoreService datastoreService) throws Exception {
         this.sharedHealthRecordsService = sharedHealthRecordsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryConstants = clientRegistryConstants;
         this.userService = userService;
+        this.datastoreService = datastoreService;
+        try {
+            Datastore configs = this.datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.MandatoryClientRegistryIdTypes);
+            if (configs!= null) {
+                this.mandatoryClientRegistryIdTypes = configs.getValue();
+            } else {
+                this.mandatoryClientRegistryIdTypes = null;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
@@ -85,8 +102,7 @@ public class SharedHealthRecordsController {
     @PostMapping(value = "/sharedRecords", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String,Object>> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
         try {
-            System.out.println("INSIDE");
-            return ResponseEntity.ok(sharedHealthRecordsService.processSharedRecords(sharedRecordsPayload));
+            return ResponseEntity.ok(sharedHealthRecordsService.processSharedRecords(sharedRecordsPayload, this.mandatoryClientRegistryIdTypes));
         } catch (Exception e) {
             e.printStackTrace();
             Map<String,Object> response = new HashMap<>();

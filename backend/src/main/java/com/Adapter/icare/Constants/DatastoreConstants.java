@@ -28,4 +28,7 @@ public class DatastoreConstants {
 
     @Value("${DATASTORE_KEY_FOR_DATA_TEMPLATE_METADATA:DATA-TEMPLATE}")
     public String DataTemplateMetadataKey;
+
+    @Value("${DATASTORE_KEY_FOR_AGREED_CLIENT_MANDATORY_IDS_TYPES:mandatory-cr-id-types}")
+    public String MandatoryClientRegistryIdTypes;
 }

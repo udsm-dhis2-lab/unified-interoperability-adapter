@@ -19,6 +19,8 @@ import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import org.hl7.fhir.r4.model.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -215,7 +217,8 @@ public class SharedHealthRecordsService {
         }
     }
 
-    public Map<String,Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload) throws Exception {
+    public Map<String,Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload,
+                                                   Map<String,Object> mandatoryClientRegistryIdTypes) throws Exception {
         try {
             Map<String,Object> response = new HashMap<>();
             DemographicDetailsDTO demographicDetails = sharedRecordPayload.getDemographicDetails();
@@ -244,6 +247,9 @@ public class SharedHealthRecordsService {
 
             if (patient == null) {
                 // 1. Check if mandatory IDs are found to register the client
+                if (mandatoryClientRegistryIdTypes == null) {
+                    throw new Exception("Mandatory Identifier types have not been set");
+                }
                 //2. Create patient
                 Patient patientToCreate = new Patient();
                 patientToCreate.setActive(Boolean.TRUE);
