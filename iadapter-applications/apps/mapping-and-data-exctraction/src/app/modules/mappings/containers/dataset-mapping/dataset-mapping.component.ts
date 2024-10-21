@@ -51,6 +51,12 @@ class Disaggregation {
 export class DatasetMappingComponent implements OnInit {
   isSubmittingMapping: boolean = false;
 
+  alert = {
+    show: false,
+    type: '',
+    message: '',
+  };
+
   useIcdCodes = false;
 
   mappingsData: MappingsData = {
@@ -338,12 +344,30 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetManagementService.addMappings(payLoad).subscribe({
       next: (data: any) => {
         this.isSubmittingMapping = false;
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Mapping added successfully',
+        };
         // TODO: Handle response
       },
       error: (error: any) => {
         this.isSubmittingMapping = false;
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
         // TODO: Handle error
       },
     });
+  }
+
+  onCloseAlert() {
+    this.alert = {
+      show: false,
+      type: '',
+      message: '',
+    };
   }
 }
