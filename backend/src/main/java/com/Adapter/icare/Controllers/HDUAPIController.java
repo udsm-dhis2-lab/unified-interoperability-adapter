@@ -32,9 +32,9 @@ public class HDUAPIController {
 
     private final DatastoreService datastoreService;
     private final MediatorsService mediatorsService;
-    private final boolean shouldUseWorkflowEngine;
-    private final String defaultWorkflowEngineCode;
-    private final Mediator workflowEngine;
+    private boolean shouldUseWorkflowEngine;
+    private String defaultWorkflowEngineCode;
+    private Mediator workflowEngine;
     private final DatastoreConstants datastoreConstants;
     private final UserService userService;
     private final Authentication authentication;
@@ -244,21 +244,21 @@ public class HDUAPIController {
                        }
                    }
                    validatedDataTemplate.setListGrid(validatedListGrid);
-                   clientIds = clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
+                   clientIds = this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
                    validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
                    validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
                    validatedDataTemplate.setClientIdentifiersPool(clientIds);
                    payload.put("payload",validatedDataTemplate);
                } else {
                    DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
-                   clientIds = clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
+                   clientIds = this.clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
                    updatedDataTemplateData.setClientIdentifiersPool(clientIds);
                    payload.put("payload", updatedDataTemplateData);
                }
-               return ResponseEntity.ok(mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
+               return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
            } else if (!shouldUseWorkflowEngine) {
                // TODO: Review send data to mediator (OpenFN)
-               return ResponseEntity.ok(mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
+               return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
            } else {
                // TODO: handle warning appropriately
                return null;

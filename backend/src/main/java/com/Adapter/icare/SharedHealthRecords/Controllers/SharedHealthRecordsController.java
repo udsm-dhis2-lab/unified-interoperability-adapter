@@ -1,11 +1,17 @@
 package com.Adapter.icare.SharedHealthRecords.Controllers;
 
+import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
+import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.DataTemplateDataDTO;
+import com.Adapter.icare.Dtos.FacilityDetailsDTO;
+import com.Adapter.icare.Dtos.IdentifierDTO;
 import com.Adapter.icare.Services.DatastoreService;
+import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
 import com.Adapter.icare.SharedHealthRecords.Services.SharedHealthRecordsService;
@@ -15,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,24 +39,58 @@ public class SharedHealthRecordsController {
     private final User authenticatedUser;
     private Map<String,Object> mandatoryClientRegistryIdTypes;
     private DatastoreService datastoreService;
+    private final ClientRegistryService clientRegistryService;
+    private final MediatorsService mediatorsService;
+    private boolean shouldUseWorkflowEngine = false;
+    private String defaultWorkflowEngineCode = null;
+    private Mediator workflowEngine = null;
 
     public SharedHealthRecordsController(
             DatastoreConstants datastoreConstants,
             ClientRegistryConstants clientRegistryConstants,
             UserService userService,
             SharedHealthRecordsService sharedHealthRecordsService,
-            DatastoreService datastoreService) throws Exception {
+            DatastoreService datastoreService,
+            ClientRegistryService clientRegistryService,
+            MediatorsService mediatorsService) throws Exception {
         this.sharedHealthRecordsService = sharedHealthRecordsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryConstants = clientRegistryConstants;
         this.userService = userService;
         this.datastoreService = datastoreService;
+        this.clientRegistryService = clientRegistryService;
+        this.mediatorsService = mediatorsService;
         try {
             Datastore configs = this.datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.MandatoryClientRegistryIdTypes);
             if (configs!= null) {
                 this.mandatoryClientRegistryIdTypes = configs.getValue();
             } else {
                 this.mandatoryClientRegistryIdTypes = null;
+            }
+
+            Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace,
+                    datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
+            if (WESystemConfigurations != null) {
+                Map<String, Object> weSystemConfigValue = WESystemConfigurations.getValue();
+                if (weSystemConfigValue != null) {
+                    this.shouldUseWorkflowEngine = weSystemConfigValue.get("active") != null ? Boolean.parseBoolean(weSystemConfigValue.get("active").toString()): false;
+
+                    this.defaultWorkflowEngineCode = weSystemConfigValue.get("code") != null ? weSystemConfigValue.get("code").toString(): null;
+
+                    if (this.defaultWorkflowEngineCode != null) {
+                        this.workflowEngine = mediatorsService.getMediatorByCode(this.defaultWorkflowEngineCode);
+                    } else {
+                        this.workflowEngine = null;
+                    }
+                } else {
+                    this.shouldUseWorkflowEngine = false;
+                    this.defaultWorkflowEngineCode = null;
+                    this.workflowEngine = null;
+                }
+            } else {
+                this.shouldUseWorkflowEngine = false;
+                this.defaultWorkflowEngineCode = null;
+                this.workflowEngine = null;
             }
 
         } catch (Exception e) {
@@ -100,16 +141,29 @@ public class SharedHealthRecordsController {
     }
 
     @PostMapping(value = "/sharedRecords", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Object>> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
+    public ResponseEntity<String> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
         try {
-            return ResponseEntity.ok(sharedHealthRecordsService.processSharedRecords(sharedRecordsPayload, this.mandatoryClientRegistryIdTypes));
+            Map <String,Object> payload = new HashMap<>();
+            DataTemplateDataDTO dataTemplateDataDTO = new DataTemplateDataDTO();
+            dataTemplateDataDTO.setClientIdentifiersPool(null);
+            FacilityDetailsDTO facilityDetailsDTO = sharedRecordsPayload.getFacilityDetails();
+            List<SharedHealthRecordsDTO> listGrid =  new ArrayList<>();
+            listGrid.add(sharedRecordsPayload);
+            dataTemplateDataDTO.setListGrid(listGrid);
+            dataTemplateDataDTO.setFacilityDetails(facilityDetailsDTO);
+            dataTemplateDataDTO.setReportDetails(sharedRecordsPayload.getReportDetails());
+            List<IdentifierDTO> clientIds = this.clientRegistryService.getClientRegistryIdentifiers(1);
+            dataTemplateDataDTO.setClientIdentifiersPool(clientIds);
+            payload.put("code","dataTemplates");
+            payload.put("payload", dataTemplateDataDTO);
+            return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true"));
         } catch (Exception e) {
             e.printStackTrace();
             Map<String,Object> response = new HashMap<>();
             response.put("message",e.getMessage());
             response.put("statusCode",HttpStatus.BAD_REQUEST.value());
             response.put("reason",HttpStatus.BAD_REQUEST.getReasonPhrase());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
         }
     }
 
