@@ -106,7 +106,7 @@ public class SharedHealthRecordsController {
     }
 
     @GetMapping("/sharedRecords")
-    public ResponseEntity<Map<String, Object>> getSharedRecords (
+    public ResponseEntity<String> getSharedRecords (
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam( value = "id", required = false) String id,
@@ -121,20 +121,33 @@ public class SharedHealthRecordsController {
             @RequestParam( value = "numberOfVisits", defaultValue = "1") Integer numberOfVisits
     ) throws Exception {
         try {
-            Map<String,Object> sharedRecordsResponse = this.sharedHealthRecordsService.getSharedRecordsWithPagination(
-                    page,
-                    pageSize,
-                    id,
-                    idType,
-                    onlyLinkedClients,
-                    gender,
-                    firstName,
-                    middleName,
-                    lastName,
-                    hfrCode,
-                    includeDeceased,
-                    numberOfVisits);
-            return ResponseEntity.ok(sharedRecordsResponse);
+//            Map<String,Object> sharedRecordsResponse = this.sharedHealthRecordsService.getSharedRecordsWithPagination(
+//                    page,
+//                    pageSize,
+//                    id,
+//                    idType,
+//                    onlyLinkedClients,
+//                    gender,
+//                    firstName,
+//                    middleName,
+//                    lastName,
+//                    hfrCode,
+//                    includeDeceased,
+//                    numberOfVisits);
+            Map <String,Object> payload = new HashMap<>();
+            payload.put("code","SEARCH-CLIENT");
+            Map<String,Object> body = new HashMap<>();
+            List<Map<String,Object>> identifiers = new ArrayList<>();
+            Map<String,Object> identifier = new HashMap<>();
+            identifier.put("value", id);
+            identifier.put("type", idType);
+            identifiers.add(identifier);
+            body.put("identifiers",identifiers);
+            body.put("page", page);
+            body.put("pageSize", pageSize);
+            payload.put("body", body);
+            String response = this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
