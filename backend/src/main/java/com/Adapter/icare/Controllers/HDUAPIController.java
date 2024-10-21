@@ -178,7 +178,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Object>> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
+    public ResponseEntity<String> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
         /**
          * Send data to Mediator where all the logics will be done.
          */
@@ -224,6 +224,7 @@ public class HDUAPIController {
                                recordWithIssue.put("visitDetails", visitDetails);
                                recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
                                recordsWithIssues.add(recordWithIssue);
+                               validatedListGrid.add(sharedHealthRecordsDTO);
                            } else {
                                DemographicDetailsDTO newDemographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
                                newDemographicDetailsDTO.setId(patient.getId());
@@ -239,6 +240,7 @@ public class HDUAPIController {
                            recordWithIssue.put("visitDetails", visitDetailsDTO);
                            recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
                            recordsWithIssues.add(recordWithIssue);
+                           validatedListGrid.add(sharedHealthRecordsDTO);
                        }
                    }
                    validatedDataTemplate.setListGrid(validatedListGrid);
@@ -253,13 +255,10 @@ public class HDUAPIController {
                    updatedDataTemplateData.setClientIdentifiersPool(clientIds);
                    payload.put("payload", updatedDataTemplateData);
                }
-               response.put("response",mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
-               response.put("recordsWithIssues", recordsWithIssues);
-               return ResponseEntity.ok(response);
+               return ResponseEntity.ok(mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
            } else if (!shouldUseWorkflowEngine) {
                // TODO: Review send data to mediator (OpenFN)
-               response.put("response", mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
-               return ResponseEntity.ok(response);
+               return ResponseEntity.ok(mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
            } else {
                // TODO: handle warning appropriately
                return null;

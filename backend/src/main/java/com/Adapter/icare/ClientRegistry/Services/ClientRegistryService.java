@@ -344,6 +344,7 @@ public class ClientRegistryService {
             facilityDetailsDTO.setName("HDUAPI");
             identifierDTO.setOrganization(facilityDetailsDTO);
             clientRegistryIdPool.setUsed(true);
+            identifierDTOS.add(identifierDTO);
             clientRegistryIdsRepository.save(clientRegistryIdPool);
         }
         return identifierDTOS;
