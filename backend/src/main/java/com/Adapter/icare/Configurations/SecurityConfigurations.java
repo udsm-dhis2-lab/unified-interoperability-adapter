@@ -65,6 +65,8 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                         "/swagger-resources/**",
                         "/webjars/**"
                 ).permitAll()
+                .antMatchers("/**/styles-*.css", "/**/runtime-*.js", "/**/polyfills-*.js", "/**/chunk-*.js", "/**/main-*.js", "/**/favicon.ico")
+                .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/login")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/login")

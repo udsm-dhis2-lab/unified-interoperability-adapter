@@ -64,6 +64,9 @@ public class DatastoreService {
             Datastore datastoreToUpdate = datastoreRepository.getDatastoreByUuid(uuid);
             if (datastoreToUpdate != null) {
                 datastore.setId(datastoreToUpdate.getId());
+                if (authenticatedUser != null) {
+                    datastore.setLastUpdatedBy(authenticatedUser);
+                }
                 return datastoreRepository.save(datastore);
             } else {
                 throw new IllegalStateException("Datastore with uuid " + uuid + " does not exists");
@@ -99,9 +102,9 @@ public class DatastoreService {
         return datastoreRepository.getDatastoreByNamespaceByPagination(namespace, pageable, key);
     }
 
-    public Page<Datastore> getDatastoreNamespaceDetailsByPagination(String namespace, String category, String department, String q, String code, Integer page, Integer pageSize) throws Exception {
+    public Page<Datastore> getDatastoreNamespaceDetailsByPagination(String namespace, String category, String department, String q, String code, String group, Integer page, Integer pageSize) throws Exception {
         Pageable pageable = createPageable(page, pageSize);
-        return datastoreRepository.getDatastoreByNamespaceWithPagination(namespace, category, department, q, code, pageable);
+        return datastoreRepository.getDatastoreByNamespaceWithPagination(namespace, category, department, q, code, group, pageable);
     }
 
     public Page<Datastore> getDatastoreMatchingNamespaceFilterByPagination(String namespaceFilter, String key, String q, String code, Integer page, Integer pageSize) throws Exception {

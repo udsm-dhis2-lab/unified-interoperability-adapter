@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.persistence.*;
 
+import com.Adapter.icare.Utils.HashMapConverter;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -67,8 +68,18 @@ public class Dataset extends BaseEntity implements Serializable {
 
     private String code;
 
-    @Lob
-    private String datasetFields;
+    @Column(columnDefinition = "json", nullable = false)
+    @Convert(converter = HashMapConverter.class)
+    private Map<String,Object> categoryCombo;
+
+
+    @Column(columnDefinition = "json", nullable = false)
+    @Convert(converter = HashMapConverter.class)
+    private Map<String,Object> dataElements;
+
+    @Column(columnDefinition = "json", nullable = false)
+    @Convert(converter = HashMapConverter.class)
+    private Map<String, Object> datasetFields;
     
     @ManyToOne
     private Instance instances;
@@ -84,6 +95,8 @@ public class Dataset extends BaseEntity implements Serializable {
         dataSetMap.put("formDesignCode", this.getFormDesignCode());
         dataSetMap.put("timelyDays", this.getTimelyDays());
         dataSetMap.put("expiryDays", this.getExpiryDays());
+        dataSetMap.put("categoryCombo", this.getCategoryCombo());
+        dataSetMap.put("dataElements", this.getDataElements());
         dataSetMap.put("datasetFields", this.getDatasetFields());
         dataSetMap.put("instance", this.getInstances().toMap());
 

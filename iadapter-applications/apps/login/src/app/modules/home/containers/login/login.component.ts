@@ -83,7 +83,7 @@ export class LoginComponent implements OnDestroy {
             type: 'success',
             message: 'Login Successful',
           };
-          this.router.navigate(['/dashboard']);
+          window.open('../../../dashboard/', '_self');
         },
         error: (error) => {
           this.isLoading = false;

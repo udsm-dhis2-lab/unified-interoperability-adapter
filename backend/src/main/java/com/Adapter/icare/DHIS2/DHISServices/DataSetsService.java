@@ -37,6 +37,8 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Dataset;
@@ -94,7 +96,7 @@ public class DataSetsService {
     }
 
     public Map<String,Object> getDhis2DataSets(
-            long instanceId,
+            String instanceUuid,
             Integer page,
             Integer pageSize,
             String q,
@@ -108,10 +110,10 @@ public class DataSetsService {
         List<RemoteDatasets> remoteDataSetsList = new ArrayList<RemoteDatasets>();
         JSONObject pagerInfo = new JSONObject();
         try {
-            Optional<Instance> instance = instancesRepository.findById(instanceId);
-            String instanceUrl = instance.get().getUrl();
-            String username = instance.get().getUsername();
-            String password = instance.get().getPassword();
+            Instance instance = instancesRepository.getInstanceByUuid(instanceUuid);
+            String instanceUrl = instance.getUrl();
+            String username = instance.getUsername();
+            String password = instance.getPassword();
             String path = "/api/dataSets?fields=id,code,shortName,name,displayName,formType,version," +
                     "timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally," +
                     "renderAsTabs,periodType,openFuturePeriods,expiryDays,dataSetElements~size" +
@@ -194,6 +196,16 @@ public class DataSetsService {
 
                 if(ourDsObject.has("compulsoryFieldsCompleteOnly")){
                     remoteDataSetMap.put("compulsoryFieldsCompleteOnly",ourDsObject.getBoolean("compulsoryFieldsCompleteOnly"));
+                }
+                // Check if datasets already selected
+                Dataset datasetInstance = dataSetsRepository.getDatasetInstanceById(ourDsObject.getString("id"));
+                if (datasetInstance != null){
+                    Map<String,Object> dataSetObject = new HashMap<>();
+                    dataSetObject.put("uuid", datasetInstance.getUuid());
+                    dataSetObject.put("name", datasetInstance.getDisplayName());
+                    remoteDataSetMap.put("dataSetInstance", dataSetObject);
+                } else {
+                    remoteDataSetMap.put("dataSetInstance", null);
                 }
 
                 RemoteDatasets remoteDataSetToAdd = RemoteDatasets.fromMap(remoteDataSetMap);
@@ -311,23 +323,23 @@ public class DataSetsService {
         return remoteDataSetToAdd;
     }
 
-    public Dataset addDataSets(String id, String instance) throws Exception {
+    public Dataset addDataSet(String dataSet, String instance) throws Exception {
         URL url;
         BufferedReader reader;
         String line;
         Dataset dataset = new Dataset();
-        StringBuffer responseContent = new StringBuffer();
-
+        StringBuilder responseContent = new StringBuilder();
+        System.out.println(dataSet);
         try {
             Instance instanceDetails = instancesRepository.getInstanceByUuid(instance);
             if (instanceDetails != null) {
                 dataset.setInstances(instanceDetails);
-                dataset.setId(id);
+                dataset.setId(dataSet);
                 String instanceUrl = instanceDetails.getUrl();
                 String username = instanceDetails.getUsername();
                 String password = instanceDetails.getPassword();
 
-                url = new URL(instanceUrl.concat("/api/dataSets/"+ id +"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
+                url = new URL(instanceUrl.concat("/api/dataSets/"+ dataSet +"?fields=id,code,shortName,name,displayName,formType,version,dataEntryForm[*],sections[id,name,showColumnTotals,showRowTotals,sortOrder,dataElements[id]],timelyDays,compulsoryFieldsCompleteOnly,renderHorizontally,renderAsTabs,periodType,openFuturePeriods,expiryDays,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]],dataSetElements[dataElement[id,name,code,shortName,aggregationType,domainType,valueType,zeroIsSignificant,optionSetValue,categoryCombo[id,name,dataDimensionType,categoryOptionCombos[id,name,code]]]],attributeValues[*]"));
 
                 HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 
@@ -344,38 +356,49 @@ public class DataSetsService {
                     responseContent.append(line);
                 }
                 reader.close();
-                JSONObject jsObject = new JSONObject(responseContent.toString());
-                if(jsObject.has("formType")) {
-                    String formType = jsObject.getString("formType");
+//                JSONObject jsObject = new JSONObject(responseContent);
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Object> responseMap = objectMapper.readValue(responseContent.toString(), new TypeReference<HashMap<String, Object>>() {});
+
+                if(responseMap.get("formType") != null) {
+                    String formType = responseMap.get("formType").toString();
                     dataset.setFormType(formType);
                 }
 
-                if(jsObject.has("periodType")) {
-                    String periodType = jsObject.getString("periodType");
+                if(responseMap.get("periodType") != null) {
+                    String periodType = responseMap.get("periodType").toString();
                     dataset.setPeriodType(periodType);
                 }
 
-                if(jsObject.has("timelyDays")) {
-                    int timelyDays = jsObject.getInt("timelyDays");
+                if(responseMap.get("timelyDays") != null) {
+                    int timelyDays = (Integer) responseMap.get("timelyDays");
                     dataset.setTimelyDays(timelyDays);
                 }
 
-                if (jsObject.has("expiryDays")) {
-                    int expiryDays = jsObject.getInt("expiryDays");
+                if (responseMap.get("expiryDays") != null) {
+                    int expiryDays = (Integer) responseMap.get("expiryDays");
                     dataset.setExpiryDays(expiryDays);
                 }
 
-                if(jsObject.has("code")) {
-                    String code = jsObject.getString("code");
+                if(responseMap.get("code") != null) {
+                    String code = responseMap.get("code").toString();
                     dataset.setCode(code);
                 }
-
-                dataset.setDatasetFields(jsObject.toString());
+                Map<String,Object> dataElementsObject = new HashMap<>();
+                List<Map<String,Object>> dataElements = new ArrayList<>();
+                for(Map<String,Object> dataSetElement: (List<Map<String,Object>>) responseMap.get("dataSetElements")) {
+                    dataElements.add((Map<String, Object>) dataSetElement.get("dataElement"));
+                }
+                dataElementsObject.put("dataElements", dataElements);
+                dataset.setDataElements(dataElementsObject);
+                dataset.setCategoryCombo((Map<String, Object>) responseMap.get("categoryCombo"));
+                dataset.setDatasetFields(responseMap);
             } else {
                 throw new Exception("Instance provided does not exists");
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println(e.getMessage());
             throw new Exception(e.getMessage());
         }
@@ -420,11 +443,11 @@ public class DataSetsService {
 
        try {
 
-           String instanceurl = instance.get().getUrl();
+           String instanceUrl = instance.get().getUrl();
            String username = instance.get().getUsername();
            String password = instance.get().getPassword();
 
-           url = new URL(instanceurl.concat("/api/dataSets?query="+searchTerm));
+           url = new URL(instanceUrl.concat("/api/dataSets?query="+searchTerm));
 
            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
 

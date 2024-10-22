@@ -9,6 +9,7 @@ public class PaymentDetailsDTO {
     private String type;
     private String shortName;
     private String name;
+    private String status;
     private String insuranceId;
     private String insuranceCode;
     private String policyNumber;

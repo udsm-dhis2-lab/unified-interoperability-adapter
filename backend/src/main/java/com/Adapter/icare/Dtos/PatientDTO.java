@@ -3,10 +3,10 @@ package com.Adapter.icare.Dtos;
 import lombok.Getter;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.*;
-import org.jetbrains.annotations.NotNull;
+
+import javax.validation.constraints.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -50,8 +50,8 @@ public class PatientDTO {
         this.relatedClients = relatedClients;
     }
 
-    public Map<String, Object> toMap() {
-        Map<String, Object> mappedPatient = new HashMap<>();
+    public DemographicDetailsDTO toMap() {
+        DemographicDetailsDTO mappedPatient = new DemographicDetailsDTO();
         try {
             String firstName = null;
             String middleName = null;
@@ -62,37 +62,33 @@ public class PatientDTO {
                         List<String> givenNames = this.getName().get(0).getGiven();
                         if (!givenNames.isEmpty() && givenNames.get(0) != null) {
                             firstName = givenNames.get(0);
+                            if (givenNames.size() > 1) {
+                                middleName = givenNames.get(1);
+                            }
                         }
-                        if (!givenNames.isEmpty() && givenNames.get(1) != null) {
-                            middleName = givenNames.get(1);
-                        }
-                    } catch (Exception exception) {
 
+                    } catch (Exception exception) {
+                        exception.printStackTrace();
                     }
                 }
                 lastName = this.getName().get(0).getFamily();
             }
             // TODO: Add support to retrieve identifier relevant to requesting health facility
-            List<Map<String, Object>> identifiersList = getIdentifierMaps();
-            mappedPatient.put("id", this.id);
-            mappedPatient.put("identifiers", identifiersList);
-            mappedPatient.put("firstName",firstName);
-            mappedPatient.put("middleName",middleName);
-            mappedPatient.put("lastName",lastName);
-
-            mappedPatient.put("gender", this.getGender());
-            mappedPatient.put("dateOfBirth", this.getBirthDate());
-//            mappedPatient.put("fhirName", this.getName());
-            mappedPatient.put("status", this.getStatus());
-            mappedPatient.put("maritalStatus", getMaritalStatus());
-            mappedPatient.put("contactPeople", this.getContactPeople());
-            Map<String, Object> orgMap = new HashMap<>();
-            if (this.getOrganization() != null) {
-                orgMap = this.getOrganisationMap();
-            } else {
-                orgMap = null;
+            mappedPatient.setId(this.getId());
+            List<IdentifierDTO> idsList = new ArrayList<>();
+            if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
+                idsList= getIdentifiersDTO(this.getIdentifiers());
             }
-            mappedPatient.put("organisation", orgMap);
+            mappedPatient.setIdentifiers(idsList);
+            mappedPatient.setFirstName(firstName);
+            mappedPatient.setMiddleName(middleName);
+            mappedPatient.setLastName(lastName);
+
+            mappedPatient.setGender(this.getGender());
+            mappedPatient.setDateOfBirth(this.getBirthDate());
+//            mappedPatient.setS(this.getStatus());
+            mappedPatient.setMaritalStatus(this.getMaritalStatus());
+            mappedPatient.setContactPeople(this.getContactPeople());
             List<Map<String,Object>> relatedClientsList = new ArrayList<>();
             if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
                 for (Map<String,Object> clientDetails: this.relatedClients) {
@@ -106,8 +102,7 @@ public class PatientDTO {
                         List<String> identifiersListForRelatedClient  = new ArrayList<>();
                         clientRelated.put("id", patientData.getIdElement().getIdPart());
                         for(Identifier identifier: patientData.getIdentifier()) {
-//                            System.out.println(identifier.getValue().toString());
-                            identifiersListForRelatedClient.add(identifier.getValue().toString());
+                            identifiersListForRelatedClient.add(identifier.getValue());
                         }
                         clientRelated.put("identifiers",identifiersListForRelatedClient);
                     }
@@ -115,7 +110,7 @@ public class PatientDTO {
                     relatedClientsList.add(clientData);
                 }
             }
-            mappedPatient.put("relatedClients", relatedClientsList);
+            mappedPatient.setRelatedClients(relatedClientsList);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -143,6 +138,51 @@ public class PatientDTO {
             }
         }
         return identifiers;
+    }
+
+    public List<IdentifierDTO> getIdentifiersDTO(List<Identifier> identifiersList) {
+        List<IdentifierDTO> identifiers = new ArrayList<>();
+        if (identifiersList != null && !identifiersList.isEmpty()) {
+            for (Identifier identifier: this.getIdentifiers()) {
+                IdentifierDTO identifierDTO = new IdentifierDTO();
+                identifierDTO.setId(identifier.getValue());
+                String type = null;
+                if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
+                    try {
+                        type = identifier.getType().getCoding().get(0).getCode();
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                identifierDTO.setType(type);
+                identifierDTO.setSystem(identifier.getSystem());
+                if (identifier.getAssigner() != null) {
+                    FacilityDetailsDTO facilityDetails = getFacilityDetailsDTO(identifier);
+                    identifierDTO.setOrganization(facilityDetails);
+                }
+                identifiers.add(identifierDTO);
+            }
+        }
+        return identifiers;
+    }
+
+    private FacilityDetailsDTO getFacilityDetailsDTO(Identifier identifier) {
+        FacilityDetailsDTO facilityDetails = new FacilityDetailsDTO();
+        if (identifier.getAssigner() != null) {
+            if (identifier.getAssigner().getResource() instanceof Organization) {
+                Organization assigner = (Organization) identifier.getAssigner().getResource();
+                String code = null;
+                if (assigner.getIdElement() != null) {
+                    code = assigner.getIdElement().getIdPart();
+                    facilityDetails.setCode(code);
+                }
+                if (assigner.getName() != null) {
+                    facilityDetails.setName(assigner.getName());
+                }
+            }
+        }
+        return facilityDetails;
     }
 
     private Map<String, Object> getOrganisationMap() {

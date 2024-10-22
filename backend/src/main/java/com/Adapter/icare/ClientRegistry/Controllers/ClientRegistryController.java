@@ -1,6 +1,8 @@
 package com.Adapter.icare.ClientRegistry.Controllers;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import com.Adapter.icare.ClientRegistry.Domains.ClientRegistryIdPool;
+import com.Adapter.icare.ClientRegistry.Dtos.ClientRegistryIdDTO;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
@@ -8,7 +10,9 @@ import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.ClientRegistrationDTO;
 import com.Adapter.icare.Dtos.ClientsToMergeDTO;
+import com.Adapter.icare.Dtos.DemographicDetailsDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -17,7 +21,6 @@ import org.hl7.fhir.r4.model.HumanName;
 import org.hl7.fhir.r4.model.Identifier;
 import org.hl7.fhir.r4.model.Patient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -35,7 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/hduApi/cr/clients")
+@RequestMapping("/api/v1/hduApi/cr")
 public class ClientRegistryController {
     private final ClientRegistryService clientRegistryService;
     private final DatastoreService datastoreService;
@@ -73,9 +76,23 @@ public class ClientRegistryController {
                 datastoreConstants.ConfigurationsNamespace,
                 datastoreConstants.DefaultWorkflowEngineConfigurationDatastoreKey);
         if (WESystemConfigurations != null) {
-            this.shouldUseWorkflowEngine = (Boolean) WESystemConfigurations.getValue().get("active");
-            this.defaultWorkflowEngineCode = WESystemConfigurations.getValue().get("code").toString();
-            this.workflowEngine = mediatorsService.getMediatorByCode(defaultWorkflowEngineCode);
+            Map<String, Object> weSystemConfigValue = WESystemConfigurations.getValue();
+            if (weSystemConfigValue != null) {
+                String activeConfig = weSystemConfigValue.get("active") != null ? weSystemConfigValue.get("active").toString(): null;
+                this.shouldUseWorkflowEngine = weSystemConfigValue.get("active") != null ? Boolean.parseBoolean(weSystemConfigValue.get("active").toString()): false;
+
+                this.defaultWorkflowEngineCode = weSystemConfigValue.get("code") != null ? weSystemConfigValue.get("code").toString(): null;
+
+                if (this.defaultWorkflowEngineCode != null) {
+                    this.workflowEngine = mediatorsService.getMediatorByCode(this.defaultWorkflowEngineCode);
+                } else {
+                    this.workflowEngine = null;
+                }
+            } else {
+                this.shouldUseWorkflowEngine = false;
+                this.defaultWorkflowEngineCode = null;
+                this.workflowEngine = null;
+            }
         } else {
             this.shouldUseWorkflowEngine = false;
             this.defaultWorkflowEngineCode = null;
@@ -83,28 +100,39 @@ public class ClientRegistryController {
         }
     }
 
-    @GetMapping("generateIdentifiers")
-    public ResponseEntity<List<Map<String, Object>>> generateClientIdentifiers(
-            @RequestParam(value = "limit", defaultValue = "1") int limit
-    ) throws Exception {
+    @PostMapping(value = "/generateIdentifiers", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> generateClientRegistryIdentifiers(
+            @RequestBody ClientRegistryIdDTO clientRegistryIdDTO) throws Exception {
+        Map<String,Object> response = new HashMap<>();
         try {
-            String regex = clientRegistryConstants.ClientRegistryIdentifierRegex;
-            if (Boolean.valueOf(clientRegistryConstants.GenerateClientIdentifier)) {
-                List<Map<String,Object>> identifierPayload = new ArrayList<>();
-                for(int count= 0; count < limit; count++) {
-                    // TODO: Add logic for generating ids using the provided pattern
-                }
-                return ResponseEntity.ok(identifierPayload);
+            if (clientRegistryIdDTO.getLimit() > 0) {
+                boolean hasGenerated = clientRegistryService.generateClientRegistryIdentifiers(
+                        clientRegistryIdDTO.getStart(),
+                        clientRegistryIdDTO.getLimit(),
+                        clientRegistryConstants.ClientRegistryIdentifierRegex);
+                response.put("message", "Ids have been generated into the pool");
+                return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+                response.put("message", "limit not valid");
+                response.put("statusCode", HttpStatus.EXPECTATION_FAILED.value());
+                return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(response);
             }
-
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    @GetMapping()
+    @GetMapping("/identifiersPool/count")
+    public Integer countOfIdentifiers(@RequestParam (value = "category", required = false) ClientRegistryIdPool.IdSearchCategory idSearchCategory) throws Exception {
+        try {
+            return clientRegistryService.getCountOfIdentifiersBySearchCategory(idSearchCategory);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @GetMapping("/clients")
     public ResponseEntity<Map<String, Object>> getPatients(
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "1") int page,
@@ -121,8 +149,7 @@ public class ClientRegistryController {
         // TODO: Add support to use configured default workflow engine
 
         try {
-            Map<String, Object> patientDataResponse = new HashMap<>();
-            List<Map<String, Object>> patients = clientRegistryService.getPatients(
+            Map<String, Object> patientDataResponse = clientRegistryService.getPatientsWithPagination(
                     page,
                     pageSize,
                     status,
@@ -134,23 +161,14 @@ public class ClientRegistryController {
                     lastName,
                     dateOfBirth,
                     onlyLinkedClients);
-            patientDataResponse.put("results", patients);
-            Map<String, Object> pager = new HashMap<>();
-            pager.put("total", patients.size());
-            pager.put("totalPages", null);
-            pager.put("page", page);
-            pager.put("pageSize", pageSize);
-            // TODO: Use query parameter to identify if there is need to get total (For addressing performance issue)
-            pager.put("total", clientRegistryService.getTotalPatients());
-            patientDataResponse.put("pager", pager);
             return ResponseEntity.ok(patientDataResponse);
         }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> saveClient(@RequestBody Map<String, Object> client) throws Exception {
+    @PostMapping(value = "/clients", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> saveClient(@RequestBody ClientRegistrationDTO client) throws Exception {
         // TODO: This is just placeholder. Add support to save patient.
         Map<String, Object> patientDataResponse = new HashMap<>();
         try {
@@ -160,7 +178,7 @@ public class ClientRegistryController {
         }
     }
 
-    @GetMapping(value = "potentialDuplicates", produces = APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/clients/potentialDuplicates", produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> getPotentialDuplicates(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
@@ -168,7 +186,7 @@ public class ClientRegistryController {
         // TODO: Replace with FHIR implementation
         try {
             Map<String, Object> patientDataResponse = new HashMap<>();
-            List<Map<String, Object>> patients = clientRegistryService.getPatients(
+            List<DemographicDetailsDTO> patients = clientRegistryService.getPatients(
                     page,
                     pageSize,
                     null,
@@ -195,7 +213,7 @@ public class ClientRegistryController {
         }
     }
 
-    @PostMapping(value = "merge",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/clients/merge",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> mergePatients(
             @RequestBody ClientsToMergeDTO clientsToMerge
     ) throws Exception {
@@ -242,6 +260,28 @@ public class ClientRegistryController {
             return ResponseEntity.ok(mergeResponse);
         } catch (Exception exception) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @DeleteMapping(value = "/clientsWithNoIdentifier")
+    public ResponseEntity<Map<String,Object>> deleteClientsWithNoIdentifiers() throws Exception {
+        try {
+            return ResponseEntity.ok(this.clientRegistryService.deleteClientsWithNoIdentifiers());
+        }   catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "/clients/metaData")
+    public ResponseEntity<Map<String,Object>> getClientsMetaData() throws Exception {
+        try {
+            String namespace = datastoreConstants.ResourcesMetadataNamespace;
+            String key = datastoreConstants.ClientsMetadataKey;
+            Datastore datastore =datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+            return ResponseEntity.ok(datastore.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
     }
 }

@@ -42,5 +42,8 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="1_change_dataset_fields_column_datatype_on_datasets" author="josephat-mwakyusa">
+        <modifyDataType tableName="datasets" columnName="dataset_fields" newDataType="json"/>
+    </changeSet>
 
 </databaseChangeLog>

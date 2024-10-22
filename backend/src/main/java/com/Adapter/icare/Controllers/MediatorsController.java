@@ -5,6 +5,7 @@ import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.MediatorDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -49,7 +50,7 @@ public class MediatorsController {
 
     @GetMapping("mediators")
     public ResponseEntity<Map<String,Object>> getMediators(
-            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "category", required = false) String category
@@ -75,8 +76,9 @@ public class MediatorsController {
     }
 
     @PostMapping("mediators")
-    public ResponseEntity<Map<String,Object>> saveMediator(@RequestBody Mediator mediator) throws Exception {
+    public ResponseEntity<Map<String,Object>> saveMediator(@RequestBody MediatorDTO mediatorDTO) throws Exception {
         try {
+            Mediator mediator = new Mediator().fromMap(mediatorDTO);
             if (this.authentication != null && this.authenticatedUser != null) {
                 mediator.setCreatedBy(this.authenticatedUser);
             }
@@ -87,8 +89,9 @@ public class MediatorsController {
     }
 
     @PutMapping("mediators/{uuid}")
-    public ResponseEntity<Map<String,Object>> updateMediator(@PathVariable("uuid") String uuid, @RequestBody Mediator mediator) throws Exception {
+    public ResponseEntity<Map<String,Object>> updateMediator(@PathVariable("uuid") String uuid, @RequestBody MediatorDTO mediatorDTO) throws Exception {
         try {
+            Mediator mediator = new Mediator().fromMap(mediatorDTO);
             if (mediator.getUuid() == null) {
                 mediator.setUuid(uuid);
                 if (this.authentication != null && this.authenticatedUser != null) {
