@@ -91,5 +91,16 @@
       "linter": "eslint",
       "unitTestRunner": "jest"
     }
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/workspace/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test"],
+        "parallel": 3,
+        "cacheDirectory": ".nx/cache",
+        "accessToken": "<your-nx-cloud-token>"
+      }
+    }
   }
 }

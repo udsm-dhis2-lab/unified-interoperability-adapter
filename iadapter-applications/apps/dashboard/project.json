@@ -44,7 +44,9 @@
               "maximumError": "4kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "baseHref": "/dashboard/",
+          "deployUrl": "/dashboard/"
         },
         "development": {
           "buildOptimizer": false,

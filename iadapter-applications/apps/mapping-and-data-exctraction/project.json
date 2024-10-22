@@ -45,7 +45,9 @@
               "maximumError": "4kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "baseHref": "/mapping-and-data-exctraction/",
+          "deployUrl": "/mapping-and-data-exctraction/"
         },
         "development": {
           "optimization": false,
