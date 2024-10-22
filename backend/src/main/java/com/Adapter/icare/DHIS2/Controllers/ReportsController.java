@@ -43,12 +43,9 @@ import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
 import com.Adapter.icare.Domains.*;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Utils.EncryptionUtils;
-import org.apache.tomcat.util.json.JSONParser;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import com.Adapter.icare.Constants.DHISConstants;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValueSets;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValues;
 import com.Adapter.icare.DHIS2.DHISDomains.DhisAggregateValues;
@@ -56,8 +53,6 @@ import com.Adapter.icare.DHIS2.DHISDomains.ReportValuesSent;
 import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
 import org.hisp.dhis.integration.sdk.Dhis2ClientBuilder;
 import org.hisp.dhis.integration.sdk.api.Dhis2Client;
-
-import javax.json.stream.JsonParser;
 
 @RestController
 @RequestMapping("/api/v1/reports")
@@ -81,9 +76,9 @@ public class ReportsController {
         
         //String dataSetId = reportValuesSent.getDataSetID();
         List<DataValueSets> dvslist = new ArrayList<DataValueSets>();
-        List<DataSetElements> dSetElementsList = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
+        List<DataSetElement> dSetElementsList = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
       
-        for (DataSetElements dataSetElement : dSetElementsList) {
+        for (DataSetElement dataSetElement : dSetElementsList) {
 
             String dataElementId = dataSetElement.getDataElement();
             String categoryComboId = dataSetElement.getCategoryOptionCombo();
@@ -127,14 +122,14 @@ public class ReportsController {
         DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetInstanceUuid, completeDate,period, "",attributeOptCombo,dataValues);
         String DHIS2Response = reportsService.SendDataToDHIS(dhisAggregateValues,datasetInstanceUuid);
         Map<String, Object> jsonObjectForDatastore = new HashMap<>();
-        Datasets datasetsInstanceDetails =dataSetsService.getDataSetInstanceByUuid(datasetInstanceUuid);
+        Dataset datasetInstanceDetails =dataSetsService.getDataSetInstanceByUuid(datasetInstanceUuid);
         jsonObjectForDatastore.put("dataValues", dhisAggregateValues);
         jsonObjectForDatastore.put("period", period);
         Map<String, Object> dataSet = new HashMap<>();
-        dataSet.put("uuid", datasetsInstanceDetails.getId());
-        dataSet.put("code", datasetsInstanceDetails.getCode());
-        dataSet.put("name", datasetsInstanceDetails.getDisplayName());
-        dataSet.put("instanceUuid", datasetsInstanceDetails.getInstances().getUuid());
+        dataSet.put("uuid", datasetInstanceDetails.getId());
+        dataSet.put("code", datasetInstanceDetails.getCode());
+        dataSet.put("name", datasetInstanceDetails.getDisplayName());
+        dataSet.put("instanceUuid", datasetInstanceDetails.getInstances().getUuid());
         jsonObjectForDatastore.put("dataSet",dataSet);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
@@ -142,7 +137,7 @@ public class ReportsController {
         jsonObjectForDatastore.put("dataSet",dataSet);
         jsonObjectForDatastore.put("response",DHIS2Response);
         Datastore datastore = new Datastore();
-        String namespace = datasetsInstanceDetails.getUuid();
+        String namespace = datasetInstanceDetails.getUuid();
         String key = period;
         datastore.setNamespace(namespace);
         datastore.setDataKey(key);
@@ -177,7 +172,7 @@ public class ReportsController {
     }
 
     @PostMapping(path = "/verifyCode",consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Map<String, Object> getDHIS2OrgUnitViaCode(@RequestBody Instances instance) throws Exception {
+    public Map<String, Object> getDHIS2OrgUnitViaCode(@RequestBody Instance instance) throws Exception {
         String url = instance.getUrl() + "/api";
         String username = instance.getUsername();
         String password =instance.getPassword();

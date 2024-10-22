@@ -4,7 +4,7 @@ import com.Adapter.icare.DHIS2.DHISRepository.DataSetsRepository;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetElementsService;
 import com.Adapter.icare.DHIS2.DHISServices.DataSetsService;
 import com.Adapter.icare.DHIS2.DHISServices.ReportsService;
-import com.Adapter.icare.Domains.Instances;
+import com.Adapter.icare.Domains.Instance;
 import com.Adapter.icare.Repository.DatasourceRepository;
 import com.Adapter.icare.Repository.InstancesRepository;
 import com.Adapter.icare.Repository.UserRepository;
@@ -21,7 +21,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -84,7 +83,7 @@ public class ReportsControllerIntegrationTests {
     @Disabled
     @Test
     public void getDHIS2OrgUnitViaCodeTest() throws Exception {
-        Instances instance = new Instances();
+        Instance instance = new Instance();
         instance.setUrl("https://play.dhis2.org/2.38.3.1");
         instance.setUsername("admin");
         instance.setPassword("district");

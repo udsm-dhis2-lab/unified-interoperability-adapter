@@ -18,12 +18,12 @@ export class HduApiNavMenuComponent {
     {
       name: 'Dashboard',
       routeUrl: '/dashboard',
-      icon: 'dashboard',
+      icon: 'apartment',
       category: 'main',
     },
     {
       name: 'Client Management',
-      routeUrl: '/ClientManagementService',
+      routeUrl: '/client-management',
       icon: 'user',
       category: 'main',
       subMenus: [
@@ -43,7 +43,7 @@ export class HduApiNavMenuComponent {
     },
     {
       name: 'Worflow Management',
-      routeUrl: '/worflowManagement',
+      routeUrl: '/worflow-management',
       icon: 'apartment',
       category: 'main',
       subMenus: [
@@ -56,7 +56,27 @@ export class HduApiNavMenuComponent {
         {
           name: 'Schedules',
           routeUrl: '/schedules',
-          icon: 'clock-circle',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+      ],
+    },
+    {
+      name: 'Mapping and Data Extraction',
+      routeUrl: '/mapping-and-data-extraction',
+      icon: 'apartment',
+      category: 'main',
+      subMenus: [
+        {
+          name: 'Datasets',
+          routeUrl: '',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+        {
+          name: 'Settings',
+          routeUrl: '/settings',
+          icon: 'unordered-list',
           subMenus: [],
         },
       ],

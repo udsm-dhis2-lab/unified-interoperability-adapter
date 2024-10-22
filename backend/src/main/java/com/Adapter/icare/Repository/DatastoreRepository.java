@@ -33,15 +33,32 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
             "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
             "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
             "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
+            "(:group IS NULL OR datastore_group = :group ) AND " +
             "(:code IS NULL OR JSON_EXTRACT(value, '$.code') = :code )",
             countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
                     "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
                     "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
                     "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
+                    "(:group IS NULL OR datastore_group = :group ) AND " +
                     "(:code IS NULL OR JSON_EXTRACT(value, '$.code') = :code )",nativeQuery = true)
     Page<Datastore> getDatastoreByNamespaceWithPagination(String namespace,
                                                           String category,
                                                           String department,
+                                                          String q,
+                                                          String code,
+                                                          String group,
+                                                          Pageable pageable);
+
+    @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace LIKE CONCAT(:namespace,'%')) AND " +
+            "(:key IS NULL OR data_key = :key ) AND " +
+            "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
+            "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code)",
+            countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace LIKE CONCAT(:namespace,'%')) AND " +
+                    "(:key IS NULL OR data_key = :key ) AND " +
+                    "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
+                    "(:code IS NULL OR JSON_EXTRACT(value, '$.code') =:code)",nativeQuery = true)
+    Page<Datastore> getDatastoreMatchingNamespaceFilterByPagination(String namespace,
+                                                          String key,
                                                           String q,
                                                           String code,
                                                           Pageable pageable);

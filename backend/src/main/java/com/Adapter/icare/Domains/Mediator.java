@@ -1,5 +1,6 @@
 package com.Adapter.icare.Domains;
 
+import com.Adapter.icare.Dtos.MediatorDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,13 +8,15 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
-@Table
+@Table(name = "mediator")
 public class Mediator  extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,11 +40,9 @@ public class Mediator  extends BaseEntity implements Serializable {
         BASIC("BASIC"),
         TOKEN("TOKEN");
         final String value;
-
         AuthType(String value){
             this.value = value;
         }
-
         public String getValue(){
             return value;
         }
@@ -55,13 +56,54 @@ public class Mediator  extends BaseEntity implements Serializable {
         OPENMRS("OPENMRS");
 
         final String value;
-
         Category(String value){
             this.value = value;
         }
-
         public String getValue(){
             return value;
         }
+    }
+
+    public Mediator fromMap(MediatorDTO mediatorDTO) {
+        Mediator mediator = new Mediator();
+        mediator.setBaseUrl(mediatorDTO.getBaseUrl());
+        mediator.setPath(mediatorDTO.getPath());
+        mediator.setCode(mediatorDTO.getCode());
+        mediator.setCategory(mediatorDTO.getCategory());
+        mediator.setAuthToken(mediatorDTO.getAuthToken());
+        mediator.setAuthType(mediatorDTO.getAuthType());
+        return mediator;
+    }
+
+    public Map<String,Object> toMap() {
+        Map<String,Object> mappedMediator = new HashMap<>();
+        mappedMediator.put("uuid", this.getUuid());
+        mappedMediator.put("code", this.getCode());
+        mappedMediator.put("baseUrl", this.getBaseUrl());
+        mappedMediator.put("path", this.getPath());
+        mappedMediator.put("authType",this.authType);
+        mappedMediator.put("category",this.getCategory());
+        mappedMediator.put("createdOn", this.getCreatedOn());
+        Map<String, Object> createdBy = new HashMap<>();
+        if (this.getCreatedBy() != null) {
+            createdBy.put("uuid", this.getCreatedBy().getUuid());
+            createdBy.put("username", this.getCreatedBy().getUsername());
+            createdBy.put("names", this.getCreatedBy().getFirstName() + " " + this.getCreatedBy().getSurname());
+        } else {
+            createdBy = null;
+        }
+        mappedMediator.put("createdBy",createdBy);
+
+        Map<String, Object> lastUpdatedBy = new HashMap<>();
+        if (this.getLastUpdatedBy() != null) {
+            lastUpdatedBy.put("uuid", this.getLastUpdatedBy().getUuid());
+            lastUpdatedBy.put("username", this.getLastUpdatedBy().getUsername());
+            lastUpdatedBy.put("names", this.getLastUpdatedBy().getFirstName() + " " + this.getLastUpdatedBy().getSurname());
+        } else {
+            lastUpdatedBy = null;
+        }
+        mappedMediator.put("lastUpdatedOn", this.getLastUpdatedOn());
+        mappedMediator.put("lastUpdatedBy",lastUpdatedBy);
+        return mappedMediator;
     }
 }

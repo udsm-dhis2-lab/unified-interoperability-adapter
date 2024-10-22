@@ -1,42 +1,72 @@
-version: '3.4'
-
+version: '3.7'
 services:
-
-  db:
-    restart: "always"
-    image: mariadb:10.4
-    environment:
-      MARIADB_DATABASE: ${MARIADB_DATABASE:-unified}
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD:-Admin123}
-      MARIADB_USER: ${MARIADB_USER:-unified}
-      MARIADB_PASSWORD: ${MARIADB_PASSWORD:-Admin123}
-    healthcheck:
-      test: "exit 0"
-    #volumes:
-    #    - ./test/backup/test.openmrs.sql.gz:/docker-entrypoint-initdb.d/database.sql.gz
-  adapter:
-    restart: "always"
-    image: udsmdhis2/unified:1.0.0
-    environment: 
-      DB_HOST: db
-      DB_USER: unified
-      DB_NAME: unified
-      DB_PASSWORD: Admin123
-      #SERVER_PORT: 8080
+  fhir:
+    container_name: fhir
+    image: 'hapiproject/hapi:latest'
     ports:
-        - 8080:8080
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/fhir/metadata"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    configs:
+      - source: hapi
+        target: /app/config/application.yaml
     depends_on:
-        - db
-#   nginx:
-#     image: nginx:1.17.9-alpine
-#     env_file:
-#       - .env
-#     ports:
-#       - 80:80
-#     restart: always
-#     volumes:
-#       - ./nginx.conf:/etc/nginx/nginx.conf
-
+      - fhir-db
+  fhir-db:
+    image: postgis/postgis:13-3.2-alpine
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: Admin321
+      POSTGRES_USER: admin
+      POSTGRES_DB: hapi
+    volumes:
+      - fhir-db-volume:/var/lib/postgresql/data
+  iadapter-db:
+    container_name: iadapter-db
+    restart: 'always'
+    image: mysql:8
+    command: 'mysqld --character-set-server=utf8 --collation-server=utf8_general_ci'
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB:-hduapicoredb}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Admin123}
+      MYSQL_USER: ${MYSQL_USER:-hduapicore}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
+    healthcheck:
+      test: 'exit 0'
+    volumes:
+      - iadapter-data:/var/lib/mysql
+      - ./backup:/backup
+  iadapter:
+    restart: 'always'
+    image: udsmdhis2/unified:2.0.0
+    container_name: iadapter
+    environment:
+      DB_HOST: iadapter-db
+      DB_NAME: hduapicoredb
+      DB_PASSWORD: Admin123
+      DB_USER: hduapicore
+      FHIR_HOST: fhir
+      FHIR_PORT: 8080
+      FHIR_BASE_PATH: /fhir
+    ports:
+      - 8081:8080
+    env_file:
+      - ./config/.env
+    depends_on:
+      - iadapter-db
+      - fhir
+configs:
+  hapi:
+    file: ./hapi.application.yaml
+networks:
+  default:
+    external:
+      name: hdu-network
 volumes:
-  potal-db:
+  iadapter-data:
+    driver: local
+  fhir-db-volume:
     driver: local
