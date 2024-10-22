@@ -29,6 +29,7 @@ import { WorkflowActions } from '../../../features/workflow/state/workflow/workf
 import { skip, take } from 'rxjs';
 import { Workflow } from '../../../features/workflow/models/workflow.model';
 import { ProcessActions } from '../../../features/workflow/state/process/process.actions';
+import { omit } from 'lodash';
 
 // Create a configuration object for the Monaco Editor
 const monacoConfig: NgxMonacoEditorConfig = {
@@ -104,7 +105,6 @@ export class CodeEditorComponent implements OnInit {
     }
   }
 
-  // Method to handle theme changes
   onThemeChange(selectedTheme: string) {
     this.editorOptionsParams.theme = selectedTheme;
     this.editorOptionsParams = {
@@ -113,7 +113,6 @@ export class CodeEditorComponent implements OnInit {
     };
   }
 
-  // Method to handle language changes
   onLanguageChange(selectedLanguage: string) {
     this.editorOptionsParams.language = selectedLanguage;
     this.editorOptionsParams = {
@@ -121,6 +120,7 @@ export class CodeEditorComponent implements OnInit {
       language: selectedLanguage,
     };
   }
+
 
   onUpdateProcessCodeSnippet() {
     this.workflowState
@@ -130,7 +130,7 @@ export class CodeEditorComponent implements OnInit {
           this.processState.dispatch(
             ProcessActions.updateProcess({
               process: {
-                ...currentSelectedProcess,
+                ...omit(currentSelectedProcess, ['children']),
                 script: this.codeSnippet,
               },
             })

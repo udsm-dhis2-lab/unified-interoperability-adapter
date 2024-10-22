@@ -11,6 +11,7 @@ import {
   processAdapter,
   ProcessState,
 } from './process.state';
+import { Process } from '../../models/process.model';
 
 export const processFeatureKey = 'processs';
 
@@ -68,6 +69,7 @@ const processReducer = createReducer(
       deletedProcess: false,
       httpErrorResponse,
       editedProcess: null,
+      currentProcessParentId: null,
       currentSelectedProcess: null,
     })
   ),
@@ -86,6 +88,7 @@ const processReducer = createReducer(
       deletedProcess: false,
       httpErrorResponse: null,
       editedProcess: null,
+      currentProcessParentId: null,
       currentSelectedProcess: null,
     };
   }),
@@ -105,6 +108,7 @@ const processReducer = createReducer(
       httpErrorResponse: null,
       editedProcess: null,
       currentSelectedProcess: null,
+      currentParentProcess: null,
     });
   }),
   on(
@@ -124,6 +128,7 @@ const processReducer = createReducer(
       httpErrorResponse,
       editedProcess: null,
       currentSelectedProcess: null,
+      currentProcessParentId: null,
     })
   ),
   on(ProcessActions.loadProcesses, (state: ProcessState) => {
@@ -143,6 +148,7 @@ const processReducer = createReducer(
       pager: pagerProcessInitialState,
       editedProcess: null,
       currentSelectedProcess: null,
+      currentProcessParentId: null,
     };
   }),
   on(
@@ -163,6 +169,7 @@ const processReducer = createReducer(
         httpErrorResponse: null,
         editedProcess: null,
         currentSelectedProcess: null,
+        currentParentProcess: null,
         pager: updateInitialProcessPagerState(state.pager, processAPIResult),
       });
     }
@@ -185,6 +192,7 @@ const processReducer = createReducer(
       pager: pagerProcessInitialState,
       editedProcess: null,
       currentSelectedProcess: null,
+      currentProcessParentId: null,
     })
   ),
   on(ProcessActions.updateProcess, (state: ProcessState, { process }) => {
@@ -261,6 +269,7 @@ const processReducer = createReducer(
       httpErrorResponse: null,
       editedProcess: null,
       currentSelectedProcess: null,
+      currentProcessParentId: null,
     };
   }),
   on(
@@ -301,6 +310,7 @@ const processReducer = createReducer(
       httpErrorResponse,
       editedProcess: null,
       currentSelectedProcess: null,
+      currentProcessParentId: null,
     })
   ),
   on(ProcessActions.setEditedProcess, (state: ProcessState, { process }) => ({
@@ -317,10 +327,11 @@ const processReducer = createReducer(
     deletedProcess: false,
     editedProcess: process,
     currentSelectedProcess: null,
+    currentProcessParentId: null,
   })),
   on(
-    ProcessActions.setCurrentSelectedProcess,
-    (state: ProcessState, { process }) => ({
+    ProcessActions.setCurrentParentProcessId,
+    (state: ProcessState, { id }) => ({
       ...state,
       loading: false,
       loaded: false,
@@ -333,7 +344,8 @@ const processReducer = createReducer(
       deletingProcess: false,
       deletedProcess: false,
       editedProcess: null,
-      currentSelectedProcess: process,
+      currentProcessParentId: id,
+      currentSelectedProcess: null,
     })
   )
 );

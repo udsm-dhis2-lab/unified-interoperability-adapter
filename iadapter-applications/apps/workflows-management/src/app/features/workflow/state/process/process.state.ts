@@ -24,6 +24,7 @@ export interface ProcessState extends EntityState<Process> {
     httpErrorResponse: HttpErrorResponse | null;
     editedProcess: Process | null;
     currentSelectedProcess: Process | null;
+    currentProcessParentId: string | null;
     pager: Pager;
 }
 
@@ -43,6 +44,7 @@ export const defaultProcess: ProcessState = {
     httpErrorResponse: null,
     editedProcess: null,
     currentSelectedProcess: null,
+    currentProcessParentId: null,
     pager: pagerProcessInitialState,
 };
 

@@ -93,3 +93,8 @@ export const getCurrentSelectedProcess = createSelector(
     getProcessFeature,
     (state: ProcessState) => state.currentSelectedProcess
 );
+
+export const getCurrentProcessParentId = createSelector(
+    getProcessFeature,
+    (state: ProcessState) => state.currentProcessParentId
+);

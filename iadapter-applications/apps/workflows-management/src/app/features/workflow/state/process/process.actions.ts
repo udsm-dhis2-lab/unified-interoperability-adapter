@@ -10,7 +10,8 @@ import {
 export const ProcessActions = createActionGroup({
   source: 'Process',
   events: {
-    'Set Current Selected Process': props<{ process: Process }>(),
+    'Set Current Parent Process Id': props<{ id: string }>(),
+    'Set Current Selected Process': props<{ id: string }>(),
     'Set Edited Process': props<{ process: Process }>(),
     'Load Process': props<{ id: string }>(),
     'Load Process Success': props<{ process: Process }>(),

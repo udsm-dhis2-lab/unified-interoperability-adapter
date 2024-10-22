@@ -2,6 +2,7 @@ export interface WorkflowNode {
     id: string;
     type: string;
     isRoot: boolean;
+    isWorkflow: boolean;
     data: {
         name: string;
         icon: {

@@ -1,4 +1,4 @@
-<form [formGroup]="workflowForm" (ngSubmit)="onAddWorkflow()">
+<form [formGroup]="workflowForm">
   <div nz-row>
     <div class="form-input-container">
       <input nz-input placeholder="Name" formControlName="name" type="text" />
@@ -6,7 +6,7 @@
       <input nz-input placeholder="Description" formControlName="description" type="text" />
       <br /><br />
       <div>
-        <button [disabled]="!workflowForm.valid" *ngIf="(savingWorkflowStatus$ | async) === false" nz-button
+        <button (click)="onAddWorkflow()" [disabled]="!workflowForm.valid" *ngIf="(savingWorkflowStatus$ | async) === false" nz-button
           nzType="primary" [nzLoading]="false" nzLoading>
           <span nz-icon nzType="poweroff"></span>
           Save Workflow

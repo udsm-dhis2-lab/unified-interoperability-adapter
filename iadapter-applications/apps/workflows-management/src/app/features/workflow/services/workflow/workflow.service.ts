@@ -12,7 +12,7 @@ import { ExecutedWorkflow } from '../../models/runned.model';
 
 @Injectable()
 export class WorkflowService {
-  constructor(private hduHttpService: HduHttpService) { }
+  constructor(private hduHttpService: HduHttpService) {}
 
   /**
    * Fetches the workflows from the API based on page and pageSize
@@ -39,7 +39,10 @@ export class WorkflowService {
   getWorkflows(page = 1, pageSize = 12): Observable<WorkflowAPIResult> {
     // Set up HTTP query parameters
     const params = new HttpParams()
-      .set('fields', '*')
+      .set(
+        'fields',
+        'id,created,updated,name,description,createdBy,updatedBy,process.children,process.children.children'
+      )
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
@@ -58,10 +61,16 @@ export class WorkflowService {
    * @returns Observable of the workflow
    */
   getWorkflowById(id: string): Observable<Workflow> {
-    const apiUrl = `${WorkflowEnum.BASE_URL}${WorkflowEnum.WORKFLOW_API}/${id}?fields=*`;
+    // Set up HTTP query parameters
+    const params = new HttpParams().set(
+      'fields',
+      'id,created,updated,name,description,createdBy,updatedBy,process.children,process.children.children'
+    );
+
+    const apiUrl = `${WorkflowEnum.BASE_URL}${WorkflowEnum.WORKFLOW_API}/${id}`;
 
     return this.hduHttpService
-      .get<Workflow>(apiUrl)
+      .get<Workflow>(apiUrl, { params })
       .pipe(catchError(this.handleError));
   }
 

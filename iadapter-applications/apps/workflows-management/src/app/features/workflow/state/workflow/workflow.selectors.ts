@@ -12,6 +12,12 @@ export const {
     selectTotal: getWorkflowsTotal,
 } = workflowAdapter.getSelectors(getWorkflowFeature);
 
+
+export const getWorkflowById = (id: string | number) => createSelector(
+    getWorkflowEntities,
+    (entities) => entities[id]
+);
+
 // export const getWorkflowById = (id: string) => (getWorkflowEntities as any)[id];
 
 // export const getWorkflowById = (id: string) => (getWorkflowEntities as any)[id];

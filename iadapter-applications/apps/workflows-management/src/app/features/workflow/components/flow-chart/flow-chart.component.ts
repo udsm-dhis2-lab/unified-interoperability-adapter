@@ -10,7 +10,7 @@ import {
   OnDestroy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   NgFlowchart,
   NgFlowchartCanvasDirective,
@@ -34,13 +34,18 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { select, Store } from '@ngrx/store';
 import { WorkflowState } from '../../state/workflow/workflow.state';
-import { getCurrentSelectedWorkflow } from '../../state/workflow/workflow.selectors';
+import {
+  getCurrentSelectedWorkflow,
+  getUpdatedWorkflowStatus,
+  getWorkflowById,
+} from '../../state/workflow/workflow.selectors';
 import { Workflow } from '../../models/workflow.model';
 import { RootWorkflowNode } from '../../models/workflow-step.model';
 import { ProcessState } from '../../state/process/process.state';
 import { ProcessActions } from '../../state/process/process.actions';
 import {
   getAddedProcessStatus,
+  getCurrentProcessParentId,
   getCurrentSelectedProcess,
 } from '../../state/process/process.selectors';
 import { FlowComponent } from '../flow/flow.component';
@@ -88,10 +93,11 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
   version = VERSION;
   stepGap = '';
   item1Checked = true;
+  isWorkflowSelected = false;
 
   callbacks: NgFlowchart.Callbacks = {};
   options: NgFlowchart.Options = {
-    stepGap: 40,
+    stepGap: 20,
     rootPosition: 'TOP_CENTER',
     zoom: {
       mode: 'DISABLED',
@@ -127,7 +133,8 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
     private nzModalService: NzModalService,
     private workFlowState: Store<WorkflowState>,
     private processState: Store<ProcessState>,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router
   ) {
     this.callbacks.onDropError = this.onDropError;
     this.callbacks.onMoveError = this.onMoveError;
@@ -212,16 +219,20 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
 
   afterScale(scale: number): void {
     //realistically you want to recursively get all steps in canvas
-    const firstSetOfChildren = this.canvas.getFlow().getRoot().children;
-    firstSetOfChildren.forEach((step) => {
-      if (step instanceof FlowComponent) {
-        step.nestedCanvas.setNestedScale(scale);
-      }
-    });
+    if (this.canvas) {
+      const firstSetOfChildren = this.canvas.getFlow().getRoot().children;
+      firstSetOfChildren.forEach((step) => {
+        if (step instanceof FlowComponent) {
+          step.nestedCanvas.setNestedScale(scale);
+        }
+      });
+    }
   }
 
   showUpload() {
-    this.canvas.getFlow().upload(this.workflowTree);
+    if (this.canvas) {
+      this.canvas.getFlow().upload(this.workflowTree);
+    }
   }
 
   showFlowData() {
@@ -238,7 +249,10 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   clearData() {
-    this.canvas.getFlow().clear();
+    if (this.canvas) {
+      this.canvas.getFlow().clear();
+
+    }
   }
 
   onSequentialChange(event: any) {
@@ -281,13 +295,32 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
   runningItems: Set<number> = new Set();
 
   onSelectingItem(id: number): void {
-    this.selectedFlowItem = id;
+    if (id) {
+      this.workFlowState
+        .pipe(select(getWorkflowById(id)), take(1))
+        .subscribe((workflow: Workflow | undefined) => {
+          if (workflow) {
+            this.isWorkflowSelected = true;
+            this.selectedFlowItem = id;
+          } else {
+            this.selectedFlowItem = id;
+            this.isWorkflowSelected = false;
+            this.processState.dispatch(
+              ProcessActions.setCurrentParentProcessId({
+                id: this.selectedFlowItem,
+              })
+            );
+
+            this.workFlowState.dispatch(
+              WorkflowActions.setCurrentSelectedProcess({
+                id: this.selectedFlowItem,
+              })
+            );
+          }
+        });
+    }
+
     this.isFlowChartHasChildren = hasChildren(this.workflowTree, id.toString());
-    this.workFlowState.dispatch(
-      WorkflowActions.setCurrentSelectedProcess({
-        id: this.selectedFlowItem,
-      })
-    );
   }
 
   onRun(id: number): void {
@@ -298,8 +331,8 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.runningItems.has(id);
   }
 
-  stepGaps = [30, 40, 50, 60, 70, 80, 90]; // Array for options
-  selectedGap = 40; // Default selected value
+  stepGaps = [20, 30, 40, 50, 60, 70, 80, 90];
+  selectedGap = 20;
 
   onGapChanged(selectedValue: number): void {
     this.options = {
@@ -342,13 +375,13 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
             const instance = modalRef.getContentComponent();
             const processFormCreate = instance?.onSubmit();
 
-            this.workFlowState.dispatch(
+            this.processState.dispatch(
               ProcessActions.addProcess({
                 process: processFormCreate as any,
               })
             );
 
-            this.workFlowState
+            this.processState
               .pipe(select(getAddedProcessStatus), skip(1), take(1))
               .subscribe((status: boolean) => {
                 if (status) {
@@ -361,50 +394,60 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
                           .subscribe(
                             (currentSelectedProcess: Process | null) => {
                               if (currentSelectedProcess) {
-                                this.workFlowState.dispatch(
-                                  WorkflowActions.updateWorkflow({
-                                    workflow: {
-                                      ...workflow,
-                                      process: {
-                                        id: currentSelectedProcess.id
-                                      },
-                                    },
-                                  })
-                                );
-
-                                this.workFlowState.dispatch(
-                                  WorkflowActions.updateCurrentSelectedWorkflow(
-                                    {
+                                if (!this.isWorkflowSelected) {
+                                  this.processState
+                                    .pipe(
+                                      select(getCurrentProcessParentId),
+                                      take(1)
+                                    )
+                                    .subscribe(
+                                      (
+                                        currentProcessParentId: string | null
+                                      ) => {
+                                        if (currentProcessParentId) {
+                                          this.processState.dispatch(
+                                            ProcessActions.updateProcess({
+                                              process: {
+                                                ...currentSelectedProcess,
+                                                parent: {
+                                                  id: currentProcessParentId,
+                                                },
+                                              },
+                                            })
+                                          );
+                                        }
+                                      }
+                                    );
+                                } else {
+                                  this.workFlowState.dispatch(
+                                    WorkflowActions.updateWorkflow({
                                       workflow: {
                                         ...workflow,
-                                        process: currentSelectedProcess,
+                                        process: {
+                                          id: currentSelectedProcess.id,
+                                        },
                                       },
-                                      process: currentSelectedProcess,
-                                    }
+                                    })
+                                  );
+                                }
+
+                                this.workFlowState
+                                  .pipe(
+                                    select(getUpdatedWorkflowStatus),
+                                    skip(1),
+                                    take(1)
                                   )
-                                );
-
-                                // this.workFlowState
-                                //   .pipe(
-                                //     select(getCurrentSelectedWorkflow),
-                                //     skip(1),
-                                //     take(1)
-                                //   )
-                                //   .subscribe((workflow: Workflow | null) => {
-                                //     if (workflow) {
-                                //       const rootWorkflow: RootWorkflowNode =
-                                //         transformWorkflowToProcessTree(
-                                //           workflow
-                                //         );
-
-                                //       this.workflowTree =
-                                //         JSON.stringify(rootWorkflow);
-                                //       this.isWorkflowNodeRoot =
-                                //         isRootNode(rootWorkflow);
-                                //       this.selectedFlowItem = null;
-                                //       this.showUpload();
-                                //     }
-                                //   });
+                                  .subscribe(
+                                    (workflowUpdatedStatus: boolean) => {
+                                      if (workflowUpdatedStatus) {
+                                        this.workFlowState.dispatch(
+                                          WorkflowActions.loadWorkflow({
+                                            id: workflow.id,
+                                          })
+                                        );
+                                      }
+                                    }
+                                  );
                               }
                             }
                           );

@@ -24,6 +24,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { filterPayload } from '../../helpers/workflow.helper';
+import { omit } from 'lodash';
 
 @Component({
   selector: 'app-edit',
@@ -99,7 +100,7 @@ export class EditComponent implements OnInit, AfterViewInit {
             this.workFlowState.dispatch(
               WorkflowActions.updateWorkflow({
                 workflow: {
-                  ...workflow,
+                  ...omit(workflow, ['process']),
                   name: this.workflowForm.get('name')?.value,
                   description: this.workflowForm.get('description')?.value,
                 },

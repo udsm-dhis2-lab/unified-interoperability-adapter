@@ -31,52 +31,90 @@ export function hasChildren(jsonString: string, nodeId: string): boolean {
 }
 
 // export function transformWorkflowToProcessTree(
-//     workflow: Workflow
+//   workflow: Workflow
 // ): RootWorkflowNode {
-//     return {
-//         root: {
-//             id: workflow.id, // Use the id from the source payload
-//             type: 'log',
-//             data: {
-//                 name: workflow.name, // Use the name from the source payload
-//                 icon: {
-//                     name: 'log-icon',
-//                     color: 'blue',
-//                 },
-//                 config: {
-//                     message: null,
-//                     severity: null,
-//                 },
-//             },
-//             children: [
-
-//             ], // Initialize an empty children array
+//   // Check if the workflow contains a process
+//   const process = workflow.process
+//     ? {
+//         id: workflow.process.id, // Use the id from the process payload
+//         type: 'log',
+//         isRoot: false,
+//         isWorkflow: false,
+//         data: {
+//           name: workflow?.process?.name, // Use the name from the process payload
+//           icon: {
+//             name: 'log-icon',
+//             color: 'blue',
+//           },
+//           config: {
+//             message: null,
+//             severity: null,
+//           },
 //         },
-//     };
+//         children: [], // Optionally, process can have its own children
+//       }
+//     : null;
+
+//   return {
+//     root: {
+//       id: workflow.id, // Use the id from the source payload
+//       type: 'log',
+//       isRoot: true,
+//       isWorkflow: true,
+//       data: {
+//         name: workflow.name, // Use the name from the source payload
+//         icon: {
+//           name: 'log-icon',
+//           color: 'blue',
+//         },
+//         config: {
+//           message: null,
+//           severity: null,
+//         },
+//       },
+//       children: process ? [process as WorkflowNode] : [], // Add the process if it exists
+//     },
+//   };
 // }
 
+// Helper function to transform a process and its children recursively into nodes
+export function transformProcessToNode(process: Process): WorkflowNode {
+  const workflowNode: WorkflowNode = {
+    id: process.id,
+    type: 'log',
+    isRoot: false,
+    isWorkflow: false,
+    data: {
+      name: process.name || '',
+      icon: {
+        name: 'log-icon',
+        color: 'blue',
+      },
+      config: {
+        message: null,
+        severity: null,
+      },
+    },
+    children: [], // Initialize empty children array
+  };
+
+  // If the process has children, recursively add them
+  if (process.children && process.children.length > 0) {
+    workflowNode.children = process.children.map((childProcess) =>
+      transformProcessToNode(childProcess)
+    );
+  }
+
+  return workflowNode;
+}
+
+// Main function to transform the workflow into a process tree
 export function transformWorkflowToProcessTree(
   workflow: Workflow
 ): RootWorkflowNode {
   // Check if the workflow contains a process
-  const process = workflow.process
-    ? {
-        id: workflow.process.id, // Use the id from the process payload
-        type: 'log',
-        isRoot: false,
-        data: {
-          name: workflow?.process?.name, // Use the name from the process payload
-          icon: {
-            name: 'log-icon',
-            color: 'blue',
-          },
-          config: {
-            message: null,
-            severity: null,
-          },
-        },
-        children: [], // Optionally, process can have its own children
-      }
+  const processNode = workflow.process
+    ? transformProcessToNode(workflow.process)
     : null;
 
   return {
@@ -84,6 +122,7 @@ export function transformWorkflowToProcessTree(
       id: workflow.id, // Use the id from the source payload
       type: 'log',
       isRoot: true,
+      isWorkflow: true,
       data: {
         name: workflow.name, // Use the name from the source payload
         icon: {
@@ -95,7 +134,7 @@ export function transformWorkflowToProcessTree(
           severity: null,
         },
       },
-      children: process ? [process as WorkflowNode] : [], // Add the process if it exists
+      children: processNode ? [processNode] : [], // Add the process node if it exists
     },
   };
 }
@@ -122,24 +161,76 @@ export function filterPayload(workflow: Workflow): {
   return { id, name, description };
 }
 
-// Improved TypeScript function to search for a process by ID
-export function searchProcessWithWorkflows(
-  payload: Dictionary<Workflow>,
-  id: string
-): Process | null {
-  // Iterate through all workflows in the payload
-  for (const workflowKey in payload) {
-    const workflow = payload[workflowKey];
+// // Improved TypeScript function to search for a process by ID
+// export function searchProcessWithWorkflows(
+//   payload: Dictionary<Workflow>,
+//   id: string
+// ): Process | null {
+//   // Iterate through all workflows in the payload
+//   for (const workflowKey in payload) {
+//     const workflow = payload[workflowKey];
 
-    // Check if the workflow has a process and if the process id matches the given id
-    if (workflow?.process?.id === id) {
-      return workflow.process;
+//     // Check if the workflow has a process and if the process id matches the given id
+//     if (workflow?.process?.id === id) {
+//       return workflow.process;
+//     }
+//   }
+
+//   // If no matching process is found, return null
+//   return null;
+// }
+
+// Recursive function to search for a process within the children of a process
+function searchProcessInProcessChildren(process: Process, id: string): Process | null {
+  // Check if the current process matches the id
+  if (process.id === id) {
+    return process;
+  }
+
+  // If the process has children, search recursively
+  if (process.children && process.children.length > 0) {
+    for (const childProcess of process.children) {
+      const foundProcess = searchProcessInProcessChildren(childProcess, id);
+      if (foundProcess) {
+        return foundProcess;
+      }
     }
   }
 
   // If no matching process is found, return null
   return null;
 }
+
+// Main function to search for a process by ID within the workflow (searches within processes only)
+export function searchProcessWithWorkflows(
+  payload: Dictionary<Workflow>,
+  id: string
+): Process | null {
+  // Iterate through all workflows in the payload
+  for (const workflowKey in payload) {
+    const workflow: Workflow | undefined = payload[workflowKey];
+
+    // Check if the workflow itself has a process
+    if (workflow && workflow.process) {
+      // Check if the root process matches the id
+      if (workflow.process.id === id) {
+        return workflow.process;
+      }
+
+      // Search recursively through the process' children if it has any
+      if (workflow.process.children && workflow.process.children.length > 0) {
+        const foundProcess = searchProcessInProcessChildren(workflow.process, id);
+        if (foundProcess) {
+          return foundProcess;
+        }
+      }
+    }
+  }
+
+  // If no matching process is found in any workflow, return null
+  return null;
+}
+
 
 // Helper function to get 'id' from the current route
 export function getUidFromRoute(route: ActivatedRoute): string | null {
