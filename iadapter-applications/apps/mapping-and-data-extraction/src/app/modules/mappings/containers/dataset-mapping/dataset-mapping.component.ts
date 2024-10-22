@@ -5,11 +5,11 @@ import {
   OnInit,
   Renderer2,
 } from '@angular/core';
-import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
+import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
+import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
 import { ConfigurationPage, IcdCodePage } from '../../models';
 

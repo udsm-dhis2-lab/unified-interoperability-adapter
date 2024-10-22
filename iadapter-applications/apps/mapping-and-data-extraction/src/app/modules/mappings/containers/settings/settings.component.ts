@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
+import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { Configuration, ConfigurationPage } from '../../models';
 import { Subscription } from 'rxjs';

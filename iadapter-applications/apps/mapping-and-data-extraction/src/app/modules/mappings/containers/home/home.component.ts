@@ -25,7 +25,7 @@ import {
 } from '../../models';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { SharedModule } from 'apps/mapping-and-data-exctraction/src/app/shared/shared.module';
+import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 
 @Component({

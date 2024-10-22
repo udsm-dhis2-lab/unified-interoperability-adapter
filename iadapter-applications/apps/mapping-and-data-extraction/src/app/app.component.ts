@@ -3,7 +3,7 @@ import { Router, RouterModule } from '@angular/router';
 import { HduApiTopBarMenuComponent } from 'libs/hdu-api-top-bar-menu/src/lib/hdu-api-top-bar-menu/hdu-api-top-bar-menu.component';
 import { HduApiNavMenuComponent } from 'libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
 import { antDesignModules } from './shared/ant-design-modules';
-import {Menu} from 'libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/models/menu.model';
+import { Menu } from 'libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/models/menu.model';
 
 @Component({
   standalone: true,
@@ -18,7 +18,7 @@ import {Menu} from 'libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/models/menu.m
   styleUrl: './app.component.less',
 })
 export class AppComponent {
-  title = 'mapping-and-data-exctraction';
+  title = 'mapping-and-data-extraction';
 
   isCollapsed = false;
   handleCollapseChange() {

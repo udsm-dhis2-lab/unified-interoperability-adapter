@@ -1,4 +1,4 @@
-import { Dataset } from '../';
+import { Dataset } from '..';
 
 export class DatasetPage {
   total!: number;
