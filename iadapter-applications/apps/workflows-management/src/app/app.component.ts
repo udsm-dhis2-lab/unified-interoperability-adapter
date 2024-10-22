@@ -36,8 +36,6 @@ export class AppComponent {
     if (menu?.category === 'main') {
       // window.open('../../..' + menu.routeUrl, '_self');
     } else {
-      // console.log("THIS IS HANDLED");
-      console.log("THIS IS MORE::: ", menu.routeUrl);
       this.router.navigate(['/' + menu.routeUrl]);
     }
   }

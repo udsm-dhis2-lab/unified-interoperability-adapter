@@ -1,2 +1,49 @@
-<ngx-monaco-editor class="code-editor" [options]="editorOptionsParams" [(ngModel)]="codeSnippet"></ngx-monaco-editor>
-
+<nz-card nzTitle="Code Snippet Configuration" [nzBordered]="false">
+  <nz-collapse>
+    <nz-collapse-panel
+      [nzHeader]="'Workflow Tree Configuration'"
+      [nzActive]="true"
+      [nzDisabled]="false"
+    >
+      <div nz-row>
+        <div nz-col nzSpan="12">
+          <nz-select
+            class="ng-editor-select"
+            [(ngModel)]="editorOptionsParams.theme"
+            (ngModelChange)="onThemeChange($event)"
+            style="flex: 1"
+          >
+            <nz-option nzValue="vs-light" nzLabel="Light Theme"></nz-option>
+            <nz-option nzValue="vs-dark" nzLabel="Dark Theme"></nz-option>
+          </nz-select>
+        </div>
+        <div nz-col nzSpan="12">
+          <nz-select
+            class="ng-editor-select"
+            [(ngModel)]="editorOptionsParams.language"
+            (ngModelChange)="onLanguageChange($event)"
+            style="flex: 1"
+          >
+            <nz-option nzValue="javascript" nzLabel="JavaScript"></nz-option>
+            <nz-option nzValue="typescript" nzLabel="TypeScript"></nz-option>
+          </nz-select>
+        </div>
+      </div>
+    </nz-collapse-panel>
+    <nz-collapse-panel
+      [nzHeader]="'Code Editor'"
+      [nzActive]="true"
+      [nzDisabled]="false"
+    >
+      <button (click)="onUpdateProcessCodeSnippet()" class="update-code-snippet-btn" nz-button nzType="dashed" [nzLoading]="false">
+        <span nz-icon nzType="poweroff"></span>
+        Update Code Snippet
+      </button>
+      <ngx-monaco-editor
+        class="code-editor"
+        [options]="editorOptionsParams"
+        [(ngModel)]="codeSnippet"
+      ></ngx-monaco-editor>
+    </nz-collapse-panel>
+  </nz-collapse>
+</nz-card>

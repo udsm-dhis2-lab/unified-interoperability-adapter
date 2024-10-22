@@ -24,6 +24,8 @@
     "@ngrx/store-devtools": "^18.1.0",
     "mermaid": "^11.3.0",
     "monaco-editor": "^0.52.0",
+    "monaco-editor-webpack-plugin": "^7.1.0",
+    "ngx-log-monitor": "^1.2.0",
     "ngx-monaco-editor-v2": "^18.1.0",
     "rxjs": "~7.8.0",
     "zone.js": "~0.14.3"
