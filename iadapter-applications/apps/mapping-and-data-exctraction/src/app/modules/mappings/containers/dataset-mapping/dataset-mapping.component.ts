@@ -92,7 +92,10 @@ export class DatasetMappingComponent implements OnInit {
     this.assignConfigurationToSelectedDisaggregation(value);
   }
 
-  assignConfigurationToSelectedDisaggregation(configuration: any[]): void {
+  assignConfigurationToSelectedDisaggregation(configuration: {
+    name: string;
+    options: any[];
+  }): void {
     this.mappingsData.disagregations.forEach((item) => {
       if (!item.configurations) {
         item.configurations = [];
@@ -100,9 +103,9 @@ export class DatasetMappingComponent implements OnInit {
       item.configurations = [
         ...item.configurations,
         {
-          name: configuration[0],
+          name: configuration.name,
           selectedValue: '',
-          options: configuration[1],
+          options: configuration.options,
         },
       ];
     });
@@ -169,8 +172,52 @@ export class DatasetMappingComponent implements OnInit {
     this.isLoadingDisaggregation = true;
     const inputElement = event.target as HTMLInputElement;
     this.selectedInputId = inputElement.id.split('-')[0];
+    this.getCategoryOptionCombos(this.selectedInputId);
     this.dataSetManagementService
-      .getCategoryOptionCombos(this.selectedInputId)
+      .getMappingFromDataStore(this.selectedInputId)
+      .subscribe({
+        next: (data: any) => {
+          if (data.value.mappings.length > 0) {
+            this.useIcdCodes = true;
+            this.selectedICdCodes = data.value.mappings.map(
+              (item: any) => item.code
+            );
+          }
+          if (data.value.params.length > 0) {
+            const param = data.value.params[0];
+            if (param.gender) {
+              const configuration = this.configurationOptionList.find(
+                (item: any) => item.label === 'Gender'
+              );
+              this.assignConfigurationToSelectedDisaggregation(
+                configuration.value
+              );
+            }
+            if (param.ageType) {
+              const configuration = this.configurationOptionList.find(
+                (item: any) => item.label === 'Agetype'
+              );
+              this.assignConfigurationToSelectedDisaggregation(
+                configuration.value
+              );
+            }
+            if (param.startAge) {
+              const configuration = this.configurationOptionList.find(
+                (item: any) => item.label === 'Agegroup'
+              );
+              this.assignConfigurationToSelectedDisaggregation(
+                configuration.value
+              );
+            }
+          }
+        },
+        //TODO: Implement error handling
+      });
+  }
+
+  getCategoryOptionCombos(dataElementUuid: string) {
+    this.dataSetManagementService
+      .getCategoryOptionCombos(dataElementUuid)
       .subscribe({
         next: (data: any) => {
           this.mappingsData.disagregations = [];
@@ -261,7 +308,10 @@ export class DatasetMappingComponent implements OnInit {
         this.configurationOptionList =
           data?.listOfConfigurations?.map((configuration: any) => {
             return {
-              value: [configuration.name, configuration.options],
+              value: {
+                name: configuration.name,
+                options: configuration.options,
+              },
               label: configuration.name,
             };
           }) ?? [];
@@ -297,38 +347,34 @@ export class DatasetMappingComponent implements OnInit {
   createMappingsPayload() {
     const payLoad = {
       mapping: {
-        mappings: [
-          this.selectedICdCodes.map((item) => {
-            return {
-              code: item,
-            };
-          }),
-        ],
+        mappings: this.selectedICdCodes.map((item) => {
+          return {
+            code: item,
+          };
+        }),
+
         dataElement: {
           id: this.selectedInputId,
           name: '',
           code: '',
         },
         type: '',
-        params: [
-          this.mappingsData.disagregations.map((item) => {
-            return {
-              co: item.categoryOptionComboId,
-              ...(item.configurations ?? []).reduce((acc, config: Setting) => {
-                if (config.name === 'Agegroup') {
-                  const startingAge = config.selectedValue?.split('-')[0];
-                  const endingAge = config.selectedValue?.split('-')[1];
-                  acc['startAge'] = startingAge;
-                  acc['endAge'] = endingAge;
-                } else {
-                  acc[config.keyToUseInPayload as string] =
-                    config.selectedValue;
-                }
-                return acc;
-              }, {} as { [key: string]: any }),
-            };
-          }),
-        ],
+        params: this.mappingsData.disagregations.map((item) => {
+          return {
+            co: item.categoryOptionComboId,
+            ...(item.configurations ?? []).reduce((acc, config: Setting) => {
+              if (config.name === 'Agegroup') {
+                const startingAge = config.selectedValue?.split('-')[0];
+                const endingAge = config.selectedValue?.split('-')[1];
+                acc['startAge'] = startingAge;
+                acc['endAge'] = endingAge;
+              } else {
+                acc[config.keyToUseInPayload as string] = config.selectedValue;
+              }
+              return acc;
+            }, {} as { [key: string]: any }),
+          };
+        }),
       },
       dataKey: this.selectedInputId,
       namespace: `MAPPINGS-${this.selectedInputId}`,

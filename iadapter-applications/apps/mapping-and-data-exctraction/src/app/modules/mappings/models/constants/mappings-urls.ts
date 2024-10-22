@@ -9,4 +9,5 @@ export enum MappingsUrls {
   REMOVE_DATASET_FROM_MAPPING = 'dataSets',
   GET_CATEGORY_OPTION_COMBO = 'dataElements',
   ADD_MAPPINGS = 'hduApi/mappings',
+  GET_MAPPINGS_FROM_DATASTORE = 'datastore',
 }
