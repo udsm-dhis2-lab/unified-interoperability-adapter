@@ -2,7 +2,10 @@ package com.Adapter.icare.ClientRegistry.Services;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import com.Adapter.icare.ClientRegistry.Domains.ClientRegistryIdPool;
+import com.Adapter.icare.ClientRegistry.Repository.ClientRegistryIdsRepository;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Domains.User;
@@ -11,12 +14,15 @@ import com.Adapter.icare.Services.UserService;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static kotlin.reflect.jvm.internal.impl.builtins.StandardNames.FqNames.number;
 
 @Service
 public class ClientRegistryService {
@@ -26,10 +32,14 @@ public class ClientRegistryService {
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
+    private final ClientRegistryIdsRepository clientRegistryIdsRepository;
 
     @Autowired
-    public ClientRegistryService(FHIRConstants fhirConstants, UserService userService) {
+    public ClientRegistryService(FHIRConstants fhirConstants,
+                                 UserService userService,
+                                 ClientRegistryIdsRepository clientRegistryIdsRepository) {
         this.fhirConstants = fhirConstants;
+        this.clientRegistryIdsRepository = clientRegistryIdsRepository;
 
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirClient =  fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
@@ -52,7 +62,96 @@ public class ClientRegistryService {
         return fhirClient.update().resource(patient).execute();
     }
 
-    public List<Map<String, Object>> getPatients(int page,
+    public Map<String,Object> getPatientsWithPagination(
+            int page,
+            int pageSize,
+            String status,
+            String identifier,
+            String identifierType,
+            String gender,
+            String firstName,
+            String middleName,
+            String lastName,
+            Date dateOfBirth,
+            Boolean onlyLinkedClients
+    ) throws Exception {
+        Map<String,Object> patientDataResponse = new HashMap<>();
+        try {
+            List<ClientRegistrationDTO> patients = new ArrayList<>();
+            Bundle response = new Bundle();
+            // TODO: You might consider enumerating the gender codes
+            var searchClient =  fhirClient.search().forResource(Patient.class);
+            if (identifier != null) {
+                searchClient.where(Patient.IDENTIFIER.exactly().identifier(identifier));
+            }
+
+            if (onlyLinkedClients != null) {
+                // TODO replace hardcoded ids with dynamic ones
+                searchClient.where(Patient.LINK.hasAnyOfIds("299","152"));
+            }
+
+            if (gender != null) {
+                searchClient.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
+            }
+
+            if (lastName != null) {
+                searchClient.where(Patient.FAMILY.matches().value(lastName));
+            }
+
+            if (firstName != null) {
+                searchClient.where(Patient.GIVEN.matches().value(firstName));
+            }
+
+            if (dateOfBirth != null) {
+                searchClient.where(Patient.BIRTHDATE.beforeOrEquals().day(dateOfBirth));
+            }
+
+            response = searchClient.count(pageSize)
+                    .offset(page-1)
+                    .returnBundle(Bundle.class)
+                    .execute();
+            Bundle clientTotalBundle = searchClient
+                    .summaryMode(SummaryEnum.COUNT)
+                    .returnBundle(Bundle.class)
+                    .execute();
+
+            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                    try {
+                        Patient patientData = (Patient) entry.getResource();
+                        patientData.getIdentifier();
+                        PatientDTO patientDTO = mapToPatientDTO(patientData);
+                        ClientRegistrationDTO clientDetails = new ClientRegistrationDTO();
+                        clientDetails.setDemographicDetails(patientDTO.toMap());
+                        Organization managingOrganization = new Organization();
+                        FacilityDetailsDTO facilityDetails = new FacilityDetailsDTO();
+                        managingOrganization = (Organization) patientData.getManagingOrganization().getResource();
+                        if (managingOrganization != null && managingOrganization.getIdElement() != null) {
+                            facilityDetails.setCode(managingOrganization.getIdElement().getIdPart());
+                            facilityDetails.setName(managingOrganization.getName());
+                        }
+                        clientDetails.setFacilityDetails(facilityDetails);
+                        patients.add(clientDetails);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            patientDataResponse.put("results", patients);
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("totalPages", null);
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("total", clientTotalBundle.getTotal());
+            patientDataResponse.put("pager", pager);
+            return patientDataResponse;
+        }  catch (Exception e) {
+            e.printStackTrace(); // Log the exception for referencing via logs
+            throw new RuntimeException("Failed to retrieve patients from FHIR server", e);
+        }
+    }
+
+    public List<DemographicDetailsDTO> getPatients(int page,
                                                  int pageSize,
                                                  String status,
                                                  String identifier,
@@ -64,12 +163,12 @@ public class ClientRegistryService {
                                                  Date dateOfBirth,
                                                  Boolean onlyLinkedClients) {
         try {
-            List<Map<String, Object>> patients = new ArrayList<>();
+            List<DemographicDetailsDTO> patients = new ArrayList<>();
             Bundle response = new Bundle();
             // TODO: You might consider enumerating the gender codes
             var searchClient =  fhirClient.search().forResource(Patient.class);
             if (identifier != null) {
-                searchClient.where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier));
+                searchClient.where(Patient.IDENTIFIER.exactly().identifier(identifier));
             }
 
             if (onlyLinkedClients != null) {
@@ -97,6 +196,10 @@ public class ClientRegistryService {
                     .offset(page)
                     .returnBundle(Bundle.class)
                     .execute();
+            Bundle clientTotalBundle = searchClient
+                    .summaryMode(SummaryEnum.COUNT)
+                    .returnBundle(Bundle.class)
+                    .execute();
 
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
@@ -116,7 +219,7 @@ public class ClientRegistryService {
     public int getTotalPatients() {
         Bundle response = fhirClient.search()
                 .forResource(Patient.class)
-                .count(1)
+                .summaryMode(SummaryEnum.COUNT)  // Request only the total count
                 .returnBundle(Bundle.class)
                 .execute();
         return response.getTotal();
@@ -131,13 +234,120 @@ public class ClientRegistryService {
 
     public Patient getPatientByIdentifier(String identifier) {
         Patient patient = new Patient();
-        Bundle response = fhirClient.search().forResource(Patient.class).where(Patient.IDENTIFIER.exactly().systemAndIdentifier(null, identifier))
+        Bundle response = fhirClient.search().forResource(Patient.class).where(Patient.IDENTIFIER.exactly().identifier(identifier))
                 .returnBundle(Bundle.class)
                 .execute();
         if (!response.getEntry().isEmpty()) {
             patient = (Patient) response.getEntry().get(0).getResource();
         }
         return patient;
+    }
+
+    public Patient getPatientUsingIdentifier(String identifier) throws Exception {
+        Bundle response = new Bundle();
+        Patient patient = new Patient();
+        var searchClient =  fhirClient.search().forResource(Patient.class)
+                .where(Patient.IDENTIFIER.exactly().identifier(identifier));
+        response = searchClient.returnBundle(Bundle.class).execute();
+
+        if (!response.getEntry().isEmpty()) {
+            // TODO: Handle potential duplicate
+            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                    patient = (Patient) entry.getResource();
+                }
+            }
+        }
+        return patient;
+    }
+
+    public Map<String,Object> deleteClientsWithNoIdentifiers() throws Exception {
+        Bundle resourceBundle = new Bundle();
+        List<Map<String,Object>> deleteClients = new ArrayList<>();
+        List<Map<String,Object>> clientsFailed = new ArrayList<>();
+        var searchClient =  fhirClient.search().forResource(Patient.class);
+        // TODO: ENsure the number of clients to be loaded is dynamic
+        resourceBundle = searchClient.count(1000).returnBundle(Bundle.class).execute();
+        if (!resourceBundle.getEntry().isEmpty()) {
+            for (Bundle.BundleEntryComponent entry : resourceBundle.getEntry()) {
+                if (entry.getResource() instanceof Patient) {
+                   Patient patient = (Patient) entry.getResource();
+                   if (patient.getIdentifier().isEmpty()) {
+                       try {
+                           Map<String,Object> client = new HashMap<>();
+                           client.put("id", patient.getIdElement().getIdPart());
+                           client.put("name", patient.getName());
+                           deleteClients.add(client);
+                           MethodOutcome methodOutcome = fhirClient.delete().resource(patient).execute();
+                       } catch (Exception e) {
+                           Map<String,Object> client = new HashMap<>();
+                           client.put("id", patient.getIdElement().getIdPart());
+                           client.put("name", patient.getName());
+                           client.put("reason", e.getMessage());
+                           clientsFailed.add(client);
+                           e.printStackTrace();  // This will log the internal server error details
+                       }
+                       Thread.sleep(100);
+                   }
+                }
+            }
+        }
+        Map<String,Object> response = new HashMap<>();
+        response.put("deleteClients", deleteClients);
+        response.put("clientsFailed", clientsFailed);
+        return response;
+    }
+
+    public boolean generateClientRegistryIdentifiers(Integer start,
+                                                     Integer limit,
+                                                     String regex) throws Exception {
+        try {
+            List<ClientRegistryIdPool> clientRegistryIdPools = new ArrayList<>();
+            for (Integer count = start; count <= limit; count++) {
+                ClientRegistryIdPool clientRegistryIdPool = new ClientRegistryIdPool();
+                String id = createIdentifier(count, regex);
+                clientRegistryIdPool.setIdentifier(id);
+                clientRegistryIdPools.add(clientRegistryIdPool);
+            }
+            List<ClientRegistryIdPool> saved = clientRegistryIdsRepository.saveAll(clientRegistryIdPools);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Boolean.FALSE;
+        }
+    }
+
+    public Integer getCountOfIdentifiersBySearchCategory(
+            ClientRegistryIdPool.IdSearchCategory idSearchCategory) throws Exception {
+        if (idSearchCategory.equals(ClientRegistryIdPool.IdSearchCategory.UNUSED)) {
+            return Math.toIntExact(clientRegistryIdsRepository.countByUsedFalse());
+        } else if (idSearchCategory.equals(ClientRegistryIdPool.IdSearchCategory.USED)) {
+            return Math.toIntExact(clientRegistryIdsRepository.countByUsedTrue());
+        } else {
+            return Math.toIntExact(clientRegistryIdsRepository.count());
+        }
+    }
+
+    private String createIdentifier(Integer idNumber, String regex) throws Exception {
+        return String.format(regex.replace("^","").replace("$",""), idNumber);
+    }
+
+    public List<IdentifierDTO> getClientRegistryIdentifiers(Integer countOfIdentifiers) throws Exception {
+        List<IdentifierDTO> identifierDTOS = new ArrayList<>();
+        List<ClientRegistryIdPool> clientRegistryIdPools = clientRegistryIdsRepository.getIds(countOfIdentifiers);
+        for(ClientRegistryIdPool clientRegistryIdPool: clientRegistryIdPools) {
+            IdentifierDTO identifierDTO = new IdentifierDTO();
+            identifierDTO.setId(clientRegistryIdPool.getIdentifier());
+            identifierDTO.setType("HDU-API-ID");
+            FacilityDetailsDTO facilityDetailsDTO = new FacilityDetailsDTO();
+            facilityDetailsDTO.setCode("HDUAPI");
+            facilityDetailsDTO.setName("HDUAPI");
+            identifierDTO.setOrganization(facilityDetailsDTO);
+            clientRegistryIdPool.setUsed(true);
+            identifierDTOS.add(identifierDTO);
+            clientRegistryIdsRepository.save(clientRegistryIdPool);
+        }
+        return identifierDTOS;
     }
 
     public PatientDTO mapToPatientDTO(Patient patient) {

@@ -1,0 +1,24 @@
+.inner-content {
+  padding: 16px;
+  margin-top: 50px;
+}
+
+.left-column {
+  height: 74vh;
+  overflow: auto;
+}
+
+.right-column {
+  height: 54vh;
+  overflow: auto;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.collapse-button {
+  margin-bottom: 16px;
+}

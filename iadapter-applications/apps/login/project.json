@@ -22,6 +22,7 @@
             "input": "apps/login/public"
           }
         ],
+        "baseHref": "/login/",
         "styles": [
           "node_modules/ng-zorro-antd/src/ng-zorro-antd.min.css",
           "node_modules/ng-zorro-antd/resizable/style/index.min.css",
@@ -44,12 +45,15 @@
               "maximumError": "4kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "baseHref": "/login/",
+          "deployUrl": "/login/"
         },
         "development": {
           "optimization": false,
           "extractLicenses": false,
-          "sourceMap": true
+          "sourceMap": true,
+          "baseHref": "/"
         }
       },
       "defaultConfiguration": "production"
@@ -62,7 +66,7 @@
         },
         "development": {
           "buildTarget": "login:build:development",
-          "proxyConfig": "apps/login/proxy.conf.json"
+          "proxyConfig": "apps/login/proxy-config.json"
         }
       },
       "defaultConfiguration": "development"

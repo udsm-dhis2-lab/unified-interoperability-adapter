@@ -47,12 +47,15 @@
               "maximumError": "100kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "baseHref": "/client-management/",
+          "deployUrl": "/client-management/"
         },
         "development": {
           "optimization": false,
           "extractLicenses": false,
-          "sourceMap": true
+          "sourceMap": true,
+          "baseHref": "/"
         }
       },
       "defaultConfiguration": "production"

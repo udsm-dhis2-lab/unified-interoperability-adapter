@@ -6,16 +6,14 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Getter
 @Setter
 @Entity
 @Table(uniqueConstraints={
-        @UniqueConstraint(columnNames = {"data_set_id", "instance_id"})
+        @UniqueConstraint(columnNames = {"data_sets_id", "instances_id"})
 })
 public class DatasetQuery extends BaseEntity implements Serializable  {
     @Id
@@ -23,12 +21,12 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
     private Long id;
 
     @ManyToOne
-    private Datasets dataSet;
+    private Dataset dataSets;
 
     private String sqlQuery;
 
     @ManyToOne
-    private Instances instance;
+    private Instance instances;
 
     @ManyToOne
     private Datasource dataSource;
@@ -48,7 +46,7 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
 
         if (datasetQueryMap.get("dataSet") !=null) {
             String uuid = ((Map<String, Object>) datasetQueryMap.get("dataSet")).get("uuid").toString();
-            Datasets datasets = new Datasets();
+            Dataset dataset = new Dataset();
 //            datasetQuery.setDataSet(datasetQueryMap.get("dataSet"));
         }
         return  datasetQuery;
@@ -57,8 +55,8 @@ public class DatasetQuery extends BaseEntity implements Serializable  {
         HashMap<String, Object> dataSetsQueries = (new HashMap<String, Object>());
         dataSetsQueries.put("uuid",this.getUuid());
         dataSetsQueries.put("sqlQuery",this.getSqlQuery());
-        dataSetsQueries.put("dataSetInstance",this.getDataSet());
-        dataSetsQueries.put("instance",this.getInstance());
+        dataSetsQueries.put("dataSetInstance",this.getDataSets());
+        dataSetsQueries.put("instance",this.getInstances());
         dataSetsQueries.put("dataSource", this.getDataSource());
         dataSetsQueries.put("mappings", this.getMappings());
         return dataSetsQueries;

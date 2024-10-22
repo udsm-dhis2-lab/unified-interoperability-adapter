@@ -11,14 +11,21 @@
 
     <div class="inner-content">
       <div nz-row>
-        <div style="padding: 16px; width: 100%;">
+        <div style="padding: 16px; width: 100%">
           <div style="margin-bottom: 16px">
-            <app-search [labelText]="'Search client:'"></app-search>
+            <search-bar [labelText]="'Search client:'"></search-bar>
           </div>
 
-          <nz-table nzShowSizeChanger [nzData]="listOfHduClients" [nzFrontPagination]="false" [nzLoading]="loading"
-            [nzTotal]="total" [nzPageSize]="pageSize" [nzPageIndex]="pageIndex"
-            (nzQueryParams)="onQueryParamsChange($event)">
+          <nz-table
+            nzShowSizeChanger
+            [nzData]="listOfHduClients"
+            [nzFrontPagination]="false"
+            [nzLoading]="loading"
+            [nzTotal]="total"
+            [nzPageSize]="pageSize"
+            [nzPageIndex]="pageIndex"
+            (nzQueryParams)="onQueryParamsChange($event)"
+          >
             <thead>
               <tr>
                 <th>SN</th>
@@ -33,9 +40,12 @@
               </tr>
             </thead>
             <tbody>
-              @for (data of listOfHduClients; track data.fname; let i = $index ) {
+              @for (data of listOfHduClients; track data.fname; let i = $index )
+              {
               <tr>
-                <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
+                <td>
+                  {{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}
+                </td>
                 <td>
                   <!-- Use primary color from theme  -->
                   <span style="color: #1890ff">{{ data.clientID }}</span>
@@ -44,10 +54,15 @@
                 <td>{{ data.mname }}</td>
                 <td>{{ data.surname }}</td>
                 <td>{{ data.gender }}</td>
-                <td>{{ data.idNUmber }}</td>
+                <td>{{ data.idNumber }}</td>
                 <td>{{ data.idType }}</td>
                 <td>
-                  <button nz-button nzType="text" style="color: #1890ff" (click)="viewClientDetails()">
+                  <button
+                    nz-button
+                    nzType="text"
+                    class="view-button"
+                    (click)="viewClientDetails()"
+                  >
                     View
                   </button>
                 </td>

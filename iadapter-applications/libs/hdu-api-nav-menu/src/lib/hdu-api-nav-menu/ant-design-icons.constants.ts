@@ -6,6 +6,7 @@ import {
   MergeOutline,
   UnorderedListOutline,
   UserOutline,
+  SettingOutline,
 } from '@ant-design/icons-angular/icons';
 
 const antDesignIcons: any[] = [
@@ -14,5 +15,6 @@ const antDesignIcons: any[] = [
   MergeOutline,
   ApartmentOutline,
   DashboardOutline,
+  SettingOutline,
 ];
 export const icons: IconDefinition[] = [...antDesignIcons];
