@@ -49,7 +49,13 @@ export class HduApiNavMenuComponent {
       subMenus: [
         {
           name: 'Workflows',
-          routeUrl: '/home',
+          routeUrl: '/workflows',
+          icon: 'calendar',
+          subMenus: [],
+        },
+        {
+          name: 'Schedules',
+          routeUrl: '/schedules',
           icon: 'unordered-list',
           subMenus: [],
         },
@@ -79,7 +85,7 @@ export class HduApiNavMenuComponent {
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();
 
-  constructor() {}
+  constructor() { }
 
   onRouteTo(event: Event, menu: Menu): void {
     event.stopPropagation();

@@ -1,0 +1,168 @@
+<nz-card nzTitle="Tree Configuration" [nzBordered]="false">
+  <nz-collapse>
+    <nz-collapse-panel
+      [nzHeader]="'Workflow Tree Configuration'"
+      [nzActive]="true"
+      [nzDisabled]="false"
+    >
+      <div nz-row>
+        <!-- Zoom Buttons -->
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="6" [nzLg]="6">
+          <div>
+            <button nz-button (click)="onGrow()" nzType="primary">
+              Zoom In
+            </button>
+            <button nz-button (click)="onShrink()" nzType="default">
+              Zoom Out
+            </button>
+          </div>
+        </div>
+
+        <!-- Select Step Gap -->
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="10" [nzLg]="10">
+          <div>
+            <nz-select
+              [(ngModel)]="selectedGap"
+              (ngModelChange)="onGapChanged($event)"
+              placeholder="Select Step Gap"
+              class="full-width-select"
+            >
+              <nz-option
+                *ngFor="let gap of stepGaps"
+                [nzValue]="gap"
+                [nzLabel]="'Tree Node Spacing (' + gap + ' Size)'"
+              ></nz-option>
+            </nz-select>
+          </div>
+        </div>
+
+        <!-- Sequential Checkbox -->
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="4" [nzLg]="4">
+          <div class="ng-flow-checkbox">
+            <nz-checkbox-group
+              (change)="onSequentialChange($event)"
+              [(ngModel)]="sequential"
+            ></nz-checkbox-group>
+          </div>
+        </div>
+
+        <!-- Orientation Checkbox -->
+        <div nz-col [nzXs]="24" [nzSm]="12" [nzMd]="4" [nzLg]="4">
+          <div class="ng-flow-checkbox">
+            <nz-checkbox-group
+              (change)="onOrientationChange($event)"
+              [(ngModel)]="orientation"
+            ></nz-checkbox-group>
+          </div>
+        </div>
+      </div>
+    </nz-collapse-panel>
+    <nz-collapse-panel
+      [nzHeader]="'Workflow Tree'"
+      [nzActive]="true"
+      [nzDisabled]="false"
+    >
+      <div nz-row>
+        <div nz-col nzSpan="12">
+          <div class="process-card">
+            <div class="process-header">
+              <h3>{{ (currentSelectedWorkflow$ | async)?.name }}</h3>
+
+              <span class="badge" [ngClass]="getStatusClass(process.status)">
+                {{ process.status | titlecase }}
+              </span>
+            </div>
+            <p class="description">{{ process.description }}</p>
+            <div class="timestamps">
+              <small
+                >Created:
+                {{
+                  (currentSelectedWorkflow$ | async)?.created
+                    | date : 'fullDate'
+                }}</small
+              >
+              <small
+                >Last Updated:
+                {{
+                  (currentSelectedWorkflow$ | async)?.updated
+                    | date : 'fullDate'
+                }}</small
+              >
+            </div>
+          </div>
+        </div>
+        <div nz-col nzSpan="12">
+          <div class="process-card">
+            <div class="process-header">
+              <h3>{{ (currentSelectedWorkflow$ | async)?.process?.name }}</h3>
+
+              <span class="badge" [ngClass]="getStatusClass(process.status)">
+                {{ process.status | titlecase }}
+              </span>
+            </div>
+            <p class="description">{{ process.description }}</p>
+            <div class="timestamps">
+              <small
+                >Created:
+                {{
+                  (currentSelectedWorkflow$ | async)?.process?.created
+                    | date : 'fullDate'
+                }}</small
+              >
+              <small
+                >Last Updated:
+                {{
+                  (currentSelectedWorkflow$ | async)?.process?.updated
+                    | date : 'fullDate'
+                }}</small
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div
+          id="canvas"
+          ngFlowchartCanvas
+          [ngFlowchartOptions]="options"
+          [ngFlowchartCallbacks]="callbacks"
+          [disabled]="disabled"
+        ></div>
+
+        <ng-template #workflowTreeStep let-data>
+          <div
+            nz-row
+            nzGutter="16"
+            class="card-container"
+            [ngClass]="{
+              'selected-class': selectedFlowItem === data.id,
+              'deselected-class': selectedFlowItem !== data.id,
+              'root-node': isWorkflowNodeRoot
+            }"
+            [attr.name]="data.data.name"
+            tabindex="0"
+            role="button"
+            (click)="onSelectingItem(data.id)"
+            (keydown)="onKeydown($event, data.id)"
+          >
+            <!-- Item Name -->
+            <div nz-col nzSpan="16" class="item-content">
+              <span>{{ data.data.name }}</span>
+            </div>
+          </div>
+
+          <!-- Add New Button -->
+          <div
+            *ngIf="selectedFlowItem === data.id && !isFlowChartHasChildren"
+            class="add-new-button"
+          >
+            <button nz-button nzType="dashed" nzBlock (click)="onAddNew()">
+              <!-- <span nz-icon nzType="plus" nzTheme="outline"></span> -->
+              Add New Process
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </nz-collapse-panel>
+  </nz-collapse>
+</nz-card>

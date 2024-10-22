@@ -1,0 +1,26 @@
+// ******************************************************************
+//   START: Process Summary Info
+// ******************************************************************
+
+.custom-card {
+  background-color: #e6f7ff; /* Light blue background color */
+  border: 1px solid #91d5ff; /* Light blue border color */
+  // padding: 16px; /* Inner padding for better spacing */
+}
+
+.narrative-summary {
+  padding-top: 16px; /* Optional additional padding for the summary */
+}
+
+.narrative-summary ul {
+  list-style-type: none; /* Remove bullet points */
+  padding: 0; /* Remove default padding */
+}
+
+.narrative-summary li {
+  margin-bottom: 2px; /* Space between list items */
+}
+
+// ******************************************************************
+//   END: Process Summary Info
+// ******************************************************************

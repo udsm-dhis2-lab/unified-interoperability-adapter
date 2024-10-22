@@ -1,0 +1,96 @@
+<nz-card nzTitle="Parameter Configuration Panel" [nzBordered]="false">
+  <app-process-summary [currentSelectedProcess]="currentSelectedProcess$ | async"></app-process-summary>
+  <nz-collapse>
+    <nz-collapse-panel [nzHeader]="'Adapter Configuration'" [nzActive]="true" [nzDisabled]="false">
+      <div>
+        <nz-checkbox-group [(ngModel)]="checkboxOptions" (ngModelChange)="onCheckboxChange($event)"></nz-checkbox-group>
+        <br />
+        <br />
+        <nz-space nzAlign="center" nzJustify="space-between" style="width: 100%">
+          <button (click)="onUpdateProcessAdapter()" nz-button nzType="primary" [nzLoading]="false">
+            <span nz-icon nzType="poweroff"></span>
+            Update Process Adapter
+          </button>
+        </nz-space>
+      </div>
+    </nz-collapse-panel>
+    <!-- <nz-collapse-panel
+      [nzHeader]="'Parameters Configuration'"
+      [nzActive]="false"
+      [nzDisabled]="false"
+    >
+      <form [formGroup]="processParametersForm" (ngSubmit)="submitForm()">
+        <div nz-row>
+          <div class="form-input-container">
+            <input
+              nz-input
+              placeholder="Name"
+              formControlName="name"
+              type="text"
+            />
+            <br /><br />
+            <input
+              nz-input
+              placeholder="Value"
+              formControlName="value"
+              type="text"
+            />
+            <br /><br />
+            <nz-space
+              nzAlign="center"
+              nzJustify="space-between"
+              style="width: 100%"
+            >
+              <button nz-button nzType="primary" [nzLoading]="false">
+                <span nz-icon nzType="poweroff"></span>
+                Save Parameter
+              </button>
+              <button nz-button nzType="default" [nzLoading]="false">
+                <span nz-icon nzType="poweroff"></span>
+                Save and Add One
+              </button>
+            </nz-space>
+          </div>
+        </div>
+      </form>
+    </nz-collapse-panel> -->
+    <nz-collapse-panel [nzHeader]="'Parameters Configuration'" [nzActive]="true" [nzDisabled]="false">
+      <nz-space nzAlign="center" nzJustify="space-between" style="width: 100%">
+        <button (click)="addPair()" nz-button nzType="dashed" [nzLoading]="false">
+          <span nz-icon nzType="poweroff"></span>
+          Add Parameter
+        </button>
+      </nz-space>
+      <br />
+      <br />
+      <form [formGroup]="parameterFormGroup">
+        <div class="param-container" formArrayName="pairs">
+          <div *ngFor="let pair of pairs.controls; let i = index" [formGroupName]="i" style="margin-bottom: 2px">
+            <nz-space nzAlign="center" nzJustify="space-between" style="width: 100%">
+              <input nz-input placeholder="Parameter Key" formControlName="key" type="text" />
+              <input nz-input placeholder="Parameter Value" formControlName="value" type="text" />
+              <button (click)="removePair(i)" nz-button nzType="dashed" [nzLoading]="false" nzDanger>
+                <span nz-icon nzType="poweroff"></span>
+                Delete
+              </button>
+            </nz-space>
+          </div>
+        </div>
+
+        <nz-space nzAlign="center" nzJustify="space-between" style="width: 100%">
+          <div style="width: 100%">
+            <pre>{{ getFinalParamJSON | json }}</pre>
+          </div>
+        </nz-space>
+        <br />
+        <br />
+        <nz-space nzAlign="center" nzJustify="space-between" style="width: 100%">
+          <button (click)="onUpdateProcessParameter()" nz-button nzType="primary" [nzLoading]="false">
+            <span nz-icon nzType="poweroff"></span>
+            Update Process Parameter
+          </button>
+        </nz-space>
+      </form>
+    </nz-collapse-panel>
+  </nz-collapse>
+</nz-card>

@@ -1,0 +1,32 @@
+<nz-card nzTitle="Welcome to the Code Editor" [nzBordered]="false">
+  <app-process-summary [currentSelectedProcess]="currentSelectedProcess$ | async"></app-process-summary>
+  <p>
+    This is your workspace for configuring and editing source code efficiently.
+    Follow these tips to get started:
+  </p>
+  <ul>
+    <li>
+      <strong>Write and Edit:</strong> Use the editor to input, modify, and
+      structure your code with ease. Syntax highlighting helps you quickly
+      identify key elements.
+    </li>
+    <li>
+      <strong>Real-time Feedback:</strong> As you code, the editor provides
+      real-time validation to ensure everything runs smoothly.
+    </li>
+    <li>
+      <strong>Navigation and Tools:</strong> Use the navigation panel and
+      available tools to explore files, functions, or snippets that simplify
+      your coding process.
+    </li>
+  </ul>
+  <p><strong>Happy coding!</strong></p>
+  <br>
+  <br>
+  <div>
+    <button (click)="onOpenEditor()" nz-button nzType="primary" [nzLoading]="false">
+      <span nz-icon nzType="poweroff"></span>
+      Open Code Editor
+    </button>
+  </div>
+</nz-card>
