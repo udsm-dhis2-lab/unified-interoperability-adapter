@@ -8,10 +8,27 @@ import {
 import { HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
 import { WorkflowEnum } from '../../enums/http-api.enum';
+import { ExecutedWorkflow } from '../../models/runned.model';
 
 @Injectable()
 export class WorkflowService {
-  constructor(private hduHttpService: HduHttpService) {}
+  constructor(private hduHttpService: HduHttpService) { }
+
+  /**
+   * Fetches the workflows from the API based on page and pageSize
+   * @param page The page number to query (defaults to 1)
+   * @param pageSize The number of records per page (defaults to 12)
+   * @returns Observable of WorkflowResult containing the API response
+   */
+  runWorkflow(workflow: Workflow): Observable<ExecutedWorkflow> {
+    // Construct the full API URL safely
+    const apiUrl = `${WorkflowEnum.BASE_URL}${WorkflowEnum.WORKFLOW_API}/${workflow.id}/run`;
+
+    // Make the GET request with the query parameters
+    return this.hduHttpService.get<ExecutedWorkflow>(apiUrl).pipe(
+      catchError(this.handleError) // Centralized error handling
+    );
+  }
 
   /**
    * Fetches the workflows from the API based on page and pageSize
@@ -22,6 +39,7 @@ export class WorkflowService {
   getWorkflows(page = 1, pageSize = 12): Observable<WorkflowAPIResult> {
     // Set up HTTP query parameters
     const params = new HttpParams()
+      .set('fields', '*')
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
@@ -40,7 +58,7 @@ export class WorkflowService {
    * @returns Observable of the workflow
    */
   getWorkflowById(id: string): Observable<Workflow> {
-    const apiUrl = `${WorkflowEnum.BASE_URL}${WorkflowEnum.WORKFLOW_API}/${id}`;
+    const apiUrl = `${WorkflowEnum.BASE_URL}${WorkflowEnum.WORKFLOW_API}/${id}?fields=*`;
 
     return this.hduHttpService
       .get<Workflow>(apiUrl)
