@@ -81,7 +81,7 @@ jobs:
             echo "No apps specified to build. Exiting."
             exit 1
           fi
-
+          npx nx connect-to-nx-cloud
           for app in "${APPS[@]}"; do
             echo "Building $app in NX workspace..."
             npx nx build "$app" --configuration production
