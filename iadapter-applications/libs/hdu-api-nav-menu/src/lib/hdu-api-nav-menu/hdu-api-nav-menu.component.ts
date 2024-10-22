@@ -18,12 +18,12 @@ export class HduApiNavMenuComponent {
     {
       name: 'Dashboard',
       routeUrl: '/dashboard',
-      icon: 'dashboard',
+      icon: 'apartment',
       category: 'main',
     },
     {
       name: 'Client Management',
-      routeUrl: '/ClientManagementService',
+      routeUrl: '/client-management',
       icon: 'user',
       category: 'main',
       subMenus: [
@@ -43,7 +43,7 @@ export class HduApiNavMenuComponent {
     },
     {
       name: 'Worflow Management',
-      routeUrl: '/worflowManagement',
+      routeUrl: '/worflow-management',
       icon: 'apartment',
       category: 'main',
       subMenus: [
