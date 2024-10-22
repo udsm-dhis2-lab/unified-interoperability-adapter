@@ -1,8 +1,0 @@
-Testing file
-
-for dir in /app/ui-apps/*; do 
-    echo  $dir;
-    app_name=$(basename "$dir");
-     cp -r $dir /app/backend/src/main/resources/static/$app_name;
-    echo "Copied $app_name to /app/backend/src/main/resources/static/$app_name";
-done
