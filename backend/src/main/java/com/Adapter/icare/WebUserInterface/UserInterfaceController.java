@@ -46,7 +46,6 @@ public class UserInterfaceController {
     @PostConstruct
     public void loadRouteConfigurations() {
         for (Map<String, Object> app : apps) {
-            System.out.println("App Config: " + app);
             if (app.get("key") != null && app.get("appPath") != null) {
                 appsRoutesToResourceMap.put(app.get("key").toString(), app.get("appPath").toString());
             } else {
@@ -58,14 +57,10 @@ public class UserInterfaceController {
     @GetMapping("{appRoute}")
     public String provideUi(@PathVariable String appRoute) {
         try {
-            System.out.println("Requested App Route: " + appRoute);
-            System.out.println(appsRoutesToResourceMap.toString());
             String appPath = appsRoutesToResourceMap.get(appRoute);
-            System.out.println("App Path: " + appPath);
             if (appPath != null) {
                 return "forward:" + appPath + "/index.html";
             } else {
-                System.out.println("No appPath found for appRoute: " + appRoute);
                 return "forward:/login/index.html";
             }
         } catch (Exception e) {

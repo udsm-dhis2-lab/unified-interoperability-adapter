@@ -7,12 +7,12 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-devkit/build-angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/dashboard",
         "index": "apps/dashboard/src/index.html",
-        "main": "apps/dashboard/src/main.ts",
+        "browser": "apps/dashboard/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/dashboard/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
@@ -92,6 +92,8 @@
       "executor": "@nx/web:file-server",
       "options": {
         "buildTarget": "dashboard:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/dashboard/browser",
         "spa": true
       }
     }
