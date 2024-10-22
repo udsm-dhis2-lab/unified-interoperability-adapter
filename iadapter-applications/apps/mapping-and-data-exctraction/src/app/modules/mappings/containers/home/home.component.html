@@ -8,6 +8,7 @@
             <search-bar
               [labelText]="'Search Dataset:'"
               (search)="onDatasetsSearch()"
+              (inputSearchValue)="onDatasetsSearchInputTyping($event)"
             >
               <ng-template #additionalContent>
                 <!-- Additional filter content -->

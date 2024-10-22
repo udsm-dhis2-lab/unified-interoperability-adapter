@@ -181,7 +181,7 @@ export class DatasetManagementService {
   ): HttpParams {
     let params = new HttpParams()
       .append('page', `${pageIndex}`)
-      .append('results', `${pageSize}`)
+      .append('pageSize', `${pageSize}`)
       .append('paging', `${paging}`);
 
     filters.forEach((filter) => {
