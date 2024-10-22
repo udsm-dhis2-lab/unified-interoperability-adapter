@@ -1,0 +1,57 @@
+<div nz-row>
+  <div nz-col nzFlex="3">
+    <router-outlet></router-outlet>
+  </div>
+  <div nz-col nzFlex="2">
+    <nz-card nzTitle="Workflow Configuration" [nzBordered]="false">
+      <div>
+        <button
+          [disabled]="
+            (currentSelectedWorkflow$ | async) === null || isRunningProcessReady
+          "
+          (click)="onRunWorkflow()"
+          nz-button
+          nzType="primary"
+          [nzLoading]="false"
+        >
+          <span nz-icon nzType="poweroff"></span>
+          Run Workflow
+        </button>
+      </div>
+      <div>
+        <nz-tabset
+          [(nzSelectedIndex)]="selectedTabIndex"
+          (nzSelectChange)="onTabChange($event)"
+          nzCentered
+        >
+          <nz-tab
+            nzTitle="Details"
+            [nzDisabled]="(currentSelectedWorkflow$ | async) === null"
+          >
+            <app-add
+              *ngIf="(currentSelectedWorkflow$ | async) === null"
+            ></app-add>
+            <app-edit
+              *ngIf="(currentSelectedWorkflow$ | async) !== null"
+            ></app-edit>
+          </nz-tab>
+          <nz-tab
+            nzTitle="Settings"
+            [nzDisabled]="(currentSelectedProcess$ | async) === null"
+          >
+            <app-parameters></app-parameters>
+          </nz-tab>
+          <nz-tab
+            nzTitle="Code Editor"
+            [nzDisabled]="(currentSelectedProcess$ | async) === null"
+          >
+            <app-editor></app-editor>
+          </nz-tab>
+        </nz-tabset>
+      </div>
+    </nz-card>
+  </div>
+</div>
+<div class="workflow-run-logging">
+  <app-workflow-run-logging></app-workflow-run-logging>
+</div>

@@ -1,3 +1,5 @@
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 <!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
 <div class="action-container">
     <!-- Search input with a button -->
@@ -22,8 +24,7 @@
     [nzLoading]="settingValue.loading" [nzPaginationType]="settingValue.paginationType"
     [nzPaginationPosition]="settingValue.position" [nzShowSizeChanger]="settingValue.sizeChanger"
     [nzFrontPagination]="settingValue.pagination" [nzShowPagination]="settingValue.pagination"
-    [nzFooter]="settingValue.footer ? 'Workflow Management' : null"
-    [nzTitle]="settingValue.title ? 'Workflow Management' : null" [nzSize]="settingValue.size"
+    [nzFooter]="settingValue.footer ? '' : null" [nzTitle]="settingValue.title ? '' : null" [nzSize]="settingValue.size"
     (nzCurrentPageDataChange)="currentPageDataChange($event)">
     <thead>
         @if (settingValue.header) {
@@ -51,7 +52,7 @@
             } @if (settingValue.checkbox) {
             <td [nzLeft]="fixedColumn" [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
             }
-            <td [nzLeft]="fixedColumn">{{ data.name }}</td>
+            <td>{{ data.name }}</td>
             <td>{{ data.description }}</td>
             <td [nzEllipsis]="settingValue.ellipsis">
                 {{ data.created | date : 'fullDate' }}
@@ -59,32 +60,106 @@
             <td [nzEllipsis]="settingValue.ellipsis">
                 {{ data.updated | date : 'fullDate' }}
             </td>
-            <td [nzRight]="fixedColumn" [nzEllipsis]="settingValue.ellipsis">
-                <button nz-button nzType="default">Not Started</button>
+            <!-- <td class="centered-cell" [nzEllipsis]="settingValue.ellipsis">
+                <nz-tag *ngIf="data.task && data.task.status === 'FINISHED'" nzColor="green">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'ERROR'" nzColor="red">{{ data.task.status }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'RUNNING'" nzColor="red">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="!data.task" nzColor="gray">{{ 'PENDING' }}</nz-tag>
+            </td> -->
+            <td class="centered-cell" [nzRight]="fixedColumn" [nzEllipsis]="settingValue.ellipsis">
+                <!-- <nz-tag *ngIf="data.task && data.task.status === 'FINISHED'" nzColor="green">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'ERROR'" nzColor="red">{{ data.task.status }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'RUNNING'" nzColor="red">{{ data.task.status
+                    }}</nz-tag> -->
+                <nz-tag nzColor="gray">{{ 'Not Started' }}</nz-tag>
                 <nz-divider nzType="vertical"></nz-divider>
-                <button nz-button nzType="primary" [nzLoading]="true" nzWarning>
-                    Running
-                </button>
-                <nz-divider nzType="vertical"></nz-divider>
-                <button nz-button nzType="default" nzDanger>Stopped</button>
-                <nz-divider nzType="vertical"></nz-divider>
-                <button nz-button nzType="primary" nzDanger>Failed</button>
             </td>
-            <td [nzRight]="fixedColumn" [nzEllipsis]="settingValue.ellipsis">
-                <button (click)="onDeleteWorkflow(data)" nz-button nzType="dashed">Delete</button>
-                <nz-divider nzType="vertical"></nz-divider>
-                <button (click)="onEditWorkflow(data)" nz-button nzType="dashed">Edit</button>
-                <nz-divider nzType="vertical"></nz-divider>
-                <button nz-button nzType="dashed">Run</button>
-                <nz-divider nzType="vertical"></nz-divider>
-                <button nz-button nzType="dashed">Logs</button>
-                <nz-divider nzType="vertical"></nz-divider>
+            <td>
+                <nz-button-group>
+                    <button nz-button (click)="onRunWorkflow(data)">
+                        Run
+                    </button>
+                    <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
+                        <span nz-icon nzType="ellipsis"></span>
+                    </button>
+                </nz-button-group>
+                <nz-dropdown-menu #menu1="nzDropdownMenu">
+                    <ul nz-menu>
+                        <li (click)="onEditWorkflow(data)" nz-menu-item>
+                            <i nz-icon nzType="edit"></i>
+                            <span class="menu-label">Edit</span>
+                        </li>
+                        <li (click)="onDeleteWorkflow(data)" nz-menu-item>
+                            <i nz-icon nzType="delete"></i>
+                            <span class="menu-label">Delete</span>
+                        </li>
+                        <li (click)="onAddProcess(data)" nz-menu-item>
+                            <i nz-icon nzType="delete"></i>
+                            <span class="menu-label">Manage Workflow</span>
+                        </li>
+                    </ul>
+                </nz-dropdown-menu>
             </td>
         </tr>
         @if (settingValue.expandable) {
         <tr [nzExpand]="data.expand">
-            <span>{{ data.description }}</span>
+            <div nz-row [nzGutter]="16">
+                <div nz-col class="gutter-row" [nzSpan]="12">
+                    <div class="inner-box">
+                        <h3>Workflow Information</h3>
+                        <ul>
+                            <!-- Workflow Information -->
+                            <li><strong>Workflow ID:</strong> {{ data.id }}</li>
+                            <li><strong>data Name:</strong> {{ data.name }}</li>
+                            <li><strong>data Description:</strong> {{ data.description }}</li>
+                            <li>
+                                <strong>data Created:</strong>
+                                {{ data.created | date : 'fullDate' }}
+                                {{ data.created | date : 'shortTime' }}
+                            </li>
+                            <li>
+                                <strong>data Updated:</strong>
+                                {{ data.updated | date : 'fullDate' }}
+                                {{ data.updated | date : 'shortTime' }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div nz-col class="gutter-row" [nzSpan]="12">
+                    <div class="inner-box">
+                        <h3>Process Information</h3>
+                        <ul>
+                            <li><strong>Process ID: </strong> {{ data?.process?.id }}</li>
+                            <li><strong>Process Code: </strong> {{ data?.process?.code }}</li>
+                            <li><strong>Process Name: </strong> {{ data?.process?.name }}</li>
+                            <li>
+                                <strong>Process Created: </strong>
+                                {{ data?.process?.created | date : 'fullDate' }}
+                                {{ data?.process?.created | date : 'shortTime' }}
+                            </li>
+                            <li>
+                                <strong>Process Updated: </strong>
+                                {{ data?.process?.updated | date : 'fullDate' }}
+                                {{ data?.process?.updated | date : 'shortTime' }}
+                            </li>
+                            <li>
+                                <strong>Adaptors: </strong>
+                                <nz-tag *ngFor="let adaptor of data?.process?.adaptors" nzColor="blue">{{ adaptor
+                                    }}</nz-tag>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </tr>
         } }
     </tbody>
 </nz-table>
+
+<div class="workflow-run-logging">
+    <app-workflow-run-logging></app-workflow-run-logging>
+</div>

@@ -1,0 +1,25 @@
+<div class="footer-container mat-elevation-z3 mat-typography d-print-none">
+    <div class="footer-left">
+        <!-- <a class="footer-logo" matRipple>
+            <img [src]="appIcon" alt="App Logo" />
+        </a> -->
+        <div class="footer-text">HDU API | Workflow Log Monitor</div>
+    </div>
+    <div class="footer-right">
+        <!-- <a target="_blank" rel="noopener noreferrer" href="https://dhis2.udsm.ac.tz/">| Open Dashboard</a>
+        <a target="_blank" rel="noopener noreferrer"
+            href="https://play.google.com/store/apps/developer?id=UDSM+DHIS+PROJECT">| Google Play Store</a> -->
+        <button class="toggle-log-btn" (click)="toggleLogMonitor()">
+            {{ isLogOpen ? 'Hide Logs' : 'Show Logs' }}
+        </button>
+    </div>
+</div>
+
+<div class="log-monitor" [ngClass]="{ open: isLogOpen }">
+    <div class="log-content" #logContainer>
+        <div *ngFor="let log of logs" [ngClass]="log.type" class="log-entry">
+            <span class="log-time">{{ log.time }}</span>
+            <span class="log-message">{{ log.message }}</span>
+        </div>
+    </div>
+</div>

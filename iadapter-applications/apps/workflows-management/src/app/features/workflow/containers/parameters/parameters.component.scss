@@ -1,0 +1,28 @@
+button {
+  width: 100%;
+}
+
+.form-input-container {
+  width: 100%;
+}
+
+.nz-checkbox-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* app.component.css */
+h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+pre {
+  background: #f5f5f5;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.param-container {
+  margin-bottom: 10px;
+}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -23,25 +24,27 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { AddComponent } from '../add/add.component';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 import { NzModalModule, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
-import { WorkflowState } from '../../state/workflow.state';
+import { WorkflowState } from '../../state/workflow/workflow.state';
 import { select, Store } from '@ngrx/store';
-import { WorkflowActions } from '../../state/workflow.actions';
+import { WorkflowActions } from '../../state/workflow/workflow.actions';
 import { WorkflowService } from '../../services/workflow/workflow.service';
 import {
-  getAddedWorkflowStatus,
   getUpdatedWorkflowStatus,
   getWorkflows,
-} from '../../state/workflow.selectors';
+} from '../../state/workflow/workflow.selectors';
 import {
   Workflow,
   WorkflowFormCreate,
   WorkflowTable,
 } from '../../models/workflow.model';
-import { defaultIfEmpty } from 'rxjs';
+import { defaultIfEmpty} from 'rxjs';
 import { EditComponent } from '../edit/edit.component';
+import { Router } from '@angular/router';
+import { WorkflowRunLoggingComponent } from '../workflow-run-logging/workflow-run-logging.component';
+import { NzTagModule } from 'ng-zorro-antd/tag';
 
 type TableScroll = 'unset' | 'scroll' | 'fixed';
 
@@ -81,6 +84,9 @@ interface Setting {
     NzInputModule,
     NzIconModule,
     NzModalModule,
+    NzDropDownModule,
+    NzTagModule,
+    WorkflowRunLoggingComponent,
   ],
   providers: [WorkflowService],
   templateUrl: './table.component.html',
@@ -100,7 +106,8 @@ export class TableComponent implements OnInit {
     private addWorkflowNzModalService: NzModalService,
     private editWorkflowNzModalService: NzModalService,
     private workFlowState: Store<WorkflowState>,
-    private deleteflowNzModalService: NzModalService
+    private deleteflowNzModalService: NzModalService,
+    private router: Router
   ) {
     this.settingForm = this.formBuilder.group({
       bordered: [false],
@@ -169,71 +176,74 @@ export class TableComponent implements OnInit {
         }) as WorkflowTable[];
       });
 
-    this.settingForm.valueChanges.subscribe((value) => {
-      this.settingValue = value as Setting;
-    });
-    this.settingForm.controls.tableScroll.valueChanges.subscribe((scroll) => {
-      this.fixedColumn = scroll === 'fixed';
-      this.scrollX = scroll === 'scroll' || scroll === 'fixed' ? '100vw' : null;
-    });
-    this.settingForm.controls.fixHeader.valueChanges.subscribe((fixed) => {
-      this.scrollY = fixed ? '240px' : null;
-    });
+    // this.settingForm.valueChanges.subscribe((value) => {
+    //   this.settingValue = value as Setting;
+    // });
+    // this.settingForm.controls.tableScroll.valueChanges.subscribe((scroll) => {
+    //   this.fixedColumn = scroll === 'fixed';
+    //   this.scrollX = scroll === 'scroll' || scroll === 'fixed' ? '100vw' : null;
+    // });
+    // this.settingForm.controls.fixHeader.valueChanges.subscribe((fixed) => {
+    //   this.scrollY = fixed ? '240px' : null;
+    // });
   }
 
   onAddWorkflow() {
-    const modalRef: NzModalRef<AddComponent> =
-      this.addWorkflowNzModalService.create({
-        nzTitle: 'Add Workflow',
-        nzContent: AddComponent,
-        nzMaskClosable: false,
-        nzClosable: false,
-        nzStyle: {
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '80vh',
-          width: '80vh',
-        },
-        nzBodyStyle: {
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'stretch',
-        },
-        nzWidth: '50vw',
-        nzFooter: [
-          {
-            label: 'Close',
-            onClick: () => {
-              modalRef.destroy();
-            },
-          },
-          {
-            label: 'Save Workflow',
-            type: 'primary',
-            onClick: () => {
-              const instance = modalRef.getContentComponent();
-              const workflowFormCreate: WorkflowFormCreate | null =
-                instance?.submitForm();
+    // const modalRef: NzModalRef<AddComponent> =
+    //   this.addWorkflowNzModalService.create({
+    //     nzTitle: 'Add Workflow',
+    //     nzContent: AddComponent,
+    //     nzMaskClosable: false,
+    //     nzClosable: false,
+    //     nzStyle: {
+    //       display: 'flex',
+    //       justifyContent: 'center',
+    //       alignItems: 'center',
+    //       minHeight: '80vh',
+    //       width: '80vh',
+    //     },
+    //     nzBodyStyle: {
+    //       display: 'flex',
+    //       flexDirection: 'column',
+    //       justifyContent: 'center',
+    //       alignItems: 'stretch',
+    //     },
+    //     nzWidth: '50vw',
+    //     nzFooter: [
+    //       {
+    //         label: 'Close',
+    //         onClick: () => {
+    //           modalRef.destroy();
+    //         },
+    //       },
+    //       {
+    //         label: 'Save Workflow',
+    //         type: 'primary',
+    //         onClick: () => {
+    //           const instance = modalRef.getContentComponent();
+    //           const workflowFormCreate: WorkflowFormCreate | null =
+    //             instance?.submitForm();
 
-              this.workFlowState.dispatch(
-                WorkflowActions.addWorkflow({
-                  workflow: workflowFormCreate as Workflow,
-                })
-              );
+    //           this.workFlowState.dispatch(
+    //             WorkflowActions.addWorkflow({
+    //               workflow: workflowFormCreate as Workflow,
+    //             })
+    //           );
 
-              this.workFlowState
-                .pipe(select(getAddedWorkflowStatus))
-                .subscribe((status: boolean) => {
-                  if (status) {
-                    modalRef.destroy();
-                  }
-                });
-            },
-          },
-        ],
-      });
+    //           this.workFlowState
+    //             .pipe(select(getAddedWorkflowStatus))
+    //             .subscribe((status: boolean) => {
+    //               if (status) {
+    //                 modalRef.destroy();
+    //               }
+    //             });
+    //         },
+    //       },
+    //     ],
+    //   });
+    // const decodedUrl = decodeURIComponent(workflowTable.id);
+    // this.router.navigate([decodeURIComponent('main/flow')]);
+    this.router.navigate(['/', 'config', 'flow']);
   }
 
   onDeleteWorkflow(workflowTable: WorkflowTable) {
@@ -314,6 +324,24 @@ export class TableComponent implements OnInit {
             },
           ],
         });
+    }
+  }
+
+  onRunWorkflow(workflowTable: WorkflowTable) {
+    this.workFlowState.dispatch(
+      WorkflowActions.runWorkflow({
+        workflow: workflowTable as any,
+      })
+    );
+  }
+
+  onAddProcess(workflowTable: WorkflowTable) {
+    if (workflowTable) {
+      this.workFlowState.dispatch(
+        WorkflowActions.setCurrentSelectedWorkflow({ workflow: workflowTable })
+      );
+      // this.router.navigate([decodeURIComponent('main/flow'), decodedUrl]);
+      this.router.navigate(['/', 'config', 'flow', `${workflowTable.id}`]);
     }
   }
 }
