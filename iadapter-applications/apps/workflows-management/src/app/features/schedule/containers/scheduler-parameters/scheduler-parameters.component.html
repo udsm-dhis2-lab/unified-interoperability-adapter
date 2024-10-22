@@ -1,0 +1,84 @@
+<nz-card
+  [ngClass]="{ 'disabled-card': (currentSelectedSchedule$ | async) === null }"
+  nzTitle="Scheduler Parameters Configuration"
+  [nzBordered]="false"
+>
+  <nz-space nzAlign="center" nzJustify="space-between" style="width: 100%">
+    <button (click)="addPair()" nz-button nzType="dashed" [nzLoading]="false">
+      <span nz-icon nzType="poweroff"></span>
+      Add Parameter
+    </button>
+  </nz-space>
+  <br />
+  <br />
+  <form [formGroup]="parameterFormGroup">
+    <div class="param-container" formArrayName="pairs">
+      <div
+        *ngFor="let pair of pairs.controls; let i = index"
+        [formGroupName]="i"
+        style="margin-bottom: 2px"
+      >
+        <nz-space
+          nzAlign="center"
+          nzJustify="space-between"
+          style="width: 100%"
+        >
+          <input
+            nz-input
+            placeholder="Parameter Key"
+            formControlName="key"
+            type="text"
+          />
+          <input
+            nz-input
+            placeholder="Parameter Value"
+            formControlName="value"
+            type="text"
+          />
+          <button
+            (click)="removePair(i)"
+            nz-button
+            nzType="dashed"
+            [nzLoading]="false"
+            nzDanger
+          >
+            <span nz-icon nzType="poweroff"></span>
+            Delete
+          </button>
+        </nz-space>
+      </div>
+    </div>
+
+    <nz-space nzAlign="center" nzJustify="space-between" style="width: 100%">
+      <div style="width: 100%">
+        <pre>{{ getFinalParamJSON | json }}</pre>
+      </div>
+    </nz-space>
+    <br />
+    <br />
+    <button
+      *ngIf="(updatingSchedule$ | async) === false"
+      [disabled]="(currentSelectedSchedule$ | async) === null"
+      (click)="onAddParams()"
+      nz-button
+      nzType="primary"
+      [nzLoading]="false"
+      nzLoading
+    >
+      <span nz-icon nzType="poweroff"></span>
+      Add Parameters
+    </button>
+    <button
+      *ngIf="updatingSchedule$ | async"
+      [disabled]="(currentSelectedSchedule$ | async) === null"
+      (click)="onAddParams()"
+      nz-button
+      nzType="primary"
+      [nzLoading]="false"
+      nzLoading
+    >
+      <span nz-icon nzType="poweroff"></span>
+      Adding Parameters...
+    </button>
+  </form>
+</nz-card>

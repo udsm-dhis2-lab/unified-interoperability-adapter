@@ -1,0 +1,51 @@
+<nz-card [ngClass]="{ 'disabled-card': (currentSelectedSchedule$ | async) === null }" nzTitle="Schedule Configuration Form" [nzBordered]="false">
+    <form [formGroup]="scheduleForm">
+        <div nz-row>
+            <div class="form-input-container">
+                <input nz-input placeholder="Name" formControlName="name" type="text" />
+                <br /><br />
+                <input nz-input placeholder="Code" formControlName="code" type="text" />
+                <br /><br />
+                <nz-textarea-count placeholder="Description" [nzMaxCharacterCount]="500">
+                    <textarea rows="12" formControlName="description" nz-input></textarea>
+                </nz-textarea-count>
+                <br />
+                <br />
+
+                <div formGroupName="workflow">
+                    <nz-input-group nzAddOnAfterIcon="edit">
+                        <nz-select formControlName="id" [nzDisabled]="workflowLoadingStatus$ | async"
+                            [nzLoading]="workflowLoadingStatus$ | async" style="width: 100%">
+                            <nz-option *ngFor="let workflow of workflows$ | async" [nzLabel]="workflow.name"
+                                [nzValue]="workflow?.id"></nz-option>
+                        </nz-select>
+                    </nz-input-group>
+                </div>
+
+                <br />
+                <br />
+
+                <nz-input-group nzAddOnAfterIcon="edit">
+                    <nz-select formControlName="cron" [nzDisabled]="workflowLoadingStatus$ | async"
+                        [nzLoading]="workflowLoadingStatus$ | async" style="width: 100%">
+                        <nz-option *ngFor="let cronSchedule of cronSchedules" [nzLabel]="cronSchedule.name"
+                            [nzValue]="cronSchedule?.value"></nz-option>
+                    </nz-select>
+                </nz-input-group>
+                <br />
+                <br />
+                <div>
+                    <button (click)="onUpdateWorkflow()" [disabled]="!scheduleForm.valid" *ngIf="(savingWorkflowStatus$ | async) === false" nz-button
+                        nzType="primary" [nzLoading]="false" nzLoading>
+                        <span nz-icon nzType="poweroff"></span>
+                        Update Schedule
+                    </button>
+                    <button *ngIf="(savingWorkflowStatus$ | async) !== false" nz-button nzType="primary" nzLoading>
+                        <span nz-icon nzType="poweroff"></span>
+                        Updating Schedule...
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</nz-card>
