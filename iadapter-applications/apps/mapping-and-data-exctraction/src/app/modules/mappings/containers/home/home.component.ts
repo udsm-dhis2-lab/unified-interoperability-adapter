@@ -36,6 +36,12 @@ import { Router } from '@angular/router';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
+  alert = {
+    show: false,
+    type: '',
+    message: '',
+  };
+
   selectedInstanceFetchingMechanism: string = 'remoteDatasets';
 
   @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
@@ -104,7 +110,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
           this.pageIndex = data.pageIndex;
           this.pageSize = data.pageSize;
           this.listOfDatasets = data.listOfDatasets;
-          console.log('LIST OF DATA SETS', this.listOfDatasets);
         },
         error: (error) => {
           this.loading = false;
@@ -224,10 +229,20 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.alert = {
+            show: true,
+            type: 'success',
+            message: 'Added dataset to mapping successfully',
+          };
           this.reLoadDataSets();
         },
         error: (error: any) => {
           // TODO: Implement error handling
+          this.alert = {
+            show: true,
+            type: 'success',
+            message: error.message,
+          };
         },
       });
   }
@@ -238,10 +253,19 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.alert = {
+            show: true,
+            type: 'success',
+            message: 'Removed dataset from mapping successfully',
+          };
           this.reLoadDataSets();
         },
         error: (error: any) => {
-          // TODO: Implement error handling
+          this.alert = {
+            show: true,
+            type: 'error',
+            message: error.message,
+          };
         },
       });
   }
@@ -262,5 +286,13 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
 
   goToDataSetMapping(uuid: string) {
     this.router.navigate(['/dataset-mapping', uuid]);
+  }
+
+  onCloseAlert() {
+    this.alert = {
+      show: false,
+      type: '',
+      message: '',
+    };
   }
 }

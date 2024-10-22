@@ -115,6 +115,16 @@
               }
             </tbody>
           </nz-table>
+
+          <!-- Alert  -->
+          <nz-alert
+            nzCloseable
+            *ngIf="alert.show"
+            [nzType]="alert.type === 'success' ? 'success' : 'error'"
+            [nzMessage]="alert.message"
+            (nzOnClose)="onCloseAlert()"
+            nzShowIcon
+          ></nz-alert>
         </div>
       </div>
     </nz-content>
