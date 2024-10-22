@@ -10,6 +10,7 @@ import { SearchBarComponent } from 'search-bar';
 import {
   BehaviorSubject,
   debounceTime,
+  first,
   Observable,
   Subscription,
   switchMap,
@@ -35,6 +36,12 @@ import { Router } from '@angular/router';
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
+  alert = {
+    show: false,
+    type: '',
+    message: '',
+  };
+
   selectedInstanceFetchingMechanism: string = 'remoteDatasets';
 
   @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
@@ -46,6 +53,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   pageSize = 10;
   pageIndex = 1;
   filterKey = [{}];
+  dataSetSeachQuery: string = '';
 
   isFirstLoad = true;
 
@@ -98,9 +106,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: DatasetPage) => {
           this.loading = false;
-          //TODO: Set total from data after it's support in fhir is implemented
-          this.total = data.total; //data.total;
+          this.total = data.total;
           this.pageIndex = data.pageIndex;
+          this.pageSize = data.pageSize;
           this.listOfDatasets = data.listOfDatasets;
         },
         error: (error) => {
@@ -116,12 +124,13 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       return;
     }
     const { pageSize, pageIndex, filter } = params;
-
     const queryFilter = [
       ...filter,
       { key: 'instance', value: [this.selectedInstance!] },
+      this.dataSetSeachQuery !== ''
+        ? { key: 'q', value: [this.dataSetSeachQuery] }
+        : { key: 'q', value: [] },
     ];
-
     this.loadDatasetsFromServer(
       pageIndex,
       pageSize,
@@ -142,14 +151,16 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
         switchMap((value: string) => {
           return this.dataSetManagementService.getInstances(1, 10, true, []);
         })
+        // first()
       );
+
     optionList$.subscribe({
       next: (data: any) => {
         this.instancesOptionList = data.listOfInstances;
         this.selectedInstance = this.instancesOptionList[0].uuid;
         this.loadDatasetsFromServer(
-          1,
-          10,
+          this.pageIndex,
+          this.pageSize,
           this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
           [{ key: 'instance', value: [this.selectedInstance!] }]
         );
@@ -162,6 +173,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     });
   }
 
+  /**
+   * Load datasets from server when user clicks the search button in the search bar.
+   * The filter parameter is set to the selected instance uuid and fetch mechanism that can be
+   * either "remoteDatasets" or "selectedDatasets".
+   */
   onDatasetsSearch() {
     this.loadDatasetsFromServer(
       1,
@@ -169,6 +185,28 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
       [{ key: 'instance', value: [this.selectedInstance!] }]
     );
+  }
+
+  /**
+   * This function is a callback function for the search input typing event in the
+   * search bar. It reloads the datasets table with the search query in the
+   * input box.
+   *
+   * @param value The search query in the input box.
+   */
+  onDatasetsSearchInputTyping(value: string) {
+    this.dataSetSeachQuery = value;
+    if (value.length >= 3 || value === '') {
+      this.loadDatasetsFromServer(
+        1,
+        10,
+        this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+        [
+          { key: 'instance', value: [this.selectedInstance!] },
+          value !== '' ? { key: 'q', value: [value] } : { key: 'q', value: [] },
+        ]
+      );
+    }
   }
 
   dataSetAction(event: {
@@ -185,27 +223,26 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     }
   }
 
-  getButtonText(dataSetInstance?: DataSetInstance): string {
-    if (this.selectedInstanceFetchingMechanism === 'selectedDataset') {
-      return 'View';
-    } else {
-      return dataSetInstance ? 'Remove' : 'Select';
-    }
-  }
-
-  goToDataSetMapping(uuid: string) {
-    this.router.navigate(['/dataset-mapping', uuid]);
-  }
-
   selectDatasetForMapping(datasetUuid: string, instanceUuid: string) {
     this.dataSetManagementService
       .selectDatasetForMapping(instanceUuid, datasetUuid)
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.alert = {
+            show: true,
+            type: 'success',
+            message: 'Added dataset to mapping successfully',
+          };
+          this.reLoadDataSets();
         },
         error: (error: any) => {
           // TODO: Implement error handling
+          this.alert = {
+            show: true,
+            type: 'success',
+            message: error.message,
+          };
         },
       });
   }
@@ -216,10 +253,46 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           // TODO: Handle success
+          this.alert = {
+            show: true,
+            type: 'success',
+            message: 'Removed dataset from mapping successfully',
+          };
+          this.reLoadDataSets();
         },
         error: (error: any) => {
-          // TODO: Implement error handling
+          this.alert = {
+            show: true,
+            type: 'error',
+            message: error.message,
+          };
         },
       });
+  }
+
+  reLoadDataSets() {
+    this.loadDatasetsFromServer(
+      this.pageIndex,
+      this.pageSize,
+      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
+      [
+        { key: 'instance', value: [this.selectedInstance!] },
+        this.dataSetSeachQuery !== ''
+          ? { key: 'q', value: [this.dataSetSeachQuery] }
+          : { key: 'q', value: [] },
+      ]
+    );
+  }
+
+  goToDataSetMapping(uuid: string) {
+    this.router.navigate(['/dataset-mapping', uuid]);
+  }
+
+  onCloseAlert() {
+    this.alert = {
+      show: false,
+      type: '',
+      message: '',
+    };
   }
 }

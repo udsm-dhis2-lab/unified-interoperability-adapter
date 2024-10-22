@@ -9,3 +9,9 @@ export class UnknownException extends Error {
     super(message);
   }
 }
+
+export class InternalServerException extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
