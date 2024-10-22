@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Action, createReducer, on } from '@ngrx/store';
 import { WorkflowActions } from './workflow.actions';
+
+import { updateInitialWorkflowPagerState } from '../../helpers/state.helper';
 import {
   initialWorkflowState,
-  pagerInitialState,
+  pagerWorkflowInitialState,
   workflowAdapter,
   WorkflowState,
 } from './workflow.state';
-import { updateInitialPagerState } from '../helpers/state.helper';
+import { searchProcessWithWorkflows } from '../../helpers/workflow.helper';
 
 export const workflowFeatureKey = 'workflows';
+export const routerStateKey = 'router';
 
 const workflowReducer = createReducer(
   initialWorkflowState,
@@ -28,6 +31,10 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse: null,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     };
   }),
   on(
@@ -47,6 +54,10 @@ const workflowReducer = createReducer(
         deletedWorkflow: false,
         httpErrorResponse: null,
         editedWorkflow: null,
+        currentSelectedWorkflow: workflow,
+        runned: false,
+        running: false,
+        executedWorkflow: null,
       });
     }
   ),
@@ -66,6 +77,10 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     })
   ),
   on(WorkflowActions.loadWorkflow, (state: WorkflowState) => {
@@ -83,11 +98,15 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse: null,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     };
   }),
   on(
     WorkflowActions.loadWorkflowSuccess,
-    (state: WorkflowState, { workflow }) => {
+    (state: WorkflowState, { workflow, process }) => {
       return workflowAdapter.upsertOne(workflow, {
         ...state,
         loading: false,
@@ -102,6 +121,11 @@ const workflowReducer = createReducer(
         deletedWorkflow: false,
         httpErrorResponse: null,
         editedWorkflow: null,
+        currentSelectedWorkflow: workflow,
+        currentSelectedProcess: process,
+        runned: false,
+        running: false,
+        executedWorkflow: null,
       });
     }
   ),
@@ -121,6 +145,10 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     })
   ),
   on(WorkflowActions.loadWorkflows, (state: WorkflowState) => {
@@ -137,8 +165,12 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse: null,
-      pager: pagerInitialState,
+      pager: pagerWorkflowInitialState,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     };
   }),
   on(
@@ -158,7 +190,11 @@ const workflowReducer = createReducer(
         deletedWorkflow: false,
         httpErrorResponse: null,
         editedWorkflow: null,
-        pager: updateInitialPagerState(state.pager, workflowAPIResult),
+        currentSelectedWorkflow: null,
+        runned: false,
+        running: false,
+        executedWorkflow: null,
+        pager: updateInitialWorkflowPagerState(state.pager, workflowAPIResult),
       });
     }
   ),
@@ -177,8 +213,12 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       httpErrorResponse,
-      pager: pagerInitialState,
+      pager: pagerWorkflowInitialState,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     })
   ),
   on(WorkflowActions.updateWorkflow, (state: WorkflowState, { workflow }) => {
@@ -196,11 +236,15 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse: null,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     };
   }),
   on(
     WorkflowActions.updateWorkflowSuccess,
-    (state: WorkflowState, { workflow }) => {
+    (state: WorkflowState, { workflow, updatedWorkflow }) => {
       return workflowAdapter.updateOne(workflow, {
         ...state,
         loading: false,
@@ -215,6 +259,10 @@ const workflowReducer = createReducer(
         deletedWorkflow: false,
         httpErrorResponse: null,
         editedWorkflow: null,
+        // currentSelectedWorkflow: updatedWorkflow,
+        runned: false,
+        running: false,
+        executedWorkflow: null,
       });
     }
   ),
@@ -234,6 +282,10 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     })
   ),
   on(WorkflowActions.deleteWorkflow, (state: WorkflowState, { workflow }) => {
@@ -251,6 +303,10 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse: null,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     };
   }),
   on(
@@ -270,6 +326,10 @@ const workflowReducer = createReducer(
         deletedWorkflow: true,
         httpErrorResponse: null,
         editedWorkflow: null,
+        currentSelectedWorkflow: null,
+        runned: false,
+        running: false,
+        executedWorkflow: null,
       });
     }
   ),
@@ -289,6 +349,10 @@ const workflowReducer = createReducer(
       deletedWorkflow: false,
       httpErrorResponse,
       editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     })
   ),
   on(
@@ -306,8 +370,97 @@ const workflowReducer = createReducer(
       deletingWorkflow: false,
       deletedWorkflow: false,
       editedWorkflow: workflow,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
     })
-  )
+  ),
+  on(
+    WorkflowActions.setCurrentSelectedWorkflow,
+    (state: WorkflowState, { workflow }) => ({
+      ...state,
+      loading: false,
+      loaded: false,
+      loadingWorkflow: false,
+      loadedWorkflow: false,
+      addingWorkflow: false,
+      addedWorkflow: false,
+      updatingWorkflow: false,
+      updatedWorkflow: false,
+      deletingWorkflow: false,
+      deletedWorkflow: false,
+      editedWorkflow: null,
+      currentSelectedWorkflow: workflow,
+      runned: false,
+      running: false,
+      executedWorkflow: null,
+    })
+  ),
+  on(
+    WorkflowActions.setCurrentSelectedProcess,
+    (state: WorkflowState, { id }) => {
+      return {
+        ...state,
+        currentSelectedProcess: searchProcessWithWorkflows(state.entities, id),
+      };
+    }
+  ),
+  on(WorkflowActions.runWorkflow, (state: WorkflowState, { workflow }) => {
+    return {
+      ...state,
+      loading: false,
+      loaded: false,
+      loadingWorkflow: false,
+      loadedWorkflow: false,
+      addingWorkflow: true,
+      addedWorkflow: false,
+      updatingWorkflow: false,
+      updatedWorkflow: false,
+      deletingWorkflow: false,
+      deletedWorkflow: false,
+      httpErrorResponse: null,
+      editedWorkflow: null,
+      currentSelectedWorkflow: null,
+      runned: false,
+      running: true,
+      executedWorkflow: null,
+    };
+  }),
+  on(
+    WorkflowActions.runWorkflowSuccess,
+    (state: WorkflowState, { executedWorkflow }) => {
+      return {
+        ...state,
+        loading: false,
+        loaded: false,
+        loadingWorkflow: false,
+        loadedWorkflow: false,
+        addingWorkflow: false,
+        addedWorkflow: true,
+        updatingWorkflow: false,
+        updatedWorkflow: false,
+        deletingWorkflow: false,
+        deletedWorkflow: false,
+        httpErrorResponse: null,
+        editedWorkflow: null,
+        currentSelectedWorkflow: null,
+        runned: false,
+        running: false,
+        executedWorkflow,
+      };
+    }
+  ),
+  on(
+    WorkflowActions.updateCurrentSelectedWorkflow,
+    (state: WorkflowState, { workflow, process }) => {
+      return {
+        ...state,
+        currentSelectedWorkflow: workflow,
+        currentSelectedProcess: process,
+      };
+    }
+  ),
 );
 
 export function WorkflowReducer(

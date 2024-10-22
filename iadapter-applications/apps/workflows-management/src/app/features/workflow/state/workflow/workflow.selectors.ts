@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { workflowFeatureKey } from './workflow.reducer';
+import { routerStateKey, workflowFeatureKey } from './workflow.reducer';
 import { workflowAdapter, WorkflowState } from './workflow.state';
 
 export const getWorkflowFeature =
@@ -13,6 +13,13 @@ export const {
 } = workflowAdapter.getSelectors(getWorkflowFeature);
 
 // export const getWorkflowById = (id: string) => (getWorkflowEntities as any)[id];
+
+// export const getWorkflowById = (id: string) => (getWorkflowEntities as any)[id];
+
+export const getAppRouterState = createFeatureSelector(routerStateKey);
+
+
+
 
 export const getWorkflowsLoadingStatus = createSelector(
     getWorkflowFeature,
@@ -87,4 +94,30 @@ export const getPagerTotal = createSelector(
 export const getEditedWorkflow = createSelector(
     getWorkflowFeature,
     (state: WorkflowState) => state.editedWorkflow
+);
+
+export const getCurrentSelectedWorkflow = createSelector(
+    getWorkflowFeature,
+    (state: WorkflowState) => state.currentSelectedWorkflow
+);
+
+export const getExecutedWorkflow = createSelector(
+    getWorkflowFeature,
+    (state: WorkflowState) => state.executedWorkflow
+);
+
+export const getRunnedWorkflowStatus = createSelector(
+    getWorkflowFeature,
+    (state: WorkflowState) => state?.runned
+);
+
+export const getRunningWorkflowStatus = createSelector(
+    getWorkflowFeature,
+    (state: WorkflowState) => state?.running
+);
+
+
+export const getCurrentSelectedProcess = createSelector(
+    getWorkflowFeature,
+    (state: WorkflowState) => state?.currentSelectedProcess
 );

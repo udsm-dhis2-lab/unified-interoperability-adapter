@@ -1,14 +1,16 @@
 import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 
 import { HttpErrorResponse } from '@angular/common/http';
-import { Workflow } from '../models/workflow.model';
-import { Pager } from '../models/pager.model';
+import { Workflow } from '../../models/workflow.model';
+import { Pager } from '../../models/pager.model';
+import { ExecutedWorkflow } from '../../models/runned.model';
+import { Process } from '../../models/process.model';
 
-export const pagerInitialState: Pager = {
+export const pagerWorkflowInitialState: Pager = {
     page: 0,
     total: 0,
     pageSize: 12,
-}
+};
 
 export interface WorkflowState extends EntityState<Workflow> {
     loading: boolean;
@@ -22,7 +24,12 @@ export interface WorkflowState extends EntityState<Workflow> {
     deletingWorkflow: boolean;
     deletedWorkflow: boolean;
     httpErrorResponse: HttpErrorResponse | null;
-    editedWorkflow: Workflow | null,
+    editedWorkflow: Workflow | null;
+    currentSelectedWorkflow: Workflow | null;
+    runned: boolean;
+    running: boolean;
+    executedWorkflow: ExecutedWorkflow | null;
+    currentSelectedProcess: Process | null;
     pager: Pager;
 }
 
@@ -41,7 +48,12 @@ export const defaultWorkflow: WorkflowState = {
     deletedWorkflow: false,
     httpErrorResponse: null,
     editedWorkflow: null,
-    pager: pagerInitialState
+    currentSelectedWorkflow: null,
+    runned: false,
+    running: false,
+    executedWorkflow: null,
+    currentSelectedProcess: null,
+    pager: pagerWorkflowInitialState,
 };
 
 export const workflowAdapter: EntityAdapter<Workflow> =

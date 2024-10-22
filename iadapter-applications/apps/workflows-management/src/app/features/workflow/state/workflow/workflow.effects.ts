@@ -3,13 +3,15 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { catchError, map, of, switchMap } from 'rxjs';
 import { Update } from '@ngrx/entity';
-import { WorkflowService } from '../services/workflow/workflow.service';
+import { WorkflowService } from '../../services/workflow/workflow.service';
 import {
   DeleteResponse,
   Workflow,
   WorkflowAPIResult,
-} from '../models/workflow.model';
+} from '../../models/workflow.model';
 import { WorkflowActions } from './workflow.actions';
+import { ExecutedWorkflow } from '../../models/runned.model';
+import { Process } from '../../models/process.model';
 
 Injectable();
 export class WorkflowEffects {
@@ -39,6 +41,25 @@ export class WorkflowEffects {
     )
   );
 
+  runWorkflow$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(WorkflowActions.runWorkflow),
+      map((payload: { workflow: Workflow }) => payload),
+      switchMap((payload: { workflow: Workflow }) => {
+        return this.workflowService.runWorkflow(payload.workflow).pipe(
+          map((executedWorkflow: ExecutedWorkflow) => {
+            return WorkflowActions.runWorkflowSuccess({
+              executedWorkflow,
+            });
+          }),
+          catchError((httpErrorResponse: HttpErrorResponse) =>
+            of(WorkflowActions.runWorkflowFailure({ httpErrorResponse }))
+          )
+        );
+      })
+    )
+  );
+
   getWorkflows$ = createEffect(() =>
     this.actions$.pipe(
       ofType(WorkflowActions.loadWorkflows),
@@ -64,7 +85,10 @@ export class WorkflowEffects {
       switchMap((payload: { id: string }) =>
         this.workflowService.getWorkflowById(payload?.id).pipe(
           map((workflow: Workflow) =>
-            WorkflowActions.loadWorkflowSuccess({ workflow })
+            WorkflowActions.loadWorkflowSuccess({
+              workflow,
+              process: workflow.process as Process,
+            })
           ),
           catchError((httpErrorResponse: HttpErrorResponse) =>
             of(WorkflowActions.loadWorkflowFailure({ httpErrorResponse }))
@@ -85,10 +109,15 @@ export class WorkflowEffects {
             map((workflow: Workflow) => {
               const updatedWorkflow: Update<Workflow> = {
                 id: workflow.id,
-                changes: workflow,
+                changes: {
+                  ...workflow,
+                },
               };
               return WorkflowActions.updateWorkflowSuccess({
                 workflow: updatedWorkflow,
+                updatedWorkflow: {
+                  ...workflow
+                },
               });
             }),
             catchError((httpErrorResponse: HttpErrorResponse) =>
