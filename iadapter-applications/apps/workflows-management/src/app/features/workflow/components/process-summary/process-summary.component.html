@@ -1,0 +1,22 @@
+<nz-card
+  *ngIf="currentSelectedProcess && currentSelectedProcess.name"
+  [nzBordered]="true"
+  class="custom-card"
+>
+  <nz-card-meta [nzTitle]="currentSelectedProcess.name"></nz-card-meta>
+
+  <div class="narrative-summary">
+    <ul>
+      <li><strong>Code:</strong> {{ currentSelectedProcess.code }}</li>
+      <li>
+        <strong>Creation Date:</strong>
+        {{ currentSelectedProcess.created | date : 'fullDate' }}
+      </li>
+      <li>
+        <strong>Adaptors:</strong>
+        {{ currentSelectedProcess.adaptors?.join(', ') }}
+      </li>
+    </ul>
+  </div>
+</nz-card>
+<br />
