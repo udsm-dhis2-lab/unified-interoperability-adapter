@@ -9,18 +9,21 @@ import {
 import { CommonModule } from '@angular/common';
 import { antDesignModules } from './ant-design-modules';
 import { BehaviorSubject, debounceTime, switchMap } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'search-bar',
   standalone: true,
-  imports: [CommonModule, ...antDesignModules],
+  imports: [CommonModule, FormsModule, ...antDesignModules],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css',
 })
-export class SearchBarComponent implements OnInit{
+export class SearchBarComponent implements OnInit {
   ngOnInit(): void {
     this.searchOnInputField();
   }
+
+  searchQuery: string = '';
   searchInputChange$ = new BehaviorSubject('');
 
   @Input({
@@ -30,7 +33,7 @@ export class SearchBarComponent implements OnInit{
 
   @Output() search: EventEmitter<string> = new EventEmitter();
 
-  @Output() onInputSearchValue: EventEmitter<string> = new EventEmitter();
+  @Output() inputSearchValue: EventEmitter<string> = new EventEmitter();
 
   additionalContent: TemplateRef<any> | null = null;
 
@@ -43,15 +46,24 @@ export class SearchBarComponent implements OnInit{
   }
 
   searchOnInputField() {
-    this.searchInputChange$
+    const searchInputChange$ = this.searchInputChange$
       .asObservable()
       .pipe(debounceTime(500))
       .pipe(
         switchMap((value: string) => {
-          this.onInputSearchValue.emit(value);
-          return new BehaviorSubject(null).asObservable();
+          return new BehaviorSubject(value).asObservable();
         })
       );
+
+    searchInputChange$.subscribe({
+      next: (value: string) => {
+        console.log('THE VALUE stream', value);
+        this.inputSearchValue.emit(value);
+      },
+      error: (error: any) => {
+        // TODO: Implement error handling
+      },
+    });
   }
 
   setAdditionalContent(content: TemplateRef<any>) {

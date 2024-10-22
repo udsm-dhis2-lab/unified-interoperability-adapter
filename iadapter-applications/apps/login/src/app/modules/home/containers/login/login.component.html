@@ -61,7 +61,7 @@
       *ngIf="alert.show"
       [nzType]="alert.type === 'success' ? 'success' : 'error'"
       [nzMessage]="alert.message"
-      (nzOnClose)="afterClose()"
+      (nzOnClose)="onCloseAlert()"
       nzShowIcon
     ></nz-alert>
   </form>

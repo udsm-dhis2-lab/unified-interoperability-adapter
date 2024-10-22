@@ -6,7 +6,13 @@
           {{ labelText }}
         </div>
         <div nz-col nzSpan="18">
-          <input nz-input placeholder="Write to search" type="text" />
+          <input
+            nz-input
+            placeholder="Write to search"
+            type="text"
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchInputTyping($event)"
+          />
         </div>
       </div>
     </div>
