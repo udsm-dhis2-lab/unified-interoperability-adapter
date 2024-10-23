@@ -24,9 +24,10 @@ export class DatasetManagementService {
   instanceUrl: string = MappingsUrls.GET_INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
   configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
-  addMappingsUrl: string = MappingsUrls.ADD_MAPPINGS;
-  getMappingsUrl: string = MappingsUrls.GET_MAPPINGS;
-  updateMappingsUrl: string = MappingsUrls.UPDATE_MAPPING;
+  addMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
+  getMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
+  updateMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
+  deleteMappingUrl: string = MappingsUrls.HDU_MAPPINGS;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -175,10 +176,10 @@ export class DatasetManagementService {
     );
   }
 
-  getMappingFromDataStore(dataElementUud: string) {
+  getMappingFromDataStore(dataElementUud: string, datasetUuid: string) {
     return this.httpClient
       .get<any>(
-        `${MappingsUrls.GET_MAPPINGS}/MAPPINGS-${dataElementUud}/${dataElementUud}`
+        `${MappingsUrls.HDU_MAPPINGS}/MAPPINGS-${datasetUuid}/${dataElementUud}`
       )
       .pipe(
         map((response: any) => {
@@ -191,6 +192,16 @@ export class DatasetManagementService {
   updateMappings(payLoad: any, mappingUuid: string): Observable<any> {
     return this.httpClient
       .put<any>(`${this.updateMappingsUrl}/${mappingUuid}`, payLoad)
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  deleteMapping(mappingUuid: string): Observable<any> {
+    return this.httpClient
+      .delete<any>(`${this.deleteMappingUrl}/${mappingUuid}`, {})
       .pipe(
         // TODO: return response
         map((response: any) => console.log(response)),

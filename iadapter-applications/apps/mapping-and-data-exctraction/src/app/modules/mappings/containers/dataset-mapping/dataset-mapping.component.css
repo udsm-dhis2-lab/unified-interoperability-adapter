@@ -22,3 +22,12 @@
 .collapse-button {
   margin-bottom: 16px;
 }
+
+.action-buttons-row {
+  display: flex !important;
+  justify-content: end;
+  margin-top: 0.5rem !important;
+}
+.button-padding {
+  margin-left: 0.5rem;
+}

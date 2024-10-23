@@ -137,12 +137,22 @@
             </div>
           </nz-card>
 
-          <div
-            nz-row
-            nzJustify="end"
-            style="margin-top: 16; margin-bottom: 16px"
-          >
-            <nz-spin [nzSpinning]="isSubmittingMapping">
+          <div class="action-buttons-row">
+            <nz-spin
+              *ngIf="mappingUuid != null"
+              [nzSpinning]="isDeletingMapping"
+              class="button-padding"
+            >
+              <button
+                nz-button
+                nzType="default"
+                (click)="deleteMapping()"
+                nzDanger
+              >
+                Delete mappings
+              </button>
+            </nz-spin>
+            <nz-spin [nzSpinning]="isSubmittingMapping" class="button-padding">
               <button nz-button nzType="primary" (click)="onSubmitMappings()">
                 Save mappings
               </button>

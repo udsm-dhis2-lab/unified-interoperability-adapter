@@ -18,7 +18,6 @@ import {
   switchMap,
 } from 'rxjs';
 import { ConfigurationPage, IcdCodePage } from '../../models';
-import { Action } from 'rxjs/internal/scheduler/Action';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -57,6 +56,7 @@ class Disaggregation {
 })
 export class DatasetMappingComponent implements OnInit {
   isSubmittingMapping: boolean = false;
+  isDeletingMapping: boolean = false;
   mappingUuid?: string;
 
   alert = {
@@ -187,18 +187,18 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedInputId = inputElement.id.split('-')[0];
     this.getCategoryOptionCombos(this.selectedInputId);
     this.dataSetManagementService
-      .getMappingFromDataStore(this.selectedInputId)
+      .getMappingFromDataStore(this.selectedInputId, this.dataSetUuid)
       .subscribe({
         next: (data: any) => {
           this.mappingUuid = data.uuid;
-          if (data.value.mappings.length > 0) {
+          if (data.mapping.mappings.length > 0) {
             this.useIcdCodes = true;
-            this.selectedICdCodes = data.value.mappings.map(
+            this.selectedICdCodes = data.mapping.mappings.map(
               (item: any) => item.code
             );
           }
-          if (data.value.params.length > 0) {
-            const param = data.value.params[0];
+          if (data.mapping.params.length > 0) {
+            const param = data.mapping.params[0];
             if (param.gender) {
               const configuration = this.configurationOptionList.find(
                 (item: any) => item.label === 'Gender'
@@ -224,7 +224,7 @@ export class DatasetMappingComponent implements OnInit {
               );
             }
 
-            for (const param of data.value.params) {
+            for (const param of data.mapping.params) {
               if (param.gender) {
                 const configuration = this.configurationOptionList.find(
                   (item: any) => item.label === 'Gender'
@@ -427,7 +427,7 @@ export class DatasetMappingComponent implements OnInit {
         }),
       },
       dataKey: this.selectedInputId,
-      namespace: `MAPPINGS-${this.selectedInputId}`,
+      namespace: `MAPPINGS-${this.dataSetUuid}`,
       description: '',
       group: '',
     };
@@ -439,7 +439,7 @@ export class DatasetMappingComponent implements OnInit {
     const payLoad: any = this.createMappingsPayload();
     let action$: Observable<any>;
 
-    if (this.mappingUuid !== undefined) {
+    if (this.mappingUuid != null) {
       payLoad.uuid = this.mappingUuid;
       action$ = this.dataSetManagementService.updateMappings(
         payLoad,
@@ -461,6 +461,29 @@ export class DatasetMappingComponent implements OnInit {
       },
       error: (error: any) => {
         this.isSubmittingMapping = false;
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
+        // TODO: Handle error
+      },
+    });
+  }
+
+  deleteMapping() {
+    this.isDeletingMapping = true;
+    this.dataSetManagementService.deleteMapping(this.mappingUuid!).subscribe({
+      next: (data: any) => {
+        this.isDeletingMapping = false;
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Mapping deleted successfully',
+        };
+      },
+      error: (error: any) => {
+        this.isDeletingMapping = false;
         this.alert = {
           show: true,
           type: 'error',
