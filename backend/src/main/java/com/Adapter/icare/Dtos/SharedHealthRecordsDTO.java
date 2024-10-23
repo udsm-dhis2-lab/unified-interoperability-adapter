@@ -57,9 +57,9 @@ public class SharedHealthRecordsDTO {
 
     private VisitMainPaymentDetailsDTO visitMainPaymentDetails;
 
-    private OtherInformationDTO otherInformation;
-
     private ReferralDetailsDTO referralDetails;
+
+    private OtherInformationDTO otherInformation;
 
     public Map<String,Object> toMap() {
         Map<String,Object> sharedRecordMap = new HashMap<>();
@@ -68,6 +68,22 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("demographicDetails", this.getDemographicDetails());
         sharedRecordMap.put("visitDetails", this.getVisitDetails());
         sharedRecordMap.put("clinicalInformation", this.getClinicalInformation());
+        sharedRecordMap.put("allergies", this.getAllergies());
+        sharedRecordMap.put("chronicConditions", this.getChronicConditions());
+        sharedRecordMap.put("lifeStyleInformation", this.getLifeStyleInformation());
+        sharedRecordMap.put("investigationDetails", this.getInvestigationDetails());
+        sharedRecordMap.put("labInvestigationDetails", this.getLabInvestigationDetails());
+        sharedRecordMap.put("diagnosisDetails", this.getDiagnosisDetails());
+        sharedRecordMap.put("medicationDetails", this.getMedicationDetails());
+        sharedRecordMap.put("treatmentDetails", this.getTreatmentDetails());
+        sharedRecordMap.put("radiologyDetails", this.getRadiologyDetails());
+        sharedRecordMap.put("admissionDetails", this.getAdmissionDetails());
+        sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
+        sharedRecordMap.put("causesOfDeathDetails", this.getCausesOfDeathDetails());
+        sharedRecordMap.put("billingsDetails", this.getBillingsDetails());
+        sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
+        sharedRecordMap.put("referralDetails", this.getReferralDetails());
+        sharedRecordMap.put("otherInformation", this.getOtherInformation());
         return  sharedRecordMap;
     }
 }

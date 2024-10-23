@@ -155,9 +155,11 @@ public class SharedHealthRecordsService {
                         // TODO: Find a way to retrieve these from resource
                         visitDetails.setNewThisYear(Boolean.FALSE);
                         visitDetails.setNew(Boolean.FALSE);
+                        templateData.setVisitDetails(visitDetails);
 
                         // Get clinicalInformation
                         // 1. clinicalInformation - vital signs
+                        ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
                         List<Map<String,Object>> vitalSigns =  new ArrayList<>();
                         // Get Observation Group
                         System.out.println(encounter.getIdElement().getIdPart());
@@ -173,6 +175,15 @@ public class SharedHealthRecordsService {
                             System.out.println(observationsData.size());
                         }
 
+                        // Visit notes
+                        List<String> visitNotes = new ArrayList<>();
+
+                        Map<String,Object> clinicalInformationDetails = new HashMap<>();
+                        clinicalInformationDetails.put("vitalSigns", vitalSigns);
+                        clinicalInformationDetails.put("visitNotes", visitNotes);
+                        clinicalInformationDTO.setClinicalInformation(clinicalInformationDetails);
+                        templateData.setClinicalInformation(clinicalInformationDTO);
+
                         // TODO: Add history when numberOfVisits > 1
                     } else if (organization != null) {
                         // TODO: Request visit from facility provided
@@ -181,7 +192,6 @@ public class SharedHealthRecordsService {
                     } else {
                         visitDetails = null;
                     }
-                    templateData.setVisitDetails(visitDetails);
                     sharedRecords.add(templateData.toMap());
                 }
             }
