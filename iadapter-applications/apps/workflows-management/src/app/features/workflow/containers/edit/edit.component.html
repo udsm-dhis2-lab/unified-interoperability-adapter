@@ -1,0 +1,21 @@
+<form [formGroup]="workflowForm">
+    <div nz-row>
+        <div class="form-input-container">
+            <input nz-input placeholder="Name" formControlName="name" type="text" />
+            <br /><br />
+            <input nz-input placeholder="Description" formControlName="description" type="text" />
+            <br /><br />
+            <div>
+                <button (click)="saveUpdateWorkflow()" [disabled]="!workflowForm.valid" *ngIf="(updatingWorkflowStatus$ | async) === false" nz-button
+                    nzType="primary" [nzLoading]="false" nzLoading>
+                    <span nz-icon nzType="poweroff"></span>
+                    Update Workflow
+                </button>
+                <button *ngIf="(updatingWorkflowStatus$ | async) !== false" nz-button nzType="primary" nzLoading>
+                    <span nz-icon nzType="poweroff"></span>
+                    Updating Workflow...
+                </button>
+            </div>
+        </div>
+    </div>
+</form>

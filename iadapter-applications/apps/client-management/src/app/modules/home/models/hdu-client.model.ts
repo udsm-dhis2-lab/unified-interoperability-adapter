@@ -23,3 +23,11 @@ export class HduClient {
     return hduClient;
   }
 }
+
+export class HDUAPIClientDetails {
+  demographicDetails!: HduClient;
+  facilityDetails!: {
+    code: string;
+    name: string;
+  };
+}

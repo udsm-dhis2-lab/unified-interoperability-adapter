@@ -1,0 +1,81 @@
+form nz-form-item {
+    margin-right: 16px;
+    margin-bottom: 8px;
+}
+
+.action-container {
+    display: flex;
+    margin: 10px;
+    padding: 15px;
+    background-color: #eee;
+    align-items: center;
+    /* Ensure vertical alignment */
+}
+
+.action-container nz-input-group {
+    flex: 1;
+    /* Make the search input take up most of the space */
+}
+
+.action-container button {
+    white-space: nowrap;
+    /* Prevents button text from wrapping */
+}
+
+.workflow-run-logging {
+    max-height: 62vh !important;
+    overflow-y: auto;
+    font-family: 'Roboto', sans-serif;
+    max-width: 100% !important;
+    // background-color: #000;
+    scroll-padding-bottom: 0 !important;
+}
+
+/* Container for the menu */
+ul[nz-menu] {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+ul[nz-menu] li {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+ul[nz-menu] li i[nz-icon] {
+    margin-right: 12px;
+    font-size: 18px;
+    color: #1890ff;
+}
+
+.menu-label {
+    font-size: 16px;
+    color: #333;
+}
+
+ul[nz-menu] li:hover {
+    background-color: #f0f0f0;
+}
+
+.inner-box {
+    padding: 16px;
+    border: 1px solid #e8e8e8;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    height: 100%;
+}
+
+[nz-tag] {
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+.centered-cell {
+    text-align: center;      /* Center text horizontally */
+    vertical-align: middle;  /* Center text vertically */
+    height: 100%;            /* Ensure full height for vertical centering */
+}

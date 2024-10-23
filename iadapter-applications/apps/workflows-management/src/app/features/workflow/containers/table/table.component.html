@@ -1,0 +1,165 @@
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="action-container">
+    <!-- Search input with a button -->
+    <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton" style="flex: 1">
+        <input type="text" nz-input placeholder="Search Workflows" />
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+        <button nz-button nzType="primary" nzSearch>
+            <span nz-icon nzType="search"></span>
+        </button>
+    </ng-template>
+
+    <!-- Action button -->
+    <button (click)="onAddWorkflow()" nz-button nzType="default" style="margin-left: 10px">
+        Add Workflow
+        <!-- <span nz-icon nzType="plus"></span> -->
+    </button>
+</div>
+
+<nz-table #dynamicTable [nzScroll]="{ x: scrollX, y: scrollY }" [nzData]="workflows" [nzPageSize]="12"
+    [nzTableLayout]="settingValue.tableLayout" [nzBordered]="settingValue.bordered" [nzSimple]="settingValue.simple"
+    [nzLoading]="settingValue.loading" [nzPaginationType]="settingValue.paginationType"
+    [nzPaginationPosition]="settingValue.position" [nzShowSizeChanger]="settingValue.sizeChanger"
+    [nzFrontPagination]="settingValue.pagination" [nzShowPagination]="settingValue.pagination"
+    [nzFooter]="settingValue.footer ? '' : null" [nzTitle]="settingValue.title ? '' : null" [nzSize]="settingValue.size"
+    (nzCurrentPageDataChange)="currentPageDataChange($event)">
+    <thead>
+        @if (settingValue.header) {
+        <tr>
+            @if (settingValue.expandable) {
+            <th nzWidth="40px" [nzLeft]="fixedColumn"></th>
+            } @if (settingValue.checkbox) {
+            <th nzWidth="60px" [(nzChecked)]="allChecked" [nzLeft]="fixedColumn" [nzIndeterminate]="indeterminate"
+                (nzCheckedChange)="checkAll($event)"></th>
+            }
+            <th [nzLeft]="fixedColumn">Name</th>
+            <th>Description</th>
+            <th>Create</th>
+            <th>Updated</th>
+            <th [nzRight]="fixedColumn">Status</th>
+            <th [nzRight]="fixedColumn">Action</th>
+        </tr>
+        }
+    </thead>
+    <tbody>
+        @for (data of dynamicTable.data; track data) {
+        <tr>
+            @if (settingValue.expandable) {
+            <td [nzLeft]="fixedColumn" [(nzExpand)]="data.expand"></td>
+            } @if (settingValue.checkbox) {
+            <td [nzLeft]="fixedColumn" [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+            }
+            <td>{{ data.name }}</td>
+            <td>{{ data.description }}</td>
+            <td [nzEllipsis]="settingValue.ellipsis">
+                {{ data.created | date : 'fullDate' }}
+            </td>
+            <td [nzEllipsis]="settingValue.ellipsis">
+                {{ data.updated | date : 'fullDate' }}
+            </td>
+            <!-- <td class="centered-cell" [nzEllipsis]="settingValue.ellipsis">
+                <nz-tag *ngIf="data.task && data.task.status === 'FINISHED'" nzColor="green">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'ERROR'" nzColor="red">{{ data.task.status }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'RUNNING'" nzColor="red">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="!data.task" nzColor="gray">{{ 'PENDING' }}</nz-tag>
+            </td> -->
+            <td class="centered-cell" [nzRight]="fixedColumn" [nzEllipsis]="settingValue.ellipsis">
+                <!-- <nz-tag *ngIf="data.task && data.task.status === 'FINISHED'" nzColor="green">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'ERROR'" nzColor="red">{{ data.task.status }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'RUNNING'" nzColor="red">{{ data.task.status
+                    }}</nz-tag> -->
+                <nz-tag nzColor="gray">{{ 'Not Started' }}</nz-tag>
+                <nz-divider nzType="vertical"></nz-divider>
+            </td>
+            <td>
+                <nz-button-group>
+                    <button nz-button (click)="onRunWorkflow(data)">
+                        Run
+                    </button>
+                    <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
+                        <span nz-icon nzType="ellipsis"></span>
+                    </button>
+                </nz-button-group>
+                <nz-dropdown-menu #menu1="nzDropdownMenu">
+                    <ul nz-menu>
+                        <li (click)="onEditWorkflow(data)" nz-menu-item>
+                            <i nz-icon nzType="edit"></i>
+                            <span class="menu-label">Edit</span>
+                        </li>
+                        <li (click)="onDeleteWorkflow(data)" nz-menu-item>
+                            <i nz-icon nzType="delete"></i>
+                            <span class="menu-label">Delete</span>
+                        </li>
+                        <li (click)="onAddProcess(data)" nz-menu-item>
+                            <i nz-icon nzType="delete"></i>
+                            <span class="menu-label">Manage Workflow</span>
+                        </li>
+                    </ul>
+                </nz-dropdown-menu>
+            </td>
+        </tr>
+        @if (settingValue.expandable) {
+        <tr [nzExpand]="data.expand">
+            <div nz-row [nzGutter]="16">
+                <div nz-col class="gutter-row" [nzSpan]="12">
+                    <div class="inner-box">
+                        <h3>Workflow Information</h3>
+                        <ul>
+                            <!-- Workflow Information -->
+                            <li><strong>Workflow ID:</strong> {{ data.id }}</li>
+                            <li><strong>data Name:</strong> {{ data.name }}</li>
+                            <li><strong>data Description:</strong> {{ data.description }}</li>
+                            <li>
+                                <strong>data Created:</strong>
+                                {{ data.created | date : 'fullDate' }}
+                                {{ data.created | date : 'shortTime' }}
+                            </li>
+                            <li>
+                                <strong>data Updated:</strong>
+                                {{ data.updated | date : 'fullDate' }}
+                                {{ data.updated | date : 'shortTime' }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div nz-col class="gutter-row" [nzSpan]="12">
+                    <div class="inner-box">
+                        <h3>Process Information</h3>
+                        <ul>
+                            <li><strong>Process ID: </strong> {{ data?.process?.id }}</li>
+                            <li><strong>Process Code: </strong> {{ data?.process?.code }}</li>
+                            <li><strong>Process Name: </strong> {{ data?.process?.name }}</li>
+                            <li>
+                                <strong>Process Created: </strong>
+                                {{ data?.process?.created | date : 'fullDate' }}
+                                {{ data?.process?.created | date : 'shortTime' }}
+                            </li>
+                            <li>
+                                <strong>Process Updated: </strong>
+                                {{ data?.process?.updated | date : 'fullDate' }}
+                                {{ data?.process?.updated | date : 'shortTime' }}
+                            </li>
+                            <li>
+                                <strong>Adaptors: </strong>
+                                <nz-tag *ngFor="let adaptor of data?.process?.adaptors" nzColor="blue">{{ adaptor
+                                    }}</nz-tag>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </tr>
+        } }
+    </tbody>
+</nz-table>
+
+<div class="workflow-run-logging">
+    <app-workflow-run-logging></app-workflow-run-logging>
+</div>

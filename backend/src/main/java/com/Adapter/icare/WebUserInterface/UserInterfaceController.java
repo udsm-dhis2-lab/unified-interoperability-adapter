@@ -45,26 +45,28 @@ public class UserInterfaceController {
 
     @PostConstruct
     public void loadRouteConfigurations() {
-        // TODO: Create DTO for the app configs instead of using Map<String,Object> type
         for (Map<String, Object> app : apps) {
-            appsRoutesToResourceMap.put(app.get("key").toString(), app.get("appPath").toString());
+            if (app.get("key") != null && app.get("appPath") != null) {
+                appsRoutesToResourceMap.put(app.get("key").toString(), app.get("appPath").toString());
+            } else {
+                System.out.println("Invalid app configuration: " + app);
+            }
         }
     }
 
-//    @GetMapping("/")
-//    public RedirectView redirectRouteApplicationPathToLoginUiPath() {
-//        System.out.println("TESTING REDIRECTION");
-//        return new RedirectView(webUIConstants.DefaultApplicationUiRoutePath);
-//    }
-
     @GetMapping("{appRoute}")
     public String provideUi(@PathVariable String appRoute) {
-        System.out.println(appRoute);
-        String appPath = appsRoutesToResourceMap.get(appRoute.toString());
-        if (appPath != null) {
-            return "forward:" + appPath + "/index.html";
-        } else {
-//            logger.warning("No mapping found for appRoute: {}. Redirecting to login page.");
+        try {
+//            System.out.println(appRoute);
+            String appPath = appsRoutesToResourceMap.get(appRoute);
+//            System.out.println(appPath);
+            if (appPath != null) {
+                return "forward:" + appPath + "/index.html";
+            } else {
+                return "forward:/login/index.html";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
             return "forward:/login/index.html";
         }
     }

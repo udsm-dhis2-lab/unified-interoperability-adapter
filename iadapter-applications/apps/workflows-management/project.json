@@ -33,7 +33,8 @@
           "node_modules/ng-zorro-antd/src/ng-zorro-antd.min.css",
           "node_modules/ng-zorro-antd/resizable/style/index.min.css",
           "node_modules/ng-zorro-antd/code-editor/style/index.min.css",
-          "node_modules/ng-zorro-antd/graph/style/index.min.css"
+          "node_modules/ng-zorro-antd/graph/style/index.min.css",
+          "node_modules/ng-zorro-antd/ng-zorro-antd.min.css"
         ],
         "scripts": []
       },
@@ -58,7 +59,8 @@
         "development": {
           "optimization": false,
           "extractLicenses": false,
-          "sourceMap": true
+          "sourceMap": true,
+          "baseHref": "/"
         }
       },
       "defaultConfiguration": "production"
@@ -70,7 +72,8 @@
           "buildTarget": "workflows-management:build:production"
         },
         "development": {
-          "buildTarget": "workflows-management:build:development"
+          "buildTarget": "workflows-management:build:development",
+          "proxyConfig": "apps/workflows-management/proxy-config.json"
         }
       },
       "defaultConfiguration": "development"

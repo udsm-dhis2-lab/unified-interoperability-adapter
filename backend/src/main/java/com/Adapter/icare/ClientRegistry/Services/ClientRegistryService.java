@@ -389,7 +389,7 @@ public class ClientRegistryService {
                 patient.getContact().stream()
                         .map(contact -> new ContactPeopleDTO(
                                 contact.hasName() ? contact.getName().getFamily() : null,
-                                contact.hasTelecom() ? (List<String>) contact.getTelecom().stream().map(telecom -> telecom.getValue().toString()) : null,
+                                contact.hasTelecom() ? (List<String>) contact.getTelecom().stream().map(telecom -> telecom.hasValue() ? telecom.getValue().toString(): "") : null,
                                 contact.hasRelationship() ? contact.getRelationship().get(0).getText() : null
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();

@@ -1,0 +1,99 @@
+{
+  "name": "mapping-and-data-extraction",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/mapping-and-data-extraction/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/mapping-and-data-extraction",
+        "index": "apps/mapping-and-data-extraction/src/index.html",
+        "browser": "apps/mapping-and-data-extraction/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/mapping-and-data-extraction/tsconfig.app.json",
+        "inlineStyleLanguage": "less",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/mapping-and-data-extraction/public"
+          }
+        ],
+        "styles": [
+          "node_modules/ng-zorro-antd/src/ng-zorro-antd.min.css",
+          "node_modules/ng-zorro-antd/resizable/style/index.min.css",
+          "node_modules/ng-zorro-antd/code-editor/style/index.min.css",
+          "node_modules/ng-zorro-antd/graph/style/index.min.css"
+        ],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all",
+          "baseHref": "/mapping-and-data-extraction/",
+          "deployUrl": "/mapping-and-data-extraction/"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "baseHref": "/"
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "mapping-and-data-extraction:build:production"
+        },
+        "development": {
+          "buildTarget": "mapping-and-data-extraction:build:development",
+          "proxyConfig": "apps/mapping-and-data-extraction/proxy-config.json"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "mapping-and-data-extraction:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/mapping-and-data-extraction/jest.config.ts"
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "mapping-and-data-extraction:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/mapping-and-data-extraction/browser",
+        "spa": true
+      }
+    }
+  }
+}

@@ -1,0 +1,36 @@
+form nz-form-item {
+    margin-right: 16px;
+    margin-bottom: 8px;
+}
+
+.action-container {
+    display: flex;
+    margin: 10px;
+    padding: 15px;
+    background-color: #eee;
+    align-items: center;
+    /* Ensure vertical alignment */
+}
+
+.action-container nz-input-group {
+    flex: 1;
+    /* Make the search input take up most of the space */
+}
+
+.action-container button {
+    white-space: nowrap;
+    /* Prevents button text from wrapping */
+}
+
+[nz-row] {
+    background-color: rgba(128, 128, 128, 0.08);
+    margin: 10px;
+
+    div {
+        margin: 10px;
+    }
+}
+
+.flow-chart-component-container {
+    margin: 10px;
+}

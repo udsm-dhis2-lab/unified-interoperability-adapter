@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { icons } from './ant-design-icons.constants';
 import { antDesignModules } from './ant-design.modules';
 import { Menu } from './models/menu.model';
+import { AuthService } from './services/auth.service';
+import { User } from './models/user.model';
 
 @Component({
   selector: 'lib-hdu-api-nav-menu',
@@ -13,27 +15,33 @@ import { Menu } from './models/menu.model';
   styleUrl: './hdu-api-nav-menu.component.less',
   providers: [{ provide: NZ_ICONS, useValue: icons }],
 })
-export class HduApiNavMenuComponent {
+export class HduApiNavMenuComponent implements OnInit {
+  @Input() activeMainMenuId: string | null = null;
+  currentUser: User | null = null;
   menus: Menu[] = [
     {
       name: 'Dashboard',
+      id: 'dashboard',
       routeUrl: '/dashboard',
-      icon: 'dashboard',
+      icon: 'apartment',
       category: 'main',
     },
     {
       name: 'Client Management',
-      routeUrl: '/ClientManagementService',
+      id: 'client-management',
+      routeUrl: '/client-management',
       icon: 'user',
       category: 'main',
       subMenus: [
         {
           name: 'Clients',
+          id: 'clients',
           routeUrl: '/',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
+          id: 'deduplication',
           name: 'Deduplication',
           routeUrl: '/deduplication',
           icon: 'merge',
@@ -42,20 +50,30 @@ export class HduApiNavMenuComponent {
       ],
     },
     {
-      name: 'Worflow Management',
-      routeUrl: '/worflowManagement',
+      name: 'Worflows Management',
+      id: 'workflows-management',
+      routeUrl: '/worflows-management',
       icon: 'apartment',
       category: 'main',
       subMenus: [
         {
           name: 'Workflows',
-          routeUrl: '/home',
+          id: 'workflows',
+          routeUrl: '/workflows',
+          icon: 'calendar',
+          subMenus: [],
+        },
+        {
+          id: 'schedules',
+          name: 'Schedules',
+          routeUrl: '/schedules',
           icon: 'unordered-list',
           subMenus: [],
         },
       ],
     },
     {
+      id: 'mapping-and-data-extraction',
       name: 'Mapping and Data Extraction',
       routeUrl: '/mapping-and-data-extraction',
       icon: 'apartment',
@@ -63,12 +81,14 @@ export class HduApiNavMenuComponent {
       subMenus: [
         {
           name: 'Datasets',
+          id: 'datasets',
           routeUrl: '',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
           name: 'Settings',
+          id: 'settings',
           routeUrl: '/settings',
           icon: 'unordered-list',
           subMenus: [],
@@ -79,7 +99,13 @@ export class HduApiNavMenuComponent {
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();
 
-  constructor() {}
+  constructor(private authService: AuthService) {
+    this.activeMainMenuId = !this.activeMainMenuId
+      ? 'dashboard'
+      : this.activeMainMenuId;
+  }
+
+  ngOnInit(): void {}
 
   onRouteTo(event: Event, menu: Menu): void {
     event.stopPropagation();

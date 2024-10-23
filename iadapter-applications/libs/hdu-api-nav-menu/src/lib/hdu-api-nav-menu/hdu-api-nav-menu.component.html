@@ -1,12 +1,23 @@
-<ul nz-menu nzMode="inline">
+<ul nz-menu nzMode="inline" style="margin-top: 50px">
   <ng-container *ngFor="let menu of menus">
     <li
-      *ngIf="menu?.subMenus; else noSubMenus"
+      *ngIf="!menu?.subMenus"
+      nz-menu-item
+      (click)="onRouteTo($event, menu)"
+      [class.active]="activeMainMenuId === menu?.id"
+    >
+      <nz-space>
+        <span *nzSpaceItem nz-icon nzType="{{ menu?.icon }}"></span>
+        <a *nzSpaceItem routerLink="">{{ menu?.name }}</a>
+      </nz-space>
+    </li>
+    <li
+      *ngIf="menu?.subMenus"
       nz-submenu
       nzTitle="{{ menu?.name }}"
       nzIcon="{{ menu.icon }}"
       (click)="onRouteTo($event, menu)"
-      nzOpen
+      [nzOpen]="activeMainMenuId === menu?.id"
     >
       <ul>
         <li
@@ -21,13 +32,19 @@
         </li>
       </ul>
     </li>
-    <ng-template #noSubMenus>
-      <li nz-menu-item (click)="onRouteTo($event, menu)">
+    <!-- <ng-template #noSubMenus>
+      <li nz-menu-item (click)="onRouteTo($event, menu)"
+      nz-submenu
+      nzTitle="{{ menu?.name }}"
+      nzIcon="{{ menu.icon }}"
+      (click)="onRouteTo($event, menu)"
+      nzOpen
+      >
         <nz-space>
           <span *nzSpaceItem nz-icon nzType="{{ menu?.icon }}"></span>
           <a *nzSpaceItem routerLink="">{{ menu?.name }}</a>
         </nz-space>
       </li>
-    </ng-template>
+    </ng-template> -->
   </ng-container>
 </ul>
