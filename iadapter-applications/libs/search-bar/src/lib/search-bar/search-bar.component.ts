@@ -57,7 +57,6 @@ export class SearchBarComponent implements OnInit {
 
     searchInputChange$.subscribe({
       next: (value: string) => {
-        console.log('THE VALUE stream', value);
         this.inputSearchValue.emit(value);
       },
       error: (error: any) => {
