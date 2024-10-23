@@ -133,6 +133,12 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedICdCodes = [...this.selectedICdCodes, value];
   }
 
+  onRemoveIcdCode(tag: string) {
+    this.selectedICdCodes = this.selectedICdCodes.filter(
+      (item) => item !== tag
+    );
+  }
+
   constructor(
     private route: ActivatedRoute,
     private dataSetManagementService: DatasetManagementService,

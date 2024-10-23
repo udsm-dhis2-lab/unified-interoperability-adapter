@@ -65,8 +65,12 @@
               style="margin-top: 16px; margin-bottom: 16px"
             >
               <nz-card style="width: 100%">
-                @for (icdCode of selectedICdCodes?? []; track $index) {
-                <nz-tag>{{ icdCode ?? '' }}</nz-tag>
+                @for (icdCode of selectedICdCodes; track $index) {
+                <nz-tag
+                  nzMode="closeable"
+                  (nzOnClose)="onRemoveIcdCode(icdCode)"
+                  >{{ icdCode ?? '' }}</nz-tag
+                >
                 }
               </nz-card>
             </div>

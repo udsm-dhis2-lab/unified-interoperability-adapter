@@ -25,7 +25,7 @@ export class DatasetManagementService {
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
   configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
   addMappingsUrl: string = MappingsUrls.ADD_MAPPINGS;
-  getMappingsUrl: string = MappingsUrls.GET_MAPPINGS_FROM_DATASTORE;
+  getMappingsUrl: string = MappingsUrls.GET_MAPPINGS;
   updateMappingsUrl: string = MappingsUrls.UPDATE_MAPPING;
 
   constructor(private httpClient: HduHttpService) {}
@@ -178,7 +178,7 @@ export class DatasetManagementService {
   getMappingFromDataStore(dataElementUud: string) {
     return this.httpClient
       .get<any>(
-        `${MappingsUrls.GET_MAPPINGS_FROM_DATASTORE}/MAPPINGS-${dataElementUud}/${dataElementUud}`
+        `${MappingsUrls.GET_MAPPINGS}/MAPPINGS-${dataElementUud}/${dataElementUud}`
       )
       .pipe(
         map((response: any) => {
