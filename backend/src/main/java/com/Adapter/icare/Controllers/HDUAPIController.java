@@ -698,19 +698,19 @@ public class HDUAPIController {
             @RequestParam(value = "code", required = false) String code,
             @RequestParam(value = "key", required = false) String key
     ) throws Exception {
-        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        List<MappingsDTO> namespaceDetails = new ArrayList<>();
         try {
             String namespaceFilter = datastoreConstants.MappingsNamespaceFilter;
             Page<Datastore> pagedDatastoreData =   datastoreService.getDatastoreMatchingNamespaceFilterByPagination(
                     namespaceFilter, key,q,code,page,pageSize);
             for (Datastore datastore: pagedDatastoreData.getContent()) {
-                Map<String,Object> mapping = new HashMap<>();
-                mapping.put("uuid", datastore.getUuid());
-                mapping.put("dataKey", datastore.getDataKey());
-                mapping.put("namespace", datastore.getNamespace());
-                mapping.put("group", datastore.getDatastoreGroup());
-                mapping.put("description", datastore.getDescription());
-                mapping.put("mapping", datastore.getValue());
+                MappingsDTO mapping = new MappingsDTO();
+                mapping.setUuid (datastore.getUuid());
+                mapping.setDataKey(datastore.getDataKey());
+                mapping.setNamespace(datastore.getNamespace());
+                mapping.setGroup(datastore.getDatastoreGroup());
+                mapping.setDescription(datastore.getDescription());
+                mapping.setMapping(datastore.getValue());
                 namespaceDetails.add(mapping);
             }
             Map<String, Object> response = new HashMap<>();
@@ -728,16 +728,34 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "mappings/{uuid}")
-    public ResponseEntity<Map<String,Object>> getMappingsByUuid(@PathVariable(value = "uuid") String uuid) throws Exception {
+    public ResponseEntity<MappingsDTO> getMappingsByUuid(@PathVariable(value = "uuid") String uuid) throws Exception {
         try {
-            Map<String,Object> response = new HashMap<>();
+            MappingsDTO response = new MappingsDTO();
             Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
-            response.put("uuid", datastore.getUuid());
-            response.put("dataKey", datastore.getDataKey());
-            response.put("namespace", datastore.getNamespace());
-            response.put("group", datastore.getDatastoreGroup());
-            response.put("description", datastore.getDescription());
-            response.put("mapping", datastore.getValue());
+            response.setUuid (datastore.getUuid());
+            response.setDataKey(datastore.getDataKey());
+            response.setNamespace(datastore.getNamespace());
+            response.setGroup(datastore.getDatastoreGroup());
+            response.setDescription(datastore.getDescription());
+            response.setMapping(datastore.getValue());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "mappings/{namespace}/{key}")
+    public ResponseEntity<MappingsDTO> getMappingsByNamespaceAndKey(@PathVariable(value = "namespace") String namespace,
+                                                                    @PathVariable(value = "key") String key) throws Exception {
+        try {
+            MappingsDTO response = new MappingsDTO();
+            Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+            response.setUuid (datastore.getUuid());
+            response.setDataKey(datastore.getDataKey());
+            response.setNamespace(datastore.getNamespace());
+            response.setGroup(datastore.getDatastoreGroup());
+            response.setDescription(datastore.getDescription());
+            response.setMapping(datastore.getValue());
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
@@ -765,11 +783,11 @@ public class HDUAPIController {
     @PutMapping(value = "mappings/{uuid}")
     public ResponseEntity<Map<String,Object>> updateMappingsByUuid(
             @PathVariable(value = "uuid") String uuid,
-            @RequestBody Datastore datastore) throws Exception {
+            @RequestBody MappingsDTO mappingsDTO) throws Exception {
         try {
             Datastore mappingsToUpdate = datastoreService.getDatastoreByUuid(uuid);
             if (mappingsToUpdate != null) {
-                mappingsToUpdate.setValue(datastore.getValue());
+                mappingsToUpdate.setValue(mappingsDTO.getMapping());
                 if (authenticatedUser != null) {
                     mappingsToUpdate.setLastUpdatedBy(authenticatedUser);
                 }

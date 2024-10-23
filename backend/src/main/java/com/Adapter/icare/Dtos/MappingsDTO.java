@@ -8,6 +8,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class MappingsDTO {
+    private String uuid;
     private String dataKey;
     private Map<String, Object> mapping;
     private String namespace;
