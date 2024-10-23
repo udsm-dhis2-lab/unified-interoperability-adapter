@@ -14,7 +14,6 @@ import {
   BehaviorSubject,
   debounceTime,
   Observable,
-  Subscription,
   switchMap,
 } from 'rxjs';
 import { ConfigurationPage, IcdCodePage } from '../../models';
