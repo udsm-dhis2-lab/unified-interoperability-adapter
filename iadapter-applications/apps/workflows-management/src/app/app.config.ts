@@ -17,24 +17,42 @@ import {
   provideClientHydration,
 } from '@angular/platform-browser';
 import { antDesignIcons } from './shared/config/ant-design-icons.constants';
-import { appReducers, metaReducers } from './state/app.state';
+import { appEffects, appReducers, metaReducers } from './state/app.state';
 import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient } from '@angular/common/http';
+import { WorkflowService } from './features/workflow/services/workflow/workflow.service';
+import { provideEffects } from '@ngrx/effects';
+import { TaskService } from './features/workflow/services/task/task.service';
+import { ProcessService } from './features/workflow/services/process/process.service';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
+import { LogMonitorModule } from 'ngx-log-monitor';
+import { provideRouterStore } from '@ngrx/router-store';
+import { ScheduleService } from './features/schedule/services/schedule/schedule.service';
 
 registerLocaleData(en);
 const icons: IconDefinition[] = [...antDesignIcons];
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideHttpClient(),
+    importProvidersFrom(MonacoEditorModule),
+    importProvidersFrom(LogMonitorModule),
     importProvidersFrom(BrowserModule),
     importProvidersFrom(BrowserAnimationsModule),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(appRoutes),
     provideClientHydration(),
-    provideStore(appReducers, { metaReducers }), // Register the root state
+    provideRouter(appRoutes),
+    provideStore(appReducers, { metaReducers }),
+    provideEffects(appEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
     provideAnimationsAsync(),
+    provideRouterStore(),
+    WorkflowService,
+    TaskService,
+    ProcessService,
+    ScheduleService,
     { provide: NZ_ICONS, useValue: icons },
     { provide: NZ_I18N, useValue: en_US },
   ],

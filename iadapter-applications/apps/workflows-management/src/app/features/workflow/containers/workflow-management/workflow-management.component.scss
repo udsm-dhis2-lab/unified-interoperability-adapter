@@ -1,0 +1,11 @@
+button {
+  width: 100%;
+}
+
+.workflow-run-logging {
+  max-height: 62vh !important;
+  overflow-y: auto;
+  font-family: 'Roboto', sans-serif;
+  max-width: 100% !important;
+  scroll-padding-bottom: 0 !important;
+}

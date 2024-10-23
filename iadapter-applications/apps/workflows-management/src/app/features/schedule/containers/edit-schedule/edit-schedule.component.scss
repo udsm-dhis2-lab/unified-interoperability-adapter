@@ -1,0 +1,27 @@
+[nz-row] {
+    // background-color: rgba(128, 128, 128, 0.08);
+    // width: 30vw;
+}
+
+button {
+    width: 100%;
+}
+
+input {
+    width: 100%;
+}
+
+.form-input-container {
+    width: 100%;
+}
+
+[nz-select] {
+    width: 100%;
+}
+
+.disabled-card {
+    pointer-events: none;
+    /* Disable all pointer events */
+    opacity: 0.5;
+    /* Add opacity to give a 'disabled' visual effect */
+}

@@ -1,0 +1,12 @@
+<form [formGroup]="processForm" (ngSubmit)="onSubmit()">
+  <div nz-row>
+      <div class="form-input-container">
+          <!-- Name Input -->
+          <input nz-input placeholder="Name" formControlName="name" type="text" />
+          <br /><br />
+          <!-- Description Input -->
+          <input nz-input placeholder="Description" formControlName="description" type="text" />
+          <br /><br />
+      </div>
+  </div>
+</form>

@@ -4,18 +4,22 @@ export const appRoutes: Route[] = [
     {
         path: '',
         loadChildren: () =>
-            import('../app/pages/workflow/workflow.module').then((m) => m.WorkflowModule),
+            import('../app/features/workflow/workflow.module').then(
+                (m) => m.WorkflowModule
+            ),
     },
     {
-        path: 'home',
+        path: 'schedules',
         loadChildren: () =>
-            import('../app/pages/workflow/workflow.module').then((m) => m.WorkflowModule),
+            import('../app/features/schedule/schedule.module').then(
+                (m) => m.ScheduleModule
+            ),
     },
-    // {
-    //   path: 'deduplication',
-    //   loadChildren: () =>
-    //     import('./modules/deduplication/deduplication.module').then(
-    //       (m) => m.DeduplicationModule
-    //     ),
-    // },
+    {
+        path: 'workflows',
+        loadChildren: () =>
+            import('../app/features/workflow/workflow.module').then(
+                (m) => m.WorkflowModule
+            ),
+    },
 ];

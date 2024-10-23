@@ -1,0 +1,197 @@
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<!-- eslint-disable @angular-eslint/template/label-has-associated-control -->
+<div class="action-container">
+    <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton" style="flex: 1">
+        <input [formControl]="searchControl" type="text" nz-input placeholder="Search Schedules" />
+    </nz-input-group>
+    <ng-template #suffixIconButton>
+        <button nz-button nzType="primary" nzSearch>
+            <span nz-icon nzType="search"></span>
+        </button>
+    </ng-template>
+
+    <button (click)="onAddSchedule()" nz-button nzType="default" style="margin-left: 10px">
+        Add Schedule
+        <!-- <span nz-icon nzType="plus"></span> -->
+    </button>
+</div>
+
+<nz-table #dynamicTable [nzScroll]="{ x: scrollX, y: scrollY }" [nzData]="filteredSchedules" [nzPageSize]="12"
+    [nzTableLayout]="settingValue.tableLayout" [nzBordered]="settingValue.bordered" [nzSimple]="settingValue.simple"
+    [nzLoading]="settingValue.loading" [nzPaginationType]="settingValue.paginationType"
+    [nzPaginationPosition]="settingValue.position" [nzShowSizeChanger]="settingValue.sizeChanger"
+    [nzFrontPagination]="settingValue.pagination" [nzShowPagination]="settingValue.pagination"
+    [nzFooter]="settingValue.footer ? '' : null" [nzTitle]="settingValue.title ? '' : null" [nzSize]="settingValue.size"
+    (nzCurrentPageDataChange)="currentPageDataChange($event)">
+    <thead>
+        @if (settingValue.header) {
+        <tr>
+            @if (settingValue.expandable) {
+            <th nzWidth="40px" [nzLeft]="fixedColumn"></th>
+            } @if (settingValue.checkbox) {
+            <th nzWidth="60px" [(nzChecked)]="allChecked" [nzLeft]="fixedColumn" [nzIndeterminate]="indeterminate"
+                (nzCheckedChange)="checkAll($event)"></th>
+            }
+            <th [nzLeft]="fixedColumn">Name</th>
+            <!-- <th>Description</th> -->
+            <!-- <th>Code</th> -->
+            <th>Created</th>
+            <th>Updated</th>
+            <th [nzRight]="fixedColumn">Workflow</th>
+            <th [nzRight]="fixedColumn">Cron</th>
+            <th [nzRight]="fixedColumn">Info</th>
+            <th [nzRight]="fixedColumn">Schedule Status</th>
+            <th [nzRight]="fixedColumn">Next Run</th>
+            <th [nzRight]="fixedColumn">Action</th>
+        </tr>
+        }
+    </thead>
+    <tbody>
+        @for (data of dynamicTable.data; track data) {
+        <tr>
+            @if (settingValue.expandable) {
+            <td [nzLeft]="fixedColumn" [(nzExpand)]="data.expand"></td>
+            } @if (settingValue.checkbox) {
+            <td [nzLeft]="fixedColumn" [(nzChecked)]="data.checked" (nzCheckedChange)="refreshStatus()"></td>
+            }
+            <td>{{ data.name }}</td>
+            <!-- <td>{{ data.description }}</td> -->
+            <!-- <td>{{ data.code }}</td> -->
+            <td [nzEllipsis]="settingValue.ellipsis">
+                {{ data.created | date : 'fullDate' }}
+            </td>
+            <td [nzEllipsis]="settingValue.ellipsis">
+                {{ data.updated | date : 'fullDate' }}
+            </td>
+            <td [nzEllipsis]="settingValue.ellipsis">
+                {{ data.workflow?.name }}
+            </td>
+            <td [nzEllipsis]="settingValue.ellipsis">
+                {{ data.cron }}
+            </td>
+            <td class="centered-cell" [nzEllipsis]="settingValue.ellipsis">
+                <nz-tag *ngIf="data.status === 'SCHEDULED'" nzColor="blue">{{
+                    data.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="data.status === 'ERROR'" nzColor="red">{{
+                    data.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="data.status === 'RUNNING'" nzColor="orange">{{
+                    data.status
+                    }}</nz-tag>
+            </td>
+            <td class="centered-cell" [nzEllipsis]="settingValue.ellipsis">
+                <nz-tag *ngIf="data.task && data.task.status === 'FINISHED'" nzColor="green">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'ERROR'" nzColor="red">{{ data.task.status }}</nz-tag>
+                <nz-tag *ngIf="data.task && data.task.status === 'RUNNING'" nzColor="red">{{ data.task.status
+                    }}</nz-tag>
+                <nz-tag *ngIf="!data.task" nzColor="gray">{{ 'PENDING' }}</nz-tag>
+            </td>
+
+            <td [nzEllipsis]="settingValue.ellipsis">
+                {{ data?.nextRun | date : 'medium' }}
+            </td>
+            <td>
+                <nz-button-group>
+                    <button [disabled]="data && !data.task" nz-button (click)="onViewLogs(data)">
+                        View Logs
+                    </button>
+                    <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
+                        <span nz-icon nzType="ellipsis"></span>
+                    </button>
+                </nz-button-group>
+                <nz-dropdown-menu #menu1="nzDropdownMenu">
+                    <ul nz-menu>
+                        <li (click)="onEditSchedule(data)" nz-menu-item>
+                            <i nz-icon nzType="edit"></i>
+                            <span class="menu-label">Edit</span>
+                        </li>
+                        <li (click)="onDeleteSchedule(data)" nz-menu-item>
+                            <i nz-icon nzType="delete"></i>
+                            <span class="menu-label">Delete</span>
+                        </li>
+                    </ul>
+                </nz-dropdown-menu>
+            </td>
+        </tr>
+        @if (settingValue.expandable) {
+        <tr  [nzExpand]="data.expand">
+            <div nz-row [nzGutter]="16">
+                <!-- Schedule Information on the left -->
+                <div nz-col class="gutter-row" [nzSpan]="8">
+                    <div class="inner-box">
+                        <h3>Schedule Information</h3>
+                        <ul>
+                            <!-- <li><strong>Schedule ID:</strong> {{ data.id }}</li> -->
+                            <li><strong>Code:</strong> {{ data.code }}</li>
+                            <li><strong>Name:</strong> {{ data.name }}</li>
+                            <li><strong>Description:</strong> {{ data.description }}</li>
+                            <li><strong>Created:</strong> {{ data.created | date : 'fullDate' }} {{ data.created | date:
+                                'shortTime' }}</li>
+                            <li><strong>Updated:</strong> {{ data.updated | date : 'fullDate' }} {{ data.updated | date:
+                                'shortTime' }}</li>
+                            <li><strong>Status:</strong>
+                                <nz-tag *ngIf="data.status === 'SCHEDULED'" nzColor="blue">{{ data.status }}</nz-tag>
+                                <nz-tag *ngIf="data.status === 'RUNNING'" nzColor="orange">{{ data.status }}</nz-tag>
+                                <nz-tag *ngIf="data.status === 'ERROR'" nzColor="red">{{ data.status }}</nz-tag>
+                            </li>
+                            <li><strong>Cron Expression:</strong> {{ data.cron }}</li>
+                            <li><strong>Next Run:</strong> {{ data.nextRun | date : 'fullDate' }} {{ data.nextRun |
+                                date: 'shortTime' }}</li>
+
+
+                        </ul>
+                    </div>
+                </div>
+
+                <div nz-col class="gutter-row" [nzSpan]="8">
+                    <div class="inner-box">
+                        <h3>Workflow Information</h3>
+                        <ul>
+                            <!-- <li><strong>Workflow ID:</strong> {{ data.workflow?.id }}</li> -->
+                            <li><strong>Workflow Name:</strong> {{ data.workflow?.name }}</li>
+                            <li><strong>Workflow Description:</strong> {{ data.workflow?.description }}</li>
+                            <li><strong>Workflow Created:</strong> {{ data.workflow?.created | date : 'fullDate' }} {{
+                                data.workflow?.created | date: 'shortTime' }}</li>
+                            <li><strong>Workflow Updated:</strong> {{ data.workflow?.updated | date : 'fullDate' }} {{
+                                data.workflow?.updated | date: 'shortTime' }}</li>
+
+                        </ul>
+                    </div>
+                </div>
+
+                <div nz-col class="gutter-row" [nzSpan]="8">
+                    <div class="inner-box">
+                        <h3>Task Information</h3>
+                        <ul>
+                            <!-- <li><strong>Task ID:</strong> {{ data.task?.id }}</li> -->
+                            <li><strong>Task Name:</strong> {{ data.task?.name }}</li>
+                            <li><strong>Task Status:</strong>
+                                <nz-tag *ngIf="data.task?.status === 'FINISHED'" nzColor="green">{{ data.task?.status
+                                    }}</nz-tag>
+                                <nz-tag *ngIf="data.task?.status === 'ERROR'" nzColor="red">{{ data.task?.status
+                                    }}</nz-tag>
+                            </li>
+                            <li><strong>Task Created:</strong> {{ data.task?.created | date : 'fullDate' }} {{
+                                data.task?.created | date: 'shortTime' }}</li>
+                            <li><strong>Task Updated:</strong> {{ data.task?.updated | date : 'fullDate' }} {{
+                                data.task?.updated | date: 'shortTime' }}</li>
+                            <li><strong>Task Started:</strong> {{ data.task?.started | date : 'fullDate' }} {{
+                                data.task?.started | date: 'shortTime' }}</li>
+                            <li><strong>Task Ended:</strong> {{ data.task?.ended | date : 'fullDate' }} {{
+                                data.task?.ended | date: 'shortTime' }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </tr>
+        } }
+    </tbody>
+</nz-table>
+
+<div class="schedule-run-logging">
+    <app-schedule-run-logging
+        [currentExecutedScheduleTask]="currentExecutedScheduleTask$ | async"></app-schedule-run-logging>
+</div>

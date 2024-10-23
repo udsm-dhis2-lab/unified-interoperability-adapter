@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { icons } from './ant-design-icons.constants';
 import { antDesignModules } from './ant-design.modules';
 import { Menu } from './models/menu.model';
+import { User } from './models/user.model';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'lib-hdu-api-nav-menu',
@@ -13,7 +15,8 @@ import { Menu } from './models/menu.model';
   styleUrl: './hdu-api-nav-menu.component.less',
   providers: [{ provide: NZ_ICONS, useValue: icons }],
 })
-export class HduApiNavMenuComponent {
+export class HduApiNavMenuComponent implements OnInit {
+  currentUser: User | null = null;
   menus: Menu[] = [
     {
       name: 'Dashboard',
@@ -49,7 +52,13 @@ export class HduApiNavMenuComponent {
       subMenus: [
         {
           name: 'Workflows',
-          routeUrl: '/home',
+          routeUrl: '/workflows',
+          icon: 'calendar',
+          subMenus: [],
+        },
+        {
+          name: 'Schedules',
+          routeUrl: '/schedules',
           icon: 'unordered-list',
           subMenus: [],
         },
@@ -79,7 +88,13 @@ export class HduApiNavMenuComponent {
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();
 
-  constructor() {}
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    // this.authService.currentUser$.subscribe((user) => {
+    //   this.currentUser = user;
+    // });
+  }
 
   onRouteTo(event: Event, menu: Menu): void {
     event.stopPropagation();
