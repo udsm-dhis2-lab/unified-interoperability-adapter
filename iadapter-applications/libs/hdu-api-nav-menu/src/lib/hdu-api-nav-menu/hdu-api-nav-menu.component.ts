@@ -17,13 +17,13 @@ export class HduApiNavMenuComponent {
   menus: Menu[] = [
     {
       name: 'Dashboard',
-      routeUrl: '/dashboard/',
+      routeUrl: '/dashboard',
       icon: 'apartment',
       category: 'main',
     },
     {
       name: 'Client Management',
-      routeUrl: '/client-management/',
+      routeUrl: '/client-management',
       icon: 'user',
       category: 'main',
       subMenus: [
@@ -43,7 +43,7 @@ export class HduApiNavMenuComponent {
     },
     {
       name: 'Worflow Management',
-      routeUrl: '/worflow-management/',
+      routeUrl: '/worflow-management',
       icon: 'apartment',
       category: 'main',
       subMenus: [
@@ -57,7 +57,7 @@ export class HduApiNavMenuComponent {
     },
     {
       name: 'Mapping and Data Extraction',
-      routeUrl: '/mapping-and-data-extraction/',
+      routeUrl: '/mapping-and-data-extraction',
       icon: 'apartment',
       category: 'main',
       subMenus: [
