@@ -708,7 +708,9 @@ public class HDUAPIController {
                 mapping.setUuid (datastore.getUuid());
                 mapping.setDataKey(datastore.getDataKey());
                 mapping.setNamespace(datastore.getNamespace());
-                mapping.setGroup(datastore.getDatastoreGroup());
+                if (datastore.getDatastoreGroup() != null) {
+                    mapping.setGroup(datastore.getDatastoreGroup());
+                }
                 mapping.setDescription(datastore.getDescription());
                 mapping.setMapping(datastore.getValue());
                 namespaceDetails.add(mapping);
@@ -732,14 +734,17 @@ public class HDUAPIController {
         try {
             MappingsDTO response = new MappingsDTO();
             Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
-            response.setUuid (datastore.getUuid());
-            response.setDataKey(datastore.getDataKey());
-            response.setNamespace(datastore.getNamespace());
-            response.setGroup(datastore.getDatastoreGroup());
-            response.setDescription(datastore.getDescription());
-            response.setMapping(datastore.getValue());
+            if (datastore != null) {
+                response.setUuid (datastore.getUuid());
+                response.setDataKey(datastore.getDataKey());
+                response.setNamespace(datastore.getNamespace());
+                response.setGroup(datastore.getDatastoreGroup());
+                response.setDescription(datastore.getDescription());
+                response.setMapping(datastore.getValue());
+            }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -750,14 +755,17 @@ public class HDUAPIController {
         try {
             MappingsDTO response = new MappingsDTO();
             Datastore datastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
-            response.setUuid (datastore.getUuid());
-            response.setDataKey(datastore.getDataKey());
-            response.setNamespace(datastore.getNamespace());
-            response.setGroup(datastore.getDatastoreGroup());
-            response.setDescription(datastore.getDescription());
-            response.setMapping(datastore.getValue());
+            if (datastore != null) {
+                response.setUuid (datastore.getUuid());
+                response.setDataKey(datastore.getDataKey());
+                response.setNamespace(datastore.getNamespace());
+                response.setGroup(datastore.getDatastoreGroup());
+                response.setDescription(datastore.getDescription());
+                response.setMapping(datastore.getValue());
+            }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -776,6 +784,7 @@ public class HDUAPIController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
@@ -807,6 +816,9 @@ public class HDUAPIController {
             @RequestBody MappingsDTO mappings) throws Exception {
         try {
             Datastore datastore = new Datastore();
+            if (mappings.getUuid() != null) {
+                datastore.setUuid(mappings.getUuid());
+            }
             datastore.setNamespace(mappings.getNamespace());
             datastore.setDataKey(mappings.getDataKey());
             datastore.setDatastoreGroup(mappings.getGroup());
