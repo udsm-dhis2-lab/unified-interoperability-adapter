@@ -99,7 +99,11 @@ export class HduApiNavMenuComponent implements OnInit {
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {
+    this.activeMainMenuId = !this.activeMainMenuId
+      ? 'dashboard'
+      : this.activeMainMenuId;
+  }
 
   ngOnInit(): void {}
 
