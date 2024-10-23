@@ -10,8 +10,15 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-exctraction/src/app/shared/components';
-import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
+import {
+  BehaviorSubject,
+  debounceTime,
+  Observable,
+  Subscription,
+  switchMap,
+} from 'rxjs';
 import { ConfigurationPage, IcdCodePage } from '../../models';
+import { Action } from 'rxjs/internal/scheduler/Action';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -50,6 +57,7 @@ class Disaggregation {
 })
 export class DatasetMappingComponent implements OnInit {
   isSubmittingMapping: boolean = false;
+  mappingUuid?: string;
 
   alert = {
     show: false,
@@ -176,6 +184,7 @@ export class DatasetMappingComponent implements OnInit {
       .getMappingFromDataStore(this.selectedInputId)
       .subscribe({
         next: (data: any) => {
+          this.mappingUuid = data.uuid;
           if (data.value.mappings.length > 0) {
             this.useIcdCodes = true;
             this.selectedICdCodes = data.value.mappings.map(
@@ -242,6 +251,9 @@ export class DatasetMappingComponent implements OnInit {
               }
             }
           }
+        },
+        error: (error: any) => {
+          this.mappingUuid = undefined;
         },
         //TODO: Implement error handling
       });
@@ -413,14 +425,25 @@ export class DatasetMappingComponent implements OnInit {
       description: '',
       group: '',
     };
-    console.log("CONFIGURATION", payLoad)
     return payLoad;
   }
 
   onSubmitMappings() {
     this.isSubmittingMapping = true;
     const payLoad: any = this.createMappingsPayload();
-    this.dataSetManagementService.addMappings(payLoad).subscribe({
+    let action$: Observable<any>;
+
+    if (this.mappingUuid !== undefined) {
+      payLoad.uuid = this.mappingUuid;
+      action$ = this.dataSetManagementService.updateMappings(
+        payLoad,
+        this.mappingUuid
+      );
+    } else {
+      action$ = this.dataSetManagementService.addMappings(payLoad);
+    }
+
+    action$.subscribe({
       next: (data: any) => {
         this.isSubmittingMapping = false;
         this.alert = {

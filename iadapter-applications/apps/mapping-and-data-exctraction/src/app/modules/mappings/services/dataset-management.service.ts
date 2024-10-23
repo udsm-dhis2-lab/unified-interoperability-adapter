@@ -26,6 +26,7 @@ export class DatasetManagementService {
   configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
   addMappingsUrl: string = MappingsUrls.ADD_MAPPINGS;
   getMappingsUrl: string = MappingsUrls.GET_MAPPINGS_FROM_DATASTORE;
+  updateMappingsUrl: string = MappingsUrls.UPDATE_MAPPING;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -187,6 +188,16 @@ export class DatasetManagementService {
       );
   }
 
+  updateMappings(payLoad: any, mappingUuid: string): Observable<any> {
+    return this.httpClient
+      .put<any>(`${this.updateMappingsUrl}/${mappingUuid}`, payLoad)
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
   private buildHttpParams(
     pageIndex: number,
     pageSize: number,
@@ -208,7 +219,6 @@ export class DatasetManagementService {
   }
 
   private handleError(error: any): never {
-    console.log('ERRORRR', error);
     if (error.status === 401) {
       throw new UnAuothorizedException('Invalid username or password');
     }
