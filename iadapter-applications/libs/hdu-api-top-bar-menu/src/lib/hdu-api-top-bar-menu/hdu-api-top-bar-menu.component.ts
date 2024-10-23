@@ -39,11 +39,10 @@ export class HduApiTopBarMenuComponent implements OnInit {
   ngOnInit(): void {
     this.applicationIcon = TZNationalEmblemIcon;
     this.selectedSideMenuName = this.sideMenuService.getMenuNameByRoute();
-
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
-      if (user && user.name) {
-        this.currentUserInitials = getInitials(user.name);
+      if (user && user.displayName) {
+        this.currentUserInitials = getInitials(user.displayName);
       }
     });
   }

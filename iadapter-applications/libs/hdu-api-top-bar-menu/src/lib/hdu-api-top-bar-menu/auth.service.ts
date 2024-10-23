@@ -19,17 +19,17 @@ export class AuthService {
 
   login(credentials: { username: string; password: string }): Observable<User> {
     return this.http
-      .post<User>('../../../engine/login', credentials)
+      .post<User>('../../../api/v1/login', credentials)
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 
-  logout(): void {
-    this.currentUserSubject.next(null);
+  logout(): Observable<string> {
+    return this.http.get<string>('../../../api/v1/logout');
   }
 
   fetchCurrentUser(): Observable<User> {
     return this.http
-      .get<User>('../../../engine/me')
+      .get<User>('../../../api/v1/me')
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 }

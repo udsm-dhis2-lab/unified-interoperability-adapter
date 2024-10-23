@@ -1,6 +1,9 @@
 export interface CurrentUserModel {
   uuid: string;
   authenticated: boolean;
+  displayName: string;
+  firstName: string;
+  lastName: string;
   username: string;
   externalAuth: string;
   groups: GroupModel[];
