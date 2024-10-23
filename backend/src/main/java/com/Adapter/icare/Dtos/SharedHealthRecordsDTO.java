@@ -66,6 +66,8 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("facilityDetails", this.getFacilityDetails());
         sharedRecordMap.put("reportingDetails", this.getReportDetails());
         sharedRecordMap.put("demographicDetails", this.getDemographicDetails());
+        sharedRecordMap.put("visitDetails", this.getVisitDetails());
+        sharedRecordMap.put("clinicalInformation", this.getClinicalInformation());
         return  sharedRecordMap;
     }
 }

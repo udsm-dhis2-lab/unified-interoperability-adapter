@@ -159,8 +159,19 @@ public class SharedHealthRecordsService {
                         // Get clinicalInformation
                         // 1. clinicalInformation - vital signs
                         List<Map<String,Object>> vitalSigns =  new ArrayList<>();
-                        // 1. Get Observation Group
-                        List<Observation> observationGroup = getObservationsByCategory("vital-signs", encounter);
+                        // Get Observation Group
+                        System.out.println(encounter.getIdElement().getIdPart());
+                        List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
+                        System.out.println(observationGroups.size());
+                        for(Observation observationGroup: observationGroups) {
+                            // Get observations mapped to this group
+                            System.out.println(observationGroup.getIdElement().getIdPart());
+                            List<Observation> observationsData = getObservationsByObservationGroupId(
+                                    "vital-signs",
+                                    encounter,
+                                    observationGroup.getIdElement().getIdPart());
+                            System.out.println(observationsData.size());
+                        }
 
                         // TODO: Add history when numberOfVisits > 1
                     } else if (organization != null) {
@@ -349,18 +360,42 @@ public class SharedHealthRecordsService {
         return List.of();
     }
 
-    public List<Observation> getObservationsByCategory(String category, Encounter encounter) throws Exception {
+    public List<Observation> getObservationsByCategory(String category,
+                                                       Encounter encounter,
+                                                       boolean forGroup) throws Exception {
         List<Observation> observations = new ArrayList<>();
         var observationSearch = fhirClient.search().forResource(Observation.class)
-                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getId()));
+                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
         observationSearch.where(Observation.CATEGORY.exactly().code(category));
         Bundle observationBundle = new Bundle();
-        observationBundle = observationSearch.returnBundle(Bundle.class)
-                .execute();
+        observationBundle = observationSearch.returnBundle(Bundle.class).execute();
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
                 Observation observationGroup = (Observation) entryComponent.getResource();
-                observations.add(observationGroup);
+                if (forGroup && !observationGroup.hasDerivedFrom() && !observationGroup.hasHasMember()) {
+                    observations.add(observationGroup);
+                }
+            }
+        }
+
+        return observations;
+    }
+
+    public List<Observation> getObservationsByObservationGroupId(String category,
+                                                               Encounter encounter,
+                                                               String id) throws Exception {
+        List<Observation> observations = new ArrayList<>();
+        System.out.println(id);
+        var observationSearch = fhirClient.search().forResource(Observation.class)
+                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
+        observationSearch.where(Observation.CATEGORY.exactly().code(category));
+        observationSearch.where(Observation.HAS_MEMBER.hasId(id));
+        Bundle observationBundle = new Bundle();
+        observationBundle = observationSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
+                Observation observation = (Observation) entryComponent.getResource();
+                observations.add(observation);
             }
         }
 

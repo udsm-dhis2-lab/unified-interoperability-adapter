@@ -163,4 +163,4 @@ jobs:
           git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
           # Push the changes back to the repository
-          git push origin ${{ github.ref_name }}
+          git push origin develop
