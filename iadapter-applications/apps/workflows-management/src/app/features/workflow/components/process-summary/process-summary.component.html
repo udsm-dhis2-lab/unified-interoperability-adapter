@@ -7,7 +7,7 @@
 
   <div class="narrative-summary">
     <ul>
-      <li><strong>Code:</strong> {{ currentSelectedProcess.code }}</li>
+      <li><strong>Code:</strong> {{ currentSelectedProcess?.code }}</li>
       <li>
         <strong>Creation Date:</strong>
         {{ currentSelectedProcess.created | date : 'fullDate' }}

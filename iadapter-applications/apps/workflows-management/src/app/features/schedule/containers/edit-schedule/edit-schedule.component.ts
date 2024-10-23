@@ -34,7 +34,7 @@ import {
   getCurrentSelectedSchedule,
   getUpdatedScheduleStatus,
 } from '../../state/schedule/schedule.selectors';
-import { getUidFromRoute } from '../../../workflow/helpers/workflow.helper';
+import { getWorkflowUidFromRoute } from '../../../workflow/helpers/workflow.helper';
 
 @Component({
   selector: 'app-edit-schedule',
@@ -129,7 +129,7 @@ export class EditScheduleComponent implements OnInit, AfterViewInit {
       select(getAddedWorkflowStatus)
     );
 
-    const currentScheduleUid = getUidFromRoute(this.route);
+    const currentScheduleUid = getWorkflowUidFromRoute(this.route);
 
     if (currentScheduleUid) {
       this.scheduleState.dispatch(

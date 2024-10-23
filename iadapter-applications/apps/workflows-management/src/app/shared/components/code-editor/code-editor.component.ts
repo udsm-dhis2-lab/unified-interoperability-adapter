@@ -19,17 +19,17 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { select, Store } from '@ngrx/store';
 import { WorkflowState } from '../../../features/workflow/state/workflow/workflow.state';
-import {
-  getCurrentSelectedProcess,
-  getCurrentSelectedWorkflow,
-} from '../../../features/workflow/state/workflow/workflow.selectors';
+
 import { Process } from '../../../features/workflow/models/process.model';
-import { getUidFromRoute } from '../../../features/workflow/helpers/workflow.helper';
-import { WorkflowActions } from '../../../features/workflow/state/workflow/workflow.actions';
+import {
+  getProcessUidFromRoute,
+  getWorkflowUidFromRoute,
+} from '../../../features/workflow/helpers/workflow.helper';
 import { skip, take } from 'rxjs';
-import { Workflow } from '../../../features/workflow/models/workflow.model';
 import { ProcessActions } from '../../../features/workflow/state/process/process.actions';
 import { omit } from 'lodash';
+import { getCurrentSelectedProcess } from '../../../features/workflow/state/process/process.selectors';
+import { WorkflowActions } from '../../../features/workflow/state/workflow/workflow.actions';
 
 // Create a configuration object for the Monaco Editor
 const monacoConfig: NgxMonacoEditorConfig = {
@@ -76,7 +76,8 @@ export class CodeEditorComponent implements OnInit {
 
   ngOnInit(): void {
     this.editorOptionsParams = { theme: 'vs-dark', language: 'javascript' };
-    this.codeSnippet = 'function x() {\nconsole.log("Hello world!");\n}';
+    this.codeSnippet =
+      'function x() {\nconsole.log("Welcome to HDU Implementation!");\n}';
 
     this.workflowState
       .pipe(select(getCurrentSelectedProcess), take(1))
@@ -86,7 +87,9 @@ export class CodeEditorComponent implements OnInit {
         }
       });
 
-    const currentWorkflowUid = getUidFromRoute(this.route);
+    const currentWorkflowUid = getWorkflowUidFromRoute(this.route);
+
+    const currentProcessUid = getProcessUidFromRoute(this.route);
 
     if (currentWorkflowUid) {
       this.workflowState.dispatch(
@@ -94,12 +97,23 @@ export class CodeEditorComponent implements OnInit {
           id: currentWorkflowUid,
         })
       );
+    }
 
-      this.workflowState
-        .pipe(select(getCurrentSelectedWorkflow), skip(1), take(1))
-        .subscribe((workflow: Workflow | null) => {
-          if (workflow && workflow.process && workflow.process.script) {
-            this.codeSnippet = workflow.process.script;
+    if (currentProcessUid) {
+      this.processState.dispatch(
+        ProcessActions.loadProcess({
+          id: currentProcessUid,
+        })
+      );
+
+      this.processState
+        .pipe(select(getCurrentSelectedProcess), skip(1), take(1))
+        .subscribe((process: Process | null) => {
+          if (process && process.script) {
+            this.workflowState.dispatch(
+              WorkflowActions.setSelectedProcess({ process })
+            );
+            this.codeSnippet = process.script;
           }
         });
     }
@@ -121,7 +135,6 @@ export class CodeEditorComponent implements OnInit {
     };
   }
 
-
   onUpdateProcessCodeSnippet() {
     this.workflowState
       .pipe(select(getCurrentSelectedProcess), take(1))
@@ -131,6 +144,14 @@ export class CodeEditorComponent implements OnInit {
             ProcessActions.updateProcess({
               process: {
                 ...omit(currentSelectedProcess, ['children']),
+                script: this.codeSnippet,
+              },
+            })
+          );
+          this.workflowState.dispatch(
+            WorkflowActions.setSelectedProcess({
+              process: {
+                ...currentSelectedProcess,
                 script: this.codeSnippet,
               },
             })

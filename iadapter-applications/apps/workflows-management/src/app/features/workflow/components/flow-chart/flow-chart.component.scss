@@ -314,3 +314,15 @@ div#canvas[disabled='true'] ::ng-deep.ngflowchart-step-wrapper {
 // ******************************************************************
 //    END::: PROCESS CARD DETAILS
 // ******************************************************************
+
+
+.horizontal-buttons {
+  display: flex;
+  gap: 0px; /* Space between buttons */
+  justify-content: flex-start; /* Align to the left */
+  align-items: center; /* Center align vertically */
+}
+
+button {
+  /* Optional: Add some padding or other button styles if needed */
+}

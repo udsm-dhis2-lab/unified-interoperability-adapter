@@ -22,9 +22,10 @@ import { ProcessState } from 'apps/workflows-management/src/app/features/workflo
 import { select, Store } from '@ngrx/store';
 import { WorkflowState } from 'apps/workflows-management/src/app/features/workflow/state/workflow/workflow.state';
 import { Workflow } from 'apps/workflows-management/src/app/features/workflow/models/workflow.model';
-import { getCurrentSelectedWorkflow } from '../../state/workflow/workflow.selectors';
+import { getCurrentSelectedProcessInWorkflow, getCurrentSelectedWorkflow } from '../../state/workflow/workflow.selectors';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { take } from 'rxjs';
+import { Process } from '../../models/process.model';
 
 @Component({
   selector: 'app-add-flow',
@@ -42,12 +43,12 @@ import { take } from 'rxjs';
     MonacoEditorModule,
     CodeEditorComponent,
     ReactiveFormsModule,
-    NzCardModule
+    NzCardModule,
   ],
-  templateUrl: './add-flow.component.html',
-  styleUrl: './add-flow.component.scss',
+  templateUrl: './update-process.component.html',
+  styleUrl: './update-process.component.scss',
 })
-export class AddFlowComponent implements OnInit {
+export class UpdateProcessComponent implements OnInit {
   processForm!: FormGroup;
   currentSelectedWorkflow!: Workflow;
   selectedTabIndex = 0;
@@ -65,6 +66,14 @@ export class AddFlowComponent implements OnInit {
       code: ['', [Validators.required]],
       description: ['', [Validators.required]],
     });
+
+    this.workFlowState
+      .pipe(select(getCurrentSelectedProcessInWorkflow))
+      .subscribe((currentSelectedProcess: Process | null) => {
+        if (currentSelectedProcess) {
+          this.processForm.patchValue(currentSelectedProcess);
+        }
+      });
   }
 
   onSubmit() {
@@ -94,7 +103,6 @@ export class AddFlowComponent implements OnInit {
 
   editorOptions = { theme: 'vs-dark', language: 'javascript' };
   code = 'function x() {\nconsole.log("Hello world!");\n}';
-
 
   isVisible = false;
 

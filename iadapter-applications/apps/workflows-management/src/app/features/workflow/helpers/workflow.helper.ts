@@ -233,8 +233,13 @@ export function searchProcessWithWorkflows(
 
 
 // Helper function to get 'id' from the current route
-export function getUidFromRoute(route: ActivatedRoute): string | null {
-  return route.snapshot.paramMap.get('id');
+export function getWorkflowUidFromRoute(route: ActivatedRoute): string | null {
+  return route.snapshot.paramMap.get('workflowId');
+}
+
+// Helper function to get 'id' from the current route
+export function getProcessUidFromRoute(route: ActivatedRoute): string | null {
+  return route.snapshot.paramMap.get('procId');
 }
 
 export function extractUidFromUrl(url: string): string | null {
@@ -260,7 +265,9 @@ export function toCamelCase(word: string) {
     .join(''); // Join the words back together with no spaces
 }
 
-export function extractIdFromPath(url: string): string {
+export function extractIdFromPath(url: string, index: number): string {
   const parts = url.split('/');
-  return parts.pop() || '';
+  return parts[index] || '';
 }
+
+

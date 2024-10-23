@@ -13,10 +13,6 @@ const routes: Routes = [
     component: WorkflowComponent,
   },
   {
-    path: 'process',
-    component: ProcessComponent,
-  },
-  {
     path: 'config',
     component: WorkflowManagementComponent,
     children: [
@@ -26,40 +22,18 @@ const routes: Routes = [
         pathMatch: 'full',
       },
       {
-        path: 'flow/:id',
+        path: 'flow/:workflowId',
         component: FlowchartComponent,
         pathMatch: 'full',
       },
       {
-        path: 'code-editor/:id',
+        path: 'code-editor/:workflowId/proc/:procId',
         component: CodeEditorComponent,
         pathMatch: 'full',
       }
     ]
   },
-  // {
-  //   path: 'main',
-  //   component: MainComponent,
-  //   children: [
-  //     {
-  //       path: '',
-  //       redirectTo: 'flow',
-  //       pathMatch: 'full',
-  //     },
-  //     {
-  //       path: 'flow',
-  //       component: FlowchartComponent,
-  //     },
-  //     {
-  //       path: 'flow/:id',
-  //       component: FlowchartComponent,
-  //     },
-  //     {
-  //       path: 'code-editor/:id',
-  //       component: CodeEditorComponent,
-  //     },
-  //   ],
-  // },
+
 ];
 
 @NgModule({

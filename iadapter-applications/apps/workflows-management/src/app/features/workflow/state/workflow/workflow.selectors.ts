@@ -123,7 +123,7 @@ export const getRunningWorkflowStatus = createSelector(
 );
 
 
-export const getCurrentSelectedProcess = createSelector(
+export const getCurrentSelectedProcessInWorkflow = createSelector(
     getWorkflowFeature,
     (state: WorkflowState) => state?.currentSelectedProcess
 );

@@ -23,6 +23,7 @@ export const WorkflowActions = createActionGroup({
     }>(),
     'Set Current Selected Workflow': props<{ workflow: Workflow }>(),
     'Set Current Selected Process': props<{ id: string }>(),
+    'Set Selected Process': props<{ process: Process }>(),
     'Set Edited Workflow': props<{ workflow: Workflow }>(),
     'Get Get Current Selected Process': props<{ id: string }>(),
     'Load Workflow': props<{ id: string }>(),
