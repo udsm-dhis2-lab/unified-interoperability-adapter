@@ -4,6 +4,7 @@ import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
+import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
@@ -34,6 +35,7 @@ public class SharedHealthRecordsController {
     private final SharedHealthRecordsService sharedHealthRecordsService;
     private final DatastoreConstants datastoreConstants;
     private final ClientRegistryConstants clientRegistryConstants;
+    private final SharedRecordsConstants sharedRecordsConstants;
     private final Authentication authentication;
     private final UserService userService;
     private final User authenticatedUser;
@@ -52,7 +54,8 @@ public class SharedHealthRecordsController {
             SharedHealthRecordsService sharedHealthRecordsService,
             DatastoreService datastoreService,
             ClientRegistryService clientRegistryService,
-            MediatorsService mediatorsService) throws Exception {
+            MediatorsService mediatorsService,
+            SharedRecordsConstants sharedRecordsConstants) throws Exception {
         this.sharedHealthRecordsService = sharedHealthRecordsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryConstants = clientRegistryConstants;
@@ -60,6 +63,7 @@ public class SharedHealthRecordsController {
         this.datastoreService = datastoreService;
         this.clientRegistryService = clientRegistryService;
         this.mediatorsService = mediatorsService;
+        this.sharedRecordsConstants =  sharedRecordsConstants;
         try {
             Datastore configs = this.datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.MandatoryClientRegistryIdTypes);
             if (configs!= null) {
@@ -121,33 +125,38 @@ public class SharedHealthRecordsController {
             @RequestParam( value = "numberOfVisits", defaultValue = "1") Integer numberOfVisits
     ) throws Exception {
         try {
-//            Map<String,Object> sharedRecordsResponse = this.sharedHealthRecordsService.getSharedRecordsWithPagination(
-//                    page,
-//                    pageSize,
-//                    id,
-//                    idType,
-//                    onlyLinkedClients,
-//                    gender,
-//                    firstName,
-//                    middleName,
-//                    lastName,
-//                    hfrCode,
-//                    includeDeceased,
-//                    numberOfVisits);
-            Map <String,Object> payload = new HashMap<>();
-            payload.put("code","SEARCH-CLIENT");
-            Map<String,Object> body = new HashMap<>();
-            List<Map<String,Object>> identifiers = new ArrayList<>();
-            Map<String,Object> identifier = new HashMap<>();
-            identifier.put("value", id);
-            identifier.put("type", idType);
-            identifiers.add(identifier);
-            body.put("identifiers",identifiers);
-            body.put("page", page);
-            body.put("pageSize", pageSize);
-            payload.put("body", body);
-            String response = this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true");
-            return ResponseEntity.ok(response);
+            if (!sharedRecordsConstants.ShouldGetSharedRecordsFromEngine) {
+                Map<String,Object> sharedRecordsResponse = this.sharedHealthRecordsService.getSharedRecordsWithPagination(
+                    page,
+                    pageSize,
+                    id,
+                    idType,
+                    onlyLinkedClients,
+                    gender,
+                    firstName,
+                    middleName,
+                    lastName,
+                    hfrCode,
+                    includeDeceased,
+                    numberOfVisits);
+                return ResponseEntity.ok(sharedRecordsResponse.toString());
+            } else {
+                Map <String,Object> payload = new HashMap<>();
+                payload.put("code","SEARCH-CLIENT");
+                Map<String,Object> body = new HashMap<>();
+                List<Map<String,Object>> identifiers = new ArrayList<>();
+                Map<String,Object> identifier = new HashMap<>();
+                identifier.put("value", id);
+                identifier.put("type", idType);
+                identifiers.add(identifier);
+                body.put("identifiers",identifiers);
+                body.put("page", page);
+                body.put("pageSize", pageSize);
+                payload.put("body", body);
+                String response = this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true");
+                return ResponseEntity.ok(response);
+            }
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -179,5 +188,4 @@ public class SharedHealthRecordsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
         }
     }
-
 }
