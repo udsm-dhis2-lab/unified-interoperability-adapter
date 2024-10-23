@@ -10,12 +10,7 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
-import {
-  BehaviorSubject,
-  debounceTime,
-  Observable,
-  switchMap,
-} from 'rxjs';
+import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
 import { ConfigurationPage, IcdCodePage } from '../../models';
 
 export interface MappingsData {
@@ -104,11 +99,8 @@ export class DatasetMappingComponent implements OnInit {
     options: any[];
   }): void {
     this.mappingsData.disagregations.forEach((item) => {
-      if (!item.configurations) {
-        item.configurations = [];
-      }
       item.configurations = [
-        ...item.configurations,
+        ...(item.configurations ?? []),
         {
           name: configuration.name,
           options: configuration.options,
@@ -269,8 +261,6 @@ export class DatasetMappingComponent implements OnInit {
       .getCategoryOptionCombos(dataElementUuid)
       .subscribe({
         next: (data: any) => {
-          this.mappingsData.disagregations = [];
-
           const preSelectedInputs = this.elRef.nativeElement.querySelectorAll(
             'input[name="entryfield"][style*="background-color: green"]'
           );
