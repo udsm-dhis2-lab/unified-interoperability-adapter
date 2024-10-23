@@ -65,8 +65,12 @@
               style="margin-top: 16px; margin-bottom: 16px"
             >
               <nz-card style="width: 100%">
-                @for (icdCode of selectedICdCodes?? []; track $index) {
-                <nz-tag>{{ icdCode ?? '' }}</nz-tag>
+                @for (icdCode of selectedICdCodes; track $index) {
+                <nz-tag
+                  nzMode="closeable"
+                  (nzOnClose)="onRemoveIcdCode(icdCode)"
+                  >{{ icdCode ?? '' }}</nz-tag
+                >
                 }
               </nz-card>
             </div>
@@ -97,7 +101,7 @@
                         "
                       >
                         <nz-select
-                          ngModel="default"
+                          [ngModel]="config.selectedValue ?? 'default'"
                           (ngModelChange)="
                             onSelectMappingSetting({
                               value: $event,
@@ -119,8 +123,8 @@
                             ></nz-option>
                           </ng-container>
                           <nz-option
-                            nzValue="default"
-                            nzLabel="Select"
+                            [nzValue]="config.selectedValue ?? 'default'"
+                            [nzLabel]="config.name"
                             nzHide
                           ></nz-option>
                         </nz-select>
@@ -133,12 +137,22 @@
             </div>
           </nz-card>
 
-          <div
-            nz-row
-            nzJustify="end"
-            style="margin-top: 16; margin-bottom: 16px"
-          >
-            <nz-spin [nzSpinning]="isSubmittingMapping">
+          <div class="action-buttons-row">
+            <nz-spin
+              *ngIf="mappingUuid != null"
+              [nzSpinning]="isDeletingMapping"
+              class="button-padding"
+            >
+              <button
+                nz-button
+                nzType="default"
+                (click)="deleteMapping()"
+                nzDanger
+              >
+                Delete mappings
+              </button>
+            </nz-spin>
+            <nz-spin [nzSpinning]="isSubmittingMapping" class="button-padding">
               <button nz-button nzType="primary" (click)="onSubmitMappings()">
                 Save mappings
               </button>

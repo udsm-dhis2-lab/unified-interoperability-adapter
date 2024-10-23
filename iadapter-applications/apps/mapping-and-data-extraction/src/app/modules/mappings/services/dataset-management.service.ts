@@ -24,7 +24,10 @@ export class DatasetManagementService {
   instanceUrl: string = MappingsUrls.GET_INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
   configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
-  addMappingsUrl: string = MappingsUrls.ADD_MAPPINGS;
+  addMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
+  getMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
+  updateMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
+  deleteMappingUrl: string = MappingsUrls.HDU_MAPPINGS;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -173,6 +176,39 @@ export class DatasetManagementService {
     );
   }
 
+  getMappingFromDataStore(dataElementUud: string, datasetUuid: string) {
+    return this.httpClient
+      .get<any>(
+        `${MappingsUrls.HDU_MAPPINGS}/MAPPINGS-${datasetUuid}/${dataElementUud}`
+      )
+      .pipe(
+        map((response: any) => {
+          return response;
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  updateMappings(payLoad: any, mappingUuid: string): Observable<any> {
+    return this.httpClient
+      .put<any>(`${this.updateMappingsUrl}/${mappingUuid}`, payLoad)
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  deleteMapping(mappingUuid: string): Observable<any> {
+    return this.httpClient
+      .delete<any>(`${this.deleteMappingUrl}/${mappingUuid}`, {})
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
   private buildHttpParams(
     pageIndex: number,
     pageSize: number,
@@ -194,7 +230,6 @@ export class DatasetManagementService {
   }
 
   private handleError(error: any): never {
-    console.log('ERRORRR', error);
     if (error.status === 401) {
       throw new UnAuothorizedException('Invalid username or password');
     }

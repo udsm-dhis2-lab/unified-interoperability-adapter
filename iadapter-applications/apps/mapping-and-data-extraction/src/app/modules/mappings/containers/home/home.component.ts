@@ -14,6 +14,7 @@ import {
   Observable,
   Subscription,
   switchMap,
+  take,
 } from 'rxjs';
 import {
   Dataset,
@@ -27,6 +28,7 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { Router } from '@angular/router';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-home',
@@ -64,7 +66,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
 
   constructor(
     private dataSetManagementService: DatasetManagementService,
-    private router: Router
+    private router: Router,
+    private modal: NzModalService
   ) {}
 
   onInstanceSearch(value: string): void {
@@ -143,6 +146,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     this.searchInstances();
   }
 
+  /**
+   * Search for instances based on the input in the search bar.
+   * Debounce for 500ms and fetch the first page of instances.
+   * Set the selectedInstance to the first instance in the list :- This is done on first load.
+   * Load the datasets for the selected instance.
+   */
   searchInstances() {
     const optionList$: Observable<InstancePage> = this.searchInstanceChange$
       .asObservable()
@@ -151,12 +160,21 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
         switchMap((value: string) => {
           return this.dataSetManagementService.getInstances(1, 10, true, []);
         })
-        // first()
       );
 
     optionList$.subscribe({
       next: (data: any) => {
         this.instancesOptionList = data.listOfInstances;
+        this.isInstanceFetchingLoading = false;
+      },
+      error: (error: any) => {
+        // TODO: Implement error handling
+        this.isInstanceFetchingLoading = false;
+      },
+    });
+
+    optionList$.pipe(take(1)).subscribe((data: any) => {
+      if (this.instancesOptionList.length > 0) {
         this.selectedInstance = this.instancesOptionList[0].uuid;
         this.loadDatasetsFromServer(
           this.pageIndex,
@@ -165,11 +183,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
           [{ key: 'instance', value: [this.selectedInstance!] }]
         );
         this.isInstanceFetchingLoading = false;
-      },
-      error: (error: any) => {
-        // TODO: Implement error handling
-        this.loading = false;
-      },
+      }
     });
   }
 
@@ -248,26 +262,32 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   removeDatasetFromMapping(datasetUuid: string) {
-    this.dataSetManagementService
-      .removeDatasetForMapping(datasetUuid)
-      .subscribe({
-        next: (data: any) => {
-          // TODO: Handle success
-          this.alert = {
-            show: true,
-            type: 'success',
-            message: 'Removed dataset from mapping successfully',
-          };
-          this.reLoadDataSets();
-        },
-        error: (error: any) => {
-          this.alert = {
-            show: true,
-            type: 'error',
-            message: error.message,
-          };
-        },
-      });
+    this.modal.warning({
+      nzTitle: 'Do you want to remove this dataset?',
+      nzOkText: 'Yes',
+      nzOnOk: () => this.onRemoveDatasetConfirm(datasetUuid),
+    });
+  }
+
+  onRemoveDatasetConfirm(uuid: string) {
+    this.dataSetManagementService.removeDatasetForMapping(uuid).subscribe({
+      next: (data: any) => {
+        // TODO: Handle success
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Removed dataset from mapping successfully',
+        };
+        this.reLoadDataSets();
+      },
+      error: (error: any) => {
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
+      },
+    });
   }
 
   reLoadDataSets() {
