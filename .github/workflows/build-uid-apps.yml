@@ -154,7 +154,9 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
           # Checkout the branch to commit the changes
-          git checkout ${{ github.ref_name }}  # Checkout to the current branch
+          # ${{ github.ref_name }}
+          git branch -a
+          git checkout develop  # Checkout to the current branch, replace with ${{ github.ref_name }} in future
 
           # Add changes to the git index
           git add .github/apps-builds
@@ -163,4 +165,4 @@ jobs:
           git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
           # Push the changes back to the repository
-          git push origin develop
+          git push origin develop  # Replace with ${{ github.ref_name }}
