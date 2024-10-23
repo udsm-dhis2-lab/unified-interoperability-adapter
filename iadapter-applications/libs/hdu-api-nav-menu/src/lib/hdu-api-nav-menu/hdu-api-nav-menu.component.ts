@@ -16,27 +16,32 @@ import { AuthService } from './services/auth.service';
   providers: [{ provide: NZ_ICONS, useValue: icons }],
 })
 export class HduApiNavMenuComponent implements OnInit {
+  @Input() activeMainMenuId: string | null = null;
   currentUser: User | null = null;
   menus: Menu[] = [
     {
       name: 'Dashboard',
+      id: 'dashboard',
       routeUrl: '/dashboard',
       icon: 'apartment',
       category: 'main',
     },
     {
       name: 'Client Management',
+      id: 'client-management',
       routeUrl: '/client-management',
       icon: 'user',
       category: 'main',
       subMenus: [
         {
           name: 'Clients',
+          id: 'clients',
           routeUrl: '/',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
+          id: 'deduplication',
           name: 'Deduplication',
           routeUrl: '/deduplication',
           icon: 'merge',
@@ -46,17 +51,20 @@ export class HduApiNavMenuComponent implements OnInit {
     },
     {
       name: 'Worflow Management',
+      id: 'workflow-management',
       routeUrl: '/worflow-management',
       icon: 'apartment',
       category: 'main',
       subMenus: [
         {
           name: 'Workflows',
+          id: 'workflows',
           routeUrl: '/workflows',
           icon: 'calendar',
           subMenus: [],
         },
         {
+          id: 'schedules',
           name: 'Schedules',
           routeUrl: '/schedules',
           icon: 'unordered-list',
@@ -65,6 +73,7 @@ export class HduApiNavMenuComponent implements OnInit {
       ],
     },
     {
+      id: 'mapping-and-data-extraction',
       name: 'Mapping and Data Extraction',
       routeUrl: '/mapping-and-data-extraction',
       icon: 'apartment',
@@ -72,12 +81,14 @@ export class HduApiNavMenuComponent implements OnInit {
       subMenus: [
         {
           name: 'Datasets',
+          id: 'datasets',
           routeUrl: '',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
           name: 'Settings',
+          id: 'settings',
           routeUrl: '/settings',
           icon: 'unordered-list',
           subMenus: [],
@@ -90,11 +101,7 @@ export class HduApiNavMenuComponent implements OnInit {
 
   constructor(private authService: AuthService) {}
 
-  ngOnInit(): void {
-    // this.authService.currentUser$.subscribe((user) => {
-    //   this.currentUser = user;
-    // });
-  }
+  ngOnInit(): void {}
 
   onRouteTo(event: Event, menu: Menu): void {
     event.stopPropagation();

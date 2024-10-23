@@ -4,6 +4,7 @@
   <nz-layout class="main-layout">
     <nz-sider nzTheme="light" class="sider" nzCollapsible nzWidth="15vw">
       <lib-hdu-api-nav-menu
+        [activeMainMenuId]="'mapping-and-data-extraction'"
         (selectedMenu)="onGetSelectedMenu($event)"
       ></lib-hdu-api-nav-menu>
     </nz-sider>

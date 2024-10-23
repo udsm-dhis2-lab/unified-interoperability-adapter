@@ -3,6 +3,7 @@
 <nz-layout>
   <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
     <lib-hdu-api-nav-menu
+      [activeMainMenuId]="'dashboard'"
       (selectedMenu)="onGetSelectedMenu($event)"
     ></lib-hdu-api-nav-menu>
   </nz-sider>
