@@ -14,7 +14,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { Workflow, WorkflowFormCreate } from '../../models/workflow.model';
 import { select, Store } from '@ngrx/store';
 import { WorkflowState } from '../../state/workflow/workflow.state';
-import { getCurrentSelectedProcess } from '../../state/workflow/workflow.selectors';
+import { getCurrentSelectedProcessInWorkflow } from '../../state/workflow/workflow.selectors';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
@@ -27,6 +27,7 @@ import { ProcessState } from '../../state/process/process.state';
 import { ProcessActions } from '../../state/process/process.actions';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { toCamelCase } from '../../helpers/workflow.helper';
+import { omit } from 'lodash';
 
 @Component({
   selector: 'app-parameters',
@@ -80,7 +81,7 @@ export class ParametersComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.workflowState
-      .pipe(select(getCurrentSelectedProcess), take(1))
+      .pipe(select(getCurrentSelectedProcessInWorkflow), take(1))
       .subscribe((currentSelectedProcess: Process | null) => {
         if (currentSelectedProcess) {
           this.processParametersForm.patchValue(currentSelectedProcess);
@@ -88,7 +89,7 @@ export class ParametersComponent implements OnInit, AfterViewInit {
       });
 
     this.workflowState
-      .pipe(select(getCurrentSelectedProcess))
+      .pipe(select(getCurrentSelectedProcessInWorkflow))
       .subscribe((process: Process | null) => {
         if (process && process.adaptors) {
           this.updateCheckboxOptions(process.adaptors);
@@ -109,7 +110,7 @@ export class ParametersComponent implements OnInit, AfterViewInit {
     });
 
     this.currentSelectedProcess$ = this.workflowState.pipe(
-      select(getCurrentSelectedProcess)
+      select(getCurrentSelectedProcessInWorkflow)
     );
   }
 
@@ -151,7 +152,7 @@ export class ParametersComponent implements OnInit, AfterViewInit {
       .subscribe((currentSelectedProcess: Process | null) => {
         if (currentSelectedProcess) {
           const process: Process | null = {
-            ...currentSelectedProcess,
+            ...omit(currentSelectedProcess, ['children']),
             adaptors: this.selectedAdaptors,
           };
 

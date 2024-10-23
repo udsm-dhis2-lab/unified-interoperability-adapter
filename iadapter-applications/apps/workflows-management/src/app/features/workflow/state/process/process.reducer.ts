@@ -107,7 +107,7 @@ const processReducer = createReducer(
       deletedProcess: false,
       httpErrorResponse: null,
       editedProcess: null,
-      currentSelectedProcess: null,
+      currentSelectedProcess: process,
       currentParentProcess: null,
     });
   }),
@@ -230,7 +230,7 @@ const processReducer = createReducer(
         deletedProcess: false,
         httpErrorResponse: null,
         editedProcess: null,
-        currentSelectedProcess: null,
+        currentSelectedProcess: process.changes as Process,
       });
     }
   ),

@@ -5,13 +5,13 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ProcessSummaryComponent } from '../../components/process-summary/process-summary.component';
 import { Process } from '../../models/process.model';
-import { Observable, of, take } from 'rxjs';
+import { Observable, of, switchMap, take } from 'rxjs';
 import { WorkflowState } from '../../state/workflow/workflow.state';
 import { select, Store } from '@ngrx/store';
-import { getCurrentSelectedProcess } from '../../state/workflow/workflow.selectors';
+import { getCurrentSelectedProcessInWorkflow } from '../../state/workflow/workflow.selectors';
 import {
   extractUidFromUrl,
-  getUidFromRoute,
+  getWorkflowUidFromRoute,
 } from '../../helpers/workflow.helper';
 import { getCurrentUrl } from 'apps/workflows-management/src/app/state/router.selector';
 
@@ -38,28 +38,75 @@ export class EditorComponent implements OnInit, AfterViewInit {
   ) {}
 
   ngAfterViewInit(): void {
-    this.currentWorkflowUid = getUidFromRoute(this.route);
+    this.currentWorkflowUid = getWorkflowUidFromRoute(this.route);
   }
 
   ngOnInit(): void {
     this.currentSelectedProcess$ = this.workflowState.pipe(
-      select(getCurrentSelectedProcess)
+      select(getCurrentSelectedProcessInWorkflow)
     );
   }
 
   onOpenEditor() {
-    this.workflowState
-      .pipe(select(getCurrentUrl), take(1))
-      .subscribe((route: string) => {
-        if (route) {
-          this.currentWorkflowUid = extractUidFromUrl(route);
+    // this.workflowState
+    //   .pipe(select(getCurrentUrl), take(1))
+    //   .subscribe((route: string) => {
+    //     if (route) {
+    //       this.currentWorkflowUid = extractUidFromUrl(route);
 
-          if (this.currentWorkflowUid) {
-            // const uid = decodeURIComponent(this.currentWorkflowUid);
-            // this.router.navigate([decodeURIComponent('main/code-editor'), uid]);
-            this.router.navigate(['/', 'config','code-editor', this.currentWorkflowUid]);
+    //       if (this.currentWorkflowUid) {
+    //         this.workflowState
+    //           .pipe(select(getCurrentSelectedProcess), take(1))
+    //           .subscribe((currentSelectedProcess: Process | null) => {
+    //             if (currentSelectedProcess && currentSelectedProcess.id) {
+    //               this.router.navigate([
+    //                 '/',
+    //                 'config',
+    //                 'code-editor',
+    //                 this.currentWorkflowUid,
+    //                 'proc',
+    //                 currentSelectedProcess.id,
+    //               ]);
+    //             }
+    //           });
+    //       }
+    //     }
+    //   });
+
+    this.workflowState
+    .pipe(
+      select(getCurrentUrl),
+      take(1), 
+      switchMap((route: string) => {
+        if (route) {
+          const workflowUid = extractUidFromUrl(route);
+          if (workflowUid) {
+            this.currentWorkflowUid = workflowUid;
+            return this.workflowState.pipe(
+              select(getCurrentSelectedProcessInWorkflow),
+              take(1)
+            );
+          } else {
+            return of(null);
           }
+        } else {
+          return of(null);
         }
-      });
+      })
+    )
+    .subscribe((currentSelectedProcess: Process | null) => {
+      if (currentSelectedProcess && currentSelectedProcess.id) {
+        this.router.navigate([
+          '/',
+          'config',
+          'code-editor',
+          this.currentWorkflowUid,
+          'proc',
+          currentSelectedProcess.id,
+        ]);
+      } else {
+        console.error('No process selected');
+      }
+    });
   }
 }

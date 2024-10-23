@@ -61,8 +61,9 @@ export class AddFlowComponent implements OnInit {
 
   ngOnInit(): void {
     this.processForm = this.fb.group({
-      name: ['', [Validators.required]], // Validates for numbers
-      description: ['', [Validators.required]], // Also validates for numbers
+      name: ['', [Validators.required]],
+      code: ['', [Validators.required]],
+      description: ['', [Validators.required]],
     });
   }
 

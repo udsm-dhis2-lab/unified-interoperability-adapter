@@ -26,7 +26,7 @@ import { FlowchartComponent } from '../../components/flow-chart/flow-chart.compo
 import { WorkflowState } from '../../state/workflow/workflow.state';
 import { select, Store } from '@ngrx/store';
 import {
-  getCurrentSelectedProcess,
+  getCurrentSelectedProcessInWorkflow,
   getCurrentSelectedWorkflow,
 } from '../../state/workflow/workflow.selectors';
 import { Process } from '../../models/process.model';
@@ -34,7 +34,7 @@ import { Observable, of, take } from 'rxjs';
 import { ProcessSummaryComponent } from '../../components/process-summary/process-summary.component';
 import {
   extractIdFromPath,
-  getUidFromRoute,
+  getWorkflowUidFromRoute,
 } from '../../helpers/workflow.helper';
 import { WorkflowActions } from '../../state/workflow/workflow.actions';
 import { getCurrentUrl } from 'apps/workflows-management/src/app/state/router.selector';
@@ -91,10 +91,10 @@ export class WorkflowManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentSelectedProcess$ = this.workflowState.pipe(
-      select(getCurrentSelectedProcess)
+      select(getCurrentSelectedProcessInWorkflow)
     );
 
-    this.currentWorkflowUid = getUidFromRoute(this.route);
+    this.currentWorkflowUid = getWorkflowUidFromRoute(this.route);
 
     if (this.currentWorkflowUid) {
       this.workflowState.dispatch(
@@ -118,9 +118,8 @@ export class WorkflowManagementComponent implements OnInit {
             nzTabChangeEvent &&
             (nzTabChangeEvent.index == 0 || nzTabChangeEvent.index == 1)
           ) {
-            const uid = extractIdFromPath(route);
-            // this.router.navigate(['/main/flow', uid]);
-            this.router.navigate(['/', 'config', 'flow', `${uid}`]);
+            const uid = extractIdFromPath(route, 3);
+            this.router.navigate(['/', 'config', 'flow', uid]);
           }
         }
       });

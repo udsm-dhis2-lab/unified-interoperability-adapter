@@ -459,6 +459,15 @@ const workflowReducer = createReducer(
       };
     }
   ),
+  on(
+    WorkflowActions.setSelectedProcess,
+    (state: WorkflowState, { process }) => {
+      return {
+        ...state,
+        currentSelectedProcess: process,
+      };
+    }
+  )
 );
 
 export function WorkflowReducer(

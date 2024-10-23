@@ -18,7 +18,7 @@ import {
   NgFlowchartStepRegistry,
 } from '@joelwenzel/ng-flowchart';
 import {
-  getUidFromRoute,
+  getWorkflowUidFromRoute,
   hasChildren,
   isRootNode,
   transformWorkflowToProcessTree,
@@ -32,9 +32,13 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+
 import { select, Store } from '@ngrx/store';
 import { WorkflowState } from '../../state/workflow/workflow.state';
 import {
+  getCurrentSelectedProcessInWorkflow,
   getCurrentSelectedWorkflow,
   getUpdatedWorkflowStatus,
   getWorkflowById,
@@ -47,6 +51,7 @@ import {
   getAddedProcessStatus,
   getCurrentProcessParentId,
   getCurrentSelectedProcess,
+  getUpdatedProcessStatus,
 } from '../../state/process/process.selectors';
 import { FlowComponent } from '../flow/flow.component';
 import { AddFlowComponent } from '../add-flow/add-flow.component';
@@ -59,6 +64,8 @@ import { WorkflowActions } from '../../state/workflow/workflow.actions';
 import { Observable, skip, Subscription, take } from 'rxjs';
 import { Process } from '../../models/process.model';
 import { WorkflowRunLoggingComponent } from '../../containers/workflow-run-logging/workflow-run-logging.component';
+import { UpdateProcessComponent } from '../update-process/update-process.component';
+import { omit } from 'lodash';
 
 @Component({
   selector: 'app-flow-chart',
@@ -81,6 +88,10 @@ import { WorkflowRunLoggingComponent } from '../../containers/workflow-run-loggi
     NzBadgeModule,
     NzSpinModule,
     NzToolTipModule,
+    NzMenuModule,
+    NzDropDownModule,
+    NzIconModule,
+    NzIconModule,
     WorkflowRunLoggingComponent,
   ],
   templateUrl: './flow-chart.component.html',
@@ -94,6 +105,8 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
   stepGap = '';
   item1Checked = true;
   isWorkflowSelected = false;
+
+  runningItems: Set<number> = new Set();
 
   callbacks: NgFlowchart.Callbacks = {};
   options: NgFlowchart.Options = {
@@ -152,7 +165,7 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    const currentWorkflowUid = getUidFromRoute(this.route);
+    const currentWorkflowUid = getWorkflowUidFromRoute(this.route);
 
     if (currentWorkflowUid) {
       void this.workFlowState.dispatch(
@@ -251,7 +264,6 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
   clearData() {
     if (this.canvas) {
       this.canvas.getFlow().clear();
-
     }
   }
 
@@ -292,7 +304,101 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  runningItems: Set<number> = new Set();
+  onDoubleClickEdit(id: number) {
+    console.log('THIS YAILAHI', id);
+    const modalRef: NzModalRef<UpdateProcessComponent> =
+      this.nzModalService.create({
+        nzTitle: 'Process Management',
+        nzContent: UpdateProcessComponent,
+        nzMaskClosable: false,
+        nzClosable: false,
+        nzStyle: {
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '80vh',
+          width: '80vh',
+        },
+        nzBodyStyle: {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'stretch',
+        },
+        nzWidth: '70vw',
+        nzFooter: [
+          {
+            label: 'Close',
+            onClick: () => {
+              modalRef.destroy();
+            },
+          },
+          {
+            label: 'Update Process',
+            type: 'primary',
+            onClick: () => {
+              const instance = modalRef.getContentComponent();
+              const processFormUpdate = instance?.onSubmit();
+
+              this.workFlowState
+                .pipe(select(getCurrentSelectedWorkflow), take(1))
+                .subscribe((workflow: Workflow | null) => {
+                  if (workflow) {
+                    this.processState
+                      .pipe(
+                        select(getCurrentSelectedProcessInWorkflow),
+                        take(1)
+                      )
+                      .subscribe((currentSelectedProcess: Process | null) => {
+                        if (currentSelectedProcess) {
+                          if (!this.isWorkflowSelected) {
+                            this.processState.dispatch(
+                              ProcessActions.updateProcess({
+                                process: {
+                                  ...omit(currentSelectedProcess, ['children']),
+                                  ...(processFormUpdate as any),
+                                },
+                              })
+                            );
+                          }
+
+                          this.processState
+                            .pipe(
+                              select(getUpdatedProcessStatus),
+                              skip(1),
+                              take(1)
+                            )
+                            .subscribe((status: boolean) => {
+                              if (status) {
+                                this.workFlowState
+                                  .pipe(
+                                    select(getUpdatedWorkflowStatus),
+                                    skip(1),
+                                    take(1)
+                                  )
+                                  .subscribe(
+                                    (workflowUpdatedStatus: boolean) => {
+                                      if (workflowUpdatedStatus) {
+                                        this.workFlowState.dispatch(
+                                          WorkflowActions.loadWorkflow({
+                                            id: workflow.id,
+                                          })
+                                        );
+                                      }
+                                    }
+                                  );
+                                modalRef.destroy();
+                              }
+                            });
+                        }
+                      });
+                  }
+                });
+            },
+          },
+        ],
+      });
+  }
 
   onSelectingItem(id: number): void {
     if (id) {
@@ -566,5 +672,20 @@ export class FlowchartComponent implements OnInit, AfterViewInit, OnDestroy {
       default:
         return '';
     }
+  }
+
+  onEditProcess() {
+    // Handle edit logic here
+    console.log('Edit process');
+  }
+
+  onDeleteProcess() {
+    // Handle delete logic here
+    console.log('Delete process');
+  }
+
+  onDuplicateProcess() {
+    // Handle duplicate logic here
+    console.log('Duplicate process');
   }
 }
