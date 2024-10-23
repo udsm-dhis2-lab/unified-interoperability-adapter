@@ -117,9 +117,8 @@ public class MediatorsService {
         return  new HashMap<>();
     }
 
-    public String processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data, String api) throws Exception {
+    public Map<String,Object> processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data, String api) throws Exception {
         try {
-            System.out.println(api);
             return sendDataToExternalSystem(mediator,data, "POST", api);
         } catch (Exception e) {
             System.err.println(e.getMessage());
@@ -127,7 +126,7 @@ public class MediatorsService {
         }
     }
 
-    public String routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
+    public Map<String,Object> routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
                 System.out.println(apiPath);
@@ -147,7 +146,7 @@ public class MediatorsService {
         }
     }
 
-    public String sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
+    public Map<String,Object> sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
         /**
          * TODO: The base url, path and authentication details should be put on configurations
          */
@@ -315,7 +314,7 @@ public class MediatorsService {
                 returnResults.put("statusText", "OK");
                 returnResults.put("statusCode", 200);
                 returnResults.put("workOrder", returnStr);
-                return  JSONObject.valueToString(returnResults);
+                return  returnResults;
             } else {
                 throw new IllegalStateException("Workflow uuid or id is missing");
             }
@@ -389,7 +388,7 @@ public class MediatorsService {
         return response;
     }
 
-    public String getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
+    public Map<String,Object> getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
         String response = new String();
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -406,7 +405,7 @@ public class MediatorsService {
         BufferedReader reader;
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
-        JSONObject responseJsonObject = new JSONObject();
+        Map<String,Object> responseMap = new HashMap<>();
 
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -430,17 +429,20 @@ public class MediatorsService {
                 responseContent.append(dataLine);
             }
             reader.close();
-
-            responseJsonObject = new JSONObject(responseContent.toString());
-            response = responseJsonObject.toString();
+            ObjectMapper mapper = new ObjectMapper();
+            String responseString = responseContent.toString();
+            responseMap = mapper.readValue(responseString, Map.class);
 
         } catch (Exception e) {
             e.printStackTrace(); // Print any exception details
         }
-        return response;
+        return responseMap;
     }
 
-    public String sendDataToExternalSystem(Mediator mediator, Map<String, Object> data, String method, String api) throws Exception {
+    public Map<String,Object> sendDataToExternalSystem(Mediator mediator,
+                                                       Map<String, Object> data,
+                                                       String method,
+                                                       String api) throws Exception {
         // TODO: Make this valid for async true
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -455,8 +457,7 @@ public class MediatorsService {
         BufferedReader reader;
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
-        JSONObject responseJsonObject = new JSONObject();
-        String returnStr = "";
+        Map<String, Object> responseMap = new HashMap<>();
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             String authentication = "";
@@ -481,22 +482,24 @@ public class MediatorsService {
                 os.write(input, 0, input.length);
             }
 
+            // Read the response
             reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
             while ((dataLine = reader.readLine()) != null) {
                 responseContent.append(dataLine);
             }
             reader.close();
-            // System.out.println(js);
-            responseJsonObject = new JSONObject(responseContent.toString());
-            returnStr  = responseJsonObject.toString();
+
+            // Convert the response JSON string to a Map
+            String responseString = responseContent.toString();
+            responseMap = mapper.readValue(responseString, Map.class);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception(e.getMessage());
         }
-        return responseJsonObject.toString();
+        return responseMap;
     }
 
-    public String deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
+    public Map<String,Object> deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
         String response = new String();
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -514,7 +517,7 @@ public class MediatorsService {
         BufferedReader reader;
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
-        JSONObject responseJsonObject = new JSONObject();
+        Map<String,Object> responseMap = new HashMap<>();
 
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -537,15 +540,14 @@ public class MediatorsService {
                 responseContent.append(dataLine);
             }
             reader.close();
-
-            responseJsonObject = new JSONObject(responseContent.toString());
-            response = responseJsonObject.toString();
+            ObjectMapper mapper = new ObjectMapper();
+            responseMap = mapper.readValue(responseContent.toString(), Map.class);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return response;
+        return responseMap;
     }
 
     private Pageable createPageable(Integer page, Integer pageSize) throws Exception {

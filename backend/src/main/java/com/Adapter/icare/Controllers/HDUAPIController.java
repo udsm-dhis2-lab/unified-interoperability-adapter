@@ -178,7 +178,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
+    public ResponseEntity<Map<String,Object>> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws Exception {
         /**
          * Send data to Mediator where all the logics will be done.
          */
@@ -478,7 +478,7 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "workflows")
-    public ResponseEntity<String> getWorkflows() throws Exception {
+    public ResponseEntity<Map<String,Object>> getWorkflows() throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows","GET", null));
@@ -491,7 +491,7 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "workflows/{id}")
-    public ResponseEntity<String> getWorkflowById(
+    public ResponseEntity<Map<String,Object>> getWorkflowById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {
@@ -506,7 +506,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "workflows")
-    public ResponseEntity<String> addWorkflow(@RequestBody Map<String, Object> workflow) throws Exception {
+    public ResponseEntity<Map<String,Object>> addWorkflow(@RequestBody Map<String, Object> workflow) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows", "POST", workflow));
@@ -519,7 +519,7 @@ public class HDUAPIController {
     }
 
     @PutMapping(value = "workflows/{id}")
-    public ResponseEntity<String> updateWorkflow(
+    public ResponseEntity<Map<String,Object>> updateWorkflow(
             @RequestBody Map<String, Object> workflow,
             @PathVariable(value = "id") String id) throws Exception {
         try {
@@ -534,7 +534,7 @@ public class HDUAPIController {
     }
 
     @DeleteMapping(value = "workflows/{id}")
-    public ResponseEntity<String> deleteWorkflowById(
+    public ResponseEntity<Map<String,Object>> deleteWorkflowById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {
@@ -549,7 +549,7 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "processes")
-    public ResponseEntity<String> getProcesses() throws Exception {
+    public ResponseEntity<Map<String,Object>> getProcesses() throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes","GET", null));
@@ -562,7 +562,7 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "processes/{id}")
-    public ResponseEntity<String> getProcessById(
+    public ResponseEntity<Map<String,Object>> getProcessById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {
@@ -577,7 +577,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "processes")
-    public ResponseEntity<String> addProcess(@RequestBody Map<String, Object> process) throws Exception {
+    public ResponseEntity<Map<String,Object>> addProcess(@RequestBody Map<String, Object> process) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes", "POST", process));
@@ -590,7 +590,7 @@ public class HDUAPIController {
     }
 
     @PutMapping(value = "processes/{id}")
-    public ResponseEntity<String> updateProcess(
+    public ResponseEntity<Map<String,Object>> updateProcess(
             @RequestBody Map<String, Object> process,
             @PathVariable(value = "id") String id) throws Exception {
         try {
@@ -605,7 +605,7 @@ public class HDUAPIController {
     }
 
     @DeleteMapping(value = "processes/{id}")
-    public ResponseEntity<String> deleteProcessById(
+    public ResponseEntity<Map<String,Object>> deleteProcessById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {
@@ -620,7 +620,7 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "schedules")
-    public ResponseEntity<String> getSchedules() throws Exception {
+    public ResponseEntity<Map<String,Object>> getSchedules() throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules","GET", null));
@@ -633,7 +633,7 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "schedules/{id}")
-    public ResponseEntity<String> getScheduleById(
+    public ResponseEntity<Map<String,Object>> getScheduleById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {
@@ -648,7 +648,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "schedules")
-    public ResponseEntity<String> addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
+    public ResponseEntity<Map<String,Object>> addSchedule(@RequestBody Map<String, Object> schedule) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "schedules", "POST", schedule));
@@ -661,7 +661,7 @@ public class HDUAPIController {
     }
 
     @PutMapping(value = "schedules/{id}")
-    public ResponseEntity<String> addSchedule(
+    public ResponseEntity<Map<String,Object>> addSchedule(
             @RequestBody Map<String, Object> schedule,
             @PathVariable(value = "id") String id) throws Exception {
         try {
@@ -676,7 +676,7 @@ public class HDUAPIController {
     }
 
     @DeleteMapping(value = "schedules/{id}")
-    public ResponseEntity<String> deleteScheduleById(
+    public ResponseEntity<Map<String,Object>> deleteScheduleById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {

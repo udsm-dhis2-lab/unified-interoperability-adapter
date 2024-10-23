@@ -4,7 +4,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -58,4 +60,12 @@ public class SharedHealthRecordsDTO {
     private OtherInformationDTO otherInformation;
 
     private ReferralDetailsDTO referralDetails;
+
+    public Map<String,Object> toMap() {
+        Map<String,Object> sharedRecordMap = new HashMap<>();
+        sharedRecordMap.put("facilityDetails", this.getFacilityDetails());
+        sharedRecordMap.put("reportingDetails", this.getReportDetails());
+        sharedRecordMap.put("demographicDetails", this.getDemographicDetails());
+        return  sharedRecordMap;
+    }
 }

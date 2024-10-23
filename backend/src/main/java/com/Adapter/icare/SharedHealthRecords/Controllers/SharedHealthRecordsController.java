@@ -110,7 +110,7 @@ public class SharedHealthRecordsController {
     }
 
     @GetMapping("/sharedRecords")
-    public ResponseEntity<String> getSharedRecords (
+    public ResponseEntity<Map<String,Object>> getSharedRecords (
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam( value = "id", required = false) String id,
@@ -139,7 +139,7 @@ public class SharedHealthRecordsController {
                     hfrCode,
                     includeDeceased,
                     numberOfVisits);
-                return ResponseEntity.ok(sharedRecordsResponse.toString());
+                return ResponseEntity.ok(sharedRecordsResponse);
             } else {
                 Map <String,Object> payload = new HashMap<>();
                 payload.put("code","SEARCH-CLIENT");
@@ -153,7 +153,7 @@ public class SharedHealthRecordsController {
                 body.put("page", page);
                 body.put("pageSize", pageSize);
                 payload.put("body", body);
-                String response = this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true");
+                Map<String,Object> response = this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true");
                 return ResponseEntity.ok(response);
             }
 
@@ -163,7 +163,7 @@ public class SharedHealthRecordsController {
     }
 
     @PostMapping(value = "/sharedRecords", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
+    public ResponseEntity<Map<String,Object>> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
         try {
             Map <String,Object> payload = new HashMap<>();
             DataTemplateDataDTO dataTemplateDataDTO = new DataTemplateDataDTO();
@@ -185,7 +185,7 @@ public class SharedHealthRecordsController {
             response.put("message",e.getMessage());
             response.put("statusCode",HttpStatus.BAD_REQUEST.value());
             response.put("reason",HttpStatus.BAD_REQUEST.getReasonPhrase());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.toString());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

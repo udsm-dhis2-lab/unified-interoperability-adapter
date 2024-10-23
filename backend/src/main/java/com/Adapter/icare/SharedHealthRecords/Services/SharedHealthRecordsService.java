@@ -79,7 +79,7 @@ public class SharedHealthRecordsService {
             boolean includeDeceased,
             Integer numberOfVisits
     ) throws Exception {
-        List<SharedHealthRecordsDTO> sharedRecords =  new ArrayList<>();
+        List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
         if (onlyLinkedClients) {
@@ -155,15 +155,23 @@ public class SharedHealthRecordsService {
                         // TODO: Find a way to retrieve these from resource
                         visitDetails.setNewThisYear(Boolean.FALSE);
                         visitDetails.setNew(Boolean.FALSE);
+
+                        // Get clinicalInformation
+                        // 1. clinicalInformation - vital signs
+                        List<Map<String,Object>> vitalSigns =  new ArrayList<>();
+                        // 1. Get Observation Group
+                        List<Observation> observationGroup = getObservationsByCategory("vital-signs", encounter);
+
                         // TODO: Add history when numberOfVisits > 1
                     } else if (organization != null) {
                         // TODO: Request visit from facility provided
+                        Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
                         visitDetails = null;
                     } else {
                         visitDetails = null;
                     }
                     templateData.setVisitDetails(visitDetails);
-                    sharedRecords.add(templateData);
+                    sharedRecords.add(templateData.toMap());
                 }
             }
         }
@@ -341,9 +349,21 @@ public class SharedHealthRecordsService {
         return List.of();
     }
 
-    public Observation createObservationPayload() throws Exception {
-        Observation observation = new Observation();
+    public List<Observation> getObservationsByCategory(String category, Encounter encounter) throws Exception {
+        List<Observation> observations = new ArrayList<>();
+        var observationSearch = fhirClient.search().forResource(Observation.class)
+                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getId()));
+        observationSearch.where(Observation.CATEGORY.exactly().code(category));
+        Bundle observationBundle = new Bundle();
+        observationBundle = observationSearch.returnBundle(Bundle.class)
+                .execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
+                Observation observationGroup = (Observation) entryComponent.getResource();
+                observations.add(observationGroup);
+            }
+        }
 
-        return observation;
+        return observations;
     }
 }
