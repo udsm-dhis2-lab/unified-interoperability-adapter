@@ -4,8 +4,8 @@ import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { icons } from './ant-design-icons.constants';
 import { antDesignModules } from './ant-design.modules';
 import { Menu } from './models/menu.model';
-import { User } from './models/user.model';
 import { AuthService } from './services/auth.service';
+import { User } from './models/user.model';
 
 @Component({
   selector: 'lib-hdu-api-nav-menu',
@@ -50,9 +50,9 @@ export class HduApiNavMenuComponent implements OnInit {
       ],
     },
     {
-      name: 'Worflow Management',
-      id: 'workflow-management',
-      routeUrl: '/worflow-management',
+      name: 'Worflows Management',
+      id: 'workflows-management',
+      routeUrl: '/worflows-management',
       icon: 'apartment',
       category: 'main',
       subMenus: [

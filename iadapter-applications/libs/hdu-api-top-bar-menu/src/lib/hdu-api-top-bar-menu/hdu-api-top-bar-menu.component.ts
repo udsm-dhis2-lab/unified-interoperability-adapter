@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
@@ -24,6 +24,7 @@ import { getInitials } from './helpers/user.helper';
   styleUrl: './hdu-api-top-bar-menu.component.less',
 })
 export class HduApiTopBarMenuComponent implements OnInit {
+  @Input() appName: string | null = null;
   currentUser: User | null = null;
   currentUserInitials = '';
   selectedSideMenuName = '';
@@ -42,7 +43,7 @@ export class HduApiTopBarMenuComponent implements OnInit {
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       if (user && user.name) {
-        this.currentUserInitials = getInitials(user.name)
+        this.currentUserInitials = getInitials(user.name);
       }
     });
   }
