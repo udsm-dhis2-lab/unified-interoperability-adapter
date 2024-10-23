@@ -97,7 +97,7 @@
                         "
                       >
                         <nz-select
-                          ngModel="default"
+                          [ngModel]="config.selectedValue ?? 'default'"
                           (ngModelChange)="
                             onSelectMappingSetting({
                               value: $event,
@@ -119,8 +119,8 @@
                             ></nz-option>
                           </ng-container>
                           <nz-option
-                            nzValue="default"
-                            nzLabel="Select"
+                            [nzValue]="config.selectedValue ?? 'default'"
+                            [nzLabel]="config.name"
                             nzHide
                           ></nz-option>
                         </nz-select>

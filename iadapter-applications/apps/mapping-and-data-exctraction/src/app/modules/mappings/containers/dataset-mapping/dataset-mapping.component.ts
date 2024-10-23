@@ -104,7 +104,6 @@ export class DatasetMappingComponent implements OnInit {
         ...item.configurations,
         {
           name: configuration.name,
-          selectedValue: '',
           options: configuration.options,
         },
       ];
@@ -208,6 +207,39 @@ export class DatasetMappingComponent implements OnInit {
               this.assignConfigurationToSelectedDisaggregation(
                 configuration.value
               );
+            }
+
+            for (const param of data.value.params) {
+              if (param.gender) {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) => item.label === 'Gender'
+                );
+                this.onSelectMappingSetting({
+                  value: param.gender,
+                  categoryOptionComboId: param.co,
+                  settingName: configuration.label,
+                });
+              }
+              if (param.ageType) {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) => item.label === 'Agetype'
+                );
+                this.onSelectMappingSetting({
+                  value: param.ageType,
+                  categoryOptionComboId: param.co,
+                  settingName: configuration.label,
+                });
+              }
+              if (param.startAge) {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) => item.label === 'Agegroup'
+                );
+                this.onSelectMappingSetting({
+                  value: param.startAge + '-' + param.endAge,
+                  categoryOptionComboId: param.co,
+                  settingName: configuration.label,
+                });
+              }
             }
           }
         },
@@ -381,6 +413,7 @@ export class DatasetMappingComponent implements OnInit {
       description: '',
       group: '',
     };
+    console.log("CONFIGURATION", payLoad)
     return payLoad;
   }
 
