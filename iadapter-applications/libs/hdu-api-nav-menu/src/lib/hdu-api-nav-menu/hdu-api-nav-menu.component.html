@@ -1,6 +1,11 @@
 <ul nz-menu nzMode="inline" style="margin-top: 50px">
   <ng-container *ngFor="let menu of menus">
-    <li *ngIf="!menu?.subMenus" nz-menu-item (click)="onRouteTo($event, menu)">
+    <li
+      *ngIf="!menu?.subMenus"
+      nz-menu-item
+      (click)="onRouteTo($event, menu)"
+      [class.active]="activeMainMenuId === menu?.id"
+    >
       <nz-space>
         <span *nzSpaceItem nz-icon nzType="{{ menu?.icon }}"></span>
         <a *nzSpaceItem routerLink="">{{ menu?.name }}</a>
