@@ -176,7 +176,7 @@ export class DatasetManagementService {
     );
   }
 
-  getMappingFromDataStore(dataElementUud: string, datasetUuid: string) {
+  getExistingMappings(dataElementUud: string, datasetUuid: string) {
     return this.httpClient
       .get<any>(
         `${MappingsUrls.HDU_MAPPINGS}/MAPPINGS-${datasetUuid}/${dataElementUud}`
