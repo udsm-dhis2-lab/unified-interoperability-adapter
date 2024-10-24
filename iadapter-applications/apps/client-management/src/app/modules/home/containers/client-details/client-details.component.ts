@@ -21,37 +21,7 @@ interface ExtraInfoSection {
 export class ClientDetailsComponent implements OnInit {
   basicInfo: BasicInfo = {};
 
-  extraInfo: ExtraInfoSection[] = [
-    {
-      sectionTitle: 'Contact Information',
-      info: {
-        'Phone Number': '+255-456-7890',
-        Email: 'john.doe@example.com',
-        'Permanet address': 'Dar es salaam, Tanzania',
-        'Current address': 'Morogoro, Tanzania',
-        Occupation: 'Software Engineer',
-        Nationality: 'Tanzanian',
-      },
-    },
-    {
-      sectionTitle: 'Next of Kin',
-      info: {
-        'Full name': 'Herman Moshi Moshi',
-        Relationship: 'Brother',
-        'Phone number': '+255-456-7890',
-      },
-    },
-    {
-      sectionTitle: 'Insurance Type',
-      info: {
-        'Insuarance Provider': 'NSSF',
-        'Insuarance Number': 'IBS_00297209',
-        'Policy Number': 'IBS_00297209',
-        'Group Number': 'IBS_00297209',
-        Region: 'Tanzania',
-      },
-    },
-  ];
+  extraInfo: ExtraInfoSection[] = [];
 
   constructor(private router: Router, private route: ActivatedRoute) {}
   backToList() {
@@ -66,7 +36,6 @@ export class ClientDetailsComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       if (params['client']) {
         const client = JSON.parse(params['client']);
-        console.log('CLIENT', client);
         this.basicInfo = {
           'Case ID': client['demographicDetails']['caseID'],
           'Full name':
@@ -81,6 +50,19 @@ export class ClientDetailsComponent implements OnInit {
             this.calculateAge(client['demographicDetails']['dateOfBirth']) +
             ' years',
         };
+
+        this.extraInfo = [
+          {
+            sectionTitle: 'Contact Information',
+            info: {
+              'Phone Number': client['demographicDetails']['phoneNumbers'],
+              Email: client['demographicDetails']['emails'],
+              addresses: client['demographicDetails']['addresses'],
+              Occupation: client['demographicDetails']['occupation'],
+              Nationality: client['demographicDetails']['nationality'],
+            },
+          },
+        ];
       }
     });
   }

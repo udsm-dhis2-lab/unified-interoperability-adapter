@@ -7,6 +7,11 @@ export class HduClient {
   idNumber!: string;
   idType!: string;
   dateOfBirth!: string;
+  phoneNumbers!: string;
+  emails!: string;
+  addresses!: string;
+  occupation!: string;
+  nationality!: string;
 
   static fromJson(json: any): HduClient {
     const hduClient = new HduClient();
@@ -16,6 +21,11 @@ export class HduClient {
     hduClient.surname = json['lastName'];
     hduClient.gender = json['gender'];
     hduClient.dateOfBirth = json['dateOfBirth'];
+    hduClient.phoneNumbers = json['phoneNumbers'];
+    hduClient.emails = json['emails'];
+    hduClient.addresses = json['addresses'];
+    hduClient.occupation = json['occupation'];
+    hduClient.nationality = json['nationality'];
     hduClient.idNumber = json['identifiers'][0]
       ? json['identifiers'][0]['id']
       : '';
