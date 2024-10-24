@@ -30,4 +30,14 @@ export class HDUAPIClientDetails {
     code: string;
     name: string;
   };
+
+  static fromJson(json: any): HDUAPIClientDetails {
+    const hduClient = new HDUAPIClientDetails();
+    hduClient.demographicDetails = HduClient.fromJson(json['demographicDetails']);
+    hduClient.facilityDetails = {
+      code: json['facilityDetails']['code'],
+      name: json['facilityDetails']['name'],
+    };
+    return hduClient;
+  }
 }
