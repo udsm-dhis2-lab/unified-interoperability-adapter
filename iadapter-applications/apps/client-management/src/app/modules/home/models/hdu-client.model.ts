@@ -6,6 +6,7 @@ export class HduClient {
   gender!: string;
   idNumber!: string;
   idType!: string;
+  dateOfBirth!: string;
 
   static fromJson(json: any): HduClient {
     const hduClient = new HduClient();
@@ -14,6 +15,7 @@ export class HduClient {
     hduClient.mname = json['middleName'];
     hduClient.surname = json['lastName'];
     hduClient.gender = json['gender'];
+    hduClient.dateOfBirth = json['dateOfBirth'];
     hduClient.idNumber = json['identifiers'][0]
       ? json['identifiers'][0]['id']
       : '';
@@ -33,7 +35,9 @@ export class HDUAPIClientDetails {
 
   static fromJson(json: any): HDUAPIClientDetails {
     const hduClient = new HDUAPIClientDetails();
-    hduClient.demographicDetails = HduClient.fromJson(json['demographicDetails']);
+    hduClient.demographicDetails = HduClient.fromJson(
+      json['demographicDetails']
+    );
     hduClient.facilityDetails = {
       code: json['facilityDetails']['code'],
       name: json['facilityDetails']['name'],

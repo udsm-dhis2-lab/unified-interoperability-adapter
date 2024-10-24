@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 interface BasicInfo {
   [key: string]: string;
@@ -18,14 +18,8 @@ interface ExtraInfoSection {
   templateUrl: './client-details.component.html',
   styleUrl: './client-details.component.css',
 })
-export class ClientDetailsComponent {
-  basicInfo: BasicInfo = {
-    'Case ID': 'IBS_00297209',
-    'FUll name': 'Herman Moshi Moshi',
-    Sex: 'Male',
-    'Date of Birth': '25/06/1989',
-    Age: '35 Years',
-  };
+export class ClientDetailsComponent implements OnInit {
+  basicInfo: BasicInfo = {};
 
   extraInfo: ExtraInfoSection[] = [
     {
@@ -59,12 +53,49 @@ export class ClientDetailsComponent {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
   backToList() {
     this.router.navigate(['']);
   }
 
   objectKeys(obj: any): string[] {
     return Object.keys(obj);
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      if (params['client']) {
+        const client = JSON.parse(params['client']);
+        console.log('CLIENT', client);
+        this.basicInfo = {
+          'Case ID': client['demographicDetails']['caseID'],
+          'Full name':
+            (client['demographicDetails']['fname'] ?? '') +
+            ' ' +
+            (client['demographicDetails']['mname'] ?? '') +
+            ' ' +
+            (client['demographicDetails']['surname'] ?? ''),
+          Sex: client['demographicDetails']['gender'],
+          'Date of Birth': client['demographicDetails']['dateOfBirth'],
+          Age:
+            this.calculateAge(client['demographicDetails']['dateOfBirth']) +
+            ' years',
+        };
+      }
+    });
+  }
+
+  calculateAge(dateOfBirth: string): string {
+    const birthDate = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (
+      monthDifference < 0 ||
+      (monthDifference === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+    return age.toString();
   }
 }

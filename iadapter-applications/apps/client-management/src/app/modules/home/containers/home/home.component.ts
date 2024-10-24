@@ -73,7 +73,9 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsFromServer(this.pageIndex, this.pageSize, []);
   }
 
-  viewClientDetails() {
-    this.router.navigate(['/client-details']);
+  viewClientDetails(client: HDUAPIClientDetails) {
+    this.router.navigate(['/client-details'], {
+      queryParams: { client: JSON.stringify(client) },
+    });
   }
 }
