@@ -389,10 +389,14 @@ public class ClientRegistryService {
                 patient.getContact().stream()
                         .map(contact -> new ContactPeopleDTO(
                                 contact.hasName() ? contact.getName().getFamily() : null,
-                                contact.hasTelecom() ? (List<String>) contact.getTelecom().stream().map(telecom -> telecom.getValue().toString()) : null,
+                                contact.hasTelecom() ? contact.getTelecom().stream()
+                                        .map(telecom -> telecom.hasValue() ? telecom.getValue() : "")
+                                        .collect(Collectors.toList()) // Collect the stream into a list
+                                        : null,
                                 contact.hasRelationship() ? contact.getRelationship().get(0).getText() : null
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
+
         String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
         List<Patient.PatientLinkComponent> patientLinkComponents = patient.getLink();
         List<Map<String,Object>> relatedClients = new ArrayList();
