@@ -79,7 +79,7 @@ public class SharedHealthRecordsService {
             boolean includeDeceased,
             Integer numberOfVisits
     ) throws Exception {
-        List<SharedHealthRecordsDTO> sharedRecords =  new ArrayList<>();
+        List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
         if (onlyLinkedClients) {
@@ -155,15 +155,44 @@ public class SharedHealthRecordsService {
                         // TODO: Find a way to retrieve these from resource
                         visitDetails.setNewThisYear(Boolean.FALSE);
                         visitDetails.setNew(Boolean.FALSE);
+                        templateData.setVisitDetails(visitDetails);
+
+                        // Get clinicalInformation
+                        // 1. clinicalInformation - vital signs
+                        ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
+                        List<Map<String,Object>> vitalSigns =  new ArrayList<>();
+                        // Get Observation Group
+                        System.out.println(encounter.getIdElement().getIdPart());
+                        List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
+                        System.out.println(observationGroups.size());
+                        for(Observation observationGroup: observationGroups) {
+                            // Get observations mapped to this group
+                            System.out.println(observationGroup.getIdElement().getIdPart());
+                            List<Observation> observationsData = getObservationsByObservationGroupId(
+                                    "vital-signs",
+                                    encounter,
+                                    observationGroup.getIdElement().getIdPart());
+                            System.out.println(observationsData.size());
+                        }
+
+                        // Visit notes
+                        List<String> visitNotes = new ArrayList<>();
+
+                        Map<String,Object> clinicalInformationDetails = new HashMap<>();
+                        clinicalInformationDetails.put("vitalSigns", vitalSigns);
+                        clinicalInformationDetails.put("visitNotes", visitNotes);
+                        clinicalInformationDTO.setClinicalInformation(clinicalInformationDetails);
+                        templateData.setClinicalInformation(clinicalInformationDTO);
+
                         // TODO: Add history when numberOfVisits > 1
                     } else if (organization != null) {
                         // TODO: Request visit from facility provided
+                        Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
                         visitDetails = null;
                     } else {
                         visitDetails = null;
                     }
-                    templateData.setVisitDetails(visitDetails);
-                    sharedRecords.add(templateData);
+                    sharedRecords.add(templateData.toMap());
                 }
             }
         }
@@ -341,9 +370,45 @@ public class SharedHealthRecordsService {
         return List.of();
     }
 
-    public Observation createObservationPayload() throws Exception {
-        Observation observation = new Observation();
+    public List<Observation> getObservationsByCategory(String category,
+                                                       Encounter encounter,
+                                                       boolean forGroup) throws Exception {
+        List<Observation> observations = new ArrayList<>();
+        var observationSearch = fhirClient.search().forResource(Observation.class)
+                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
+        observationSearch.where(Observation.CATEGORY.exactly().code(category));
+        Bundle observationBundle = new Bundle();
+        observationBundle = observationSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
+                Observation observationGroup = (Observation) entryComponent.getResource();
+                if (forGroup && !observationGroup.hasDerivedFrom() && !observationGroup.hasHasMember()) {
+                    observations.add(observationGroup);
+                }
+            }
+        }
 
-        return observation;
+        return observations;
+    }
+
+    public List<Observation> getObservationsByObservationGroupId(String category,
+                                                               Encounter encounter,
+                                                               String id) throws Exception {
+        List<Observation> observations = new ArrayList<>();
+        System.out.println(id);
+        var observationSearch = fhirClient.search().forResource(Observation.class)
+                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
+        observationSearch.where(Observation.CATEGORY.exactly().code(category));
+        observationSearch.where(Observation.HAS_MEMBER.hasId(id));
+        Bundle observationBundle = new Bundle();
+        observationBundle = observationSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
+                Observation observation = (Observation) entryComponent.getResource();
+                observations.add(observation);
+            }
+        }
+
+        return observations;
     }
 }

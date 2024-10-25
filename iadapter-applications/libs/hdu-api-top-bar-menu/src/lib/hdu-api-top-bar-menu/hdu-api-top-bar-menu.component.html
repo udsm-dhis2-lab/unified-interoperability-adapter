@@ -4,12 +4,13 @@
       <img [src]="applicationIcon" alt="" />
     </a>
     <div class="hdu-header">
-      <!-- <a href="/">HDU API | <a href="/workflows">Client Registry</a></a> -->
-      <a href="/">HDU API</a>
+      <a href="/"
+        >HDU API | <a href="/workflows">{{ appName }}</a></a
+      >
     </div>
   </div>
   <div class="hdu-right-header">
-    <span class="hdu-user-profile-name">{{ currentUser?.name }}</span>
+    <span class="hdu-user-profile-name">{{ currentUser?.displayName }}</span>
     <a class="hdu-user-profile-circle"> {{ currentUserInitials }} </a>
   </div>
 </div>

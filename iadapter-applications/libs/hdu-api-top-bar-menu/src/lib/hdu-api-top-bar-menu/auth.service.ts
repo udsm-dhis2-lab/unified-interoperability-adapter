@@ -23,8 +23,8 @@ export class AuthService {
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 
-  logout(): void {
-    this.currentUserSubject.next(null);
+  logout(): Observable<string> {
+    return this.http.get<string>('../../../api/v1/logout');
   }
 
   fetchCurrentUser(): Observable<User> {
