@@ -19,7 +19,7 @@ export class AuthService {
 
   login(credentials: { username: string; password: string }): Observable<User> {
     return this.http
-      .post<User>('../../../api/v1/login', credentials)
+      .post<User>('../../../api/v1/hduApi/login', credentials)
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 
@@ -29,7 +29,7 @@ export class AuthService {
 
   fetchCurrentUser(): Observable<User> {
     return this.http
-      .get<User>('../../../api/v1/me')
+      .get<User>('../../../api/v1/hduApi/me')
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 }
