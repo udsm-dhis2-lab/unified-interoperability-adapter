@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { ActivatedRoute, Router } from '@angular/router';
+import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
 
 interface BasicInfo {
   [key: string]: string;
@@ -47,7 +48,7 @@ export class ClientDetailsComponent implements OnInit {
           Sex: client['demographicDetails']['gender'],
           'Date of Birth': client['demographicDetails']['dateOfBirth'],
           Age:
-            this.calculateAge(client['demographicDetails']['dateOfBirth']) +
+            calculateAge(client['demographicDetails']['dateOfBirth']) +
             ' years',
         };
 
@@ -65,19 +66,5 @@ export class ClientDetailsComponent implements OnInit {
         ];
       }
     });
-  }
-
-  calculateAge(dateOfBirth: string): string {
-    const birthDate = new Date(dateOfBirth);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const monthDifference = today.getMonth() - birthDate.getMonth();
-    if (
-      monthDifference < 0 ||
-      (monthDifference === 0 && today.getDate() < birthDate.getDate())
-    ) {
-      age--;
-    }
-    return age.toString();
   }
 }

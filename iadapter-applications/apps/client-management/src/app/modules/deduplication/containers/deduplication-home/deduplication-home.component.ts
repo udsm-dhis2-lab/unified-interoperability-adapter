@@ -73,7 +73,9 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsFromServer(this.pageIndex, this.pageSize, []);
   }
 
-  viewDeduplicationDetails() {
-    this.router.navigate(['/deduplication/deduplication-details']);
+  viewDeduplicationDetails(deduplicate: Deduplication) {
+    this.router.navigate(['/deduplication/deduplication-details'], {
+      queryParams: { deduplicate: JSON.stringify(deduplicate) },
+    });
   }
 }

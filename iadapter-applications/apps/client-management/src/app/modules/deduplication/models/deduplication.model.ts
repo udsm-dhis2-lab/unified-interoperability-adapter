@@ -6,6 +6,11 @@ export class Deduplication {
   gender!: string;
   idNumber!: string;
   idType!: string;
+  dateOfBirth!: string;
+  emails!: string;
+  occupation!: string;
+  nationality!: string;
+  addresses!: string;
   associatedDuplicates!: number;
 
   static fromJson(json: any): Deduplication {

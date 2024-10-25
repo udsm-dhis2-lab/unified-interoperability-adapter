@@ -1,13 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
 
 interface BasicInfo {
   [key: string]: string;
 }
 
-interface Deduplication {
+interface Deduplicate {
   id: number;
   clientID: string;
   iDNumber: string;
@@ -28,7 +29,7 @@ interface ExtraInfoSection {
   templateUrl: './deduplication-details.component.html',
   styleUrl: './deduplication-details.component.css',
 })
-export class DeduplicationDetailsComponent {
+export class DeduplicationDetailsComponent implements OnInit {
   basicInfo: BasicInfo = {
     'Case ID': 'IBS_00297209',
     'FUll name': 'Herman Moshi Moshi',
@@ -37,7 +38,7 @@ export class DeduplicationDetailsComponent {
     Age: '35 Years',
   };
 
-  listOfData: Deduplication[] = [
+  listOfData: Deduplicate[] = [
     {
       id: 1,
       clientID: 'IBS_00297209',
@@ -95,7 +96,7 @@ export class DeduplicationDetailsComponent {
 
   checked = false;
   indeterminate = false;
-  listOfCurrentPageData: readonly Deduplication[] = [];
+  listOfCurrentPageData: readonly Deduplicate[] = [];
   setOfCheckedId = new Set<number>();
 
   updateCheckedSet(id: number, checked: boolean): void {
@@ -118,7 +119,7 @@ export class DeduplicationDetailsComponent {
     this.refreshCheckedStatus();
   }
 
-  onCurrentPageDataChange($event: readonly Deduplication[]): void {
+  onCurrentPageDataChange($event: readonly Deduplicate[]): void {
     this.listOfCurrentPageData = $event;
     this.refreshCheckedStatus();
   }
@@ -133,7 +134,43 @@ export class DeduplicationDetailsComponent {
       ) && !this.checked;
   }
 
-  constructor(private router: Router, private modal: NzModalService) {}
+  constructor(
+    private router: Router,
+    private modal: NzModalService,
+    private route: ActivatedRoute
+  ) {}
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      if (params['deduplicate']) {
+        const deduplicate = JSON.parse(params['deduplicate']);
+        this.basicInfo = {
+          // 'Case ID': deduplicate['caseID'],
+          'Full name':
+            (deduplicate['fname'] ?? '') +
+            ' ' +
+            (deduplicate['mname'] ?? '') +
+            ' ' +
+            (deduplicate['surname'] ?? ''),
+          Sex: deduplicate['gender'],
+          'Date of Birth': deduplicate['dateOfBirth'],
+          Age: calculateAge(deduplicate['dateOfBirth']) + ' years',
+        };
+
+        this.extraInfo = [
+          {
+            sectionTitle: 'Contact Information',
+            info: {
+              'Phone Number': deduplicate['phoneNumbers'],
+              Email: deduplicate['emails'],
+              addresses: deduplicate['addresses'],
+              Occupation: deduplicate['occupation'],
+              Nationality: deduplicate['nationality'],
+            },
+          },
+        ];
+      }
+    });
+  }
   backToList() {
     this.router.navigate(['']);
   }
