@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { WorkflowComponent } from './workflow.component';
-import { ProcessComponent } from './containers/process/process.component';
-import { MainComponent } from './containers/main/main.component';
 import { FlowchartComponent } from './components/flow-chart/flow-chart.component';
 import { CodeEditorComponent } from '../../shared/components/code-editor/code-editor.component';
 import { WorkflowManagementComponent } from './containers/workflow-management/workflow-management.component';
