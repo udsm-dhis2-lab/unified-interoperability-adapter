@@ -6,6 +6,11 @@ export class Deduplication {
   gender!: string;
   idNumber!: string;
   idType!: string;
+  dateOfBirth!: string;
+  emails!: string;
+  occupation!: string;
+  nationality!: string;
+  addresses!: string;
   associatedDuplicates!: number;
 
   static fromJson(json: any): Deduplication {
@@ -17,6 +22,11 @@ export class Deduplication {
     deduplication.gender = json['gender'];
     deduplication.idNumber = json['identifiers'][0]['id'];
     deduplication.idType = json['identifiers'][0]['type'];
+    deduplication.dateOfBirth = json['dateOfBirth'];
+    deduplication.occupation = json['occupation'];
+    deduplication.nationality = json['nationality'];
+    deduplication.emails = json['emails'];
+    deduplication.addresses = json['addresses'];
     deduplication.associatedDuplicates = json['associatedDuplicates'] ?? 0;
     return deduplication;
   }

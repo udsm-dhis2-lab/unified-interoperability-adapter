@@ -177,8 +177,47 @@ export class DatasetMappingComponent implements OnInit {
     const inputElement = event.target as HTMLInputElement;
     this.selectedInputId = inputElement.id.split('-')[0];
     this.getCategoryOptionCombos(this.selectedInputId);
+  }
+
+  getCategoryOptionCombos(dataElementUuid: string) {
     this.dataSetManagementService
-      .getMappingFromDataStore(this.selectedInputId, this.dataSetUuid)
+      .getCategoryOptionCombos(dataElementUuid)
+      .subscribe({
+        next: (data: any) => {
+          const preSelectedInputs = this.elRef.nativeElement.querySelectorAll(
+            'input[name="entryfield"][style*="background-color: green"]'
+          );
+          preSelectedInputs.forEach((input: HTMLInputElement) => {
+            this.renderer.removeAttribute(input, 'disabled');
+            this.renderer.removeStyle(input, 'background-color');
+          });
+
+          this.isLoadingDisaggregation = false;
+
+          this.mappingsData.disagregations = data.map((item: any) => {
+            const matchingInputs = this.elRef.nativeElement.querySelectorAll(
+              `input[name="entryfield"][id*="${this.selectedInputId}-${item.id}"]`
+            );
+            matchingInputs.forEach((input: HTMLInputElement) => {
+              this.renderer.setAttribute(input, 'disabled', 'true');
+              this.renderer.setStyle(input, 'background-color', 'green');
+            });
+            return new Disaggregation(item.id, item.name);
+          });
+          if (this.mappingsData.disagregations.length > 0) {
+            this.getExistingMappings(this.selectedInputId, this.dataSetUuid);
+          }
+        },
+        error: (error: any) => {
+          this.isLoadingDisaggregation = false;
+          // TODO: Handle error
+        },
+      });
+  }
+
+  getExistingMappings(selectedInputId: string, datasetUuid: string) {
+    this.dataSetManagementService
+      .getExistingMappings(selectedInputId, datasetUuid)
       .subscribe({
         next: (data: any) => {
           this.mappingUuid = data.uuid;
@@ -253,39 +292,6 @@ export class DatasetMappingComponent implements OnInit {
           this.mappingUuid = undefined;
         },
         //TODO: Implement error handling
-      });
-  }
-
-  getCategoryOptionCombos(dataElementUuid: string) {
-    this.dataSetManagementService
-      .getCategoryOptionCombos(dataElementUuid)
-      .subscribe({
-        next: (data: any) => {
-          const preSelectedInputs = this.elRef.nativeElement.querySelectorAll(
-            'input[name="entryfield"][style*="background-color: green"]'
-          );
-          preSelectedInputs.forEach((input: HTMLInputElement) => {
-            this.renderer.removeAttribute(input, 'disabled');
-            this.renderer.removeStyle(input, 'background-color');
-          });
-
-          this.isLoadingDisaggregation = false;
-
-          this.mappingsData.disagregations = data.map((item: any) => {
-            const matchingInputs = this.elRef.nativeElement.querySelectorAll(
-              `input[name="entryfield"][id*="${this.selectedInputId}-${item.id}"]`
-            );
-            matchingInputs.forEach((input: HTMLInputElement) => {
-              this.renderer.setAttribute(input, 'disabled', 'true');
-              this.renderer.setStyle(input, 'background-color', 'green');
-            });
-            return new Disaggregation(item.id, item.name);
-          });
-        },
-        error: (error: any) => {
-          this.isLoadingDisaggregation = false;
-          // TODO: Handle error
-        },
       });
   }
 

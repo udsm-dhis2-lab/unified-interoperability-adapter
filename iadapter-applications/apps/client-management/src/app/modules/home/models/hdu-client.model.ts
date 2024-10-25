@@ -6,6 +6,12 @@ export class HduClient {
   gender!: string;
   idNumber!: string;
   idType!: string;
+  dateOfBirth!: string;
+  phoneNumbers!: string;
+  emails!: string;
+  addresses!: string;
+  occupation!: string;
+  nationality!: string;
 
   static fromJson(json: any): HduClient {
     const hduClient = new HduClient();
@@ -14,6 +20,12 @@ export class HduClient {
     hduClient.mname = json['middleName'];
     hduClient.surname = json['lastName'];
     hduClient.gender = json['gender'];
+    hduClient.dateOfBirth = json['dateOfBirth'];
+    hduClient.phoneNumbers = json['phoneNumbers'];
+    hduClient.emails = json['emails'];
+    hduClient.addresses = json['addresses'];
+    hduClient.occupation = json['occupation'];
+    hduClient.nationality = json['nationality'];
     hduClient.idNumber = json['identifiers'][0]
       ? json['identifiers'][0]['id']
       : '';
@@ -30,4 +42,16 @@ export class HDUAPIClientDetails {
     code: string;
     name: string;
   };
+
+  static fromJson(json: any): HDUAPIClientDetails {
+    const hduClient = new HDUAPIClientDetails();
+    hduClient.demographicDetails = HduClient.fromJson(
+      json['demographicDetails']
+    );
+    hduClient.facilityDetails = {
+      code: json['facilityDetails']['code'],
+      name: json['facilityDetails']['name'],
+    };
+    return hduClient;
+  }
 }

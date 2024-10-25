@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router, RouterModule } from '@angular/router';
-import { HduClient } from '../../models';
+import { HDUAPIClientDetails } from '../../models';
 import { ClientManagementService } from '../../services/client-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
@@ -17,7 +17,7 @@ import { SearchBarComponent } from 'search-bar';
 })
 export class HomeComponent implements OnDestroy, OnInit {
   total = 1;
-  listOfHduClients: HduClient[] = [];
+  listOfHduClients: HDUAPIClientDetails[] = [];
   loading = true;
   pageSize = 10;
   pageIndex = 1;
@@ -73,7 +73,9 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsFromServer(this.pageIndex, this.pageSize, []);
   }
 
-  viewClientDetails() {
-    this.router.navigate(['/client-details']);
+  viewClientDetails(client: HDUAPIClientDetails) {
+    this.router.navigate(['/client-details'], {
+      queryParams: { client: JSON.stringify(client) },
+    });
   }
 }

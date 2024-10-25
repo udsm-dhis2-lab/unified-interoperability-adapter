@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
 
 interface BasicInfo {
   [key: string]: string;
@@ -18,53 +19,52 @@ interface ExtraInfoSection {
   templateUrl: './client-details.component.html',
   styleUrl: './client-details.component.css',
 })
-export class ClientDetailsComponent {
-  basicInfo: BasicInfo = {
-    'Case ID': 'IBS_00297209',
-    'FUll name': 'Herman Moshi Moshi',
-    Sex: 'Male',
-    'Date of Birth': '25/06/1989',
-    Age: '35 Years',
-  };
+export class ClientDetailsComponent implements OnInit {
+  basicInfo: BasicInfo = {};
 
-  extraInfo: ExtraInfoSection[] = [
-    {
-      sectionTitle: 'Contact Information',
-      info: {
-        'Phone Number': '+255-456-7890',
-        Email: 'john.doe@example.com',
-        'Permanet address': 'Dar es salaam, Tanzania',
-        'Current address': 'Morogoro, Tanzania',
-        Occupation: 'Software Engineer',
-        Nationality: 'Tanzanian',
-      },
-    },
-    {
-      sectionTitle: 'Next of Kin',
-      info: {
-        'Full name': 'Herman Moshi Moshi',
-        Relationship: 'Brother',
-        'Phone number': '+255-456-7890',
-      },
-    },
-    {
-      sectionTitle: 'Insurance Type',
-      info: {
-        'Insuarance Provider': 'NSSF',
-        'Insuarance Number': 'IBS_00297209',
-        'Policy Number': 'IBS_00297209',
-        'Group Number': 'IBS_00297209',
-        Region: 'Tanzania',
-      },
-    },
-  ];
+  extraInfo: ExtraInfoSection[] = [];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
   backToList() {
     this.router.navigate(['']);
   }
 
   objectKeys(obj: any): string[] {
     return Object.keys(obj);
+  }
+
+  ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      if (params['client']) {
+        const client = JSON.parse(params['client']);
+        this.basicInfo = {
+          'Case ID': client['demographicDetails']['caseID'],
+          'Full name':
+            (client['demographicDetails']['fname'] ?? '') +
+            ' ' +
+            (client['demographicDetails']['mname'] ?? '') +
+            ' ' +
+            (client['demographicDetails']['surname'] ?? ''),
+          Sex: client['demographicDetails']['gender'],
+          'Date of Birth': client['demographicDetails']['dateOfBirth'],
+          Age:
+            calculateAge(client['demographicDetails']['dateOfBirth']) +
+            ' years',
+        };
+
+        this.extraInfo = [
+          {
+            sectionTitle: 'Contact Information',
+            info: {
+              'Phone Number': client['demographicDetails']['phoneNumbers'],
+              Email: client['demographicDetails']['emails'],
+              addresses: client['demographicDetails']['addresses'],
+              Occupation: client['demographicDetails']['occupation'],
+              Nationality: client['demographicDetails']['nationality'],
+            },
+          },
+        ];
+      }
+    });
   }
 }

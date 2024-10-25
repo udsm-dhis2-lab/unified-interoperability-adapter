@@ -31,6 +31,7 @@ export class DeduplicationManagementService {
       })
       .pipe(
         map((response: { results: any }) => {
+          console.log('RESPONSE PAYLOAD', response);
           return DeduplicationPage.fromJson(response);
         }),
         catchError((error: any) => {
