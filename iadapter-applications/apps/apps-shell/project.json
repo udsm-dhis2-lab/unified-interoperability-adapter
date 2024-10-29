@@ -1,0 +1,102 @@
+{
+  "name": "apps-shell",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/apps-shell/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/apps-shell",
+        "index": "apps/apps-shell/src/index.html",
+        "browser": "apps/apps-shell/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/apps-shell/tsconfig.app.json",
+        "inlineStyleLanguage": "less",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/apps-shell/public"
+          }
+        ],
+        "styles": [
+          "apps/apps-shell/src/styles.less",
+          "node_modules/ng-zorro-antd/src/ng-zorro-antd.min.css",
+          "node_modules/ng-zorro-antd/resizable/style/index.min.css",
+          "node_modules/ng-zorro-antd/code-editor/style/index.min.css",
+          "node_modules/ng-zorro-antd/graph/style/index.min.css"
+        ],
+        "scripts": [],
+        "server": "apps/apps-shell/src/main.server.ts",
+        "prerender": true,
+        "ssr": {
+          "entry": "apps/apps-shell/server.ts"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "apps-shell:build:production"
+        },
+        "development": {
+          "buildTarget": "apps-shell:build:development",
+          "proxyConfig": "apps/login/proxy-config.json"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "apps-shell:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/apps-shell/jest.config.ts"
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "apps-shell:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/apps-shell/browser",
+        "spa": true
+      }
+    }
+  }
+}

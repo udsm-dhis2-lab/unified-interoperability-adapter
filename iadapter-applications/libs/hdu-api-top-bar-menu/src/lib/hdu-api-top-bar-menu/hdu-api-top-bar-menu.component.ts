@@ -6,9 +6,9 @@ import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { TZNationalEmblemIcon } from './resources/national-emblem.icon';
 import { SideMenuService } from './services/menu/side-menu.service';
-import { User } from './models/user.model';
 import { AuthService } from './auth.service';
 import { getInitials } from './helpers/user.helper';
+import { User } from './models/user.model';
 
 @Component({
   selector: 'lib-hdu-api-top-bar-menu',

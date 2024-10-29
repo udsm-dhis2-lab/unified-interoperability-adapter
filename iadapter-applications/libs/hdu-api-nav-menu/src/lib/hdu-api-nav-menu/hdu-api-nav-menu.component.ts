@@ -95,6 +95,13 @@ export class HduApiNavMenuComponent implements OnInit {
         },
       ],
     },
+    {
+      name: 'Settings',
+      id: 'settings',
+      routeUrl: '/settings',
+      icon: 'settings',
+      category: 'main',
+    },
   ];
 
   @Output() selectedMenu: EventEmitter<Menu> = new EventEmitter<Menu>();

@@ -1,3 +1,25 @@
-import { CurrentUserModel } from '@models';
+export interface User {
+  uuid: string;
+  authenticated: boolean;
+  displayName: string;
+  firstName: string;
+  lastName: string;
+  username: string;
+  externalAuth: string;
+  groups: GroupModel[];
+  email: string;
+  roles: RoleModel[];
+  authorities: string[];
+  avatar: string;
+}
 
-export interface User extends CurrentUserModel {}
+export interface GroupModel {
+  name: string;
+  uuid: string;
+}
+
+export interface RoleModel {
+  name?: string;
+  rolename?: string;
+  uuid: string;
+}

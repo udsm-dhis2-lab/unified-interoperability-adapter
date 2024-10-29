@@ -1,0 +1,16 @@
+<lib-hdu-api-top-bar-menu [appName]="'Dashboard'"></lib-hdu-api-top-bar-menu>
+
+<nz-layout>
+  <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
+    <lib-hdu-api-nav-menu
+      [activeMainMenuId]="'dashboard'"
+      (selectedMenu)="onGetSelectedMenu($event)"
+    ></lib-hdu-api-nav-menu>
+  </nz-sider>
+
+  <nz-content>
+    <div class="inner-content">
+      <router-outlet />
+    </div>
+  </nz-content>
+</nz-layout>
