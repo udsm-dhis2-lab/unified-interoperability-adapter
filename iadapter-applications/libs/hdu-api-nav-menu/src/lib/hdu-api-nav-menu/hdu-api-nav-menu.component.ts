@@ -23,7 +23,7 @@ export class HduApiNavMenuComponent implements OnInit {
       name: 'Dashboard',
       id: 'dashboard',
       routeUrl: '/dashboard',
-      icon: 'apartment',
+      icon: 'appstore',
       category: 'main',
     },
     {
@@ -36,14 +36,14 @@ export class HduApiNavMenuComponent implements OnInit {
         {
           name: 'Clients',
           id: 'clients',
-          routeUrl: '/',
+          routeUrl: '/client-management/',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
           id: 'deduplication',
           name: 'Deduplication',
-          routeUrl: '/deduplication',
+          routeUrl: '/client-management/deduplication',
           icon: 'merge',
           subMenus: [],
         },
@@ -82,14 +82,14 @@ export class HduApiNavMenuComponent implements OnInit {
         {
           name: 'Datasets',
           id: 'datasets',
-          routeUrl: '',
+          routeUrl: '/mapping-and-data-extraction',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
           name: 'Settings',
           id: 'settings',
-          routeUrl: '/settings',
+          routeUrl: '/mapping-and-data-extraction/settings',
           icon: 'unordered-list',
           subMenus: [],
         },
@@ -99,7 +99,7 @@ export class HduApiNavMenuComponent implements OnInit {
       name: 'Settings',
       id: 'settings',
       routeUrl: '/settings',
-      icon: 'settings',
+      icon: 'setting',
       category: 'main',
     },
   ];

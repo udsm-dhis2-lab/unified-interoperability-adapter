@@ -3,9 +3,7 @@
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
     "types": ["node"],
-    "paths": {
-      "settings/*": ["apps/settings/src/app/*"]
-    }
+    "paths": {}
   },
   "files": ["src/main.ts", "src/main.server.ts", "server.ts"],
   "include": ["src/**/*.d.ts"],

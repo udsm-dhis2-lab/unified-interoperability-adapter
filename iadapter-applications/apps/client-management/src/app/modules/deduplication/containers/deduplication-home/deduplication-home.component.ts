@@ -5,7 +5,7 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Deduplication } from '../../models/deduplication.model';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 import { Subscription } from 'rxjs';
-import { SearchBarComponent } from 'search-bar';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-deduplication-home',

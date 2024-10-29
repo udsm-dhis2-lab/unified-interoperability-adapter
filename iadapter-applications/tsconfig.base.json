@@ -25,7 +25,8 @@
         "libs/hdu-api-top-bar-menu/src/index.ts"
       ],
       "@models": ["libs/models/src/index.ts"],
-      "search-bar": ["libs/search-bar/src/index.ts"]
+      "search-bar": ["libs/search-bar/src/index.ts"],
+      "settings/*": ["apps/settings/src/app/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
