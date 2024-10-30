@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
+import { HduHttpService } from '../../../../../../../../libs/hdu-api-http-client/src';
 import { WorkflowEnum } from '../../enums/http-api.enum';
 import {
   DeleteResponse,

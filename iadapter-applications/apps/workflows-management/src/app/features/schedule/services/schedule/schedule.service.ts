@@ -7,7 +7,7 @@ import {
 import { catchError, Observable, throwError } from 'rxjs';
 import { HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { ScheduleEnum } from '../../enums/http-api.enum';
-import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
+import { HduHttpService } from '../../../../../../../../libs/hdu-api-http-client/src';
 import { ExecutedScheduleTask } from '../../models/runned.model';
 
 @Injectable({

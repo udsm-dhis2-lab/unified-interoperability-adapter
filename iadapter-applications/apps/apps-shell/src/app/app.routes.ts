@@ -17,6 +17,13 @@ export const appRoutes: Route[] = [
       ).then((m) => m.ClientManagementModule),
   },
   {
+    path: 'workflows-management',
+    loadChildren: () =>
+      import(
+        './../../../../apps/workflows-management/src/app/workflows-management/workflows-management.module'
+      ).then((m) => m.WorkflowsManagementModule),
+  },
+  {
     path: 'settings',
     loadChildren: () =>
       import(

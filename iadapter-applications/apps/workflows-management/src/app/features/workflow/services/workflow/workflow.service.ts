@@ -6,11 +6,13 @@ import {
   WorkflowAPIResult,
 } from '../../models/workflow.model';
 import { HttpErrorResponse, HttpParams } from '@angular/common/http';
-import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
+import { HduHttpService } from '../../../../../../../../libs/hdu-api-http-client/src/index';
 import { WorkflowEnum } from '../../enums/http-api.enum';
 import { ExecutedWorkflow } from '../../models/runned.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class WorkflowService {
   constructor(private hduHttpService: HduHttpService) {}
 

@@ -30,7 +30,6 @@ import { NzModalModule, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { WorkflowState } from '../../state/workflow/workflow.state';
 import { select, Store } from '@ngrx/store';
 import { WorkflowActions } from '../../state/workflow/workflow.actions';
-import { WorkflowService } from '../../services/workflow/workflow.service';
 import {
   getUpdatedWorkflowStatus,
   getWorkflows,
@@ -40,7 +39,7 @@ import {
   WorkflowFormCreate,
   WorkflowTable,
 } from '../../models/workflow.model';
-import { defaultIfEmpty} from 'rxjs';
+import { defaultIfEmpty } from 'rxjs';
 import { EditComponent } from '../edit/edit.component';
 import { Router } from '@angular/router';
 import { WorkflowRunLoggingComponent } from '../workflow-run-logging/workflow-run-logging.component';
@@ -88,7 +87,7 @@ interface Setting {
     NzTagModule,
     WorkflowRunLoggingComponent,
   ],
-  providers: [WorkflowService],
+  providers: [],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
 })
