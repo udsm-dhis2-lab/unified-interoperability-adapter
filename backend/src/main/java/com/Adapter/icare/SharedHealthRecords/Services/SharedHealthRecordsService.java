@@ -109,6 +109,8 @@ public class SharedHealthRecordsService {
                 .returnBundle(Bundle.class)
                 .execute();
 
+        System.out.println(response.getEntry().size());
+
         if (!response.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {

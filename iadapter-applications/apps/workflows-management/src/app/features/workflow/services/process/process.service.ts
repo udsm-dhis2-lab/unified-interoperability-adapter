@@ -9,7 +9,7 @@ import {
   ProcessAPIResult,
 } from '../../models/process.model';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ProcessService {
   constructor(private hduHttpService: HduHttpService) {}
 

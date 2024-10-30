@@ -5,7 +5,9 @@ import { HduHttpService } from '../../../../../../../../libs/hdu-api-http-client
 import { WorkflowEnum } from '../../enums/http-api.enum';
 import { DeleteResponse, Task, TaskAPIResult } from '../../models/task.model';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class TaskService {
   constructor(private hduHttpService: HduHttpService) {}
 

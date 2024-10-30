@@ -186,10 +186,7 @@ export class ScheduleTableComponent implements OnInit {
       });
 
     this.searchControl.valueChanges
-      .pipe(
-        debounceTime(100), 
-        distinctUntilChanged()
-      )
+      .pipe(debounceTime(100), distinctUntilChanged())
       .subscribe((searchTerm) => {
         this.onSearch(searchTerm);
       });
@@ -243,7 +240,14 @@ export class ScheduleTableComponent implements OnInit {
         ScheduleActions.setCurrentSelectedSchedule({ schedule: scheduleTable })
       );
 
-      this.router.navigate(['/', 'config', 'edit', scheduleTable.id]);
+      this.router.navigate([
+        '/',
+        'workflows-management',
+        'schedules',
+        'config',
+        'edit',
+        scheduleTable.id,
+      ]);
     }
   }
 

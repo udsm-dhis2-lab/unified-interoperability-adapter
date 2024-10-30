@@ -242,7 +242,7 @@ export class TableComponent implements OnInit {
     //   });
     // const decodedUrl = decodeURIComponent(workflowTable.id);
     // this.router.navigate([decodeURIComponent('main/flow')]);
-    this.router.navigate(['/', 'config', 'flow']);
+    this.router.navigate(['/', 'workflows-management', 'config', 'flow']);
   }
 
   onDeleteWorkflow(workflowTable: WorkflowTable) {
@@ -340,7 +340,13 @@ export class TableComponent implements OnInit {
         WorkflowActions.setCurrentSelectedWorkflow({ workflow: workflowTable })
       );
       // this.router.navigate([decodeURIComponent('main/flow'), decodedUrl]);
-      this.router.navigate(['/', 'config', 'flow', `${workflowTable.id}`]);
+      this.router.navigate([
+        '/',
+        'workflows-management',
+        'config',
+        'flow',
+        `${workflowTable.id}`,
+      ]);
     }
   }
 }

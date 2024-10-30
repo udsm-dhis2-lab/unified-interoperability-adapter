@@ -23,7 +23,7 @@
     "@ngrx/router-store": "^18.1.0",
     "@ngrx/signals": "^18.1.0",
     "@ngrx/store": "^18.1.0",
-    "@ngrx/store-devtools": "^18.1.0",
+    "@ngrx/store-devtools": "^18.1.1",
     "express": "~4.18.2",
     "lodash": "^4.17.21",
     "mermaid": "^11.3.0",
