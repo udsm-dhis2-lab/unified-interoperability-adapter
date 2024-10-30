@@ -221,9 +221,9 @@ export class DatasetMappingComponent implements OnInit {
       .subscribe({
         next: (data: any) => {
           this.mappingUuid = data.uuid;
-          if (data.mapping.mappings.length > 0) {
+          if (data?.mapping?.mappings?.length > 0) {
             this.useIcdCodes = true;
-            this.selectedICdCodes = data.mapping.mappings.map(
+            this.selectedICdCodes = data?.mapping?.mappings.map(
               (item: any) => item.code
             );
           }
