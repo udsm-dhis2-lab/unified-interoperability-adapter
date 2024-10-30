@@ -17,6 +17,13 @@ export const appRoutes: Route[] = [
       ).then((m) => m.ClientManagementModule),
   },
   {
+    path: 'mapping-and-data-extraction',
+    loadChildren: () =>
+      import(
+        './../../../../apps/mapping-and-data-extraction/src/app/mapping-and-data-extraction/mapping-and-data-extraction.module'
+      ).then((m) => m.MappingAndDataExtractionModule),
+  },
+  {
     path: 'workflows-management',
     loadChildren: () =>
       import(

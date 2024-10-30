@@ -6,7 +6,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { SearchBarComponent } from 'search-bar';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 import {
   BehaviorSubject,
   debounceTime,
