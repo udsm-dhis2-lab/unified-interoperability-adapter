@@ -119,7 +119,6 @@ public class ClientRegistryService {
                 if (entry.getResource() instanceof Patient) {
                     try {
                         Patient patientData = (Patient) entry.getResource();
-                        patientData.getIdentifier();
                         PatientDTO patientDTO = mapToPatientDTO(patientData);
                         ClientRegistrationDTO clientDetails = new ClientRegistrationDTO();
                         clientDetails.setDemographicDetails(patientDTO.toMap());
