@@ -13,4 +13,6 @@ public class VisitDetailsDTO {
     private boolean newThisYear;
     private boolean isNew;
     private Date closedDate;
+    private String visitType;
+    private CareServiceDTO careService;
 }

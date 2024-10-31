@@ -13,4 +13,8 @@ public class CausesOfDeathDetailsDTO {
     private String lineB;
     private String lineC;
     private String lineD;
+    private String causeOfDeathOther;
+    private String mannerOfDeath;
+    private String placeOfDeath;
+    private OtherDeathDetailsDTO otherDeathDetails;
 }
