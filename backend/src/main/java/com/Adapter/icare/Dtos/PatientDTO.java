@@ -128,7 +128,7 @@ public class PatientDTO {
                 String type = null;
                 if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
                     try {
-                       type = identifier.getType().getCoding().get(0).getCode();
+                        type = identifier.getType().getCoding().get(0).getCode();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -145,7 +145,7 @@ public class PatientDTO {
         if (identifiersList != null && !identifiersList.isEmpty()) {
             for (Identifier identifier: this.getIdentifiers()) {
                 IdentifierDTO identifierDTO = new IdentifierDTO();
-                identifierDTO.setId(identifier.getValue());
+                identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): identifier.getType().hasCoding() && identifier.getType().getCoding().get(0).getCode().equals("HCRCODE") ? this.getId(): null);
                 String type = null;
                 if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
                     try {
