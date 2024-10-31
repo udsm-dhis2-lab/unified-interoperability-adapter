@@ -21,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -179,7 +180,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Object>> passDataToMediator(@RequestBody DataTemplateDTO dataTemplate) throws MethodArgumentNotValidException {
+    public ResponseEntity<Map<String,Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate) {
         /**
          * Send data to Mediator where all the logics will be done.
          */
@@ -347,7 +348,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "configurations", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> addConfigurations(@RequestBody DatastoreConfigurationsDTO configurations) throws Exception {
+    public ResponseEntity<Map<String, Object>> addConfigurations(@RequestBody DatastoreConfigurationsDTO configurations) {
         try {
             String namespace = datastoreConstants.ConfigurationsNamespace;
             Map<String, Object> returnObject = new HashMap<>();
@@ -378,7 +379,7 @@ public class HDUAPIController {
 
     @PutMapping(value = "configurations/{uuid}", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> updateConfigurations(@RequestBody DatastoreConfigurationsDTO configurations,
-                                                                    @PathVariable(value = "uuid") String uuid) throws Exception {
+                                                                    @PathVariable(value = "uuid") String uuid) {
         try {
             Datastore existingConfigs = datastoreService.getDatastoreByUuid(uuid);
             if (existingConfigs != null && existingConfigs.getNamespace() .equals(datastoreConstants.ConfigurationsNamespace)) {
@@ -817,7 +818,7 @@ public class HDUAPIController {
 
     @PostMapping(value = "mappings")
     public ResponseEntity<Map<String,Object>> addMappings(
-            @RequestBody MappingsDTO mappings) throws Exception {
+            @RequestBody MappingsDTO mappings) {
         try {
             Datastore datastore = new Datastore();
             if (mappings.getUuid() != null) {
