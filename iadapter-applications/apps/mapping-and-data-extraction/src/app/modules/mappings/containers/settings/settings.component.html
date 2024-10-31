@@ -45,11 +45,11 @@
           <td>{{ data.name }}</td>
           <td>
             <ng-container *ngFor="let option of data.options">
-              <ng-container *ngFor="let key of getKeys(option)">
-                <nz-tag style="margin-right: 16px"
-                  >{{ key }}: {{ option[key] }}</nz-tag
-                >
-              </ng-container>
+              <nz-tag style="margin-right: 16px">
+                <ng-container *ngFor="let key of getKeys(option)">
+                  {{ key }}: {{ option[key] }} ,
+                </ng-container>
+              </nz-tag>
             </ng-container>
           </td>
           <td class="centered-cell">
