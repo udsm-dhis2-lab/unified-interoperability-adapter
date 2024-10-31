@@ -122,6 +122,19 @@ public class ClientRegistryController {
         }
     }
 
+    @PostMapping(value = "activateIdentifiers", consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<String>> activateIdentifiers(
+            @RequestBody List<String> identifiers
+    ) throws Exception {
+        try {
+           List idsActivated = clientRegistryService.activateIdentifiers(identifiers);
+           return ResponseEntity.ok(idsActivated);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @GetMapping("/identifiersPool/count")
     public Integer countOfIdentifiers(@RequestParam (value = "category", required = false) ClientRegistryIdPool.IdSearchCategory idSearchCategory) throws Exception {
         try {

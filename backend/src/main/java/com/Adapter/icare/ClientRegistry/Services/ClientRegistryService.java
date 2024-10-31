@@ -350,6 +350,24 @@ public class ClientRegistryService {
         }
     }
 
+    public List<String> activateIdentifiers(List<String> identifiers) throws Exception {
+        try {
+            List<String> idsActivated = new ArrayList<>();
+            for(String identifier: identifiers) {
+                ClientRegistryIdPool clientRegistryIdPool = clientRegistryIdsRepository.getIdPoolDetails(identifier);
+                clientRegistryIdPool.setUsed(false);
+                ClientRegistryIdPool updatedIdentifier = clientRegistryIdsRepository.save(clientRegistryIdPool);
+                if (!updatedIdentifier.isUsed()) {
+                    idsActivated.add(updatedIdentifier.getIdentifier());
+                }
+            }
+            return idsActivated;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
+
     public Integer getCountOfIdentifiersBySearchCategory(
             ClientRegistryIdPool.IdSearchCategory idSearchCategory) throws Exception {
         if (idSearchCategory.equals(ClientRegistryIdPool.IdSearchCategory.UNUSED)) {

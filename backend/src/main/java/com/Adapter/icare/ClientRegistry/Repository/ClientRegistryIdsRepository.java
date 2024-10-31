@@ -13,6 +13,9 @@ public interface ClientRegistryIdsRepository extends JpaRepository<ClientRegistr
     @Query(value = "SELECT * FROM client_registry_id_pool WHERE is_used=false LIMIT :limit",nativeQuery = true)
     List<ClientRegistryIdPool> getIds(Integer limit);
 
+    @Query(value = "SELECT * FROM client_registry_id_pool WHERE identifier=:identifier", nativeQuery = true)
+    ClientRegistryIdPool getIdPoolDetails(String identifier);
+
 //    @Query(value = "SELECT COUNT(cridp) FROM client_registry_id_pool cridp WHERE is_used = true ")
 //    Integer getCountOfAllIdsUsed();
     Long countByUsedTrue();
