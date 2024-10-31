@@ -37,6 +37,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/v1/hduApi/cr")
 public class ClientRegistryController {
@@ -102,7 +104,7 @@ public class ClientRegistryController {
 
     @PostMapping(value = "/generateIdentifiers", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> generateClientRegistryIdentifiers(
-            @RequestBody ClientRegistryIdDTO clientRegistryIdDTO) throws Exception {
+           @Valid @RequestBody ClientRegistryIdDTO clientRegistryIdDTO) {
         Map<String,Object> response = new HashMap<>();
         try {
             if (clientRegistryIdDTO.getLimit() > 0) {
@@ -124,8 +126,8 @@ public class ClientRegistryController {
 
     @PostMapping(value = "activateIdentifiers", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<List<String>> activateIdentifiers(
-            @RequestBody List<String> identifiers
-    ) throws Exception {
+            @Valid @RequestBody List<String> identifiers
+    ) {
         try {
            List idsActivated = clientRegistryService.activateIdentifiers(identifiers);
            return ResponseEntity.ok(idsActivated);
@@ -228,8 +230,8 @@ public class ClientRegistryController {
 
     @PostMapping(value = "/clients/merge",consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> mergePatients(
-            @RequestBody ClientsToMergeDTO clientsToMerge
-    ) throws Exception {
+            @Valid @RequestBody ClientsToMergeDTO clientsToMerge
+    ) {
         try {
             Map<String, Object> mergeResponse = new HashMap<>();
             // Get patients

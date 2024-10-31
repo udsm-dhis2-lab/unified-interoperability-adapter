@@ -348,7 +348,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "configurations", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> addConfigurations(@RequestBody DatastoreConfigurationsDTO configurations) {
+    public ResponseEntity<Map<String, Object>> addConfigurations(@Valid @RequestBody DatastoreConfigurationsDTO configurations) {
         try {
             String namespace = datastoreConstants.ConfigurationsNamespace;
             Map<String, Object> returnObject = new HashMap<>();
@@ -378,7 +378,7 @@ public class HDUAPIController {
     }
 
     @PutMapping(value = "configurations/{uuid}", consumes = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> updateConfigurations(@RequestBody DatastoreConfigurationsDTO configurations,
+    public ResponseEntity<Map<String, Object>> updateConfigurations(@Valid @RequestBody DatastoreConfigurationsDTO configurations,
                                                                     @PathVariable(value = "uuid") String uuid) {
         try {
             Datastore existingConfigs = datastoreService.getDatastoreByUuid(uuid);
@@ -797,7 +797,7 @@ public class HDUAPIController {
     @PutMapping(value = "mappings/{uuid}")
     public ResponseEntity<Map<String,Object>> updateMappingsByUuid(
             @PathVariable(value = "uuid") String uuid,
-            @RequestBody MappingsDTO mappingsDTO) throws Exception {
+            @Valid @RequestBody MappingsDTO mappingsDTO) {
         try {
             Datastore mappingsToUpdate = datastoreService.getDatastoreByUuid(uuid);
             if (mappingsToUpdate != null) {
@@ -818,7 +818,7 @@ public class HDUAPIController {
 
     @PostMapping(value = "mappings")
     public ResponseEntity<Map<String,Object>> addMappings(
-            @RequestBody MappingsDTO mappings) {
+            @Valid @RequestBody MappingsDTO mappings) {
         try {
             Datastore datastore = new Datastore();
             if (mappings.getUuid() != null) {

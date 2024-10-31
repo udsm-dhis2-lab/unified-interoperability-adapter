@@ -22,6 +22,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -163,7 +164,7 @@ public class SharedHealthRecordsController {
     }
 
     @PostMapping(value = "/sharedRecords", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Object>> addSharedRecords(@RequestBody SharedHealthRecordsDTO sharedRecordsPayload) throws Exception {
+    public ResponseEntity<Map<String,Object>> addSharedRecords(@Valid @RequestBody SharedHealthRecordsDTO sharedRecordsPayload) {
         try {
             Map <String,Object> payload = new HashMap<>();
             DataTemplateDataDTO dataTemplateDataDTO = new DataTemplateDataDTO();
