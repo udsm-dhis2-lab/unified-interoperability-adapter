@@ -13,6 +13,7 @@ import { Menu } from './shared/menu.model';
     HduApiNavMenuComponent,
     ...antDesignModules,
   ],
+  providers: [],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.less',
