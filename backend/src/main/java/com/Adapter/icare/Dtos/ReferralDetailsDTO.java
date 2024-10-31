@@ -12,6 +12,5 @@ import java.util.Map;
 public class ReferralDetailsDTO {
     private Date referralDate;
     private List<String> reason;
-    private List<String> reasons;
     private Map<String,Object> referringClinician; // TODO: Add specific model
 }
