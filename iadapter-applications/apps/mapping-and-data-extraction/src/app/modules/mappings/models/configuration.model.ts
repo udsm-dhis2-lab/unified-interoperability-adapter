@@ -1,9 +1,8 @@
-import { Option } from './options.model';
-
 export class Configuration {
   key!: string;
   name!: string;
   code!: string;
+  uuid?: string;
   options!: { [key: string]: any }[];
 
   static fromJson(json: any): Configuration {
@@ -11,6 +10,7 @@ export class Configuration {
     configuration.key = json['key'];
     configuration.name = json['name'];
     configuration.code = json['code'];
+    configuration.uuid = json['uuid'];
 
     if (typeof json['options'] === 'string') {
       try {

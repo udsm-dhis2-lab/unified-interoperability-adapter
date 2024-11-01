@@ -16,3 +16,24 @@ nz-form-label {
 nz-form-control {
   width: 100%;
 }
+
+.delete-button {
+  padding-left: 0;
+  margin-left: 0;
+  color: #ff4d4f;
+}
+
+.centered-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.alert-container {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  z-index: 1000; /* Ensure it is above other elements */
+}
