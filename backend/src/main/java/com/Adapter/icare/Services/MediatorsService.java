@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -50,11 +51,13 @@ public class MediatorsService {
         }
     }
 
+    @Transactional
     public Mediator saveMediatorConfigs(Mediator mediator) throws Exception {
         if (mediator.getUuid() == null) {
             UUID uuid = UUID.randomUUID();
             mediator.setUuid(uuid.toString());
         }
+        mediator.getApis().forEach(api -> api.setMediator(mediator));
         return mediatorsRepository.save(mediator);
     }
 

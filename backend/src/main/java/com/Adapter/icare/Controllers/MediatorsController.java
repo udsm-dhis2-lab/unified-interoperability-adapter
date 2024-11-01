@@ -17,6 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,7 @@ public class MediatorsController {
     }
 
     @PostMapping("mediators")
-    public ResponseEntity<Map<String,Object>> saveMediator(@RequestBody MediatorDTO mediatorDTO) throws Exception {
+    public ResponseEntity<Map<String,Object>> saveMediator( @Valid @RequestBody MediatorDTO mediatorDTO) {
         try {
             Mediator mediator = new Mediator().fromMap(mediatorDTO);
             if (this.authentication != null && this.authenticatedUser != null) {
