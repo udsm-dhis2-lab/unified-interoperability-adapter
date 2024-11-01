@@ -83,6 +83,7 @@ public class MediatorsService {
             String uuid = mediator.getUuid();
             Mediator mediatorToUpdate = mediatorsRepository.getMediatorByUuid(uuid);
             if (mediatorToUpdate != null) {
+                mediator.getApis().forEach(api -> api.setMediator(mediator));
                 return mediatorsRepository.save(mediator);
             } else {
                 throw new IllegalStateException("Mediator with uuid " + uuid + " does not exists");

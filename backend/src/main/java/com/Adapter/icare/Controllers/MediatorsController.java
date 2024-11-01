@@ -90,7 +90,7 @@ public class MediatorsController {
     }
 
     @PutMapping("mediators/{uuid}")
-    public ResponseEntity<Map<String,Object>> updateMediator(@PathVariable("uuid") String uuid, @RequestBody MediatorDTO mediatorDTO) throws Exception {
+    public ResponseEntity<Map<String,Object>> updateMediator(@PathVariable("uuid") String uuid, @Valid @RequestBody MediatorDTO mediatorDTO) {
         try {
             Mediator mediator = new Mediator().fromMap(mediatorDTO);
             if (mediator.getUuid() == null) {
