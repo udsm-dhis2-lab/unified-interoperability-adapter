@@ -21,7 +21,7 @@
 
 <nz-table #dynamicTable [nzScroll]="{ x: scrollX, y: scrollY }" [nzData]="workflows" [nzPageSize]="12"
     [nzTableLayout]="settingValue.tableLayout" [nzBordered]="settingValue.bordered" [nzSimple]="settingValue.simple"
-    [nzLoading]="settingValue.loading" [nzPaginationType]="settingValue.paginationType"
+    [nzLoading]="(loadingWorkflows$ | async) || settingValue.loading" [nzPaginationType]="settingValue.paginationType"
     [nzPaginationPosition]="settingValue.position" [nzShowSizeChanger]="settingValue.sizeChanger"
     [nzFrontPagination]="settingValue.pagination" [nzShowPagination]="settingValue.pagination"
     [nzFooter]="settingValue.footer ? '' : null" [nzTitle]="settingValue.title ? '' : null" [nzSize]="settingValue.size"
