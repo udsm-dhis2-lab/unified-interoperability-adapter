@@ -29,12 +29,7 @@
           "node_modules/ng-zorro-antd/code-editor/style/index.min.css",
           "node_modules/ng-zorro-antd/graph/style/index.min.css"
         ],
-        "scripts": [],
-        "server": "apps/apps-shell/src/main.server.ts",
-        "prerender": true,
-        "ssr": {
-          "entry": "apps/apps-shell/server.ts"
-        }
+        "scripts": []
       },
       "configurations": {
         "production": {
@@ -50,7 +45,9 @@
               "maximumError": "400kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "baseHref": "/apps/",
+          "deployUrl": "/apps/"
         },
         "development": {
           "optimization": false,
