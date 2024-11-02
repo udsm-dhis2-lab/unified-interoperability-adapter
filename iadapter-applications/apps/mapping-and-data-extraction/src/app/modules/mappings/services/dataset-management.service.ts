@@ -23,7 +23,7 @@ import { CategoryOptionCombo } from '../models/category-option-combo.model';
 export class DatasetManagementService {
   instanceUrl: string = MappingsUrls.GET_INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
-  configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
+  configurationUrl: string = MappingsUrls.CONFIGURATIONS;
   addMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
   getMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
   updateMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
@@ -105,6 +105,16 @@ export class DatasetManagementService {
       map((response: any) => console.log(response)),
       catchError((error: any) => this.handleError(error))
     );
+  }
+
+  deleteConfiguration(uuid: string): Observable<any> {
+    return this.httpClient
+      .delete<any>(`${this.configurationUrl}/${uuid}`, {})
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
   }
 
   getIcdCodes(
