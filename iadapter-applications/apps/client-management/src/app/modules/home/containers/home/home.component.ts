@@ -48,8 +48,7 @@ export class HomeComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           this.loading = false;
-          //TODO: Set total from data after it's support in fhir is implemented
-          this.total = 4000; //data.total;
+          this.total = data.total; 
           this.pageIndex = data.pageIndex;
           this.listOfHduClients = data.listOfClients;
         },
