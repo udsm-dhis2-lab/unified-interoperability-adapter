@@ -11,6 +11,8 @@ import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -26,4 +28,6 @@ export const antDesignModules = [
   NzModalModule,
   NzDropDownModule,
   NzBreadCrumbModule,
+  NzSpinModule,
+  NzAlertModule,
 ];
