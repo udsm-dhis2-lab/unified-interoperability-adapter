@@ -54,12 +54,17 @@ public class UserInterfaceController {
         }
     }
 
+    @GetMapping("/")
+    public RedirectView redirectToLogin() {
+        return new RedirectView("/login");
+    }
+
     @GetMapping("{appRoute}")
     public String provideUi(@PathVariable String appRoute) {
         try {
 //            System.out.println(appRoute);
             String appPath = appsRoutesToResourceMap.get(appRoute);
-//            System.out.println(appPath);
+            System.out.println(appPath);
             if (appPath != null) {
                 return "forward:" + appPath + "/index.html";
             } else {

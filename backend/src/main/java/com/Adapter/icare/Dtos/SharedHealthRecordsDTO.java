@@ -54,6 +54,20 @@ public class SharedHealthRecordsDTO {
 
     private CausesOfDeathDetailsDTO causesOfDeathDetails;
 
+    private AntenatalCareDetailsDTO antenatalCareDetails;
+
+    private LaborAndDeliveryDetailsDTO laborAndDeliveryDetails;
+
+    private BirthDetailsDTO birthDetails;
+
+    private PostnatalDetailsDTO postnatalDetails;
+
+    private List<ProphylAxisDetailsDTO> prophylAxisDetails;
+
+    private List<VaccinationDetailsDTO> vaccinationDetails;
+
+    private FamilyPlanningDetailsDTO familyPlanningDetails;
+
     private List<BillingsDetailsDTO> billingsDetails;
 
     private VisitMainPaymentDetailsDTO visitMainPaymentDetails;
@@ -81,6 +95,13 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("admissionDetails", this.getAdmissionDetails());
         sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
         sharedRecordMap.put("causesOfDeathDetails", this.getCausesOfDeathDetails());
+        sharedRecordMap.put("antenatalCareDetails", this.getAntenatalCareDetails());
+        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails());
+        sharedRecordMap.put("vaccinationDetails", this.getVaccinationDetails());
+        sharedRecordMap.put("familyPlanningDetails", this.getFamilyPlanningDetails());
+        sharedRecordMap.put("laborAndDeliveryDetails", this.getLaborAndDeliveryDetails());
+        sharedRecordMap.put("birthDetails", this.getBirthDetails());
+        sharedRecordMap.put("postnatalDetails", this.getPostnatalDetails());
         sharedRecordMap.put("billingsDetails", this.getBillingsDetails());
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());

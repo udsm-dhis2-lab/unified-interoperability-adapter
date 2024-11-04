@@ -52,7 +52,7 @@ export class HduApiNavMenuComponent implements OnInit {
     {
       name: 'Worflows Management',
       id: 'workflows-management',
-      routeUrl: '/worflows-management',
+      routeUrl: '/workflows-management',
       icon: 'apartment',
       category: 'main',
       subMenus: [

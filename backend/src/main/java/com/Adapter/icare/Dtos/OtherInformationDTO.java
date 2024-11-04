@@ -8,5 +8,6 @@ import java.util.List;
 @Getter
 @Setter
 public class OtherInformationDTO {
+    private CancerScreeningDTO cancerScreening;
     private List<CancerDetailsDTO> cancerDetails;
 }
