@@ -88,6 +88,7 @@ public class Mediator  extends BaseEntity implements Serializable {
         mappedMediator.put("path", this.getPath());
         mappedMediator.put("authType",this.authType);
         mappedMediator.put("category",this.getCategory());
+        mappedMediator.put("authToken",this.getAuthToken());
         mappedMediator.put("createdOn", this.getCreatedOn());
         Map<String, Object> createdBy = new HashMap<>();
         if (this.getCreatedBy() != null) {
