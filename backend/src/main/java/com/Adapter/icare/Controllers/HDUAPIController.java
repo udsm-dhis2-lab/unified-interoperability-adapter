@@ -654,6 +654,19 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "tasks/{id}")
+    public ResponseEntity<Map<String,Object>> getTask(@PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "tasks/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @GetMapping(value = "schedules")
     public ResponseEntity<Map<String,Object>> getSchedules() throws Exception {
         try {
