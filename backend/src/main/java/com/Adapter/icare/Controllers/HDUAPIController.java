@@ -490,8 +490,8 @@ public class HDUAPIController {
 
     @GetMapping(value = "workflows")
     public ResponseEntity<Map<String,Object>> getWorkflows(
-            @RequestParam(value = "fields") String fields,
-            @RequestParam(value = "filter") String filter
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter
     ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
@@ -510,8 +510,8 @@ public class HDUAPIController {
     @GetMapping(value = "workflows/{id}")
     public ResponseEntity<Map<String,Object>> getWorkflowById(
             @PathVariable(value = "id") String id,
-            @RequestParam(value = "fields") String fields,
-            @RequestParam(value = "filter") String filter
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter
     ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
@@ -587,8 +587,8 @@ public class HDUAPIController {
 
     @GetMapping(value = "processes")
     public ResponseEntity<Map<String,Object>> getProcesses(
-            @RequestParam(value = "fields") String fields,
-            @RequestParam(value = "filter") String filter) throws Exception {
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 String queryParamsPath = null;
@@ -606,8 +606,8 @@ public class HDUAPIController {
     @GetMapping(value = "processes/{id}")
     public ResponseEntity<Map<String,Object>> getProcessById(
             @PathVariable(value = "id") String id,
-            @RequestParam(value = "fields") String fields,
-            @RequestParam(value = "filter") String filter
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter
     ) throws Exception {
         try {
 
