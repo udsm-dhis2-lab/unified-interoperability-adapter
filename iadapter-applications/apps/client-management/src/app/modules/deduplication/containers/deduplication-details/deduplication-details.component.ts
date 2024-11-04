@@ -3,6 +3,7 @@ import { SharedModule } from 'apps/client-management/src/app/shared/shared.modul
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
+import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 
 interface BasicInfo {
   [key: string]: string;
@@ -30,6 +31,14 @@ interface ExtraInfoSection {
   styleUrl: './deduplication-details.component.css',
 })
 export class DeduplicationDetailsComponent implements OnInit {
+  alert = {
+    show: false,
+    type: '',
+    message: '',
+  };
+
+  isSubmittingMappingRequest = false;
+
   basicInfo: BasicInfo = {
     'Case ID': 'IBS_00297209',
     'FUll name': 'Herman Moshi Moshi',
@@ -137,7 +146,8 @@ export class DeduplicationDetailsComponent implements OnInit {
   constructor(
     private router: Router,
     private modal: NzModalService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private deduplicateService: DeduplicationManagementService
   ) {}
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
@@ -175,13 +185,16 @@ export class DeduplicationDetailsComponent implements OnInit {
     this.router.navigate(['']);
   }
 
-  warning(content: string): void {
+  warning(content: string, action: string, payLoad?: any): void {
     this.modal.warning({
       nzTitle: 'Warning',
       nzContent: content,
       nzCancelText: 'Cancel',
       nzOkText: 'Yes',
-      nzOnOk: () => this.success(),
+      nzOnOk: () =>
+        action === 'requestMerge'
+          ? this.createMappingRequest(payLoad)
+          : this.success(),
     });
   }
 
@@ -195,5 +208,38 @@ export class DeduplicationDetailsComponent implements OnInit {
 
   objectKeys(obj: any): string[] {
     return Object.keys(obj);
+  }
+
+  createMappingRequest(payload: any) {
+    this.isSubmittingMappingRequest = true;
+    this.alert = {
+      show: true,
+      type: 'info',
+      message: 'Creating mapping request',
+    };
+    return this.deduplicateService.createMergeRequest(payload).subscribe({
+      next: () => {
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Mapping request was sent successfully',
+        };
+      },
+      error: (error) => {
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
+      },
+    });
+  }
+
+  onCloseAlert() {
+    this.alert = {
+      show: false,
+      type: '',
+      message: '',
+    };
   }
 }
