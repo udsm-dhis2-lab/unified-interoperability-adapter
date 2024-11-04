@@ -18,6 +18,7 @@ import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,6 +71,7 @@ public class SharedHealthRecordsService {
             Integer pageSize,
             String identifier,
             String identifierType,
+            String referralNumber,
             boolean onlyLinkedClients,
             String gender,
             String firstName,
@@ -81,33 +83,61 @@ public class SharedHealthRecordsService {
     ) throws Exception {
         List<Map<String,Object>> sharedRecords =  new ArrayList<>();
         Bundle response = new Bundle();
-        var searchRecords =  fhirClient.search().forResource(Patient.class);
-        if (onlyLinkedClients) {
-            // TODO replace hardcoded ids with dynamic ones
-            searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
-        }
+        Bundle clientTotalBundle = new Bundle();
+        Encounter encounter = new Encounter();
+        if (referralNumber == null) {
+            var searchRecords =  fhirClient.search().forResource(Patient.class);
+            if (onlyLinkedClients) {
+                // TODO replace hardcoded ids with dynamic ones
+                searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
+            }
 
-        // TODO: Review the deceased concept
-        if (!includeDeceased) {
+            // TODO: Review the deceased concept
+            if (!includeDeceased) {
 //            searchRecords.where(Patient.DECEASED.isMissing(true));
-        }
+            }
 //                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
-        if (identifier != null) {
-            searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
-        }
+            if (identifier != null) {
+                searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
+            }
 
-        if (firstName != null) {
-            searchRecords.where(Patient.GIVEN.matches().value(firstName));
-        }
+            if (firstName != null) {
+                searchRecords.where(Patient.GIVEN.matches().value(firstName));
+            }
 
-        response = searchRecords.count(pageSize)
-                .offset(page -1)
-                .returnBundle(Bundle.class)
-                .execute();
-        Bundle clientTotalBundle = searchRecords
-                .summaryMode(SummaryEnum.COUNT)
-                .returnBundle(Bundle.class)
-                .execute();
+            response = searchRecords.count(pageSize)
+                    .offset(page -1)
+                    .returnBundle(Bundle.class)
+                    .execute();
+            clientTotalBundle = searchRecords
+                    .summaryMode(SummaryEnum.COUNT)
+                    .returnBundle(Bundle.class)
+                    .execute();
+
+        } else {
+            // referralNumber should saved as identifier of the encounter
+            var encSearch = fhirClient.search().forResource(Encounter.class)
+                    .where(Encounter.IDENTIFIER.exactly().identifier(referralNumber));
+            Bundle encBundle = encSearch.returnBundle(Bundle.class).execute();
+            if (encBundle.hasEntry()) {
+                for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                    if (entry.getResource() instanceof Encounter) {
+                        // Assumption is the referral with the id will be one
+                        encounter = (Encounter) entry.getResource();
+                        IIdType patientReference = encounter.getSubject().getReferenceElement();
+                        Patient patient = fhirClient.read().resource(Patient.class).withId(patientReference.getIdPart()).execute();
+                        response = fhirClient.search().forResource(Patient.class)
+                                .where(Patient.IDENTIFIER.exactly().identifier(patient.getIdElement().getIdPart()))
+                                .count(pageSize)
+                                .offset(page -1)
+                                .returnBundle(Bundle.class)
+                                .execute();
+                        break;
+                    }
+                }
+            }
+
+        }
 
         System.out.println(response.getEntry().size());
 
@@ -148,7 +178,9 @@ public class SharedHealthRecordsService {
                                     organization.getActive()).toSummary(): null);
 
                     // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
-                    Encounter encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
+                    if (referralNumber == null) {
+                        encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
+                    }
                     VisitDetailsDTO visitDetails = new VisitDetailsDTO();
                     if (encounter != null) {
                         visitDetails.setId(encounter.getIdElement().getIdPart());
