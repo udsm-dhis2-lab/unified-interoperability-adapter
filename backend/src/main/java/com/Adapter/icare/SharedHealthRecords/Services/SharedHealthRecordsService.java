@@ -91,7 +91,7 @@ public class SharedHealthRecordsService {
         if (!includeDeceased) {
 //            searchRecords.where(Patient.DECEASED.isMissing(true));
         }
-//                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
+
         if (identifier != null) {
             searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
         }
@@ -108,6 +108,24 @@ public class SharedHealthRecordsService {
                 .summaryMode(SummaryEnum.COUNT)
                 .returnBundle(Bundle.class)
                 .execute();
+        System.out.println(response);
+        if (!response.hasEntry()) {
+            System.out.println("INSIDE HCR");
+            searchRecords =  fhirClient.search().forResource(Patient.class);
+            if (identifier != null) {
+                searchRecords.where(Patient.RES_ID.exactly().code(identifier));
+            }
+
+            if (firstName != null) {
+                searchRecords.where(Patient.GIVEN.matches().value(firstName));
+            }
+
+            response = searchRecords.count(pageSize)
+                    .offset(page -1)
+                    .returnBundle(Bundle.class)
+                    .execute();
+            System.out.println(response.hasEntry());
+        }
 
         if (!response.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {

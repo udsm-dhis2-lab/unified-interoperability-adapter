@@ -133,7 +133,6 @@ public class MediatorsService {
     public Map<String,Object> routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
-                System.out.println( "CHECK::" + mediator.getBaseUrl() + mediator.getPath() + apiPath);
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
                 return sendDataToExternalSystem(mediator,payload, method, null);
@@ -401,7 +400,8 @@ public class MediatorsService {
         URL url = null;
 
         try {
-            url = new URL(baseUrl + path + (apiPath != null ? apiPath: ""));
+            String pathUrl = baseUrl + path + (apiPath != null ? apiPath: "");
+            url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -454,7 +454,8 @@ public class MediatorsService {
         String path = mediator.getPath() != null ? mediator.getPath(): "";
         URL url = null;
         try {
-            url = new URL(baseUrl + path + (api != null ? api: ""));
+            String pathUrl = baseUrl + path + (api != null ? api: "");
+            url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
