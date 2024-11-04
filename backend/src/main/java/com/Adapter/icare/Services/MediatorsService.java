@@ -397,11 +397,11 @@ public class MediatorsService {
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
-        String path = mediator.getPath();
+        String path = mediator.getPath() != null ? mediator.getPath() : "";
         URL url = null;
 
         try {
-            url = new URL(baseUrl + path + apiPath);
+            url = new URL(baseUrl + path + (apiPath != null ? apiPath: ""));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -451,10 +451,10 @@ public class MediatorsService {
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
-        String path = mediator.getPath();
+        String path = mediator.getPath() != null ? mediator.getPath(): "";
         URL url = null;
         try {
-            url = new URL(baseUrl + path + api);
+            url = new URL(baseUrl + path + (api != null ? api: ""));
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
