@@ -33,13 +33,14 @@ import { WorkflowActions } from '../../state/workflow/workflow.actions';
 import {
   getUpdatedWorkflowStatus,
   getWorkflows,
+  getWorkflowsLoadingStatus,
 } from '../../state/workflow/workflow.selectors';
 import {
   Workflow,
   WorkflowFormCreate,
   WorkflowTable,
 } from '../../models/workflow.model';
-import { defaultIfEmpty } from 'rxjs';
+import { defaultIfEmpty, Observable } from 'rxjs';
 import { EditComponent } from '../edit/edit.component';
 import { Router } from '@angular/router';
 import { WorkflowRunLoggingComponent } from '../workflow-run-logging/workflow-run-logging.component';
@@ -99,6 +100,8 @@ export class TableComponent implements OnInit {
   scrollX: string | null = null;
   scrollY: string | null = null;
   settingValue: Setting;
+
+  loadingWorkflows$!: Observable<boolean | null>;
 
   constructor(
     private formBuilder: NonNullableFormBuilder,
@@ -162,6 +165,10 @@ export class TableComponent implements OnInit {
 
   ngOnInit(): void {
     this.workFlowState.dispatch(WorkflowActions.loadWorkflows());
+
+    this.loadingWorkflows$ = this.workFlowState.pipe(
+      select(getWorkflowsLoadingStatus)
+    );
 
     this.workFlowState
       .pipe(select(getWorkflows), defaultIfEmpty([]))

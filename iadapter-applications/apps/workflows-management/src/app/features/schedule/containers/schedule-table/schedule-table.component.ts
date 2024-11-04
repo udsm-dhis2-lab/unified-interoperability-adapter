@@ -41,7 +41,9 @@ import { Schedule, ScheduleTable } from '../../models/schedule.model';
 import { ScheduleActions } from '../../state/schedule/schedule.actions';
 import {
   getExecutedScheduleTask,
+  getScheduleLoadingStatus,
   getSchedules,
+  getSchedulesLoadingStatus,
 } from '../../state/schedule/schedule.selectors';
 import { ScheduleRunLoggingComponent } from '../schedule-run-logging/schedule-run-logging.component';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
@@ -104,6 +106,7 @@ export class ScheduleTableComponent implements OnInit {
   scrollX: string | null = null;
   scrollY: string | null = null;
   settingValue: Setting;
+  loadingSchedule$!: Observable<boolean | null>;
 
   searchControl = new FormControl();
 
@@ -171,6 +174,10 @@ export class ScheduleTableComponent implements OnInit {
 
   ngOnInit(): void {
     this.scheduleState.dispatch(ScheduleActions.loadSchedules());
+
+    this.loadingSchedule$ = this.scheduleState.pipe(
+      select(getSchedulesLoadingStatus)
+    );
 
     this.scheduleState
       .pipe(select(getSchedules), skip(1), take(1))

@@ -190,6 +190,9 @@ public class SharedHealthRecordsService {
                     } else if (organization != null) {
                         // TODO: Request visit from facility provided
                         Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
+                        Map<String,Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType,"GET", null);
+                        List<Map<String,Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
+                        System.out.println(visits.size());
                         visitDetails = null;
                     } else {
                         visitDetails = null;

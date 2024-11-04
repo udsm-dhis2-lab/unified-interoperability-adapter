@@ -48,8 +48,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           this.loading = false;
-          //TODO: Set total from data after it's support in fhir is implemented
-          this.total = 200; //data.total;
+          this.total = data.total;
           this.pageIndex = data.pageIndex;
           this.listOfDeduplications = data.data;
         },

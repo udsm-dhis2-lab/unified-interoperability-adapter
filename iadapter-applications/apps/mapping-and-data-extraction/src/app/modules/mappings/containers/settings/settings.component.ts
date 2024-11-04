@@ -10,6 +10,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-settings',
@@ -19,6 +20,14 @@ import {
   styleUrl: './settings.component.css',
 })
 export class SettingsComponent implements OnDestroy, OnInit {
+  alert = {
+    show: false,
+    type: '',
+    message: '',
+  };
+
+  isDeleting = false;
+
   settingsForm!: FormGroup;
   optionElementForm!: FormGroup;
   optionForm!: FormGroup;
@@ -39,7 +48,8 @@ export class SettingsComponent implements OnDestroy, OnInit {
 
   constructor(
     private dataSetManagementService: DatasetManagementService,
-    private fb: NonNullableFormBuilder
+    private fb: NonNullableFormBuilder,
+    private modal: NzModalService
   ) {
     this.settingsForm = this.fb.group({
       configurationName: ['', Validators.required],
@@ -58,6 +68,10 @@ export class SettingsComponent implements OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
+    this.reLoadConfigurations();
+  }
+
+  reLoadConfigurations() {
     const customFilters = [
       ...this.filterKey,
       { key: 'group', value: ['MAPPINGS-SETTINGS'] },
@@ -181,5 +195,52 @@ export class SettingsComponent implements OnDestroy, OnInit {
 
   getKeys(obj: any): string[] {
     return Object.keys(obj);
+  }
+
+  showDeleteConfirm(uuid: string): void {
+    this.modal.confirm({
+      nzTitle: 'Are you sure you want to delete this configuration?',
+      nzOkText: 'Yes',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzOnOk: () => this.deleteConfiguration(uuid),
+    });
+  }
+
+  deleteConfiguration(uuid: string) {
+    this.isDeleting = true;
+    this.alert = {
+      show: true,
+      type: 'info',
+      message: 'Deleting configuration...',
+    };
+    this.dataSetManagementService.deleteConfiguration(uuid).subscribe({
+      next: () => {
+        this.isDeleting = false;
+        this.onCloseAlert();
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Configuration deleted successfully',
+        };
+        this.reLoadConfigurations();
+      },
+      error: (error: any) => {
+        this.isDeleting = false;
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
+      },
+    });
+  }
+
+  onCloseAlert() {
+    this.alert = {
+      show: false,
+      type: '',
+      message: '',
+    };
   }
 }

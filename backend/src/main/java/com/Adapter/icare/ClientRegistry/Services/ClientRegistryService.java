@@ -151,16 +151,16 @@ public class ClientRegistryService {
     }
 
     public List<DemographicDetailsDTO> getPatients(int page,
-                                                 int pageSize,
-                                                 String status,
-                                                 String identifier,
-                                                 String identifierType,
-                                                 String gender,
-                                                 String firstName,
-                                                 String middleName,
-                                                 String lastName,
-                                                 Date dateOfBirth,
-                                                 Boolean onlyLinkedClients) {
+                                                   int pageSize,
+                                                   String status,
+                                                   String identifier,
+                                                   String identifierType,
+                                                   String gender,
+                                                   String firstName,
+                                                   String middleName,
+                                                   String lastName,
+                                                   Date dateOfBirth,
+                                                   Boolean onlyLinkedClients) {
         try {
             List<DemographicDetailsDTO> patients = new ArrayList<>();
             Bundle response = new Bundle();
@@ -347,6 +347,24 @@ public class ClientRegistryService {
         } catch (Exception e) {
             e.printStackTrace();
             return Boolean.FALSE;
+        }
+    }
+
+    public List<String> activateIdentifiers(List<String> identifiers) throws Exception {
+        try {
+            List<String> idsActivated = new ArrayList<>();
+            for(String identifier: identifiers) {
+                ClientRegistryIdPool clientRegistryIdPool = clientRegistryIdsRepository.getIdPoolDetails(identifier);
+                clientRegistryIdPool.setUsed(false);
+                ClientRegistryIdPool updatedIdentifier = clientRegistryIdsRepository.save(clientRegistryIdPool);
+                if (!updatedIdentifier.isUsed()) {
+                    idsActivated.add(updatedIdentifier.getIdentifier());
+                }
+            }
+            return idsActivated;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
     }
 

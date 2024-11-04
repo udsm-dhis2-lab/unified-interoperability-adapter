@@ -128,7 +128,7 @@ public class PatientDTO {
                 String type = null;
                 if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
                     try {
-                       type = identifier.getType().getCoding().get(0).getCode();
+                        type = identifier.getType().getCoding().get(0).getCode();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
