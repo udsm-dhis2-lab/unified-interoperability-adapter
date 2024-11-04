@@ -84,7 +84,7 @@ export class LoginComponent implements OnDestroy {
             message: 'Login Successful',
           };
           console.log('LOGGED IN');
-          window.open('../../../dashboard/', '_self');
+          window.open('../../../apps', '_self');
         },
         error: (error) => {
           this.isLoading = false;
