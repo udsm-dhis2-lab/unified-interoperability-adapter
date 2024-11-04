@@ -18,8 +18,12 @@ import { provideEffects } from '@ngrx/effects';
 import { routerReducer } from '@ngrx/router-store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { appEffects, appReducers, metaReducers } from './store/app.state';
+import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
+import en from '@angular/common/locales/en';
+import { registerLocaleData } from '@angular/common';
 
 const icons: IconDefinition[] = [...antDesignIcons];
+registerLocaleData(en);
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -37,5 +41,6 @@ export const appConfig: ApplicationConfig = {
     provideEffects(),
     provideRouter(appRoutes),
     { provide: NZ_ICONS, useValue: icons },
+    { provide: NZ_I18N, useValue: en_US },
   ],
 };
