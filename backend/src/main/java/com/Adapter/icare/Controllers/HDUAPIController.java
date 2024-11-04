@@ -510,6 +510,21 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping(value = "workflows/{id}/run")
+    public ResponseEntity<Map<String,Object>> runWorkflowById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id + "/run","GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping(value = "workflows")
     public ResponseEntity<Map<String,Object>> addWorkflow(@RequestBody Map<String, Object> workflow) throws Exception {
         try {
@@ -573,6 +588,21 @@ public class HDUAPIController {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "processes/{id}/run")
+    public ResponseEntity<Map<String,Object>> runProcessById(
+            @PathVariable(value = "id") String id
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id + "/run","GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
