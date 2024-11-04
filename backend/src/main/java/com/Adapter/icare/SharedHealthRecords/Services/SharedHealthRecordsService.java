@@ -108,9 +108,7 @@ public class SharedHealthRecordsService {
                 .summaryMode(SummaryEnum.COUNT)
                 .returnBundle(Bundle.class)
                 .execute();
-        System.out.println(response);
         if (!response.hasEntry()) {
-            System.out.println("INSIDE HCR");
             searchRecords =  fhirClient.search().forResource(Patient.class);
             if (identifier != null) {
                 searchRecords.where(Patient.RES_ID.exactly().code(identifier));
@@ -124,7 +122,6 @@ public class SharedHealthRecordsService {
                     .offset(page -1)
                     .returnBundle(Bundle.class)
                     .execute();
-            System.out.println(response.hasEntry());
         }
 
         if (!response.getEntry().isEmpty()) {
