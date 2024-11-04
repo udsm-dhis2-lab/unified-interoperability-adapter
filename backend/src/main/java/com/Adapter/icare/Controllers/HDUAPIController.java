@@ -267,9 +267,15 @@ public class HDUAPIController {
            }
        } catch (Exception e) {
            e.printStackTrace();
-           Map<String,Object> statusResponse = new HashMap<>();
-           statusResponse.put("message", e.getMessage());
+           Map<String,Object> statusResponse = new LinkedHashMap<>();
+           statusResponse.put("status","BAD_REQUEST" );
            statusResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
+           statusResponse.put("newClients", 0);
+           statusResponse.put("updatedClients",0);
+           statusResponse.put("failedClients",0);
+           statusResponse.put("ignoredClients",0);
+           statusResponse.put("summary", new ArrayList<>());
+           statusResponse.put("message", e.getMessage());
            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(statusResponse);
        }
     }
