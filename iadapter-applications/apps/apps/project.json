@@ -1,29 +1,29 @@
 {
-  "name": "apps-shell",
+  "name": "apps",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "prefix": "app",
-  "sourceRoot": "apps/apps-shell/src",
+  "sourceRoot": "apps/apps/src",
   "tags": [],
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:application",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/apps-shell",
-        "index": "apps/apps-shell/src/index.html",
-        "browser": "apps/apps-shell/src/main.ts",
+        "outputPath": "dist/apps/apps",
+        "index": "apps/apps/src/index.html",
+        "browser": "apps/apps/src/main.ts",
         "polyfills": ["zone.js"],
-        "tsConfig": "apps/apps-shell/tsconfig.app.json",
+        "tsConfig": "apps/apps/tsconfig.app.json",
         "inlineStyleLanguage": "less",
         "assets": [
           {
             "glob": "**/*",
-            "input": "apps/apps-shell/public"
+            "input": "apps/apps/public"
           }
         ],
         "styles": [
-          "apps/apps-shell/src/styles.less",
+          "apps/apps/src/styles.less",
           "node_modules/ng-zorro-antd/src/ng-zorro-antd.min.css",
           "node_modules/ng-zorro-antd/resizable/style/index.min.css",
           "node_modules/ng-zorro-antd/code-editor/style/index.min.css",
@@ -61,10 +61,10 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "buildTarget": "apps-shell:build:production"
+          "buildTarget": "apps:build:production"
         },
         "development": {
-          "buildTarget": "apps-shell:build:development",
+          "buildTarget": "apps:build:development",
           "proxyConfig": "apps/login/proxy-config.json"
         }
       },
@@ -73,7 +73,7 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "buildTarget": "apps-shell:build"
+        "buildTarget": "apps:build"
       }
     },
     "lint": {
@@ -83,15 +83,15 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/apps-shell/jest.config.ts"
+        "jestConfig": "apps/apps/jest.config.ts"
       }
     },
     "serve-static": {
       "executor": "@nx/web:file-server",
       "options": {
-        "buildTarget": "apps-shell:build",
+        "buildTarget": "apps:build",
         "port": 4200,
-        "staticFilePath": "dist/apps/apps-shell/browser",
+        "staticFilePath": "dist/apps/apps/browser",
         "spa": true
       }
     }
