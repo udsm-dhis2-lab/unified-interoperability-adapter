@@ -24,6 +24,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   filterKey = [{}];
 
   isFirstLoad = true;
+  dataSetSeachQuery: string = '';
 
   constructor(
     private router: Router,
@@ -48,7 +49,7 @@ export class HomeComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           this.loading = false;
-          this.total = data.total; 
+          this.total = data.total;
           this.pageIndex = data.pageIndex;
           this.listOfHduClients = data.listOfClients;
         },
@@ -59,13 +60,30 @@ export class HomeComponent implements OnDestroy, OnInit {
       });
   }
 
+  onDatasetsSearchInputTyping(value: string) {
+    this.dataSetSeachQuery = value;
+    if (value.length >= 3 || value === '') {
+      this.loadHduClientsFromServer(1, 10, [
+        value !== ''
+          ? { key: 'firstName', value: [value] }
+          : { key: 'firstName', value: [] },
+      ]);
+    }
+  }
+
   onQueryParamsChange(params: NzTableQueryParams): void {
     if (this.isFirstLoad) {
       this.isFirstLoad = false;
       return;
     }
     const { pageSize, pageIndex, filter } = params;
-    this.loadHduClientsFromServer(pageIndex, pageSize, filter);
+    const queryFilter = [
+      ...filter,
+      this.dataSetSeachQuery !== ''
+        ? { key: 'firstName', value: [this.dataSetSeachQuery] }
+        : { key: 'firstName', value: [] },
+    ];
+    this.loadHduClientsFromServer(pageIndex, pageSize, queryFilter);
   }
 
   ngOnInit(): void {
