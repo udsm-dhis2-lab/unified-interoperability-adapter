@@ -495,10 +495,11 @@ public class HDUAPIController {
     ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                String queryParamsPath = null;
+                String queryParamsPath = "";
                 queryParamsPath += fields != null ? "fields=" + fields: "";
                 queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows" + queryParamsPath != null ? "?" + queryParamsPath: "","GET", null));
+                String api = "workflows" + queryParamsPath != "" ? "?" + queryParamsPath: "";
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api,"GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -515,10 +516,11 @@ public class HDUAPIController {
     ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                String queryParamsPath = null;
+                String queryParamsPath = "";
                 queryParamsPath += fields != null ? "fields=" + fields: "";
                 queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id + queryParamsPath != null ? "?" + queryParamsPath: "","GET", null));
+                String api = "workflows/" + id + queryParamsPath != "" ? "?" + queryParamsPath: "";
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api ,"GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -591,10 +593,11 @@ public class HDUAPIController {
             @RequestParam(value = "filter", required = false) String filter) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                String queryParamsPath = null;
+                String queryParamsPath = "";
                 queryParamsPath += fields != null ? "fields=" + fields: "";
                 queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes" + queryParamsPath != null ? "?" + queryParamsPath: "","GET", null));
+                String api = "processes" + queryParamsPath != "" ? "?" + queryParamsPath: "";
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api ,"GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -612,10 +615,11 @@ public class HDUAPIController {
         try {
 
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                String queryParamsPath = null;
+                String queryParamsPath = "";
                 queryParamsPath += fields != null ? "fields=" + fields: "";
                 queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id + "?" + queryParamsPath,"GET", null));
+                String api = "processes/" + id + queryParamsPath != "" ?  "?" + queryParamsPath : "";
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api ,"GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }

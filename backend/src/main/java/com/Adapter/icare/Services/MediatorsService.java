@@ -133,7 +133,7 @@ public class MediatorsService {
     public Map<String,Object> routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
-                System.out.println(apiPath);
+                System.out.println( "CHECK::" + mediator.getBaseUrl() + mediator.getPath() + apiPath);
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
                 return sendDataToExternalSystem(mediator,payload, method, null);
