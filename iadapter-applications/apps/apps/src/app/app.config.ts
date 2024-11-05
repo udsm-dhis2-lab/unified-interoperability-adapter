@@ -34,6 +34,7 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideStore({ reducer: routerReducer }),
     provideStore(appReducers, { metaReducers }),
+    provideRouter(appRoutes),
     provideEffects(appEffects),
     provideStoreDevtools({
       logOnly: !isDevMode(),

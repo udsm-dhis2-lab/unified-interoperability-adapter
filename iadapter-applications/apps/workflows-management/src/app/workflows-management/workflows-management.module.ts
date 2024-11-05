@@ -9,6 +9,6 @@ import { appRoutes } from '../app.routes';
 @NgModule({
   declarations: [WorkflowsManagementHomeComponent],
   imports: [CommonModule, WorkflowsManagementRoutingModule],
-  providers: [provideRouter(appRoutes)],
+  providers: [],
 })
 export class WorkflowsManagementModule {}

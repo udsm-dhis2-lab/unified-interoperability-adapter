@@ -110,25 +110,29 @@ export class WorkflowManagementComponent implements OnInit {
   }
 
   onTabChange(nzTabChangeEvent: NzTabChangeEvent) {
-    this.workflowState
-      .pipe(select(getCurrentUrl), take(1))
-      .subscribe((route: string) => {
-        if (route) {
-          if (
-            nzTabChangeEvent &&
-            (nzTabChangeEvent.index == 0 || nzTabChangeEvent.index == 1)
-          ) {
-            const uid = extractIdFromPath(route, 3);
-            this.router.navigate([
-              '/',
-              'workflows-management',
-              'config',
-              'flow',
-              uid,
-            ]);
+    if (this.workflowState) {
+      this.workflowState
+        .pipe(select(getCurrentUrl), take(1))
+        .subscribe((route: string) => {
+          if (route) {
+            if (
+              nzTabChangeEvent &&
+              (nzTabChangeEvent.index == 0 || nzTabChangeEvent.index == 1)
+            ) {
+              const uid = extractIdFromPath(route, 3);
+              this.router.navigate([
+                '/',
+                'workflows-management',
+                'config',
+                'flow',
+                uid,
+              ]);
+            }
           }
-        }
-      });
+        });
+    } else {
+      console.error('workflowState is undefined');
+    }
   }
 
   onRunWorkflow() {
