@@ -199,51 +199,15 @@ public class HDUAPIController {
                    List<SharedHealthRecordsDTO> validatedListGrid = new ArrayList<>();
 
                    for (SharedHealthRecordsDTO sharedHealthRecordsDTO: listGrid) {
-                       DemographicDetailsDTO demographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
-                       String mrn = sharedHealthRecordsDTO.getMrn();
-                       // Check if mandatory identifier types are there or the CR ID
-                       List<IdentifierDTO> identifiers = demographicDetails != null ? demographicDetails.getIdentifiers(): null;
-                       Patient patient = new Patient();
-                       if (identifiers != null && !identifiers.isEmpty()) {
-                           for (IdentifierDTO identifier: identifiers) {
-                               patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getId());
-                               if (patient != null) {
-                                   DemographicDetailsDTO newDemographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
-                                   newDemographicDetails.setId(patient.getId());
-                                   SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
-                                   newSharedRecord.setDemographicDetails(newDemographicDetails);
-                                   validatedListGrid.add(newSharedRecord);
-                                   break;
-                               }
-                           }
-                       } else if (mrn != null) {
-                           patient = this.clientRegistryService.getPatientUsingIdentifier(mrn);
-                           if (patient == null) {
-                               Map<String,Object> recordWithIssue = new HashMap<>();
-                               Map<String,Object> patientDetails = new HashMap<>();
-                               VisitDetailsDTO visitDetails = sharedHealthRecordsDTO.getVisitDetails();
-                               recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
-                               recordWithIssue.put("visitDetails", visitDetails);
-                               recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
-                               recordsWithIssues.add(recordWithIssue);
-                               validatedListGrid.add(sharedHealthRecordsDTO);
-                           } else {
-                               DemographicDetailsDTO newDemographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
-                               newDemographicDetailsDTO.setId(patient.getId());
-                               SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
-                               newSharedRecord.setDemographicDetails(newDemographicDetailsDTO);
-                               validatedListGrid.add(newSharedRecord);
-                           }
-                       } else {
-                           Map<String,Object> recordWithIssue = new HashMap<>();
-                           Map<String,Object> patientDetails = new HashMap<>();
-                           VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
-                           recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
-                           recordWithIssue.put("visitDetails", visitDetailsDTO);
-                           recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
-                           recordsWithIssues.add(recordWithIssue);
-                           validatedListGrid.add(sharedHealthRecordsDTO);
-                       }
+                       // TODO: Implement validation
+//                       DemographicDetailsDTO demographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
+                       Map<String,Object> recordWithIssue = new HashMap<>();
+                       VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
+                       recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
+                       recordWithIssue.put("visitDetails", visitDetailsDTO);
+                       recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
+                       recordsWithIssues.add(recordWithIssue);
+                       validatedListGrid.add(sharedHealthRecordsDTO);
                    }
                    validatedDataTemplate.setListGrid(validatedListGrid);
                    clientIds = this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
