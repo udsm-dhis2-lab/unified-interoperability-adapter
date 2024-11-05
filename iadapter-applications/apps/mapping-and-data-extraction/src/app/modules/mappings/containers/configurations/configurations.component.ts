@@ -238,9 +238,20 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
         this.isEditing = false;
         this.settingsForm.reset();
         this.reLoadConfigurations();
+        this.onCloseSideDrawer();
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Configuration updated successfully',
+        };
       },
-      error: (err) => {
+      error: (error) => {
         this.isSubmitting = false;
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
         // TODO: Implement error handling
       },
     });
