@@ -199,6 +199,8 @@ export class DatasetMappingComponent implements OnInit {
     this.isLoadingDisaggregation = true;
     const inputElement = event.target as HTMLInputElement;
     this.selectedInputId = inputElement.id.split('-')[0];
+    this.selectedDataTemplateBlock = '';
+    this.selectedICdCodes = [];
     this.getCategoryOptionCombos(this.selectedInputId);
   }
 
