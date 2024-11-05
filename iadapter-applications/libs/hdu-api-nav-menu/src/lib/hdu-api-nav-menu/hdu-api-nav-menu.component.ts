@@ -87,9 +87,9 @@ export class HduApiNavMenuComponent implements OnInit {
           subMenus: [],
         },
         {
-          name: 'Settings',
+          name: 'Configuration',
           id: 'settings',
-          routeUrl: '/settings',
+          routeUrl: '/configuration',
           icon: 'unordered-list',
           subMenus: [],
         },

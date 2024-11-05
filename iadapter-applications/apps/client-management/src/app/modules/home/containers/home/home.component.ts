@@ -66,7 +66,7 @@ export class HomeComponent implements OnDestroy, OnInit {
       this.loadHduClientsFromServer(1, 10, [
         value !== ''
           ? { key: 'firstName', value: [value] }
-          : { key: 'firstName', value: [] },
+          : { key: '', value: [] },
       ]);
     }
   }
@@ -81,7 +81,7 @@ export class HomeComponent implements OnDestroy, OnInit {
       ...filter,
       this.dataSetSeachQuery !== ''
         ? { key: 'firstName', value: [this.dataSetSeachQuery] }
-        : { key: 'firstName', value: [] },
+        : { key: '', value: [] },
     ];
     this.loadHduClientsFromServer(pageIndex, pageSize, queryFilter);
   }

@@ -23,6 +23,12 @@ nz-form-control {
   color: #ff4d4f;
 }
 
+.edit-button {
+  padding-left: 0;
+  margin-left: 0;
+  color: #1890ff;
+}
+
 .centered-cell {
   display: flex;
   justify-content: center;
