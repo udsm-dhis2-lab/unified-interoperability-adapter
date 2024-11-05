@@ -180,68 +180,61 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate) {
-        /**
-         * Send data to Mediator where all the logics will be done.
-         */
-        Map<String,Object> response = new HashMap<>();
-       try {
-           if (shouldUseWorkflowEngine && workflowEngine != null) {
-               Map<String, Object> payload = new HashMap<>();
-               payload.put("code","dataTemplates");
-               List<IdentifierDTO> clientIds = new ArrayList<>();
-               List<Map<String,Object>> recordsWithIssues = new ArrayList<>();
-               if (clientRegistryConstants.ValidateDataTemplate) {
-                   // validate data Template
+    public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("code", "dataTemplates");
+                List<IdentifierDTO> clientIds = new ArrayList<>();
+                List<Map<String, Object>> recordsWithIssues = new ArrayList<>();
+                if (clientRegistryConstants.ValidateDataTemplate) {
+                    // Validate data template
+                    DataTemplateDataDTO validatedDataTemplate = new DataTemplateDataDTO();
+                    List<SharedHealthRecordsDTO> listGrid = dataTemplate.getData().getListGrid();
+                    List<SharedHealthRecordsDTO> validatedListGrid = new ArrayList<>();
 
-                   DataTemplateDataDTO validatedDataTemplate = new DataTemplateDataDTO();
-                   List<SharedHealthRecordsDTO> listGrid = dataTemplate.getData().getListGrid();
-                   List<SharedHealthRecordsDTO> validatedListGrid = new ArrayList<>();
+                    for (SharedHealthRecordsDTO sharedHealthRecordsDTO : listGrid) {
+                        Map<String, Object> recordWithIssue = new HashMap<>();
+                        VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
+                        recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
+                        recordWithIssue.put("visitDetails", visitDetailsDTO);
+                        recordWithIssue.put("issue", "Not enough details for registering the client and saving associated records");
+                        recordsWithIssues.add(recordWithIssue);
+                        validatedListGrid.add(sharedHealthRecordsDTO);
+                    }
 
-                   for (SharedHealthRecordsDTO sharedHealthRecordsDTO: listGrid) {
-                       // TODO: Implement validation
-//                       DemographicDetailsDTO demographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
-                       Map<String,Object> recordWithIssue = new HashMap<>();
-                       VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
-                       recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
-                       recordWithIssue.put("visitDetails", visitDetailsDTO);
-                       recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
-                       recordsWithIssues.add(recordWithIssue);
-                       validatedListGrid.add(sharedHealthRecordsDTO);
-                   }
-                   validatedDataTemplate.setListGrid(validatedListGrid);
-                   clientIds = this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
-                   validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
-                   validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
-                   validatedDataTemplate.setClientIdentifiersPool(clientIds);
-                   payload.put("payload",validatedDataTemplate);
-               } else {
-                   DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
-                   clientIds = this.clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
-                   updatedDataTemplateData.setClientIdentifiersPool(clientIds);
-                   payload.put("payload", updatedDataTemplateData);
-               }
-               return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
-           } else if (!shouldUseWorkflowEngine) {
-               // TODO: Review send data to mediator (OpenFN)
-               return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
-           } else {
-               // TODO: handle warning appropriately
-               return null;
-           }
-       } catch (Exception e) {
-           e.printStackTrace();
-           Map<String,Object> statusResponse = new LinkedHashMap<>();
-           statusResponse.put("status","BAD_REQUEST" );
-           statusResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
-           statusResponse.put("newClients", 0);
-           statusResponse.put("updatedClients",0);
-           statusResponse.put("failedClients",0);
-           statusResponse.put("ignoredClients",0);
-           statusResponse.put("summary", new ArrayList<>());
-           statusResponse.put("message", e.getMessage());
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(statusResponse);
-       }
+                    validatedDataTemplate.setListGrid(validatedListGrid);
+                    clientIds = this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
+                    validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
+                    validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
+                    validatedDataTemplate.setClientIdentifiersPool(clientIds);
+                    payload.put("payload", validatedDataTemplate);
+                } else {
+                    DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
+                    clientIds = this.clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
+                    updatedDataTemplateData.setClientIdentifiersPool(clientIds);
+                    payload.put("payload", updatedDataTemplateData);
+                }
+                return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
+            } else if (!shouldUseWorkflowEngine) {
+                return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
+            } else {
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> statusResponse = new LinkedHashMap<>();
+            statusResponse.put("status", "BAD_REQUEST");
+            statusResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
+            statusResponse.put("newClients", 0);
+            statusResponse.put("updatedClients", 0);
+            statusResponse.put("failedClients", 0);
+            statusResponse.put("ignoredClients", 0);
+            statusResponse.put("summary", new ArrayList<>());
+            statusResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(statusResponse);
+        }
     }
 
     @DeleteMapping("datastore/{uuid}")
