@@ -31,7 +31,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
   settingsForm!: FormGroup;
   optionElementForm!: FormGroup;
   optionForm!: FormGroup;
-  options: {}[] = [];
+  // options: {}[] = [];
   optionElements: { [key: string]: string }[] = [];
   isSubmitting = false;
 
@@ -45,6 +45,8 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
   isDrwawerVisible = false;
 
   isFirstLoad = true;
+  isEditing: boolean = false;
+  configuration?: Configuration;
 
   constructor(
     private dataSetManagementService: DatasetManagementService,
@@ -135,51 +137,58 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
     this.isDrwawerVisible = false;
   }
 
-  onAddOptionElement(): void {
-    if (this.optionElementForm.valid) {
-      const optionElementKey = this.optionElementForm.get('key')!.value;
-      const optionElementValue = this.optionElementForm.get('value')!.value;
-      this.optionElements = {
-        ...this.optionElements,
-        [optionElementKey]: optionElementValue,
-      };
-      const formattedOption = this.optionElements;
+  // onAddOptionElement(): void {
+  //   if (this.optionElementForm.valid) {
+  //     const optionElementKey = this.optionElementForm.get('key')!.value;
+  //     const optionElementValue = this.optionElementForm.get('value')!.value;
+  //     this.optionElements = {
+  //       ...this.optionElements,
+  //       [optionElementKey]: optionElementValue,
+  //     };
+  //     const formattedOption = this.optionElements;
 
-      const optionString = JSON.stringify(formattedOption, null, 2);
-      this.optionForm.get('option')!.setValue(optionString);
-      this.optionElementForm.reset();
-    } else {
-      // TODO: Show error
-    }
-  }
+  //     const optionString = JSON.stringify(formattedOption, null, 2);
+  //     this.optionForm.get('option')!.setValue(optionString);
+  //     this.optionElementForm.reset();
+  //   } else {
+  //     // TODO: Show error
+  //   }
+  // }
 
-  onAddOption(): void {
-    if (this.optionForm.valid) {
-      this.options.push(this.optionElements);
-      this.optionForm.reset();
-      this.optionElements = [];
-      const formattedOptions = JSON.stringify(this.options, null, 2);
-      this.settingsForm.get('options')!.setValue(formattedOptions);
-    } else {
-      // TODO: Show error
-    }
-  }
+  // onAddOption(): void {
+  //   if (this.optionForm.valid) {
+  //     this.options.push(this.optionElements);
+  //     this.optionForm.reset();
+  //     this.optionElements = [];
+  //     const formattedOptions = JSON.stringify(this.options, null, 2);
+  //     this.settingsForm.get('options')!.setValue(formattedOptions);
+  //   } else {
+  //     // TODO: Show error
+  //   }
+  // }
 
   onSubmit(): void {
     if (this.settingsForm.valid) {
       this.isSubmitting = true;
-      const json = {
+      const option = JSON.parse(this.settingsForm.get('options')!.value);
+      const payLoad: any = {
         group: 'MAPPINGS-SETTINGS',
         key: this.settingsForm.get('configurationCode')!.value,
         value: {
           key: this.settingsForm.get('configurationCode')!.value,
           code: this.settingsForm.get('configurationCode')!.value,
           name: this.settingsForm.get('configurationName')!.value,
-          options: [...this.options],
+          options: option,
         },
       };
 
-      this.dataSetManagementService.addConfiguration(json).subscribe({
+      if (this.isEditing) {
+        payLoad.uuid = this.configuration!.uuid;
+        this.updateConfiguration(payLoad);
+        return;
+      }
+
+      this.dataSetManagementService.addConfiguration(payLoad).subscribe({
         next: (repsonse: any) => {
           this.isSubmitting = false;
         },
@@ -204,6 +213,36 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
       nzOkType: 'primary',
       nzOkDanger: true,
       nzOnOk: () => this.deleteConfiguration(uuid),
+    });
+  }
+
+  editConfiguration(configuration: Configuration) {
+    this.isEditing = true;
+    this.configuration = configuration;
+    this.onOpenSideDrawer();
+    const formattedOptions = JSON.stringify(
+      this.configuration.options,
+      null,
+      2
+    );
+    this.settingsForm.get('options')!.setValue(formattedOptions);
+    this.settingsForm.get('configurationName')!.setValue(configuration.name);
+    this.settingsForm.get('configurationCode')!.setValue(configuration.code);
+  }
+
+  updateConfiguration(configuration: any) {
+    this.isSubmitting = true;
+    this.dataSetManagementService.editConfiguration(configuration).subscribe({
+      next: (repsonse: any) => {
+        this.isSubmitting = false;
+        this.isEditing = false;
+        this.settingsForm.reset();
+        this.reLoadConfigurations();
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        // TODO: Implement error handling
+      },
     });
   }
 
