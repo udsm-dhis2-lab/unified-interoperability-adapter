@@ -114,6 +114,21 @@ public class ClientRegistryService {
                     .summaryMode(SummaryEnum.COUNT)
                     .returnBundle(Bundle.class)
                     .execute();
+            if (!response.hasEntry()) {
+                searchClient =  fhirClient.search().forResource(Patient.class);
+                if (identifier != null) {
+                    searchClient.where(Patient.RES_ID.exactly().code(identifier));
+                }
+
+                if (firstName != null) {
+                    searchClient.where(Patient.GIVEN.matches().value(firstName));
+                }
+
+                response = searchClient.count(pageSize)
+                        .offset(page -1)
+                        .returnBundle(Bundle.class)
+                        .execute();
+            }
 
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
