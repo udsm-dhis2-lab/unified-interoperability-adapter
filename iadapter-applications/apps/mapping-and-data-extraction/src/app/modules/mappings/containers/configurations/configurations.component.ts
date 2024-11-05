@@ -16,10 +16,10 @@ import { NzModalService } from 'ng-zorro-antd/modal';
   selector: 'app-settings',
   standalone: true,
   imports: [SharedModule, ReactiveFormsModule],
-  templateUrl: './settings.component.html',
-  styleUrl: './settings.component.css',
+  templateUrl: './configurations.component.html',
+  styleUrl: './configurations.component.css',
 })
-export class SettingsComponent implements OnDestroy, OnInit {
+export class ConfigurationsComponent implements OnDestroy, OnInit {
   alert = {
     show: false,
     type: '',
