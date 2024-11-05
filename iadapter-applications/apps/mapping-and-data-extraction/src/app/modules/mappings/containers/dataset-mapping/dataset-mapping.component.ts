@@ -85,6 +85,29 @@ export class DatasetMappingComponent implements OnInit {
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
 
+  dataTemplatesBlocks: {
+    key: string;
+    name: string;
+  }[] = [
+    {
+      key: 'visitDetails',
+      name: 'Visit Details',
+    },
+    {
+      key: 'clinicalInformationDetails',
+      name: 'Clinical Information Details',
+    },
+    {
+      key: 'vaccinationDetails',
+      name: 'Vaccination Details',
+    },
+  ];
+
+  selectedDataTemplateBlock: string = '';
+  onDataTemplateBlockSelect(value: string) {
+    this.selectedDataTemplateBlock = value;
+  }
+
   onSearchConfiguration(value: string): void {
     this.isLoadingConfigurations = true;
     this.searchConfigurationChange$.next(value);
@@ -221,12 +244,17 @@ export class DatasetMappingComponent implements OnInit {
       .subscribe({
         next: (data: any) => {
           this.mappingUuid = data.uuid;
+          if (data.mapping.type !== '') {
+            this.selectedDataTemplateBlock = data.mapping.type;
+          }
+
           if (data.mapping.mappings.length > 0) {
             this.useIcdCodes = true;
             this.selectedICdCodes = data.mapping.mappings.map(
               (item: any) => item.code
             );
           }
+
           if (data.mapping.params.length > 0) {
             const param = data.mapping.params[0];
             if (param.gender) {
@@ -403,7 +431,7 @@ export class DatasetMappingComponent implements OnInit {
           name: '',
           code: '',
         },
-        type: '',
+        type: this.selectedDataTemplateBlock,
         params: this.mappingsData.disagregations.map((item) => {
           return {
             co: item.categoryOptionComboId,
@@ -426,6 +454,8 @@ export class DatasetMappingComponent implements OnInit {
       description: '',
       group: '',
     };
+    this.selectedICdCodes = [];
+    this.selectedDataTemplateBlock = '';
     return payLoad;
   }
 

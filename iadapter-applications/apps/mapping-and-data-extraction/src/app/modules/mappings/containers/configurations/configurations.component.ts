@@ -59,14 +59,14 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
       options: ['', Validators.required],
     });
 
-    this.optionElementForm = this.fb.group({
-      key: ['', Validators.required],
-      value: ['', Validators.required],
-    });
+    // this.optionElementForm = this.fb.group({
+    //   key: ['', Validators.required],
+    //   value: ['', Validators.required],
+    // });
 
-    this.optionForm = this.fb.group({
-      option: ['', Validators.required],
-    });
+    // this.optionForm = this.fb.group({
+    //   option: ['', Validators.required],
+    // });
   }
 
   ngOnInit(): void {

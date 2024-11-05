@@ -25,10 +25,37 @@
               </button>
             </div>
             <div nz-col nzSpan="12">
-              <div nz-row nzJustify="end">
-                <label nz-checkbox [(ngModel)]="useIcdCodes"
-                  >Use Icd codes</label
-                >
+              <div nz-row nzJustify="space-between" [nzGutter]="16">
+                <div nz-col nzSpan="12">
+                  <nz-select
+                    style="width: 100%"
+                    [ngModel]="selectedDataTemplateBlock"
+                    (ngModelChange)="onDataTemplateBlockSelect($event)"
+                  >
+                    <ng-container *ngFor="let option of dataTemplatesBlocks">
+                      <nz-option
+                        [nzValue]="option.key"
+                        [nzLabel]="option.name"
+                      ></nz-option>
+                    </ng-container>
+                    <nz-option
+                      [nzValue]="selectedDataTemplateBlock"
+                      [nzLabel]="
+                        selectedDataTemplateBlock !== ''
+                          ? selectedDataTemplateBlock
+                          : 'Template blocks'
+                      "
+                      nzHide
+                    ></nz-option>
+                  </nz-select>
+                </div>
+                <div nz-col nzSpan="12">
+                  <div nz-row nzJustify="end">
+                    <label nz-checkbox [(ngModel)]="useIcdCodes"
+                      >Use Icd codes</label
+                    >
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -95,10 +122,7 @@
                     <td>{{ data.categoryOptionComboName }}</td>
                     <td>
                       <ng-container
-                        *ngFor="
-                          let config of data.configurations ?? [];
-                          let i = index
-                        "
+                        *ngFor="let config of data.configurations ?? []"
                       >
                         <nz-select
                           [ngModel]="config.selectedValue ?? 'default'"
@@ -112,10 +136,7 @@
                           style="margin-right: 16px"
                         >
                           <ng-container
-                            *ngFor="
-                              let option of config.options ?? [];
-                              let j = index
-                            "
+                            *ngFor="let option of config.options ?? []"
                           >
                             <nz-option
                               [nzValue]="option.code"
