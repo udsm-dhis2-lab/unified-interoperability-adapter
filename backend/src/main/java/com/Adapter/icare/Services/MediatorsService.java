@@ -133,7 +133,6 @@ public class MediatorsService {
     public Map<String,Object> routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
-                System.out.println(apiPath);
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
                 return sendDataToExternalSystem(mediator,payload, method, null);
@@ -397,11 +396,12 @@ public class MediatorsService {
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
-        String path = mediator.getPath();
+        String path = mediator.getPath() != null ? mediator.getPath() : "";
         URL url = null;
 
         try {
-            url = new URL(baseUrl + path + apiPath);
+            String pathUrl = baseUrl + path + (apiPath != null ? apiPath: "");
+            url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -451,10 +451,11 @@ public class MediatorsService {
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
-        String path = mediator.getPath();
+        String path = mediator.getPath() != null ? mediator.getPath(): "";
         URL url = null;
         try {
-            url = new URL(baseUrl + path + api);
+            String pathUrl = baseUrl + path + (api != null ? api: "");
+            url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

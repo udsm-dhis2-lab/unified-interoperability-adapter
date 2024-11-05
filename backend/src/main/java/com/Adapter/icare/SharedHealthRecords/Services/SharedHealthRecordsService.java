@@ -85,8 +85,8 @@ public class SharedHealthRecordsService {
         Bundle response = new Bundle();
         Bundle clientTotalBundle = new Bundle();
         Encounter encounter = new Encounter();
+        var searchRecords =  fhirClient.search().forResource(Patient.class);
         if (referralNumber == null) {
-            var searchRecords =  fhirClient.search().forResource(Patient.class);
             if (onlyLinkedClients) {
                 // TODO replace hardcoded ids with dynamic ones
                 searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
@@ -136,10 +136,23 @@ public class SharedHealthRecordsService {
                     }
                 }
             }
-
         }
 
-        System.out.println(response.getEntry().size());
+        if (!response.hasEntry()) {
+            searchRecords =  fhirClient.search().forResource(Patient.class);
+            if (identifier != null) {
+                searchRecords.where(Patient.RES_ID.exactly().code(identifier));
+            }
+
+            if (firstName != null) {
+                searchRecords.where(Patient.GIVEN.matches().value(firstName));
+            }
+
+            response = searchRecords.count(pageSize)
+                    .offset(page -1)
+                    .returnBundle(Bundle.class)
+                    .execute();
+        }
 
         if (!response.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
