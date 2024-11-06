@@ -11,6 +11,7 @@ import { getCurrentSelectedProcess } from '../../../features/workflow/state/proc
 import { ProcessActions } from '../../../features/workflow/state/process/process.actions';
 import { omit } from 'lodash';
 import { WorkflowActions } from '../../../features/workflow/state/workflow/workflow.actions';
+import { take } from 'rxjs';
 
 const monacoConfig: NgxMonacoEditorConfig = {
   baseUrl: 'assets', // Adjust if necessary
@@ -31,13 +32,13 @@ export class CodeEditorContainerComponent implements OnInit {
     private workflowState: Store<WorkflowState>,
     private processState: Store<Process>
   ) {}
-  ngOnInit(): void {
-    console.log(this.codeSnippet);
-  }
+  ngOnInit(): void {}
 
-  onUpdateProcessCodeSnippet() {
+  onUpdateProcessCodeSnippet(event: Event): void {
+    event.stopPropagation();
+    this.editedCodeSnippet.emit(this.codeSnippet);
     this.workflowState
-      .pipe(select(getCurrentSelectedProcess))
+      .pipe(select(getCurrentSelectedProcess), take(1))
       .subscribe((currentSelectedProcess: Process | null) => {
         if (currentSelectedProcess) {
           this.processState.dispatch(
