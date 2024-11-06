@@ -126,7 +126,13 @@ export class EditComponent implements OnInit, AfterViewInit {
               .subscribe((workflow: Workflow | null) => {
                 if (workflow && workflow.id) {
                   // this.router.navigate(['main/flow', `${workflow.id}`]);
-                  this.router.navigate(['/', 'config', 'flow', `${workflow.id}`]);
+                  this.router.navigate([
+                    '/',
+                    'workflows-management',
+                    'config',
+                    'flow',
+                    `${workflow.id}`,
+                  ]);
                 }
               });
           }

@@ -135,9 +135,9 @@ public class MediatorsService {
             if (method == null || method.equals("GET")) {
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
-                return sendDataToExternalSystem(mediator,payload, method, null);
+                return sendDataToExternalSystem(mediator,payload, method, apiPath);
             } else if (method.equals("PUT")) {
-                return sendDataToExternalSystem(mediator,payload, method, null);
+                return sendDataToExternalSystem(mediator,payload, method, apiPath);
             } else if (method.equals("DELETE")){
                 return deleteResourceFromExternalSystem(mediator,apiPath);
             } else {

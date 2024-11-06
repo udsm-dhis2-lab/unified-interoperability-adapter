@@ -1,0 +1,104 @@
+{
+  "name": "apps",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "prefix": "app",
+  "sourceRoot": "apps/apps/src",
+  "tags": [],
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:application",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/apps",
+        "index": "apps/apps/src/index.html",
+        "browser": "apps/apps/src/main.ts",
+        "polyfills": ["zone.js"],
+        "tsConfig": "apps/apps/tsconfig.app.json",
+        "inlineStyleLanguage": "less",
+        "assets": [
+          {
+            "glob": "**/*",
+            "input": "apps/apps/public"
+          },
+          {
+            "glob": "**/*",
+            "input": "node_modules/monaco-editor",
+            "output": "/assets/monaco/"
+          }
+        ],
+        "styles": [
+          "apps/apps/src/styles.less",
+          "node_modules/ng-zorro-antd/src/ng-zorro-antd.min.css",
+          "node_modules/ng-zorro-antd/resizable/style/index.min.css",
+          "node_modules/ng-zorro-antd/code-editor/style/index.min.css",
+          "node_modules/ng-zorro-antd/graph/style/index.min.css"
+        ],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "200kb",
+              "maximumError": "400kb"
+            }
+          ],
+          "outputHashing": "all",
+          "baseHref": "/apps/",
+          "deployUrl": "/apps/"
+        },
+        "development": {
+          "optimization": false,
+          "extractLicenses": false,
+          "sourceMap": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "buildTarget": "apps:build:production"
+        },
+        "development": {
+          "buildTarget": "apps:build:development",
+          "proxyConfig": "apps/login/proxy-config.json"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "buildTarget": "apps:build"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/apps/jest.config.ts"
+      }
+    },
+    "serve-static": {
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "apps:build",
+        "port": 4200,
+        "staticFilePath": "dist/apps/apps/browser",
+        "spa": true
+      }
+    }
+  }
+}

@@ -5,7 +5,7 @@ on:
     inputs:
       app_names:
         description: "Comma-separated list of app names to build within the NX workspace"
-        default: "login,client-management"
+        default: "login,apps"
         required: true
         type: string
   # push:

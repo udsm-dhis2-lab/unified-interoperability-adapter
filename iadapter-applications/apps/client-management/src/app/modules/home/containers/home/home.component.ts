@@ -5,7 +5,7 @@ import { HDUAPIClientDetails } from '../../models';
 import { ClientManagementService } from '../../services/client-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
-import { SearchBarComponent } from 'search-bar';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-home',

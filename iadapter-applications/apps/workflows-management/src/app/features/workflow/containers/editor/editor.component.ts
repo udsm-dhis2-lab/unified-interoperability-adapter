@@ -74,39 +74,40 @@ export class EditorComponent implements OnInit, AfterViewInit {
     //   });
 
     this.workflowState
-    .pipe(
-      select(getCurrentUrl),
-      take(1), 
-      switchMap((route: string) => {
-        if (route) {
-          const workflowUid = extractUidFromUrl(route);
-          if (workflowUid) {
-            this.currentWorkflowUid = workflowUid;
-            return this.workflowState.pipe(
-              select(getCurrentSelectedProcessInWorkflow),
-              take(1)
-            );
+      .pipe(
+        select(getCurrentUrl),
+        take(1),
+        switchMap((route: string) => {
+          if (route) {
+            const workflowUid = extractUidFromUrl(route);
+            if (workflowUid) {
+              this.currentWorkflowUid = workflowUid;
+              return this.workflowState.pipe(
+                select(getCurrentSelectedProcessInWorkflow),
+                take(1)
+              );
+            } else {
+              return of(null);
+            }
           } else {
             return of(null);
           }
+        })
+      )
+      .subscribe((currentSelectedProcess: Process | null) => {
+        if (currentSelectedProcess && currentSelectedProcess.id) {
+          this.router.navigate([
+            '/',
+            'workflows-management',
+            'config',
+            'code-editor',
+            this.currentWorkflowUid,
+            'proc',
+            currentSelectedProcess.id,
+          ]);
         } else {
-          return of(null);
+          console.error('No process selected');
         }
-      })
-    )
-    .subscribe((currentSelectedProcess: Process | null) => {
-      if (currentSelectedProcess && currentSelectedProcess.id) {
-        this.router.navigate([
-          '/',
-          'config',
-          'code-editor',
-          this.currentWorkflowUid,
-          'proc',
-          currentSelectedProcess.id,
-        ]);
-      } else {
-        console.error('No process selected');
-      }
-    });
+      });
   }
 }

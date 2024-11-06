@@ -4,7 +4,10 @@ import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-ht
 import { ClientUrls } from '../models';
 import { catchError, map, Observable } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
-import { UnAuothorizedException, UnknownException } from '@models';
+import {
+  UnAuothorizedException,
+  UnknownException,
+} from '../../../../../../../libs/models';
 import { ClientPage } from '../models';
 
 @Injectable()

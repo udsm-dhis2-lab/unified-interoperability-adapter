@@ -252,7 +252,7 @@ export class DatasetMappingComponent implements OnInit {
 
           if (data.mapping.mappings.length > 0) {
             this.useIcdCodes = true;
-            this.selectedICdCodes = data.mapping.mappings.map(
+            this.selectedICdCodes = data?.mapping?.mappings.map(
               (item: any) => item.code
             );
           }
