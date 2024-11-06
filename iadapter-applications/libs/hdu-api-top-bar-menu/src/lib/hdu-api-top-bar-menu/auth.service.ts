@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { User } from './models/user.model';
+import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
 
 @Injectable({
   providedIn: 'root',
@@ -12,7 +13,7 @@ export class AuthService {
   public currentUser$: Observable<User | null> =
     this.currentUserSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HduHttpService) {
     // Fetch the current user on service initialization
     this.fetchCurrentUser().subscribe(); // This can be modified based on your app structure
   }
@@ -24,12 +25,12 @@ export class AuthService {
   }
 
   logout(): Observable<string> {
-    return this.http.get<string>('../../../api/v1/logout');
+    return this.http.get<string>('logout');
   }
 
   fetchCurrentUser(): Observable<User> {
     return this.http
-      .get<User>('../../../api/v1/me')
+      .get<User>('me')
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 }
