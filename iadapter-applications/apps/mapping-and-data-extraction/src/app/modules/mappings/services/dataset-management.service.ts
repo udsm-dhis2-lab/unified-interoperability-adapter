@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, map, Observable } from 'rxjs';
 import {
+  Configuration,
   ConfigurationPage,
   Dataset,
   DatasetPage,
@@ -110,6 +111,16 @@ export class DatasetManagementService {
   deleteConfiguration(uuid: string): Observable<any> {
     return this.httpClient
       .delete<any>(`${this.configurationUrl}/${uuid}`, {})
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  editConfiguration(payLoad: any): Observable<any> {
+    return this.httpClient
+      .put<any>(`${this.configurationUrl}/${payLoad.uuid}`, payLoad)
       .pipe(
         // TODO: return response
         map((response: any) => console.log(response)),

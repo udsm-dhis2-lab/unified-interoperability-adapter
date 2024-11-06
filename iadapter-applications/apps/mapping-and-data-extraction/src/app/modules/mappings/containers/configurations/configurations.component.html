@@ -1,7 +1,7 @@
 <div class="inner-content">
   <nz-card style="width: 100%">
     <div>
-      <h3>Settings</h3>
+      <h3>Mapping Configurations</h3>
     </div>
 
     <div nz-row nzJustify="space-between">
@@ -53,13 +53,32 @@
             </ng-container>
           </td>
           <td class="centered-cell">
-            <span
+            <button
+              style="margin-right: 1rem"
+              nz-button
+              nzType="default"
+              nzDanger
               (click)="showDeleteConfirm(data.uuid ?? '')"
-              class="delete-button"
-              nz-icon
-              nzType="delete"
-              nzTheme="outline"
-            ></span>
+            >
+              <span
+                class="delete-button"
+                nz-icon
+                nzType="delete"
+                nzTheme="outline"
+              ></span>
+            </button>
+            <button
+              nz-button
+              nzType="default"
+              (click)="editConfiguration(data)"
+            >
+              <span
+                class="edit-button"
+                nz-icon
+                nzType="edit"
+                nzTheme="outline"
+              ></span>
+            </button>
           </td>
         </tr>
         }
@@ -134,8 +153,7 @@
                 nz-input
                 formControlName="options"
                 placeholder="Options will be populated here"
-                [nzAutosize]="{ minRows: 4, maxRows: 8 }"
-                readonly
+                [nzAutosize]="{ minRows: 4, maxRows: 12 }"
               ></textarea>
             </nz-form-control>
           </nz-form-item>
@@ -151,7 +169,7 @@
     </form>
 
     <!-- option element form  -->
-    <form [formGroup]="optionElementForm" (ngSubmit)="onAddOptionElement()">
+    <!-- <form [formGroup]="optionElementForm" (ngSubmit)="onAddOptionElement()">
       <div nz-row [nzGutter]="16" style="margin-top: 16px" nzAlign="bottom">
         <div nz-col nzSpan="8">
           <nz-form-item>
@@ -185,10 +203,10 @@
           </div>
         </div>
       </div>
-    </form>
+    </form> -->
 
     <!-- option form -->
-    <form [formGroup]="optionForm" (ngSubmit)="onAddOption()">
+    <!-- <form [formGroup]="optionForm" (ngSubmit)="onAddOption()">
       <div nz-row [nzGutter]="16" style="margin-top: 16px">
         <div nz-col nzSpan="24">
           <nz-form-item>
@@ -210,7 +228,7 @@
           Add option
         </button>
       </div>
-    </form>
+    </form> -->
   </div>
 </nz-drawer>
 
