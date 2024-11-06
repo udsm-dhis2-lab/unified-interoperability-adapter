@@ -119,7 +119,7 @@ export class WorkflowManagementComponent implements OnInit {
               nzTabChangeEvent &&
               (nzTabChangeEvent.index == 0 || nzTabChangeEvent.index == 1)
             ) {
-              const uid = extractIdFromPath(route, 3);
+              const uid = extractIdFromPath(route, 4);
               this.router.navigate([
                 '/',
                 'workflows-management',

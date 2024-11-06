@@ -1,0 +1,14 @@
+<button
+  (click)="onUpdateProcessCodeSnippet()"
+  class="update-code-snippet-btn"
+  nz-button
+  nzType="dashed"
+  [nzLoading]="false"
+>
+  <span nz-icon nzType="poweroff"></span>
+  Update Code Snippet
+</button>
+<ngx-monaco-editor
+  [options]="editorOptionsParams"
+  [(ngModel)]="codeSnippet"
+></ngx-monaco-editor>

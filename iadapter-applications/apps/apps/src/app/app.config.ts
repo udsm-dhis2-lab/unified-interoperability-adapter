@@ -15,7 +15,7 @@ import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { appRoutes } from './app.routes';
 import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
-import { routerReducer } from '@ngrx/router-store';
+import { provideRouterStore, routerReducer } from '@ngrx/router-store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { appEffects, appReducers, metaReducers } from './store/app.state';
 import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
@@ -40,7 +40,7 @@ export const appConfig: ApplicationConfig = {
       logOnly: !isDevMode(),
     }),
     provideEffects(),
-    provideRouter(appRoutes),
+    provideRouterStore(),
     { provide: NZ_ICONS, useValue: icons },
     { provide: NZ_I18N, useValue: en_US },
   ],
