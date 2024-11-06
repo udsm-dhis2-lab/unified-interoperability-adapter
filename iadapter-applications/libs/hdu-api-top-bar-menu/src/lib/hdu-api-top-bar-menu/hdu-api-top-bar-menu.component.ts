@@ -9,7 +9,6 @@ import { SideMenuService } from './services/menu/side-menu.service';
 import { User } from './models/user.model';
 import { AuthService } from './auth.service';
 import { getInitials } from './helpers/user.helper';
-import { NzPlacementType } from 'ng-zorro-antd/dropdown';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 
 @Component({

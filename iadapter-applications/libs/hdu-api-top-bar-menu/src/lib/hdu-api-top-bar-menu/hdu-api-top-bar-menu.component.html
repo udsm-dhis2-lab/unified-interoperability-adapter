@@ -24,7 +24,12 @@
   <nz-dropdown-menu #menu="nzDropdownMenu">
     <ul nz-menu>
       <li nz-menu-item (click)="logOut()">
-        <span nz-icon nzType="logout" nzTheme="outline"></span>
+        <span
+          nz-icon
+          nzType="logout"
+          nzTheme="outline"
+          class="logout-icon"
+        ></span>
         logout
       </li>
     </ul>
