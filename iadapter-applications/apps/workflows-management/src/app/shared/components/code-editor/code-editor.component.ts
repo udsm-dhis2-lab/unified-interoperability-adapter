@@ -6,17 +6,6 @@ import {
   NGX_MONACO_EDITOR_CONFIG,
   NgxMonacoEditorConfig,
 } from 'ngx-monaco-editor-v2';
-import { FormsModule } from '@angular/forms';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { ActivatedRoute, RouterModule } from '@angular/router';
-import { NgFlowchartModule } from '@joelwenzel/ng-flowchart';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-import { NzCollapseModule } from 'ng-zorro-antd/collapse';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzModalModule } from 'ng-zorro-antd/modal';
-import { NzSelectModule } from 'ng-zorro-antd/select';
 import { select, Store } from '@ngrx/store';
 import { WorkflowState } from '../../../features/workflow/state/workflow/workflow.state';
 
@@ -25,11 +14,13 @@ import {
   getProcessUidFromRoute,
   getWorkflowUidFromRoute,
 } from '../../../features/workflow/helpers/workflow.helper';
-import { skip, take } from 'rxjs';
+import { Observable, skip, take } from 'rxjs';
 import { ProcessActions } from '../../../features/workflow/state/process/process.actions';
 import { omit } from 'lodash';
 import { getCurrentSelectedProcess } from '../../../features/workflow/state/process/process.selectors';
 import { WorkflowActions } from '../../../features/workflow/state/workflow/workflow.actions';
+import { ActivatedRoute } from '@angular/router';
+import { SharedModule } from '../../shared.module';
 
 // Create a configuration object for the Monaco Editor
 const monacoConfig: NgxMonacoEditorConfig = {
@@ -39,28 +30,10 @@ const monacoConfig: NgxMonacoEditorConfig = {
 @Component({
   selector: 'app-code-editor',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    MonacoEditorModule,
-    FormsModule,
-    NgFlowchartModule,
-    RouterModule,
-    NzButtonModule,
-    NzSelectModule,
-    NzCheckboxModule,
-    NzButtonModule,
-    NzGridModule,
-    NzModalModule,
-    NzCardModule,
-    NzCollapseModule,
-    NzFormModule,
-  ],
+  imports: [CommonModule, SharedModule],
   templateUrl: './code-editor.component.html',
   styleUrl: './code-editor.component.scss',
-  providers: [
-    { provide: NGX_MONACO_EDITOR_CONFIG, useValue: monacoConfig }, // Provide the config
-  ],
+  providers: [],
 })
 export class CodeEditorComponent implements OnInit {
   @Output() codeSnippetEmitter = new EventEmitter<string>();
@@ -73,19 +46,16 @@ export class CodeEditorComponent implements OnInit {
 
   @Input() editorOptionsParams: any;
   @Input() codeSnippet = '';
+  currentSelectedProcess$: Observable<any> = new Observable();
 
   ngOnInit(): void {
     this.editorOptionsParams = { theme: 'vs-dark', language: 'javascript' };
     this.codeSnippet =
       'function x() {\nconsole.log("Welcome to HDU Implementation!");\n}';
 
-    this.workflowState
-      .pipe(select(getCurrentSelectedProcess), take(1))
-      .subscribe((currentSelectedProcess: Process | null) => {
-        if (currentSelectedProcess && currentSelectedProcess.script) {
-          this.codeSnippet = currentSelectedProcess?.script;
-        }
-      });
+    this.currentSelectedProcess$ = this.workflowState.pipe(
+      select(getCurrentSelectedProcess)
+    );
 
     const currentWorkflowUid = getWorkflowUidFromRoute(this.route);
 
@@ -113,7 +83,7 @@ export class CodeEditorComponent implements OnInit {
             this.workflowState.dispatch(
               WorkflowActions.setSelectedProcess({ process })
             );
-            this.codeSnippet = process.script;
+            // this.codeSnippet = process.script;
           }
         });
     }
@@ -136,9 +106,11 @@ export class CodeEditorComponent implements OnInit {
   }
 
   onUpdateProcessCodeSnippet() {
-    this.workflowState
-      .pipe(select(getCurrentSelectedProcess), take(1))
-      .subscribe((currentSelectedProcess: Process | null) => {
+    this.currentSelectedProcess$ = this.workflowState.pipe(
+      select(getCurrentSelectedProcess)
+    );
+    this.currentSelectedProcess$.subscribe(
+      (currentSelectedProcess: Process | null) => {
         if (currentSelectedProcess) {
           this.processState.dispatch(
             ProcessActions.updateProcess({
@@ -157,6 +129,7 @@ export class CodeEditorComponent implements OnInit {
             })
           );
         }
-      });
+      }
+    );
   }
 }

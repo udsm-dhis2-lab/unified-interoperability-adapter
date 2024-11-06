@@ -285,35 +285,35 @@ public class ClientRegistryService {
         if (!resourceBundle.getEntry().isEmpty()) {
             for (Bundle.BundleEntryComponent entry : resourceBundle.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
-                    Patient patient = (Patient) entry.getResource();
-                    String patientId = patient.getIdElement().getIdPart();
-                    if (patient.getIdentifier().isEmpty()) {
-                        try {
-                            Map<String,Object> client = new HashMap<>();
-                            client.put("id", patient.getIdElement().getIdPart());
-                            deleteClients.add(client);
-                            MethodOutcome methodOutcome = fhirClient.delete().resource(patient).execute();
-                        } catch (Exception e) {
-                            Bundle encounterBundle = fhirClient.search().forResource(Encounter.class)
-                                    .where(Encounter.PATIENT.hasId(patientId))
-                                    .returnBundle(Bundle.class).execute();
-                            Bundle conditionBundle = fhirClient.search().forResource(Condition.class)
-                                    .where(Encounter.PATIENT.hasId(patientId))
-                                    .returnBundle(Bundle.class).execute();
-                            if (encounterBundle.hasEntry() && !encounterBundle.getEntry().isEmpty()) {
-                                for (Bundle.BundleEntryComponent encounterEntry: encounterBundle.getEntry()) {
-                                    Encounter encounter = (Encounter) encounterEntry.getResource();
-                                    try {
-                                        MethodOutcome methodOutcomeEncounterDelete = fhirClient.delete().resource(encounter).execute();
-                                        MethodOutcome methodOutcomeClientDelete = fhirClient.delete().resource(patient).execute();
-                                        Map<String,Object> client = new HashMap<>();
-                                        client.put("id", patient.getIdElement().getIdPart());
-                                        deleteClients.add(client);
-                                    } catch (Exception exception) {
-                                        exception.printStackTrace();
-                                    }
-                                }
-                            }
+                   Patient patient = (Patient) entry.getResource();
+                   String patientId = patient.getIdElement().getIdPart();
+                   if (patient.getIdentifier().isEmpty()) {
+                       try {
+                           Map<String,Object> client = new HashMap<>();
+                           client.put("id", patient.getIdElement().getIdPart());
+                           deleteClients.add(client);
+                           MethodOutcome methodOutcome = fhirClient.delete().resource(patient).execute();
+                       } catch (Exception e) {
+                           Bundle encounterBundle = fhirClient.search().forResource(Encounter.class)
+                                   .where(Encounter.PATIENT.hasId(patientId))
+                                   .returnBundle(Bundle.class).execute();
+                           Bundle conditionBundle = fhirClient.search().forResource(Condition.class)
+                                   .where(Encounter.PATIENT.hasId(patientId))
+                                   .returnBundle(Bundle.class).execute();
+                           if (encounterBundle.hasEntry() && !encounterBundle.getEntry().isEmpty()) {
+                               for (Bundle.BundleEntryComponent encounterEntry: encounterBundle.getEntry()) {
+                                   Encounter encounter = (Encounter) encounterEntry.getResource();
+                                   try {
+                                       MethodOutcome methodOutcomeEncounterDelete = fhirClient.delete().resource(encounter).execute();
+                                       MethodOutcome methodOutcomeClientDelete = fhirClient.delete().resource(patient).execute();
+                                       Map<String,Object> client = new HashMap<>();
+                                       client.put("id", patient.getIdElement().getIdPart());
+                                       deleteClients.add(client);
+                                   } catch (Exception exception) {
+                                       exception.printStackTrace();
+                                   }
+                               }
+                           }
 
 //                           if (conditionBundle.hasEntry() && !conditionBundle.getEntry().isEmpty()) {
 //                               for (Bundle.BundleEntryComponent conditionEntry: encounterBundle.getEntry()) {
@@ -329,14 +329,14 @@ public class ClientRegistryService {
 //                                   }
 //                               }
 //                           }
-                            Map<String,Object> client = new HashMap<>();
-                            client.put("id", patient.getIdElement().getIdPart());
-                            client.put("reason", e.getMessage());
-                            clientsFailed.add(client);
-                            e.printStackTrace();
-                        }
-                        Thread.sleep(100);
-                    }
+                           Map<String,Object> client = new HashMap<>();
+                           client.put("id", patient.getIdElement().getIdPart());
+                           client.put("reason", e.getMessage());
+                           clientsFailed.add(client);
+                           e.printStackTrace();
+                       }
+                       Thread.sleep(100);
+                   }
                 }
             }
         }
