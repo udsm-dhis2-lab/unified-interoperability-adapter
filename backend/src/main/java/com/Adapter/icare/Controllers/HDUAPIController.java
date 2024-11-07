@@ -1,9 +1,12 @@
 package com.Adapter.icare.Controllers;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
+import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
@@ -12,7 +15,8 @@ import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.google.common.collect.Maps;
-import org.hl7.fhir.r4.model.Patient;
+import org.hl7.fhir.r4.model.*;
+import org.hl7.fhir.r4.utils.SnomedExpressions;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigInteger;
+import java.nio.Buffer;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -43,19 +48,25 @@ public class HDUAPIController {
     private final User authenticatedUser;
     private final ClientRegistryService clientRegistryService;
     private final ClientRegistryConstants clientRegistryConstants;
+    private final IGenericClient fhirClient;
+    private final FHIRConstants fhirConstants;
 
     public  HDUAPIController(DatastoreService datastoreService,
                              MediatorsService mediatorsService,
                              DatastoreConstants datastoreConstants,
                              UserService userService,
                              ClientRegistryService clientRegistryService,
-                             ClientRegistryConstants clientRegistryConstants) throws Exception {
+                             ClientRegistryConstants clientRegistryConstants,
+                             FHIRConstants fhirConstants) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryService = clientRegistryService;
         this.userService = userService;
         this.clientRegistryConstants = clientRegistryConstants;
+        FhirContext fhirContext = FhirContext.forR4();
+        this.fhirConstants =fhirConstants;
+        this.fhirClient =  fhirContext.newRestfulGenericClient(this.fhirConstants.FHIRServerUrl);
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
@@ -292,19 +303,54 @@ public class HDUAPIController {
                                                @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
-            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, null, page,pageSize);
-            for (Datastore datastore: pagedDatastoreData.getContent()) {
-                namespaceDetails.add(datastore.getValue());
+            String keysForGeneralCodes = datastoreConstants.KeysForGeneralCodes;
+//            System.out.println(keysForGeneralCodes);
+            if (keysForGeneralCodes.contains(namespace)) {
+                Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, null, page,pageSize);
+                for (Datastore datastore: pagedDatastoreData.getContent()) {
+                    namespaceDetails.add(datastore.getValue());
+                }
+                Map<String, Object> returnObject =  new HashMap<>();
+                Map<String, Object> pager = new HashMap<>();
+                pager.put("page", page);
+                pager.put("pageSize", pageSize);
+                pager.put("totalPages",pagedDatastoreData.getTotalPages());
+                pager.put("total", pagedDatastoreData.getTotalElements());
+                returnObject.put("pager",pager);
+                returnObject.put("results", namespaceDetails);
+                return ResponseEntity.ok(returnObject);
+            } else {
+                List<GeneralCodesDTO> generalCodes = new ArrayList<>();
+                Parameters inputParameters = new Parameters();
+                Parameters outputParameters = fhirClient
+                        .operation()
+                        .onInstance(new IdType("ValueSet", namespace))
+                        .named("$expand")
+                        .withParameters(inputParameters)
+                        .execute();
+
+                ValueSet expandedValueSet = (ValueSet) outputParameters.getParameter().get(0).getResource();
+
+                if (expandedValueSet.hasExpansion() && expandedValueSet.getExpansion().hasContains()) {
+                    for(ValueSet.ValueSetExpansionContainsComponent valueSetExpansionContainsComponent :expandedValueSet.getExpansion().getContains()) {
+                        GeneralCodesDTO generalCodesDTO = new GeneralCodesDTO();
+                        generalCodesDTO.setStandardCode("LOINC");
+                        generalCodesDTO.setCode(valueSetExpansionContainsComponent.getCode());
+                        generalCodesDTO.setName(valueSetExpansionContainsComponent.getDisplay());
+                        generalCodesDTO.setTitle(valueSetExpansionContainsComponent.getDisplay());
+                        generalCodesDTO.setVersion(valueSetExpansionContainsComponent.getVersion());
+                        generalCodes.add(generalCodesDTO);
+                    }
+                }
+                Map<String, Object> returnObject =  new HashMap<>();
+                Map<String, Object> pager = new HashMap<>();
+                pager.put("page", page);
+                pager.put("pageSize", pageSize);
+                returnObject.put("pager",pager);
+                returnObject.put("results", generalCodes);
+                return ResponseEntity.ok(returnObject);
             }
-            Map<String, Object> returnObject =  new HashMap<>();
-            Map<String, Object> pager = new HashMap<>();
-            pager.put("page", page);
-            pager.put("pageSize", pageSize);
-            pager.put("totalPages",pagedDatastoreData.getTotalPages());
-            pager.put("total", pagedDatastoreData.getTotalElements());
-            returnObject.put("pager",pager);
-            returnObject.put("results", namespaceDetails);
-            return ResponseEntity.ok(returnObject);
+
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }

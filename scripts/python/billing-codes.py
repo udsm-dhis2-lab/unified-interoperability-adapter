@@ -3,8 +3,14 @@ import csv
 import json
 import requests
 from requests.auth import HTTPBasicAuth
-username = 'admin'
-password = 'AdminUser'
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+username =  os.getenv('HDU_USERNAME')
+password = os.getenv('HDU_PASSWORD')
+
 headers = {
     'Content-Type': 'application/json; charset=utf8'
 }
