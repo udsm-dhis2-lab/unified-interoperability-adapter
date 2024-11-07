@@ -218,6 +218,7 @@ public class SharedHealthRecordsService {
                         visitDetails.setNew(Boolean.FALSE);
                         templateData.setVisitDetails(visitDetails);
 
+
                         // Get clinicalInformation
                         // 1. clinicalInformation - vital signs
                         ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
@@ -243,6 +244,13 @@ public class SharedHealthRecordsService {
                         clinicalInformationDetails.setVitalSigns(vitalSigns);
                         clinicalInformationDetails.setVisitNotes(visitNotes);
                         templateData.setClinicalInformation(clinicalInformationDTO);
+                        ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
+                        List<Identifier> identifiers = encounter.getIdentifier();
+                        for (Identifier identifierData: identifiers) {
+                            referralDetailsDTO.setReferralNumber(identifierData.getValue());
+                            break;
+                        }
+                        templateData.setReferralDetails(referralDetailsDTO);
 
                         // TODO: Add history when numberOfVisits > 1
                     } else if (organization != null) {
