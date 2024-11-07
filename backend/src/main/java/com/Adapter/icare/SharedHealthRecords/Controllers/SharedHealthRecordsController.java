@@ -23,10 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -123,6 +120,7 @@ public class SharedHealthRecordsController {
             @RequestParam( value = "middleName", required = false) String middleName,
             @RequestParam( value = "lastName", required = false) String lastName,
             @RequestParam( value = "hfrCode", required = false) String hfrCode,
+            @RequestParam( value = "dateOfBirth", required = false) Date dateOfBirth,
             @RequestParam( value = "includeDeceased", defaultValue = "false") boolean includeDeceased,
             @RequestParam( value = "numberOfVisits", defaultValue = "1") Integer numberOfVisits
     ) throws Exception {
@@ -140,6 +138,7 @@ public class SharedHealthRecordsController {
                     middleName,
                     lastName,
                     hfrCode,
+                    dateOfBirth,
                     includeDeceased,
                     numberOfVisits);
                 return ResponseEntity.ok(sharedRecordsResponse);
