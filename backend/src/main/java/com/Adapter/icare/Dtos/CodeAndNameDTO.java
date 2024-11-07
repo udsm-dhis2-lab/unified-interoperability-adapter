@@ -5,8 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ProvidedAndCodeDTO {
-    private String code;
+public class CodeAndNameDTO {
     private String name;
-    private boolean provided;
+    private String code;
 }

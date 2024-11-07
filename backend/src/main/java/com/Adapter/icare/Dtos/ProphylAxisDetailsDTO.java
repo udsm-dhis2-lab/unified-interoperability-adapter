@@ -13,7 +13,9 @@ public class ProphylAxisDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
+    private String code;
     private String type;
+    private String name;
     private String status;
     private String notes;
     private ReactionDTO reaction;
