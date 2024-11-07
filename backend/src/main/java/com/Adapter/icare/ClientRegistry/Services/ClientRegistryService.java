@@ -68,6 +68,7 @@ public class ClientRegistryService {
             String status,
             String identifier,
             String identifierType,
+            String hfrCode,
             String gender,
             String firstName,
             String middleName,
@@ -83,6 +84,10 @@ public class ClientRegistryService {
             var searchClient =  fhirClient.search().forResource(Patient.class);
             if (identifier != null) {
                 searchClient.where(Patient.IDENTIFIER.exactly().identifier(identifier));
+            }
+
+            if (hfrCode != null) {
+                searchClient.where(Patient.IDENTIFIER.hasSystemWithAnyCode(hfrCode));
             }
 
             if (onlyLinkedClients != null) {

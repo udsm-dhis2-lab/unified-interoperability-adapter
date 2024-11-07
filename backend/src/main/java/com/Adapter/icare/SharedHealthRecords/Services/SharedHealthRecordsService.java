@@ -101,6 +101,10 @@ public class SharedHealthRecordsService {
                 searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
             }
 
+            if (hfrCode != null) {
+                searchRecords.where(Patient.IDENTIFIER.hasSystemWithAnyCode(hfrCode));
+            }
+
             if (firstName != null) {
                 searchRecords.where(Patient.GIVEN.matches().value(firstName));
             }
