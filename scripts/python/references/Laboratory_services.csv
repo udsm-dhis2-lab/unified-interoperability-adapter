@@ -1,0 +1,227 @@
+CODE,SERVICE DESCRIPTION,Categort,Department
+84311,Adenosine Deaminase (ADA) – Serum,Laboratory,CLINICAL CHEMISTRY
+82040,Albumin,Laboratory,CLINICAL CHEMISTRY
+84182,Albumin/Globulin Ratio,Laboratory,CLINICAL CHEMISTRY
+84075,Alkaline Phosphatase (ALP) Serum,Laboratory,CLINICAL CHEMISTRY
+84460,Alanine Aminotransferaseor (ALT) / Serum Glutamic Pyruvate Transaminase (SGPT),Laboratory,CLINICAL CHEMISTRY
+82150,Amylase,Laboratory,CLINICAL CHEMISTRY
+84450,Aspartate Aminotransferase (AST) / Serum Glutamic Oxaloacetic Transaminase (SGOT),Laboratory,CLINICAL CHEMISTRY
+84702,Beta - Human Chorionic Gonadotropin (β-HCG) - Serum,Laboratory,CLINICAL CHEMISTRY
+82248,Bilirubin Direct,Laboratory,CLINICAL CHEMISTRY
+82247,Bilirubin Total,Laboratory,CLINICAL CHEMISTRY
+86140,C-Reactive Protein (CRP),Laboratory,CLINICAL CHEMISTRY
+82310,Calcium - Serum/Post Dialysis Calcium,Laboratory,CLINICAL CHEMISTRY
+82435,Chloride – Serum,Laboratory,CLINICAL CHEMISTRY
+82436,Chloride-Urine,Laboratory,CLINICAL CHEMISTRY
+82465,Cholesterol (Total),Laboratory,CLINICAL CHEMISTRY
+82550,Creatine Kinase (CK- MB),Laboratory,CLINICAL CHEMISTRY
+82565,Creatinine/Post Dialysis Creatinine,Laboratory,CLINICAL CHEMISTRY
+82945,"Glucose Level on Body Fluids (CSF Ascitic, Peritonial, Pleural, Pericadial, Synovial)",Laboratory,CLINICAL CHEMISTRY
+84157,"Protein Level on Body Fluids (CSF, Ascitic, Peritonial, Pleural)",Laboratory,CLINICAL CHEMISTRY
+85397,D-Dimer,Laboratory,CLINICAL CHEMISTRY
+82728,Ferritin,Laboratory,CLINICAL CHEMISTRY
+82746,Folic Acid Level (Folate),Laboratory,CLINICAL CHEMISTRY
+82977,Gamma - Glutamyltransferase (GGT),Laboratory,CLINICAL CHEMISTRY
+82947,Fasting/Random Blood Glucose (FBG/RBG),Laboratory,CLINICAL CHEMISTRY
+83036,Glycosylated Haemoglobin (HbA1c),Laboratory,CLINICAL CHEMISTRY
+83718,High Density Lipoprotein (HDL),Laboratory,CLINICAL CHEMISTRY
+83540,Iron (Fe),Laboratory,CLINICAL CHEMISTRY
+83550,Iron Saturation (% Saturation),Laboratory,CLINICAL CHEMISTRY
+83615,Lactate Dehydrogenase (LDH),Laboratory,CLINICAL CHEMISTRY
+83721,Low Density Lipoprotein (LDL),Laboratory,CLINICAL CHEMISTRY
+83735,Magnesium,Laboratory,CLINICAL CHEMISTRY
+84100,Phosphorus/Post Dialysis Phosphorus,Laboratory,CLINICAL CHEMISTRY
+84132,Potassium/Post Dialysis Potassium,Laboratory,CLINICAL CHEMISTRY
+84156,Protein in Urine,Laboratory,CLINICAL CHEMISTRY
+83690,Lipase Serum,Laboratory,CLINICAL CHEMISTRY
+84165,Protein Electrophoresis Serum,Laboratory,CLINICAL CHEMISTRY
+82607,Vitamin B-12 (Cyanocobalamin),Laboratory,CLINICAL CHEMISTRY
+84295,Sodium/Post Dialysis Sodium,Laboratory,CLINICAL CHEMISTRY
+84432,Thyroglobulin Antibodies (Tg Ab),Laboratory,CLINICAL CHEMISTRY
+84466,Transferrin,Laboratory,CLINICAL CHEMISTRY
+84478,Triglycerides,Laboratory,CLINICAL CHEMISTRY
+84484,Troponin-I,Laboratory,CLINICAL CHEMISTRY
+84560,Uric Acid,Laboratory,CLINICAL CHEMISTRY
+80202,Vancomycin Level,Laboratory,CLINICAL CHEMISTRY
+82652,"Vitamin D-25 (Dihydroxyvitamin D, 1, 25)",Laboratory,CLINICAL CHEMISTRY
+83719,Very Low Density Lipoprotein (VLDL),Laboratory,CLINICAL CHEMISTRY
+82570,24Hr Creatinine Urine,Laboratory,CLINICAL CHEMISTRY
+84133,24Hr Potassium Urine,Laboratory,CLINICAL CHEMISTRY
+84300,24Hr Sodium Urine,Laboratory,CLINICAL CHEMISTRY
+84181,Globulin,Laboratory,CLINICAL CHEMISTRY
+82374,Carbondioxide Serum,Laboratory,CLINICAL CHEMISTRY
+82951,Oral Glucose Tolerance Test (OGTT),Laboratory,CLINICAL CHEMISTRY
+84066,Acid Phosphotase Serum,Laboratory,CLINICAL CHEMISTRY
+82803,Blood Gas Panel,Laboratory,CLINICAL CHEMISTRY
+80375,Urine Drug Screening (UDS ),Laboratory,CLINICAL CHEMISTRY
+80299,Quantitation of Therapeutic Drugs,Laboratory,CLINICAL CHEMISTRY
+80197,Tacrolimus Level,Laboratory,CLINICAL CHEMISTRY
+80195,Sirolimus Level,Laboratory,CLINICAL CHEMISTRY
+80169,Everolimus Level,Laboratory,CLINICAL CHEMISTRY
+82105,Alpha Feto Protein (AFP),Laboratory,IMMUNOLOGY
+83880,Brain Natriuretic Peptide (BNP),Laboratory,IMMUNOLOGY
+86304,Cancer Antigen - 125 (CA - 125),Laboratory,IMMUNOLOGY
+82378,Carcinoembryonic Antigen (CEA),Laboratory,IMMUNOLOGY
+82530,Cortisol,Laboratory,IMMUNOLOGY
+80158,Cyclosporine Level,Laboratory,IMMUNOLOGY
+82670,Estradiol Level,Laboratory,IMMUNOLOGY
+83001,Follicle Stimulating Hormone (FSH),Laboratory,IMMUNOLOGY
+83003,Growth Hormone (GH),Laboratory,IMMUNOLOGY
+82784,Immunoglobulin A (IgA ),Laboratory,IMMUNOLOGY
+86001,Immunoglobulin G (IgG),Laboratory,IMMUNOLOGY
+86005,Immunoglobulin E for Allergic Substance (IgE),Laboratory,IMMUNOLOGY
+83525,Insulin,Laboratory,IMMUNOLOGY
+83002,Luteinizing Hormone (LH),Laboratory,IMMUNOLOGY
+84144,Progesterone,Laboratory,IMMUNOLOGY
+84146,Prolactin,Laboratory,IMMUNOLOGY
+84153,Prostate Specific Antigen (PSA) Measurement,Laboratory,IMMUNOLOGY
+84152,Prostate Specific Antigen (PSA) Level,Laboratory,IMMUNOLOGY
+84681,C – Peptide,Laboratory,IMMUNOLOGY
+84402,Testosterone,Laboratory,IMMUNOLOGY
+86812,Immunoglobulin M (IgM),Laboratory,IMMUNOLOGY
+86807,Complement Dependent Cytotoxicity Compatibility ( CDCC),Laboratory,IMMUNOLOGY
+81371,Human Leukocyte Antigen Typing (HLA Typing),Laboratory,IMMUNOLOGY
+88182,Flowcytometry Lymphocyte Crossmatch,Laboratory,IMMUNOLOGY
+86316,Tumor Markers Analysis ( Others ),Laboratory,IMMUNOLOGY
+86829,Donor Specific Antibody (DSA) to HLA Antigen,Laboratory,IMMUNOLOGY
+86830,Panel Reactiveantibody Screening HLA Class I & Ii,Laboratory,IMMUNOLOGY
+86060,Anti Streptolysin O Titre (ASOT),Laboratory,SEROLOGY
+86039,Autoimmune Antibodies (dsDNA),Laboratory,SEROLOGY
+86622,Brucella Abortus Antigen (Ag),Laboratory,SEROLOGY
+87147,Chlamydia (ELISA),Laboratory,SEROLOGY
+86644,Cytomegalovirus Antibody test (CMC-IgG),Laboratory,SEROLOGY
+86645,Cytomegalovirus Antibody test (CMV-IgM),Laboratory,SEROLOGY
+86664,Epstein Barr Virus IgG – Serum,Laboratory,SEROLOGY
+86663,Epstein Barr Virus IgM- Serum,Laboratory,SEROLOGY
+86705,Hepatitis B Core Igm Antibody (HBcAb),Laboratory,SEROLOGY
+86709,Hepatitis A Antibody (IgM ),Laboratory,SEROLOGY
+86707,Hepatitis B Envelope Antibody (HBeAb),Laboratory,SEROLOGY
+87350,Hepatitis B Envelope Antigen (HBeAg),Laboratory,SEROLOGY
+86706,Hepatitis B Surface Antibody (HBsAb),Laboratory,SEROLOGY
+87340,Hepatitis B Surface Antigen (HBsAg),Laboratory,SEROLOGY
+86803,Hepatitis C Antibody (HCVAb),Laboratory,SEROLOGY
+86695,Herpes Simplex Virus - Type 1(HSV-1) IgG & IgM,Laboratory,SEROLOGY
+86696,Herpes Simplex Virus - Type 2(HSV-2) IgG & IgM,Laboratory,SEROLOGY
+86689,HIV 1 & 2 Antibodies (ELISA),Laboratory,SEROLOGY
+87338,Helicobacter Pylori (H.pylori) Antigen test,Laboratory,SEROLOGY
+86677,Helicobacter Pylori (H.pylori) Antibody test,Laboratory,SEROLOGY
+81025,Urine for pregnancy test (UPT),Laboratory,SEROLOGY
+86757,Proteus abortus antibody test (Rapid),Laboratory,SEROLOGY
+86430,Rheumatoid Factor (RF) Qualitative,Laboratory,SEROLOGY
+86592,"Syphilis screening Test (VDRL, RPR or SD Bioline)",Laboratory,SEROLOGY
+86762,Rubella Antibody Test (IgG /IgM),Laboratory,SEROLOGY
+86777,Toxoplasma Antibody Test (IgG),Laboratory,SEROLOGY
+86778,Toxoplasma Antibody Test (IgM),Laboratory,SEROLOGY
+86780,Treponema Pallidum Haemagglutination Test (TPHA/TPPA),Laboratory,SEROLOGY
+86768,Widal Test,Laboratory,SEROLOGY
+84480,Tri - Iodothyronine Hormone (T3),Laboratory,SEROLOGY
+84437,Thyroxine Hormone (T4),Laboratory,SEROLOGY
+84155,Total Protein Serum,Laboratory,SEROLOGY
+84443,Thyroid Stimulating Hormone (TSH),Laboratory,SEROLOGY
+84520,Urea Nitrogen (Bun)/Post Dialysis Urea Nitrogen (BUN),Laboratory,SEROLOGY
+86021,Anti Neutrophil Cystoplasmic Antibodies (ANCA-C),Laboratory,SEROLOGY
+86406,Cryptococcal Antigen (CrAg),Laboratory,SEROLOGY
+86790,"Antibody Test for Influenza Virus, Rift Valley Fever, Chikungunya Virus, Zika Virus, Dengue Virus,Ebola Virus",Laboratory,SEROLOGY
+86431,Rheumatoid Factor (RF) Quantitative,Laboratory,SEROLOGY
+82024,Adenocorticotropic Hormone (ACTH),Laboratory,SEROLOGY
+86704,Hepatitis B Core Antibody (HBcAb),Laboratory,SEROLOGY
+82164,Angiotensin I,Laboratory,SEROLOGY
+82163,Angiotensin II,Laboratory,SEROLOGY
+82671,Oestrogen,Laboratory,SEROLOGY
+86703,HIV 1& 2 Antibody Rapid Test,Laboratory,SEROLOGY
+86708,Hepatitis A Antibody,Laboratory,SEROLOGY
+86022,Anti-Neutrophil Cystoplasmic Antibody(ANCA-P),Laboratory,SEROLOGY
+86225,Anti-Nuclear Antibody (ANA),Laboratory,SEROLOGY
+86403,Brucella Antibody Test (IgG)/ (IgM),Laboratory,SEROLOGY
+86828,Toxoplasma Antigen Test,Laboratory,SEROLOGY
+85025,Full Blood Picture (FBP) / Complete Blood Count (CBC),Laboratory,HAEMATOLOGY
+85097,Bone Marrow Smear Interpretation,Laboratory,HAEMATOLOGY
+86360,CD3/CD4/CD8 T Cell Count,Laboratory,HAEMATOLOGY
+85651,Erythrocyte Sedimentation Rate (ESR),Laboratory,HAEMATOLOGY
+85230,Factor VII,Laboratory,HAEMATOLOGY
+85247,Factor VII,Laboratory,HAEMATOLOGY
+85384,Fibrinogen,Laboratory,HAEMATOLOGY
+82955,Glucose - 6 Phosphatase Dehydrogenase(G-6PGD),Laboratory,HAEMATOLOGY
+83026,Haemoglobin (Hb),Laboratory,HAEMATOLOGY
+82664,Haemoglobin Electropheresis + Sickling Test,Laboratory,HAEMATOLOGY
+86235,Lupus Erythromatous Cell (LE Cell).,Laboratory,HAEMATOLOGY
+85705,Partial Thromboplastin Time (PTT),Laboratory,HAEMATOLOGY
+85060,Peripheral Blood Smear (PBS),Laboratory,HAEMATOLOGY
+81206,Philadelphia Chromosome,Laboratory,HAEMATOLOGY
+85049,"Platelet Count, Automated Test",Laboratory,HAEMATOLOGY
+85210,Prothrombin Time (PT),Laboratory,HAEMATOLOGY
+85660,Sickling Test,Laboratory,HAEMATOLOGY
+85002,Bleeding Time,Laboratory,HAEMATOLOGY
+85732,Activated Partial Thrombin Time (APTT),Laboratory,HAEMATOLOGY
+85045,Reticulocyte Count,Laboratory,HAEMATOLOGY
+86900,Blood Group Typing (ABO) and Blood Typing for Rhesus (D) Antigen,Laboratory,BLOOD TRANSFUSION
+86850,Red Blood Cells Antibodies Identification,Laboratory,BLOOD TRANSFUSION
+86920,Compatability Testing (Cross Matching) for Blood Transfusion,Laboratory,BLOOD TRANSFUSION
+86885,Coombs Test (Direct),Laboratory,BLOOD TRANSFUSION
+86940,Haemolysin Test,Laboratory,BLOOD TRANSFUSION
+86880,Coombs Test (Indirect),Laboratory,BLOOD TRANSFUSION
+86985,Preparation of Blood Product,Laboratory,BLOOD TRANSFUSION
+87070,"Body Fluids for Culture and Sensitivity (Cerebrospinal Fluids, Pleural,Ascitic, Peritoneal, Pericardial, Synovial Etc.)",Laboratory,MICROBIOLOGY
+87040,Blood for Culture and Sensitivity,Laboratory,MICROBIOLOGY
+87220,Skin Scraping for KOH,Laboratory,MICROBIOLOGY
+87205,Gram Stain,Laboratory,MICROBIOLOGY
+87206,Wet Preparation for Microorganisms and Cells,Laboratory,MICROBIOLOGY
+87207,"Special Stain (Indian Ink, Nigrosin)",Laboratory,MICROBIOLOGY
+87181,Quantitative Antimicrobial Susceptibility Testing,Laboratory,MICROBIOLOGY
+87800,"Genital Swabs for Culture and Sensitivity (High Vaginal Swab, Urethral, Vaginal, Endo - Cervical Swabs)",Laboratory,MICROBIOLOGY
+87076,"Ear Swab, Nasal Swab, Throat Swab and Eye Swab for Culture and Sensitivity",Laboratory,MICROBIOLOGY
+87075,Pus Swab for Culture and Sensitivity,Laboratory,MICROBIOLOGY
+87101,"Scraping for Fungi Culture (Skin, Hair or Nail)",Laboratory,MICROBIOLOGY
+87077,Sputum for Culture and Sensitivity,Laboratory,MICROBIOLOGY
+87045,Stool for Culture and Sensitivity,Laboratory,MICROBIOLOGY
+87088,Urine for Culture and Sensitivity,Laboratory,MICROBIOLOGY
+81099,Urine Dipstick,Laboratory,MICROBIOLOGY
+87046,Rectal Swab Culture and Sensitivity,Laboratory,MICROBIOLOGY
+87015,Staining of Mycobacteria Species (ZN or Auramine Stains),Laboratory,MYCOBACTERIOLOGY
+87190,Mycobacteria Liquid Culture and Drug Susceptibility Testing,Laboratory,MYCOBACTERIOLOGY
+87550,"Genotypic Method for Mycobacteria (Xpert® MTB/Rif, LPA, etc.)",Laboratory,MYCOBACTERIOLOGY
+87116,Mycobacteria Solid Culture and Drug Susceptibility Testing,Laboratory,MYCOBACTERIOLOGY
+87560,Genotypic Methods for Detecting Non Tuberculous Mycobacteria (NTM),Laboratory,MYCOBACTERIOLOGY
+87561,Genotypic Drug Susceptibility Testing for NTM,Laboratory,MYCOBACTERIOLOGY
+,PARASITOLOGY AND MEDICAL ENTOMOLOGY,Laboratory,
+87177,Blood Smear for Malaria Parasites (BS),Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+86750,Malaria Rapid Diagnostic Test (MRDT),Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+87209,"Special Stain for Parasites (Microfilaria, Leshmania, Trypanosoma etc.)",Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+82272,Stool for Occult Blood,Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+82274,Stool Analysis,Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+81005,Urine Analysis,Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+83883,Urine Bence Jones Protein,Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+88184,Ham Test for Paroxysmal Nocturnal Hemoglobinuria (PNH),Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+87210,Knot Technique for Microfilaria,Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+81015,Urine Analysis (Microscope),Laboratory,PARASITOLOGY AND MEDICAL ENTOMOLOGY
+88342,Immunohistochemistry (IHC),Laboratory,Histopathology
+88323,"Tissue Biopsy Processing, Interpretation and Report",Laboratory,Histopathology
+88314,"Frozen Preparation of Specimen, Interpretation and Report",Laboratory,Histopathology
+88313,"Special Stained Tissue Specimen Slides, Interpretation and Report",Laboratory,Histopathology
+88302,"Tissue Block Staining, Interpretation and Report",Laboratory,Histopathology
+88304,Specimen Slides Interpretation and Report,Laboratory,Histopathology
+88106,Cytology of Body Fluids,Laboratory,Cytology
+88364,Bone Marrow Aspirate Cytology,Laboratory,Cytology
+88173,Fine Needle Aspiration Cytology (FNAC),Laboratory,Cytology
+88141,Pap Smear,Laboratory,Cytology
+89322,Seminal Fluid Analysis (Cytology),Laboratory,Cytology
+88104,Sputum Cytology,Laboratory,Cytology
+88120,Urine Cytology,Laboratory,Cytology
+88371,Immunocytochemistry,Laboratory,Cytology
+88000,Autopsy without Histology,Laboratory,MORTUARY AND FORENSIC SERVICES
+88020,Autopsy with Histology,Laboratory,MORTUARY AND FORENSIC SERVICES
+88040,"Autopsy with Ancillary Studies (Microbiology, Chemistry/Toxicology,Genetic Etc",Laboratory,MORTUARY AND FORENSIC SERVICES
+88045,Preservation of Dead Body,Laboratory,MORTUARY AND FORENSIC SERVICES
+88005,Embalming,Laboratory,MORTUARY AND FORENSIC SERVICES
+88099,Washing and Decoration of Dead Body,Laboratory,MORTUARY AND FORENSIC SERVICES
+88125,Forensic (Investigation) Examination of Specimen,Laboratory,MORTUARY AND FORENSIC SERVICES
+89320,Semen Analysis,Laboratory,ANDROLOGY
+87515,Hepatitis B Viral Load,Laboratory,MOLECULAR BIOLOGY
+87389,HIV 1/2 Viral Load,Laboratory,MOLECULAR BIOLOGY
+87534,PCR- Based Test(Others) test,Laboratory,MOLECULAR BIOLOGY
+87149,PCR-Based Assays for Micro Organisms Identification,Laboratory,MOLECULAR BIOLOGY
+87522,Hepatitis C Viral Load,Laboratory,MOLECULAR BIOLOGY
+87150,"Identification of Organisms by Genetic Analysis (HBV,HCV,CMV, Polyoma)",Laboratory,MOLECULAR BIOLOGY
+87185,Genotypic Antimicrobial Susceptibility Testing for Bacteria (PCR-Based),Laboratory,MOLECULAR BIOLOGY
+87153,Genome Sequencing Methods,Laboratory,MOLECULAR BIOLOGY
+87490,Chlamydia PCR,Laboratory,MOLECULAR BIOLOGY
