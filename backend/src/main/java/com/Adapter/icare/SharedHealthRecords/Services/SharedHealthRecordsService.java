@@ -223,12 +223,11 @@ public class SharedHealthRecordsService {
                         }
 
                         // Visit notes
-                        List<String> visitNotes = new ArrayList<>();
+                        List<Map<String,Object>> visitNotes = new ArrayList<>();
 
-                        Map<String,Object> clinicalInformationDetails = new HashMap<>();
-                        clinicalInformationDetails.put("vitalSigns", vitalSigns);
-                        clinicalInformationDetails.put("visitNotes", visitNotes);
-                        clinicalInformationDTO.setClinicalInformation(clinicalInformationDetails);
+                        ClinicalInformationDTO clinicalInformationDetails = new ClinicalInformationDTO();
+                        clinicalInformationDetails.setVitalSigns(vitalSigns);
+                        clinicalInformationDetails.setVisitNotes(visitNotes);
                         templateData.setClinicalInformation(clinicalInformationDTO);
 
                         // TODO: Add history when numberOfVisits > 1
