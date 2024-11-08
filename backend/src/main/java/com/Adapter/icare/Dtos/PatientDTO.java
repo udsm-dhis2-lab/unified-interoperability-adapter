@@ -77,7 +77,14 @@ public class PatientDTO {
             mappedPatient.setId(this.getId());
             List<IdentifierDTO> idsList = new ArrayList<>();
             if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
-                idsList= getIdentifiersDTO(this.getIdentifiers());
+                for(Identifier identifier: this.getIdentifiers()) {
+                    IdentifierDTO identifierDTO =  new IdentifierDTO();
+                    identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): this.getId());
+                    identifierDTO.setType(identifier.getType().getText());
+                    identifierDTO.setUse(identifier.getUse().getDisplay());
+                    identifierDTO.setSystem(identifier.getSystem());
+                    idsList.add(identifierDTO);
+                }
             }
             mappedPatient.setIdentifiers(idsList);
             mappedPatient.setFirstName(firstName);
