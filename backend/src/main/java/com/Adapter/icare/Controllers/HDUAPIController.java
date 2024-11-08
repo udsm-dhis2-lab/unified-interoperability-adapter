@@ -320,6 +320,7 @@ public class HDUAPIController {
                 returnObject.put("results", namespaceDetails);
                 return ResponseEntity.ok(returnObject);
             } else {
+                // TODO: Add pagination support
                 List<GeneralCodesDTO> generalCodes = new ArrayList<>();
                 Parameters inputParameters = new Parameters();
                 Parameters outputParameters = fhirClient
@@ -334,7 +335,11 @@ public class HDUAPIController {
                 if (expandedValueSet.hasExpansion() && expandedValueSet.getExpansion().hasContains()) {
                     for(ValueSet.ValueSetExpansionContainsComponent valueSetExpansionContainsComponent :expandedValueSet.getExpansion().getContains()) {
                         GeneralCodesDTO generalCodesDTO = new GeneralCodesDTO();
-                        generalCodesDTO.setStandardCode("LOINC");
+                        generalCodesDTO.setStandardCode(valueSetExpansionContainsComponent.getSystem().contains("loinc") ? "LOINC"
+                                :valueSetExpansionContainsComponent.getSystem().contains("nhif") ? "NHIF"
+                                :valueSetExpansionContainsComponent.getSystem().contains("msd") ? "MSD CODE"
+                                :valueSetExpansionContainsComponent.getSystem().contains("moh") ? "GENERAL"
+                                : "LOCAL");
                         generalCodesDTO.setCode(valueSetExpansionContainsComponent.getCode());
                         generalCodesDTO.setName(valueSetExpansionContainsComponent.getDisplay());
                         generalCodesDTO.setTitle(valueSetExpansionContainsComponent.getDisplay());
@@ -345,6 +350,7 @@ public class HDUAPIController {
                 Map<String, Object> returnObject =  new HashMap<>();
                 Map<String, Object> pager = new HashMap<>();
                 pager.put("page", page);
+                pager.put("total", expandedValueSet.getExpansion().getTotal());
                 pager.put("pageSize", pageSize);
                 returnObject.put("pager",pager);
                 returnObject.put("results", generalCodes);
