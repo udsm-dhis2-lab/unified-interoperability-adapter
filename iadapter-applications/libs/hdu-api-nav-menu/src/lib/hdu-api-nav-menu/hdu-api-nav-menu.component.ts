@@ -23,7 +23,7 @@ export class HduApiNavMenuComponent implements OnInit {
       name: 'Dashboard',
       id: 'dashboard',
       routeUrl: '/dashboard',
-      icon: 'apartment',
+      icon: 'appstore',
       category: 'main',
     },
     {
@@ -36,14 +36,14 @@ export class HduApiNavMenuComponent implements OnInit {
         {
           name: 'Clients',
           id: 'clients',
-          routeUrl: '/',
+          routeUrl: '/client-management/',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
           id: 'deduplication',
           name: 'Deduplication',
-          routeUrl: '/deduplication',
+          routeUrl: '/client-management/deduplication',
           icon: 'merge',
           subMenus: [],
         },
@@ -59,14 +59,14 @@ export class HduApiNavMenuComponent implements OnInit {
         {
           name: 'Workflows',
           id: 'workflows',
-          routeUrl: '/workflows',
+          routeUrl: '/workflows-management/workflows',
           icon: 'calendar',
           subMenus: [],
         },
         {
           id: 'schedules',
           name: 'Schedules',
-          routeUrl: '/schedules',
+          routeUrl: '/workflows-management/schedules',
           icon: 'unordered-list',
           subMenus: [],
         },
@@ -82,18 +82,25 @@ export class HduApiNavMenuComponent implements OnInit {
         {
           name: 'Datasets',
           id: 'datasets',
-          routeUrl: '',
+          routeUrl: '/mapping-and-data-extraction',
           icon: 'unordered-list',
           subMenus: [],
         },
         {
           name: 'Configuration',
           id: 'settings',
-          routeUrl: '/configuration',
+          routeUrl: '/mapping-and-data-extraction/configuration',
           icon: 'unordered-list',
           subMenus: [],
         },
       ],
+    },
+    {
+      name: 'Settings',
+      id: 'settings',
+      routeUrl: '/settings',
+      icon: 'setting',
+      category: 'main',
     },
   ];
 

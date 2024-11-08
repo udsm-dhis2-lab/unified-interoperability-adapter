@@ -3,8 +3,11 @@ import { Injectable, model } from '@angular/core';
 import { catchError, map, Observable, tap } from 'rxjs';
 import { DeduplicationUrls } from '../models';
 import { DeduplicationPage } from '../models';
-import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
-import { UnAuothorizedException, UnknownException } from '@models';
+import { HduHttpService } from '../../../../../../../libs/hdu-api-http-client/src/lib/services/hdu-http.service';
+import {
+  UnAuothorizedException,
+  UnknownException,
+} from '../../../../../../../libs/models';
 
 @Injectable()
 export class DeduplicationManagementService {
@@ -31,7 +34,7 @@ export class DeduplicationManagementService {
       })
       .pipe(
         map((response: { results: any }) => {
-          console.log('RESPONSE PAYLOAD', response);
+          // console.log('RESPONSE PAYLOAD', response);
           return DeduplicationPage.fromJson(response);
         }),
         catchError((error: any) => {

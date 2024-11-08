@@ -15,7 +15,7 @@ import {
   UnAuothorizedException,
   UnknownException,
   InternalServerException,
-} from '@models';
+} from '../../../../../../../libs/models';
 import { CategoryOptionCombo } from '../models/category-option-combo.model';
 
 @Injectable({

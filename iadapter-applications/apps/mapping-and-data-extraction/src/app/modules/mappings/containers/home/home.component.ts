@@ -6,7 +6,7 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { SearchBarComponent } from 'search-bar';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 import {
   BehaviorSubject,
   debounceTime,
@@ -305,7 +305,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   goToDataSetMapping(uuid: string) {
-    this.router.navigate(['/dataset-mapping', uuid]);
+    this.router.navigate([
+      '/mapping-and-data-extraction/dataset-mapping',
+      uuid,
+    ]);
   }
 
   onCloseAlert() {

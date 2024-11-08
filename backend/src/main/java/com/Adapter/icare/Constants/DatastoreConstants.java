@@ -31,4 +31,7 @@ public class DatastoreConstants {
 
     @Value("${DATASTORE_KEY_FOR_AGREED_CLIENT_MANDATORY_IDS_TYPES:mandatory-cr-id-types}")
     public String MandatoryClientRegistryIdTypes;
+
+    @Value("${DATASTORE_KEYS_FOR_GENERAL_CODES_API:insurances,exemptions,billings}")
+    public String KeysForGeneralCodes;
 }

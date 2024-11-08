@@ -40,9 +40,8 @@ import { take } from 'rxjs';
     NzInputModule,
     NzSelectModule,
     MonacoEditorModule,
-    CodeEditorComponent,
     ReactiveFormsModule,
-    NzCardModule
+    NzCardModule,
   ],
   templateUrl: './add-flow.component.html',
   styleUrl: './add-flow.component.scss',
@@ -94,7 +93,6 @@ export class AddFlowComponent implements OnInit {
 
   editorOptions = { theme: 'vs-dark', language: 'javascript' };
   code = 'function x() {\nconsole.log("Hello world!");\n}';
-
 
   isVisible = false;
 

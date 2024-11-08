@@ -22,7 +22,10 @@ import { ProcessState } from 'apps/workflows-management/src/app/features/workflo
 import { select, Store } from '@ngrx/store';
 import { WorkflowState } from 'apps/workflows-management/src/app/features/workflow/state/workflow/workflow.state';
 import { Workflow } from 'apps/workflows-management/src/app/features/workflow/models/workflow.model';
-import { getCurrentSelectedProcessInWorkflow, getCurrentSelectedWorkflow } from '../../state/workflow/workflow.selectors';
+import {
+  getCurrentSelectedProcessInWorkflow,
+  getCurrentSelectedWorkflow,
+} from '../../state/workflow/workflow.selectors';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { take } from 'rxjs';
 import { Process } from '../../models/process.model';
@@ -41,7 +44,6 @@ import { Process } from '../../models/process.model';
     NzInputModule,
     NzSelectModule,
     MonacoEditorModule,
-    CodeEditorComponent,
     ReactiveFormsModule,
     NzCardModule,
   ],

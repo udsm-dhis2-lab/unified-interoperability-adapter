@@ -13,23 +13,25 @@ export class AuthService {
   public currentUser$: Observable<User | null> =
     this.currentUserSubject.asObservable();
 
-  constructor(private http: HduHttpService) {
+  constructor(
+    private hduHttpService: HduHttpService
+  ) {
     // Fetch the current user on service initialization
     this.fetchCurrentUser().subscribe(); // This can be modified based on your app structure
   }
 
   login(credentials: { username: string; password: string }): Observable<User> {
-    return this.http
-      .post<User>('../../../api/v1/login', credentials)
+    return this.hduHttpService
+      .post<User>('login', credentials)
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 
   logout(): Observable<string> {
-    return this.http.get<string>('logout');
+    return this.hduHttpService.get<string>('logout');
   }
 
   fetchCurrentUser(): Observable<User> {
-    return this.http
+    return this.hduHttpService
       .get<User>('me')
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }

@@ -28,8 +28,6 @@ export class AppComponent {
   constructor(private router: Router) {}
 
   onGetSelectedMenu(menu: Menu): void {
-    !menu?.category || (menu?.category && menu?.category !== 'main')
-      ? this.router.navigate([menu.routeUrl])
-      : window.open('../../..' + menu.routeUrl, '_self');
+    this.router.navigate([menu.routeUrl]);
   }
 }

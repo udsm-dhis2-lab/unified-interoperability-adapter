@@ -57,6 +57,9 @@ public class UserInitializer implements ApplicationRunner {
             User userCreate = new User();
             userCreate.setPassword("AdminUser");
             userCreate.setUsername("admin");
+            userCreate.setFirstName("Admin");
+            userCreate.setMiddleName("HDU");
+            userCreate.setSurname("API");
             userCreate.setRoles(roles);
             userService.createUser(userCreate);
         } else {
