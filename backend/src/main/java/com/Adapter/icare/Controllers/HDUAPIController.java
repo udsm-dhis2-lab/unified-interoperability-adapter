@@ -358,9 +358,11 @@ public class HDUAPIController {
             }
 
         } catch (Exception e) {
+            e.printStackTrace();
             Map<String,Object> response = new HashMap<>();
             response.put("status", HttpStatus.NOT_FOUND.getReasonPhrase());
             response.put("statusCode", HttpStatus.NOT_FOUND.value());
+            response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
