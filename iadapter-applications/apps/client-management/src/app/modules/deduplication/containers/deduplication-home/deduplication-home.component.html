@@ -1,6 +1,9 @@
 <div style="padding: 16px">
   <div style="margin-bottom: 16px">
-    <search-bar [labelText]="'Search client:'"></search-bar>
+    <search-bar
+      [labelText]="'Search client:'"
+      (inputSearchValue)="onDatasetsSearchInputTyping($event)"
+    ></search-bar>
   </div>
 
   <nz-table

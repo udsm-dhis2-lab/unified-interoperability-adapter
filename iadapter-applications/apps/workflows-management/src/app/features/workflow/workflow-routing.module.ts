@@ -5,7 +5,7 @@ import { FlowchartComponent } from './components/flow-chart/flow-chart.component
 import { CodeEditorComponent } from '../../shared/components/code-editor/code-editor.component';
 import { WorkflowManagementComponent } from './containers/workflow-management/workflow-management.component';
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: '',
     component: WorkflowComponent,
@@ -28,10 +28,9 @@ const routes: Routes = [
         path: 'code-editor/:workflowId/proc/:procId',
         component: CodeEditorComponent,
         pathMatch: 'full',
-      }
-    ]
+      },
+    ],
   },
-
 ];
 
 @NgModule({

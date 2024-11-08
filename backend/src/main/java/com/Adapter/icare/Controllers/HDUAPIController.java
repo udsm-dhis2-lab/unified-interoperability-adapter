@@ -180,98 +180,61 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate) {
-        /**
-         * Send data to Mediator where all the logics will be done.
-         */
-        Map<String,Object> response = new HashMap<>();
-       try {
-           if (shouldUseWorkflowEngine && workflowEngine != null) {
-               Map<String, Object> payload = new HashMap<>();
-               payload.put("code","dataTemplates");
-               List<IdentifierDTO> clientIds = new ArrayList<>();
-               List<Map<String,Object>> recordsWithIssues = new ArrayList<>();
-               if (clientRegistryConstants.ValidateDataTemplate) {
-                   // validate data Template
+    public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("code", "dataTemplates");
+                List<IdentifierDTO> clientIds = new ArrayList<>();
+                List<Map<String, Object>> recordsWithIssues = new ArrayList<>();
+                if (clientRegistryConstants.ValidateDataTemplate) {
+                    // Validate data template
+                    DataTemplateDataDTO validatedDataTemplate = new DataTemplateDataDTO();
+                    List<SharedHealthRecordsDTO> listGrid = dataTemplate.getData().getListGrid();
+                    List<SharedHealthRecordsDTO> validatedListGrid = new ArrayList<>();
 
-                   DataTemplateDataDTO validatedDataTemplate = new DataTemplateDataDTO();
-                   List<SharedHealthRecordsDTO> listGrid = dataTemplate.getData().getListGrid();
-                   List<SharedHealthRecordsDTO> validatedListGrid = new ArrayList<>();
+                    for (SharedHealthRecordsDTO sharedHealthRecordsDTO : listGrid) {
+                        Map<String, Object> recordWithIssue = new HashMap<>();
+                        VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
+                        recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
+                        recordWithIssue.put("visitDetails", visitDetailsDTO);
+                        recordWithIssue.put("issue", "Not enough details for registering the client and saving associated records");
+                        recordsWithIssues.add(recordWithIssue);
+                        validatedListGrid.add(sharedHealthRecordsDTO);
+                    }
 
-                   for (SharedHealthRecordsDTO sharedHealthRecordsDTO: listGrid) {
-                       DemographicDetailsDTO demographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
-                       String mrn = sharedHealthRecordsDTO.getMrn();
-                       // Check if mandatory identifier types are there or the CR ID
-                       List<IdentifierDTO> identifiers = demographicDetails != null ? demographicDetails.getIdentifiers(): null;
-                       Patient patient = new Patient();
-                       if (identifiers != null && !identifiers.isEmpty()) {
-                           for (IdentifierDTO identifier: identifiers) {
-                               patient = this.clientRegistryService.getPatientUsingIdentifier(identifier.getId());
-                               if (patient != null) {
-                                   DemographicDetailsDTO newDemographicDetails = sharedHealthRecordsDTO.getDemographicDetails();
-                                   newDemographicDetails.setId(patient.getId());
-                                   SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
-                                   newSharedRecord.setDemographicDetails(newDemographicDetails);
-                                   validatedListGrid.add(newSharedRecord);
-                                   break;
-                               }
-                           }
-                       } else if (mrn != null) {
-                           patient = this.clientRegistryService.getPatientUsingIdentifier(mrn);
-                           if (patient == null) {
-                               Map<String,Object> recordWithIssue = new HashMap<>();
-                               Map<String,Object> patientDetails = new HashMap<>();
-                               VisitDetailsDTO visitDetails = sharedHealthRecordsDTO.getVisitDetails();
-                               recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
-                               recordWithIssue.put("visitDetails", visitDetails);
-                               recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
-                               recordsWithIssues.add(recordWithIssue);
-                               validatedListGrid.add(sharedHealthRecordsDTO);
-                           } else {
-                               DemographicDetailsDTO newDemographicDetailsDTO = sharedHealthRecordsDTO.getDemographicDetails();
-                               newDemographicDetailsDTO.setId(patient.getId());
-                               SharedHealthRecordsDTO newSharedRecord = sharedHealthRecordsDTO;
-                               newSharedRecord.setDemographicDetails(newDemographicDetailsDTO);
-                               validatedListGrid.add(newSharedRecord);
-                           }
-                       } else {
-                           Map<String,Object> recordWithIssue = new HashMap<>();
-                           Map<String,Object> patientDetails = new HashMap<>();
-                           VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
-                           recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
-                           recordWithIssue.put("visitDetails", visitDetailsDTO);
-                           recordWithIssue.put("issue", "No enough details for registering the client and saving associated records");
-                           recordsWithIssues.add(recordWithIssue);
-                           validatedListGrid.add(sharedHealthRecordsDTO);
-                       }
-                   }
-                   validatedDataTemplate.setListGrid(validatedListGrid);
-                   clientIds = this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
-                   validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
-                   validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
-                   validatedDataTemplate.setClientIdentifiersPool(clientIds);
-                   payload.put("payload",validatedDataTemplate);
-               } else {
-                   DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
-                   clientIds = this.clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
-                   updatedDataTemplateData.setClientIdentifiersPool(clientIds);
-                   payload.put("payload", updatedDataTemplateData);
-               }
-               return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
-           } else if (!shouldUseWorkflowEngine) {
-               // TODO: Review send data to mediator (OpenFN)
-               return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
-           } else {
-               // TODO: handle warning appropriately
-               return null;
-           }
-       } catch (Exception e) {
-           e.printStackTrace();
-           Map<String,Object> statusResponse = new HashMap<>();
-           statusResponse.put("message", e.getMessage());
-           statusResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
-           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(statusResponse);
-       }
+                    validatedDataTemplate.setListGrid(validatedListGrid);
+                    clientIds = this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
+                    validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
+                    validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
+                    validatedDataTemplate.setClientIdentifiersPool(clientIds);
+                    payload.put("payload", validatedDataTemplate);
+                } else {
+                    DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
+                    clientIds = this.clientRegistryService.getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
+                    updatedDataTemplateData.setClientIdentifiersPool(clientIds);
+                    payload.put("payload", updatedDataTemplateData);
+                }
+                return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
+            } else if (!shouldUseWorkflowEngine) {
+                return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
+            } else {
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> statusResponse = new LinkedHashMap<>();
+            statusResponse.put("status", "BAD_REQUEST");
+            statusResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
+            statusResponse.put("newClients", 0);
+            statusResponse.put("updatedClients", 0);
+            statusResponse.put("failedClients", 0);
+            statusResponse.put("ignoredClients", 0);
+            statusResponse.put("summary", new ArrayList<>());
+            statusResponse.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(statusResponse);
+        }
     }
 
     @DeleteMapping("datastore/{uuid}")
@@ -483,10 +446,17 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "workflows")
-    public ResponseEntity<Map<String,Object>> getWorkflows() throws Exception {
+    public ResponseEntity<Map<String,Object>> getWorkflows(
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter
+    ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows","GET", null));
+                String queryParamsPath = "";
+                queryParamsPath += fields != null ? "fields=" + fields: "";
+                queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
+                String api = "workflows" + (queryParamsPath != "" ? "?" + queryParamsPath: "");
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api,"GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -497,11 +467,32 @@ public class HDUAPIController {
 
     @GetMapping(value = "workflows/{id}")
     public ResponseEntity<Map<String,Object>> getWorkflowById(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter
+    ) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                String queryParamsPath = "";
+                queryParamsPath += fields != null ? "fields=" + fields: "";
+                queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
+                String api = "workflows/" + id + (queryParamsPath != "" ? "?" + queryParamsPath: "");
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api ,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "workflows/{id}/run")
+    public ResponseEntity<Map<String,Object>> runWorkflowById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id,"GET", null));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "workflows/" + id + "/run","GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -554,10 +545,16 @@ public class HDUAPIController {
     }
 
     @GetMapping(value = "processes")
-    public ResponseEntity<Map<String,Object>> getProcesses() throws Exception {
+    public ResponseEntity<Map<String,Object>> getProcesses(
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes","GET", null));
+                String queryParamsPath = "";
+                queryParamsPath += fields != null ? "fields=" + fields: "";
+                queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
+                String api = "processes" + (queryParamsPath != "" ? "?" + queryParamsPath: "");
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api ,"GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -568,11 +565,33 @@ public class HDUAPIController {
 
     @GetMapping(value = "processes/{id}")
     public ResponseEntity<Map<String,Object>> getProcessById(
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "fields", required = false) String fields,
+            @RequestParam(value = "filter", required = false) String filter
+    ) throws Exception {
+        try {
+
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                String queryParamsPath = "";
+                queryParamsPath += fields != null ? "fields=" + fields: "";
+                queryParamsPath += filter != null ? (queryParamsPath.contains("fields") ? "&": "") + "filter=" + filter: "";
+                String api = "processes/" + id + (queryParamsPath != "" ?  "?" + queryParamsPath : "");
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, api ,"GET", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "processes/{id}/run")
+    public ResponseEntity<Map<String,Object>> runProcessById(
             @PathVariable(value = "id") String id
     ) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id,"GET", null));
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id + "/run","GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }
@@ -616,6 +635,19 @@ public class HDUAPIController {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "processes/" + id,"DELETE", null));
+            } else {
+                throw new Exception("Can no access route/mediator due to missing configurations");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping(value = "tasks/{id}")
+    public ResponseEntity<Map<String,Object>> getTask(@PathVariable(value = "id") String id) throws Exception {
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                return ResponseEntity.ok(mediatorsService.routeToMediator(workflowEngine, "tasks/" + id,"GET", null));
             } else {
                 throw new Exception("Can no access route/mediator due to missing configurations");
             }

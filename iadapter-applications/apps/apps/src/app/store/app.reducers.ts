@@ -1,6 +1,4 @@
-import { ActionReducerMap, MetaReducer } from '@ngrx/store';
-
-import * as fromWorkflowManagement from '../../../../workflows-management/src/app/state/app.state';
+import { MetaReducer } from '@ngrx/store';
 export interface AppShellState {
   user: null;
   isAuthenticated: false;

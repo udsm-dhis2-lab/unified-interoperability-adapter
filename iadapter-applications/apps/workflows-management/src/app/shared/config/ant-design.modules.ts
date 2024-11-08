@@ -10,6 +10,10 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -23,5 +27,10 @@ export const antDesignModules = [
   NzButtonModule,
   NzTableModule,
   NzModalModule,
-  NzBreadCrumbModule
+  NzBreadCrumbModule,
+  NzButtonModule,
+  NzSelectModule,
+  NzCheckboxModule,
+  NzCollapseModule,
+  NzFormModule,
 ];

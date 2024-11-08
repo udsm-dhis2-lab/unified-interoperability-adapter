@@ -4,13 +4,8 @@ import { CommonModule } from '@angular/common';
 import { ScheduleRoutingModule } from './schedule-routing.module';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 
-
 @NgModule({
   declarations: [],
-  imports: [
-    CommonModule,
-    ScheduleRoutingModule,
-    NzLayoutModule,
-  ]
+  imports: [CommonModule, ScheduleRoutingModule, NzLayoutModule],
 })
-export class ScheduleModule { }
+export class ScheduleModule {}

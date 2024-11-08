@@ -15,6 +15,7 @@ export interface Process {
   description?: string;
   script?: string;
   parameters?: any;
+  params?: any;
   status?: string;
   parent?: Process;
   children?: Process[]

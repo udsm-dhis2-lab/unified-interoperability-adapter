@@ -48,4 +48,16 @@ export class DeduplicationManagementService {
         })
       );
   }
+
+  createMergeRequest(payload: any): Observable<any> {
+    const namespace = 'MERGE_REQUESTS';
+    const time = new Date().toISOString;
+    const dataKey = `MG${payload['id']}${time}`;
+    return this.httpClient
+      .post<any>(`${DeduplicationUrls.DATASTORE}/${namespace}/${dataKey}`, payload)
+      .pipe(
+        map((response: any) => response)
+        //TODO: Implement error handling
+      );
+  }
 }

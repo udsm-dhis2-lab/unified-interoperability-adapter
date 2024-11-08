@@ -20,6 +20,11 @@
           {
             "glob": "**/*",
             "input": "apps/apps/public"
+          },
+          {
+            "glob": "**/*",
+            "input": "node_modules/monaco-editor",
+            "output": "/assets/monaco/"
           }
         ],
         "styles": [

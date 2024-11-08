@@ -1,5 +1,14 @@
 .no-bullets {
-    list-style-type: none;
-    padding: 0;
-    margin: 0;
-  }
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.alert-container {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  z-index: 1000; /* Ensure it is above other elements */
+}
