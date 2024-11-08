@@ -24,8 +24,8 @@ public class LaborAndDeliveryDetailsDTO {
     private boolean isAttendantSkilled;
     private boolean providedWithFamilyPlanningCounseling;
     private boolean providedWithInfantFeedingCounseling;
-    private List<String> beforeBirthComplications;
-    private List<String> birthCompications;
+    private List<CodeAndNameDTO> beforeBirthComplications;
+    private List<CodeAndNameDTO> birthComplications;
     private List<BirthDetailsDTO> birthDetails;
     private Map<String,Object> others;
 }
