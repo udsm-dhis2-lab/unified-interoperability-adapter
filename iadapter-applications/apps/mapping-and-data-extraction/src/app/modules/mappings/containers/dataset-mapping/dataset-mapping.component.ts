@@ -422,11 +422,13 @@ export class DatasetMappingComponent implements OnInit {
   createMappingsPayload() {
     const payLoad = {
       mapping: {
-        mappings: this.selectedICdCodes.map((item) => {
+        icdMappings: this.selectedICdCodes.map((item) => {
           return {
             code: item,
           };
         }),
+
+        loincMappings: [],
 
         dataElement: {
           id: this.selectedInputId,

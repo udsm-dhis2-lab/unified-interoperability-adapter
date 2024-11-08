@@ -5,6 +5,7 @@ import {
   UnorderedListOutline,
   UserOutline,
   SearchOutline,
+  LogoutOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const antDesignIcons: any[] = [
@@ -14,4 +15,5 @@ export const antDesignIcons: any[] = [
   ApartmentOutline,
   DashboardOutline,
   SearchOutline,
+  LogoutOutline,
 ];
