@@ -8,6 +8,7 @@ import { TZNationalEmblemIcon } from './resources/national-emblem.icon';
 import { SideMenuService } from './services/menu/side-menu.service';
 import { AuthService } from './auth.service';
 import { getInitials } from './helpers/user.helper';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { User } from './models/user.model';
 
 @Component({
@@ -19,6 +20,7 @@ import { User } from './models/user.model';
     NzMenuModule,
     NzIconModule,
     NzPageHeaderModule,
+    NzDropDownModule,
   ],
   templateUrl: './hdu-api-top-bar-menu.component.html',
   styleUrl: './hdu-api-top-bar-menu.component.less',
@@ -44,6 +46,16 @@ export class HduApiTopBarMenuComponent implements OnInit {
       if (user && user.displayName) {
         this.currentUserInitials = getInitials(user.displayName);
       }
+    });
+  }
+
+  logOut() {
+    //TODO: Remove subscription here
+    this.authService.logout().subscribe({
+      next: () => {
+        window.location.reload();
+      },
+      error: (error) => {},
     });
   }
 }

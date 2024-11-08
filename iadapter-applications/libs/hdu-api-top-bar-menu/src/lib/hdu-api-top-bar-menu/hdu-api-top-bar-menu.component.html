@@ -9,6 +9,27 @@
   </div>
   <div class="hdu-right-header">
     <span class="hdu-user-profile-name">{{ currentUser?.displayName }}</span>
-    <a class="hdu-user-profile-circle"> {{ currentUserInitials }} </a>
+    <a
+      class="hdu-user-profile-circle"
+      nz-dropdown
+      [nzDropdownMenu]="menu"
+      nzPlacement="bottomRight"
+    >
+      {{ currentUserInitials }}
+    </a>
   </div>
+
+  <nz-dropdown-menu #menu="nzDropdownMenu">
+    <ul nz-menu>
+      <li nz-menu-item (click)="logOut()">
+        <span
+          nz-icon
+          nzType="logout"
+          nzTheme="outline"
+          class="logout-icon"
+        ></span>
+        logout
+      </li>
+    </ul>
+  </nz-dropdown-menu>
 </div>
