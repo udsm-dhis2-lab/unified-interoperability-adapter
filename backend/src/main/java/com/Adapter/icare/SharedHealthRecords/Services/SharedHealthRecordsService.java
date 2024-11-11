@@ -84,217 +84,220 @@ public class SharedHealthRecordsService {
         Bundle clientTotalBundle = new Bundle();
         Encounter encounter = new Encounter();
         var searchRecords =  fhirClient.search().forResource(Patient.class);
-        if (referralNumber == null) {
-            if (onlyLinkedClients) {
-                // TODO replace hardcoded ids with dynamic ones
-                searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
-            }
+        try {
+            if (referralNumber == null) {
+                if (onlyLinkedClients) {
+                    // TODO replace hardcoded ids with dynamic ones
+                    searchRecords.where(Patient.LINK.hasAnyOfIds("299","152"));
+                }
 
-            // TODO: Review the deceased concept
-            if (!includeDeceased) {
+                // TODO: Review the deceased concept
+                if (!includeDeceased) {
 //            searchRecords.where(Patient.DECEASED.isMissing(true));
-            }
+                }
 //                .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
-            if (identifier != null) {
-                searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
-            }
+                if (identifier != null) {
+                    searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
+                }
 
-            if (hfrCode != null) {
-                searchRecords.where(Patient.IDENTIFIER.hasSystemWithAnyCode(hfrCode));
-            }
+                if (hfrCode != null) {
+                    searchRecords.where(Patient.IDENTIFIER.hasSystemWithAnyCode(hfrCode));
+                }
 
-            if (gender != null) {
-                searchRecords.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
-            }
+                if (gender != null) {
+                    searchRecords.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
+                }
 
-            if (lastName != null) {
-                searchRecords.where(Patient.FAMILY.matches().value(lastName));
-            }
+                if (lastName != null) {
+                    searchRecords.where(Patient.FAMILY.matches().value(lastName));
+                }
 
-            if (firstName != null) {
-                searchRecords.where(Patient.GIVEN.matches().value(firstName));
-            }
+                if (firstName != null) {
+                    searchRecords.where(Patient.GIVEN.matches().value(firstName));
+                }
 
-            if (dateOfBirth != null) {
-                searchRecords.where(Patient.BIRTHDATE.beforeOrEquals().day(dateOfBirth));
-            }
+                if (dateOfBirth != null) {
+                    searchRecords.where(Patient.BIRTHDATE.beforeOrEquals().day(dateOfBirth));
+                }
 
-            response = searchRecords.count(pageSize)
-                    .offset(page -1)
-                    .returnBundle(Bundle.class)
-                    .execute();
-            clientTotalBundle = searchRecords
-                    .summaryMode(SummaryEnum.COUNT)
-                    .returnBundle(Bundle.class)
-                    .execute();
+                response = searchRecords.count(pageSize)
+                        .offset(page -1)
+                        .returnBundle(Bundle.class)
+                        .execute();
+                clientTotalBundle = searchRecords
+                        .summaryMode(SummaryEnum.COUNT)
+                        .returnBundle(Bundle.class)
+                        .execute();
 
-        } else {
-            // referralNumber should saved as identifier of the encounter
-            var encSearch = fhirClient.search().forResource(Encounter.class)
-                    .where(Encounter.IDENTIFIER.exactly().identifier(referralNumber));
-            Bundle encBundle = encSearch.returnBundle(Bundle.class).execute();
-            if (encBundle.hasEntry()) {
-                for (Bundle.BundleEntryComponent entry : response.getEntry()) {
-                    if (entry.getResource() instanceof Encounter) {
-                        // Assumption is the referral with the id will be one
-                        encounter = (Encounter) entry.getResource();
-                        IIdType patientReference = encounter.getSubject().getReferenceElement();
-                        Patient patient = fhirClient.read().resource(Patient.class).withId(patientReference.getIdPart()).execute();
-                        response = fhirClient.search().forResource(Patient.class)
-                                .where(Patient.IDENTIFIER.exactly().identifier(patient.getIdElement().getIdPart()))
-                                .count(pageSize)
-                                .offset(page -1)
-                                .returnBundle(Bundle.class)
-                                .execute();
-                        break;
+            } else {
+                // referralNumber should saved as identifier of the encounter
+                var encSearch = fhirClient.search().forResource(Encounter.class)
+                        .where(Encounter.IDENTIFIER.exactly().identifier(referralNumber));
+                Bundle encBundle = encSearch.returnBundle(Bundle.class).execute();
+                if (encBundle.hasEntry()) {
+                    for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                        if (entry.getResource() instanceof Encounter) {
+                            // Assumption is the referral with the id will be one
+                            encounter = (Encounter) entry.getResource();
+                            IIdType patientReference = encounter.getSubject().getReferenceElement();
+                            Patient patient = fhirClient.read().resource(Patient.class).withId(patientReference.getIdPart()).execute();
+                            response = fhirClient.search().forResource(Patient.class)
+                                    .where(Patient.IDENTIFIER.exactly().identifier(patient.getIdElement().getIdPart()))
+                                    .count(pageSize)
+                                    .offset(page -1)
+                                    .returnBundle(Bundle.class)
+                                    .execute();
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        if (!response.hasEntry()) {
-            searchRecords =  fhirClient.search().forResource(Patient.class);
-            if (identifier != null) {
-                searchRecords.where(Patient.RES_ID.exactly().code(identifier));
+            if (!response.hasEntry()) {
+                searchRecords =  fhirClient.search().forResource(Patient.class);
+                if (identifier != null) {
+                    searchRecords.where(Patient.RES_ID.exactly().code(identifier));
+                }
+
+                if (firstName != null) {
+                    searchRecords.where(Patient.GIVEN.matches().value(firstName));
+                }
+
+                response = searchRecords.count(pageSize)
+                        .offset(page -1)
+                        .returnBundle(Bundle.class)
+                        .execute();
             }
 
-            if (firstName != null) {
-                searchRecords.where(Patient.GIVEN.matches().value(firstName));
-            }
-
-            response = searchRecords.count(pageSize)
-                    .offset(page -1)
-                    .returnBundle(Bundle.class)
-                    .execute();
-        }
-
-        if (!response.getEntry().isEmpty()) {
-            for (Bundle.BundleEntryComponent entry : response.getEntry()) {
-                if (entry.getResource() instanceof Patient) {
-                    SharedHealthRecordsDTO templateData = new SharedHealthRecordsDTO();
-                    Patient patient = (Patient) entry.getResource();
-                    try {
-                        PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
-                        // TODO: Provided HFR code is provided find a way to return relevant identifiers
-                        templateData.setDemographicDetails(patientDTO.toMap());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                    templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
-                    Organization organization = null;
-                    if (hfrCode !=null) {
+            if (!response.getEntry().isEmpty()) {
+                for (Bundle.BundleEntryComponent entry : response.getEntry()) {
+                    if (entry.getResource() instanceof Patient) {
+                        SharedHealthRecordsDTO templateData = new SharedHealthRecordsDTO();
+                        Patient patient = (Patient) entry.getResource();
                         try {
-                            Bundle bundle = new Bundle();
-                            bundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode)).returnBundle(Bundle.class)
-                                    .execute();
-                            for (Bundle.BundleEntryComponent bundleEntryComponent : bundle.getEntry()) {
-                                if (bundleEntryComponent.getResource() instanceof Organization) {
-                                    organization = (Organization) bundleEntryComponent.getResource();
-                                }
-                            }
+                            PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
+                            // TODO: Provided HFR code is provided find a way to return relevant identifiers
+                            templateData.setDemographicDetails(patientDTO.toMap());
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
-                    }
-                    templateData.setFacilityDetails(organization != null ?
-                            new OrganizationDTO(
-                                    organization.getId(),
-                                    organization.getIdentifier(),
-                                    organization.getName(),
-                                    organization.getActive()).toSummary(): null);
 
-                    // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
-                    if (referralNumber == null) {
-                        encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
-                    }
-                    VisitDetailsDTO visitDetails = new VisitDetailsDTO();
-                    if (encounter != null) {
-                        visitDetails.setId(encounter.getIdElement().getIdPart());
-                        visitDetails.setVisitDate(encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ?  encounter.getPeriod().getStart(): null);
-                        visitDetails.setClosedDate(encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd(): null);
-                        // TODO: Find a way to retrieve these from resource
-                        visitDetails.setNewThisYear(Boolean.FALSE);
-                        visitDetails.setNew(Boolean.FALSE);
-                        templateData.setVisitDetails(visitDetails);
-
-
-                        // Get clinicalInformation
-                        // 1. clinicalInformation - vital signs
-                        ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
-                        List<Map<String,Object>> vitalSigns =  new ArrayList<>();
-                        // Get Observation Group
-//                        System.out.println(encounter.getIdElement().getIdPart());
-                        List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
-//                        System.out.println(observationGroups.size());
-
-                        // Visit notes
-                        List<Map<String,Object>> visitNotes = new ArrayList<>();
-                        for(Observation observationGroup: observationGroups) {
-                            List<Observation> observationsData = getObservationsByObservationGroupId(
-                                    "vital-signs",
-                                    encounter,
-                                    observationGroup.getIdElement().getIdPart());
-//                            System.out.println("TESTING");
-                            if (!observationsData.isEmpty()) {
-                                Map<String,Object> vitalSign = new LinkedHashMap<>();
-                                for (Observation observation: observationsData) {
-                                    // TODO: Improve the code to use dynamically fetched LOINC codes for vital signs
-                                    if (observation.getCode().getCoding().get(0).getCode().equals("8480-6") || observation.getCode().getCoding().get(0).getCode().equals("8462-4")) {
-                                        vitalSign.put("bloodPressure", observation.hasValueQuantity() ? observation.getValueStringType().getValue(): null);
+                        templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
+                        Organization organization = null;
+                        if (hfrCode !=null) {
+                            try {
+                                Bundle bundle = new Bundle();
+                                bundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode)).returnBundle(Bundle.class)
+                                        .execute();
+                                for (Bundle.BundleEntryComponent bundleEntryComponent : bundle.getEntry()) {
+                                    if (bundleEntryComponent.getResource() instanceof Organization) {
+                                        organization = (Organization) bundleEntryComponent.getResource();
                                     }
-                                    if (observation.getCode().getCoding().get(0).getCode().equals("29463-7")) {
-                                        vitalSign.put("weight", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
-                                    }
-                                    if (observation.getCode().getCoding().get(0).getCode().equals("8310-5")) {
-                                        vitalSign.put("temperature", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
-                                    }
-                                    if (observation.getCode().getCoding().get(0).getCode().equals("8302-2")) {
-                                        vitalSign.put("height", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
-                                    }
-                                    System.out.println(observationGroup.getEffectiveTiming());
-                                    vitalSign.put("dateTime", observationGroup.hasEffectiveTiming() ? observationGroup.getEffectiveTiming().dateTimeValue(): null);
                                 }
-                                vitalSigns.add(vitalSign);
+                            } catch (Exception e) {
+                                e.printStackTrace();
                             }
                         }
+                        templateData.setFacilityDetails(organization != null ?
+                                new OrganizationDTO(
+                                        organization.getId(),
+                                        organization.getIdentifier(),
+                                        organization.getName(),
+                                        organization.getActive()).toSummary(): null);
 
-                        clinicalInformationDTO.setVitalSigns(vitalSigns);
-                        clinicalInformationDTO.setVisitNotes(visitNotes);
-                        templateData.setClinicalInformation(clinicalInformationDTO);
-
-                        ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
-                        List<Identifier> identifiers = encounter.getIdentifier();
-                        for (Identifier identifierData: identifiers) {
-                            referralDetailsDTO.setReferralNumber(identifierData.getValue());
-                            break;
+                        // TODO: Add logic to handle number of visits. Latest visit is primary and the rest is history
+                        if (referralNumber == null) {
+                            encounter = getLatestEncounterUsingPatientAndOrganisation(patient.getIdElement().getIdPart(), organization);
                         }
-                        templateData.setReferralDetails(referralDetailsDTO);
+                        VisitDetailsDTO visitDetails = new VisitDetailsDTO();
+                        if (encounter != null) {
+                            visitDetails.setId(encounter.getIdElement().getIdPart());
+                            visitDetails.setVisitDate(encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ?  encounter.getPeriod().getStart(): null);
+                            visitDetails.setClosedDate(encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd(): null);
+                            // TODO: Find a way to retrieve these from resource
+                            visitDetails.setNewThisYear(Boolean.FALSE);
+                            visitDetails.setNew(Boolean.FALSE);
+                            templateData.setVisitDetails(visitDetails);
 
-                        // TODO: Add history when numberOfVisits > 1
-                    } else if (organization != null) {
-                        // TODO: Request visit from facility provided
-                        Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
-                        Map<String,Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType,"GET", null);
-                        List<Map<String,Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
+
+                            // Get clinicalInformation
+                            // 1. clinicalInformation - vital signs
+                            ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
+                            List<Map<String,Object>> vitalSigns =  new ArrayList<>();
+                            // Get Observation Group
+//                        System.out.println(encounter.getIdElement().getIdPart());
+                            List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
+//                        System.out.println(observationGroups.size());
+
+                            // Visit notes
+                            List<Map<String,Object>> visitNotes = new ArrayList<>();
+                            for(Observation observationGroup: observationGroups) {
+                                List<Observation> observationsData = getObservationsByObservationGroupId(
+                                        "vital-signs",
+                                        encounter,
+                                        observationGroup.getIdElement().getIdPart());
+                                if (!observationsData.isEmpty()) {
+                                    Map<String,Object> vitalSign = new LinkedHashMap<>();
+                                    for (Observation observation: observationsData) {
+                                        // TODO: Improve the code to use dynamically fetched LOINC codes for vital signs
+                                        if (observation.getCode().getCoding().get(0).getCode().equals("8480-6") || observation.getCode().getCoding().get(0).getCode().equals("8462-4")) {
+                                            vitalSign.put("bloodPressure", observation.hasValueQuantity() ? observation.getValueStringType().getValue(): null);
+                                        }
+                                        if (observation.getCode().getCoding().get(0).getCode().equals("29463-7")) {
+                                            vitalSign.put("weight", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                        }
+                                        if (observation.getCode().getCoding().get(0).getCode().equals("8310-5")) {
+                                            vitalSign.put("temperature", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                        }
+                                        if (observation.getCode().getCoding().get(0).getCode().equals("8302-2")) {
+                                            vitalSign.put("height", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                        }
+                                    vitalSign.put("dateTime", observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString(): null);
+                                    }
+                                    vitalSigns.add(vitalSign);
+                                }
+                            }
+
+                            clinicalInformationDTO.setVitalSigns(vitalSigns);
+                            clinicalInformationDTO.setVisitNotes(visitNotes);
+                            templateData.setClinicalInformation(clinicalInformationDTO);
+
+                            ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
+                            List<Identifier> identifiers = encounter.getIdentifier();
+                            for (Identifier identifierData: identifiers) {
+                                referralDetailsDTO.setReferralNumber(identifierData.getValue());
+                                break;
+                            }
+                            templateData.setReferralDetails(referralDetailsDTO);
+
+                            // TODO: Add history when numberOfVisits > 1
+                        } else if (organization != null) {
+                            // TODO: Request visit from facility provided
+                            Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
+                            Map<String,Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType,"GET", null);
+                            List<Map<String,Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
 //                        System.out.println(visits.size());
-                        visitDetails = null;
-                    } else {
-                        visitDetails = null;
+                            visitDetails = null;
+                        } else {
+                            visitDetails = null;
+                        }
+                        sharedRecords.add(templateData.toMap());
                     }
-                    sharedRecords.add(templateData.toMap());
                 }
             }
+            Map<String,Object> sharedRecordsResponse = new HashMap<>();
+            sharedRecordsResponse.put("results", sharedRecords);
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("total", clientTotalBundle.getTotal());
+            pager.put("totalPages", null);
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            sharedRecordsResponse.put("pager",pager);
+            return sharedRecordsResponse;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e);
         }
-        Map<String,Object> sharedRecordsResponse = new HashMap<>();
-        sharedRecordsResponse.put("results", sharedRecords);
-        Map<String, Object> pager = new HashMap<>();
-        pager.put("total", clientTotalBundle.getTotal());
-        pager.put("totalPages", null);
-        pager.put("page", page);
-        pager.put("pageSize", pageSize);
-        sharedRecordsResponse.put("pager",pager);
-        return sharedRecordsResponse;
     }
 
     public Encounter getLatestEncounterUsingPatientAndOrganisation(String id, Organization organization) throws Exception {
