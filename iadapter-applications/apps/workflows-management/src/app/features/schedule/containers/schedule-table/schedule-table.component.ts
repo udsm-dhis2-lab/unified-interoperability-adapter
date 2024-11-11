@@ -218,7 +218,7 @@ export class ScheduleTableComponent implements OnInit {
   }
 
   onAddSchedule() {
-    this.router.navigate(['/', 'config', 'add']);
+    this.router.navigate(['/', 'workflows-management', 'config', 'add']);
   }
 
   onDeleteSchedule(scheduleTable: ScheduleTable) {
