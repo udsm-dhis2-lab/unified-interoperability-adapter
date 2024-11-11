@@ -224,26 +224,45 @@ public class SharedHealthRecordsService {
                         ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
                         List<Map<String,Object>> vitalSigns =  new ArrayList<>();
                         // Get Observation Group
-                        System.out.println(encounter.getIdElement().getIdPart());
+//                        System.out.println(encounter.getIdElement().getIdPart());
                         List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
-                        System.out.println(observationGroups.size());
+//                        System.out.println(observationGroups.size());
+
+                        // Visit notes
+                        List<Map<String,Object>> visitNotes = new ArrayList<>();
                         for(Observation observationGroup: observationGroups) {
-                            // Get observations mapped to this group
-                            System.out.println(observationGroup.getIdElement().getIdPart());
                             List<Observation> observationsData = getObservationsByObservationGroupId(
                                     "vital-signs",
                                     encounter,
                                     observationGroup.getIdElement().getIdPart());
-                            System.out.println(observationsData.size());
+//                            System.out.println("TESTING");
+                            if (!observationsData.isEmpty()) {
+                                Map<String,Object> vitalSign = new LinkedHashMap<>();
+                                for (Observation observation: observationsData) {
+                                    // TODO: Improve the code to use dynamically fetched LOINC codes for vital signs
+                                    if (observation.getCode().getCoding().get(0).getCode().equals("8480-6") || observation.getCode().getCoding().get(0).getCode().equals("8462-4")) {
+                                        vitalSign.put("bloodPressure", observation.hasValueQuantity() ? observation.getValueStringType().getValue(): null);
+                                    }
+                                    if (observation.getCode().getCoding().get(0).getCode().equals("29463-7")) {
+                                        vitalSign.put("weight", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                    }
+                                    if (observation.getCode().getCoding().get(0).getCode().equals("8310-5")) {
+                                        vitalSign.put("temperature", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                    }
+                                    if (observation.getCode().getCoding().get(0).getCode().equals("8302-2")) {
+                                        vitalSign.put("height", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                    }
+                                    System.out.println(observationGroup.getEffectiveTiming());
+                                    vitalSign.put("dateTime", observationGroup.hasEffectiveTiming() ? observationGroup.getEffectiveTiming().dateTimeValue(): null);
+                                }
+                                vitalSigns.add(vitalSign);
+                            }
                         }
 
-                        // Visit notes
-                        List<Map<String,Object>> visitNotes = new ArrayList<>();
-
-                        ClinicalInformationDTO clinicalInformationDetails = new ClinicalInformationDTO();
-                        clinicalInformationDetails.setVitalSigns(vitalSigns);
-                        clinicalInformationDetails.setVisitNotes(visitNotes);
+                        clinicalInformationDTO.setVitalSigns(vitalSigns);
+                        clinicalInformationDTO.setVisitNotes(visitNotes);
                         templateData.setClinicalInformation(clinicalInformationDTO);
+
                         ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
                         List<Identifier> identifiers = encounter.getIdentifier();
                         for (Identifier identifierData: identifiers) {
@@ -258,7 +277,7 @@ public class SharedHealthRecordsService {
                         Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
                         Map<String,Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType,"GET", null);
                         List<Map<String,Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
-                        System.out.println(visits.size());
+//                        System.out.println(visits.size());
                         visitDetails = null;
                     } else {
                         visitDetails = null;
@@ -466,7 +485,6 @@ public class SharedHealthRecordsService {
                                                                Encounter encounter,
                                                                String id) throws Exception {
         List<Observation> observations = new ArrayList<>();
-        System.out.println(id);
         var observationSearch = fhirClient.search().forResource(Observation.class)
                 .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
         observationSearch.where(Observation.CATEGORY.exactly().code(category));
