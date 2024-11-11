@@ -262,6 +262,7 @@ public class SharedHealthRecordsService {
                                 for(Observation observationGroup: visitNotesGroup) {
                                     // TODO: Extract for all other blocks
                                     Map<String,Object> visitNotesData = new LinkedHashMap<>();
+                                    visitNotesData.put("date",observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString(): null);
                                     // Chief complaints
                                     List<String> chiefComplaints = new ArrayList<>();
                                     List<Observation> chiefComplaintsData = getObservationsByObservationGroupId(
@@ -275,7 +276,41 @@ public class SharedHealthRecordsService {
                                         }
                                     }
                                     visitNotesData.put("chiefComplaints", chiefComplaints);
-                                    visitNotesData.put("date",observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString(): null);
+                                    // historyOfPresentIllness
+                                    List<String> historyOfPresentIllness = new ArrayList<>();
+                                    visitNotesData.put("historyOfPresentIllness", historyOfPresentIllness);
+
+                                    // reviewOfOtherSystems
+                                    List<Map<String,Object>> reviewOfOtherSystems = new ArrayList<>();
+                                    visitNotesData.put("reviewOfOtherSystems", reviewOfOtherSystems);
+
+                                    // pastMedicalHistory
+                                    List<String> pastMedicalHistory = new ArrayList<>();
+                                    visitNotesData.put("pastMedicalHistory",pastMedicalHistory);
+
+                                    // familyAndSocialHistory
+                                    List<String> familyAndSocialHistory = new ArrayList<>();
+                                    visitNotesData.put("familyAndSocialHistory", familyAndSocialHistory);
+
+                                    // generalExaminationObservation
+                                    List<String> generalExaminationObservation = new ArrayList<>();
+                                    visitNotesData.put("generalExaminationObservation", generalExaminationObservation);
+
+                                    // localExamination
+                                    List<String> localExamination = new ArrayList<>();
+                                    visitNotesData.put("localExamination", localExamination);
+
+                                    //systemicExaminationObservation
+                                    List<Map<String,Object>> systemicExaminationObservation = new ArrayList<>();
+                                    visitNotesData.put("systemicExaminationObservation", systemicExaminationObservation);
+
+                                    // doctorPlanOrSuggestion
+                                    List<String> doctorPlanOrSuggestion = new ArrayList<>();
+                                    visitNotesData.put("doctorPlanOrSuggestion", doctorPlanOrSuggestion);
+
+                                    // providerSpeciality
+                                    List<String> providerSpeciality = new ArrayList<>();
+                                    visitNotesData.put("providerSpeciality", providerSpeciality);
                                     visitNotes.add(visitNotesData);
                                 }
                             }
