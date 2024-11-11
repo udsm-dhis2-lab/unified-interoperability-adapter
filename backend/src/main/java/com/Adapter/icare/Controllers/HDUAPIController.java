@@ -339,6 +339,7 @@ public class HDUAPIController {
                                 :valueSetExpansionContainsComponent.getSystem().contains("nhif") ? "NHIF"
                                 :valueSetExpansionContainsComponent.getSystem().contains("msd") ? "MSD CODE"
                                 :valueSetExpansionContainsComponent.getSystem().contains("moh") ? "GENERAL"
+                                :valueSetExpansionContainsComponent.getSystem().contains("icd") ? "ICD"
                                 : "LOCAL");
                         generalCodesDTO.setCode(valueSetExpansionContainsComponent.getCode());
                         generalCodesDTO.setName(valueSetExpansionContainsComponent.getDisplay());
