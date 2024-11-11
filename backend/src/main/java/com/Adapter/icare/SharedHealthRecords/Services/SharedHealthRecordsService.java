@@ -446,7 +446,6 @@ public class SharedHealthRecordsService {
                             templateData.setChronicConditions(chronicConditionsDTOS);
 
                             LifeStyleInformationDTO lifeStyleInformationDTO = new LifeStyleInformationDTO();
-                            Map<String,Object> lifeStyleInformation = new LinkedHashMap<>();
                             List<Observation> smokingObs = getObservationsByCategory("smoking", encounter, true);
                             Map<String,Object> smoking = new LinkedHashMap<>();
                             if(!smokingObs.isEmpty()) {
@@ -460,7 +459,7 @@ public class SharedHealthRecordsService {
                                     }
                                 }
                             }
-                            lifeStyleInformation.put("smoking", smoking);
+                            lifeStyleInformationDTO.setSmoking(smoking);
 
                             List<Observation> alcoholUseObs = getObservationsByCategory("alcohol-use", encounter, true);
                             Map<String,Object> alcoholUse = new LinkedHashMap<>();
@@ -475,7 +474,7 @@ public class SharedHealthRecordsService {
                                     }
                                 }
                             }
-                            lifeStyleInformation.put("alcoholUse", alcoholUse);
+                            lifeStyleInformationDTO.setAlcoholUse(alcoholUse);
 
                             List<Observation> drugUseObs = getObservationsByCategory("drug-use", encounter, true);
                             Map<String,Object> drugUse = new LinkedHashMap<>();
@@ -490,9 +489,8 @@ public class SharedHealthRecordsService {
                                     }
                                 }
                             }
-                            lifeStyleInformation.put("drugUse", drugUse);
+                            lifeStyleInformationDTO.setDrugUse(drugUse);
 
-                            lifeStyleInformationDTO.setLifeStyleInformation(lifeStyleInformation);
                             templateData.setLifeStyleInformation(lifeStyleInformationDTO);
 
                             templateData.setAllergies(allergiesDTOS);
@@ -764,7 +762,6 @@ public class SharedHealthRecordsService {
 
         Bundle observationBundle = new Bundle();
         observationBundle = conditionSearch.returnBundle(Bundle.class).execute();
-        System.out.println(observationBundle.getEntry().size());
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
                 Condition condition = (Condition) entryComponent.getResource();
