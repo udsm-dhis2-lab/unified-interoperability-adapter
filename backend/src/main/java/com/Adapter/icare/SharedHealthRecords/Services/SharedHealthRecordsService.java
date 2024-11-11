@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import javax.security.auth.Subject;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SharedHealthRecordsService {
@@ -430,17 +431,69 @@ public class SharedHealthRecordsService {
 
                             // Chronic conditions
                             List<ChronicConditionsDTO> chronicConditionsDTOS = new ArrayList<>();
-                            List<Condition> conditions = getConditionsByCategory(encounter.getIdElement().getIdPart(), encounter.getIdElement().getIdPart());
-                            for (Condition condition: conditions) {
-                                ChronicConditionsDTO chronicConditionsDTO = new ChronicConditionsDTO();
-                                chronicConditionsDTO.setCode(condition.hasCode() ? condition.getCode().getCoding().get(0).getCode().toString(): null);
-                                chronicConditionsDTO.setName(condition.hasCategory() ? condition.getCategory().get(0).getCoding().get(0).getCode(): null);
-                                chronicConditionsDTO.setName(condition.hasCode() ? condition.getCode().getCoding().get(0).getDisplay().toString(): null);
-                                chronicConditionsDTO.setCriticality(condition.getClinicalStatus().getCoding().get(0).getCode());
-                                chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode(): null);
-                                chronicConditionsDTOS.add(chronicConditionsDTO);
+                            List<Condition> conditions = getConditionsByCategory(encounter.getIdElement().getIdPart(), "chronic-condition");
+                            if (!conditions.isEmpty()) {
+                                for (Condition condition: conditions) {
+                                    ChronicConditionsDTO chronicConditionsDTO = new ChronicConditionsDTO();
+                                    chronicConditionsDTO.setCode(condition.hasCode() ? condition.getCode().getCoding().get(0).getCode().toString(): null);
+                                    chronicConditionsDTO.setName(condition.hasCategory() ? condition.getCategory().get(0).getCoding().get(0).getCode(): null);
+                                    chronicConditionsDTO.setName(condition.hasCode() ? condition.getCode().getCoding().get(0).getDisplay().toString(): null);
+                                    chronicConditionsDTO.setCriticality(condition.getClinicalStatus().getCoding().get(0).getCode());
+                                    chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode(): null);
+                                    chronicConditionsDTOS.add(chronicConditionsDTO);
+                                }
                             }
                             templateData.setChronicConditions(chronicConditionsDTOS);
+
+                            LifeStyleInformationDTO lifeStyleInformationDTO = new LifeStyleInformationDTO();
+                            Map<String,Object> lifeStyleInformation = new LinkedHashMap<>();
+                            List<Observation> smokingObs = getObservationsByCategory("smoking", encounter, true);
+                            Map<String,Object> smoking = new LinkedHashMap<>();
+                            if(!smokingObs.isEmpty()) {
+                                for (Observation observation: smokingObs) {
+                                    if (observation.hasValue() && observation.hasValueBooleanType()) {
+                                        smoking.put("use", observation.getValueBooleanType().booleanValue());
+                                        smoking.put("notes", observation.getNote().stream()
+                                                .map(note -> note.getText())
+                                                .collect(Collectors.joining(", ")));
+                                        break;
+                                    }
+                                }
+                            }
+                            lifeStyleInformation.put("smoking", smoking);
+
+                            List<Observation> alcoholUseObs = getObservationsByCategory("alcohol-use", encounter, true);
+                            Map<String,Object> alcoholUse = new LinkedHashMap<>();
+                            if(!alcoholUseObs.isEmpty()) {
+                                for (Observation observation: alcoholUseObs) {
+                                    if (observation.hasValue() && observation.hasValueBooleanType()) {
+                                        alcoholUse.put("use", observation.getValueBooleanType().booleanValue());
+                                        alcoholUse.put("notes", observation.getNote().stream()
+                                                .map(note -> note.getText())
+                                                .collect(Collectors.joining(", ")));
+                                        break;
+                                    }
+                                }
+                            }
+                            lifeStyleInformation.put("alcoholUse", alcoholUse);
+
+                            List<Observation> drugUseObs = getObservationsByCategory("drug-use", encounter, true);
+                            Map<String,Object> drugUse = new LinkedHashMap<>();
+                            if(!drugUseObs.isEmpty()) {
+                                for (Observation observation: drugUseObs) {
+                                    if (observation.hasValue() && observation.hasValueBooleanType()) {
+                                        alcoholUse.put("use", observation.getValueBooleanType().booleanValue());
+                                        alcoholUse.put("notes", observation.getNote().stream()
+                                                .map(note -> note.getText())
+                                                .collect(Collectors.joining(", ")));
+                                        break;
+                                    }
+                                }
+                            }
+                            lifeStyleInformation.put("drugUse", drugUse);
+
+                            lifeStyleInformationDTO.setLifeStyleInformation(lifeStyleInformation);
+                            templateData.setLifeStyleInformation(lifeStyleInformationDTO);
 
                             templateData.setAllergies(allergiesDTOS);
                             ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
@@ -658,6 +711,8 @@ public class SharedHealthRecordsService {
                 Observation observationGroup = (Observation) entryComponent.getResource();
                 if (forGroup && !observationGroup.hasDerivedFrom() && !observationGroup.hasHasMember()) {
                     observations.add(observationGroup);
+                } else {
+                    observations.add(observationGroup);
                 }
             }
         }
@@ -709,6 +764,7 @@ public class SharedHealthRecordsService {
 
         Bundle observationBundle = new Bundle();
         observationBundle = conditionSearch.returnBundle(Bundle.class).execute();
+        System.out.println(observationBundle.getEntry().size());
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
                 Condition condition = (Condition) entryComponent.getResource();
