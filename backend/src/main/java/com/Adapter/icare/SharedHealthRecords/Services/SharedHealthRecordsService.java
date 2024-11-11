@@ -420,12 +420,18 @@ public class SharedHealthRecordsService {
                                         AllergiesDTO allergiesDTO = new AllergiesDTO();
                                         allergiesDTO.setCode(allergyIntolerance.hasCode() ? allergyIntolerance.getCode().getCoding().get(0).getCode().toString(): null);
                                         allergiesDTO.setCategory(allergyIntolerance.hasCategory() ? allergyIntolerance.getCategory().get(0).getCode(): null);
-                                        allergiesDTO.setCriticality(allergyIntolerance.hasCriticality() ? allergyIntolerance.getCriticality().getDisplay(): null);
+                                        allergiesDTO.setName(allergyIntolerance.hasCode() ? allergyIntolerance.getCode().getCoding().get(0).getDisplay(): null);
+                                        allergiesDTO.setCriticality(allergyIntolerance.hasCriticality() ? allergyIntolerance.getCriticality().getDisplay().toString(): null);
                                         allergiesDTO.setVerificationStatus(allergyIntolerance.hasVerificationStatus() && allergyIntolerance.getVerificationStatus().hasCoding() ? allergyIntolerance.getVerificationStatus().getCoding().get(0).getCode().toString(): null);
                                         allergiesDTOS.add(allergiesDTO);
                                     }
                                 }
                             }
+
+                            // Chronic conditions
+                            List<ChronicConditionsDTO> chronicConditionsDTOS = new ArrayList<>();
+                            // TODO: Implement chronic conditions
+                            templateData.setChronicConditions(chronicConditionsDTOS);
 
                             templateData.setAllergies(allergiesDTOS);
                             ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
