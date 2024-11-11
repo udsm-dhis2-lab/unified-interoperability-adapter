@@ -228,9 +228,6 @@ public class SharedHealthRecordsService {
 //                        System.out.println(encounter.getIdElement().getIdPart());
                             List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
 //                        System.out.println(observationGroups.size());
-
-                            // Visit notes
-                            List<Map<String,Object>> visitNotes = new ArrayList<>();
                             for(Observation observationGroup: observationGroups) {
                                 List<Observation> observationsData = getObservationsByObservationGroupId(
                                         "vital-signs",
@@ -241,7 +238,7 @@ public class SharedHealthRecordsService {
                                     for (Observation observation: observationsData) {
                                         // TODO: Improve the code to use dynamically fetched LOINC codes for vital signs
                                         if (observation.getCode().getCoding().get(0).getCode().equals("8480-6") || observation.getCode().getCoding().get(0).getCode().equals("8462-4")) {
-                                            vitalSign.put("bloodPressure", observation.hasValueQuantity() ? observation.getValueStringType().getValue(): null);
+                                            vitalSign.put("bloodPressure", observation.hasValueStringType() ? observation.getValueStringType().getValue(): null);
                                         }
                                         if (observation.getCode().getCoding().get(0).getCode().equals("29463-7")) {
                                             vitalSign.put("weight", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
@@ -255,6 +252,31 @@ public class SharedHealthRecordsService {
                                     vitalSign.put("dateTime", observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString(): null);
                                     }
                                     vitalSigns.add(vitalSign);
+                                }
+                            }
+
+                            List<Map<String,Object>> visitNotes = new ArrayList<>();
+                            List<Observation> visitNotesGroup =  getObservationsByCategory("visit-notes", encounter, true);
+                            // Visit notes
+                            if (!visitNotesGroup.isEmpty()) {
+                                for(Observation observationGroup: visitNotesGroup) {
+                                    // TODO: Extract for all other blocks
+                                    Map<String,Object> visitNotesData = new LinkedHashMap<>();
+                                    // Chief complaints
+                                    List<String> chiefComplaints = new ArrayList<>();
+                                    List<Observation> chiefComplaintsData = getObservationsByObservationGroupId(
+                                            "chief-complaint",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!chiefComplaintsData.isEmpty()) {
+                                        for (Observation observation: chiefComplaintsData) {
+
+                                            chiefComplaints.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
+                                        }
+                                    }
+                                    visitNotesData.put("chiefComplaints", chiefComplaints);
+                                    visitNotesData.put("date",observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString(): null);
+                                    visitNotes.add(visitNotesData);
                                 }
                             }
 
