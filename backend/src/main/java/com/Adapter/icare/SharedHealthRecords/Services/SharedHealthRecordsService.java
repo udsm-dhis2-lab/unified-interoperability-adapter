@@ -271,45 +271,136 @@ public class SharedHealthRecordsService {
                                             observationGroup.getIdElement().getIdPart());
                                     if (!chiefComplaintsData.isEmpty()) {
                                         for (Observation observation: chiefComplaintsData) {
-
                                             chiefComplaints.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
                                         }
                                     }
                                     visitNotesData.put("chiefComplaints", chiefComplaints);
                                     // historyOfPresentIllness
                                     List<String> historyOfPresentIllness = new ArrayList<>();
+                                    List<Observation> historyOfPresentIllnessData = getObservationsByObservationGroupId(
+                                            "history-of-preventive-illness",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!historyOfPresentIllnessData.isEmpty()) {
+                                        for (Observation observation: historyOfPresentIllnessData) {
+                                            historyOfPresentIllness.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
+                                        }
+                                    }
                                     visitNotesData.put("historyOfPresentIllness", historyOfPresentIllness);
 
-                                    // reviewOfOtherSystems
+                                    // reviewOfOtherSystems - review-of-other-system
                                     List<Map<String,Object>> reviewOfOtherSystems = new ArrayList<>();
+                                    List<Observation> reviewOfOtherSystemsData = getObservationsByObservationGroupId(
+                                            "review-of-other-system",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!reviewOfOtherSystemsData.isEmpty()) {
+                                        for (Observation observation: reviewOfOtherSystemsData) {
+                                            Map<String,Object> data = new LinkedHashMap<>();
+                                            data.put("code", observation.hasCode() ? observation.getCode().getCoding().get(0).getCode().toString(): null);
+                                            data.put("name", observation.hasCode() ? observation.getCode().getCoding().get(0).getDisplay(): null);
+                                            data.put("notes", observation.getValueStringType().toString());
+                                            reviewOfOtherSystems.add(data);
+                                        }
+                                    }
                                     visitNotesData.put("reviewOfOtherSystems", reviewOfOtherSystems);
 
-                                    // pastMedicalHistory
+                                    // pastMedicalHistory - past-medical-history
                                     List<String> pastMedicalHistory = new ArrayList<>();
+                                    List<Observation> pastMedicalHistoryData = getObservationsByObservationGroupId(
+                                            "past-medical-history",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!pastMedicalHistoryData.isEmpty()) {
+                                        for (Observation observation: pastMedicalHistoryData) {
+                                            pastMedicalHistory.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
+                                        }
+                                    }
                                     visitNotesData.put("pastMedicalHistory",pastMedicalHistory);
 
-                                    // familyAndSocialHistory
+                                    // familyAndSocialHistory - family-and-social-history
                                     List<String> familyAndSocialHistory = new ArrayList<>();
+                                    List<Observation> familyAndSocialHistoryData = getObservationsByObservationGroupId(
+                                            "family-and-social-history",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!familyAndSocialHistoryData.isEmpty()) {
+                                        for (Observation observation: familyAndSocialHistoryData) {
+                                            familyAndSocialHistory.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
+                                        }
+                                    }
                                     visitNotesData.put("familyAndSocialHistory", familyAndSocialHistory);
 
-                                    // generalExaminationObservation
+                                    // generalExaminationObservation - general-examination
                                     List<String> generalExaminationObservation = new ArrayList<>();
+                                    List<Observation> generalExaminationObservationData = getObservationsByObservationGroupId(
+                                            "general-examination",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!generalExaminationObservationData.isEmpty()) {
+                                        for (Observation observation: generalExaminationObservationData) {
+                                            generalExaminationObservation.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
+                                        }
+                                    }
                                     visitNotesData.put("generalExaminationObservation", generalExaminationObservation);
 
-                                    // localExamination
+                                    // localExamination - local-examination
                                     List<String> localExamination = new ArrayList<>();
+                                    List<Observation> localExaminationData = getObservationsByObservationGroupId(
+                                            "local-examination",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!localExaminationData.isEmpty()) {
+                                        for (Observation observation: localExaminationData) {
+                                            localExamination.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
+                                        }
+                                    }
                                     visitNotesData.put("localExamination", localExamination);
 
-                                    //systemicExaminationObservation
+                                    //systemicExaminationObservation - systemic-examination
                                     List<Map<String,Object>> systemicExaminationObservation = new ArrayList<>();
+                                    List<Observation> systemicExaminationObservationData = getObservationsByObservationGroupId(
+                                            "systemic-examination",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!systemicExaminationObservationData.isEmpty()) {
+                                        for (Observation observation: systemicExaminationObservationData) {
+                                            Map<String,Object> data = new LinkedHashMap<>();
+                                            data.put("code", observation.hasCode() ? observation.getCode().getCoding().get(0).getCode().toString(): null);
+                                            data.put("name", observation.hasCode() ? observation.getCode().getCoding().get(0).getDisplay(): null);
+                                            data.put("notes", observation.getValueStringType().toString());
+                                            systemicExaminationObservation.add(data);
+                                        }
+                                    }
                                     visitNotesData.put("systemicExaminationObservation", systemicExaminationObservation);
 
-                                    // doctorPlanOrSuggestion
+                                    // doctorPlanOrSuggestion - doctor-plan
                                     List<String> doctorPlanOrSuggestion = new ArrayList<>();
+                                    List<Observation> doctorPlanOrSuggestionData = getObservationsByObservationGroupId(
+                                            "doctor-plan",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!doctorPlanOrSuggestionData.isEmpty()) {
+                                        for (Observation observation: doctorPlanOrSuggestionData) {
+                                            doctorPlanOrSuggestion.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
+                                        }
+                                    }
                                     visitNotesData.put("doctorPlanOrSuggestion", doctorPlanOrSuggestion);
 
-                                    // providerSpeciality
-                                    List<String> providerSpeciality = new ArrayList<>();
+                                    // providerSpeciality - provider-speciality
+                                    String providerSpeciality = null;
+                                    List<Observation> providerSpecialityData = getObservationsByObservationGroupId(
+                                            "provider-speciality",
+                                            encounter,
+                                            observationGroup.getIdElement().getIdPart());
+                                    if (!providerSpecialityData.isEmpty()) {
+                                        for (Observation observation: providerSpecialityData) {
+                                            if (observation.hasValueStringType()) {
+                                                providerSpeciality = observation.getValueStringType().toString();
+                                                break;
+                                            }
+                                        }
+                                    }
                                     visitNotesData.put("providerSpeciality", providerSpeciality);
                                     visitNotes.add(visitNotesData);
                                 }
