@@ -1,5 +1,5 @@
 <button
-  (click)="onUpdateProcessCodeSnippet($event)"
+  (click)="onUpdateProcessCodeSnippet()"
   class="update-code-snippet-btn"
   nz-button
   nzType="dashed"
@@ -9,7 +9,6 @@
   Update Code Snippet
 </button>
 <ngx-monaco-editor
-  class="code-editor"
   [options]="editorOptionsParams"
   [(ngModel)]="codeSnippet"
 ></ngx-monaco-editor>

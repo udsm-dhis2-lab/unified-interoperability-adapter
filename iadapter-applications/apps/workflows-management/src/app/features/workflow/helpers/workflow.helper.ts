@@ -270,4 +270,16 @@ export function extractIdFromPath(url: string, index: number): string {
   return parts[index] || '';
 }
 
+export function generateProcessChildrenString(depth: number): string {
+  const baseString = "id,created,updated,name,description,createdBy,updatedBy,";
+  const result: string[] = [];
+  
+  // Loop to add each level of ".children" based on the specified depth
+  for (let i = 1; i <= depth; i++) {
+    result.push("process" + ".children".repeat(i));
+  }
+  
+  // Join all elements in the array with commas and concatenate with baseString
+  return baseString + result.join(",");
+}
 

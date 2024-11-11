@@ -2,11 +2,10 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ProcessSummaryComponent } from '../../components/process-summary/process-summary.component';
 import { Process } from '../../models/process.model';
-import { Observable, of, switchMap, take } from 'rxjs';
-import { WorkflowState } from '../../state/workflow/workflow.state';
+import { filter, Observable, of, switchMap, take } from 'rxjs';
 import { select, Store } from '@ngrx/store';
 import { getCurrentSelectedProcessInWorkflow } from '../../state/workflow/workflow.selectors';
 import {
@@ -14,6 +13,8 @@ import {
   getWorkflowUidFromRoute,
 } from '../../helpers/workflow.helper';
 import { getCurrentUrl } from 'apps/workflows-management/src/app/state/router.selector';
+import { WorkflowState } from '../../state/workflow/workflow.state';
+import { AppState } from 'apps/workflows-management/src/app/state/app.state';
 
 @Component({
   selector: 'app-editor',
@@ -34,7 +35,8 @@ export class EditorComponent implements OnInit, AfterViewInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private workflowState: Store<WorkflowState>
+    private workflowState: Store<WorkflowState>,
+    private appState: Store<AppState>
   ) {}
 
   ngAfterViewInit(): void {

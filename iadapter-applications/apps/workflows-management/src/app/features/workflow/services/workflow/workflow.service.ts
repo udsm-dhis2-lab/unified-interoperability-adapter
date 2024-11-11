@@ -9,6 +9,7 @@ import { HttpErrorResponse, HttpParams } from '@angular/common/http';
 import { HduHttpService } from '../../../../../../../../libs/hdu-api-http-client/src/index';
 import { WorkflowEnum } from '../../enums/http-api.enum';
 import { ExecutedWorkflow } from '../../models/runned.model';
+import { generateProcessChildrenString } from '../../helpers/workflow.helper';
 
 @Injectable({
   providedIn: 'root',
@@ -39,12 +40,11 @@ export class WorkflowService {
    * @returns Observable of WorkflowResult containing the API response
    */
   getWorkflows(page = 1, pageSize = 12): Observable<WorkflowAPIResult> {
+    const queryParamUrl: string = generateProcessChildrenString(10);
+
     // Set up HTTP query parameters
     const params = new HttpParams()
-      .set(
-        'fields',
-        'id,created,updated,name,description,createdBy,updatedBy,process.children,process.children.children'
-      )
+      .set('fields', queryParamUrl)
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
@@ -63,11 +63,10 @@ export class WorkflowService {
    * @returns Observable of the workflow
    */
   getWorkflowById(id: string): Observable<Workflow> {
+    const queryParamUrl: string = generateProcessChildrenString(10);
+
     // Set up HTTP query parameters
-    const params = new HttpParams().set(
-      'fields',
-      'id,created,updated,name,description,createdBy,updatedBy,process.children,process.children.children'
-    );
+    const params = new HttpParams().set('fields', queryParamUrl);
 
     const apiUrl = `${WorkflowEnum.BASE_URL}${WorkflowEnum.WORKFLOW_API}/${id}`;
 

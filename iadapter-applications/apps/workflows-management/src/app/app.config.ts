@@ -5,7 +5,7 @@ import {
   provideZoneChangeDetection,
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { appRoutes } from './app.routes';
+import { workflowManagementRoutes } from './app.routes';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { IconDefinition } from '@ant-design/icons-angular';
 import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
@@ -43,7 +43,7 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom(BrowserAnimationsModule),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideClientHydration(),
-    provideRouter(appRoutes),
+    provideRouter(workflowManagementRoutes),
     provideStore(appReducers, { metaReducers }),
     provideEffects(appEffects),
     provideStoreDevtools({ maxAge: 25, logOnly: !isDevMode() }),
