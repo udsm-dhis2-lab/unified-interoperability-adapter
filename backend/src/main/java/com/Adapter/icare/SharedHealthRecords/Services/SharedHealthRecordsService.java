@@ -410,6 +410,24 @@ public class SharedHealthRecordsService {
                             clinicalInformationDTO.setVisitNotes(visitNotes);
                             templateData.setClinicalInformation(clinicalInformationDTO);
 
+
+                            // Allergies
+                            List<AllergyIntolerance> allergyIntolerances = getAllergyTolerances(patient.getIdElement().getIdPart());
+                            List<AllergiesDTO> allergiesDTOS = new ArrayList<>();
+                            if (!allergyIntolerances.isEmpty()) {
+                                for (AllergyIntolerance allergyIntolerance: allergyIntolerances) {
+                                    if (allergyIntolerance.hasCode()) {
+                                        AllergiesDTO allergiesDTO = new AllergiesDTO();
+                                        allergiesDTO.setCode(allergyIntolerance.hasCode() ? allergyIntolerance.getCode().getCoding().get(0).getCode().toString(): null);
+                                        allergiesDTO.setCategory(allergyIntolerance.hasCategory() ? allergyIntolerance.getCategory().get(0).getCode(): null);
+                                        allergiesDTO.setCriticality(allergyIntolerance.hasCriticality() ? allergyIntolerance.getCriticality().getDisplay(): null);
+                                        allergiesDTO.setVerificationStatus(allergyIntolerance.hasVerificationStatus() && allergyIntolerance.getVerificationStatus().hasCoding() ? allergyIntolerance.getVerificationStatus().getCoding().get(0).getCode().toString(): null);
+                                        allergiesDTOS.add(allergiesDTO);
+                                    }
+                                }
+                            }
+
+                            templateData.setAllergies(allergiesDTOS);
                             ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
                             List<Identifier> identifiers = encounter.getIdentifier();
                             for (Identifier identifierData: identifiers) {
@@ -650,5 +668,21 @@ public class SharedHealthRecordsService {
         }
 
         return observations;
+    }
+
+    public List<AllergyIntolerance> getAllergyTolerances(String patientId) throws Exception{
+        List<AllergyIntolerance> allergyIntolerances = new ArrayList<>();
+        var allergySearch = fhirClient.search().forResource(AllergyIntolerance.class)
+                .where(AllergyIntolerance.PATIENT.hasAnyOfIds(patientId));
+
+        Bundle observationBundle = new Bundle();
+        observationBundle = allergySearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
+                AllergyIntolerance allergyIntolerance = (AllergyIntolerance) entryComponent.getResource();
+                allergyIntolerances.add(allergyIntolerance);
+            }
+        }
+        return allergyIntolerances;
     }
 }

@@ -8,5 +8,9 @@ import java.util.Map;
 @Getter
 @Setter
 public class AllergiesDTO {
-    private Map<String,Object> allergies;
+    private String code;
+    private String category;
+    private String name;
+    private String criticality;
+    private String verificationStatus;
 }
