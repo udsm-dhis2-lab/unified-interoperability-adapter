@@ -1,0 +1,353 @@
+CODE,SERVICE DESCRIPTION,Category,Section
+61107,Subdural Tapping (Insertion of Brain Drainage Catheter or Fluid Pressure Recording or Monitoring Device),Neurosurgical,HEAD
+61521,Brain Abcess,Neurosurgical,HEAD
+61538,Burr Hole for Evacuation,Neurosurgical,HEAD
+61540,Craniotomy for Posterior,Neurosurgical,HEAD
+61590,Craniotomy for Olfactory,Neurosurgical,HEAD
+61888,Craniotomy for Right Frontal,Neurosurgical,HEAD
+61512,Craniotomy for Meningioma,Neurosurgical,HEAD
+61510,Craniotomy for Tumour,Neurosurgical,HEAD
+62000,Skull Elevation (Elevation of Depressed Skull Fracture),Neurosurgical,HEAD
+61500,Skull Exostosis Excision (Removal of Brain Tumor or Other Skull Bone Lesion),Neurosurgical,HEAD
+61546,Craniotomy for Pituitary (Incision of Forehead Bone for Excision of Pituitary Gland Tumor),Neurosurgical,HEAD
+62252,Glomus Jugulare Tumour,Neurosurgical,HEAD
+63704,Ant Fontenele Meningocele (Repair of (Less than 5 Centimeter) Spinal Cord Defect),Neurosurgical,HEAD
+62005,Skull Elevation (Elevation of Depressed Skull Fractures),Neurosurgical,HEAD
+62100,Naso Encephabulle Repair (Repair of Membrane Covering the Brain),Neurosurgical,HEAD
+62120,Encephalocele Closure/Repair,Neurosurgical,HEAD
+62141,Cranioplasty,Neurosurgical,HEAD
+61548,Gastrectomy for Pituitary (Excision of Pituitary Gland Tumor),Neurosurgical,HEAD
+62230,Revision VP Shunt (Replacement or Revision of Brain Fluid Drainage Shunt Valve or Catheter),Neurosurgical,HEAD
+62256,Shunt Removal (Removal of Brain and Spinal Fluid Shunt System),Neurosurgical,HEAD
+62225,VP Shunt and SBH Evacuation (Replacement or Irrigation of Brain Fluid Drainage Shunt Catheter),Neurosurgical,HEAD
+61000,Subdural Tapping,Neurosurgical,HEAD
+61108,Right Burr Holes for SDH,Neurosurgical,HEAD
+61150,Brain Abcess,Neurosurgical,HEAD
+61305,Craniotomy for Posterior,Neurosurgical,HEAD
+61312,Subdural Haematoma,Neurosurgical,HEAD
+61313,Craniotomy for Olfactory,Neurosurgical,HEAD
+61154,Burr Hole and Haematoma,Neurosurgical,HEAD
+61250,Burr Hole and Evacuation CSDH,Neurosurgical,HEAD
+61314,Evaculation for Chronic,Neurosurgical,HEAD
+61514,Ocipital Meningocele Excision,Neurosurgical,HEAD
+61520,Olfactory Groove Mengioma,Neurosurgical,HEAD
+61570,Craniotomy for Bullet / Foreign Body,Neurosurgical,HEAD
+62010,Ds And Skull Elevation and EF,Neurosurgical,HEAD
+62117,Encephaocele Repair,Neurosurgical,HEAD
+62121,Ocipital Enephalocele Repair,Neurosurgical,HEAD
+61575,"Transoral Approach Skullbase Bx,Tomor Excision",Neurosurgical,HEAD
+61605,"Resection On Neoplastic,Vascular,Infectious Lesion Infratemporal Fossae",Neurosurgical,HEAD
+61606,Infratemporal Fossa with Duroplasty/Grafting,Neurosurgical,HEAD
+61609,Transection/Ligation Carotid Artery,Neurosurgical,HEAD
+61612,Transection/Ligation Carotid Artery with Repair,Neurosurgical,HEAD
+61613,"Obliteration of Carotid Aneurysm, AVN by Microscope",Neurosurgical,HEAD
+61618,Secondary Repair of Dura for CSF Leaking,Neurosurgical,HEAD
+61624,"Transcatheter Permanent Occlusion ,Embolization Intracranial",Neurosurgical,HEAD
+61700,Aneurysmal Creeping Intracranial,Neurosurgical,HEAD
+62201,ETV (Stereotactic Creation of Spinal Fluid Drainage Tract in the Brain using an Endoscope),Neurosurgical,HEAD
+61698,Aneurysmal Cliping (Repair of Bulging of Blood Vessel (Aneurysm) in Brain),Neurosurgical,HEAD
+62165,Removal of Pituitary Gland Tumor using an Endoscope,Neurosurgical,HEAD
+22554,"ACDF (Fusion of Spine Bones with Removal of Disc at Upper Spinal Column, Anterior Approach)",Neurosurgical,NECK AND THORAX
+22612,Spinal Stabilization Trans,Neurosurgical,NECK AND THORAX
+22552,Anterior/ Posterior Cervical,Neurosurgical,NECK AND THORAX
+22845,C3-C4 Laminectomy Under C-Arm,Neurosurgical,NECK AND THORAX
+63075,Anterior Cervical Caging (Removal of Upper Spine Disc and Release of Spinal Cord and/or nerves),Neurosurgical,NECK AND THORAX
+22846,C4-C5 Coperctomy Cage and,Neurosurgical,NECK AND THORAX
+22847,C4-C5c5-C6 Ventral Fusion,Neurosurgical,NECK AND THORAX
+64634,Percutaneous Discectomy Cervical,Neurosurgical,NECK AND THORAX
+22851,Synthetic Caging Cervical,Neurosurgical,NECK AND THORAX
+22630,L2-L3 Caopectomy and,Neurosurgical,BACK (THORACO LUMBER)
+22632,L4-L5 Fusion,Neurosurgical,BACK (THORACO LUMBER)
+22840,Revision Transpedicular,Neurosurgical,BACK (THORACO LUMBER)
+63017,Lumbar Canal Decompression,Neurosurgical,BACK (THORACO LUMBER)
+63020,Lumbar Decompression,Neurosurgical,BACK (THORACO LUMBER)
+63015,Discectomy L4-L5,Neurosurgical,BACK (THORACO LUMBER)
+63045,Laminectomy L3-L5,Neurosurgical,BACK (THORACO LUMBER)
+63046,Laminectomy L4-L5 Under C-,Neurosurgical,BACK (THORACO LUMBER)
+63047,Laminectomy T11-T12,Neurosurgical,BACK (THORACO LUMBER)
+63048,Laminectomy T12-L1,Neurosurgical,BACK (THORACO LUMBER)
+63056,DECOMPRESION L4-L5.L5-S1(Release of Lower Spinal Cord and/or Nerves),Neurosurgical,BACK (THORACO LUMBER)
+63307,Retroperitoneal L2-L3,Neurosurgical,BACK (THORACO LUMBER)
+63700,SB Closure,Neurosurgical,BACK (THORACO LUMBER)
+63706,Revision Wound for SB Repair,Neurosurgical,BACK (THORACO LUMBER)
+63702,SB Repair,Neurosurgical,BACK (THORACO LUMBER)
+22849,Revision Instrument L4-L5,Neurosurgical,BACK (THORACO LUMBER)
+22859,Carpectomy and Meshed Cage,Neurosurgical,BACK (THORACO LUMBER)
+63030,Discectomy L4-L5/L5-S1,Neurosurgical,BACK (THORACO LUMBER)
+63057,Fusion L3-S1 (Release of Middle or Lower Spinal Cord and/or Nerves),Neurosurgical,BACK (THORACO LUMBER)
+63035,Disfraciculation LT Hip/Wide,Neurosurgical,BACK (THORACO LUMBER)
+63050,Ilistrumented Fusion L5-S1,Neurosurgical,BACK (THORACO LUMBER)
+64490,Lumber Facet Injection L4-L5,Neurosurgical,BACK (THORACO LUMBER)
+22633,L4-L5 Fusion Under Image,Neurosurgical,BACK (THORACO LUMBER)
+22634,L4-L5 And L5-S1 Epidural,Neurosurgical,BACK (THORACO LUMBER)
+22800,L4-L5 Decompression Under C -Arm,Neurosurgical,BACK (THORACO LUMBER)
+22812,L4-L5l5-S1 Decompresion,Neurosurgical,BACK (THORACO LUMBER)
+22804,L5 Si Decompressive And,Neurosurgical,BACK (THORACO LUMBER)
+22808,L5-S1 Facet Injection Under C-,Neurosurgical,BACK (THORACO LUMBER)
+22810,L5-Si Laminectomy,Neurosurgical,BACK (THORACO LUMBER)
+22818,Laminectomy L3-L4,Neurosurgical,BACK (THORACO LUMBER)
+22830,Laminectomy L2-L3 Under C-,Neurosurgical,BACK (THORACO LUMBER)
+,Laminectomy L3-L4 L5-S1,Neurosurgical,BACK (THORACO LUMBER)
+62278,Percutaneous Discectomy Lumbar,Neurosurgical,BACK (THORACO LUMBER)
+62311,Epidural Injection T12-L1,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63055,Thoracic Spine Stabilization (Release of Middle Spinal Cord and/or Nerves),Neurosurgical,SPINE (VERTEBRAL COLUMN)
+22842,Instrumentation T12-L4 Under C-Arm,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63086,T12-L1 Decompression And,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63087,T12-L1-L2l4 stabilization,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63088,T12-L1l2 Instrumentation,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63089,T2-T1 Fixation with Pedicle,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63276,Spinal Tumour Exicision And,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63064,T3 Decompression,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+63085,T12 Decompression,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+22802,Arthrodesis of 6 Vertebral SEG,Neurosurgical,SPINE (VERTEBRAL COLUMN)
+22819,Kyphectomy (Resection Vert SEG),Neurosurgical,SPINE (VERTEBRAL COLUMN)
+23040,Arthrotomy Shoulder,Neurosurgical,SHOULDER
+23120,Bone Nibbling Clavicle,Neurosurgical,SHOULDER
+23430,Repair-Biceps,Neurosurgical,SHOULDER
+23655,Recurrent Shoulder,Neurosurgical,SHOULDER
+23802,Arthrodesis-Shoulder Joint,Neurosurgical,SHOULDER
+23900,Forequarter Amputation,Neurosurgical,SHOULDER
+23935,Arthrolysis,Neurosurgical,SHOULDER
+15101,Skin-Graft Shoulder,Neurosurgical,SHOULDER
+23065,Biopsy Shoulder,Neurosurgical,SHOULDER
+23330,Debridment Shoulder,Neurosurgical,SHOULDER
+23921,Disarticulation-Shoulder,Neurosurgical,SHOULDER
+24075,Tumour Excision,Neurosurgical,SHOULDER
+24079,Tumour Debukling And Biopsy,Neurosurgical,SHOULDER
+23540,Ac Joint Sublaxation-,Neurosurgical,SHOULDER
+23550,Orif Acj,Neurosurgical,SHOULDER
+23500,Closed Treatment Clavicle,Neurosurgical,SHOULDER
+23515,Orif Clavicle,Neurosurgical,SHOULDER
+23570,Closed Treatment Scapula,Neurosurgical,SHOULDER
+23585,ORIF Treatment Scapula,Neurosurgical,SHOULDER
+23675,Closed Treatment of Shulder Dislocation,Neurosurgical,SHOULDER
+23680,ORIF Shoulder Dislocation,Neurosurgical,SHOULDER
+,,Neurosurgical,
+,HUMERUS (UPPER ARM AND ELBOW),Neurosurgical,
+20200,Biopsy Elbow,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+15736,Reverse Radial Flap Elbow,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24006,Gout Tophies Debridement,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24076,Elbow Joint Toilet-Bx,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24134,Sequstrectomy Humerus,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24341,Elbow Reconstruction,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24342,Repair-Triceps,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24345,Elbow Reconstruction,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24362,Reconstraction Elbow,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24400,Co Humerus,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24435,Revision ORIF Humerus,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24515,Dcp Humeerus,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24675,EF Trans Elbow,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24685,Plating Olecranon,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24800,Arthrodesis-Elbow Joint,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+28341,Revision Surgery Right Elbow,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+20550,Injection Bursa,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+12006,SSG Arm,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24101,Excision Lateral Epicondyle,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24358,Lateral Epicondyle Excision Arthroscopically,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24359,Epicondyle Excision,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24360,Elbow Reconstrunction under C-Arm,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24579,T/Plate/Sign Nail Humerus,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24620,Closed Reduction Elbow,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24635,Open Reduction Elbow,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24640,Trans Elbow EF,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24900,Above Elbow Amputation,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+24920,Disarticulation-Elbow / Amputation-through Arm,Neurosurgical,HUMERUS (UPPER ARM AND ELBOW)
+11603,"Incisional Bx Forearm, Humerus, Shoulder",Neurosurgical,FOREARM AND WRIST
+20670,"Removal of K-Wire, Rush Rod, Screw, R/U, Humerus, Ankle, etc.",Neurosurgical,FOREARM AND WRIST
+20690,EF Radius / Ulna / Tibia,Neurosurgical,FOREARM AND WRIST
+20900,Bone Nibbling Radius / Tibia / Femur,Neurosurgical,FOREARM AND WRIST
+25275,Repair-Hand Extensor / Flexor Tendon,Neurosurgical,FOREARM AND WRIST
+25350,Co Distal Radius,Neurosurgical,FOREARM AND WRIST
+25415,Revision ORIF Radius,Neurosurgical,FOREARM AND WRIST
+25606,EF Extension Upper Limb,Neurosurgical,FOREARM AND WRIST
+25607,Volar Plate Redius,Neurosurgical,FOREARM AND WRIST
+25905,Amputation Forearm,Neurosurgical,FOREARM AND WRIST
+25924,Disarticulation-Wrist,Neurosurgical,FOREARM AND WRIST
+26055,Co and 1st and 2nd Proximal,Neurosurgical,FOREARM AND WRIST
+64718,Darach Procedure Ulna,Neurosurgical,FOREARM AND WRIST
+64719,Ulna Nerve Exploration,Neurosurgical,FOREARM AND WRIST
+11043,Debridement And EF,Neurosurgical,FOREARM AND WRIST
+24152,Bone Excision Radius,Neurosurgical,FOREARM AND WRIST
+24164,Excision Radial Head,Neurosurgical,FOREARM AND WRIST
+25111,Gandlion Excision Wrist,Neurosurgical,FOREARM AND WRIST
+25112,Granuloma Excision,Neurosurgical,FOREARM AND WRIST
+25320,Open Reduction Lunate,Neurosurgical,FOREARM AND WRIST
+25355,Co Radius,Neurosurgical,FOREARM AND WRIST
+25405,Decortication Radius,Neurosurgical,FOREARM AND WRIST
+25574,EF Radius / Ulna,Neurosurgical,FOREARM AND WRIST
+25600,Close Reduction MPI Open 1st,Neurosurgical,FOREARM AND WRIST
+29805,DX Shoulder Arthroscopically,Neurosurgical,FOREARM AND WRIST
+29824,Mumford Procedure,Neurosurgical,FOREARM AND WRIST
+29826,ACJ Decompresion by Endoscopy,Neurosurgical,FOREARM AND WRIST
+23470,HA Shoulder,Neurosurgical,FOREARM AND WRIST
+23472,TSA Total Shoulder Arthroplasty,Neurosurgical,FOREARM AND WRIST
+25635,Scaphoid Bone Reduction,Neurosurgical,HAND AND FINGER
+25800,Arthrodesis-Wrist Joint,Neurosurgical,HAND AND FINGER
+26350,Repair-Hand -Flexor (One / Two),Neurosurgical,HAND AND FINGER
+26548,Bilateral Vollar Plate Both,Neurosurgical,HAND AND FINGER
+26565,Corrective Osteatomy,Neurosurgical,HAND AND FINGER
+26850,Arthrodesis 1st MCP Joint,Neurosurgical,HAND AND FINGER
+26951,Flexor / Extensor Tendon Repair Hand,Neurosurgical,HAND AND FINGER
+25071,Excision Biopsy Hand,Neurosurgical,HAND AND FINGER
+25825,Lunate Excision,Neurosurgical,HAND AND FINGER
+27640,Exostosis Removal R/U,Neurosurgical,HAND AND FINGER
+64721,Bilateral Carpal Tunnel (Surgery),Neurosurgical,HAND AND FINGER
+20240,"Bone Biopsy Pelvis, Femur, Tibia, Humerus etc.",Neurosurgical,PELVIC AND HIP JOINT
+20245,Biopsy Acetabular,Neurosurgical,PELVIC AND HIP JOINT
+27030,Arthrotomy Hip,Neurosurgical,PELVIC AND HIP JOINT
+27052,Synovectomy BX Hip,Neurosurgical,PELVIC AND HIP JOINT
+27125,HA,Neurosurgical,PELVIC AND HIP JOINT
+27130,Cemented THR,Neurosurgical,PELVIC AND HIP JOINT
+27134,Revision Total Hip,Neurosurgical,PELVIC AND HIP JOINT
+27158,Acetabular Re-Construction,Neurosurgical,PELVIC AND HIP JOINT
+27215,Plating Ilium,Neurosurgical,PELVIC AND HIP JOINT
+27218,Plating Si Joint,Neurosurgical,PELVIC AND HIP JOINT
+27236,Revision HA,Neurosurgical,PELVIC AND HIP JOINT
+27266,Revision Hip Reduction and K,Neurosurgical,PELVIC AND HIP JOINT
+27275,Closed Reduction Total Hip,Neurosurgical,PELVIC AND HIP JOINT
+27280,Arthrodesis-Hip,Neurosurgical,PELVIC AND HIP JOINT
+27295,Hip Disarticularion,Neurosurgical,PELVIC AND HIP JOINT
+27360,Saucerization Hip Joint/Femur/Tibia/Humerus/R-U,Neurosurgical,PELVIC AND HIP JOINT
+27442,Total-Knee Replacement,Neurosurgical,PELVIC AND HIP JOINT
+11101,Excision of Bone Hip,Neurosurgical,PELVIC AND HIP JOINT
+15110,Skin Grafting,Neurosurgical,PELVIC AND HIP JOINT
+27217,Plating Pubis Symphisis,Neurosurgical,PELVIC AND HIP JOINT
+27227,Symphysis Plate Acetabular,Neurosurgical,PELVIC AND HIP JOINT
+27235,Hip Srew Under C Arm,Neurosurgical,PELVIC AND HIP JOINT
+27253,Open Reduction EF Hip,Neurosurgical,PELVIC AND HIP JOINT
+27137,THA Revison Femoral Compnent,Neurosurgical,PELVIC AND HIP JOINT
+27138,THA Revison Acetabular Component,Neurosurgical,PELVIC AND HIP JOINT
+27132,Conversional HA to THA,Neurosurgical,PELVIC AND HIP JOINT
+27299,Pemberton Osteotomy,Neurosurgical,PELVIC AND HIP JOINT
+27258,ORIF Congenital / Developmental or Pathological Hip Dislocation(Tenotomy),Neurosurgical,PELVIC AND HIP JOINT
+27175,Treatment of Slipped Growth Plate at Upper thigh Bone,Neurosurgical,PELVIC AND HIP JOINT
+11605,Biops And Grafting Femur,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+20270,Arthrotomy Knee,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+20610,Skeletal-Traction,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+20650,Skin-Traction,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+20694,Cbp and Bone Graft,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+20838,Revision Amputation AKA,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27422,Repair-Knee Medial/Lateral Colateral Ligament,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+26605,Fracture Closed-Reduction,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27040,Synovial Biopsy Knee,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27245,"Revision Plate, Sign Nail, Shc/Angled Plate Femur",Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27331,Arthrotomy of BX Knee,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27334,Synovectomy Knee Joint,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27345,Bakers Cyst Excision Knee,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27386,Quadriceps Tendon Repair,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27506,Antegrade / Retrograde Sign Nail Femur / Tibia / Humerus,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27507,Sign Nail Biopsy Femur,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27515,Condylar Butress Plate Femr,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27580,Arthrodesis- Knee/Ankle,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27590,Modular Transfemoral,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27964,Amputation Stump Femur,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+28035,Posterior Release of (Release of Nerve Between Tissue and Bone of Foot),Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29830,Diagnostics-Arthroscopy,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29850,Medial Collateal Ligament,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29873,Total Release-Knee,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29875,Arthroscopy Knee,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29882,Arthroscopy Reconstruction,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29887,Arthroscopy,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+11045,Debridement,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+15050,Skin Grafting Kneeand,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27244,DHS,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27248,Sign Nail Revision,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27310,Arthrotomy and Biopsy,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27420,Demedialiazation Patela,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27440,Total Knee Revision,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27445,Total Knee Replacement,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27450,Bilateral Co Both Femurs,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27508,ESIN Femur,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27511,Compression Screw Femur,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27513,"Co and Butress Plating, Pinning",Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+26520,Capsulloraphy Patella,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27524,TBW Patella,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27530,Trans Knee EF,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27598,Disarticulation-Knee,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27695,LCL Repair,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27724,Masquellete Technique,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27752,Fracture Closed-Reduction,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27758,Blade Plate CBP,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29880,Medial Meniscetomy,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29870,DX Arthroscopy,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29881,Arthroscipic meniscectomy / shaving,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29888,ACL Repair Arthroscopically,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29889,Pcl Repair Arthroscopically,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+27418,Medialization of Patella (ORIF),Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29877,Medialization of Patella (Arthroscopically ),Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+29999,MCL & ACL Repair Arthroscopically,Neurosurgical,FEMUR (HIGH REGION) AND KNEE JOINT
+11042,Skin Graft Leg,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+15100,Soleus Flap Rotation,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+13122,Biopsy Leg,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+20201,Biopsy P/3Tibia and Trans,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+20692,"Ankle, Knee Spanning SD/ EF T/F",Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+20693,"EF/Hoffman Revision/Adjustment/ Tibia/Fibula,Femur",Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+22853,Double Butress Plate,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27536,T Plateau Fracture Revision,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27610,Joint Toilet Ankle,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27620,Arthrotomy Ankle,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27635,Anterior Bone Block Excion,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27650,Achiles Tendon Repair,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27696,Ankle Reconstruction (Repair of Disruption of Both Collateral Ligaments of Ankle),Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27700,Ankle Reconstraction,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27704,Angles Plate Removal,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27705,CO And EF Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27709,CO Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27722,Grafting Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27759,Bilateral Sign Nailing Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27825,Ex Fix T/F,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27827,Tibia Lengthening,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27860,Tripe Arthrodesis Ankle,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27870,Arthodresis Left Ankle,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27880,Modular Transtibial (BKA),Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27882,Above Knee Amputation (AKA),Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+11047,Sequstrectomy Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+11400,Excision Biopsy Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+11442,Demoid Cyst Excision,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+20680,Sign Nail Removal Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+24925,Stump Closure Leg,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+24930,Soft Tissue-Stamp Revision,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27535,Butress Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27599,Surgical Debridement Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27607,HTCO Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27826,Ex Fix Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27828,Butress Plate Distal,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27871,Decortication EF Tibia,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+27888,Disarticulation - Ankle,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+29906,Arthroscopiy of Ankle Joint,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+29907,Debridemen of Ankle Arthroscopically,Neurosurgical,LEG (TIBIA AND FIBULA) AND ANKLE JOINT
+26538,Traction Skeletal(Adult),Neurosurgical,MINOR PROCEDURES
+24538,Traction Skin (Children),Neurosurgical,MINOR PROCEDURES
+23600,Distal Humeral Fracture Pop (Adults),Neurosurgical,MINOR PROCEDURES
+29345,Above Knee Pop (Adult),Neurosurgical,MINOR PROCEDURES
+29065,Above/Below Elbow Pop (Adult/Children),Neurosurgical,MINOR PROCEDURES
+29325,Sarmieto Pop (Adults),Neurosurgical,MINOR PROCEDURES
+29085,Below Elbow Pop (Children),Neurosurgical,MINOR PROCEDURES
+29405,Below Knee Pop (Children/Adult),Neurosurgical,MINOR PROCEDURES
+29450,Club Foot Pop (Children),Neurosurgical,MINOR PROCEDURES
+29445,Contact/Cylinder Pop,Neurosurgical,MINOR PROCEDURES
+29305,Sarmieto Pop (Children),Neurosurgical,MINOR PROCEDURES
+11044,In Growing Nail Excision,Neurosurgical,FOOT AND TOES
+27605,ETA and Pmr,Neurosurgical,FOOT AND TOES
+27687,Bilateral PCT,Neurosurgical,FOOT AND TOES
+27805,Ankle Foot Orthosis,Neurosurgical,FOOT AND TOES
+27814,Open Reduction-Weber,Neurosurgical,FOOT AND TOES
+27823,Open Reduction-Weber,Neurosurgical,FOOT AND TOES
+28400,SD And Calcaneal and Pop,Neurosurgical,FOOT AND TOES
+28445,Reconstruction-Talus,Neurosurgical,FOOT AND TOES
+28645,Reconstruction-Calcaneum,Neurosurgical,FOOT AND TOES
+28715,Tripe Arthropdesis Foot,Neurosurgical,FOOT AND TOES
+28750,ARTHRODESIS OF MTPJ 2 and 3rd,Neurosurgical,FOOT AND TOES
+28820,Amputation Fore/Mid /Hind Foot,Neurosurgical,FOOT AND TOES
+28810,Disarticulation-Phallanges,Neurosurgical,FOOT AND TOES
+29058,Fibre Glass Free Casting Tape,Neurosurgical,FOOT AND TOES
+29899,Arthrodesis (Triple) Foot,Neurosurgical,FOOT AND TOES
+29905,Synovectomy-Arthrotomy,Neurosurgical,FOOT AND TOES
+32405,Trephene Needle Biopsy,Neurosurgical,FOOT AND TOES
+11300,Excisional Biopsy Foot,Neurosurgical,FOOT AND TOES
+26952,Poly Dactyl/Extra Digit Excision Foot,Neurosurgical,FOOT AND TOES
+27122,Modified Girdle Stone Right,Neurosurgical,FOOT AND TOES
+27606,ETA and Pmr-Clubfoot,Neurosurgical,FOOT AND TOES
+28262,BIL ETA/PMR,Neurosurgical,FOOT AND TOES
+28615,Orif-Calcaneum,Neurosurgical,FOOT AND TOES
+28730,Athrodesis First and Second,Neurosurgical,FOOT AND TOES

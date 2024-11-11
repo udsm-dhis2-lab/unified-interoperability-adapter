@@ -27,10 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.Subject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class SharedHealthRecordsService {
@@ -78,6 +75,7 @@ public class SharedHealthRecordsService {
             String middleName,
             String lastName,
             String hfrCode,
+            Date dateOfBirth,
             boolean includeDeceased,
             Integer numberOfVisits
     ) throws Exception {
@@ -101,8 +99,24 @@ public class SharedHealthRecordsService {
                 searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
             }
 
+            if (hfrCode != null) {
+                searchRecords.where(Patient.IDENTIFIER.hasSystemWithAnyCode(hfrCode));
+            }
+
+            if (gender != null) {
+                searchRecords.where(Patient.GENDER.exactly().code(gender.toLowerCase()));
+            }
+
+            if (lastName != null) {
+                searchRecords.where(Patient.FAMILY.matches().value(lastName));
+            }
+
             if (firstName != null) {
                 searchRecords.where(Patient.GIVEN.matches().value(firstName));
+            }
+
+            if (dateOfBirth != null) {
+                searchRecords.where(Patient.BIRTHDATE.beforeOrEquals().day(dateOfBirth));
             }
 
             response = searchRecords.count(pageSize)
@@ -204,6 +218,7 @@ public class SharedHealthRecordsService {
                         visitDetails.setNew(Boolean.FALSE);
                         templateData.setVisitDetails(visitDetails);
 
+
                         // Get clinicalInformation
                         // 1. clinicalInformation - vital signs
                         ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
@@ -223,13 +238,19 @@ public class SharedHealthRecordsService {
                         }
 
                         // Visit notes
-                        List<String> visitNotes = new ArrayList<>();
+                        List<Map<String,Object>> visitNotes = new ArrayList<>();
 
-                        Map<String,Object> clinicalInformationDetails = new HashMap<>();
-                        clinicalInformationDetails.put("vitalSigns", vitalSigns);
-                        clinicalInformationDetails.put("visitNotes", visitNotes);
-                        clinicalInformationDTO.setClinicalInformation(clinicalInformationDetails);
+                        ClinicalInformationDTO clinicalInformationDetails = new ClinicalInformationDTO();
+                        clinicalInformationDetails.setVitalSigns(vitalSigns);
+                        clinicalInformationDetails.setVisitNotes(visitNotes);
                         templateData.setClinicalInformation(clinicalInformationDTO);
+                        ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
+                        List<Identifier> identifiers = encounter.getIdentifier();
+                        for (Identifier identifierData: identifiers) {
+                            referralDetailsDTO.setReferralNumber(identifierData.getValue());
+                            break;
+                        }
+                        templateData.setReferralDetails(referralDetailsDTO);
 
                         // TODO: Add history when numberOfVisits > 1
                     } else if (organization != null) {

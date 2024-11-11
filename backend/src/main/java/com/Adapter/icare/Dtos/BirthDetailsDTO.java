@@ -6,6 +6,8 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -15,9 +17,15 @@ public class BirthDetailsDTO {
     private Date dateOfBirth;
     private Float weightInKgs;
     private boolean multipleBirth;
+    private boolean exclusiveBreastFed;
+    private boolean marcerated;
+    private boolean fresh;
     private Float motherAgeInYears;
     private Integer birthOrder;
-    private String motherHivStatus;
+    private CodeAndNameDTO motherHivStatus;
     private boolean providedWithARV;
+    private boolean referred;
+    private List<VaccinationDetailsDTO> vaccinationDetails;
     private BreatheAssistanceDTO breatheAssistance;
+    private List<Map<String,Object>> otherServices;
 }

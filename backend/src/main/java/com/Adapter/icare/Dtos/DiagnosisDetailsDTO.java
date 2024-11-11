@@ -10,14 +10,12 @@ import java.util.Date;
 @Getter
 @Setter
 public class DiagnosisDetailsDTO {
-    private String certainty;
-    private String diagnosis;
-
-    @NotNull
-    private String diagnosisCode;
-
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date diagnosisDate;
+    private String certainty;
+    private String diagnosis;
+    @NotNull
+    private String diagnosisCode;
     private String diagnosisDescription;
 }

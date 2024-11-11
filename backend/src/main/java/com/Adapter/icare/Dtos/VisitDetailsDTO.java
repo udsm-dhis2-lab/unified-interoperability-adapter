@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Getter
@@ -23,7 +24,7 @@ public class VisitDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date closedDate;
     private String visitType;
-    private CareServiceDTO careService;
+    private List<CareServiceDTO> careServices;
 
     public Map<String,Object> toMap() {
         Map<String,Object> visitDetails = new HashMap<>();
@@ -33,7 +34,7 @@ public class VisitDetailsDTO {
         visitDetails.put("visitType", this.getVisitType());
         visitDetails.put("newThisYear", this.newThisYear);
         visitDetails.put("isNew", this.isNew);
-        visitDetails.put("careService", this.getCareService().toMap());
+        visitDetails.put("careServices", this.getCareServices().stream().map(careService -> careService.toMap()));
         return visitDetails;
     }
 }

@@ -13,7 +13,10 @@ public class VaccinationDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
+    private String code;
     private String type;
+    private String name;
+    private String vaccinationModality;
     private String status;
     private String notes;
     private Integer dosage;

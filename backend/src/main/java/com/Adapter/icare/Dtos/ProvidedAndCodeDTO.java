@@ -7,5 +7,6 @@ import lombok.Setter;
 @Setter
 public class ProvidedAndCodeDTO {
     private String code;
+    private String name;
     private boolean provided;
 }

@@ -13,10 +13,7 @@ export class AuthService {
   public currentUser$: Observable<User | null> =
     this.currentUserSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private hduHttpService: HduHttpService
-  ) {
+  constructor(private hduHttpService: HduHttpService) {
     // Fetch the current user on service initialization
     this.fetchCurrentUser().subscribe(); // This can be modified based on your app structure
   }

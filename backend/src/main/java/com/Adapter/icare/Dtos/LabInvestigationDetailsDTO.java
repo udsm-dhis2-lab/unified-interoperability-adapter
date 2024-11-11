@@ -21,6 +21,7 @@ public class LabInvestigationDetailsDTO {
     private Date testResultDate;
     private String testStatus;
     private String testType;
+    @NotNull
     private boolean standardCode;
     private String codeType;
     private List<LabTestResultsDTO> testResults;
