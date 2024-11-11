@@ -430,7 +430,16 @@ public class SharedHealthRecordsService {
 
                             // Chronic conditions
                             List<ChronicConditionsDTO> chronicConditionsDTOS = new ArrayList<>();
-                            // TODO: Implement chronic conditions
+                            List<Condition> conditions = getConditionsByCategory(encounter.getIdElement().getIdPart(), encounter.getIdElement().getIdPart());
+                            for (Condition condition: conditions) {
+                                ChronicConditionsDTO chronicConditionsDTO = new ChronicConditionsDTO();
+                                chronicConditionsDTO.setCode(condition.hasCode() ? condition.getCode().getCoding().get(0).getCode().toString(): null);
+                                chronicConditionsDTO.setName(condition.hasCategory() ? condition.getCategory().get(0).getCoding().get(0).getCode(): null);
+                                chronicConditionsDTO.setName(condition.hasCode() ? condition.getCode().getCoding().get(0).getDisplay().toString(): null);
+                                chronicConditionsDTO.setCriticality(condition.getClinicalStatus().getCoding().get(0).getCode());
+                                chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode(): null);
+                                chronicConditionsDTOS.add(chronicConditionsDTO);
+                            }
                             templateData.setChronicConditions(chronicConditionsDTOS);
 
                             templateData.setAllergies(allergiesDTOS);
@@ -690,5 +699,22 @@ public class SharedHealthRecordsService {
             }
         }
         return allergyIntolerances;
+    }
+
+    public List<Condition> getConditionsByCategory(String encounterId, String category) throws Exception{
+        List<Condition> conditions = new ArrayList<>();
+        var conditionSearch = fhirClient.search().forResource(Condition.class)
+                .where(Condition.ENCOUNTER.hasAnyOfIds(encounterId))
+                .where(Condition.CATEGORY.exactly().code(category));
+
+        Bundle observationBundle = new Bundle();
+        observationBundle = conditionSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
+                Condition condition = (Condition) entryComponent.getResource();
+                conditions.add(condition);
+            }
+        }
+        return conditions;
     }
 }
