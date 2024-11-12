@@ -48,7 +48,7 @@ public class DemographicDetailsDTO {
         demographicDetails.put("occupation", this.getOccupation());
         demographicDetails.put("maritalStatus", this.getMaritalStatus());
         demographicDetails.put("nationality", this.getNationality());
-        demographicDetails.put("addresses", this.getAddresses());
+        demographicDetails.put("addresses", this.getAddresses().stream().map(address -> address.toMap()));
         demographicDetails.put("identifiers", this.getIdentifiers().stream().map(identifier -> identifier.toMap()));
         demographicDetails.put("contactPeople", this.getContactPeople());
         demographicDetails.put("paymentDetails", this.getPaymentDetails());

@@ -437,6 +437,8 @@ public class ClientRegistryService {
                                 address.hasState() ? address.getState() : null,
                                 address.hasPostalCode() ? address.getPostalCode() : null,
                                 address.hasCountry() ? address.getCountry() : null,
+                                address.hasText() ? address.getText(): null,
+                                address.hasUse() ? address.getUse().getDisplay(): null,
                                 address.hasLine() ? address.getLine().stream().map(PrimitiveType::getValue).collect(Collectors.toList()) : new ArrayList<>()
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
@@ -449,7 +451,6 @@ public class ClientRegistryService {
                                 contactPoint.hasUse() ? contactPoint.getUse().toCode() : null
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
-        System.out.println(telecomDTOs);
         String gender = patient.hasGender() ? patient.getGender().toCode() : null;
         Date birthDate = patient.hasBirthDate() ? patient.getBirthDate() : null;
         String patientId = patient.getIdElement() != null ? patient.getIdElement().getIdPart() : null;
@@ -469,7 +470,7 @@ public class ClientRegistryService {
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
 
-        String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
+        String maritalStatus = patient.hasMaritalStatus() && patient.getMaritalStatus().hasCoding() ? patient.getMaritalStatus().getCoding().get(0).getDisplay() : null;
         List<Patient.PatientLinkComponent> patientLinkComponents = patient.getLink();
         List<Map<String,Object>> relatedClients = new ArrayList();
         for (Patient.PatientLinkComponent patientLinkComponent: patientLinkComponents) {

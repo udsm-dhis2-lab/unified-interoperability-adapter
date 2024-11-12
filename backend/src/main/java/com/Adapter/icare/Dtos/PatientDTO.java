@@ -109,6 +109,7 @@ public class PatientDTO {
             mappedPatient.setEmails(emails);
 //            mappedPatient.setS(this.getStatus());
             mappedPatient.setMaritalStatus(this.getMaritalStatus());
+            mappedPatient.setAddresses(address);
             mappedPatient.setContactPeople(this.getContactPeople());
             List<Map<String,Object>> relatedClientsList = new ArrayList<>();
             if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
