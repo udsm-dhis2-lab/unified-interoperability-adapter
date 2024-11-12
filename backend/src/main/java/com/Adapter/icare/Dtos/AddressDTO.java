@@ -31,7 +31,7 @@ public class AddressDTO {
         addressesMap.put("ward", this.getText() != null  && this.getText().contains("-") ? this.getText().split("-")[0]: null);
         addressesMap.put("city", this.getCity());
         addressesMap.put("country", this.getCountry());
-        addressesMap.put("category", this.getUse().equals("home") ? "Permanent": "Temporarily");
+        addressesMap.put("category", this.getUse() != null ? (this.getUse().equals("home") ? "Permanent": "Temporarily"): null);
         return addressesMap;
     }
 

@@ -57,6 +57,28 @@ public class ClientRegistryService {
         return (Patient) fhirClient.create().resource(patient).execute().getResource();
     }
 
+    public Map<String,Object> identifyDuplicates() throws Exception {
+        try {
+            Map<String,Object> response = new HashMap<>();
+            List<Map<String,Object>> clientsList = new ArrayList<>();
+            // 1 Get all clients
+            // 2. Formulate payload as per algorithm
+            // 3. Identify potential duplicates
+            // 4. Link potential duplicates
+            // 5. Save the ids of the potential duplicates
+            Bundle bundle = fhirClient.search().forResource(Patient.class).returnBundle(Bundle.class).execute();
+            if(bundle.hasEntry()) {
+                for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+
+                }
+            }
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
+
     public MethodOutcome markPatientAsInActive(Patient patient) {
         patient.setActive(false);
         return fhirClient.update().resource(patient).execute();

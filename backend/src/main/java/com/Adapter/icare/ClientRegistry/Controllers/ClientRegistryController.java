@@ -301,4 +301,17 @@ public class ClientRegistryController {
             throw new Exception(e.getMessage());
         }
     }
+
+    @PostMapping(value = "/identifyPotentialDuplicates")
+    public ResponseEntity<Map<String,Object>> identifyPotentialDuplicates(
+            @RequestBody Map<String,Object> parameters
+    ) throws Exception {
+        Map<String,Object> response = new HashMap<>();
+        try {
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
 }
