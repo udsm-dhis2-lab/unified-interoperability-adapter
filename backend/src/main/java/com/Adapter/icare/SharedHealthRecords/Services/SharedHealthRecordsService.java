@@ -490,8 +490,24 @@ public class SharedHealthRecordsService {
                                 }
                             }
                             lifeStyleInformationDTO.setDrugUse(drugUse);
-
                             templateData.setLifeStyleInformation(lifeStyleInformationDTO);
+
+                            // Diagnosis details
+                            List<DiagnosisDetailsDTO> diagnosisDetailsDTOS = new ArrayList<>();
+
+                            List<Condition> conditionsList = getConditionsByCategory(encounter.getIdElement().getIdPart(), "encounter-diagnosis");
+                            if (!conditionsList.isEmpty()) {
+                                for(Condition condition: conditionsList) {
+                                    DiagnosisDetailsDTO diagnosisDetailsDTO = new DiagnosisDetailsDTO();
+                                    diagnosisDetailsDTO.setDiagnosisCode(condition.hasCode() ? condition.getCode().getCoding().get(0).getCode().toString(): null);
+                                    diagnosisDetailsDTO.setDiagnosis(condition.hasCode() ? condition.getCode().getCoding().get(0).getDisplay(): null);
+                                    diagnosisDetailsDTO.setDiagnosisDate(condition.hasOnsetDateTimeType() ? condition.getOnsetDateTimeType().getValue(): null);
+                                    diagnosisDetailsDTO.setDiagnosisDescription(condition.hasCode() ? condition.getCode().getText().toString(): null);
+                                    diagnosisDetailsDTO.setCertainty(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode(): null);
+                                    diagnosisDetailsDTOS.add(diagnosisDetailsDTO);
+                                }
+                            }
+                            templateData.setDiagnosisDetails(diagnosisDetailsDTOS);
 
                             templateData.setAllergies(allergiesDTOS);
                             ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
