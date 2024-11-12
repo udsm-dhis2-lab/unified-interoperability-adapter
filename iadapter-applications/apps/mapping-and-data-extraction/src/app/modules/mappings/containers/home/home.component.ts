@@ -305,10 +305,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   goToDataSetMapping(uuid: string) {
-    this.router.navigate([
-      '/mapping-and-data-extraction/dataset-mapping',
-      uuid,
-    ]);
+    this.router.navigate(['/dataset-mapping', uuid]);
   }
 
   onCloseAlert() {

@@ -5,6 +5,7 @@ export enum MappingsUrls {
   GET_DATASET_BY_ID = 'dataSets',
   CONFIGURATIONS = 'hduApi/configurations',
   GET_ICD_CODES = 'hduApi/codeSystems/icd/codes',
+  GET_LOINC_CODES = 'hduApi/codeSystems/loinc',
   SELECT_DATASET_FOR_MAPPING = 'dataSets',
   REMOVE_DATASET_FROM_MAPPING = 'dataSets',
   GET_CATEGORY_OPTION_COMBO = 'dataElements',

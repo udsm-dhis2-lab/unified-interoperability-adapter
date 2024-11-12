@@ -423,12 +423,15 @@ export class DatasetMappingComponent implements OnInit {
     const payLoad = {
       mapping: {
         icdMappings: this.selectedICdCodes.map((item) => {
+          // TODO: Add name here
           return {
             code: item,
           };
         }),
 
-        loincMappings: [],
+        loincMappings: [
+          // TODO: Add name and loinc code here
+        ],
 
         dataElement: {
           id: this.selectedInputId,
