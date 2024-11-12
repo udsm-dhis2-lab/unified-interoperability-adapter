@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, map, Observable } from 'rxjs';
 import {
-  Configuration,
   ConfigurationPage,
   Dataset,
   DatasetPage,
   IcdCodePage,
   InstancePage,
   MappingsUrls,
+  LoincCodePage,
 } from '../models';
 import { HttpParams } from '@angular/common/http';
 import {
@@ -140,6 +140,23 @@ export class DatasetManagementService {
       .pipe(
         map((response: { results: any }) => {
           return IcdCodePage.fromJson(response);
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  getLoincCodes(
+    pageIndex: number,
+    pageSize: number,
+    filters: Array<{ key: string; value: string[] }>
+  ): Observable<any> {
+    const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
+
+    return this.httpClient
+      .get<any>(MappingsUrls.GET_LOINC_CODES, { params })
+      .pipe(
+        map((response: { results: any }) => {
+          return LoincCodePage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );

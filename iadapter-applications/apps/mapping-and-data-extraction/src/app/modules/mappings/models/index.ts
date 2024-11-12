@@ -11,3 +11,4 @@ export * from './responses/icd-code-page';
 export * from './category-option-combo.model';
 export * from './icd-code.model';
 export * from './loinc-code.model';
+export * from './responses/loinc-code-page';
