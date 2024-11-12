@@ -444,12 +444,12 @@ public class ClientRegistryService {
         List<ContactDTO> telecomDTOs = patient.hasTelecom() ?
                 patient.getTelecom().stream()
                         .map(contactPoint -> new ContactDTO(
-                                contactPoint.hasSystem() ? contactPoint.getSystem().toCode() : null,
+                                contactPoint.hasSystem() ? contactPoint.getSystem().getDisplay() : null,
                                 contactPoint.hasValue() ? contactPoint.getValue() : null,
                                 contactPoint.hasUse() ? contactPoint.getUse().toCode() : null
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
-
+        System.out.println(telecomDTOs);
         String gender = patient.hasGender() ? patient.getGender().toCode() : null;
         Date birthDate = patient.hasBirthDate() ? patient.getBirthDate() : null;
         String patientId = patient.getIdElement() != null ? patient.getIdElement().getIdPart() : null;

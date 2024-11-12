@@ -93,6 +93,20 @@ public class PatientDTO {
 
             mappedPatient.setGender(this.getGender());
             mappedPatient.setDateOfBirth(this.getBirthDate());
+            List<String> phones = new ArrayList<>();
+            for (ContactDTO contactDTO: getTelecom()) {
+                if (contactDTO.getSystem().toLowerCase().equals("phone")) {
+                    phones.add(contactDTO.getValue());
+                }
+            }
+            List<String> emails = new ArrayList<>();
+            for (ContactDTO contactDTO: getTelecom()) {
+                if (contactDTO.getSystem().toLowerCase().equals("email")) {
+                    emails.add(contactDTO.getValue());
+                }
+            }
+            mappedPatient.setPhoneNumbers(phones);
+            mappedPatient.setEmails(emails);
 //            mappedPatient.setS(this.getStatus());
             mappedPatient.setMaritalStatus(this.getMaritalStatus());
             mappedPatient.setContactPeople(this.getContactPeople());
