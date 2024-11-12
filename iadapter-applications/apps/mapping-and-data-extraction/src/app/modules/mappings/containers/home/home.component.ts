@@ -10,7 +10,6 @@ import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/
 import {
   BehaviorSubject,
   debounceTime,
-  first,
   Observable,
   Subscription,
   switchMap,
@@ -45,6 +44,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   };
 
   selectedInstanceFetchingMechanism: string = 'remoteDatasets';
+  showMapAsDataSetAction = false;
 
   @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
   @ViewChild(SearchBarComponent) searchBarComponent!: SearchBarComponent;
@@ -113,6 +113,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
           this.pageIndex = data.pageIndex;
           this.pageSize = data.pageSize;
           this.listOfDatasets = data.listOfDatasets;
+          this.selectedInstanceFetchingMechanism === 'selectedDatasets'
+            ? (this.showMapAsDataSetAction = true)
+            : (this.showMapAsDataSetAction = false);
         },
         error: (error) => {
           this.loading = false;
