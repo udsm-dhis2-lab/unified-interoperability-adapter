@@ -13,7 +13,6 @@ import java.util.Map;
 @Getter
 @Setter
 public class DemographicDetailsDTO {
-    private String mrn;
     private String id;
     private String firstName;
     private String middleName;
@@ -37,7 +36,7 @@ public class DemographicDetailsDTO {
 
     public Map<String,Object> toMap() {
         Map<String,Object> demographicDetails = new LinkedHashMap<>();
-        demographicDetails.put("mrn", this.getMrn());
+        demographicDetails.put("id", this.getId());
         demographicDetails.put("firstName", this.getFirstName());
         demographicDetails.put("middleName", this.getMiddleName());
         demographicDetails.put("lastName", this.getLastName());

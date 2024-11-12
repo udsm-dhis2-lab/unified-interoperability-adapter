@@ -7,6 +7,7 @@ import org.hl7.fhir.r4.model.*;
 import javax.validation.constraints.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -80,7 +81,7 @@ public class PatientDTO {
                 for(Identifier identifier: this.getIdentifiers()) {
                     IdentifierDTO identifierDTO =  new IdentifierDTO();
                     identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): this.getId());
-                    identifierDTO.setType(identifier.getType().getText());
+                    identifierDTO.setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode().toString(): null);
                     identifierDTO.setUse(identifier.getUse().getDisplay());
                     identifierDTO.setSystem(identifier.getSystem());
                     idsList.add(identifierDTO);
@@ -137,6 +138,15 @@ public class PatientDTO {
             throw new RuntimeException(e);
         }
         return mappedPatient;
+    }
+
+    public String getMRN(String orgCode) {
+        List<String> identifiers = this.getIdentifiers().stream()
+                .filter(identifier -> identifier.hasAssigner() && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType() && identifier.getType().hasCoding() &&
+                        identifier.getType().getCoding().get(0).getCode().equals("MRN"))
+                .map(identifier -> identifier.getValue())
+                .collect(Collectors.toList());
+        return !identifiers.isEmpty() ? identifiers.get(0): null;
     }
 
     public @NotNull List<Map<String, Object>> getIdentifierMaps() {
