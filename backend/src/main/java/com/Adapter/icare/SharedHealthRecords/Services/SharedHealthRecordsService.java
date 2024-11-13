@@ -418,9 +418,9 @@ public class SharedHealthRecordsService {
                                     for (AllergyIntolerance allergyIntolerance: allergyIntolerances) {
                                         if (allergyIntolerance.hasCode()) {
                                             AllergiesDTO allergiesDTO = new AllergiesDTO();
-                                            allergiesDTO.setCode(allergyIntolerance.hasCode() ? allergyIntolerance.getCode().getCoding().get(0).getCode().toString(): null);
-                                            allergiesDTO.setCategory(allergyIntolerance.hasCategory() ? allergyIntolerance.getCategory().get(0).getCode(): null);
-                                            allergiesDTO.setName(allergyIntolerance.hasCode() ? allergyIntolerance.getCode().getCoding().get(0).getDisplay(): null);
+                                            allergiesDTO.setCode(allergyIntolerance.hasCode() && allergyIntolerance.getCode().hasCoding() && !allergyIntolerance.getCode().getCoding().isEmpty() ? allergyIntolerance.getCode().getCoding().get(0).getCode().toString(): null);
+                                            allergiesDTO.setCategory(allergyIntolerance.hasCategory() && !allergyIntolerance.getCategory().isEmpty() ? allergyIntolerance.getCategory().get(0).getCode(): null);
+                                            allergiesDTO.setName(allergyIntolerance.hasCode() && allergyIntolerance.getCode().hasCoding() && !allergyIntolerance.getCode().getCoding().isEmpty() ? allergyIntolerance.getCode().getCoding().get(0).getDisplay(): null);
                                             allergiesDTO.setCriticality(allergyIntolerance.hasCriticality() ? allergyIntolerance.getCriticality().getDisplay().toString(): null);
                                             allergiesDTO.setVerificationStatus(allergyIntolerance.hasVerificationStatus() && allergyIntolerance.getVerificationStatus().hasCoding() ? allergyIntolerance.getVerificationStatus().getCoding().get(0).getCode().toString(): null);
                                             allergiesDTOS.add(allergiesDTO);
@@ -434,9 +434,9 @@ public class SharedHealthRecordsService {
                                 if (!conditions.isEmpty()) {
                                     for (Condition condition: conditions) {
                                         ChronicConditionsDTO chronicConditionsDTO = new ChronicConditionsDTO();
-                                        chronicConditionsDTO.setCode(condition.hasCode() ? condition.getCode().getCoding().get(0).getCode().toString(): null);
-                                        chronicConditionsDTO.setName(condition.hasCategory() ? condition.getCategory().get(0).getCoding().get(0).getCode(): null);
-                                        chronicConditionsDTO.setName(condition.hasCode() ? condition.getCode().getCoding().get(0).getDisplay().toString(): null);
+                                        chronicConditionsDTO.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getCode().toString(): null);
+                                        chronicConditionsDTO.setName(condition.hasCategory() && !condition.getCategory().isEmpty() ? condition.getCategory().get(0).getCoding().get(0).getCode(): null);
+                                        chronicConditionsDTO.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getDisplay().toString(): null);
                                         chronicConditionsDTO.setCriticality(condition.getClinicalStatus().getCoding().get(0).getCode());
                                         chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode(): null);
                                         chronicConditionsDTOS.add(chronicConditionsDTO);
