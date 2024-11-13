@@ -53,7 +53,7 @@ public class ClientRegistryService {
         }
     }
 
-    public Patient savePatient(Patient patient) throws Exception {
+    public Patient savePatientToFHIR(Patient patient) throws Exception {
         return (Patient) fhirClient.create().resource(patient).execute().getResource();
     }
 
