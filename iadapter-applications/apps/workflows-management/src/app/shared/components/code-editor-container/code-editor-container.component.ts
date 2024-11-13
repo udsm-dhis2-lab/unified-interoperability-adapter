@@ -24,7 +24,7 @@ const monacoConfig: NgxMonacoEditorConfig = {
 })
 export class CodeEditorContainerComponent implements OnInit {
   @Input() editorOptionsParams: any;
-  @Input() codeSnippet: string = '';
+  @Input() codeSnippet = '';
   @Output() editedCodeSnippet: EventEmitter<string> =
     new EventEmitter<string>();
 
@@ -32,11 +32,11 @@ export class CodeEditorContainerComponent implements OnInit {
     private workflowState: Store<WorkflowState>,
     private processState: Store<Process>
   ) {}
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.codeSnippet);
+  }
 
-  onUpdateProcessCodeSnippet(event: Event): void {
-    event.stopPropagation();
-    this.editedCodeSnippet.emit(this.codeSnippet);
+  onUpdateProcessCodeSnippet() {
     this.workflowState
       .pipe(select(getCurrentSelectedProcess), take(1))
       .subscribe((currentSelectedProcess: Process | null) => {

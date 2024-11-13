@@ -198,7 +198,7 @@ export class ParametersComponent implements OnInit, AfterViewInit {
           const process: Process | null = {
             ...currentSelectedProcess,
             adaptors: this.selectedAdaptors,
-            parameters: this.getFinalParamJSON,
+            params: this.getFinalParamJSON,
           };
 
           this.processState.dispatch(ProcessActions.updateProcess({ process }));

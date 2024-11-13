@@ -7,6 +7,7 @@ import org.hl7.fhir.r4.model.*;
 import javax.validation.constraints.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -77,7 +78,14 @@ public class PatientDTO {
             mappedPatient.setId(this.getId());
             List<IdentifierDTO> idsList = new ArrayList<>();
             if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
-                idsList= getIdentifiersDTO(this.getIdentifiers());
+                for(Identifier identifier: this.getIdentifiers()) {
+                    IdentifierDTO identifierDTO =  new IdentifierDTO();
+                    identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): this.getId());
+                    identifierDTO.setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode().toString(): null);
+                    identifierDTO.setUse(identifier.getUse().getDisplay());
+                    identifierDTO.setSystem(identifier.getSystem());
+                    idsList.add(identifierDTO);
+                }
             }
             mappedPatient.setIdentifiers(idsList);
             mappedPatient.setFirstName(firstName);
@@ -86,8 +94,23 @@ public class PatientDTO {
 
             mappedPatient.setGender(this.getGender());
             mappedPatient.setDateOfBirth(this.getBirthDate());
+            List<String> phones = new ArrayList<>();
+            for (ContactDTO contactDTO: getTelecom()) {
+                if (contactDTO.getSystem().toLowerCase().equals("phone")) {
+                    phones.add(contactDTO.getValue());
+                }
+            }
+            List<String> emails = new ArrayList<>();
+            for (ContactDTO contactDTO: getTelecom()) {
+                if (contactDTO.getSystem().toLowerCase().equals("email")) {
+                    emails.add(contactDTO.getValue());
+                }
+            }
+            mappedPatient.setPhoneNumbers(phones);
+            mappedPatient.setEmails(emails);
 //            mappedPatient.setS(this.getStatus());
             mappedPatient.setMaritalStatus(this.getMaritalStatus());
+            mappedPatient.setAddresses(address);
             mappedPatient.setContactPeople(this.getContactPeople());
             List<Map<String,Object>> relatedClientsList = new ArrayList<>();
             if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
@@ -115,6 +138,15 @@ public class PatientDTO {
             throw new RuntimeException(e);
         }
         return mappedPatient;
+    }
+
+    public String getMRN(String orgCode) {
+        List<String> identifiers = this.getIdentifiers().stream()
+                .filter(identifier -> identifier.hasAssigner() && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType() && identifier.getType().hasCoding() &&
+                        identifier.getType().getCoding().get(0).getCode().equals("MRN"))
+                .map(identifier -> identifier.getValue())
+                .collect(Collectors.toList());
+        return !identifiers.isEmpty() ? identifiers.get(0): null;
     }
 
     public @NotNull List<Map<String, Object>> getIdentifierMaps() {

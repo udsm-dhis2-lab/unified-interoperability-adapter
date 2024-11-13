@@ -53,8 +53,30 @@ public class ClientRegistryService {
         }
     }
 
-    public Patient savePatient(Patient patient) throws Exception {
+    public Patient savePatientToFHIR(Patient patient) throws Exception {
         return (Patient) fhirClient.create().resource(patient).execute().getResource();
+    }
+
+    public Map<String,Object> identifyDuplicates() throws Exception {
+        try {
+            Map<String,Object> response = new HashMap<>();
+            List<Map<String,Object>> clientsList = new ArrayList<>();
+            // 1 Get all clients
+            // 2. Formulate payload as per algorithm
+            // 3. Identify potential duplicates
+            // 4. Link potential duplicates
+            // 5. Save the ids of the potential duplicates
+            Bundle bundle = fhirClient.search().forResource(Patient.class).returnBundle(Bundle.class).execute();
+            if(bundle.hasEntry()) {
+                for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+
+                }
+            }
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
     }
 
     public MethodOutcome markPatientAsInActive(Patient patient) {
@@ -437,6 +459,8 @@ public class ClientRegistryService {
                                 address.hasState() ? address.getState() : null,
                                 address.hasPostalCode() ? address.getPostalCode() : null,
                                 address.hasCountry() ? address.getCountry() : null,
+                                address.hasText() ? address.getText(): null,
+                                address.hasUse() ? address.getUse().getDisplay(): null,
                                 address.hasLine() ? address.getLine().stream().map(PrimitiveType::getValue).collect(Collectors.toList()) : new ArrayList<>()
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
@@ -444,12 +468,11 @@ public class ClientRegistryService {
         List<ContactDTO> telecomDTOs = patient.hasTelecom() ?
                 patient.getTelecom().stream()
                         .map(contactPoint -> new ContactDTO(
-                                contactPoint.hasSystem() ? contactPoint.getSystem().toCode() : null,
+                                contactPoint.hasSystem() ? contactPoint.getSystem().getDisplay() : null,
                                 contactPoint.hasValue() ? contactPoint.getValue() : null,
                                 contactPoint.hasUse() ? contactPoint.getUse().toCode() : null
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
-
         String gender = patient.hasGender() ? patient.getGender().toCode() : null;
         Date birthDate = patient.hasBirthDate() ? patient.getBirthDate() : null;
         String patientId = patient.getIdElement() != null ? patient.getIdElement().getIdPart() : null;
@@ -460,6 +483,7 @@ public class ClientRegistryService {
                 patient.getContact().stream()
                         .map(contact -> new ContactPeopleDTO(
                                 contact.hasName() ? contact.getName().getFamily() : null,
+                                contact.hasName() && !contact.getName().getGiven().isEmpty() ? contact.getName().getGiven().get(0).toString(): null,
                                 contact.hasTelecom() ? contact.getTelecom().stream()
                                         .map(telecom -> telecom.hasValue() ? telecom.getValue() : "")
                                         .collect(Collectors.toList()) // Collect the stream into a list
@@ -468,7 +492,7 @@ public class ClientRegistryService {
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
 
-        String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
+        String maritalStatus = patient.hasMaritalStatus() && patient.getMaritalStatus().hasCoding() ? patient.getMaritalStatus().getCoding().get(0).getDisplay() : null;
         List<Patient.PatientLinkComponent> patientLinkComponents = patient.getLink();
         List<Map<String,Object>> relatedClients = new ArrayList();
         for (Patient.PatientLinkComponent patientLinkComponent: patientLinkComponents) {

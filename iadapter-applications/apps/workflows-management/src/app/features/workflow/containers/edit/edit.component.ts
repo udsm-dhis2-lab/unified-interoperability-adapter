@@ -24,7 +24,6 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { filterPayload } from '../../helpers/workflow.helper';
-import { omit } from 'lodash';
 
 @Component({
   selector: 'app-edit',
@@ -100,10 +99,11 @@ export class EditComponent implements OnInit, AfterViewInit {
             this.workFlowState.dispatch(
               WorkflowActions.updateWorkflow({
                 workflow: {
-                  ...omit(workflow, ['process']),
+                  // ...omit(workflow, ['process']),
+                  id: workflow.id,
                   name: this.workflowForm.get('name')?.value,
                   description: this.workflowForm.get('description')?.value,
-                },
+                } as Workflow,
               })
             );
           }
@@ -125,7 +125,6 @@ export class EditComponent implements OnInit, AfterViewInit {
               .pipe(select(getCurrentSelectedWorkflow), take(1))
               .subscribe((workflow: Workflow | null) => {
                 if (workflow && workflow.id) {
-                  // this.router.navigate(['main/flow', `${workflow.id}`]);
                   this.router.navigate([
                     '/',
                     'workflows-management',

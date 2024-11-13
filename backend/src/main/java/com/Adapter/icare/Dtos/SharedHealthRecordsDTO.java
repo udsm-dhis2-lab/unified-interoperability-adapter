@@ -80,7 +80,8 @@ public class SharedHealthRecordsDTO {
         Map<String,Object> sharedRecordMap = new LinkedHashMap<>();
         sharedRecordMap.put("facilityDetails", this.getFacilityDetails());
         sharedRecordMap.put("reportingDetails", this.getReportDetails());
-        sharedRecordMap.put("demographicDetails", this.getDemographicDetails());
+        sharedRecordMap.put("mrn", this.getMrn());
+        sharedRecordMap.put("demographicDetails", this.getDemographicDetails().toMap());
         sharedRecordMap.put("visitDetails", this.getVisitDetails());
         sharedRecordMap.put("clinicalInformation", this.getClinicalInformation());
         sharedRecordMap.put("allergies", this.getAllergies());

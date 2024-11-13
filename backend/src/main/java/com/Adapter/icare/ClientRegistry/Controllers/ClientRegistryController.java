@@ -10,9 +10,7 @@ import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.ClientRegistrationDTO;
-import com.Adapter.icare.Dtos.ClientsToMergeDTO;
-import com.Adapter.icare.Dtos.DemographicDetailsDTO;
+import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -185,11 +183,24 @@ public class ClientRegistryController {
     }
 
     @PostMapping(value = "/clients", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> saveClient(@RequestBody ClientRegistrationDTO client) throws Exception {
-        // TODO: This is just placeholder. Add support to save patient.
+    public ResponseEntity<Map<String, Object>> saveClient(@Valid @RequestBody ClientRegistrationDTO client) throws Exception {
         Map<String, Object> patientDataResponse = new HashMap<>();
         try {
-            return ResponseEntity.ok(patientDataResponse);
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("code", "dataTemplates");
+            SharedHealthRecordsDTO sharedHealthRecordsDTO = new SharedHealthRecordsDTO();
+            sharedHealthRecordsDTO.setDemographicDetails(client.getDemographicDetails());
+            sharedHealthRecordsDTO.setFacilityDetails(client.getFacilityDetails());
+            DataTemplateDataDTO dataTemplateDataDTO = new DataTemplateDataDTO();
+            dataTemplateDataDTO.setReportDetails(null);
+            dataTemplateDataDTO.setFacilityDetails(client.getFacilityDetails());
+            List<SharedHealthRecordsDTO> listGrid = new ArrayList<>();
+            listGrid.add(sharedHealthRecordsDTO);
+            dataTemplateDataDTO.setListGrid(listGrid);
+            List<IdentifierDTO> clientIds = this.clientRegistryService.getClientRegistryIdentifiers(1);
+            dataTemplateDataDTO.setClientIdentifiersPool(clientIds);
+            payload.put("payload", dataTemplateDataDTO);
+            return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload, "processes/execute?async=true"));
         }   catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
@@ -269,7 +280,7 @@ public class ClientRegistryController {
 
             patientToKeep.setBirthDate(patientToKeep.getBirthDate() != null ? patientToKeep.getBirthDate() : patientToDeActivate.getBirthDate());
 
-            Patient mergedPatient = clientRegistryService.savePatient(patientToKeep);
+            Patient mergedPatient = clientRegistryService.savePatientToFHIR(patientToKeep);
             MethodOutcome clientUpdateOutcome = clientRegistryService.markPatientAsInActive(mergedPatient);
             mergeResponse.put("mergedClient", mergedPatient);
             mergeResponse.put("deActivatedClient", patientToDeActivate);
@@ -296,6 +307,19 @@ public class ClientRegistryController {
             String key = datastoreConstants.ClientsMetadataKey;
             Datastore datastore =datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
             return ResponseEntity.ok(datastore.getValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    @PostMapping(value = "/identifyPotentialDuplicates")
+    public ResponseEntity<Map<String,Object>> identifyPotentialDuplicates(
+            @RequestBody Map<String,Object> parameters
+    ) throws Exception {
+        Map<String,Object> response = new HashMap<>();
+        try {
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception(e.getMessage());

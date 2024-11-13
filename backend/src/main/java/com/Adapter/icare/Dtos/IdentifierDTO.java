@@ -7,6 +7,7 @@ import org.hl7.fhir.r4.model.Identifier;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Getter
@@ -21,12 +22,10 @@ public class IdentifierDTO {
     private FacilityDetailsDTO organization;
 
     public Map<String, Object> toMap () {
-        Map<String, Object> identifier =  new HashMap<>();
-        identifier.put("id", this.getId());
-        identifier.put("use", this.getUse());
-        identifier.put("system", this.getSystem());
+        Map<String, Object> identifier =  new LinkedHashMap<>();
         identifier.put("type", this.getType());
-        identifier.put("organisation", this.getOrganization());
+        identifier.put("id", this.getId());
+        identifier.put("preferred", this.getType() != null ? (this.getType().equals("mrn") ? true: false ): false);
         return identifier;
     }
 }
