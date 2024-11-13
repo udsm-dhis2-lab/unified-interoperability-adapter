@@ -20,6 +20,25 @@ import { NzModalService } from 'ng-zorro-antd/modal';
   styleUrl: './configurations.component.css',
 })
 export class ConfigurationsComponent implements OnDestroy, OnInit {
+  configurationTypes: { key: string; name: string }[] = [
+    { key: 'ageGroup', name: 'Age group' },
+    { key: 'gender', name: 'Gender' },
+    { key: 'ageType', name: 'Age type' },
+  ];
+
+  selectedConfigurationType: string = '';
+
+  onConfigurationTypeSelect(configurationType: string) {
+    this.selectedConfigurationType = configurationType;
+    configurationType === 'ageGroup'
+      ? (this.optionPlaceHolder =
+          'Include startAge, endAge, code and name keys in your options')
+      : 'Include code and name in your options';
+  }
+
+  defaultPlaceHolder: string = 'Include code and name in your options';
+  optionPlaceHolder: string = this.defaultPlaceHolder;
+
   alert = {
     show: false,
     type: '',
@@ -178,6 +197,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
           key: this.settingsForm.get('configurationCode')!.value,
           code: this.settingsForm.get('configurationCode')!.value,
           name: this.settingsForm.get('configurationName')!.value,
+          keyToUseInMappings: this.selectedConfigurationType,
           options: option,
         },
       };
@@ -238,6 +258,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
       null,
       2
     );
+    this.selectedConfigurationType = configuration.keyToUseInMappings;
     this.settingsForm.get('options')!.setValue(formattedOptions);
     this.settingsForm.get('configurationName')!.setValue(configuration.name);
     this.settingsForm.get('configurationCode')!.setValue(configuration.code);
@@ -250,6 +271,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
         this.isSubmitting = false;
         this.isEditing = false;
         this.settingsForm.reset();
+        this.selectedConfigurationType = '';
         this.reLoadConfigurations();
         this.onCloseSideDrawer();
         this.alert = {
