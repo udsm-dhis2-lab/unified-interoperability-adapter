@@ -131,9 +131,12 @@ public class SharedHealthRecordsService {
                         .execute();
 
             } else {
-                // referralNumber should be saved as identifier of the encounter
+                // referralNumber should be saved as identifier of the encounter. Since it is concatenated with HFRcode then the search criteria should consider concatenating the two
+                if (hfrCode == null) {
+                    throw new Exception("HFR code is mandatory when searching using referral number (referralNumber) param");
+                }
                 var encSearch = fhirClient.search().forResource(Encounter.class)
-                        .where(Encounter.IDENTIFIER.exactly().identifier(referralNumber));
+                        .where(Encounter.IDENTIFIER.exactly().identifier( hfrCode + "-" + referralNumber));
                 Bundle encBundle = encSearch.returnBundle(Bundle.class).execute();
                 if (encBundle.hasEntry()) {
                     for (Bundle.BundleEntryComponent entry : response.getEntry()) {
@@ -202,6 +205,7 @@ public class SharedHealthRecordsService {
                                 PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
                                 String mrn = patientDTO.getMRN(organization.getIdElement().getIdPart());
                                 templateData.setMrn(mrn);
+                                String orgCode = organization != null ? organization.getIdElement().getIdPart(): null;
                                 templateData.setDemographicDetails(patientDTO.toMap());
                                 templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
                                 templateData.setFacilityDetails(organization != null ?
@@ -582,6 +586,52 @@ public class SharedHealthRecordsService {
                                 templateData.setInvestigationDetails(investigationDetailsDTOList);
 
                                 ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
+                                // 1. get service request
+                                // 2. Extract referral details data accordingly
+                                List<ServiceRequest> serviceRequests = getServiceRequestsByCategory(encounter.getIdElement().getIdPart(),"referral-request");
+                                if (!serviceRequests.isEmpty()) {
+                                    for (ServiceRequest serviceRequest: serviceRequests) {
+                                        if (serviceRequest.hasIdentifier()
+                                                && serviceRequest.getIdentifier().get(0).hasType()
+                                                && serviceRequest.getIdentifier().get(0).getType().hasCoding()
+                                                && !serviceRequest.getIdentifier().get(0).getType().getCoding().isEmpty()
+                                                && serviceRequest.getIdentifier().get(0).getType().getCoding().get(0).getCode().equals("REFERRAL-NUMBER")) {
+                                            referralDetailsDTO.setReferralDate(serviceRequest.hasAuthoredOn() ? serviceRequest.getAuthoredOn(): null);
+                                            referralDetailsDTO.setReferralNumber(serviceRequest.getIdentifier().get(0).hasValue() ? serviceRequest.getIdentifier().get(0).getValue().replace(orgCode + "-", ""): null);
+                                            List<String> reasons = new ArrayList<>();
+                                            for (Reference reasonReference: serviceRequest.getReasonReference()) {
+                                                IIdType observationReference = reasonReference.getReferenceElement();
+                                                if (observationReference.getResourceType().equals("Observation")) {
+                                                    Observation observation = fhirClient.read().resource(Observation.class).withId(observationReference.getIdPart()).execute();
+                                                    reasons.add(observation.getValueStringType().toString());
+                                                }
+                                            }
+                                            referralDetailsDTO.setReason(reasons);
+
+                                            String facilityToCode = new String();
+                                            List<Reference> performers = serviceRequest.getPerformer();
+                                            for (Reference reference: performers) {
+                                                if (reference.hasReferenceElement() && reference.getType().equals("Organization")) {
+                                                    IIdType performerReference = reference.getReferenceElement();
+                                                    Organization performer = fhirClient.read().resource(Organization.class).withId(performerReference.getIdPart()).execute();
+                                                    referralDetailsDTO.setHfrCode(performer.getIdElement().getIdPart());
+                                                    break;
+                                                }
+                                            }
+
+                                            Map<String,Object> referringClinician = new HashMap<>();
+                                            Reference practitionerReference =  serviceRequest.getRequester();
+
+                                            IIdType practitionerReferenceType =  practitionerReference.getReferenceElement();
+                                            Practitioner practitioner = fhirClient.read().resource(Practitioner.class).withId(practitionerReferenceType.getIdPart()).execute();
+                                            referringClinician.put("MCTCode", practitioner.hasIdentifier() ? practitioner.getIdElement().getIdPart(): null);
+                                            referringClinician.put("name", practitioner.getName().get(0).getText());
+                                            referringClinician.put("phoneNumber", practitioner.hasTelecom() && !practitioner.getTelecom().isEmpty() ? practitioner.getTelecom().get(0).getValue(): null);
+                                            referralDetailsDTO.setReferringClinician(referringClinician);
+                                            break;
+                                        }
+                                    }
+                                }
                                 List<Identifier> identifiers = encounter.getIdentifier();
                                 for (Identifier identifierData: identifiers) {
                                     referralDetailsDTO.setReferralNumber(identifierData.getValue());
@@ -860,5 +910,22 @@ public class SharedHealthRecordsService {
             }
         }
         return conditions;
+    }
+
+    public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception{
+        List<ServiceRequest> serviceRequests = new ArrayList<>();
+        var serviceRequestSearch = fhirClient.search().forResource(ServiceRequest.class)
+                .where(ServiceRequest.ENCOUNTER.hasAnyOfIds(encounterId))
+                .where(ServiceRequest.CATEGORY.exactly().code(category));
+
+        Bundle observationBundle = new Bundle();
+        observationBundle = serviceRequestSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
+                ServiceRequest serviceRequest = (ServiceRequest) entryComponent.getResource();
+                serviceRequests.add(serviceRequest);
+            }
+        }
+        return serviceRequests;
     }
 }
