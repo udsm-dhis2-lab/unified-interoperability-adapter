@@ -11,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { ConfigurationPage, IcdCodePage } from '../../models';
+import { ConfigurationPage, IcdCodePage, LoincCodePage } from '../../models';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -64,8 +64,6 @@ export class DatasetMappingComponent implements OnInit {
   mappingsData: MappingsData = {
     disagregations: [],
   };
-
-  selectedICdCodes: string[] = [];
 
   isLoadingDisaggregation: boolean = false;
   leftColumnSpan: number = 16;
@@ -132,24 +130,47 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
+  selectedICdCodes: { name: string; code: string }[] = [];
   searchIcdCodeChange$ = new BehaviorSubject('');
   placeHolderForIcdCodeSelect: string = 'Select ICD Code';
   isLoadingIcdCodes: boolean = false;
-  selectedIcdCode?: string;
+  selectedIcdCode?: { name: string; code: string };
   icdCodeOptionList: any[] = [];
+
+  selectedLoincCodes: { name: string; code: string }[] = [];
+  searchLoincCodeChange$ = new BehaviorSubject('');
+  placeHolderForLoincCodeSelect: string = 'Select LOINC Code';
+  isLoadingLoincCodes: boolean = false;
+  selectedLoincCode?: { name: string; code: string };
+  loincCodeOptionList: any[] = [];
+
+  onSearchLoincCode(value: string): void {
+    this.isLoadingLoincCodes = true;
+    this.searchLoincCodeChange$.next(value);
+  }
+
+  onLoincCodeSelect(value: { name: string; code: string }) {
+    this.selectedLoincCodes = [...this.selectedLoincCodes, value];
+  }
+
+  onRemoveLoincCode(tag: { name: string; code: string }) {
+    this.selectedLoincCodes = this.selectedLoincCodes.filter(
+      (item) => item.code !== tag.code
+    );
+  }
 
   onSearchIcdCode(value: string): void {
     this.isLoadingIcdCodes = true;
     this.searchIcdCodeChange$.next(value);
   }
 
-  onIcdCodeSelect(value: string) {
+  onIcdCodeSelect(value: { name: string; code: string }) {
     this.selectedICdCodes = [...this.selectedICdCodes, value];
   }
 
-  onRemoveIcdCode(tag: string) {
+  onRemoveIcdCode(tag: { name: string; code: string }) {
     this.selectedICdCodes = this.selectedICdCodes.filter(
-      (item) => item !== tag
+      (item) => item.code !== tag.code
     );
   }
 
@@ -166,6 +187,7 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetUuid = this.route.snapshot.params['uuid'];
     this.searchIcdCode();
     this.searchConfigurations();
+    this.searchLoincCodes();
     this.loadDatasetByIdFromServer(this.dataSetUuid);
   }
 
@@ -201,6 +223,7 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedInputId = inputElement.id.split('-')[0];
     this.selectedDataTemplateBlock = '';
     this.selectedICdCodes = [];
+    this.selectedLoincCodes = [];
     this.getCategoryOptionCombos(this.selectedInputId);
   }
 
@@ -250,10 +273,15 @@ export class DatasetMappingComponent implements OnInit {
             this.selectedDataTemplateBlock = data.mapping.type;
           }
 
-          if (data.mapping.mappings.length > 0) {
-            this.useIcdCodes = true;
-            this.selectedICdCodes = data?.mapping?.mappings.map(
-              (item: any) => item.code
+          if (data.mapping.icdMappings.length > 0) {
+            this.selectedICdCodes = data?.mapping?.icdMappings.map(
+              (item: any) => item
+            );
+          }
+
+          if (data.mapping.loincMappings.length > 0) {
+            this.selectedLoincCodes = data?.mapping?.loincMappings.map(
+              (item: any) => item
             );
           }
 
@@ -352,7 +380,10 @@ export class DatasetMappingComponent implements OnInit {
         this.icdCodeOptionList =
           data?.listOfIcdCodes?.map((item: any) => {
             return {
-              value: item.code,
+              value: {
+                code: item.code,
+                name: item.name,
+              },
               label: `${item.code}-${item.name}`,
             };
           }) ?? [];
@@ -361,6 +392,35 @@ export class DatasetMappingComponent implements OnInit {
         // TODO: Implement error handling
         this.isLoadingIcdCodes = false;
       },
+    });
+  }
+
+  searchLoincCodes() {
+    const loincList$: Observable<LoincCodePage> = this.searchLoincCodeChange$
+      .asObservable()
+      .pipe(debounceTime(500))
+      .pipe(
+        switchMap((value: string) => {
+          return this.dataSetManagementService.getLoincCodes(1, 10, [
+            { key: 'q', value: [value] },
+          ]);
+        })
+      );
+    loincList$.subscribe({
+      next: (data: any) => {
+        this.isLoadingLoincCodes = false;
+        this.loincCodeOptionList =
+          data?.listOfLoincCodes?.map((item: any) => {
+            return {
+              value: {
+                code: item.code,
+                name: item.name,
+              },
+              label: `${item.code}-${item.name}`,
+            };
+          }) ?? [];
+      },
+      error: (error: any) => {},
     });
   }
 
@@ -424,11 +484,17 @@ export class DatasetMappingComponent implements OnInit {
       mapping: {
         icdMappings: this.selectedICdCodes.map((item) => {
           return {
-            code: item,
+            code: item.code,
+            name: item.name,
           };
         }),
 
-        loincMappings: [],
+        loincMappings: this.selectedLoincCodes.map((item) => {
+          return {
+            code: item.code,
+            name: item.name,
+          };
+        }),
 
         dataElement: {
           id: this.selectedInputId,
@@ -459,6 +525,7 @@ export class DatasetMappingComponent implements OnInit {
       group: '',
     };
     this.selectedICdCodes = [];
+    this.selectedLoincCodes = [];
     this.selectedDataTemplateBlock = '';
     return payLoad;
   }

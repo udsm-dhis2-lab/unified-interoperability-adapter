@@ -27,7 +27,7 @@
             <div nz-col nzSpan="12">
               <div nz-row nzJustify="space-between" [nzGutter]="16">
                 <div nz-col nzSpan="12">
-                  <nz-select
+                  <!-- <nz-select
                     style="width: 100%"
                     [ngModel]="selectedDataTemplateBlock"
                     (ngModelChange)="onDataTemplateBlockSelect($event)"
@@ -47,15 +47,15 @@
                       "
                       nzHide
                     ></nz-option>
-                  </nz-select>
+                  </nz-select> -->
                 </div>
-                <div nz-col nzSpan="12">
+                <!-- <div nz-col nzSpan="12">
                   <div nz-row nzJustify="end">
                     <label nz-checkbox [(ngModel)]="useIcdCodes"
                       >Use Icd codes</label
                     >
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>
@@ -73,7 +73,7 @@
                   (onSelectChange)="onConfigurationSelect($event)"
                 ></custom-select>
               </div>
-              <div *ngIf="useIcdCodes" nz-col nzSpan="12">
+              <div nz-col nzSpan="12">
                 <custom-select
                   [placeHolder]="placeHolderForIcdCodeSelect"
                   [isMultiple]="false"
@@ -87,7 +87,7 @@
 
             <!-- list of selected icd codes  -->
             <div
-              *ngIf="useIcdCodes"
+              *ngIf="selectedICdCodes.length > 0"
               nz-row
               style="margin-top: 16px; margin-bottom: 16px"
             >
@@ -96,7 +96,59 @@
                 <nz-tag
                   nzMode="closeable"
                   (nzOnClose)="onRemoveIcdCode(icdCode)"
-                  >{{ icdCode ?? '' }}</nz-tag
+                  >{{ icdCode.name }}</nz-tag
+                >
+                }
+              </nz-card>
+            </div>
+            <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
+              <div nz-col nzSpan="12">
+                <custom-select
+                  [placeHolder]="placeHolderForLoincCodeSelect"
+                  [isMultiple]="false"
+                  [isLoading]="isLoadingLoincCodes"
+                  [optionList]="loincCodeOptionList"
+                  (onSearchChange)="onSearchLoincCode($event)"
+                  (onSelectChange)="onLoincCodeSelect($event)"
+                ></custom-select>
+              </div>
+              <div nz-col nzSpan="12">
+                <nz-select
+                  style="width: 100%"
+                  [ngModel]="selectedDataTemplateBlock"
+                  (ngModelChange)="onDataTemplateBlockSelect($event)"
+                >
+                  <ng-container *ngFor="let option of dataTemplatesBlocks">
+                    <nz-option
+                      [nzValue]="option.key"
+                      [nzLabel]="option.name"
+                    ></nz-option>
+                  </ng-container>
+                  <nz-option
+                    [nzValue]="selectedDataTemplateBlock"
+                    [nzLabel]="
+                      selectedDataTemplateBlock !== ''
+                        ? selectedDataTemplateBlock
+                        : 'Template blocks'
+                    "
+                    nzHide
+                  ></nz-option>
+                </nz-select>
+              </div>
+            </div>
+
+            <!-- list of selected loinc codes  -->
+            <div
+              *ngIf="selectedLoincCodes.length > 0"
+              nz-row
+              style="margin-top: 16px; margin-bottom: 16px"
+            >
+              <nz-card style="width: 100%">
+                @for (loincCode of selectedLoincCodes; track $index) {
+                <nz-tag
+                  nzMode="closeable"
+                  (nzOnClose)="onRemoveLoincCode(loincCode)"
+                  >{{ loincCode.name }}</nz-tag
                 >
                 }
               </nz-card>
