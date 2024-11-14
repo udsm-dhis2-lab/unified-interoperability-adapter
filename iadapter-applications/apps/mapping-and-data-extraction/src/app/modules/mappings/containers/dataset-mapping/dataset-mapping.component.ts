@@ -19,15 +19,17 @@ export interface MappingsData {
 
 interface Setting {
   name: string;
-  selectedValue?: string;
-  keyToUseInPayload?: string;
+  keyToUseInMappings: string;
+  selectedValue?: any;
+  payLoad?: any;
   options: any;
 }
 
 interface SelectedSettingOption {
-  value: string;
+  value: any;
   categoryOptionComboId: string;
   settingName: string;
+  keyToUseInMappings: string;
 }
 
 class Disaggregation {
@@ -117,6 +119,7 @@ export class DatasetMappingComponent implements OnInit {
 
   assignConfigurationToSelectedDisaggregation(configuration: {
     name: string;
+    keyToUseInMappings: string;
     options: any[];
   }): void {
     this.mappingsData.disagregations.forEach((item) => {
@@ -124,6 +127,7 @@ export class DatasetMappingComponent implements OnInit {
         ...(item.configurations ?? []),
         {
           name: configuration.name,
+          keyToUseInMappings: configuration.keyToUseInMappings,
           options: configuration.options,
         },
       ];
@@ -269,6 +273,7 @@ export class DatasetMappingComponent implements OnInit {
       .subscribe({
         next: (data: any) => {
           this.mappingUuid = data.uuid;
+          console.log('data', data);
           if (data.mapping.type !== '') {
             this.selectedDataTemplateBlock = data.mapping.type;
           }
@@ -286,63 +291,94 @@ export class DatasetMappingComponent implements OnInit {
           }
 
           if (data.mapping.params.length > 0) {
+            console.log(
+              'params',
+              data.mapping.params.length,
+              data.mapping.params
+            );
+            // Consider taking one param, every param have the same number and type of configuration
+            // Find respective configurations against the prefetched list of configurations
+
             const param = data.mapping.params[0];
-            if (param.gender) {
+            console.log('param', param);
+            let configurations: any[] = [];
+
+            if (param.hasOwnProperty('startAge')) {
               const configuration = this.configurationOptionList.find(
-                (item: any) => item.label === 'Gender'
+                (item: any) => item.value.keyToUseInMappings === 'ageGroup'
               );
               this.assignConfigurationToSelectedDisaggregation(
                 configuration.value
               );
-            }
-            if (param.ageType) {
-              const configuration = this.configurationOptionList.find(
-                (item: any) => item.label === 'Agetype'
-              );
-              this.assignConfigurationToSelectedDisaggregation(
-                configuration.value
-              );
-            }
-            if (param.startAge) {
-              const configuration = this.configurationOptionList.find(
-                (item: any) => item.label === 'Agegroup'
-              );
-              this.assignConfigurationToSelectedDisaggregation(
-                configuration.value
-              );
+              configurations = [configuration];
+              //Remove the startAge and endAge from the param
+              delete param.startAge;
+              delete param.endAge;
+              delete param.co;
             }
 
+            Object.keys(param).forEach((key) => {
+              const configuration = this.configurationOptionList.find(
+                (item: any) => item.value.keyToUseInMappings === key
+              );
+              if (configuration) {
+                this.assignConfigurationToSelectedDisaggregation(
+                  configuration.value
+                );
+              }
+              configurations = [...configurations, configuration];
+            });
+
+            console.log('configurations', configurations);
+
+            let loopCount = 0;
             for (const param of data.mapping.params) {
-              if (param.gender) {
-                const configuration = this.configurationOptionList.find(
-                  (item: any) => item.label === 'Gender'
+              delete param.co;
+              if (param.hasOwnProperty('startAge')) {
+                const configuration = configurations.find(
+                  (item: any) => item.value.keyToUseInMappings === 'ageGroup'
+                );
+
+                const selectedOption = configuration.value.options.find(
+                  (item: any) =>
+                    item.startAge === param.startAge &&
+                    item.endAge === param.endAge
                 );
                 this.onSelectMappingSetting({
-                  value: param.gender,
+                  value: selectedOption,
                   categoryOptionComboId: param.co,
                   settingName: configuration.label,
+                  keyToUseInMappings: configuration.keyToUseInMappings,
                 });
+
+                delete param.startAge;
+                delete param.endAge;
               }
-              if (param.ageType) {
-                const configuration = this.configurationOptionList.find(
-                  (item: any) => item.label === 'Agetype'
+
+              console.log(
+                'paramCount',
+                '  ',
+                loopCount,
+                '  :',
+                data.mapping.params
+              );
+              loopCount++;
+              Object.keys(param).forEach((key) => {
+                const configuration = configurations.find(
+                  (item: any) => item.value.keyToUseInMappings === key
                 );
-                this.onSelectMappingSetting({
-                  value: param.ageType,
-                  categoryOptionComboId: param.co,
-                  settingName: configuration.label,
-                });
-              }
-              if (param.startAge) {
-                const configuration = this.configurationOptionList.find(
-                  (item: any) => item.label === 'Agegroup'
-                );
-                this.onSelectMappingSetting({
-                  value: param.startAge + '-' + param.endAge,
-                  categoryOptionComboId: param.co,
-                  settingName: configuration.label,
-                });
-              }
+                if (configuration) {
+                  const selectedOption = configuration.value.options.find(
+                    (item: any) => item.code === param.keyToUseInMappings
+                  );
+                  this.onSelectMappingSetting({
+                    value: selectedOption,
+                    categoryOptionComboId: param.co,
+                    settingName: configuration.label,
+                    keyToUseInMappings: configuration.keyToUseInMappings,
+                  });
+                }
+              });
             }
           }
         },
@@ -444,6 +480,7 @@ export class DatasetMappingComponent implements OnInit {
           data?.listOfConfigurations?.map((configuration: any) => {
             return {
               value: {
+                keyToUseInMappings: configuration.keyToUseInMappings,
                 name: configuration.name,
                 options: configuration.options,
               },
@@ -464,14 +501,15 @@ export class DatasetMappingComponent implements OnInit {
         item.configurations?.forEach((config) => {
           if (config.name === event.settingName) {
             config.selectedValue = event.value;
-            if (config.name === 'Gender') {
-              config.keyToUseInPayload = 'gender';
-            }
-            if (config.name === 'Agetype') {
-              config.keyToUseInPayload = 'ageType';
-            }
-            if (config.name === 'TEST') {
-              config.keyToUseInPayload = 'test';
+            if (event.keyToUseInMappings === 'ageGroup') {
+              config.payLoad = {
+                startAge: event.value.startAge,
+                endAge: event.value.endAge,
+              };
+            } else {
+              config.payLoad = {
+                [event.keyToUseInMappings]: event.value.code,
+              };
             }
           }
         });
@@ -506,14 +544,12 @@ export class DatasetMappingComponent implements OnInit {
           return {
             co: item.categoryOptionComboId,
             ...(item.configurations ?? []).reduce((acc, config: Setting) => {
-              if (config.name === 'Agegroup') {
-                const startingAge = config.selectedValue?.split('-')[0];
-                const endingAge = config.selectedValue?.split('-')[1];
-                acc['startAge'] = startingAge;
-                acc['endAge'] = endingAge;
-              } else {
-                acc[config.keyToUseInPayload as string] = config.selectedValue;
+              if (config.payLoad) {
+                Object.keys(config.payLoad).forEach((key) => {
+                  acc[key] = config.payLoad[key];
+                });
               }
+
               return acc;
             }, {} as { [key: string]: any }),
           };

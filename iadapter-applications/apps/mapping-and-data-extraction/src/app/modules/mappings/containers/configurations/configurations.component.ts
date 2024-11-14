@@ -153,6 +153,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
   }
 
   onCloseSideDrawer(): void {
+    this.clearForm();
     this.isDrwawerVisible = false;
   }
 
@@ -211,7 +212,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
       this.dataSetManagementService.addConfiguration(payLoad).subscribe({
         next: (repsonse: any) => {
           this.isSubmitting = false;
-          this.settingsForm.reset();
+          this.clearForm();
           this.reLoadConfigurations();
           this.onCloseSideDrawer();
           this.alert = {
@@ -270,8 +271,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
       next: (repsonse: any) => {
         this.isSubmitting = false;
         this.isEditing = false;
-        this.settingsForm.reset();
-        this.selectedConfigurationType = '';
+        this.clearForm();
         this.reLoadConfigurations();
         this.onCloseSideDrawer();
         this.alert = {
@@ -319,6 +319,11 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
         };
       },
     });
+  }
+
+  clearForm() {
+    this.settingsForm.reset();
+    this.selectedConfigurationType = '';
   }
 
   onCloseAlert() {
