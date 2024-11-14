@@ -2,10 +2,11 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { SettingsRoutingModule } from './settings-routing.module';
-import { containers } from './containers';
+import { SettingsHomeComponent } from './containers/settings-home/settings-home.component';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
-  declarations: [...containers],
-  imports: [CommonModule, SettingsRoutingModule],
+  declarations: [SettingsHomeComponent],
+  imports: [CommonModule, RouterModule, SettingsRoutingModule],
 })
 export class SettingsModule {}

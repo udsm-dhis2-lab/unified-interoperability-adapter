@@ -81,9 +81,9 @@ public class PatientDTO {
                 for(Identifier identifier: this.getIdentifiers()) {
                     IdentifierDTO identifierDTO =  new IdentifierDTO();
                     identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): this.getId());
-                    identifierDTO.setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode().toString(): null);
-                    identifierDTO.setUse(identifier.getUse().getDisplay());
-                    identifierDTO.setSystem(identifier.getSystem());
+                    identifierDTO.setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode(): null);
+                    identifierDTO.setUse( identifier.hasUse() ? identifier.getUse().getDisplay(): null);
+                    identifierDTO.setSystem(identifier.hasSystem() ? identifier.getSystem(): null);
                     idsList.add(identifierDTO);
                 }
             }
@@ -96,13 +96,13 @@ public class PatientDTO {
             mappedPatient.setDateOfBirth(this.getBirthDate());
             List<String> phones = new ArrayList<>();
             for (ContactDTO contactDTO: getTelecom()) {
-                if (contactDTO.getSystem().toLowerCase().equals("phone")) {
+                if (contactDTO.getSystem().equalsIgnoreCase("phone")) {
                     phones.add(contactDTO.getValue());
                 }
             }
             List<String> emails = new ArrayList<>();
             for (ContactDTO contactDTO: getTelecom()) {
-                if (contactDTO.getSystem().toLowerCase().equals("email")) {
+                if (contactDTO.getSystem().equalsIgnoreCase("email")) {
                     emails.add(contactDTO.getValue());
                 }
             }
@@ -144,7 +144,7 @@ public class PatientDTO {
         List<String> identifiers = this.getIdentifiers().stream()
                 .filter(identifier -> identifier.hasAssigner() && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType() && identifier.getType().hasCoding() &&
                         identifier.getType().getCoding().get(0).getCode().equals("MRN"))
-                .map(identifier -> identifier.getValue())
+                .map(Identifier::getValue)
                 .collect(Collectors.toList());
         return !identifiers.isEmpty() ? identifiers.get(0): null;
     }

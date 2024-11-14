@@ -3,6 +3,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -10,4 +11,5 @@ export const antDesignModules = [
   NzIconModule,
   NzPageHeaderModule,
   NzSpaceModule,
+  NzSpinModule,
 ];

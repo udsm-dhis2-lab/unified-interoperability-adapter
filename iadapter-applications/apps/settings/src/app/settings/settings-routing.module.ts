@@ -1,11 +1,25 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SettingsHomeComponent } from './containers/settings-home/settings-home.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: SettingsHomeComponent,
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
+  {
+    path: 'home',
+    loadChildren: () =>
+      import('../modules/general-settings/general-settings.module').then(
+        (m) => m.GeneralSettingsModule
+      ),
+  },
+  {
+    path: 'instances',
+    loadChildren: () =>
+      import('../modules/instances/instances.module').then(
+        (m) => m.InstancesModule
+      ),
   },
 ];
 
