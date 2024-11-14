@@ -291,92 +291,77 @@ export class DatasetMappingComponent implements OnInit {
           }
 
           if (data.mapping.params.length > 0) {
-            console.log(
-              'params',
-              data.mapping.params.length,
-              data.mapping.params
-            );
             // Consider taking one param, every param have the same number and type of configuration
             // Find respective configurations against the prefetched list of configurations
 
             const param = data.mapping.params[0];
-            console.log('param', param);
+
             let configurations: any[] = [];
 
-            if (param.hasOwnProperty('startAge')) {
-              const configuration = this.configurationOptionList.find(
-                (item: any) => item.value.keyToUseInMappings === 'ageGroup'
-              );
-              this.assignConfigurationToSelectedDisaggregation(
-                configuration.value
-              );
-              configurations = [configuration];
-              //Remove the startAge and endAge from the param
-              delete param.startAge;
-              delete param.endAge;
-              delete param.co;
-            }
-
             Object.keys(param).forEach((key) => {
-              const configuration = this.configurationOptionList.find(
-                (item: any) => item.value.keyToUseInMappings === key
-              );
-              if (configuration) {
+              if (key === 'startAge') {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) => item.value.keyToUseInMappings === 'ageGroup'
+                );
                 this.assignConfigurationToSelectedDisaggregation(
                   configuration.value
                 );
-              }
-              configurations = [...configurations, configuration];
-            });
-
-            console.log('configurations', configurations);
-
-            let loopCount = 0;
-            for (const param of data.mapping.params) {
-              delete param.co;
-              if (param.hasOwnProperty('startAge')) {
-                const configuration = configurations.find(
-                  (item: any) => item.value.keyToUseInMappings === 'ageGroup'
-                );
-
-                const selectedOption = configuration.value.options.find(
-                  (item: any) =>
-                    item.startAge === param.startAge &&
-                    item.endAge === param.endAge
-                );
-                this.onSelectMappingSetting({
-                  value: selectedOption,
-                  categoryOptionComboId: param.co,
-                  settingName: configuration.label,
-                  keyToUseInMappings: configuration.keyToUseInMappings,
-                });
-
-                delete param.startAge;
-                delete param.endAge;
-              }
-
-              console.log(
-                'paramCount',
-                '  ',
-                loopCount,
-                '  :',
-                data.mapping.params
-              );
-              loopCount++;
-              Object.keys(param).forEach((key) => {
-                const configuration = configurations.find(
+                configurations = [configuration];
+              } else if (key === 'endAge' || key === 'co') {
+                return;
+              } else {
+                const configuration = this.configurationOptionList.find(
                   (item: any) => item.value.keyToUseInMappings === key
                 );
                 if (configuration) {
+                  this.assignConfigurationToSelectedDisaggregation(
+                    configuration.value
+                  );
+                }
+                configurations = [...configurations, configuration];
+              }
+            });
+
+            for (const param of data.mapping.params) {
+              Object.keys(param).forEach((key) => {
+                if (key === 'endAge' || key === 'co') {
+                  return;
+                } else if (key === 'startAge') {
+                  const configuration = configurations.find(
+                    (item: any) => item.value.keyToUseInMappings === 'ageGroup'
+                  );
                   const selectedOption = configuration.value.options.find(
-                    (item: any) => item.code === param.keyToUseInMappings
+                    (item: any) =>
+                      item.startAge === param.startAge &&
+                      item.endAge === param.endAge
                   );
                   this.onSelectMappingSetting({
                     value: selectedOption,
                     categoryOptionComboId: param.co,
                     settingName: configuration.label,
-                    keyToUseInMappings: configuration.keyToUseInMappings,
+                    keyToUseInMappings: configuration.value.keyToUseInMappings,
                   });
+                } else {
+                  const configuration = configurations.find(
+                    (item: any) => item.value.keyToUseInMappings === key
+                  );
+                  if (configuration) {
+                    console.log('config', configuration);
+                    console.log('valueToSearch', param);
+                    const selectedOption = configuration.value.options.find(
+                      (item: any) =>
+                        item.code ===
+                        param[configuration.value.keyToUseInMappings]
+                    );
+                    console.log('option', selectedOption);
+                    this.onSelectMappingSetting({
+                      value: selectedOption,
+                      categoryOptionComboId: param.co,
+                      settingName: configuration.label,
+                      keyToUseInMappings:
+                        configuration.value.keyToUseInMappings,
+                    });
+                  }
                 }
               });
             }
