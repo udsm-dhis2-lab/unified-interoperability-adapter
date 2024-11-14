@@ -14,13 +14,6 @@ const routes: Routes = [
         (m) => m.GeneralSettingsModule
       ),
   },
-  {
-    path: 'instances',
-    loadChildren: () =>
-      import('../modules/instances/instances.module').then(
-        (m) => m.InstancesModule
-      ),
-  },
 ];
 
 @NgModule({
