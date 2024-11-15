@@ -273,7 +273,6 @@ export class DatasetMappingComponent implements OnInit {
       .subscribe({
         next: (data: any) => {
           this.mappingUuid = data.uuid;
-          console.log('data', data);
           if (data.mapping.type !== '') {
             this.selectedDataTemplateBlock = data.mapping.type;
           }
@@ -346,14 +345,11 @@ export class DatasetMappingComponent implements OnInit {
                     (item: any) => item.value.keyToUseInMappings === key
                   );
                   if (configuration) {
-                    console.log('config', configuration);
-                    console.log('valueToSearch', param);
                     const selectedOption = configuration.value.options.find(
                       (item: any) =>
                         item.code ===
                         param[configuration.value.keyToUseInMappings]
                     );
-                    console.log('option', selectedOption);
                     this.onSelectMappingSetting({
                       value: selectedOption,
                       categoryOptionComboId: param.co,
