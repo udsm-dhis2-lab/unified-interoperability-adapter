@@ -272,6 +272,7 @@ export class DatasetMappingComponent implements OnInit {
       .getExistingMappings(selectedInputId, datasetUuid)
       .subscribe({
         next: (data: any) => {
+          if (data.uuid === null) return;
           this.mappingUuid = data.uuid;
           if (data.mapping.type !== '') {
             this.selectedDataTemplateBlock = data.mapping.type;
