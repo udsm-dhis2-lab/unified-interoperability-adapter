@@ -182,7 +182,8 @@
                             onSelectMappingSetting({
                               value: $event,
                               categoryOptionComboId: data.categoryOptionComboId,
-                              settingName: config.name
+                              settingName: config.name,
+                              keyToUseInMappings: config.keyToUseInMappings
                             })
                           "
                           style="margin-right: 16px"
@@ -191,13 +192,17 @@
                             *ngFor="let option of config.options ?? []"
                           >
                             <nz-option
-                              [nzValue]="option.code"
+                              [nzValue]="option"
                               [nzLabel]="option.name"
                             ></nz-option>
                           </ng-container>
                           <nz-option
                             [nzValue]="config.selectedValue ?? 'default'"
-                            [nzLabel]="config.name"
+                            [nzLabel]="
+                              config.selectedValue
+                                ? config.selectedValue.name
+                                : config.name
+                            "
                             nzHide
                           ></nz-option>
                         </nz-select>

@@ -117,6 +117,31 @@
 >
   <div *nzDrawerContent>
     <!-- configuration form  -->
+    <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
+      <div nz-col nzSpan="12">
+        <nz-select
+          style="width: 100%"
+          [ngModel]="selectedConfigurationType"
+          (ngModelChange)="onConfigurationTypeSelect($event)"
+        >
+          <ng-container *ngFor="let option of configurationTypes">
+            <nz-option
+              [nzValue]="option.key"
+              [nzLabel]="option.name"
+            ></nz-option>
+          </ng-container>
+          <nz-option
+            [nzValue]="selectedConfigurationType"
+            [nzLabel]="
+              selectedConfigurationType !== ''
+                ? selectedConfigurationType
+                : 'Configuration Type'
+            "
+            nzHide
+          ></nz-option>
+        </nz-select>
+      </div>
+    </div>
     <form [formGroup]="settingsForm" (ngSubmit)="onSubmit()">
       <div nz-row [nzGutter]="16">
         <div nz-col nzSpan="12">
@@ -152,7 +177,7 @@
               <textarea
                 nz-input
                 formControlName="options"
-                placeholder="Options will be populated here"
+                [placeholder]="optionPlaceHolder"
                 [nzAutosize]="{ minRows: 4, maxRows: 12 }"
               ></textarea>
             </nz-form-control>
@@ -161,7 +186,11 @@
       </div>
       <div nz-row nzJustify="end" style="margin-top: 16px">
         <nz-spin [nzSpinning]="isSubmitting">
-          <button nz-button nzType="primary" [disabled]="!settingsForm.valid">
+          <button
+            nz-button
+            nzType="primary"
+            [disabled]="!settingsForm.valid || selectedConfigurationType === ''"
+          >
             Submit
           </button>
         </nz-spin>
