@@ -228,6 +228,7 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedDataTemplateBlock = '';
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
+    this.mappingUuid = undefined;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
 
