@@ -15,6 +15,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -34,4 +35,5 @@ export const antDesignModules = [
   NzCollapseModule,
   NzAlertModule,
   NzModalModule,
+  NzDividerModule,
 ];

@@ -241,7 +241,7 @@ public class SharedHealthRecordsService {
                                         Map<String,Object> vitalSign = new LinkedHashMap<>();
                                         for (Observation observation: observationsData) {
                                             // TODO: Improve the code to use dynamically fetched LOINC codes for vital signs
-                                            if (observation.getCode().getCoding().get(0).getCode().equals("8480-6") || observation.getCode().getCoding().get(0).getCode().equals("8462-4")) {
+                                            if (observation.hasCode() && observation.getCode().getCoding().get(0).getCode().equals("85354-9")) {
                                                 vitalSign.put("bloodPressure", observation.hasValueStringType() ? observation.getValueStringType().getValue(): null);
                                             }
                                             if (observation.getCode().getCoding().get(0).getCode().equals("29463-7")) {
@@ -252,6 +252,12 @@ public class SharedHealthRecordsService {
                                             }
                                             if (observation.getCode().getCoding().get(0).getCode().equals("8302-2")) {
                                                 vitalSign.put("height", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                            }
+                                            if (observation.getCode().getCoding().get(0).getCode().equals("9279-1")) {
+                                                vitalSign.put("respiration", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
+                                            }
+                                            if (observation.getCode().getCoding().get(0).getCode().equals("8867-4")) {
+                                                vitalSign.put("pulseRate", observation.hasValueQuantity() ? observation.getValueQuantity().getValue(): null);
                                             }
                                             vitalSign.put("dateTime", observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString(): null);
                                         }

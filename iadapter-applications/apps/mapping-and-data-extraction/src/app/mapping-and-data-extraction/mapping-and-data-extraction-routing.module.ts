@@ -14,6 +14,13 @@ const routes: Routes = [
             (m) => m.MappingsModule
           ),
       },
+      {
+        path: 'instances',
+        loadChildren: () =>
+          import(
+            './../modules/instance-management/instance-management.module'
+          ).then((m) => m.InstanceManagementModule),
+      },
     ],
   },
 ];

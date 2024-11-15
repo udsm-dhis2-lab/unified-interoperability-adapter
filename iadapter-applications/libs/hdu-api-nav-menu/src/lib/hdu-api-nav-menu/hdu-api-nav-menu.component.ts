@@ -93,6 +93,13 @@ export class HduApiNavMenuComponent implements OnInit {
           icon: 'unordered-list',
           subMenus: [],
         },
+        {
+          name: 'Instances',
+          id: 'instances',
+          routeUrl: '/mapping-and-data-extraction/instances',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
       ],
     },
     {
@@ -101,6 +108,23 @@ export class HduApiNavMenuComponent implements OnInit {
       routeUrl: '/settings',
       icon: 'setting',
       category: 'main',
+
+      subMenus: [
+        {
+          name: 'General',
+          id: 'general',
+          routeUrl: '/settings',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+        {
+          name: 'instances',
+          id: 'settings',
+          routeUrl: '/settings/instances',
+          icon: 'unordered-list',
+          subMenus: [],
+        },
+      ],
     },
   ];
 
