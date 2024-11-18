@@ -263,6 +263,11 @@ export class DatasetMappingComponent implements OnInit {
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
+          this.alert = {
+            show: true,
+            type: 'error',
+            message: error.message,
+          };
           // TODO: Handle error
         },
       });
