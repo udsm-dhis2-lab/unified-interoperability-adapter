@@ -534,20 +534,31 @@ export class DatasetMappingComponent implements OnInit {
           code: '',
         },
         type: this.selectedDataTemplateBlock,
-        params: this.mappingsData.disagregations.map((item) => {
-          return {
-            co: item.categoryOptionComboId,
-            ...(item.configurations ?? []).reduce((acc, config: Setting) => {
-              if (config.payLoad) {
-                Object.keys(config.payLoad).forEach((key) => {
-                  acc[key] = config.payLoad[key];
-                });
-              }
+        params: this.mappingsData.disagregations
+          .map((item) => {
+            const reducedConfig = (item.configurations ?? []).reduce(
+              (acc, config: Setting) => {
+                if (config.payLoad) {
+                  Object.keys(config.payLoad).forEach((key) => {
+                    acc[key] = config.payLoad[key];
+                  });
+                }
+                return acc;
+              },
+              {} as { [key: string]: any }
+            );
 
-              return acc;
-            }, {} as { [key: string]: any }),
-          };
-        }),
+            // Check if the accumulator object is empty
+            if (Object.keys(reducedConfig).length === 0) {
+              return null;
+            }
+
+            return {
+              co: item.categoryOptionComboId,
+              ...reducedConfig,
+            };
+          })
+          .filter((item) => item !== null),
       },
       dataKey: this.selectedInputId,
       namespace: `MAPPINGS-${this.dataSetUuid}`,
@@ -557,7 +568,8 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
     this.selectedDataTemplateBlock = '';
-    return payLoad;
+    console.log('payload', payLoad);
+    // return payLoad;
   }
 
   onSubmitMappings() {
