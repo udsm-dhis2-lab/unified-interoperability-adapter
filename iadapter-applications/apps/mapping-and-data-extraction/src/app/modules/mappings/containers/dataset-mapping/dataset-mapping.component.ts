@@ -11,7 +11,12 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { ConfigurationPage, IcdCodePage, LoincCodePage } from '../../models';
+import {
+  ConfigurationPage,
+  IcdCodePage,
+  LoincCodePage,
+  dataTemplatesBlocks,
+} from '../../models';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -51,6 +56,8 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  dataTemplatesBlocks = dataTemplatesBlocks;
+
   isSubmittingMapping: boolean = false;
   isDeletingMapping: boolean = false;
   mappingUuid?: string;
@@ -82,24 +89,6 @@ export class DatasetMappingComponent implements OnInit {
   isLoadingConfigurations: boolean = false;
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
-
-  dataTemplatesBlocks: {
-    key: string;
-    name: string;
-  }[] = [
-    {
-      key: 'visitDetails',
-      name: 'Visit Details',
-    },
-    {
-      key: 'clinicalInformationDetails',
-      name: 'Clinical Information Details',
-    },
-    {
-      key: 'vaccinationDetails',
-      name: 'Vaccination Details',
-    },
-  ];
 
   selectedDataTemplateBlock: string = '';
   onDataTemplateBlockSelect(value: string) {
