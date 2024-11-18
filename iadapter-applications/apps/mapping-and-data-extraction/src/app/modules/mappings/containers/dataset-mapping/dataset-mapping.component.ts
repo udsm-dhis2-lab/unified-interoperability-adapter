@@ -568,8 +568,7 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
     this.selectedDataTemplateBlock = '';
-    console.log('payload', payLoad);
-    // return payLoad;
+    return payLoad;
   }
 
   onSubmitMappings() {
