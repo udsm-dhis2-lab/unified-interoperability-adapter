@@ -61,8 +61,6 @@ export class DatasetMappingComponent implements OnInit {
     message: '',
   };
 
-  useIcdCodes = false;
-
   mappingsData: MappingsData = {
     disagregations: [],
   };
@@ -131,6 +129,14 @@ export class DatasetMappingComponent implements OnInit {
           options: configuration.options,
         },
       ];
+    });
+  }
+
+  onRemoveConfiguration(configurationName: any) {
+    this.mappingsData.disagregations.forEach((item) => {
+      item.configurations = item.configurations?.filter(
+        (configuration) => configuration.name !== configurationName
+      );
     });
   }
 
