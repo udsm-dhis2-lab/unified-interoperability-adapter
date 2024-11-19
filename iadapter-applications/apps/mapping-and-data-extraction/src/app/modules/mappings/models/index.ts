@@ -12,3 +12,4 @@ export * from './category-option-combo.model';
 export * from './icd-code.model';
 export * from './loinc-code.model';
 export * from './responses/loinc-code-page';
+export * from './data-template-blocks';

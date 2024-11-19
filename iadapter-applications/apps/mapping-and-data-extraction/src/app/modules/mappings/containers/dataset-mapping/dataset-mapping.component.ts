@@ -11,7 +11,12 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { ConfigurationPage, IcdCodePage, LoincCodePage } from '../../models';
+import {
+  ConfigurationPage,
+  IcdCodePage,
+  LoincCodePage,
+  dataTemplatesBlocks,
+} from '../../models';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -51,6 +56,8 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  dataTemplatesBlocks = dataTemplatesBlocks;
+
   isSubmittingMapping: boolean = false;
   isDeletingMapping: boolean = false;
   mappingUuid?: string;
@@ -60,8 +67,6 @@ export class DatasetMappingComponent implements OnInit {
     type: '',
     message: '',
   };
-
-  useIcdCodes = false;
 
   mappingsData: MappingsData = {
     disagregations: [],
@@ -84,24 +89,6 @@ export class DatasetMappingComponent implements OnInit {
   isLoadingConfigurations: boolean = false;
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
-
-  dataTemplatesBlocks: {
-    key: string;
-    name: string;
-  }[] = [
-    {
-      key: 'visitDetails',
-      name: 'Visit Details',
-    },
-    {
-      key: 'clinicalInformationDetails',
-      name: 'Clinical Information Details',
-    },
-    {
-      key: 'vaccinationDetails',
-      name: 'Vaccination Details',
-    },
-  ];
 
   selectedDataTemplateBlock: string = '';
   onDataTemplateBlockSelect(value: string) {
@@ -131,6 +118,14 @@ export class DatasetMappingComponent implements OnInit {
           options: configuration.options,
         },
       ];
+    });
+  }
+
+  onRemoveConfiguration(configurationName: any) {
+    this.mappingsData.disagregations.forEach((item) => {
+      item.configurations = item.configurations?.filter(
+        (configuration) => configuration.name !== configurationName
+      );
     });
   }
 
@@ -263,6 +258,11 @@ export class DatasetMappingComponent implements OnInit {
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
+          this.alert = {
+            show: true,
+            type: 'error',
+            message: error.message,
+          };
           // TODO: Handle error
         },
       });
@@ -523,20 +523,31 @@ export class DatasetMappingComponent implements OnInit {
           code: '',
         },
         type: this.selectedDataTemplateBlock,
-        params: this.mappingsData.disagregations.map((item) => {
-          return {
-            co: item.categoryOptionComboId,
-            ...(item.configurations ?? []).reduce((acc, config: Setting) => {
-              if (config.payLoad) {
-                Object.keys(config.payLoad).forEach((key) => {
-                  acc[key] = config.payLoad[key];
-                });
-              }
+        params: this.mappingsData.disagregations
+          .map((item) => {
+            const reducedConfig = (item.configurations ?? []).reduce(
+              (acc, config: Setting) => {
+                if (config.payLoad) {
+                  Object.keys(config.payLoad).forEach((key) => {
+                    acc[key] = config.payLoad[key];
+                  });
+                }
+                return acc;
+              },
+              {} as { [key: string]: any }
+            );
 
-              return acc;
-            }, {} as { [key: string]: any }),
-          };
-        }),
+            // Check if the accumulator object is empty
+            if (Object.keys(reducedConfig).length === 0) {
+              return null;
+            }
+
+            return {
+              co: item.categoryOptionComboId,
+              ...reducedConfig,
+            };
+          })
+          .filter((item) => item !== null),
       },
       dataKey: this.selectedInputId,
       namespace: `MAPPINGS-${this.dataSetUuid}`,

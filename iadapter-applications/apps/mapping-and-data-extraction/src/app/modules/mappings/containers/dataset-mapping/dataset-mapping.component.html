@@ -24,40 +24,6 @@
                 ></span>
               </button>
             </div>
-            <div nz-col nzSpan="12">
-              <div nz-row nzJustify="space-between" [nzGutter]="16">
-                <div nz-col nzSpan="12">
-                  <!-- <nz-select
-                    style="width: 100%"
-                    [ngModel]="selectedDataTemplateBlock"
-                    (ngModelChange)="onDataTemplateBlockSelect($event)"
-                  >
-                    <ng-container *ngFor="let option of dataTemplatesBlocks">
-                      <nz-option
-                        [nzValue]="option.key"
-                        [nzLabel]="option.name"
-                      ></nz-option>
-                    </ng-container>
-                    <nz-option
-                      [nzValue]="selectedDataTemplateBlock"
-                      [nzLabel]="
-                        selectedDataTemplateBlock !== ''
-                          ? selectedDataTemplateBlock
-                          : 'Template blocks'
-                      "
-                      nzHide
-                    ></nz-option>
-                  </nz-select> -->
-                </div>
-                <!-- <div nz-col nzSpan="12">
-                  <div nz-row nzJustify="end">
-                    <label nz-checkbox [(ngModel)]="useIcdCodes"
-                      >Use Icd codes</label
-                    >
-                  </div>
-                </div> -->
-              </div>
-            </div>
           </div>
 
           <nz-card>
@@ -176,36 +142,43 @@
                       <ng-container
                         *ngFor="let config of data.configurations ?? []"
                       >
-                        <nz-select
-                          [ngModel]="config.selectedValue ?? 'default'"
-                          (ngModelChange)="
-                            onSelectMappingSetting({
-                              value: $event,
-                              categoryOptionComboId: data.categoryOptionComboId,
-                              settingName: config.name,
-                              keyToUseInMappings: config.keyToUseInMappings
-                            })
-                          "
-                          style="margin-right: 16px"
+                        <nz-tag
+                          nzMode="closeable"
+                          (nzOnClose)="onRemoveConfiguration(config.name)"
+                          style="padding-left: 0 !important"
                         >
-                          <ng-container
-                            *ngFor="let option of config.options ?? []"
-                          >
-                            <nz-option
-                              [nzValue]="option"
-                              [nzLabel]="option.name"
-                            ></nz-option>
-                          </ng-container>
-                          <nz-option
-                            [nzValue]="config.selectedValue ?? 'default'"
-                            [nzLabel]="
-                              config.selectedValue
-                                ? config.selectedValue.name
-                                : config.name
+                          <nz-select
+                            [ngModel]="config.selectedValue ?? 'default'"
+                            (ngModelChange)="
+                              onSelectMappingSetting({
+                                value: $event,
+                                categoryOptionComboId:
+                                  data.categoryOptionComboId,
+                                settingName: config.name,
+                                keyToUseInMappings: config.keyToUseInMappings
+                              })
                             "
-                            nzHide
-                          ></nz-option>
-                        </nz-select>
+                            style="margin-right: 16px"
+                          >
+                            <ng-container
+                              *ngFor="let option of config.options ?? []"
+                            >
+                              <nz-option
+                                [nzValue]="option"
+                                [nzLabel]="option.name"
+                              ></nz-option>
+                            </ng-container>
+                            <nz-option
+                              [nzValue]="config.selectedValue ?? 'default'"
+                              [nzLabel]="
+                                config.selectedValue
+                                  ? config.selectedValue.name
+                                  : config.name
+                              "
+                              nzHide
+                            ></nz-option>
+                          </nz-select>
+                        </nz-tag>
                       </ng-container>
                     </td>
                   </tr>
