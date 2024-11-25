@@ -630,6 +630,8 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   goBackToDatasetList() {
-    this.router.navigate(['mapping-and-data-extraction']);
+    this.router.navigate(['mapping-and-data-extraction'], {
+      queryParams: { from: 'mapping' },
+    });
   }
 }

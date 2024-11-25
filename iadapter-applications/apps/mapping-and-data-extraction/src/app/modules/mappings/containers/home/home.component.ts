@@ -26,7 +26,7 @@ import {
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
@@ -67,7 +67,8 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   constructor(
     private dataSetManagementService: DatasetManagementService,
     private router: Router,
-    private modal: NzModalService
+    private modal: NzModalService,
+    private route: ActivatedRoute
   ) {}
 
   onInstanceSearch(value: string): void {
@@ -146,6 +147,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      if (params['from'] === 'mapping') {
+        this.selectedInstanceFetchingMechanism = 'selectedDatasets';
+      }
+    });
     this.searchInstances();
   }
 
