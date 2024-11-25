@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DHISConstants {
 
-    @Value("${DHIS_URL:https://play.dhis2.org/2.36.11.1}")
+    @Value("${DHIS_URL:https://play.im.dhis2.org/stable-2-40-5}")
     public String DHIS2Instance;
 
     @Value("${DHIS_USERNAME:admin}")
