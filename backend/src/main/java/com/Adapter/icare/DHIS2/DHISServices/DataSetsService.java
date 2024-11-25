@@ -37,6 +37,9 @@ import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+
+import com.Adapter.icare.DHIS2.DHISRepository.DataElementsRepository;
+import com.Adapter.icare.Domains.DataElement;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -62,15 +65,21 @@ public class DataSetsService {
     // TODO: This service requires total refactoring
     private final DataSetsRepository dataSetsRepository;
     private final InstancesRepository instancesRepository;
+    private final DataElementsRepository dataElementsRepository;
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
+    private final DataElementsServices dataElementsServices;
 
     public DataSetsService(DataSetsRepository dataSetsRepository,
                            InstancesRepository instancesRepository,
-                           UserService userService) {
+                           UserService userService,
+                           DataElementsRepository dataElementsRepository,
+                           DataElementsServices dataElementsServices) {
         this.dataSetsRepository = dataSetsRepository;
         this.instancesRepository = instancesRepository;
+        this.dataElementsRepository = dataElementsRepository;
+        this.dataElementsServices = dataElementsServices;
         this.userService = userService;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
@@ -329,7 +338,7 @@ public class DataSetsService {
         String line;
         Dataset dataset = new Dataset();
         StringBuilder responseContent = new StringBuilder();
-        System.out.println(dataSet);
+        List<DataElement> dataElements = new ArrayList<>();
         try {
             Instance instanceDetails = instancesRepository.getInstanceByUuid(instance);
             if (instanceDetails != null) {
@@ -385,11 +394,23 @@ public class DataSetsService {
                     dataset.setCode(code);
                 }
                 Map<String,Object> dataElementsObject = new HashMap<>();
-                List<Map<String,Object>> dataElements = new ArrayList<>();
                 for(Map<String,Object> dataSetElement: (List<Map<String,Object>>) responseMap.get("dataSetElements")) {
-                    dataElements.add((Map<String, Object>) dataSetElement.get("dataElement"));
+                    DataElement dataElement = new DataElement();
+                    Map<String,Object> dataElementObject = (Map<String, Object>) dataSetElement.get("dataElement");
+                    dataElement.setDhis2Id(dataElementObject.get("id").toString());
+                    dataElement.setName(dataElementObject.get("name").toString());
+                    dataElement.setShortName(dataElementObject.get("shortName").toString());
+                    dataElement.setDhis2Id(dataElementObject.get("id").toString());
+                    dataElement.setDetails(dataElementObject);
+                    UUID uuid = UUID.randomUUID();
+                    dataElement.setUuid(uuid.toString());
+                    if (this.authenticatedUser != null) {
+                        dataset.setCreatedBy(authenticatedUser);
+                    }
+                    dataElements.add(dataElement);
                 }
-                dataElementsObject.put("dataElements", dataElements);
+                // TODO: Consider removing the column
+                dataElementsObject.put("dataElements", null);
                 dataset.setDataElements(dataElementsObject);
                 dataset.setCategoryCombo((Map<String, Object>) responseMap.get("categoryCombo"));
                 dataset.setDatasetFields(responseMap);
@@ -407,6 +428,7 @@ public class DataSetsService {
         if (this.authenticatedUser != null) {
             dataset.setCreatedBy(authenticatedUser);
         }
+        dataElementsServices.saveDataElements(dataElements);
         return dataSetsRepository.save(dataset);
     }
 

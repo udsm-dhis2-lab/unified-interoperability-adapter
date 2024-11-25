@@ -60,10 +60,4 @@ public interface DataSetsRepository extends JpaRepository<Dataset,String> {
                     " AND (:instance IS NULL OR instances_id=:instance) " +
                     " AND (:q IS NULL OR display_name LIKE CONCAT('%',:q,'%'))", nativeQuery = true)
     Page<Dataset> getDatasetsListByPagination(String code, String formType, String q, BigInteger instance, Pageable pageable);
-
-    @Query(value = "SELECT JSON_UNQUOTE(JSON_EXTRACT(de, '$')) AS dataElement FROM datasets, " +
-            "JSON_TABLE(data_elements, '$.dataElements[*]' COLUMNS (de JSON PATH '$')) AS jt " +
-            "WHERE JSON_UNQUOTE(JSON_EXTRACT(de, '$.id')) = :id",
-            nativeQuery = true)
-    Map<String, Object> getDataElementById(String id);
 }
