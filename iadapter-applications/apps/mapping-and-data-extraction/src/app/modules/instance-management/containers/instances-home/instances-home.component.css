@@ -1,0 +1,8 @@
+nz-form-item {
+  display: flex;
+  flex-direction: column;
+}
+
+nz-form-label {
+  margin-bottom: 8px; 
+}

@@ -18,7 +18,7 @@ import {
 export class InstancesHomeComponent implements OnInit {
   instanceForm!: FormGroup;
   isSubmitting: boolean = false;
-  isDrwawerVisible: boolean = false;
+  isDrawerVisible: boolean = false;
 
   // Paging info
   pageIndex: number = 1;
@@ -35,14 +35,14 @@ export class InstancesHomeComponent implements OnInit {
 
   onOpenSideDrawer(event: Event): void {
     event.stopPropagation();
-    this.isDrwawerVisible = true;
+    this.isDrawerVisible = true;
   }
 
   onCloseSideDrawer(event: Event): void {
     if (event) {
       event.stopPropagation();
     }
-    this.isDrwawerVisible = false;
+    this.isDrawerVisible = false;
   }
 
   onSubmit(event: Event) {

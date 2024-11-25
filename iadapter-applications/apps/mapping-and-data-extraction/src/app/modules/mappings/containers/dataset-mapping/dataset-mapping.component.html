@@ -1,5 +1,14 @@
 <nz-spin [nzSpinning]="isLoading">
   <div class="inner-content">
+    <button
+      nz-button
+      nzType="default"
+      style="margin-bottom: 16px"
+      (click)="goBackToDatasetList()"
+    >
+      Go back
+    </button>
+
     <nz-card style="width: 100%">
       <div nz-row [nzGutter]="16">
         <div nz-col [nzSpan]="leftColumnSpan">
