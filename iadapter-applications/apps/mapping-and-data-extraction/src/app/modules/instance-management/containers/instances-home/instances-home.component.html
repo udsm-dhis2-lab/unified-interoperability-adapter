@@ -48,7 +48,7 @@
   [nzBodyStyle]="{ overflow: 'auto' }"
   [nzMaskClosable]="false"
   [nzWidth]="500"
-  [nzVisible]="isDrwawerVisible"
+  [nzVisible]="isDrawerVisible"
   [nzFooter]="footerTpl"
   nzTitle="Create instance"
   (nzOnClose)="onCloseSideDrawer($event)"
@@ -56,8 +56,8 @@
   <div *nzDrawerContent>
     <!-- configuration form  -->
     <form [formGroup]="instanceForm" (ngSubmit)="onSubmit($event)">
-      <div nz-row [nzGutter]="24" style="align-items: flex-start">
-        <div nz-col nzSpan="24">
+      <div nz-row [nzGutter]="16" style="margin-top: 16px">
+        <div nz-col nzSpan="12">
           <nz-form-item>
             <nz-form-label>Name</nz-form-label>
             <nz-form-control nzErrorTip="N is required">
@@ -65,7 +65,7 @@
             </nz-form-control>
           </nz-form-item>
         </div>
-        <div nz-col nzSpan="24" style="margin-top: 8px">
+        <div nz-col nzSpan="12">
           <nz-form-item>
             <nz-form-label>Url</nz-form-label>
             <nz-form-control nzErrorTip="Url is required">
@@ -73,7 +73,10 @@
             </nz-form-control>
           </nz-form-item>
         </div>
-        <div nz-col nzSpan="24" style="margin-top: 8px">
+      </div>
+
+      <div nz-row [nzGutter]="16" style="margin-top: 16px">
+        <div nz-col nzSpan="12">
           <nz-form-item>
             <nz-form-label>Code</nz-form-label>
             <nz-form-control nzErrorTip="Code is required">
@@ -81,7 +84,7 @@
             </nz-form-control>
           </nz-form-item>
         </div>
-        <div nz-col nzSpan="24" style="margin-top: 8px">
+        <div nz-col nzSpan="12">
           <nz-form-item>
             <nz-form-label>Username</nz-form-label>
             <nz-form-control nzErrorTip="Username is required">
@@ -93,7 +96,10 @@
             </nz-form-control>
           </nz-form-item>
         </div>
-        <div nz-col nzSpan="24" style="margin-top: 8px">
+      </div>
+
+      <div nz-row [nzGutter]="16" style="margin-top: 16px">
+        <div nz-col nzSpan="12">
           <nz-form-item>
             <nz-form-label>Password</nz-form-label>
             <nz-form-control nzErrorTip="Password is required">
