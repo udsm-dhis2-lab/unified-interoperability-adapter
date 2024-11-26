@@ -19,6 +19,12 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
   styleUrl: './instances-home.component.css',
 })
 export class InstancesHomeComponent implements OnInit {
+  alert = {
+    show: false,
+    type: '',
+    message: '',
+  };
+
   instanceForm!: FormGroup;
   isSubmitting: boolean = false;
   isDrawerVisible: boolean = false;
@@ -71,6 +77,33 @@ export class InstancesHomeComponent implements OnInit {
 
   onSubmit(event: Event) {
     event.stopPropagation();
+    var payLoad = this.instanceForm.value;
+    this.addInstance(payLoad);
+  }
+
+  addInstance(payLoad: any) {
+    this.isSubmitting = true;
+    this.instanceManagementService.verifyAndAddInstance(payLoad).subscribe({
+      next: (response) => {
+        this.isSubmitting = false;
+
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Added instance successfully',
+        };
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
+        // TODO: Implement error handling
+      },
+    });
   }
 
   loadInstanceManagementFromServer(
@@ -101,5 +134,13 @@ export class InstancesHomeComponent implements OnInit {
     const { pageSize, pageIndex, filter } = params;
 
     this.loadInstanceManagementFromServer(pageIndex, pageSize, filter);
+  }
+
+  onCloseAlert() {
+    this.alert = {
+      show: false,
+      type: '',
+      message: '',
+    };
   }
 }

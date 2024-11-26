@@ -130,6 +130,15 @@
       </div>
     </form>
   </div>
+
+  <nz-alert
+    nzCloseable
+    *ngIf="alert.show"
+    [nzType]="alert.type === 'success' ? 'success' : 'error'"
+    [nzMessage]="alert.message"
+    (nzOnClose)="onCloseAlert()"
+    nzShowIcon
+  ></nz-alert>
 </nz-drawer>
 
 <ng-template #footerTpl>

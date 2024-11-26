@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { Endpoints } from '../constants';
-import { catchError, map } from 'rxjs';
+import { catchError, map, Observable, switchMap } from 'rxjs';
 import { HttpParams } from '@angular/common/http';
 import {
   InternalServerException,
@@ -15,6 +15,7 @@ import { InstancePage } from '../models';
 })
 export class InstanceManagementService {
   instanceUrl: string = Endpoints.INSTANCES;
+  verifyInstanceByCodeUrl: string = Endpoints.VERIFY_CODE;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -38,6 +39,29 @@ export class InstanceManagementService {
       );
   }
 
+  addInstance(payLoad: any) {
+    return this.httpClient
+      .post(this.instanceUrl, payLoad)
+      .pipe(catchError((error: any) => this.handleError(error)));
+  }
+
+  verifyInstanceByCode(payLoad: any) {
+    return this.httpClient.post(this.verifyInstanceByCodeUrl, payLoad).pipe(
+      catchError((error: any) => {
+        if (error.status === 400) {
+          throw new Error('Incorrect code or credentilals');
+        } else {
+          this.handleError(error);
+        }
+      })
+    );
+  }
+
+  verifyAndAddInstance(payLoad: any): Observable<any> {
+    return this.verifyInstanceByCode(payLoad).pipe(
+      switchMap(() => this.addInstance(payLoad))
+    );
+  }
   // TODO: These functions below need to be moved to a common shared folder
   private buildHttpParams(
     pageIndex: number,
