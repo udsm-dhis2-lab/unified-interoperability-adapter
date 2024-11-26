@@ -6,7 +6,6 @@ import {
   Dataset,
   DatasetPage,
   IcdCodePage,
-  InstancePage,
   MappingsUrls,
   LoincCodePage,
 } from '../models';
@@ -53,32 +52,12 @@ export class DatasetManagementService {
       );
   }
 
-  getInstanceById(uuid: string): Observable<Dataset> {
+  getDatasetById(uuid: string): Observable<Dataset> {
     return this.httpClient
       .get<{ results: any }>(`${this.dataSetByIdUrl}/${uuid}`)
       .pipe(
         map((response: { results: any }) => {
           return Dataset.fromJson(response);
-        }),
-        catchError((error: any) => this.handleError(error))
-      );
-  }
-
-  getInstances(
-    pageIndex: number,
-    pageSize: number,
-    paging: boolean,
-    filters: Array<{ key: string; value: string[] }>
-  ) {
-    const params = this.buildHttpParams(pageIndex, pageSize, paging, filters);
-
-    return this.httpClient
-      .get<{ results: any }>(this.instanceUrl, {
-        params,
-      })
-      .pipe(
-        map((response: { results: any }) => {
-          return InstancePage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );

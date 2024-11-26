@@ -192,7 +192,7 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   loadDatasetByIdFromServer(uuid: string) {
-    this.dataSetManagementService.getInstanceById(uuid).subscribe({
+    this.dataSetManagementService.getDatasetById(uuid).subscribe({
       next: (data: any) => {
         this.isLoading = false;
         this.sanitizedContent = this.sanitizer.bypassSecurityTrustHtml(

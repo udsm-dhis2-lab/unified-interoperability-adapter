@@ -19,8 +19,6 @@ import {
   Dataset,
   DataSetInstance,
   DatasetPage,
-  Instance,
-  InstancePage,
   MappingsUrls,
 } from '../../models';
 import { DatasetManagementService } from '../../services/dataset-management.service';
@@ -28,6 +26,11 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import {
+  Instance,
+  InstancePage,
+} from 'apps/mapping-and-data-extraction/src/app/shared/models';
+import { InstanceManagementService } from 'apps/mapping-and-data-extraction/src/app/shared';
 
 @Component({
   selector: 'app-home',
@@ -66,6 +69,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
 
   constructor(
     private dataSetManagementService: DatasetManagementService,
+    private instanceManagementService: InstanceManagementService,
     private router: Router,
     private modal: NzModalService,
     private route: ActivatedRoute
@@ -167,7 +171,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .pipe(debounceTime(500))
       .pipe(
         switchMap((value: string) => {
-          return this.dataSetManagementService.getInstances(1, 10, true, []);
+          return this.instanceManagementService.getInstances(1, 10, true, []);
         })
       );
 

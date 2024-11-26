@@ -7,6 +7,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { InstanceManagementService } from 'apps/mapping-and-data-extraction/src/app/shared';
 
 @Component({
   selector: 'app-instances-home',
@@ -22,7 +23,7 @@ export class InstancesHomeComponent implements OnInit {
 
   // Paging info
   pageIndex: number = 1;
-  constructor(private fb: NonNullableFormBuilder) {
+  constructor(private fb: NonNullableFormBuilder, private instanceManagementService: InstanceManagementService) {
     this.instanceForm = this.fb.group({
       name: ['', Validators.required],
       url: ['', Validators.required],
