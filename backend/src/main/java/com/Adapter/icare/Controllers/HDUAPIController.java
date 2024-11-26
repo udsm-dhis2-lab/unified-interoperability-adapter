@@ -273,6 +273,7 @@ public class HDUAPIController {
                                                @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        // TODO: Improve this to capture both datastore-based, valueset-based and codesystem-based
         try {
             Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreMatchingParams(namespace, key, version, null, q, code, page,pageSize, "GENERAL-CODES");
             for (Datastore datastore: pagedDatastoreData.getContent()) {

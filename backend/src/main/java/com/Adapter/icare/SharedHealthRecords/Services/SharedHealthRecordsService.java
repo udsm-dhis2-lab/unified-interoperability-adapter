@@ -850,7 +850,14 @@ public class SharedHealthRecordsService {
                 .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
         observationSearch.where(Observation.CATEGORY.exactly().code(category));
         Bundle observationBundle = new Bundle();
-        observationBundle = observationSearch.returnBundle(Bundle.class).execute();
+        // Valid sort params
+        /**
+         * [_content, _id, _lastUpdated, _profile, _security, _source, _tag, _text, based-on,
+         * category, code, code-value-concept, code-value-date, code-value-quantity,
+         * code-value-string, combo-code, combo-code-value-concept, combo-code-value-quantity,
+         * combo-data-absent-reason, combo-value-concept, combo-value-quantit
+         */
+        observationBundle = observationSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
                 Observation observationGroup = (Observation) entryComponent.getResource();
