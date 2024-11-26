@@ -94,7 +94,6 @@ export class InstancesHomeComponent implements OnInit {
     this.instanceManagementService.verifyAndAddInstance(payLoad).subscribe({
       next: (response) => {
         this.isSubmitting = false;
-
         this.alert = {
           show: true,
           type: 'success',
@@ -105,12 +104,12 @@ export class InstancesHomeComponent implements OnInit {
       },
       error: (error) => {
         this.isSubmitting = false;
-
         this.alert = {
           show: true,
           type: 'error',
           message: error.message,
         };
+        this.closeSideDrawer();
         // TODO: Implement error handling
       },
     });
