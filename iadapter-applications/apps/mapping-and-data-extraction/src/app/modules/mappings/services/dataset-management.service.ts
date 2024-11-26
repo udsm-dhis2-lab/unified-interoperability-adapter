@@ -17,12 +17,13 @@ import {
   InternalServerException,
 } from '../../../../../../../libs/models';
 import { CategoryOptionCombo } from '../models/category-option-combo.model';
+import { Endpoints } from '../../../shared';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetManagementService {
-  instanceUrl: string = MappingsUrls.GET_INSTANCES;
+  instanceUrl: string = Endpoints.INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
   configurationUrl: string = MappingsUrls.CONFIGURATIONS;
   addMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
