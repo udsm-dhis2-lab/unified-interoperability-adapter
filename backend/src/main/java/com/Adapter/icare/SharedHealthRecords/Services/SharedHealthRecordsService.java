@@ -490,8 +490,8 @@ public class SharedHealthRecordsService {
                                 if(!drugUseObs.isEmpty()) {
                                     for (Observation observation: drugUseObs) {
                                         if (observation.hasValue() && observation.hasValueBooleanType()) {
-                                            alcoholUse.put("use", observation.getValueBooleanType().booleanValue());
-                                            alcoholUse.put("notes", observation.getNote().stream()
+                                            drugUse.put("use", observation.getValueBooleanType().booleanValue());
+                                            drugUse.put("notes", observation.getNote().stream()
                                                     .map(note -> note.getText())
                                                     .collect(Collectors.joining(", ")));
                                             break;
