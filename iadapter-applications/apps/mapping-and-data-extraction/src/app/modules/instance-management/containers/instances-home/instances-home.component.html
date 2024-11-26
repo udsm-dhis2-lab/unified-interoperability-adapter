@@ -51,14 +51,16 @@
     </nz-table>
   </nz-card>
 
-  <nz-alert
-    nzCloseable
-    *ngIf="alert.show"
-    [nzType]="alert.type === 'success' ? 'success' : 'error'"
-    [nzMessage]="alert.message"
-    (nzOnClose)="onCloseAlert()"
-    nzShowIcon
-  ></nz-alert>
+  <div class="alert-container">
+    <nz-alert
+      nzCloseable
+      *ngIf="alert.show"
+      [nzType]="alert.type === 'success' ? 'success' : 'error'"
+      [nzMessage]="alert.message"
+      (nzOnClose)="onCloseAlert()"
+      nzShowIcon
+    ></nz-alert>
+  </div>
 </div>
 
 <nz-drawer
