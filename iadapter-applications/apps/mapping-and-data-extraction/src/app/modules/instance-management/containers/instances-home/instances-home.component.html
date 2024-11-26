@@ -50,6 +50,15 @@
       </tbody>
     </nz-table>
   </nz-card>
+
+  <nz-alert
+    nzCloseable
+    *ngIf="alert.show"
+    [nzType]="alert.type === 'success' ? 'success' : 'error'"
+    [nzMessage]="alert.message"
+    (nzOnClose)="onCloseAlert()"
+    nzShowIcon
+  ></nz-alert>
 </div>
 
 <nz-drawer
@@ -130,15 +139,6 @@
       </div>
     </form>
   </div>
-
-  <nz-alert
-    nzCloseable
-    *ngIf="alert.show"
-    [nzType]="alert.type === 'success' ? 'success' : 'error'"
-    [nzMessage]="alert.message"
-    (nzOnClose)="onCloseAlert()"
-    nzShowIcon
-  ></nz-alert>
 </nz-drawer>
 
 <ng-template #footerTpl>

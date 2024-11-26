@@ -56,13 +56,16 @@ export class InstancesHomeComponent implements OnInit {
     });
   }
   ngOnInit(): void {
+    this.reloadFetchingInstances();
+  }
+
+  reloadFetchingInstances(): void {
     this.loadInstanceManagementFromServer(
       this.pageIndex,
       this.pageSize,
       this.filterKey
     );
   }
-
   onOpenSideDrawer(event: Event): void {
     event.stopPropagation();
     this.isDrawerVisible = true;
@@ -72,6 +75,11 @@ export class InstancesHomeComponent implements OnInit {
     if (event) {
       event.stopPropagation();
     }
+    this.closeSideDrawer();
+  }
+
+  closeSideDrawer(): void {
+    this.clearFrom();
     this.isDrawerVisible = false;
   }
 
@@ -92,6 +100,8 @@ export class InstancesHomeComponent implements OnInit {
           type: 'success',
           message: 'Added instance successfully',
         };
+        this.closeSideDrawer();
+        this.reloadFetchingInstances();
       },
       error: (error) => {
         this.isSubmitting = false;
@@ -142,5 +152,9 @@ export class InstancesHomeComponent implements OnInit {
       type: '',
       message: '',
     };
+  }
+
+  clearFrom() {
+    this.instanceForm.reset();
   }
 }
