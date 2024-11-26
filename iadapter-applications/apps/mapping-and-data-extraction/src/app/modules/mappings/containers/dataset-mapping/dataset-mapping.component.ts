@@ -7,7 +7,7 @@ import {
 } from '@angular/core';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { DatasetManagementService } from '../../services/dataset-management.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
@@ -179,7 +179,8 @@ export class DatasetMappingComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private renderer: Renderer2,
     private elRef: ElementRef,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -626,5 +627,11 @@ export class DatasetMappingComponent implements OnInit {
       type: '',
       message: '',
     };
+  }
+
+  goBackToDatasetList() {
+    this.router.navigate(['mapping-and-data-extraction'], {
+      queryParams: { from: 'mapping' },
+    });
   }
 }
