@@ -1,4 +1,4 @@
-import { Instance } from '..';
+import { Instance } from '../instance.model';
 
 export class InstancePage {
   pageIndex!: number;
