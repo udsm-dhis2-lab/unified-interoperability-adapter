@@ -18,7 +18,16 @@
       </div>
     </div>
 
-    <nz-table nzShowSizeChanger [nzFrontPagination]="false">
+    <nz-table
+      nzShowSizeChanger
+      [nzData]="listOfInstances"
+      [nzFrontPagination]="false"
+      [nzLoading]="loading"
+      [nzTotal]="total"
+      [nzPageSize]="pageSize"
+      [nzPageIndex]="pageIndex"
+      (nzQueryParams)="onQueryParamsChange($event)"
+    >
       <thead>
         <tr>
           <th>SN</th>
@@ -29,8 +38,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (data of [{uuid: '', name: '', code: '', url: ''}]; track
-        data.uuid; let i = $index ) {
+        @for (data of listOfInstances; track data.uuid; let i = $index ) {
         <tr>
           <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
           <td>{{ data?.name }}</td>
@@ -42,6 +50,17 @@
       </tbody>
     </nz-table>
   </nz-card>
+
+  <div class="alert-container">
+    <nz-alert
+      nzCloseable
+      *ngIf="alert.show"
+      [nzType]="alert.type === 'success' ? 'success' : 'error'"
+      [nzMessage]="alert.message"
+      (nzOnClose)="onCloseAlert()"
+      nzShowIcon
+    ></nz-alert>
+  </div>
 </div>
 
 <nz-drawer

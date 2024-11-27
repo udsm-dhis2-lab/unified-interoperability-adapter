@@ -6,7 +6,6 @@ import {
   Dataset,
   DatasetPage,
   IcdCodePage,
-  InstancePage,
   MappingsUrls,
   LoincCodePage,
 } from '../models';
@@ -17,12 +16,13 @@ import {
   InternalServerException,
 } from '../../../../../../../libs/models';
 import { CategoryOptionCombo } from '../models/category-option-combo.model';
+import { Endpoints } from '../../../shared';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetManagementService {
-  instanceUrl: string = MappingsUrls.GET_INSTANCES;
+  instanceUrl: string = Endpoints.INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
   configurationUrl: string = MappingsUrls.CONFIGURATIONS;
   addMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
@@ -52,32 +52,12 @@ export class DatasetManagementService {
       );
   }
 
-  getInstanceById(uuid: string): Observable<Dataset> {
+  getDatasetById(uuid: string): Observable<Dataset> {
     return this.httpClient
       .get<{ results: any }>(`${this.dataSetByIdUrl}/${uuid}`)
       .pipe(
         map((response: { results: any }) => {
           return Dataset.fromJson(response);
-        }),
-        catchError((error: any) => this.handleError(error))
-      );
-  }
-
-  getInstances(
-    pageIndex: number,
-    pageSize: number,
-    paging: boolean,
-    filters: Array<{ key: string; value: string[] }>
-  ) {
-    const params = this.buildHttpParams(pageIndex, pageSize, paging, filters);
-
-    return this.httpClient
-      .get<{ results: any }>(this.instanceUrl, {
-        params,
-      })
-      .pipe(
-        map((response: { results: any }) => {
-          return InstancePage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );
