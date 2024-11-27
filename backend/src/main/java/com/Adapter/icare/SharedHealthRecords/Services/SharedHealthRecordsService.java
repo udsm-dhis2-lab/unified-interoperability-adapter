@@ -137,7 +137,7 @@ public class SharedHealthRecordsService {
                 }
                 var encSearch = fhirClient.search().forResource(Encounter.class)
                         .where(Encounter.IDENTIFIER.exactly().identifier( hfrCode + "-" + referralNumber));
-                Bundle encBundle = encSearch.returnBundle(Bundle.class).execute();
+                Bundle encBundle = encSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
                 if (encBundle.hasEntry()) {
                     for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                         if (entry.getResource() instanceof Encounter) {
@@ -932,7 +932,7 @@ public class SharedHealthRecordsService {
                 .where(ServiceRequest.CATEGORY.exactly().code(category));
 
         Bundle observationBundle = new Bundle();
-        observationBundle = serviceRequestSearch.returnBundle(Bundle.class).execute();
+        observationBundle = serviceRequestSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent: observationBundle.getEntry()) {
                 ServiceRequest serviceRequest = (ServiceRequest) entryComponent.getResource();
