@@ -855,7 +855,7 @@ public class SharedHealthRecordsService {
          * [_content, _id, _lastUpdated, _profile, _security, _source, _tag, _text, based-on,
          * category, code, code-value-concept, code-value-date, code-value-quantity,
          * code-value-string, combo-code, combo-code-value-concept, combo-code-value-quantity,
-         * combo-data-absent-reason, combo-value-concept, combo-value-quantit
+         * combo-data-absent-reason, combo-value-concept, combo-value-quantity]
          */
         observationBundle = observationSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
         if (observationBundle.hasEntry()) {
