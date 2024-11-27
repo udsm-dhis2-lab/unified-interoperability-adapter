@@ -31,13 +31,13 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
-            "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
+            "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department OR JSON_EXTRACT(value, '$.class') LIKE CONCAT('%',:department,'%') ) AND " +
             "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
             "(:group IS NULL OR datastore_group = :group ) AND " +
             "(:code IS NULL OR JSON_EXTRACT(value, '$.code') = :code )",
             countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
                     "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
-                    "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department ) AND " +
+                    "(:department IS NULL OR JSON_EXTRACT(value, '$.department') = :department OR JSON_EXTRACT(value, '$.class') LIKE CONCAT('%',:department,'%')) AND " +
                     "(:q IS NULL OR JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') ) AND " +
                     "(:group IS NULL OR datastore_group = :group ) AND " +
                     "(:code IS NULL OR JSON_EXTRACT(value, '$.code') = :code )",nativeQuery = true)

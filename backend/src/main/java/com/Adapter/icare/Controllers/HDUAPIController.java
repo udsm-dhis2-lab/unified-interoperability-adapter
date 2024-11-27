@@ -266,12 +266,12 @@ public class HDUAPIController {
 
     @GetMapping("generalCodes")
     public ResponseEntity<Map<String, Object>> getGeneralCodes(@RequestParam(value="namespace",required = false) String namespace,
-                                               @RequestParam(value="key",required = false) String key,
-                                               @RequestParam(value="code",required = false) String code,
-                                               @RequestParam(value="version",required = false) String version,
-                                               @RequestParam(value="q",required = false) String q,
-                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
-                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) throws Exception {
+                                                               @RequestParam(value="key",required = false) String key,
+                                                               @RequestParam(value="code",required = false) String code,
+                                                               @RequestParam(value="version",required = false) String version,
+                                                               @RequestParam(value="q",required = false) String q,
+                                                               @RequestParam(value = "page", defaultValue = "1") Integer page,
+                                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         // TODO: Improve this to capture both datastore-based, valueset-based and codesystem-based
         try {
@@ -298,26 +298,32 @@ public class HDUAPIController {
 
     @GetMapping("generalCodes/{namespace}")
     public ResponseEntity<Map<String, Object>> getSpecificCodedItems(@PathVariable("namespace") String namespace,
-                                               @RequestParam(value="code", required = false) String code,
-                                               @RequestParam(value="q",required = false) String q,
-                                               @RequestParam(value = "page", required = true, defaultValue = "1") Integer page,
-                                               @RequestParam(value = "pageSize", required = true, defaultValue = "10") Integer pageSize) throws Exception {
+                                                                     @RequestParam(value="code", required = false) String code,
+                                                                     @RequestParam(value="q",required = false) String q,
+                                                                     @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                                                     @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                                     @RequestParam(value = "paging", required = false, defaultValue = "true") boolean paging,
+                                                                     @RequestParam(value = "chapter", required = false) String chapter,
+                                                                     @RequestParam(value = "department", required = false) String department) throws Exception {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String keysForGeneralCodes = datastoreConstants.KeysForGeneralCodes;
 //            System.out.println(keysForGeneralCodes);
-            if (keysForGeneralCodes.contains(namespace)) {
-                Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, null, page,pageSize);
+            // TODO: The lab has to be changed to specific valueset or code system
+            if (keysForGeneralCodes.contains(namespace) || namespace.contains("laboratory")) {
+                Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(!namespace.contains("laboratory") ? namespace: "LOINC", null, department, q, code, null, page,pageSize, paging);
                 for (Datastore datastore: pagedDatastoreData.getContent()) {
                     namespaceDetails.add(datastore.getValue());
                 }
                 Map<String, Object> returnObject =  new HashMap<>();
-                Map<String, Object> pager = new HashMap<>();
-                pager.put("page", page);
-                pager.put("pageSize", pageSize);
-                pager.put("totalPages",pagedDatastoreData.getTotalPages());
-                pager.put("total", pagedDatastoreData.getTotalElements());
-                returnObject.put("pager",pager);
+                if (paging) {
+                    Map<String, Object> pager = new HashMap<>();
+                    pager.put("page", page);
+                    pager.put("pageSize", pageSize);
+                    pager.put("totalPages",pagedDatastoreData.getTotalPages());
+                    pager.put("total", pagedDatastoreData.getTotalElements());
+                    returnObject.put("pager",pager);
+                }
                 returnObject.put("results", namespaceDetails);
                 return ResponseEntity.ok(returnObject);
             } else {
@@ -463,7 +469,7 @@ public class HDUAPIController {
         try {
             String namespace = datastoreConstants.ConfigurationsNamespace;
             Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(
-                    namespace, null, null, q, null, group, page,pageSize);
+                    namespace, null, null, q, null, group, page,pageSize, true);
             for (Datastore datastore: pagedDatastoreData.getContent()) {
                 Map<String, Object> configuration = datastore.getValue();
                 configuration.put("key", datastore.getDataKey());
@@ -935,7 +941,7 @@ public class HDUAPIController {
         List<Map<String, Object>> namespaceDetails = new ArrayList<>();
         try {
             String namespace = "codeSystems";
-            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, null, page,pageSize);
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, code, null, page,pageSize, true);
             for (Datastore datastore: pagedDatastoreData.getContent()) {
                 namespaceDetails.add(datastore.getValue());
             }
