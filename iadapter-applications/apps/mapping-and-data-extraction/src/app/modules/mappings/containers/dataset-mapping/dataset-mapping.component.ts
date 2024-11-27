@@ -189,7 +189,6 @@ export class DatasetMappingComponent implements OnInit {
         uuid: params['uuid'],
         id: params['id'],
       };
-      console.log('Received dataSetIds:', params);
     });
     this.searchIcdCode();
     this.searchConfigurations();
