@@ -48,4 +48,7 @@ public class DHISConstants {
 
     @Value("${DHIS_OU:ImspTQPwCqd}")
     public String OrgUnit;//="Yc6Dt4UL6yl"(Chuo Kikuu Health Center); // = "a6eqFyAF1Rz"; // AAR TABATA Other Clinic
+
+    @Value("${DHIS_CONTEXT_PATH:}")
+    public String DHIS2ContextPath;
 }

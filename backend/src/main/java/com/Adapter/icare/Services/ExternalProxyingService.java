@@ -26,7 +26,7 @@ public class ExternalProxyingService {
     }
 
     public Map<String, Object> getExternalData(String endpointUrl) {
-        String path = this.dhisConstants.DHIS2Instance + "/api/" + endpointUrl;
+        String path = formulateDHIS2UrlPath(endpointUrl);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
 
@@ -41,7 +41,7 @@ public class ExternalProxyingService {
     }
 
     public Map<String, Object> postExternalData(String endpointUrl, Map<String,Object> payload) {
-        String path = this.dhisConstants.DHIS2Instance + "/api/" + endpointUrl;
+        String path = formulateDHIS2UrlPath(endpointUrl);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
 
@@ -53,5 +53,10 @@ public class ExternalProxyingService {
                 Map.class
         );
         return response.getBody();
+    }
+
+    private String formulateDHIS2UrlPath(String endpointUrl) {
+        String path = this.dhisConstants.DHIS2Instance + (this.dhisConstants.DHIS2ContextPath != null ? "/" + this.dhisConstants.DHIS2ContextPath : "") + "/api/" + endpointUrl;
+        return path;
     }
 }
