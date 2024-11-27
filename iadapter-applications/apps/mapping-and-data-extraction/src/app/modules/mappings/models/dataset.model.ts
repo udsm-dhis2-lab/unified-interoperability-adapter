@@ -13,7 +13,7 @@ export class Dataset {
 
   static fromJson(json: any): Dataset {
     let dataset = new Dataset();
-    dataset.id = json['id'] ?? '';
+    dataset.id = json['id'] ?? json['datasetFields']['id'];
     dataset.name = json['name'];
     dataset.uuid = json['uuid'] ?? '';
     dataset.code = json['code'] ?? '';

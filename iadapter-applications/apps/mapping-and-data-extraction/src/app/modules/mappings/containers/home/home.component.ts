@@ -237,12 +237,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   dataSetAction(event: {
-    dataSetUuid?: string;
+    dataSetUud?: string;
     dataSetInstance?: DataSetInstance;
     dataSetId: string;
   }) {
     if (this.selectedInstanceFetchingMechanism === 'selectedDatasets') {
-      this.goToDataSetMapping(event.dataSetUuid!);
+      this.goToDataSetMapping({ uuid: event.dataSetUud!, id: event.dataSetId });
     } else if (event.dataSetInstance) {
       this.removeDatasetFromMapping(event?.dataSetInstance?.uuid!);
     } else {
@@ -317,8 +317,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     );
   }
 
-  goToDataSetMapping(uuid: string) {
-    this.router.navigate(['mapping-and-data-extraction/dataset-mapping', uuid]);
+  goToDataSetMapping(dataSetIds: { uuid: string; id: string }) {
+    this.router.navigate(['mapping-and-data-extraction/dataset-mapping'], {
+      queryParams: dataSetIds,
+    });
   }
 
   onCloseAlert() {
