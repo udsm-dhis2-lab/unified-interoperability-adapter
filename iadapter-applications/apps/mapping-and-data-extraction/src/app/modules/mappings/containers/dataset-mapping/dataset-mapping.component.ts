@@ -76,7 +76,7 @@ export class DatasetMappingComponent implements OnInit {
   leftColumnSpan: number = 16;
   rightColumnSpan: number = 8;
 
-  dataSetId: string = '';
+  dataSetIds: { uuid: string; id: string } = { uuid: '', id: '' };
   isLoading: boolean = true;
   datasetFormContent: string = '';
   sanitizedContent!: SafeHtml;
@@ -184,11 +184,17 @@ export class DatasetMappingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.dataSetId = this.route.snapshot.params['dataSetId'];
+    this.route.queryParams.subscribe((params) => {
+      this.dataSetIds = {
+        uuid: params['uuid'],
+        id: params['id'],
+      };
+      console.log('Received dataSetIds:', params);
+    });
     this.searchIcdCode();
     this.searchConfigurations();
     this.searchLoincCodes();
-    this.loadDatasetByIdFromServer(this.dataSetId);
+    this.loadDatasetByIdFromServer(this.dataSetIds.uuid);
   }
 
   loadDatasetByIdFromServer(uuid: string) {
@@ -254,7 +260,7 @@ export class DatasetMappingComponent implements OnInit {
             return new Disaggregation(item.id, item.name);
           });
           if (this.mappingsData.disagregations.length > 0) {
-            this.getExistingMappings(this.selectedInputId, this.dataSetId);
+            this.getExistingMappings(this.selectedInputId, this.dataSetIds.id);
           }
         },
         error: (error: any) => {
@@ -551,7 +557,7 @@ export class DatasetMappingComponent implements OnInit {
           .filter((item) => item !== null),
       },
       dataKey: this.selectedInputId,
-      namespace: `MAPPINGS-${this.dataSetId}`,
+      namespace: `MAPPINGS-${this.dataSetIds.id}`,
       description: '',
       group: '',
     };
