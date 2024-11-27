@@ -76,7 +76,7 @@ export class DatasetMappingComponent implements OnInit {
   leftColumnSpan: number = 16;
   rightColumnSpan: number = 8;
 
-  dataSetUuid: string = '';
+  dataSetIds: { uuid: string; id: string } = { uuid: '', id: '' };
   isLoading: boolean = true;
   datasetFormContent: string = '';
   sanitizedContent!: SafeHtml;
@@ -184,11 +184,16 @@ export class DatasetMappingComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.dataSetUuid = this.route.snapshot.params['uuid'];
+    this.route.queryParams.subscribe((params) => {
+      this.dataSetIds = {
+        uuid: params['uuid'],
+        id: params['id'],
+      };
+    });
     this.searchIcdCode();
     this.searchConfigurations();
     this.searchLoincCodes();
-    this.loadDatasetByIdFromServer(this.dataSetUuid);
+    this.loadDatasetByIdFromServer(this.dataSetIds.uuid);
   }
 
   loadDatasetByIdFromServer(uuid: string) {
@@ -254,7 +259,7 @@ export class DatasetMappingComponent implements OnInit {
             return new Disaggregation(item.id, item.name);
           });
           if (this.mappingsData.disagregations.length > 0) {
-            this.getExistingMappings(this.selectedInputId, this.dataSetUuid);
+            this.getExistingMappings(this.selectedInputId, this.dataSetIds.id);
           }
         },
         error: (error: any) => {
@@ -269,9 +274,9 @@ export class DatasetMappingComponent implements OnInit {
       });
   }
 
-  getExistingMappings(selectedInputId: string, datasetUuid: string) {
+  getExistingMappings(selectedInputId: string, datasetId: string) {
     this.dataSetManagementService
-      .getExistingMappings(selectedInputId, datasetUuid)
+      .getExistingMappings(selectedInputId, datasetId)
       .subscribe({
         next: (data: any) => {
           if (data.uuid === null) return;
@@ -551,7 +556,7 @@ export class DatasetMappingComponent implements OnInit {
           .filter((item) => item !== null),
       },
       dataKey: this.selectedInputId,
-      namespace: `MAPPINGS-${this.dataSetUuid}`,
+      namespace: `MAPPINGS-${this.dataSetIds.id}`,
       description: '',
       group: '',
     };

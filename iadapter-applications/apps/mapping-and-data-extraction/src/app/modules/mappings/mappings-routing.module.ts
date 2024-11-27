@@ -10,7 +10,7 @@ const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'dataset-mapping/:uuid',
+    path: 'dataset-mapping',
     component: DatasetMappingComponent,
   },
   {
