@@ -638,7 +638,11 @@ public class SharedHealthRecordsService {
                                             Practitioner practitioner = fhirClient.read().resource(Practitioner.class).withId(practitionerReferenceType.getIdPart()).execute();
                                             referringClinician.put("MCTCode", practitioner.hasIdentifier() ? practitioner.getIdElement().getIdPart(): null);
                                             referringClinician.put("name", practitioner.hasName() && !practitioner.getName().isEmpty() ? practitioner.getName().get(0).getText(): null);
-                                            referringClinician.put("phoneNumber", practitioner.hasTelecom() && !practitioner.getTelecom().isEmpty() && practitioner.getTelecom().get(0).hasValue() ? practitioner.getTelecom().get(0).getValue(): null);
+                                            referringClinician.put("phoneNumber", practitioner.hasTelecom() &&
+                                                    !practitioner.getTelecom().isEmpty()
+                                                    && practitioner.getTelecom().get(0).hasValue()
+                                                    ? practitioner.getTelecom().get(0).getValue()
+                                                    :null);
                                             referralDetailsDTO.setReferringClinician(referringClinician);
                                             break;
                                         }
