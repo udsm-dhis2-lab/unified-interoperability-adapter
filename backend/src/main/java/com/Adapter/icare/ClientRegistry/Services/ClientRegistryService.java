@@ -559,7 +559,15 @@ public class ClientRegistryService {
                     }
                 }
             }
-            return coverages;
+            Map<String, Coverage> uniqueCoverageMap = coverages.stream()
+                    .filter(coverage -> coverage.hasSubscriberId())
+                    .collect(Collectors.toMap(
+                            Coverage::getSubscriberId,
+                            coverage -> coverage,
+                            (existing, replacement) -> existing
+                    ));
+
+            return new ArrayList<>(uniqueCoverageMap.values());
         } catch (Exception e) {
             e.printStackTrace();
         }
