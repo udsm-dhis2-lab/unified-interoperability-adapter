@@ -661,8 +661,11 @@ public class SharedHealthRecordsService {
                                         medicationDetailsDTO.setCode(medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getCode() : null);
                                         medicationDetailsDTO.setName(medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getDisplay() : null);
                                         medicationDetailsDTO.setOrderDate(medicationDispense.hasWhenHandedOver() ? medicationDispense.getWhenHandedOver() : null);
-//                                        TODO: Add codeStandard block
-                                        medicationDetailDTO.setPeriodOfMedication(); //TODO Implement this block
+                                        String code = medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getSystem() : null;
+                                        String codeStandard = code.contains("msd") ? "MSD CODE" : code.contains("loinc") ? "LOINC" : null;
+                                        medicationDetailsDTO.setCodeStandard(codeStandard);
+                                        String duration = medicationDispense.getDaysSupply().getValue() + " " + medicationDispense.getDaysSupply().getUnit();
+                                        medicationDetailsDTO.setPeriodOfMedication(duration);
                                         medicationDetailsDTO.setTreatmentType(medicationDispense.hasType() ? medicationDispense.getType().getCoding().get(0).getCode() : null);
                                         if (medicationDispense.hasDosageInstruction()) {
                                             Dosage dosage = Iterables.getLast(medicationDispense.getDosageInstruction());
@@ -676,7 +679,7 @@ public class SharedHealthRecordsService {
                                             dosagePayload.put("route", dosage.getRoute().getCoding().get(0).getDisplay());
                                             dosagePayload.put("instructions", dosage.getText());
                                             dosagePayload.put("quantity", medicationDispense.getQuantity().getValue() + " " + medicationDispense.getQuantity().getUnit());
-                                            dosagePayload.put("duration", medicationDispense.getDaysSupply().getValue() + " " + medicationDispense.getDaysSupply().getUnit());
+                                            dosagePayload.put("duration", duration);
                                             dosagePayload.put("days", daysList.add(medicationDispense.getDaysSupply().getValue()));
                                             dosagePayload.put("schedule", schedules);
                                             dosagePayload.put("dosageDates", schedules);
