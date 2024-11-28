@@ -203,6 +203,12 @@ public class SharedHealthRecordsService {
                                 IIdType organisationReference = encounter.getServiceProvider().getReferenceElement();
                                 organization = fhirClient.read().resource(Organization.class).withId(organisationReference.getIdPart()).execute();
                                 PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
+                                List<Coverage> coverages = this.clientRegistryService.getCoverages(patient.getIdElement().getIdPart());
+                                List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
+                                if (coverages.size() > 0) {
+                                    paymentDetailsDTOs = coverages.stream().map(coverage -> this.clientRegistryService.mapToPaymentDetails(coverage)).collect(Collectors.toList());
+                                }
+                                patientDTO.setPaymentDetails(paymentDetailsDTOs);
                                 String mrn = patientDTO.getMRN(organization.getIdElement().getIdPart());
                                 templateData.setMrn(mrn);
                                 String orgCode = organization != null ? organization.getIdElement().getIdPart(): null;

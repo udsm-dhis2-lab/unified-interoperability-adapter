@@ -162,7 +162,14 @@ public class ClientRegistryService {
                     try {
                         Patient patientData = (Patient) entry.getResource();
                         PatientDTO patientDTO = mapToPatientDTO(patientData);
+                        List<Coverage> coverages = getCoverages(patientData.getIdElement().getIdPart());
+                        List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
+                        if (coverages.size() > 0) {
+                            paymentDetailsDTOs = coverages.stream().map(this::mapToPaymentDetails).collect(Collectors.toList());
+                        }
+                        patientDTO.setPaymentDetails(paymentDetailsDTOs);
                         ClientRegistrationDTO clientDetails = new ClientRegistrationDTO();
+
                         clientDetails.setDemographicDetails(patientDTO.toMap());
                         Organization managingOrganization = new Organization();
                         FacilityDetailsDTO facilityDetails = new FacilityDetailsDTO();
@@ -522,5 +529,40 @@ public class ClientRegistryService {
                 maritalStatus,
                 relatedClients
         );
+    }
+
+    public PaymentDetailsDTO mapToPaymentDetails(Coverage coverage) {
+        PaymentDetailsDTO paymentDetailsDTO = new PaymentDetailsDTO();
+        paymentDetailsDTO.setInsuranceId(coverage.getSubscriberId());
+        paymentDetailsDTO.setName(coverage.hasPayor()
+                ? coverage.getPayor().get(0).getDisplay()
+                : null);
+        paymentDetailsDTO.setInsuranceCode(coverage.hasPayor() && coverage.getPayor().get(0).hasIdentifier()
+                ? coverage.getPayor().get(0).getIdentifier().getValue()
+                : null);
+        paymentDetailsDTO.setType(coverage.hasPayor() && coverage.getPayor().get(0).hasIdentifier()
+                && coverage.getPayor().get(0).getIdentifier().hasType() && coverage.getPayor().get(0).getIdentifier().getType().hasCoding()
+                ? coverage.getPayor().get(0).getIdentifier().getType().getCoding().get(0).getCode()
+                : null);
+        return paymentDetailsDTO;
+    }
+
+    public List<Coverage> getCoverages(String patientId) throws Exception {
+        try {
+            List<Coverage> coverages = new ArrayList<>();
+            var coveragesSearch = fhirClient.search().forResource(Coverage.class).where(Coverage.BENEFICIARY.hasId(patientId));
+            Bundle coverageBundle = coveragesSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
+            if (coverageBundle.hasEntry()) {
+                for (Bundle.BundleEntryComponent entry : coverageBundle.getEntry()) {
+                    if (entry.getResource() instanceof Coverage) {
+                        coverages.add( (Coverage) entry.getResource());
+                    }
+                }
+            }
+            return coverages;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return List.of();
     }
 }
