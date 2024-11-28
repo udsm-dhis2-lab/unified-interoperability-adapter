@@ -67,7 +67,7 @@ docker run -w="/app" -v "$(pwd)":/app node:20.18.0 bash -c "
             mkdir -p \"/app/backend/src/main/resources/static/\$app_name\" && \
             
             # Copy the directory into the backend static resources directory
-            cp -r \"\$dir\" \"/app/backend/src/main/resources/static/\$app_name\" && \
+            cp -r \"\$dir\"/* \"/app/backend/src/main/resources/static/\$app_name\" && \
             echo \"Copied \$app_name to /app/backend/src/main/resources/static/\$app_name\"
         fi
     done
