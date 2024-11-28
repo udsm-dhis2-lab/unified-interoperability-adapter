@@ -689,10 +689,28 @@ public class SharedHealthRecordsService {
                                     }
                                     templateData.setMedicationDetails(medicationDetailsDTOS);
                                 }
+
+
+                                //Radiology details
+                                List<RadiologyDetailsDTO> radiologyDetailsDTOS = new ArrayList<>();
+                                List<DiagnosticReport> diagnosticReportsList = getDiagnosticReportsByCategory(encounter.getIdElement().getIdPart(), "radiology-category");
+                                if (!diagnosticReportsList.isEmpty()) {
+                                    for (DiagnosticReport diagnosticReport : diagnosticReportsList) {
+                                        RadiologyDetailsDTO radiologyDetailsDTO = new RadiologyDetailsDTO();
+                                        radiologyDetailsDTO.setTestDate(diagnosticReport.hasIssued() ? diagnosticReport.getIssued() : null);
+                                        radiologyDetailsDTO.setTestTypeName(diagnosticReport.hasCode() ? diagnosticReport.getCode().getCoding().get(0).getDisplay() : null);
+                                        radiologyDetailsDTO.setTestTypeCode(diagnosticReport.hasCode() ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
+                                        //TODO: Add testReport and bodySite
+                                        String mediaReferenceId = diagnosticReport.hasMedia() ? diagnosticReport.getMedia().get(0).getLink().getReference() : null;
+                                        if (mediaReferenceId != null) {
+                                            Media media = fhirClient.read().resource(Media.class).withId(mediaReferenceId).execute();
+                                            radiologyDetailsDTO.setUrl(media.hasContent() ? media.getContent().getUrl() : null);
+                                        }
+                                        radiologyDetailsDTOS.add(radiologyDetailsDTO);
+                                    }
+                                    templateData.setRadiologyDetails(radiologyDetailsDTOS);
+                                }
                             }
-
-                            //Treatment details
-
 
                             // TODO: Add history when numberOfVisits > 1
                         } else if (organization != null) {
@@ -986,6 +1004,23 @@ public class SharedHealthRecordsService {
             }
         }
         return medicationDispenses;
+    }
+
+    public List<DiagnosticReport> getDiagnosticReportsByCategory(String encounterId, String category) throws Exception {
+        List<DiagnosticReport> diagnosticReports = new ArrayList<>();
+        var diagnosticReportSearch = fhirClient.search().forResource(DiagnosticReport.class)
+                .where(DiagnosticReport.ENCOUNTER.hasAnyOfIds(encounterId))
+                .where(DiagnosticReport.CATEGORY.exactly().code(category));
+
+        Bundle observationBundle;
+        observationBundle = diagnosticReportSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+                DiagnosticReport diagnosticReport = (DiagnosticReport) entryComponent.getResource();
+                diagnosticReports.add(diagnosticReport);
+            }
+        }
+        return diagnosticReports;
     }
 
     public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception {
