@@ -812,6 +812,25 @@ public class SharedHealthRecordsService {
                                     templateData.setAntenatalCareDetails(antenatalCareDetailsDTO);
                                 }
 
+
+                                //prophylAxisDetails
+                                List<ProphylAxisDetailsDTO> prophylAxisDetailsDTOS = new ArrayList<>();
+                                List<Procedure> prophylAxisProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart()); //TODO: Add support to fetch by category
+                                if (!prophylAxisProcedures.isEmpty()) {
+                                    for (Procedure procedure : prophylAxisProcedures) {
+                                        ProphylAxisDetailsDTO prophylAxisDetailsDTO = new ProphylAxisDetailsDTO();
+                                        prophylAxisDetailsDTO.setDate(procedure.hasPerformedDateTimeType() ? procedure.getPerformedDateTimeType().getValue() : null);
+                                        prophylAxisDetailsDTO.setCode(procedure.hasCode() ? procedure.getCode().getCoding().get(0).getCode() : null);
+                                        //TODO: Add prophylAxis type
+                                        //TODO: Add prophylAxis name
+                                        prophylAxisDetailsDTO.setStatus(procedure.hasStatus() ? procedure.getStatus().getDisplay() : null);
+                                        prophylAxisDetailsDTO.setNotes(procedure.hasNote() ? procedure.getNote().get(0).getText() : null);
+                                        //TODO: Add prophylAxis reaction
+                                        prophylAxisDetailsDTOS.add(prophylAxisDetailsDTO);
+                                    }
+                                    templateData.setProphylAxisDetails(prophylAxisDetailsDTOS);
+                                }
+
                                 sharedRecords.add(templateData.toMap());
                             }
 
@@ -1158,6 +1177,22 @@ public class SharedHealthRecordsService {
             }
         }
         return serviceRequests;
+    }
+
+    public List<Procedure> getProceduresByCategory(String encounterId) throws Exception {
+        List<Procedure> procedures = new ArrayList<>();
+        var procedureSearch = fhirClient.search().forResource(Procedure.class)
+                .where(Procedure.ENCOUNTER.hasAnyOfIds(encounterId));
+
+        Bundle observationBundle;
+        observationBundle = procedureSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+                Procedure procedure = (Procedure) entryComponent.getResource();
+                procedures.add(procedure);
+            }
+        }
+        return procedures;
     }
 
 
