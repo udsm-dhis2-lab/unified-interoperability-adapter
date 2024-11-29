@@ -19,14 +19,22 @@ public class ExternalSystemProxyController {
     @GetMapping("/**")
     public Map<String, Object> proxyGet(HttpServletRequest request) {
         String requestURI = request.getRequestURI();
+        String queryString = request.getQueryString();
         String url = requestURI.replace("/api/v1/dhis2/", "");
+        if (queryString != null) {
+            url += "?" + queryString;
+        }
         return this.externalProxyingService.getExternalData(url);
     }
 
     @PostMapping("/**")
     public Map<String, Object> proxyPost(HttpServletRequest request, @RequestBody Map<String,Object> payload) {
         String requestURI = request.getRequestURI();
+        String queryString = request.getQueryString();
         String url = requestURI.replace("/api/v1/dhis2/", "");
+        if (queryString != null) {
+            url += "?" + queryString;
+        }
         return this.externalProxyingService.postExternalData(url,payload);
     }
 }
