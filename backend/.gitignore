@@ -34,3 +34,5 @@ build/
 *.env
 
 src/main/resources/static
+
+src/main/resources/application.properties
