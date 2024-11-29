@@ -563,7 +563,7 @@ const mappings = [
 
 mappings.forEach((mapping) => {
   const dataElementId = mapping.mapping.dataElement.id;
-  let query = `SELECT en.service_org_id,\n`;
+  let query = `SELECT en.organization_id,\n`;
 
   query += `  '${dataElementId}' AS "${dataElementId}",\n`;
 
@@ -581,7 +581,7 @@ mappings.forEach((mapping) => {
 
   query += ` FROM patient_flat pt \n`;
   query += `JOIN encounter_flat en ON pt.id = en.patient_id \n`;
-  query += ` GROUP BY en.service_org_id,pt.gender`;
+  query += ` GROUP BY en.organization_id,pt.gender`;
 
   console.log(query);
 });
