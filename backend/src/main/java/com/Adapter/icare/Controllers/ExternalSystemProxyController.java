@@ -3,6 +3,7 @@ package com.Adapter.icare.Controllers;
 import com.Adapter.icare.Services.ExternalProxyingService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController()
@@ -15,13 +16,17 @@ public class ExternalSystemProxyController {
         this.externalProxyingService = externalProxyingService;
     }
 
-    @GetMapping("{url}")
-    public Map<String, Object> proxyGet(@PathVariable String url) {
+    @GetMapping("/**")
+    public Map<String, Object> proxyGet(HttpServletRequest request) {
+        String requestURI = request.getRequestURI();
+        String url = requestURI.replace("/api/v1/dhis2/", "");
         return this.externalProxyingService.getExternalData(url);
     }
 
-    @PostMapping("{url}")
-    public Map<String, Object> proxyPost(@PathVariable String url, @RequestBody Map<String,Object> payload) {
-        return this.externalProxyingService.getExternalData(url);
+    @PostMapping("/**")
+    public Map<String, Object> proxyPost(HttpServletRequest request, @RequestBody Map<String,Object> payload) {
+        String requestURI = request.getRequestURI();
+        String url = requestURI.replace("/api/v1/dhis2/", "");
+        return this.externalProxyingService.postExternalData(url,payload);
     }
 }
