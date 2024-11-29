@@ -91,7 +91,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   viewClientDetails(client: HDUAPIClientDetails) {
-    this.router.navigate(['/client-details'], {
+    this.router.navigate(['/client-management/client-details'], {
       queryParams: { client: JSON.stringify(client) },
     });
   }

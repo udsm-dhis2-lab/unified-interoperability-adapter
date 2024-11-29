@@ -560,10 +560,12 @@ const mappings = [
     group: null,
   },
 ];
+const startDate = "2024-11-01";
+const endDate = "2024-11-30:23:59:59";
 
 mappings.forEach((mapping) => {
   const dataElementId = mapping.mapping.dataElement.id;
-  let query = `SELECT\n`;
+  let query = `SELECT en.organization_id,\n`;
 
   query += `  '${dataElementId}' AS "${dataElementId}",\n`;
 
@@ -574,13 +576,15 @@ mappings.forEach((mapping) => {
     const startAge = param.startAge;
     const endAge = param.endAge;
 
-    query += `  COUNT(*) FILTER (WHERE gender = '${
+    query += `  COUNT(*) FILTER (WHERE pt.gender = '${
       gender === "M" ? "male" : "female"
     }') AS "${co}"${index < mapping.mapping.params.length - 1 ? "," : ""} \n`;
   });
 
-  query += ` FROM patient_flat `;
-  query += ` GROUP BY gender`;
+  query += ` FROM patient_flat pt \n`;
+  query += `JOIN encounter_flat en ON pt.id = en.patient_id \n `;
+  query += `AND en.period_start_date >= '${startDate}' && en.period_end_date <= '${endDate}' \n`;
+  query += ` GROUP BY en.organization_id,pt.gender`;
 
   console.log(query);
 });

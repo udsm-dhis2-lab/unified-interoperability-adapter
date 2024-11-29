@@ -23,6 +23,7 @@ public class PatientDTO {
     private Organization organization;
     private List<ContactPeopleDTO> contactPeople;
     private String maritalStatus;
+    private List<PaymentDetailsDTO> paymentDetails;
     private List<Map<String,Object>> relatedClients;
 
     public PatientDTO(String id,
@@ -112,6 +113,7 @@ public class PatientDTO {
             mappedPatient.setMaritalStatus(this.getMaritalStatus());
             mappedPatient.setAddresses(address);
             mappedPatient.setContactPeople(this.getContactPeople());
+            mappedPatient.setPaymentDetails(this.getPaymentDetails());
             List<Map<String,Object>> relatedClientsList = new ArrayList<>();
             if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
                 for (Map<String,Object> clientDetails: this.relatedClients) {
