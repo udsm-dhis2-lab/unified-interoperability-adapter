@@ -563,7 +563,7 @@ const mappings = [
 
 mappings.forEach((mapping) => {
   const dataElementId = mapping.mapping.dataElement.id;
-  let query = `SELECT\n`;
+  let query = `SELECT en.service_org_id,\n`;
 
   query += `  '${dataElementId}' AS "${dataElementId}",\n`;
 
@@ -574,13 +574,14 @@ mappings.forEach((mapping) => {
     const startAge = param.startAge;
     const endAge = param.endAge;
 
-    query += `  COUNT(*) FILTER (WHERE gender = '${
+    query += `  COUNT(*) FILTER (WHERE pt.gender = '${
       gender === "M" ? "male" : "female"
     }') AS "${co}"${index < mapping.mapping.params.length - 1 ? "," : ""} \n`;
   });
 
-  query += ` FROM patient_flat `;
-  query += ` GROUP BY gender`;
+  query += ` FROM patient_flat pt \n`;
+  query += `JOIN encounter_flat en ON pt.id = en.patient_id \n`;
+  query += ` GROUP BY en.service_org_id,pt.gender`;
 
   console.log(query);
 });

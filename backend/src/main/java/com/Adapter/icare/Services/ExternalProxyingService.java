@@ -56,7 +56,9 @@ public class ExternalProxyingService {
     }
 
     private String formulateDHIS2UrlPath(String endpointUrl) {
-        String path = this.dhisConstants.DHIS2Instance + (this.dhisConstants.DHIS2ContextPath != null ? "/" + this.dhisConstants.DHIS2ContextPath : "") + "/api/" + endpointUrl;
+        String path = this.dhisConstants.DHIS2Instance + (this.dhisConstants.DHIS2ContextPath != null ? "/" +
+                this.dhisConstants.DHIS2ContextPath : "") +
+                (endpointUrl.contains("api/") ? "": "/api/") + endpointUrl;
         return path;
     }
 }
