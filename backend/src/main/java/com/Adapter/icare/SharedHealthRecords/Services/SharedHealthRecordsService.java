@@ -732,6 +732,31 @@ public class SharedHealthRecordsService {
 //                                    }
 //                                    templateData.setOutcomeDetails(outcomeDetailsDTOS);
 //                                }
+
+
+                                //Cause of death details
+                                List<Observation> causeOfDeathObservations = getObservationsByCategory("cause-of-death", encounter, true);
+                                if (!causeOfDeathObservations.isEmpty()) {
+                                    Observation observation = Iterables.getLast(causeOfDeathObservations);
+                                    CausesOfDeathDetailsDTO causesOfDeathDetailsDTO = new CausesOfDeathDetailsDTO();
+                                    causesOfDeathDetailsDTO.setDateOfDeath(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
+                                    causesOfDeathDetailsDTO.setLineA(observation.hasComponent() ? observation.getComponent().get(0).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineB(observation.hasComponent() ? observation.getComponent().get(1).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineC(observation.hasComponent() ? observation.getComponent().get(2).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineD(observation.hasComponent() ? observation.getComponent().get(3).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setCauseOfDeathOther(observation.hasComponent() ? observation.getComponent().get(4).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setPlaceOfDeath(observation.hasComponent() ? observation.getComponent().get(5).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setMannerOfDeath(observation.hasComponent() ? observation.getComponent().get(6).getValueStringType().toString() : null);
+                                    OtherDeathDetailsDTO otherDeathDetailsDTO = new OtherDeathDetailsDTO();
+                                    otherDeathDetailsDTO.setPostmortemDetails(observation.hasComponent() ? observation.getComponent().get(7).getValueStringType().toString() : null);
+                                    otherDeathDetailsDTO.setMarcerated(observation.hasComponent() ? observation.getComponent().get(8).getValueBooleanType().booleanValue() : null);
+                                    otherDeathDetailsDTO.setFresh(observation.hasComponent() ? observation.getComponent().get(9).getValueBooleanType().booleanValue() : null);
+                                    otherDeathDetailsDTO.setMotherCondition(observation.hasComponent() ? observation.getComponent().get(10).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setOtherDeathDetails(otherDeathDetailsDTO);
+
+                                    templateData.setCausesOfDeathDetails(causesOfDeathDetailsDTO);
+                                }
+
                                 sharedRecords.add(templateData.toMap());
 
                             }
