@@ -18,6 +18,8 @@ import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
+import com.google.common.collect.Iterables;
+
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
 import org.springframework.http.HttpStatus;
@@ -27,6 +29,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.Subject;
+
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -654,6 +658,114 @@ public class SharedHealthRecordsService {
                                     break;
                                 }
                                 templateData.setReferralDetails(referralDetailsDTO);
+
+                                //Medication details
+                                List<MedicationDetailsDTO> medicationDetailsDTOS = new ArrayList<>();
+                                List<MedicationDispense> medicationDispensesList = getMedicationDispensesById(encounter.getIdElement().getIdPart());
+                                if (!medicationDispensesList.isEmpty()) {
+                                    for (MedicationDispense medicationDispense : medicationDispensesList) {
+                                        MedicationDetailsDTO medicationDetailsDTO = new MedicationDetailsDTO();
+                                        medicationDetailsDTO.setCode(medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getCode() : null);
+                                        medicationDetailsDTO.setName(medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getDisplay() : null);
+                                        medicationDetailsDTO.setOrderDate(medicationDispense.hasWhenHandedOver() ? medicationDispense.getWhenHandedOver() : null);
+                                        String code = medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getSystem() : null;
+                                        String codeStandard = code.contains("msd") ? "MSD CODE" : code.contains("loinc") ? "LOINC" : null;
+                                        medicationDetailsDTO.setCodeStandard(codeStandard);
+                                        String duration = "";
+                                        if (medicationDispense.getDaysSupply() != null) {
+                                            duration = medicationDispense.getDaysSupply().getValue() + " " + medicationDispense.getDaysSupply().getUnit();
+                                        }
+                                        medicationDetailsDTO.setPeriodOfMedication(duration);
+                                        medicationDetailsDTO.setTreatmentType(medicationDispense.hasType() ? medicationDispense.getType().getText() : null);
+                                        if (medicationDispense.hasDosageInstruction()) {
+                                            Dosage dosage = Iterables.getLast(medicationDispense.getDosageInstruction());
+                                            Map<String, Object> dosagePayload = new HashMap<>();
+                                            ArrayList<BigDecimal> daysList = new ArrayList<>();
+                                            ArrayList<String> schedules = new ArrayList<>();
+                                            schedules.add(medicationDispense.hasWhenPrepared() ? medicationDispense.getWhenPrepared().toString() : null);
+                                            schedules.add(medicationDispense.hasWhenHandedOver() ? medicationDispense.getWhenHandedOver().toString() : null);
+                                            String quantity = "";
+                                            if (medicationDispense.hasQuantity()) {
+                                                quantity = medicationDispense.getQuantity().getValue() + " " + medicationDispense.getQuantity().getUnit();
+                                            }
+                                            dosagePayload.put("dose", quantity);
+                                            dosagePayload.put("frequency", dosage.hasTiming() ? dosage.getTiming().getRepeat().getFrequency() : null);
+                                            dosagePayload.put("route", dosage.hasRoute() ? dosage.getRoute().getCoding().get(0).getDisplay() : null);
+                                            dosagePayload.put("instructions", dosage.hasText() ? dosage.getText() : null);
+                                            dosagePayload.put("quantity", quantity);
+                                            dosagePayload.put("duration", duration);
+                                            dosagePayload.put("days", daysList.add(medicationDispense.hasDaysSupply() ? medicationDispense.getDaysSupply().getValue() : null));
+                                            dosagePayload.put("schedule", schedules);
+                                            dosagePayload.put("dosageDates", schedules);
+                                            medicationDetailsDTO.setDosage(dosagePayload);
+                                        }
+                                        medicationDetailsDTOS.add(medicationDetailsDTO);
+                                    }
+                                    templateData.setMedicationDetails(medicationDetailsDTOS);
+                                }
+
+
+                                //Radiology details
+                                List<RadiologyDetailsDTO> radiologyDetailsDTOS = new ArrayList<>();
+                                List<DiagnosticReport> diagnosticReportsList = getDiagnosticReportsByCategory(encounter.getIdElement().getIdPart(), "radiology-category");
+                                if (!diagnosticReportsList.isEmpty()) {
+                                    for (DiagnosticReport diagnosticReport : diagnosticReportsList) {
+                                        RadiologyDetailsDTO radiologyDetailsDTO = new RadiologyDetailsDTO();
+                                        radiologyDetailsDTO.setTestDate(diagnosticReport.hasIssued() ? diagnosticReport.getIssued() : null);
+                                        radiologyDetailsDTO.setTestTypeName(diagnosticReport.hasCode() ? diagnosticReport.getCode().getCoding().get(0).getDisplay() : null);
+                                        radiologyDetailsDTO.setTestTypeCode(diagnosticReport.hasCode() ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
+                                        //TODO: Add testReport and bodySite
+                                        String mediaReferenceId = diagnosticReport.hasMedia() ? diagnosticReport.getMedia().get(0).getLink().getReference() : null;
+                                        if (mediaReferenceId != null) {
+                                            Media media = fhirClient.read().resource(Media.class).withId(mediaReferenceId).execute();
+                                            radiologyDetailsDTO.setUrl(media.hasContent() ? media.getContent().getUrl() : null);
+                                        }
+                                        radiologyDetailsDTOS.add(radiologyDetailsDTO);
+                                    }
+                                    templateData.setRadiologyDetails(radiologyDetailsDTOS);
+                                }
+
+
+                                //Outcome details
+                                //TODO: Discuss obout resource to be used here
+//                                List<OutcomeDetailsDTO> outcomeDetailsDTOS = new ArrayList<>();
+//                                List<QuestionnaireResponse> questionnaireResponses = getQuestionnaireResponsesById(encounter.getIdElement().getIdPart());
+//                                if (!questionnaireResponses.isEmpty()) {
+//                                    for (QuestionnaireResponse questionnaireResponse : questionnaireResponses) {
+//                                        OutcomeDetailsDTO outcomeDetailsDTO = new OutcomeDetailsDTO();
+//                                        outcomeDetailsDTO.setAlive(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(0).getAnswer().get(0).getValueBooleanType().booleanValue() : null);
+//                                        outcomeDetailsDTO.setDeathLocation(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(1).getAnswer().get(0).getValueStringType().toString() : null);
+//                                        outcomeDetailsDTO.setDeathDate(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(2).getAnswer().get(0).getValueDateType().getValue() : null);
+//                                        outcomeDetailsDTO.setContactTracing(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(3).getAnswer().get(0).getValueBooleanType().booleanValue() : null);
+//                                        outcomeDetailsDTOS.add(outcomeDetailsDTO);
+//                                    }
+//                                    templateData.setOutcomeDetails(outcomeDetailsDTOS);
+//                                }
+
+
+                                //Cause of death details
+                                List<Observation> causeOfDeathObservations = getObservationsByCategory("cause-of-death", encounter, true);
+                                if (!causeOfDeathObservations.isEmpty()) {
+                                    Observation observation = Iterables.getLast(causeOfDeathObservations);
+                                    CausesOfDeathDetailsDTO causesOfDeathDetailsDTO = new CausesOfDeathDetailsDTO();
+                                    causesOfDeathDetailsDTO.setDateOfDeath(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
+                                    causesOfDeathDetailsDTO.setLineA(observation.hasComponent() ? observation.getComponent().get(0).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineB(observation.hasComponent() ? observation.getComponent().get(1).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineC(observation.hasComponent() ? observation.getComponent().get(2).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineD(observation.hasComponent() ? observation.getComponent().get(3).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setCauseOfDeathOther(observation.hasComponent() ? observation.getComponent().get(4).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setPlaceOfDeath(observation.hasComponent() ? observation.getComponent().get(5).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setMannerOfDeath(observation.hasComponent() ? observation.getComponent().get(6).getValueStringType().toString() : null);
+                                    OtherDeathDetailsDTO otherDeathDetailsDTO = new OtherDeathDetailsDTO();
+                                    otherDeathDetailsDTO.setPostmortemDetails(observation.hasComponent() ? observation.getComponent().get(7).getValueStringType().toString() : null);
+                                    otherDeathDetailsDTO.setMarcerated(observation.hasComponent() ? observation.getComponent().get(8).getValueBooleanType().booleanValue() : null);
+                                    otherDeathDetailsDTO.setFresh(observation.hasComponent() ? observation.getComponent().get(9).getValueBooleanType().booleanValue() : null);
+                                    otherDeathDetailsDTO.setMotherCondition(observation.hasComponent() ? observation.getComponent().get(10).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setOtherDeathDetails(otherDeathDetailsDTO);
+
+                                    templateData.setCausesOfDeathDetails(causesOfDeathDetailsDTO);
+                                }
+
                                 sharedRecords.add(templateData.toMap());
                             }
 
@@ -935,7 +1047,57 @@ public class SharedHealthRecordsService {
         return conditions;
     }
 
-    public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception{
+    public List<MedicationDispense> getMedicationDispensesById(String encounterId) throws Exception {
+        List<MedicationDispense> medicationDispenses = new ArrayList<>();
+        var medicationDispenseSearch = fhirClient.search().forResource(MedicationDispense.class)
+                .where(MedicationDispense.CONTEXT.hasAnyOfIds(encounterId));
+
+        Bundle observationBundle;
+        observationBundle = medicationDispenseSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+                MedicationDispense medicationDispense = (MedicationDispense) entryComponent.getResource();
+                medicationDispenses.add(medicationDispense);
+            }
+        }
+        return medicationDispenses;
+    }
+
+    public List<DiagnosticReport> getDiagnosticReportsByCategory(String encounterId, String category) throws Exception {
+        List<DiagnosticReport> diagnosticReports = new ArrayList<>();
+        var diagnosticReportSearch = fhirClient.search().forResource(DiagnosticReport.class)
+                .where(DiagnosticReport.ENCOUNTER.hasAnyOfIds(encounterId))
+                .where(DiagnosticReport.CATEGORY.exactly().code(category));
+
+        Bundle observationBundle;
+        observationBundle = diagnosticReportSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+                DiagnosticReport diagnosticReport = (DiagnosticReport) entryComponent.getResource();
+                diagnosticReports.add(diagnosticReport);
+            }
+        }
+        return diagnosticReports;
+    }
+
+    //TODO: Confirm if we still need this function as questionnaire response is not used in the current implementation
+    public List<QuestionnaireResponse> getQuestionnaireResponsesById(String encounterId) throws Exception {
+        List<QuestionnaireResponse> questionnaireResponses = new ArrayList<>();
+        var questionnaireResponseSearch = fhirClient.search().forResource(QuestionnaireResponse.class)
+                .where(QuestionnaireResponse.ENCOUNTER.hasAnyOfIds(encounterId));
+
+        Bundle observationBundle;
+        observationBundle = questionnaireResponseSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+                QuestionnaireResponse questionnaireResponse = (QuestionnaireResponse) entryComponent.getResource();
+                questionnaireResponses.add(questionnaireResponse);
+            }
+        }
+        return questionnaireResponses;
+    }
+
+    public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception {
         List<ServiceRequest> serviceRequests = new ArrayList<>();
         var serviceRequestSearch = fhirClient.search().forResource(ServiceRequest.class)
                 .where(ServiceRequest.ENCOUNTER.hasAnyOfIds(encounterId))
