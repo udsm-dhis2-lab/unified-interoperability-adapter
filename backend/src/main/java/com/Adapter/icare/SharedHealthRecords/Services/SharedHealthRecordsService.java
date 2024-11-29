@@ -649,8 +649,6 @@ public class SharedHealthRecordsService {
                                     break;
                                 }
                                 templateData.setReferralDetails(referralDetailsDTO);
-                                sharedRecords.add(templateData.toMap());
-
 
                                 //Medication details
                                 List<MedicationDetailsDTO> medicationDetailsDTOS = new ArrayList<>();
@@ -664,23 +662,30 @@ public class SharedHealthRecordsService {
                                         String code = medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getSystem() : null;
                                         String codeStandard = code.contains("msd") ? "MSD CODE" : code.contains("loinc") ? "LOINC" : null;
                                         medicationDetailsDTO.setCodeStandard(codeStandard);
-                                        String duration = medicationDispense.getDaysSupply().getValue() + " " + medicationDispense.getDaysSupply().getUnit();
+                                        String duration = "";
+                                        if (medicationDispense.getDaysSupply() != null) {
+                                            duration = medicationDispense.getDaysSupply().getValue() + " " + medicationDispense.getDaysSupply().getUnit();
+                                        }
                                         medicationDetailsDTO.setPeriodOfMedication(duration);
-                                        medicationDetailsDTO.setTreatmentType(medicationDispense.hasType() ? medicationDispense.getType().getCoding().get(0).getCode() : null);
+                                        medicationDetailsDTO.setTreatmentType(medicationDispense.hasType() ? medicationDispense.getType().getText() : null);
                                         if (medicationDispense.hasDosageInstruction()) {
                                             Dosage dosage = Iterables.getLast(medicationDispense.getDosageInstruction());
                                             Map<String, Object> dosagePayload = new HashMap<>();
                                             ArrayList<BigDecimal> daysList = new ArrayList<>();
                                             ArrayList<String> schedules = new ArrayList<>();
-                                            schedules.add(medicationDispense.getWhenPrepared().toString());
-                                            schedules.add(medicationDispense.getWhenHandedOver().toString());
-                                            dosagePayload.put("dose", medicationDispense.getQuantity().getValue() + " " + medicationDispense.getQuantity().getUnit());
-                                            dosagePayload.put("frequency", dosage.getTiming().getRepeat().getFrequency());
-                                            dosagePayload.put("route", dosage.getRoute().getCoding().get(0).getDisplay());
-                                            dosagePayload.put("instructions", dosage.getText());
-                                            dosagePayload.put("quantity", medicationDispense.getQuantity().getValue() + " " + medicationDispense.getQuantity().getUnit());
+                                            schedules.add(medicationDispense.hasWhenPrepared() ? medicationDispense.getWhenPrepared().toString() : null);
+                                            schedules.add(medicationDispense.hasWhenHandedOver() ? medicationDispense.getWhenHandedOver().toString() : null);
+                                            String quantity = "";
+                                            if (medicationDispense.hasQuantity()) {
+                                                quantity = medicationDispense.getQuantity().getValue() + " " + medicationDispense.getQuantity().getUnit();
+                                            }
+                                            dosagePayload.put("dose", quantity);
+                                            dosagePayload.put("frequency", dosage.hasTiming() ? dosage.getTiming().getRepeat().getFrequency() : null);
+                                            dosagePayload.put("route", dosage.hasRoute() ? dosage.getRoute().getCoding().get(0).getDisplay() : null);
+                                            dosagePayload.put("instructions", dosage.hasText() ? dosage.getText() : null);
+                                            dosagePayload.put("quantity", quantity);
                                             dosagePayload.put("duration", duration);
-                                            dosagePayload.put("days", daysList.add(medicationDispense.getDaysSupply().getValue()));
+                                            dosagePayload.put("days", daysList.add(medicationDispense.hasDaysSupply() ? medicationDispense.getDaysSupply().getValue() : null));
                                             dosagePayload.put("schedule", schedules);
                                             dosagePayload.put("dosageDates", schedules);
                                             medicationDetailsDTO.setDosage(dosagePayload);
@@ -710,6 +715,25 @@ public class SharedHealthRecordsService {
                                     }
                                     templateData.setRadiologyDetails(radiologyDetailsDTOS);
                                 }
+
+
+                                //Outcome details
+                                //TODO: Discuss obout resource to be used here
+//                                List<OutcomeDetailsDTO> outcomeDetailsDTOS = new ArrayList<>();
+//                                List<QuestionnaireResponse> questionnaireResponses = getQuestionnaireResponsesById(encounter.getIdElement().getIdPart());
+//                                if (!questionnaireResponses.isEmpty()) {
+//                                    for (QuestionnaireResponse questionnaireResponse : questionnaireResponses) {
+//                                        OutcomeDetailsDTO outcomeDetailsDTO = new OutcomeDetailsDTO();
+//                                        outcomeDetailsDTO.setAlive(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(0).getAnswer().get(0).getValueBooleanType().booleanValue() : null);
+//                                        outcomeDetailsDTO.setDeathLocation(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(1).getAnswer().get(0).getValueStringType().toString() : null);
+//                                        outcomeDetailsDTO.setDeathDate(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(2).getAnswer().get(0).getValueDateType().getValue() : null);
+//                                        outcomeDetailsDTO.setContactTracing(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(3).getAnswer().get(0).getValueBooleanType().booleanValue() : null);
+//                                        outcomeDetailsDTOS.add(outcomeDetailsDTO);
+//                                    }
+//                                    templateData.setOutcomeDetails(outcomeDetailsDTOS);
+//                                }
+                                sharedRecords.add(templateData.toMap());
+
                             }
 
                             // TODO: Add history when numberOfVisits > 1
@@ -1021,6 +1045,23 @@ public class SharedHealthRecordsService {
             }
         }
         return diagnosticReports;
+    }
+
+    //TODO: Confirm if we still need this function as questionnaire response is not used in the current implementation
+    public List<QuestionnaireResponse> getQuestionnaireResponsesById(String encounterId) throws Exception {
+        List<QuestionnaireResponse> questionnaireResponses = new ArrayList<>();
+        var questionnaireResponseSearch = fhirClient.search().forResource(QuestionnaireResponse.class)
+                .where(QuestionnaireResponse.ENCOUNTER.hasAnyOfIds(encounterId));
+
+        Bundle observationBundle;
+        observationBundle = questionnaireResponseSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+                QuestionnaireResponse questionnaireResponse = (QuestionnaireResponse) entryComponent.getResource();
+                questionnaireResponses.add(questionnaireResponse);
+            }
+        }
+        return questionnaireResponses;
     }
 
     public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception {
