@@ -560,6 +560,8 @@ const mappings = [
     group: null,
   },
 ];
+const startDate = "2024-11-01";
+const endDate = "2024-11-30:23:59:59";
 
 mappings.forEach((mapping) => {
   const dataElementId = mapping.mapping.dataElement.id;
@@ -580,7 +582,8 @@ mappings.forEach((mapping) => {
   });
 
   query += ` FROM patient_flat pt \n`;
-  query += `JOIN encounter_flat en ON pt.id = en.patient_id \n`;
+  query += `JOIN encounter_flat en ON pt.id = en.patient_id \n `;
+  query += `AND en.period_start_date >= '${startDate}' && en.period_end_date <= '${endDate}' \n`;
   query += ` GROUP BY en.organization_id,pt.gender`;
 
   console.log(query);
