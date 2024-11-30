@@ -831,6 +831,7 @@ public class SharedHealthRecordsService {
                                     templateData.setProphylAxisDetails(prophylAxisDetailsDTOS);
                                 }
 
+
                                 sharedRecords.add(templateData.toMap());
                             }
 
