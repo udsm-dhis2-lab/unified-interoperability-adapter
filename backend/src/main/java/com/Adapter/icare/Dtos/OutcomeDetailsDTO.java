@@ -17,5 +17,6 @@ public class OutcomeDetailsDTO {
     private Date deathDate;
     private String contactTracing;
     private boolean investigationConducted;
+    private boolean quarantined;
     private boolean referred;
 }
