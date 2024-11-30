@@ -47,12 +47,7 @@ public class SharedHealthRecordsService {
     private final ClientRegistryService clientRegistryService;
     private final MediatorsService mediatorsService;
 
-    public SharedHealthRecordsService(
-            FHIRConstants fhirConstants,
-            UserService userService,
-            ClientRegistryService clientRegistryService,
-            MediatorsService mediatorsService,
-            ClientRegistryConstants clientRegistryConstants) {
+    public SharedHealthRecordsService(FHIRConstants fhirConstants, UserService userService, ClientRegistryService clientRegistryService, MediatorsService mediatorsService, ClientRegistryConstants clientRegistryConstants) {
         this.fhirConstants = fhirConstants;
         this.userService = userService;
         this.clientRegistryService = clientRegistryService;
@@ -69,22 +64,7 @@ public class SharedHealthRecordsService {
         }
     }
 
-    public Map<String, Object> getSharedRecordsWithPagination(
-            Integer page,
-            Integer pageSize,
-            String identifier,
-            String identifierType,
-            String referralNumber,
-            boolean onlyLinkedClients,
-            String gender,
-            String firstName,
-            String middleName,
-            String lastName,
-            String hfrCode,
-            Date dateOfBirth,
-            boolean includeDeceased,
-            Integer numberOfVisits
-    ) throws Exception {
+    public Map<String, Object> getSharedRecordsWithPagination(Integer page, Integer pageSize, String identifier, String identifierType, String referralNumber, boolean onlyLinkedClients, String gender, String firstName, String middleName, String lastName, String hfrCode, Date dateOfBirth, boolean includeDeceased, Integer numberOfVisits) throws Exception {
         List<Map<String, Object>> sharedRecords = new ArrayList<>();
         Bundle response = new Bundle();
         Bundle clientTotalBundle = new Bundle();
@@ -126,22 +106,15 @@ public class SharedHealthRecordsService {
                     searchRecords.where(Patient.BIRTHDATE.beforeOrEquals().day(dateOfBirth));
                 }
 
-                response = searchRecords.count(pageSize)
-                        .offset(page - 1)
-                        .returnBundle(Bundle.class)
-                        .execute();
-                clientTotalBundle = searchRecords
-                        .summaryMode(SummaryEnum.COUNT)
-                        .returnBundle(Bundle.class)
-                        .execute();
+                response = searchRecords.count(pageSize).offset(page - 1).returnBundle(Bundle.class).execute();
+                clientTotalBundle = searchRecords.summaryMode(SummaryEnum.COUNT).returnBundle(Bundle.class).execute();
 
             } else {
                 // referralNumber should be saved as identifier of the encounter. Since it is concatenated with HFRcode then the search criteria should consider concatenating the two
                 if (hfrCode == null) {
                     throw new Exception("HFR code is mandatory when searching using referral number (referralNumber) param");
                 }
-                var encSearch = fhirClient.search().forResource(Encounter.class)
-                        .where(Encounter.IDENTIFIER.exactly().identifier(hfrCode + "-" + referralNumber));
+                var encSearch = fhirClient.search().forResource(Encounter.class).where(Encounter.IDENTIFIER.exactly().identifier(hfrCode + "-" + referralNumber));
                 Bundle encBundle = encSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
                 if (encBundle.hasEntry()) {
                     for (Bundle.BundleEntryComponent entry : response.getEntry()) {
@@ -150,10 +123,7 @@ public class SharedHealthRecordsService {
                             encounters.add((Encounter) entry.getResource());
                             IIdType patientReference = encounters.get(0).getSubject().getReferenceElement();
                             Patient patient = fhirClient.read().resource(Patient.class).withId(patientReference.getIdPart()).execute();
-                            response = fhirClient.search().forResource(Patient.class)
-                                    .where(Patient.IDENTIFIER.exactly().identifier(patient.getIdElement().getIdPart()))
-                                    .returnBundle(Bundle.class)
-                                    .execute();
+                            response = fhirClient.search().forResource(Patient.class).where(Patient.IDENTIFIER.exactly().identifier(patient.getIdElement().getIdPart())).returnBundle(Bundle.class).execute();
                         }
                     }
                 }
@@ -169,10 +139,7 @@ public class SharedHealthRecordsService {
                     searchRecords.where(Patient.GIVEN.matches().value(firstName));
                 }
 
-                response = searchRecords.count(pageSize)
-                        .offset(page - 1)
-                        .returnBundle(Bundle.class)
-                        .execute();
+                response = searchRecords.count(pageSize).offset(page - 1).returnBundle(Bundle.class).execute();
             }
 
             if (!response.getEntry().isEmpty()) {
@@ -183,8 +150,7 @@ public class SharedHealthRecordsService {
                         if (hfrCode != null) {
                             try {
                                 Bundle bundle = new Bundle();
-                                bundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode)).returnBundle(Bundle.class)
-                                        .execute();
+                                bundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().identifier(hfrCode)).returnBundle(Bundle.class).execute();
                                 for (Bundle.BundleEntryComponent bundleEntryComponent : bundle.getEntry()) {
                                     if (bundleEntryComponent.getResource() instanceof Organization) {
                                         organization = (Organization) bundleEntryComponent.getResource();
@@ -219,12 +185,7 @@ public class SharedHealthRecordsService {
                                 String orgCode = organization != null ? organization.getIdElement().getIdPart() : null;
                                 templateData.setDemographicDetails(patientDTO.toMap());
                                 templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
-                                templateData.setFacilityDetails(organization != null ?
-                                        new OrganizationDTO(
-                                                organization.getId(),
-                                                organization.getIdentifier(),
-                                                organization.getName(),
-                                                organization.getActive()).toSummary() : null);
+                                templateData.setFacilityDetails(organization != null ? new OrganizationDTO(organization.getId(), organization.getIdentifier(), organization.getName(), organization.getActive()).toSummary() : null);
                                 VisitDetailsDTO visitDetails = new VisitDetailsDTO();
                                 visitDetails.setId(encounter.getIdElement().getIdPart());
                                 visitDetails.setVisitDate(encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ? encounter.getPeriod().getStart() : null);
@@ -244,10 +205,7 @@ public class SharedHealthRecordsService {
                                 List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
 //                        System.out.println(observationGroups.size());
                                 for (Observation observationGroup : observationGroups) {
-                                    List<Observation> observationsData = getObservationsByObservationGroupId(
-                                            "vital-signs",
-                                            encounter,
-                                            observationGroup.getIdElement().getIdPart());
+                                    List<Observation> observationsData = getObservationsByObservationGroupId("vital-signs", encounter, observationGroup.getIdElement().getIdPart());
                                     if (!observationsData.isEmpty()) {
                                         Map<String, Object> vitalSign = new LinkedHashMap<>();
                                         for (Observation observation : observationsData) {
@@ -286,10 +244,7 @@ public class SharedHealthRecordsService {
                                         visitNotesData.put("date", observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString() : null);
                                         // Chief complaints
                                         List<String> chiefComplaints = new ArrayList<>();
-                                        List<Observation> chiefComplaintsData = getObservationsByObservationGroupId(
-                                                "chief-complaint",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> chiefComplaintsData = getObservationsByObservationGroupId("chief-complaint", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!chiefComplaintsData.isEmpty()) {
                                             for (Observation observation : chiefComplaintsData) {
                                                 chiefComplaints.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
@@ -298,10 +253,7 @@ public class SharedHealthRecordsService {
                                         visitNotesData.put("chiefComplaints", chiefComplaints);
                                         // historyOfPresentIllness
                                         List<String> historyOfPresentIllness = new ArrayList<>();
-                                        List<Observation> historyOfPresentIllnessData = getObservationsByObservationGroupId(
-                                                "history-of-preventive-illness",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> historyOfPresentIllnessData = getObservationsByObservationGroupId("history-of-preventive-illness", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!historyOfPresentIllnessData.isEmpty()) {
                                             for (Observation observation : historyOfPresentIllnessData) {
                                                 historyOfPresentIllness.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
@@ -311,10 +263,7 @@ public class SharedHealthRecordsService {
 
                                         // reviewOfOtherSystems - review-of-other-system
                                         List<Map<String, Object>> reviewOfOtherSystems = new ArrayList<>();
-                                        List<Observation> reviewOfOtherSystemsData = getObservationsByObservationGroupId(
-                                                "review-of-other-system",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> reviewOfOtherSystemsData = getObservationsByObservationGroupId("review-of-other-system", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!reviewOfOtherSystemsData.isEmpty()) {
                                             for (Observation observation : reviewOfOtherSystemsData) {
                                                 Map<String, Object> data = new LinkedHashMap<>();
@@ -328,10 +277,7 @@ public class SharedHealthRecordsService {
 
                                         // pastMedicalHistory - past-medical-history
                                         List<String> pastMedicalHistory = new ArrayList<>();
-                                        List<Observation> pastMedicalHistoryData = getObservationsByObservationGroupId(
-                                                "past-medical-history",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> pastMedicalHistoryData = getObservationsByObservationGroupId("past-medical-history", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!pastMedicalHistoryData.isEmpty()) {
                                             for (Observation observation : pastMedicalHistoryData) {
                                                 pastMedicalHistory.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
@@ -341,10 +287,7 @@ public class SharedHealthRecordsService {
 
                                         // familyAndSocialHistory - family-and-social-history
                                         List<String> familyAndSocialHistory = new ArrayList<>();
-                                        List<Observation> familyAndSocialHistoryData = getObservationsByObservationGroupId(
-                                                "family-and-social-history",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> familyAndSocialHistoryData = getObservationsByObservationGroupId("family-and-social-history", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!familyAndSocialHistoryData.isEmpty()) {
                                             for (Observation observation : familyAndSocialHistoryData) {
                                                 familyAndSocialHistory.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
@@ -354,10 +297,7 @@ public class SharedHealthRecordsService {
 
                                         // generalExaminationObservation - general-examination
                                         List<String> generalExaminationObservation = new ArrayList<>();
-                                        List<Observation> generalExaminationObservationData = getObservationsByObservationGroupId(
-                                                "general-examination",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> generalExaminationObservationData = getObservationsByObservationGroupId("general-examination", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!generalExaminationObservationData.isEmpty()) {
                                             for (Observation observation : generalExaminationObservationData) {
                                                 generalExaminationObservation.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
@@ -367,10 +307,7 @@ public class SharedHealthRecordsService {
 
                                         // localExamination - local-examination
                                         List<String> localExamination = new ArrayList<>();
-                                        List<Observation> localExaminationData = getObservationsByObservationGroupId(
-                                                "local-examination",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> localExaminationData = getObservationsByObservationGroupId("local-examination", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!localExaminationData.isEmpty()) {
                                             for (Observation observation : localExaminationData) {
                                                 localExamination.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
@@ -380,10 +317,7 @@ public class SharedHealthRecordsService {
 
                                         //systemicExaminationObservation - systemic-examination
                                         List<Map<String, Object>> systemicExaminationObservation = new ArrayList<>();
-                                        List<Observation> systemicExaminationObservationData = getObservationsByObservationGroupId(
-                                                "systemic-examination",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> systemicExaminationObservationData = getObservationsByObservationGroupId("systemic-examination", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!systemicExaminationObservationData.isEmpty()) {
                                             for (Observation observation : systemicExaminationObservationData) {
                                                 Map<String, Object> data = new LinkedHashMap<>();
@@ -397,10 +331,7 @@ public class SharedHealthRecordsService {
 
                                         // doctorPlanOrSuggestion - doctor-plan
                                         List<String> doctorPlanOrSuggestion = new ArrayList<>();
-                                        List<Observation> doctorPlanOrSuggestionData = getObservationsByObservationGroupId(
-                                                "doctor-plan",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> doctorPlanOrSuggestionData = getObservationsByObservationGroupId("doctor-plan", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!doctorPlanOrSuggestionData.isEmpty()) {
                                             for (Observation observation : doctorPlanOrSuggestionData) {
                                                 doctorPlanOrSuggestion.add(observation.hasValueStringType() ? observation.getValueStringType().toString() : null);
@@ -410,10 +341,7 @@ public class SharedHealthRecordsService {
 
                                         // providerSpeciality - provider-speciality
                                         String providerSpeciality = null;
-                                        List<Observation> providerSpecialityData = getObservationsByObservationGroupId(
-                                                "provider-speciality",
-                                                encounter,
-                                                observationGroup.getIdElement().getIdPart());
+                                        List<Observation> providerSpecialityData = getObservationsByObservationGroupId("provider-speciality", encounter, observationGroup.getIdElement().getIdPart());
                                         if (!providerSpecialityData.isEmpty()) {
                                             for (Observation observation : providerSpecialityData) {
                                                 if (observation.hasValueStringType()) {
@@ -472,9 +400,7 @@ public class SharedHealthRecordsService {
                                     for (Observation observation : smokingObs) {
                                         if (observation.hasValue() && observation.hasValueBooleanType()) {
                                             smoking.put("use", observation.getValueBooleanType().booleanValue());
-                                            smoking.put("notes", observation.getNote().stream()
-                                                    .map(note -> note.getText())
-                                                    .collect(Collectors.joining(", ")));
+                                            smoking.put("notes", observation.getNote().stream().map(note -> note.getText()).collect(Collectors.joining(", ")));
                                             break;
                                         }
                                     }
@@ -487,9 +413,7 @@ public class SharedHealthRecordsService {
                                     for (Observation observation : alcoholUseObs) {
                                         if (observation.hasValue() && observation.hasValueBooleanType()) {
                                             alcoholUse.put("use", observation.getValueBooleanType().booleanValue());
-                                            alcoholUse.put("notes", observation.getNote().stream()
-                                                    .map(note -> note.getText())
-                                                    .collect(Collectors.joining(", ")));
+                                            alcoholUse.put("notes", observation.getNote().stream().map(note -> note.getText()).collect(Collectors.joining(", ")));
                                             break;
                                         }
                                     }
@@ -502,9 +426,7 @@ public class SharedHealthRecordsService {
                                     for (Observation observation : drugUseObs) {
                                         if (observation.hasValue() && observation.hasValueBooleanType()) {
                                             drugUse.put("use", observation.getValueBooleanType().booleanValue());
-                                            drugUse.put("notes", observation.getNote().stream()
-                                                    .map(note -> note.getText())
-                                                    .collect(Collectors.joining(", ")));
+                                            drugUse.put("notes", observation.getNote().stream().map(note -> note.getText()).collect(Collectors.joining(", ")));
                                             break;
                                         }
                                     }
@@ -608,11 +530,7 @@ public class SharedHealthRecordsService {
                                 List<ServiceRequest> serviceRequests = getServiceRequestsByCategory(encounter.getIdElement().getIdPart(), "referral-request");
                                 if (!serviceRequests.isEmpty()) {
                                     for (ServiceRequest serviceRequest : serviceRequests) {
-                                        if (serviceRequest.hasIdentifier()
-                                                && serviceRequest.getIdentifier().get(0).hasType()
-                                                && serviceRequest.getIdentifier().get(0).getType().hasCoding()
-                                                && !serviceRequest.getIdentifier().get(0).getType().getCoding().isEmpty()
-                                                && serviceRequest.getIdentifier().get(0).getType().getCoding().get(0).getCode().equals("REFERRAL-NUMBER")) {
+                                        if (serviceRequest.hasIdentifier() && serviceRequest.getIdentifier().get(0).hasType() && serviceRequest.getIdentifier().get(0).getType().hasCoding() && !serviceRequest.getIdentifier().get(0).getType().getCoding().isEmpty() && serviceRequest.getIdentifier().get(0).getType().getCoding().get(0).getCode().equals("REFERRAL-NUMBER")) {
                                             referralDetailsDTO.setReferralDate(serviceRequest.hasAuthoredOn() ? serviceRequest.getAuthoredOn() : null);
                                             referralDetailsDTO.setReferralNumber(serviceRequest.getIdentifier().get(0).hasValue() ? serviceRequest.getIdentifier().get(0).getValue().replace(orgCode + "-", "") : null);
                                             List<String> reasons = new ArrayList<>();
@@ -643,11 +561,7 @@ public class SharedHealthRecordsService {
                                             Practitioner practitioner = fhirClient.read().resource(Practitioner.class).withId(practitionerReferenceType.getIdPart()).execute();
                                             referringClinician.put("MCTCode", practitioner.hasIdentifier() ? practitioner.getIdElement().getIdPart() : null);
                                             referringClinician.put("name", practitioner.hasName() && !practitioner.getName().isEmpty() ? practitioner.getName().get(0).getText() : null);
-                                            referringClinician.put("phoneNumber", practitioner.hasTelecom() &&
-                                                    !practitioner.getTelecom().isEmpty()
-                                                    && practitioner.getTelecom().get(0).hasValue()
-                                                    ? practitioner.getTelecom().get(0).getValue()
-                                                    : null);
+                                            referringClinician.put("phoneNumber", practitioner.hasTelecom() && !practitioner.getTelecom().isEmpty() && practitioner.getTelecom().get(0).hasValue() ? practitioner.getTelecom().get(0).getValue() : null);
                                             referralDetailsDTO.setReferringClinician(referringClinician);
                                             break;
                                         }
@@ -735,8 +649,7 @@ public class SharedHealthRecordsService {
                                     outcomeDetailsDTO.setAlive(getComponentValueBoolean(observation, 0));
                                     outcomeDetailsDTO.setDeathLocation(getComponentValueString(observation, 1));
                                     outcomeDetailsDTO.setDeathDate(getComponentValueDateTime(observation, 2));
-                                    //TODO: decide on the type to use for contact tracing
-//                                    outcomeDetailsDTO.setContactTracing(getComponentValueBoolean(observation, 3));
+                                    outcomeDetailsDTO.setContactTracing(getComponentValueBoolean(observation, 3));
                                     outcomeDetailsDTO.setInvestigationConducted(getComponentValueBoolean(observation, 4));
                                     outcomeDetailsDTO.setQuarantined(getComponentValueBoolean(observation, 5));
                                     outcomeDetailsDTO.setReferred(getComponentValueBoolean(observation, 6));
@@ -815,7 +728,7 @@ public class SharedHealthRecordsService {
 
                                 //prophylAxisDetails
                                 List<ProphylAxisDetailsDTO> prophylAxisDetailsDTOS = new ArrayList<>();
-                                List<Procedure> prophylAxisProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart()); //TODO: Add support to fetch by category
+                                List<Procedure> prophylAxisProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), ""); //TODO: Add support to fetch by category
                                 if (!prophylAxisProcedures.isEmpty()) {
                                     for (Procedure procedure : prophylAxisProcedures) {
                                         ProphylAxisDetailsDTO prophylAxisDetailsDTO = new ProphylAxisDetailsDTO();
@@ -831,6 +744,71 @@ public class SharedHealthRecordsService {
                                     templateData.setProphylAxisDetails(prophylAxisDetailsDTOS);
                                 }
 
+                                //Treatment details
+                                TreatmentDetailsDTO treatmentDetailsDTO = new TreatmentDetailsDTO();
+
+                                //Chemotherapy treatment
+                                List<Procedure> chemotherapyProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "chemotherapy-treatment");
+                                if (!chemotherapyProcedures.isEmpty()) {
+                                    List<Map<String, Object>> chemotherapyTreatment = new ArrayList<>();
+                                    for (Procedure procedure : chemotherapyProcedures) {
+                                        Map<String, Object> chemoTherapy = new HashMap<>();
+                                        chemoTherapy.put("diagnosis", procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
+                                        chemoTherapy.put("regiment", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "regiment"));
+                                        chemoTherapy.put("stage", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "stage"));
+                                        chemoTherapy.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "totalExpectedCycles"));
+                                        chemoTherapy.put("currentChemotherapeuticCycles", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "currentCycles"));
+                                        chemotherapyTreatment.add(chemoTherapy);
+                                    }
+                                    treatmentDetailsDTO.setChemoTherapy(chemotherapyTreatment);
+                                }
+
+                                //Radiotherapy treatment
+                                List<Procedure> radiotherapyProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "radiotherapy-treatment");
+                                if (!radiotherapyProcedures.isEmpty()) {
+                                    List<Map<String, Object>> radioTherapyTreatment = new ArrayList<>();
+                                    for (Procedure procedure : radiotherapyProcedures) {
+                                        Map<String, Object> radioTherapy = new HashMap<>();
+                                        //Prescription
+                                        Map<String, Object> prescription = new HashMap<>();
+                                        prescription.put("type", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "prescriptionType"));
+                                        prescription.put("intention", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "intention"));
+                                        prescription.put("technique", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "technique"));
+                                        prescription.put("site", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "site"));
+                                        prescription.put("dailyDose", getNestedExtensionValueQuantityValue(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "dailyDose"));
+                                        prescription.put("totalDose", getNestedExtensionValueQuantityValue(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "totalDose"));
+                                        //TODO: Add the following values startDate, dosageDates, administrationDates and remarks
+                                        //Dosage dates
+                                        List<String> dosageDates = new ArrayList<>();
+                                        //Administration dates
+                                        List<String> administrationDates = new ArrayList<>();
+
+                                        // Reports
+                                        List<Map<String, Object>> reports = new ArrayList<>();
+                                        if (procedure.hasReport()) {
+                                            List<Reference> payLoadReports = procedure.getReport();
+                                            for (Reference reference : payLoadReports) {
+                                                Map<String, Object> report = new HashMap<>();
+                                                DocumentReference documentReference = getDocumentReferenceById(reference.getReference());
+                                                if (documentReference != null) {
+                                                    report.put("date", documentReference.hasDate() ? documentReference.getDate() : null);
+                                                    //TODO: attachments is a string but has been saved as a list in the radiologytherapy treatment
+//                                                   report.put("attachments", documentReference.hasAttachment() ? documentReference.getAttachment() : null);
+                                                    report.put("MU", getNestedExtensionValueInteger(documentReference, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-report", "measurementUnits"));
+                                                }
+                                                reports.add(report);
+                                            }
+                                        }
+
+
+                                        radioTherapy.put("prescription", prescription);
+                                        radioTherapy.put("report", reports);
+                                        radioTherapyTreatment.add(radioTherapy);
+                                    }
+                                    treatmentDetailsDTO.setRadioTherapy(radioTherapyTreatment);
+                                }
+
+                                templateData.setTreatmentDetails(treatmentDetailsDTO);
 
                                 sharedRecords.add(templateData.toMap());
                             }
@@ -866,14 +844,11 @@ public class SharedHealthRecordsService {
     public List<Encounter> getLatestEncounterUsingPatientAndOrganisation(String id, Organization organization, Integer numberOfVisits) throws Exception {
         List<Encounter> encounters = new ArrayList<>();
         Bundle results = new Bundle();
-        var encounterSearch = fhirClient.search().forResource(Encounter.class)
-                .where(new ReferenceClientParam("patient").hasId(id));
+        var encounterSearch = fhirClient.search().forResource(Encounter.class).where(new ReferenceClientParam("patient").hasId(id));
         if (organization != null) {
             encounterSearch.where(Encounter.SERVICE_PROVIDER.hasAnyOfIds(organization.getIdElement().getIdPart()));
         }
-        results = encounterSearch.sort(new SortSpec("date").setOrder(SortOrderEnum.DESC))
-                .returnBundle(Bundle.class)
-                .execute();
+        results = encounterSearch.sort(new SortSpec("date").setOrder(SortOrderEnum.DESC)).returnBundle(Bundle.class).execute();
         if (results.hasEntry() && !results.getEntry().isEmpty()) {
             int visitsLimit = results.getEntry().size() > numberOfVisits ? numberOfVisits : results.getEntry().size();
             for (var count = 0; count < visitsLimit; count++) {
@@ -906,8 +881,7 @@ public class SharedHealthRecordsService {
         }
     }
 
-    public Map<String, Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload,
-                                                    Map<String, Object> mandatoryClientRegistryIdTypes) throws Exception {
+    public Map<String, Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload, Map<String, Object> mandatoryClientRegistryIdTypes) throws Exception {
         try {
             Map<String, Object> response = new HashMap<>();
             DemographicDetailsDTO demographicDetails = sharedRecordPayload.getDemographicDetails();
@@ -1008,9 +982,7 @@ public class SharedHealthRecordsService {
             List<PaymentDetailsDTO> paymentDetailsList = new ArrayList<>();
             var coverageSearch = fhirClient.search().forResource(Coverage.class);
             coverageSearch.where(Coverage.BENEFICIARY.hasAnyOfIds(patient.getIdElement().getIdPart()));
-            Bundle coverageBundle = coverageSearch
-                    .returnBundle(Bundle.class)
-                    .execute();
+            Bundle coverageBundle = coverageSearch.returnBundle(Bundle.class).execute();
 
             if (!coverageBundle.getEntry().isEmpty()) {
                 for (Bundle.BundleEntryComponent entry : coverageBundle.getEntry()) {
@@ -1030,12 +1002,9 @@ public class SharedHealthRecordsService {
         return List.of();
     }
 
-    public List<Observation> getObservationsByCategory(String category,
-                                                       Encounter encounter,
-                                                       boolean forGroup) throws Exception {
+    public List<Observation> getObservationsByCategory(String category, Encounter encounter, boolean forGroup) throws Exception {
         List<Observation> observations = new ArrayList<>();
-        var observationSearch = fhirClient.search().forResource(Observation.class)
-                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
+        var observationSearch = fhirClient.search().forResource(Observation.class).where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
         observationSearch.where(Observation.CATEGORY.exactly().code(category));
         Bundle observationBundle = new Bundle();
         // Valid sort params
@@ -1060,12 +1029,9 @@ public class SharedHealthRecordsService {
         return observations;
     }
 
-    public List<Observation> getObservationsByObservationGroupId(String category,
-                                                                 Encounter encounter,
-                                                                 String id) throws Exception {
+    public List<Observation> getObservationsByObservationGroupId(String category, Encounter encounter, String id) throws Exception {
         List<Observation> observations = new ArrayList<>();
-        var observationSearch = fhirClient.search().forResource(Observation.class)
-                .where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
+        var observationSearch = fhirClient.search().forResource(Observation.class).where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
         observationSearch.where(Observation.CATEGORY.exactly().code(category));
         observationSearch.where(Observation.HAS_MEMBER.hasId(id));
         Bundle observationBundle = new Bundle();
@@ -1082,8 +1048,7 @@ public class SharedHealthRecordsService {
 
     public List<AllergyIntolerance> getAllergyTolerances(String patientId) throws Exception {
         List<AllergyIntolerance> allergyIntolerances = new ArrayList<>();
-        var allergySearch = fhirClient.search().forResource(AllergyIntolerance.class)
-                .where(AllergyIntolerance.PATIENT.hasAnyOfIds(patientId));
+        var allergySearch = fhirClient.search().forResource(AllergyIntolerance.class).where(AllergyIntolerance.PATIENT.hasAnyOfIds(patientId));
 
         Bundle observationBundle = new Bundle();
         observationBundle = allergySearch.returnBundle(Bundle.class).execute();
@@ -1098,9 +1063,7 @@ public class SharedHealthRecordsService {
 
     public List<Condition> getConditionsByCategory(String encounterId, String category) throws Exception {
         List<Condition> conditions = new ArrayList<>();
-        var conditionSearch = fhirClient.search().forResource(Condition.class)
-                .where(Condition.ENCOUNTER.hasAnyOfIds(encounterId))
-                .where(Condition.CATEGORY.exactly().code(category));
+        var conditionSearch = fhirClient.search().forResource(Condition.class).where(Condition.ENCOUNTER.hasAnyOfIds(encounterId)).where(Condition.CATEGORY.exactly().code(category));
 
         Bundle observationBundle = new Bundle();
         observationBundle = conditionSearch.returnBundle(Bundle.class).execute();
@@ -1115,8 +1078,7 @@ public class SharedHealthRecordsService {
 
     public List<MedicationDispense> getMedicationDispensesById(String encounterId) throws Exception {
         List<MedicationDispense> medicationDispenses = new ArrayList<>();
-        var medicationDispenseSearch = fhirClient.search().forResource(MedicationDispense.class)
-                .where(MedicationDispense.CONTEXT.hasAnyOfIds(encounterId));
+        var medicationDispenseSearch = fhirClient.search().forResource(MedicationDispense.class).where(MedicationDispense.CONTEXT.hasAnyOfIds(encounterId));
 
         Bundle observationBundle;
         observationBundle = medicationDispenseSearch.returnBundle(Bundle.class).execute();
@@ -1131,9 +1093,7 @@ public class SharedHealthRecordsService {
 
     public List<DiagnosticReport> getDiagnosticReportsByCategory(String encounterId, String category) throws Exception {
         List<DiagnosticReport> diagnosticReports = new ArrayList<>();
-        var diagnosticReportSearch = fhirClient.search().forResource(DiagnosticReport.class)
-                .where(DiagnosticReport.ENCOUNTER.hasAnyOfIds(encounterId))
-                .where(DiagnosticReport.CATEGORY.exactly().code(category));
+        var diagnosticReportSearch = fhirClient.search().forResource(DiagnosticReport.class).where(DiagnosticReport.ENCOUNTER.hasAnyOfIds(encounterId)).where(DiagnosticReport.CATEGORY.exactly().code(category));
 
         Bundle observationBundle;
         observationBundle = diagnosticReportSearch.returnBundle(Bundle.class).execute();
@@ -1149,8 +1109,7 @@ public class SharedHealthRecordsService {
     //TODO: Confirm if we still need this function as questionnaire response is not used in the current implementation
     public List<QuestionnaireResponse> getQuestionnaireResponsesById(String encounterId) throws Exception {
         List<QuestionnaireResponse> questionnaireResponses = new ArrayList<>();
-        var questionnaireResponseSearch = fhirClient.search().forResource(QuestionnaireResponse.class)
-                .where(QuestionnaireResponse.ENCOUNTER.hasAnyOfIds(encounterId));
+        var questionnaireResponseSearch = fhirClient.search().forResource(QuestionnaireResponse.class).where(QuestionnaireResponse.ENCOUNTER.hasAnyOfIds(encounterId));
 
         Bundle observationBundle;
         observationBundle = questionnaireResponseSearch.returnBundle(Bundle.class).execute();
@@ -1165,9 +1124,7 @@ public class SharedHealthRecordsService {
 
     public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception {
         List<ServiceRequest> serviceRequests = new ArrayList<>();
-        var serviceRequestSearch = fhirClient.search().forResource(ServiceRequest.class)
-                .where(ServiceRequest.ENCOUNTER.hasAnyOfIds(encounterId))
-                .where(ServiceRequest.CATEGORY.exactly().code(category));
+        var serviceRequestSearch = fhirClient.search().forResource(ServiceRequest.class).where(ServiceRequest.ENCOUNTER.hasAnyOfIds(encounterId)).where(ServiceRequest.CATEGORY.exactly().code(category));
 
         Bundle observationBundle = new Bundle();
         observationBundle = serviceRequestSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
@@ -1180,10 +1137,9 @@ public class SharedHealthRecordsService {
         return serviceRequests;
     }
 
-    public List<Procedure> getProceduresByCategory(String encounterId) throws Exception {
+    public List<Procedure> getProceduresByCategory(String encounterId, String category) throws Exception {
         List<Procedure> procedures = new ArrayList<>();
-        var procedureSearch = fhirClient.search().forResource(Procedure.class)
-                .where(Procedure.ENCOUNTER.hasAnyOfIds(encounterId));
+        var procedureSearch = fhirClient.search().forResource(Procedure.class).where(Procedure.ENCOUNTER.hasAnyOfIds(encounterId)).where(Procedure.CATEGORY.exactly().code(category));
 
         Bundle observationBundle;
         observationBundle = procedureSearch.returnBundle(Bundle.class).execute();
@@ -1196,6 +1152,26 @@ public class SharedHealthRecordsService {
         return procedures;
     }
 
+
+    public List<Immunization> getImmunizationByPatientId(String encounterId) throws Exception {
+        List<Immunization> immunizations = new ArrayList<>();
+        var immunizationSearch = fhirClient.search().forResource(Immunization.class).where(Immunization.PATIENT.hasAnyOfIds(encounterId));
+        Bundle observationBundle;
+        observationBundle = immunizationSearch.returnBundle(Bundle.class).execute();
+        if (observationBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+                Immunization immunization = (Immunization) entryComponent.getResource();
+                immunizations.add(immunization);
+            }
+        }
+        return immunizations;
+    }
+
+    public DocumentReference getDocumentReferenceById(String id) throws Exception {
+        DocumentReference documentReference;
+        documentReference = fhirClient.read().resource(DocumentReference.class).withId(id).execute();
+        return documentReference;
+    }
 
     private Integer getComponentValueQuantityInt(Observation observation, int index) {
         if (observation.hasComponent() && observation.getComponent().size() > index) {
@@ -1262,6 +1238,52 @@ public class SharedHealthRecordsService {
             Observation.ObservationComponentComponent component = observation.getComponent().get(index);
             if (component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && !component.getValueCodeableConcept().getCoding().isEmpty()) {
                 return component.getValueCodeableConcept().getCoding().get(0).getCode();
+            }
+        }
+        return null;
+    }
+
+    private String getNestedExtensionValueString(Procedure procedure, String parentUrl, String childUrl) {
+        if (procedure.hasExtension()) {
+            for (Extension parentExtension : procedure.getExtension()) {
+                if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
+                    for (Extension childExtension : parentExtension.getExtension()) {
+                        if (childExtension.getUrl().equals(childUrl) && childExtension.hasValue() && childExtension.getValue() instanceof StringType) {
+                            return ((StringType) childExtension.getValue()).getValue();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private Integer getNestedExtensionValueInteger(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
+                    for (Extension childExtension : parentExtension.getExtension()) {
+                        if (childExtension.getUrl().equals(childUrl) && childExtension.hasValue() && childExtension.getValue() instanceof IntegerType) {
+                            return ((IntegerType) childExtension.getValue()).getValue();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+    private BigDecimal getNestedExtensionValueQuantityValue(Procedure procedure, String parentUrl, String childUrl) {
+        if (procedure.hasExtension()) {
+            for (Extension parentExtension : procedure.getExtension()) {
+                if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
+                    for (Extension childExtension : parentExtension.getExtension()) {
+                        if (childExtension.getUrl().equals(childUrl) && childExtension.hasValue() && childExtension.getValue() instanceof Quantity) {
+                            return ((Quantity) childExtension.getValue()).getValue();
+                        }
+                    }
+                }
             }
         }
         return null;
