@@ -26,33 +26,37 @@ public class ExternalProxyingService {
         return "Basic " + Base64.getEncoder().encodeToString(credentials.getBytes());
     }
 
-    public Map<String, Object> getExternalData(String endpointUrl) {
-        String path = formulateDHIS2UrlPath(endpointUrl);
-        System.out.println(path);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
+    public Object getExternalData(String endpointUrl) throws Exception {
+        try {
+            String path = formulateDHIS2UrlPath(endpointUrl);
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
 
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<Map> response = restTemplate.exchange(
-                path,
-                org.springframework.http.HttpMethod.GET,
-                entity,
-                Map.class
-        );
-        return response.getBody();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<Object> response = restTemplate.exchange(
+                    path,
+                    org.springframework.http.HttpMethod.GET,
+                    entity,
+                    Object.class
+            );
+            return response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
     }
 
-    public Map<String, Object> postExternalData(String endpointUrl, Map<String,Object> payload) {
+    public Object postExternalData(String endpointUrl, Map<String,Object> payload) {
         String path = formulateDHIS2UrlPath(endpointUrl);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
-        ResponseEntity<Map> response = restTemplate.exchange(
+        ResponseEntity<Object> response = restTemplate.exchange(
                 path,
                 org.springframework.http.HttpMethod.POST,
                 entity,
-                Map.class
+                Object.class
         );
         return response.getBody();
     }

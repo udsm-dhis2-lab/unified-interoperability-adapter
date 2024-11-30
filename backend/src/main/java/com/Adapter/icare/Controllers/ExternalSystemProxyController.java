@@ -17,7 +17,7 @@ public class ExternalSystemProxyController {
     }
 
     @GetMapping("/**")
-    public Map<String, Object> proxyGet(HttpServletRequest request) {
+    public Object proxyGet(HttpServletRequest request) throws Exception {
         String requestURI = request.getRequestURI();
         String queryString = request.getQueryString();
         String url = requestURI.replace("/api/v1/dhis2/", "");
@@ -28,7 +28,7 @@ public class ExternalSystemProxyController {
     }
 
     @PostMapping("/**")
-    public Map<String, Object> proxyPost(HttpServletRequest request, @RequestBody Map<String,Object> payload) {
+    public Object proxyPost(HttpServletRequest request, @RequestBody Map<String,Object> payload) {
         String requestURI = request.getRequestURI();
         String queryString = request.getQueryString();
         String url = requestURI.replace("/api/v1/dhis2/", "");
