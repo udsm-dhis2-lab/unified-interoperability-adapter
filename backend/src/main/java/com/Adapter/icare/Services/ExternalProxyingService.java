@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Base64;
 import java.util.Map;
@@ -27,6 +28,7 @@ public class ExternalProxyingService {
 
     public Map<String, Object> getExternalData(String endpointUrl) {
         String path = formulateDHIS2UrlPath(endpointUrl);
+        System.out.println(path);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
 
@@ -56,9 +58,12 @@ public class ExternalProxyingService {
     }
 
     private String formulateDHIS2UrlPath(String endpointUrl) {
-        String path = this.dhisConstants.DHIS2Instance + (this.dhisConstants.DHIS2ContextPath != null ? "/" +
-                this.dhisConstants.DHIS2ContextPath : "") +
-                (endpointUrl.contains("api/") ? "": "/api/") + endpointUrl;
-        return path;
+        String baseUrl = this.dhisConstants.DHIS2Instance +
+                (this.dhisConstants.DHIS2ContextPath != null ? "/" + this.dhisConstants.DHIS2ContextPath : "") +
+                (endpointUrl.contains("api/") ? "" : "/api/");
+        return UriComponentsBuilder.fromHttpUrl(baseUrl)
+                .path(endpointUrl)
+                .build(false)
+                .toUriString();
     }
 }

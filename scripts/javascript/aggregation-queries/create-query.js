@@ -4,7 +4,7 @@ const mappings = [
     uuid: "5cd8d3c0-25f5-44ce-ae33-389b2e01bb69",
     dataKey: "Cholera",
     mapping: {
-      mappings: [
+      icdMappings: [
         {
           code: "A00.1",
         },
@@ -463,7 +463,7 @@ const mappings = [
     uuid: "13a85bf5-e992-4be0-ac71-34877cdf86eb",
     dataKey: "Typhoid",
     mapping: {
-      mappings: [
+      icdMappings: [
         {
           code: "A01.1",
         },
@@ -569,7 +569,9 @@ mappings.forEach((mapping) => {
 
   query += `  '${dataElementId}' AS "${dataElementId}",\n`;
 
+  let hasGender = false;
   mapping.mapping.params.forEach((param, index) => {
+    hasGender = param.gender ? true : false;
     const gender = param.gender;
     const co = param.co;
     const ageType = param.ageType;
@@ -584,7 +586,20 @@ mappings.forEach((mapping) => {
   query += ` FROM patient_flat pt \n`;
   query += `JOIN encounter_flat en ON pt.id = en.patient_id \n `;
   query += `AND en.period_start_date >= '${startDate}' && en.period_end_date <= '${endDate}' \n`;
-  query += ` GROUP BY en.organization_id,pt.gender`;
+  let icdCodes = [];
+  if (mapping.mapping.icdMappings && mapping.mapping.icdMappings.length > 0) {
+    icdCodes = mapping.mapping.icdMappings.map((icdMapping, index) => {
+      return icdMapping.code;
+    });
+  }
 
+  if (icdCodes && icdCodes.length > 0) {
+    query += `JOIN condition_flat cond ON en.id = cond.encounter_id \n`;
+    query += `AND cond.code IN ('${icdCodes.join("','")}') \n`;
+  }
+  query += " GROUP BY ";
+  query += icdCodes && icdCodes.length > 0 ? "cond.code," : "";
+  query += hasGender ? "pt.gender," : "";
+  query += ` en.organization_id;`;
   console.log(query);
 });
