@@ -728,20 +728,20 @@ public class SharedHealthRecordsService {
 
 
                                 //Outcome details
-                                //TODO: Discuss obout resource to be used here
-//                                List<OutcomeDetailsDTO> outcomeDetailsDTOS = new ArrayList<>();
-//                                List<QuestionnaireResponse> questionnaireResponses = getQuestionnaireResponsesById(encounter.getIdElement().getIdPart());
-//                                if (!questionnaireResponses.isEmpty()) {
-//                                    for (QuestionnaireResponse questionnaireResponse : questionnaireResponses) {
-//                                        OutcomeDetailsDTO outcomeDetailsDTO = new OutcomeDetailsDTO();
-//                                        outcomeDetailsDTO.setAlive(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(0).getAnswer().get(0).getValueBooleanType().booleanValue() : null);
-//                                        outcomeDetailsDTO.setDeathLocation(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(1).getAnswer().get(0).getValueStringType().toString() : null);
-//                                        outcomeDetailsDTO.setDeathDate(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(2).getAnswer().get(0).getValueDateType().getValue() : null);
-//                                        outcomeDetailsDTO.setContactTracing(questionnaireResponse.hasItem() ? questionnaireResponse.getItem().get(3).getAnswer().get(0).getValueBooleanType().booleanValue() : null);
-//                                        outcomeDetailsDTOS.add(outcomeDetailsDTO);
-//                                    }
-//                                    templateData.setOutcomeDetails(outcomeDetailsDTOS);
-//                                }
+                                List<Observation> outcomeObservations = getObservationsByCategory("outcome-details", encounter, true);
+                                if (!outcomeObservations.isEmpty()) {
+                                    Observation observation = Iterables.getLast(outcomeObservations);
+                                    OutcomeDetailsDTO outcomeDetailsDTO = new OutcomeDetailsDTO();
+                                    outcomeDetailsDTO.setAlive(getComponentValueBoolean(observation, 0));
+                                    outcomeDetailsDTO.setDeathLocation(getComponentValueString(observation, 1));
+                                    outcomeDetailsDTO.setDeathDate(getComponentValueDateTime(observation, 2));
+                                    //TODO: decide on the type to use for contact tracing
+//                                    outcomeDetailsDTO.setContactTracing(getComponentValueBoolean(observation, 3));
+                                    outcomeDetailsDTO.setInvestigationConducted(getComponentValueBoolean(observation, 4));
+                                    outcomeDetailsDTO.setQuarantined(getComponentValueBoolean(observation, 5));
+                                    outcomeDetailsDTO.setReferred(getComponentValueBoolean(observation, 6));
+                                    templateData.setOutcomeDetails(outcomeDetailsDTO);
+                                }
 
 
                                 //Cause of death details
@@ -1212,6 +1212,26 @@ public class SharedHealthRecordsService {
             Observation.ObservationComponentComponent component = observation.getComponent().get(index);
             if (component.hasValueIntegerType() && component.getValueIntegerType().hasValue()) {
                 return component.getValueIntegerType().getValue();
+            }
+        }
+        return null;
+    }
+
+    private String getComponentValueString(Observation observation, int index) {
+        if (observation.hasComponent() && observation.getComponent().size() > index) {
+            Observation.ObservationComponentComponent component = observation.getComponent().get(index);
+            if (component.hasValueStringType() && component.getValueStringType().hasValue()) {
+                return component.getValueStringType().toString();
+            }
+        }
+        return null;
+    }
+
+    private Date getComponentValueDateTime(Observation observation, int index) {
+        if (observation.hasComponent() && observation.getComponent().size() > index) {
+            Observation.ObservationComponentComponent component = observation.getComponent().get(index);
+            if (component.hasValueDateTimeType() && component.getValueDateTimeType().hasValue()) {
+                return component.getValueDateTimeType().getValue();
             }
         }
         return null;
