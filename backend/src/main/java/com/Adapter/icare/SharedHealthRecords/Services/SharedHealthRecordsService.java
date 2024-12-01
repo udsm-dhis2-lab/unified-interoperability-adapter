@@ -808,6 +808,61 @@ public class SharedHealthRecordsService {
                                     treatmentDetailsDTO.setRadioTherapy(radioTherapyTreatment);
                                 }
 
+                                //surgery procedure
+                                List<Procedure> surgeryProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "surgery-treatment");
+                                if (!surgeryProcedures.isEmpty()) {
+                                    List<Map<String, Object>> surgeryTreatment = new ArrayList<>();
+                                    for (Procedure procedure : surgeryProcedures) {
+                                        Map<String, Object> surgery = new HashMap<>();
+                                        Map<String, Object> report = new HashMap<>();
+                                        surgery.put("diagnosis", procedure.hasCode() ? procedure.getCode().getCoding().get(0).getDisplay() : null);
+                                        surgery.put("reason", procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
+                                        surgeryTreatment.add(surgery);
+                                        if (procedure.hasReport()) {
+                                            List<Reference> payLoadReports = procedure.getReport();
+                                            Reference reportPayload = Iterables.getLast(payLoadReports);
+                                            DocumentReference documentReference = getDocumentReferenceById(reportPayload.getReference());
+                                            if (documentReference != null) {
+                                                //TODO: Surgery report has fields that are not included during saving
+                                            }
+                                        }
+                                        surgery.put("report", report);
+                                    }
+                                    treatmentDetailsDTO.setSurgery(surgeryTreatment);
+                                }
+
+                                //Hormone therapy
+                                List<Procedure> hormoneTherapyTreatments = getProceduresByCategory(encounter.getIdElement().getIdPart(), "hormonetherapy-treatment");
+                                if (!hormoneTherapyTreatments.isEmpty()) {
+                                    List<Map<String, Object>> hormoneTherapy = new ArrayList<>();
+                                    for (Procedure procedure : hormoneTherapyTreatments) {
+                                        Map<String, Object> treatment = new HashMap<>();
+                                        treatment.put("diagnosis", procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
+                                        treatment.put("regiment", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "regiment"));
+                                        treatment.put("stage", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "stage"));
+                                        treatment.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "totalExpectedCycles"));
+                                        treatment.put("currentCycles", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "currentCycles"));
+                                        hormoneTherapy.add(treatment);
+                                    }
+                                    treatmentDetailsDTO.setHormoneTherapy(hormoneTherapy);
+                                }
+
+                                //medicalProcedureDetails
+                                List<Procedure> medicalProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "medical-procedure-details");
+                                if (!medicalProcedures.isEmpty()) {
+                                    List<MedicalProcedureDetailsDTO> medicalProcedureDetails = new ArrayList<>();
+                                    for (Procedure procedure : medicalProcedures) {
+                                        MedicalProcedureDetailsDTO treatment = new MedicalProcedureDetailsDTO();
+                                        treatment.setProcedureDate(procedure.hasPerformedDateTimeType() ? procedure.getPerformedDateTimeType().getValue() : null);
+                                        treatment.setProcedureType(procedure.hasCode() ? procedure.getCode().getText() : null);
+                                        treatment.setDiagnosis(procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getText() : null);
+                                        //TODO Add findings
+                                        medicalProcedureDetails.add(treatment);
+                                    }
+                                    treatmentDetailsDTO.setMedicalProcedureDetails(medicalProcedureDetails);
+                                }
+
+
                                 templateData.setTreatmentDetails(treatmentDetailsDTO);
 
                                 sharedRecords.add(templateData.toMap());
