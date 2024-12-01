@@ -733,7 +733,9 @@ public class SharedHealthRecordsService {
                                     for (Procedure procedure : prophylAxisProcedures) {
                                         ProphylAxisDetailsDTO prophylAxisDetailsDTO = new ProphylAxisDetailsDTO();
                                         prophylAxisDetailsDTO.setDate(procedure.hasPerformedDateTimeType() ? procedure.getPerformedDateTimeType().getValue() : null);
-                                        prophylAxisDetailsDTO.setCode(procedure.hasCode() ? procedure.getCode().getCoding().get(0).getCode() : null);
+                                        if (procedure.hasCode() && !procedure.getCode().getCoding().isEmpty()) {
+                                            prophylAxisDetailsDTO.setCode(procedure.getCode().getCoding().get(0).getCode());
+                                        }
                                         //TODO: Add prophylAxis type
                                         //TODO: Add prophylAxis name
                                         prophylAxisDetailsDTO.setStatus(procedure.hasStatus() ? procedure.getStatus().getDisplay() : null);
@@ -789,7 +791,12 @@ public class SharedHealthRecordsService {
                                             List<Reference> payLoadReports = procedure.getReport();
                                             for (Reference reference : payLoadReports) {
                                                 Map<String, Object> report = new HashMap<>();
-                                                DocumentReference documentReference = getDocumentReferenceById(reference.getReference());
+                                                // Check if the reference has an ID or a reference URL
+                                                if (reference.getId() == null) {
+                                                    System.out.println("****Reference object is missing ID and Reference: " + reference);
+                                                    continue; // Skip this iteration
+                                                }
+                                                DocumentReference documentReference = getDocumentReferenceById(reference.getId());
                                                 if (documentReference != null) {
                                                     report.put("date", documentReference.hasDate() ? documentReference.getDate() : null);
                                                     //TODO: attachments is a string but has been saved as a list in the radiologytherapy treatment
@@ -816,12 +823,19 @@ public class SharedHealthRecordsService {
                                         Map<String, Object> surgery = new HashMap<>();
                                         Map<String, Object> report = new HashMap<>();
                                         surgery.put("diagnosis", procedure.hasCode() ? procedure.getCode().getCoding().get(0).getDisplay() : null);
-                                        surgery.put("reason", procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
+                                        if (procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty()) {
+                                            surgery.put("reason", procedure.getReasonCode().get(0).getText());
+                                        }
                                         surgeryTreatment.add(surgery);
                                         if (procedure.hasReport()) {
                                             List<Reference> payLoadReports = procedure.getReport();
                                             Reference reportPayload = Iterables.getLast(payLoadReports);
-                                            DocumentReference documentReference = getDocumentReferenceById(reportPayload.getReference());
+                                            // Check if the reference has an ID or a reference URL
+                                            if (reportPayload.getId() == null) {
+                                                System.out.println("*2*Reference object is missing ID and Reference: " + reportPayload);
+                                                continue; // Skip this iteration
+                                            }
+                                            DocumentReference documentReference = getDocumentReferenceById(reportPayload.getId());
                                             if (documentReference != null) {
                                                 //TODO: Surgery report has fields that are not included during saving
                                             }
@@ -1208,17 +1222,17 @@ public class SharedHealthRecordsService {
     }
 
 
-    public List<Immunization> getImmunizationByPatientId(String encounterId) throws Exception {
+    public List<Immunization> getImmunizationByEncounterId(String encounterId) throws Exception {
         List<Immunization> immunizations = new ArrayList<>();
-        var immunizationSearch = fhirClient.search().forResource(Immunization.class).where(Immunization.PATIENT.hasAnyOfIds(encounterId));
-        Bundle observationBundle;
-        observationBundle = immunizationSearch.returnBundle(Bundle.class).execute();
-        if (observationBundle.hasEntry()) {
-            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
-                Immunization immunization = (Immunization) entryComponent.getResource();
-                immunizations.add(immunization);
-            }
-        }
+//        var immunizationSearch = fhirClient.search().forResource(Immunization.class).where(Immunization.PATIENT.hasChainedProperty());
+//        Bundle observationBundle;
+//        observationBundle = immunizationSearch.returnBundle(Bundle.class).execute();
+//        if (observationBundle.hasEntry()) {
+//            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
+//                Immunization immunization = (Immunization) entryComponent.getResource();
+//                immunizations.add(immunization);
+//            }
+//        }
         return immunizations;
     }
 
