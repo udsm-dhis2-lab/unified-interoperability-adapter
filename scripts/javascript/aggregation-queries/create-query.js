@@ -570,6 +570,7 @@ mappings.forEach((mapping) => {
   query += `  '${dataElementId}' AS "${dataElementId}",\n`;
 
   let hasGender = false;
+  let hasAgeGroup = false;
   mapping.mapping.params.forEach((param, index) => {
     hasGender = param.gender ? true : false;
     const gender = param.gender;
@@ -577,10 +578,41 @@ mappings.forEach((mapping) => {
     const ageType = param.ageType;
     const startAge = param.startAge;
     const endAge = param.endAge;
+    hasAgeGroup = ageType && startAge && endAge ? true : false;
 
-    query += `  COUNT(*) FILTER (WHERE pt.gender = '${
-      gender === "M" ? "male" : "female"
-    }') AS "${co}"${index < mapping.mapping.params.length - 1 ? "," : ""} \n`;
+    console.log(hasGender);
+    query +=
+      ` COUNT(*) ` +
+      (hasGender || hasAgeGroup
+        ? ` FILTER ( WHERE ${
+            hasGender
+              ? "pt.gender='" + (gender === "M" ? "male" : "female") + "'"
+              : ""
+          } ${hasGender && hasAgeGroup ? "AND" : ""} ${
+            hasAgeGroup
+              ? "pt.birth_date >= DATE_SUB(CURDATE(), INTERVAL " +
+                startAge +
+                (ageType === "years"
+                  ? " YEAR "
+                  : ageType === "months"
+                  ? " MONTH "
+                  : " DAY ") +
+                ")" +
+                " AND " +
+                "pt.birth_date <= DATE_SUB(CURDATE(), INTERVAL " +
+                endAge +
+                (ageType === "years"
+                  ? " YEAR "
+                  : ageType === "months"
+                  ? " MONTH "
+                  : " DAY ") +
+                ")"
+              : ""
+          })`
+        : "");
+    query += ` AS "${co}"${
+      index < mapping.mapping.params.length - 1 ? "," : ""
+    } \n`;
   });
   let icdCodes = [];
   if (mapping.mapping.icdMappings && mapping.mapping.icdMappings.length > 0) {
