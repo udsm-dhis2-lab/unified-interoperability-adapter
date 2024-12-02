@@ -915,7 +915,26 @@ public class SharedHealthRecordsService {
 
 
                                 //Billing details
-
+                                List<BillingsDetailsDTO> billingsDetailsDTOS = new ArrayList<>();
+                                List<ChargeItem> chargedItems = getChargeItemsByEncounterId(encounter.getIdElement().getIdPart());
+                                if(!chargedItems.isEmpty()){
+                                    for (ChargeItem chargeItem : chargedItems) {
+                                        //TODO: Add billingID
+                                        //TODO: Add billingCode
+                                        //TODO: Add insuranceCode
+                                        //TODO: Add insuranceName
+                                        //TODO: Add exemptionType
+                                        //TODO: Add wavedAmount
+                                        //TODO: Add billDate
+                                        //TODO: Add standardCode
+                                        BillingsDetailsDTO billingsDetailsDTO = new BillingsDetailsDTO();
+                                        billingsDetailsDTO.setBillType(chargeItem.hasCode() ? chargeItem.getCode().getText() : null);
+                                        billingsDetailsDTO.setAmountBilled(chargeItem.hasPriceOverride() ? chargeItem.getPriceOverride().getValue() : null);
+                                        billingsDetailsDTO.setBillDate(chargeItem.hasEnteredDate() ? chargeItem.getEnteredDate() : null);
+                                        billingsDetailsDTOS.add(billingsDetailsDTO);
+                                    }
+                                    templateData.setBillingsDetails(billingsDetailsDTOS);
+                                }
 
                                 sharedRecords.add(templateData.toMap());
                             }
@@ -1290,6 +1309,20 @@ public class SharedHealthRecordsService {
         return immunizations;
     }
 
+    public List<ChargeItem> getChargeItemsByEncounterId(String encounterId) throws Exception {
+        List<ChargeItem> chargeItems = new ArrayList<>();
+        var chargeItemsSearch = fhirClient.search().forResource(ChargeItem.class).where(ChargeItem.CONTEXT.hasAnyOfIds(encounterId));
+
+        Bundle chargeItemsBundle;
+        chargeItemsBundle = chargeItemsSearch.returnBundle(Bundle.class).execute();
+        if(chargeItemsBundle.hasEntry()){
+            for (Bundle.BundleEntryComponent entryComponent : chargeItemsBundle.getEntry()) {
+                ChargeItem chargeItem = (ChargeItem) entryComponent.getResource();
+                chargeItems.add(chargeItem);
+            }
+        }
+        return chargeItems;
+    }
 
     public DocumentReference getDocumentReferenceById(String id) throws Exception {
         DocumentReference documentReference;
