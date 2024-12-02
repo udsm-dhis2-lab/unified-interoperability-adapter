@@ -917,23 +917,36 @@ public class SharedHealthRecordsService {
                                 //Billing details
                                 List<BillingsDetailsDTO> billingsDetailsDTOS = new ArrayList<>();
                                 List<ChargeItem> chargedItems = getChargeItemsByEncounterId(encounter.getIdElement().getIdPart());
-                                if(!chargedItems.isEmpty()){
+                                if (!chargedItems.isEmpty()) {
                                     for (ChargeItem chargeItem : chargedItems) {
                                         //TODO: Add billingID
-                                        //TODO: Add billingCode
                                         //TODO: Add insuranceCode
                                         //TODO: Add insuranceName
-                                        //TODO: Add exemptionType
                                         //TODO: Add wavedAmount
-                                        //TODO: Add billDate
-                                        //TODO: Add standardCode
                                         BillingsDetailsDTO billingsDetailsDTO = new BillingsDetailsDTO();
-                                        billingsDetailsDTO.setBillType(chargeItem.hasCode() ? chargeItem.getCode().getText() : null);
+                                        billingsDetailsDTO.setBillType(chargeItem.hasReason() && !chargeItem.getReason().isEmpty() ? chargeItem.getReason().get(0).getText() : null);
+                                        billingsDetailsDTO.setBillingCode(chargeItem.hasCode() && chargeItem.getCode().hasCoding() && !chargeItem.getCode().getCoding().isEmpty() ? chargeItem.getCode().getCoding().get(0).getCode() : null);
                                         billingsDetailsDTO.setAmountBilled(chargeItem.hasPriceOverride() ? chargeItem.getPriceOverride().getValue() : null);
-                                        billingsDetailsDTO.setBillDate(chargeItem.hasEnteredDate() ? chargeItem.getEnteredDate() : null);
+                                        billingsDetailsDTO.setBillDate(chargeItem.hasOccurrenceDateTimeType() ? chargeItem.getOccurrenceDateTimeType().getValue() : null);
+                                        billingsDetailsDTO.setExemptionType(getNestedExtensionValueString(chargeItem, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/billing-details", "exemptionType"));
+                                        billingsDetailsDTO.setStandardCode(getNestedExtensionValueString(chargeItem, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/billing-details", "standardCode"));
                                         billingsDetailsDTOS.add(billingsDetailsDTO);
                                     }
                                     templateData.setBillingsDetails(billingsDetailsDTOS);
+                                }
+
+                                //Family planning details
+                                List<FamilyPlanningDetailsDTO> familyPlanningDetailsDTOS = new ArrayList<>();
+                                List<CarePlan> carePlans = getCarePlansByCategory(encounter.getIdElement().getIdPart(), "family-planning");
+                                if (!carePlans.isEmpty()) {
+                                    for (CarePlan carePlan : carePlans) {
+                                        FamilyPlanningDetailsDTO familyPlanningDetailsDTO = new FamilyPlanningDetailsDTO();
+                                        familyPlanningDetailsDTO.setDate(carePlan.hasPeriod() ? carePlan.getPeriod().getStart() : null);
+                                        //long term methods
+                                        List<LongTermMethodDTO> longTermMethodDTOS = new ArrayList<>();
+
+                                        familyPlanningDetailsDTOS.add(familyPlanningDetailsDTO);
+                                    }
                                 }
 
                                 sharedRecords.add(templateData.toMap());
@@ -1315,7 +1328,7 @@ public class SharedHealthRecordsService {
 
         Bundle chargeItemsBundle;
         chargeItemsBundle = chargeItemsSearch.returnBundle(Bundle.class).execute();
-        if(chargeItemsBundle.hasEntry()){
+        if (chargeItemsBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent : chargeItemsBundle.getEntry()) {
                 ChargeItem chargeItem = (ChargeItem) entryComponent.getResource();
                 chargeItems.add(chargeItem);
@@ -1328,6 +1341,21 @@ public class SharedHealthRecordsService {
         DocumentReference documentReference;
         documentReference = fhirClient.read().resource(DocumentReference.class).withId(id).execute();
         return documentReference;
+    }
+
+    public List<CarePlan> getCarePlansByCategory(String encounterId, String category) throws Exception {
+        List<CarePlan> carePlans = new ArrayList<>();
+        var carePlanSearch = fhirClient.search().forResource(CarePlan.class).where(CarePlan.ENCOUNTER.hasAnyOfIds(encounterId)).where(CarePlan.CATEGORY.exactly().code(category));
+
+        Bundle carePlanBundle;
+        carePlanBundle = carePlanSearch.returnBundle(Bundle.class).execute();
+        if (carePlanBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : carePlanBundle.getEntry()) {
+                CarePlan carePlan = (CarePlan) entryComponent.getResource();
+                carePlans.add(carePlan);
+            }
+        }
+        return carePlans;
     }
 
     private Integer getComponentValueQuantityInt(Observation observation, int index) {
@@ -1400,9 +1428,9 @@ public class SharedHealthRecordsService {
         return null;
     }
 
-    private String getNestedExtensionValueString(Procedure procedure, String parentUrl, String childUrl) {
-        if (procedure.hasExtension()) {
-            for (Extension parentExtension : procedure.getExtension()) {
+    private String getNestedExtensionValueString(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
                     for (Extension childExtension : parentExtension.getExtension()) {
                         if (childExtension.getUrl().equals(childUrl) && childExtension.hasValue() && childExtension.getValue() instanceof StringType) {

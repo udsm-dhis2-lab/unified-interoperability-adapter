@@ -18,6 +18,7 @@ public class BillingsDetailsDTO {
     private Number amountBilled;
     private String exemptionType;
     private String wavedAmount;
+    private String standardCode;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date billDate;
