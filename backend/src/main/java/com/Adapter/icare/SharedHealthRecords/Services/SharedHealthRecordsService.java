@@ -581,10 +581,10 @@ public class SharedHealthRecordsService {
                                 if (!medicationDispensesList.isEmpty()) {
                                     for (MedicationDispense medicationDispense : medicationDispensesList) {
                                         MedicationDetailsDTO medicationDetailsDTO = new MedicationDetailsDTO();
-                                        medicationDetailsDTO.setCode(medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getCode() : null);
-                                        medicationDetailsDTO.setName(medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getDisplay() : null);
+                                        medicationDetailsDTO.setCode(medicationDispense.hasMedicationCodeableConcept() && medicationDispense.getMedicationCodeableConcept().hasCoding() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getCode() : null);
+                                        medicationDetailsDTO.setName(medicationDispense.hasMedicationCodeableConcept() && medicationDispense.getMedicationCodeableConcept().hasCoding() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getDisplay() : null);
                                         medicationDetailsDTO.setOrderDate(medicationDispense.hasWhenHandedOver() ? medicationDispense.getWhenHandedOver() : null);
-                                        String code = medicationDispense.hasMedicationCodeableConcept() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getSystem() : null;
+                                        String code = medicationDispense.hasMedicationCodeableConcept() && medicationDispense.getMedicationCodeableConcept().hasCoding() ? medicationDispense.getMedicationCodeableConcept().getCoding().get(0).getSystem() : null;
                                         String codeStandard = code.contains("msd") ? "MSD CODE" : code.contains("loinc") ? "LOINC" : null;
                                         medicationDetailsDTO.setCodeStandard(codeStandard);
                                         String duration = "";
@@ -605,8 +605,8 @@ public class SharedHealthRecordsService {
                                                 quantity = medicationDispense.getQuantity().getValue() + " " + medicationDispense.getQuantity().getUnit();
                                             }
                                             dosagePayload.put("dose", quantity);
-                                            dosagePayload.put("frequency", dosage.hasTiming() ? dosage.getTiming().getRepeat().getFrequency() : null);
-                                            dosagePayload.put("route", dosage.hasRoute() ? dosage.getRoute().getCoding().get(0).getDisplay() : null);
+                                            dosagePayload.put("frequency", dosage.hasTiming() && dosage.getTiming().hasRepeat() ? dosage.getTiming().getRepeat().getFrequency() : null);
+                                            dosagePayload.put("route", dosage.hasRoute() && dosage.getRoute().hasCoding() ? dosage.getRoute().getCoding().get(0).getDisplay() : null);
                                             dosagePayload.put("instructions", dosage.hasText() ? dosage.getText() : null);
                                             dosagePayload.put("quantity", quantity);
                                             dosagePayload.put("duration", duration);
@@ -628,8 +628,8 @@ public class SharedHealthRecordsService {
                                     for (DiagnosticReport diagnosticReport : diagnosticReportsList) {
                                         RadiologyDetailsDTO radiologyDetailsDTO = new RadiologyDetailsDTO();
                                         radiologyDetailsDTO.setTestDate(diagnosticReport.hasIssued() ? diagnosticReport.getIssued() : null);
-                                        radiologyDetailsDTO.setTestTypeName(diagnosticReport.hasCode() ? diagnosticReport.getCode().getCoding().get(0).getDisplay() : null);
-                                        radiologyDetailsDTO.setTestTypeCode(diagnosticReport.hasCode() ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
+                                        radiologyDetailsDTO.setTestTypeName(diagnosticReport.hasCode() && diagnosticReport.getCode().hasCoding() ? diagnosticReport.getCode().getCoding().get(0).getDisplay() : null);
+                                        radiologyDetailsDTO.setTestTypeCode(diagnosticReport.hasCode() && diagnosticReport.getCode().hasCoding() ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
                                         //TODO: Add testReport and bodySite
                                         String mediaReferenceId = diagnosticReport.hasMedia() ? diagnosticReport.getMedia().get(0).getLink().getReference() : null;
                                         if (mediaReferenceId != null) {
@@ -665,18 +665,18 @@ public class SharedHealthRecordsService {
                                     Observation observation = Iterables.getLast(causeOfDeathObservations);
                                     CausesOfDeathDetailsDTO causesOfDeathDetailsDTO = new CausesOfDeathDetailsDTO();
                                     causesOfDeathDetailsDTO.setDateOfDeath(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
-                                    causesOfDeathDetailsDTO.setLineA(observation.hasComponent() ? observation.getComponent().get(0).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setLineB(observation.hasComponent() ? observation.getComponent().get(1).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setLineC(observation.hasComponent() ? observation.getComponent().get(2).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setLineD(observation.hasComponent() ? observation.getComponent().get(3).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setCauseOfDeathOther(observation.hasComponent() ? observation.getComponent().get(4).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setPlaceOfDeath(observation.hasComponent() ? observation.getComponent().get(5).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setMannerOfDeath(observation.hasComponent() ? observation.getComponent().get(6).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineA(observation.hasComponent() && !observation.getComponent().isEmpty() ? observation.getComponent().get(0).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineB(observation.hasComponent() && observation.getComponent().size() > 1 ? observation.getComponent().get(1).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineC(observation.hasComponent() && observation.getComponent().size() > 2 ? observation.getComponent().get(2).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineD(observation.hasComponent() && observation.getComponent().size() > 3 ? observation.getComponent().get(3).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setCauseOfDeathOther(observation.hasComponent() && observation.getComponent().size() > 4 ? observation.getComponent().get(4).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setPlaceOfDeath(observation.hasComponent() && observation.getComponent().size() > 5 ? observation.getComponent().get(5).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setMannerOfDeath(observation.hasComponent() && observation.getComponent().size() > 6 ? observation.getComponent().get(6).getValueStringType().toString() : null);
                                     OtherDeathDetailsDTO otherDeathDetailsDTO = new OtherDeathDetailsDTO();
-                                    otherDeathDetailsDTO.setPostmortemDetails(observation.hasComponent() ? observation.getComponent().get(7).getValueStringType().toString() : null);
-                                    otherDeathDetailsDTO.setMarcerated(observation.hasComponent() ? observation.getComponent().get(8).getValueBooleanType().booleanValue() : null);
-                                    otherDeathDetailsDTO.setFresh(observation.hasComponent() ? observation.getComponent().get(9).getValueBooleanType().booleanValue() : null);
-                                    otherDeathDetailsDTO.setMotherCondition(observation.hasComponent() ? observation.getComponent().get(10).getValueStringType().toString() : null);
+                                    otherDeathDetailsDTO.setPostmortemDetails(observation.hasComponent() && observation.getComponent().size() > 7 ? observation.getComponent().get(7).getValueStringType().toString() : null);
+                                    otherDeathDetailsDTO.setMarcerated(observation.hasComponent() && observation.getComponent().size() > 8 ? observation.getComponent().get(8).getValueBooleanType().booleanValue() : null);
+                                    otherDeathDetailsDTO.setFresh(observation.hasComponent() && observation.getComponent().size() > 9 ? observation.getComponent().get(9).getValueBooleanType().booleanValue() : null);
+                                    otherDeathDetailsDTO.setMotherCondition(observation.hasComponent() && observation.getComponent().size() > 10 ? observation.getComponent().get(10).getValueStringType().toString() : null);
                                     causesOfDeathDetailsDTO.setOtherDeathDetails(otherDeathDetailsDTO);
 
                                     templateData.setCausesOfDeathDetails(causesOfDeathDetailsDTO);
@@ -740,7 +740,7 @@ public class SharedHealthRecordsService {
                                         //TODO: Add prophylAxis type
                                         //TODO: Add prophylAxis name
                                         prophylAxisDetailsDTO.setStatus(procedure.hasStatus() ? procedure.getStatus().getDisplay() : null);
-                                        prophylAxisDetailsDTO.setNotes(procedure.hasNote() ? procedure.getNote().get(0).getText() : null);
+                                        prophylAxisDetailsDTO.setNotes(procedure.hasNote() && !procedure.getNote().isEmpty() ? procedure.getNote().get(0).getText() : null);
                                         //TODO: Add prophylAxis reaction
                                         prophylAxisDetailsDTOS.add(prophylAxisDetailsDTO);
                                     }
@@ -756,7 +756,7 @@ public class SharedHealthRecordsService {
                                     List<Map<String, Object>> chemotherapyTreatment = new ArrayList<>();
                                     for (Procedure procedure : chemotherapyProcedures) {
                                         Map<String, Object> chemoTherapy = new HashMap<>();
-                                        chemoTherapy.put("diagnosis", procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
+                                        chemoTherapy.put("diagnosis", procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty() && procedure.getReasonCode().get(0).hasCoding() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
                                         chemoTherapy.put("regiment", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "regiment"));
                                         chemoTherapy.put("stage", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "stage"));
                                         chemoTherapy.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "totalExpectedCycles"));
@@ -823,7 +823,7 @@ public class SharedHealthRecordsService {
                                     for (Procedure procedure : surgeryProcedures) {
                                         Map<String, Object> surgery = new HashMap<>();
                                         Map<String, Object> report = new HashMap<>();
-                                        surgery.put("diagnosis", procedure.hasCode() ? procedure.getCode().getCoding().get(0).getDisplay() : null);
+                                        surgery.put("diagnosis", procedure.hasCode() && procedure.getCode().hasCoding() ? procedure.getCode().getCoding().get(0).getDisplay() : null);
                                         if (procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty()) {
                                             surgery.put("reason", procedure.getReasonCode().get(0).getText());
                                         }
@@ -852,7 +852,7 @@ public class SharedHealthRecordsService {
                                     List<Map<String, Object>> hormoneTherapy = new ArrayList<>();
                                     for (Procedure procedure : hormoneTherapyTreatments) {
                                         Map<String, Object> treatment = new HashMap<>();
-                                        treatment.put("diagnosis", procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
+                                        treatment.put("diagnosis", procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
                                         treatment.put("regiment", getNestedExtensionValueString(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "regiment"));
                                         treatment.put("stage", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "stage"));
                                         treatment.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "totalExpectedCycles"));
@@ -870,7 +870,7 @@ public class SharedHealthRecordsService {
                                         MedicalProcedureDetailsDTO treatment = new MedicalProcedureDetailsDTO();
                                         treatment.setProcedureDate(procedure.hasPerformedDateTimeType() ? procedure.getPerformedDateTimeType().getValue() : null);
                                         treatment.setProcedureType(procedure.hasCode() ? procedure.getCode().getText() : null);
-                                        treatment.setDiagnosis(procedure.hasReasonCode() ? procedure.getReasonCode().get(0).getText() : null);
+                                        treatment.setDiagnosis(procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty() ? procedure.getReasonCode().get(0).getText() : null);
                                         //TODO Add findings
                                         medicalProcedureDetails.add(treatment);
                                     }
@@ -913,6 +913,28 @@ public class SharedHealthRecordsService {
                                     templateData.setVaccinationDetails(vaccinationDetailsDTOS);
                                 }
 
+
+                                //Billing details
+                                List<BillingsDetailsDTO> billingsDetailsDTOS = new ArrayList<>();
+                                List<ChargeItem> chargedItems = getChargeItemsByEncounterId(encounter.getIdElement().getIdPart());
+                                if(!chargedItems.isEmpty()){
+                                    for (ChargeItem chargeItem : chargedItems) {
+                                        //TODO: Add billingID
+                                        //TODO: Add billingCode
+                                        //TODO: Add insuranceCode
+                                        //TODO: Add insuranceName
+                                        //TODO: Add exemptionType
+                                        //TODO: Add wavedAmount
+                                        //TODO: Add billDate
+                                        //TODO: Add standardCode
+                                        BillingsDetailsDTO billingsDetailsDTO = new BillingsDetailsDTO();
+                                        billingsDetailsDTO.setBillType(chargeItem.hasCode() ? chargeItem.getCode().getText() : null);
+                                        billingsDetailsDTO.setAmountBilled(chargeItem.hasPriceOverride() ? chargeItem.getPriceOverride().getValue() : null);
+                                        billingsDetailsDTO.setBillDate(chargeItem.hasEnteredDate() ? chargeItem.getEnteredDate() : null);
+                                        billingsDetailsDTOS.add(billingsDetailsDTO);
+                                    }
+                                    templateData.setBillingsDetails(billingsDetailsDTOS);
+                                }
 
                                 sharedRecords.add(templateData.toMap());
                             }
@@ -1287,6 +1309,20 @@ public class SharedHealthRecordsService {
         return immunizations;
     }
 
+    public List<ChargeItem> getChargeItemsByEncounterId(String encounterId) throws Exception {
+        List<ChargeItem> chargeItems = new ArrayList<>();
+        var chargeItemsSearch = fhirClient.search().forResource(ChargeItem.class).where(ChargeItem.CONTEXT.hasAnyOfIds(encounterId));
+
+        Bundle chargeItemsBundle;
+        chargeItemsBundle = chargeItemsSearch.returnBundle(Bundle.class).execute();
+        if(chargeItemsBundle.hasEntry()){
+            for (Bundle.BundleEntryComponent entryComponent : chargeItemsBundle.getEntry()) {
+                ChargeItem chargeItem = (ChargeItem) entryComponent.getResource();
+                chargeItems.add(chargeItem);
+            }
+        }
+        return chargeItems;
+    }
 
     public DocumentReference getDocumentReferenceById(String id) throws Exception {
         DocumentReference documentReference;
