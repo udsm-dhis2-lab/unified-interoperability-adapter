@@ -579,8 +579,6 @@ mappings.forEach((mapping) => {
     const startAge = param.startAge;
     const endAge = param.endAge;
     hasAgeGroup = ageType && startAge && endAge ? true : false;
-
-    console.log(hasGender);
     query +=
       ` COUNT(*) ` +
       (hasGender || hasAgeGroup
@@ -590,23 +588,23 @@ mappings.forEach((mapping) => {
               : ""
           } ${hasGender && hasAgeGroup ? "AND" : ""} ${
             hasAgeGroup
-              ? "pt.birth_date >= DATE_SUB(CURDATE(), INTERVAL " +
+              ? "pt.birth_date >= (CURRENT_DATE - INTERVAL '" +
                 startAge +
                 (ageType === "years"
                   ? " YEAR "
                   : ageType === "months"
                   ? " MONTH "
                   : " DAY ") +
-                ")" +
+                "')" +
                 " AND " +
-                "pt.birth_date <= DATE_SUB(CURDATE(), INTERVAL " +
+                "pt.birth_date <= (CURRENT_DATE - INTERVAL '" +
                 endAge +
                 (ageType === "years"
                   ? " YEAR "
                   : ageType === "months"
                   ? " MONTH "
                   : " DAY ") +
-                ")"
+                "')"
               : ""
           })`
         : "");
@@ -628,7 +626,7 @@ mappings.forEach((mapping) => {
     query += `AND cond.code IN ('${icdCodes.join("','")}') \n`;
   }
   query += `LEFT JOIN patient_flat pt ON pt.id = en.patient_id \n `;
-  query += `AND en.period_start_date >= '${startDate}' && en.period_start_date <= '${endDate}' \n`;
+  query += `AND en.period_start >= '${startDate}' AND en.period_start <= '${endDate}' \n`;
 
   query += ` GROUP BY `;
   query += icdCodes && icdCodes.length > 0 ? `cond.code,` : "";
