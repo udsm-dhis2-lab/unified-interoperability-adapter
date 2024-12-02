@@ -15,4 +15,5 @@ public class MedicalProcedureDetailsDTO {
     private Date procedureDate;
     private String procedureType;
     private String findings;
+    private String diagnosis;
 }

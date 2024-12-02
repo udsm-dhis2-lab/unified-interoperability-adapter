@@ -15,7 +15,7 @@ public class OutcomeDetailsDTO {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date deathDate;
-    private String contactTracing;
+    private boolean contactTracing;
     private boolean investigationConducted;
     private boolean quarantined;
     private boolean referred;
