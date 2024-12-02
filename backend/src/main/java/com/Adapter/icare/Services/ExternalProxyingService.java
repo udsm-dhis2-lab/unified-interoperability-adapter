@@ -29,6 +29,7 @@ public class ExternalProxyingService {
     public Object getExternalData(String endpointUrl) throws Exception {
         try {
             String path = formulateDHIS2UrlPath(endpointUrl);
+            System.out.println(path);
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
 
@@ -62,9 +63,12 @@ public class ExternalProxyingService {
     }
 
     private String formulateDHIS2UrlPath(String endpointUrl) {
+        System.out.println(endpointUrl);
+        System.out.println("#########");
         String baseUrl = this.dhisConstants.DHIS2Instance +
                 (this.dhisConstants.DHIS2ContextPath != null ? "/" + this.dhisConstants.DHIS2ContextPath : "") +
-                (endpointUrl.contains("api/") ? "" : "/api/");
+                (endpointUrl.contains("api/") ? "" : "api/");
+        System.out.println(baseUrl);
         return UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path(endpointUrl)
                 .build(false)
