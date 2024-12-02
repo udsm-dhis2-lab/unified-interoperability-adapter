@@ -8,6 +8,7 @@ import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
+import ca.uhn.fhir.rest.gclient.StringClientParam;
 
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
@@ -876,8 +877,42 @@ public class SharedHealthRecordsService {
                                     treatmentDetailsDTO.setMedicalProcedureDetails(medicalProcedureDetails);
                                 }
 
-
                                 templateData.setTreatmentDetails(treatmentDetailsDTO);
+
+
+                                //Vaccination details
+                                //TODO: Add name, type and notes for this resource
+                                List<VaccinationDetailsDTO> vaccinationDetailsDTOS = new ArrayList<>();
+                                List<Immunization> vaccinationDetails = getImmunizationsByEncounterId(encounter.getIdElement().getIdPart(), patient);
+                                if (!vaccinationDetails.isEmpty()) {
+                                    for (Immunization immunization : vaccinationDetails) {
+                                        VaccinationDetailsDTO vaccinationDetailsDTO = new VaccinationDetailsDTO();
+                                        vaccinationDetailsDTO.setDate(immunization.hasOccurrenceDateTimeType() ? immunization.getOccurrenceDateTimeType().getValue() : null);
+                                        vaccinationDetailsDTO.setCode(immunization.hasVaccineCode() ? immunization.getVaccineCode().getText() : null);
+                                        vaccinationDetailsDTO.setStatus(immunization.hasStatus() ? immunization.getStatus().getDisplay() : null);
+                                        vaccinationDetailsDTO.setDosage(immunization.hasDoseQuantity() ? immunization.getDoseQuantity().getValue().intValue() : null);
+                                        if (immunization.hasNote() && !immunization.getNote().get(0).isEmpty()) {
+                                            vaccinationDetailsDTO.setNotes(immunization.getNote().get(0).getText());
+                                        }
+                                        if (immunization.hasRoute() && !immunization.getRoute().getCoding().isEmpty()) {
+                                            vaccinationDetailsDTO.setVaccinationModality(immunization.getRoute().getCoding().get(0).getDisplay());
+                                        }
+                                        ReactionDTO reaction = new ReactionDTO();
+                                        if (immunization.hasReaction() && !immunization.getReaction().isEmpty()) {
+                                            var immunizationObject = immunization.getReaction().get(0);
+                                            reaction.setReactionDate(immunizationObject.hasDate() ? immunizationObject.getDate() : null);
+                                            //TODO: Add notes
+//                                            if (immunizationObject.hasDetail() && immunizationObject.getDetail().getDisplay() != null) {
+//                                                reaction.setNotes(immunizationObject.getDetail().getDisplay());
+//                                            }
+                                            reaction.setReported(immunizationObject.hasReported() ? immunizationObject.getReported() : null);
+                                            vaccinationDetailsDTO.setReaction(reaction);
+                                        }
+                                        vaccinationDetailsDTOS.add(vaccinationDetailsDTO);
+                                    }
+                                    templateData.setVaccinationDetails(vaccinationDetailsDTOS);
+                                }
+
 
                                 sharedRecords.add(templateData.toMap());
                             }
@@ -904,7 +939,8 @@ public class SharedHealthRecordsService {
             pager.put("pageSize", pageSize);
             sharedRecordsResponse.put("pager", pager);
             return sharedRecordsResponse;
-        } catch (Exception e) {
+        } catch (
+                Exception e) {
             e.printStackTrace();
             throw new Exception(e);
         }
@@ -1222,19 +1258,35 @@ public class SharedHealthRecordsService {
     }
 
 
-    public List<Immunization> getImmunizationByEncounterId(String encounterId) throws Exception {
+    public List<Immunization> getImmunizationsByEncounterId(String encounterId, Patient patient) throws Exception {
         List<Immunization> immunizations = new ArrayList<>();
-//        var immunizationSearch = fhirClient.search().forResource(Immunization.class).where(Immunization.PATIENT.hasChainedProperty());
-//        Bundle observationBundle;
-//        observationBundle = immunizationSearch.returnBundle(Bundle.class).execute();
-//        if (observationBundle.hasEntry()) {
-//            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
-//                Immunization immunization = (Immunization) entryComponent.getResource();
-//                immunizations.add(immunization);
-//            }
-//        }
+
+        try {
+            Bundle immunizationBundle = fhirClient
+                    .search()
+                    .forResource(Immunization.class).where(Immunization.PATIENT.hasId(patient.getIdElement().getIdPart()))
+                    .returnBundle(Bundle.class)
+                    .execute();
+
+            if (immunizationBundle.hasEntry()) {
+                for (Bundle.BundleEntryComponent entry : immunizationBundle.getEntry()) {
+                    Resource resource = entry.getResource();
+                    if (resource instanceof Immunization) {
+                        Immunization immunization = (Immunization) resource;
+                        // Check if the immunization references the specified encounter
+                        if (immunization.hasEncounter() && ("Encounter/" + encounterId).equals(immunization.getEncounter().getReference())) {
+                            immunizations.add(immunization);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+
         return immunizations;
     }
+
 
     public DocumentReference getDocumentReferenceById(String id) throws Exception {
         DocumentReference documentReference;
