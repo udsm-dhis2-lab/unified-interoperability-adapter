@@ -596,7 +596,7 @@ mappings.forEach((mapping) => {
     query += `AND cond.code IN ('${icdCodes.join("','")}') \n`;
   }
   query += `LEFT JOIN patient_flat pt ON pt.id = en.patient_id \n `;
-  query += `AND en.period_start_date >= '${startDate}' && en.period_end_date <= '${endDate}' \n`;
+  query += `AND en.period_start_date >= '${startDate}' && en.period_start_date <= '${endDate}' \n`;
 
   query += ` GROUP BY `;
   query += icdCodes && icdCodes.length > 0 ? `cond.code,` : "";
