@@ -731,7 +731,7 @@ public class SharedHealthRecordsService {
 
 
                                 //Outcome details
-                                List<Observation> outcomeObservations = getObservationsByCategory("outcome-details", encounter, true);
+                                List<Observation> outcomeObservations = getObservationsByCategory("outcome-details", encounter, false);
                                 if (!outcomeObservations.isEmpty()) {
                                     Observation observation = Iterables.getLast(outcomeObservations);
                                     OutcomeDetailsDTO outcomeDetailsDTO = new OutcomeDetailsDTO();
@@ -747,7 +747,7 @@ public class SharedHealthRecordsService {
 
 
                                 //Cause of death details
-                                List<Observation> causeOfDeathObservations = getObservationsByCategory("cause-of-death", encounter, true);
+                                List<Observation> causeOfDeathObservations = getObservationsByCategory("cause-of-death", encounter, false);
                                 if (!causeOfDeathObservations.isEmpty()) {
                                     //TODO: Discuss about the resource to be used here
                                     Observation observation = Iterables.getLast(causeOfDeathObservations);
@@ -772,7 +772,7 @@ public class SharedHealthRecordsService {
 
 
                                 //Antenatal care details
-                                List<Observation> antenatalCareObservations = getObservationsByCategory("anc-details", encounter, true);
+                                List<Observation> antenatalCareObservations = getObservationsByCategory("anc-details", encounter, false);
                                 if (!antenatalCareObservations.isEmpty()) {
                                     Observation observation = Iterables.getLast(antenatalCareObservations);
                                     AntenatalCareDetailsDTO antenatalCareDetailsDTO = new AntenatalCareDetailsDTO();
@@ -1139,7 +1139,7 @@ public class SharedHealthRecordsService {
 
                                 //Postnatal details
                                 PostnatalDetailsDTO postnatalDetailsDTO = new PostnatalDetailsDTO();
-                                List<Observation> postnatalDetailsObservations = getObservationsByCategory("postnatal-details", encounter, true);
+                                List<Observation> postnatalDetailsObservations = getObservationsByCategory("postnatal-details", encounter, false);
                                 if (!postnatalDetailsObservations.isEmpty()) {
                                     //TODO: Decide on the resource to be used here
                                     Observation postnatalDetailObservation = Iterables.getLast(postnatalDetailsObservations);
@@ -1183,7 +1183,7 @@ public class SharedHealthRecordsService {
                                     //TODO: Add breast feeding details
 
                                     //Birth details observation
-                                    List<Observation> birthDetailsPostnatalObservations = getObservationsByCategory("postnatal-birth-details", encounter, true);
+                                    List<Observation> birthDetailsPostnatalObservations = getObservationsByCategory("postnatal-birth-details", encounter, false);
                                     List<BirthDetailsDTO> birthDetailsPostnatalDTOS = new ArrayList<>();
                                     if (!birthDetailsPostnatalObservations.isEmpty()) {
                                         for (Observation observation : birthDetailsPostnatalObservations) {
@@ -1210,7 +1210,7 @@ public class SharedHealthRecordsService {
                                             }
                                             birthDetailsDTOS.add(birthDetailsDTO);
                                         }
-                                        postnatalDetailsDTO.setBirthDetails(birthDetailsDTOS);
+                                        postnatalDetailsDTO.setBirthDetails(birthDetailsPostnatalDTOS);
                                     }
                                     templateData.setPostnatalDetails(postnatalDetailsDTO);
                                 }
