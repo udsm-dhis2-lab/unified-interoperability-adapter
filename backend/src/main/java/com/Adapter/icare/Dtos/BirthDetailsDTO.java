@@ -20,7 +20,7 @@ public class BirthDetailsDTO {
     private boolean exclusiveBreastFed;
     private boolean marcerated;
     private boolean fresh;
-    private Float motherAgeInYears;
+    private Integer motherAgeInYears;
     private Integer birthOrder;
     private CodeAndNameDTO motherHivStatus;
     private boolean providedWithARV;
