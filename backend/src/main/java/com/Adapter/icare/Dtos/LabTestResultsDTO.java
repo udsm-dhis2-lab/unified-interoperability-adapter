@@ -17,7 +17,7 @@ public class LabTestResultsDTO {
     private String result;
     private String codedValue;
     private String valueType;
-    private String standardCode;
+    private boolean standardCode;
     private String codeType;
     private String unit;
     private String lowRange;

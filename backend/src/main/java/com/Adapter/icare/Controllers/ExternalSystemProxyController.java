@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController()
 @RequestMapping("/api/v1/dhis2")
@@ -17,18 +19,19 @@ public class ExternalSystemProxyController {
     }
 
     @GetMapping("/**")
-    public Map<String, Object> proxyGet(HttpServletRequest request) {
+    public Object proxyGet(HttpServletRequest request) throws Exception {
         String requestURI = request.getRequestURI();
         String queryString = request.getQueryString();
         String url = requestURI.replace("/api/v1/dhis2/", "");
         if (queryString != null) {
-            url += "?" + queryString;
+            String decodedQuery = URLDecoder.decode(queryString, StandardCharsets.UTF_8.name());
+            url += "?" + decodedQuery;
         }
         return this.externalProxyingService.getExternalData(url);
     }
 
     @PostMapping("/**")
-    public Map<String, Object> proxyPost(HttpServletRequest request, @RequestBody Map<String,Object> payload) {
+    public Object proxyPost(HttpServletRequest request, @RequestBody Map<String,Object> payload) {
         String requestURI = request.getRequestURI();
         String queryString = request.getQueryString();
         String url = requestURI.replace("/api/v1/dhis2/", "");

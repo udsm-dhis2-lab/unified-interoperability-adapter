@@ -570,6 +570,7 @@ mappings.forEach((mapping) => {
   query += `  '${dataElementId}' AS "${dataElementId}",\n`;
 
   let hasGender = false;
+  let hasAgeGroup = false;
   mapping.mapping.params.forEach((param, index) => {
     hasGender = param.gender ? true : false;
     const gender = param.gender;
@@ -577,15 +578,40 @@ mappings.forEach((mapping) => {
     const ageType = param.ageType;
     const startAge = param.startAge;
     const endAge = param.endAge;
-
-    query += `  COUNT(*) FILTER (WHERE pt.gender = '${
-      gender === "M" ? "male" : "female"
-    }') AS "${co}"${index < mapping.mapping.params.length - 1 ? "," : ""} \n`;
+    hasAgeGroup = ageType && startAge && endAge ? true : false;
+    query +=
+      ` COUNT(*) ` +
+      (hasGender || hasAgeGroup
+        ? ` FILTER ( WHERE ${
+            hasGender
+              ? "pt.gender='" + (gender === "M" ? "male" : "female") + "'"
+              : ""
+          } ${hasGender && hasAgeGroup ? "AND" : ""} ${
+            hasAgeGroup
+              ? "pt.birth_date >= (CURRENT_DATE - INTERVAL '" +
+                startAge +
+                (ageType === "years"
+                  ? " YEAR "
+                  : ageType === "months"
+                  ? " MONTH "
+                  : " DAY ") +
+                "')" +
+                " AND " +
+                "pt.birth_date <= (CURRENT_DATE - INTERVAL '" +
+                endAge +
+                (ageType === "years"
+                  ? " YEAR "
+                  : ageType === "months"
+                  ? " MONTH "
+                  : " DAY ") +
+                "')"
+              : ""
+          })`
+        : "");
+    query += ` AS "${co}"${
+      index < mapping.mapping.params.length - 1 ? "," : ""
+    } \n`;
   });
-
-  query += ` FROM patient_flat pt \n`;
-  query += `JOIN encounter_flat en ON pt.id = en.patient_id \n `;
-  query += `AND en.period_start_date >= '${startDate}' && en.period_end_date <= '${endDate}' \n`;
   let icdCodes = [];
   if (mapping.mapping.icdMappings && mapping.mapping.icdMappings.length > 0) {
     icdCodes = mapping.mapping.icdMappings.map((icdMapping, index) => {
@@ -593,13 +619,18 @@ mappings.forEach((mapping) => {
     });
   }
 
+  query += ` FROM encounter_flat en \n`;
+
   if (icdCodes && icdCodes.length > 0) {
-    query += `JOIN condition_flat cond ON en.id = cond.encounter_id \n`;
+    query += `RIGHT JOIN condition_flat cond ON en.id = cond.encounter_id \n`;
     query += `AND cond.code IN ('${icdCodes.join("','")}') \n`;
   }
-  query += " GROUP BY ";
-  query += icdCodes && icdCodes.length > 0 ? "cond.code," : "";
-  query += hasGender ? "pt.gender," : "";
+  query += `LEFT JOIN patient_flat pt ON pt.id = en.patient_id \n `;
+  query += `AND en.period_start >= '${startDate}' AND en.period_start <= '${endDate}' \n`;
+
+  query += ` GROUP BY `;
+  query += icdCodes && icdCodes.length > 0 ? `cond.code,` : "";
+  query += hasGender ? `pt.gender,` : "";
   query += ` en.organization_id;`;
   console.log(query);
 });

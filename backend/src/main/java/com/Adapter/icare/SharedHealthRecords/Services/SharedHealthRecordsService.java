@@ -147,7 +147,7 @@ public class SharedHealthRecordsService {
                 for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                     if (entry.getResource() instanceof Patient) {
                         Patient patient = (Patient) entry.getResource();
-                        Organization organization = null;
+                        Organization organization = new Organization();
                         if (hfrCode != null) {
                             try {
                                 Bundle bundle = new Bundle();
@@ -174,6 +174,16 @@ public class SharedHealthRecordsService {
                                 // if organisation is null then do this
                                 IIdType organisationReference = encounter.getServiceProvider().getReferenceElement();
                                 organization = fhirClient.read().resource(Organization.class).withId(organisationReference.getIdPart()).execute();
+//                                Bundle ouBundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().code(organisationReference.getIdPart())).returnBundle(Bundle.class).execute();
+//                                if (ouBundle.hasEntry()) {
+//                                    for (Bundle.BundleEntryComponent entryComponent: ouBundle.getEntry()) {
+//                                        Organization ou = (Organization) entryComponent.getResource();
+//                                        if (ou.getIdElement().getIdPart().equals(organisationReference.getIdPart())) {
+//                                            organization = ou;
+//                                            break;
+//                                        }
+//                                    }
+//                                }
                                 PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
                                 List<Coverage> coverages = this.clientRegistryService.getCoverages(patient.getIdElement().getIdPart());
                                 List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
@@ -384,11 +394,11 @@ public class SharedHealthRecordsService {
                                 if (!conditions.isEmpty()) {
                                     for (Condition condition : conditions) {
                                         ChronicConditionsDTO chronicConditionsDTO = new ChronicConditionsDTO();
-                                        chronicConditionsDTO.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getCode().toString() : null);
-                                        chronicConditionsDTO.setName(condition.hasCategory() && !condition.getCategory().isEmpty() ? condition.getCategory().get(0).getCoding().get(0).getCode() : null);
-                                        chronicConditionsDTO.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getDisplay().toString() : null);
-                                        chronicConditionsDTO.setCriticality(condition.getClinicalStatus().getCoding().get(0).getCode());
-                                        chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode() : null);
+                                        chronicConditionsDTO.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() && condition.getCode().getCoding().get(0).hasCode() ? condition.getCode().getCoding().get(0).getCode() : null);
+                                        chronicConditionsDTO.setName(condition.hasCategory() && !condition.getCategory().isEmpty() && condition.getCategory().get(0).getCoding().get(0).hasCode() ? condition.getCategory().get(0).getCoding().get(0).getCode() : null);
+                                        chronicConditionsDTO.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() && condition.getCode().getCoding().get(0).hasDisplay() ? condition.getCode().getCoding().get(0).getDisplay() : null);
+                                        chronicConditionsDTO.setCriticality(condition.hasClinicalStatus() &&  condition.getClinicalStatus().hasCoding() && !condition.getClinicalStatus().getCoding().isEmpty() && condition.getClinicalStatus().getCoding().get(0).hasCode() ? condition.getClinicalStatus().getCoding().get(0).getCode(): null);
+                                        chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() && condition.getVerificationStatus().getCoding().get(0).hasCode() ? condition.getVerificationStatus().getCoding().get(0).getCode() : null);
                                         chronicConditionsDTOS.add(chronicConditionsDTO);
                                     }
                                 }
@@ -524,6 +534,84 @@ public class SharedHealthRecordsService {
                                 }
 
                                 templateData.setInvestigationDetails(investigationDetailsDTOList);
+
+                                // Lab investigation details using DiagnosticReport
+                                List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
+                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(encounter.getIdElement().getIdPart(), "LAB");
+                                if (!diagnosticReports.isEmpty()) {
+                                    for(DiagnosticReport diagnosticReport: diagnosticReports) {
+                                        LabInvestigationDetailsDTO labInvestigationDetailsDTO = new LabInvestigationDetailsDTO();
+                                        labInvestigationDetailsDTO.setTestCode(diagnosticReport.hasCode() &&
+                                                diagnosticReport.getCode().hasCoding() &&
+                                                !diagnosticReport.getCode().getCoding().isEmpty()
+                                                ? diagnosticReport.getCode().getCoding().get(0).getCode(): null);
+
+                                        List<Identifier> identifiers = diagnosticReport.getIdentifier();
+                                        for (Identifier reportIdentifier: identifiers) {
+                                            if (reportIdentifier.hasValue() && reportIdentifier.hasType() && reportIdentifier.getType().hasCoding() && !reportIdentifier.getType().getCoding().isEmpty()) {
+                                               if (reportIdentifier.getType().getCoding().get(0).getCode().equals("TEST-ORDER")) {
+                                                   labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
+                                               } else if (reportIdentifier.getType().getCoding().get(0).getCode().equals("SAMPLE-ID")) {
+                                                   labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
+                                               }
+                                            }
+                                        }
+                                        labInvestigationDetailsDTO.setTestOrderDate(diagnosticReport.hasEffectiveDateTimeType() ? diagnosticReport.getEffectiveDateTimeType().getValue(): null);
+                                        labInvestigationDetailsDTO.setTestType("Lab Test");
+                                        labInvestigationDetailsDTO.setStandardCode(
+                                                diagnosticReport.hasCode() &&
+                                                        diagnosticReport.getCode().hasCoding() &&
+                                                        !diagnosticReport.getCode().getCoding().isEmpty()
+                                                        && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE: Boolean.FALSE);
+                                        labInvestigationDetailsDTO.setCodeType(
+                                                diagnosticReport.hasCode() &&
+                                                        diagnosticReport.getCode().hasCoding() &&
+                                                        !diagnosticReport.getCode().getCoding().isEmpty()
+                                                        && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? "LOINC" : null
+                                        );
+
+                                        List<LabTestResultsDTO> labTestResultsDTOS = new ArrayList<>();
+                                        if (diagnosticReport.hasResult()) {
+                                            for (Reference reference: diagnosticReport.getResult()) {
+                                                LabTestResultsDTO labTestResultsDTO = new LabTestResultsDTO();
+                                                IIdType obsReference = reference.getReferenceElement();
+                                                if (obsReference.getResourceType().equals("Observation")) {
+                                                    Observation observation = fhirClient.read().resource(Observation.class).withId(obsReference.getIdPart()).execute();
+                                                    labTestResultsDTO.setParameter(observation.hasCode() &&
+                                                            observation.getCode().hasCoding() &&
+                                                            !observation.getCode().getCoding().isEmpty() ?
+                                                            observation.getCode().getCoding().get(0).getCode(): null);
+                                                    labTestResultsDTO.setStandardCode(
+                                                            diagnosticReport.hasCode() &&
+                                                                    diagnosticReport.getCode().hasCoding() &&
+                                                                    !diagnosticReport.getCode().getCoding().isEmpty()
+                                                                    && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE: Boolean.FALSE);
+                                                    labTestResultsDTO.setReleaseDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue(): null);
+                                                    labTestResultsDTO.setValueType(observation.hasValueStringType()
+                                                            ? "TEXT"
+                                                            : observation.hasValueQuantity()
+                                                            ? "NUMERIC"
+                                                            : observation.hasValueCodeableConcept()
+                                                            ? "CODED": null);
+                                                    labTestResultsDTO.setResult(observation.hasValueStringType()
+                                                            ? String.valueOf(observation.getValueStringType().getValue())
+                                                        : observation.hasValueQuantity()
+                                                            ? String.valueOf(observation.getValueQuantity().getValue())
+                                                            : observation.hasValueCodeableConcept()
+                                                            ? observation.getValueCodeableConcept().getText(): null);
+                                                    labTestResultsDTO.setUnit(observation.hasValueQuantity()
+                                                            ? String.valueOf(observation.getValueQuantity().getUnit())
+                                                            : null);
+                                                }
+                                                labTestResultsDTOS.add(labTestResultsDTO);
+                                            }
+                                        }
+                                        labInvestigationDetailsDTO.setTestResults(labTestResultsDTOS);
+                                        labInvestigationDetailsDTOS.add(labInvestigationDetailsDTO);
+                                    }
+                                }
+
+                                templateData.setLabInvestigationDetails(labInvestigationDetailsDTOS);
 
                                 ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
                                 // 1. get service request
@@ -974,17 +1062,21 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Infant and family planning counseling
-                                List<Observation> infantFeedingCounselings = getObservationsByCategory("infant-feeding-counseling", encounter, true);
-                                List<Observation> familyPlanningCounselings = getObservationsByCategory("family-planning-counseling", encounter, true);
+                                List<Observation> infantFeedingCounselings = getObservationsByCategory("infant-feeding-counseling", encounter, false);
+                                List<Observation> familyPlanningCounselings = getObservationsByCategory("family-planning-counseling", encounter, false);
                                 if (!infantFeedingCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation infantFeedingCounseling = Iterables.getLast(infantFeedingCounselings);
-                                    laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.hasValueBooleanType() && infantFeedingCounseling.getValueBooleanType().hasValue() ? infantFeedingCounseling.getValueBooleanType().getValue() : false);
+                                    if (infantFeedingCounseling != null && infantFeedingCounseling.hasValueBooleanType() && infantFeedingCounseling.getValueBooleanType().hasValue() ) {
+                                        laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.getValueBooleanType().getValue());
+                                    }
                                 }
                                 if (!familyPlanningCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation familyPlanningCounseling = Iterables.getLast(familyPlanningCounselings);
-                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.hasValueBooleanType() && familyPlanningCounseling.getValueBooleanType().hasValue() ? familyPlanningCounseling.getValueBooleanType().getValue() : false);
+                                    if (familyPlanningCounseling.hasValueBooleanType()) {
+                                        laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.getValueBooleanType().getValue());
+                                    }
                                 }
 
                                 //Before birth complications
@@ -1014,7 +1106,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Birth details observation
-                                List<Observation> birthDetailsObservations = getObservationsByCategory("labor-delivery-birth-details", encounter, true);
+                                List<Observation> birthDetailsObservations = getObservationsByCategory("labor-delivery-birth-details", encounter, false);
                                 List<BirthDetailsDTO> birthDetailsDTOS = new ArrayList<>();
                                 if (!birthDetailsObservations.isEmpty()) {
                                     for (Observation observation : birthDetailsObservations) {
@@ -1332,11 +1424,13 @@ public class SharedHealthRecordsService {
         observationBundle = observationSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
-                Observation observationGroup = (Observation) entryComponent.getResource();
-                if (forGroup && !observationGroup.hasDerivedFrom() && !observationGroup.hasHasMember()) {
-                    observations.add(observationGroup);
+                Observation observation = (Observation) entryComponent.getResource();
+                if (forGroup && !observation.hasDerivedFrom() && !observation.hasHasMember()) {
+                    observations.add(observation);
+                } else if (!forGroup) {
+                    observations.add(observation);
                 } else {
-                    observations.add(observationGroup);
+                    // Check if non-grouped obs falls here
                 }
             }
         }
@@ -1435,6 +1529,21 @@ public class SharedHealthRecordsService {
             }
         }
         return questionnaireResponses;
+    }
+
+    public List<DiagnosticReport> getDiagnosticReportByCategory(String encounterId, String category) throws Exception {
+        List<DiagnosticReport> diagnosticReports = new ArrayList<>();
+        var searchDiagnosticReports = fhirClient.search().forResource(DiagnosticReport.class).where(DiagnosticReport.CATEGORY.exactly().code(category));
+        searchDiagnosticReports.where(DiagnosticReport.ENCOUNTER.hasAnyOfIds(encounterId));
+        Bundle diagnosticReportBundle = searchDiagnosticReports.sort().descending("_lastUpdated")
+                .returnBundle(Bundle.class).execute();
+        if (diagnosticReportBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: diagnosticReportBundle.getEntry()) {
+                DiagnosticReport diagnosticReport = (DiagnosticReport) entryComponent.getResource();
+                diagnosticReports.add(diagnosticReport);
+            }
+        }
+        return diagnosticReports;
     }
 
     public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception {

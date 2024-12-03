@@ -143,12 +143,12 @@ public class PatientDTO {
     }
 
     public String getMRN(String orgCode) {
-        List<String> identifiers = this.getIdentifiers().stream()
+        List<String> identifiers = orgCode != null ? this.getIdentifiers().stream()
                 .filter(identifier -> identifier.hasAssigner() && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType() && identifier.getType().hasCoding() &&
                         identifier.getType().getCoding().get(0).getCode().equals("MRN"))
                 .map(Identifier::getValue)
-                .collect(Collectors.toList());
-        return !identifiers.isEmpty() ? identifiers.get(0): null;
+                .collect(Collectors.toList()): null;
+        return identifiers != null && !identifiers.isEmpty() ? identifiers.get(0): null;
     }
 
     public @NotNull List<Map<String, Object>> getIdentifierMaps() {
