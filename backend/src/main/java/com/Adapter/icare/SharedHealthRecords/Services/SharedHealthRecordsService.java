@@ -60,6 +60,7 @@ public class SharedHealthRecordsService {
     }
 
     public Map<String, Object> getSharedRecordsWithPagination(Integer page, Integer pageSize, String identifier, String identifierType, String referralNumber, boolean onlyLinkedClients, String gender, String firstName, String middleName, String lastName, String hfrCode, Date dateOfBirth, boolean includeDeceased, Integer numberOfVisits) throws Exception {
+        System.out.println(fhirClient.getServerBase());
         List<Map<String, Object>> sharedRecords = new ArrayList<>();
         Bundle response = new Bundle();
         Bundle clientTotalBundle = new Bundle();
@@ -378,11 +379,11 @@ public class SharedHealthRecordsService {
                                 if (!conditions.isEmpty()) {
                                     for (Condition condition : conditions) {
                                         ChronicConditionsDTO chronicConditionsDTO = new ChronicConditionsDTO();
-                                        chronicConditionsDTO.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getCode().toString() : null);
-                                        chronicConditionsDTO.setName(condition.hasCategory() && !condition.getCategory().isEmpty() ? condition.getCategory().get(0).getCoding().get(0).getCode() : null);
-                                        chronicConditionsDTO.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getDisplay().toString() : null);
-                                        chronicConditionsDTO.setCriticality(condition.getClinicalStatus().getCoding().get(0).getCode());
-                                        chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode() : null);
+                                        chronicConditionsDTO.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() && condition.getCode().getCoding().get(0).hasCode() ? condition.getCode().getCoding().get(0).getCode() : null);
+                                        chronicConditionsDTO.setName(condition.hasCategory() && !condition.getCategory().isEmpty() && condition.getCategory().get(0).getCoding().get(0).hasCode() ? condition.getCategory().get(0).getCoding().get(0).getCode() : null);
+                                        chronicConditionsDTO.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() && condition.getCode().getCoding().get(0).hasDisplay() ? condition.getCode().getCoding().get(0).getDisplay() : null);
+                                        chronicConditionsDTO.setCriticality(condition.hasClinicalStatus() &&  condition.getClinicalStatus().hasCoding() && !condition.getClinicalStatus().getCoding().isEmpty() && condition.getClinicalStatus().getCoding().get(0).hasCode() ? condition.getClinicalStatus().getCoding().get(0).getCode(): null);
+                                        chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() && condition.getVerificationStatus().getCoding().get(0).hasCode() ? condition.getVerificationStatus().getCoding().get(0).getCode() : null);
                                         chronicConditionsDTOS.add(chronicConditionsDTO);
                                     }
                                 }
