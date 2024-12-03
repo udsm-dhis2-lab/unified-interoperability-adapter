@@ -60,7 +60,6 @@ public class SharedHealthRecordsService {
     }
 
     public Map<String, Object> getSharedRecordsWithPagination(Integer page, Integer pageSize, String identifier, String identifierType, String referralNumber, boolean onlyLinkedClients, String gender, String firstName, String middleName, String lastName, String hfrCode, Date dateOfBirth, boolean includeDeceased, Integer numberOfVisits) throws Exception {
-        System.out.println(fhirClient.getServerBase());
         List<Map<String, Object>> sharedRecords = new ArrayList<>();
         Bundle response = new Bundle();
         Bundle clientTotalBundle = new Bundle();
@@ -142,7 +141,7 @@ public class SharedHealthRecordsService {
                 for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                     if (entry.getResource() instanceof Patient) {
                         Patient patient = (Patient) entry.getResource();
-                        Organization organization = null;
+                        Organization organization = new Organization();
                         if (hfrCode != null) {
                             try {
                                 Bundle bundle = new Bundle();
@@ -169,6 +168,16 @@ public class SharedHealthRecordsService {
                                 // if organisation is null then do this
                                 IIdType organisationReference = encounter.getServiceProvider().getReferenceElement();
                                 organization = fhirClient.read().resource(Organization.class).withId(organisationReference.getIdPart()).execute();
+//                                Bundle ouBundle = fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().code(organisationReference.getIdPart())).returnBundle(Bundle.class).execute();
+//                                if (ouBundle.hasEntry()) {
+//                                    for (Bundle.BundleEntryComponent entryComponent: ouBundle.getEntry()) {
+//                                        Organization ou = (Organization) entryComponent.getResource();
+//                                        if (ou.getIdElement().getIdPart().equals(organisationReference.getIdPart())) {
+//                                            organization = ou;
+//                                            break;
+//                                        }
+//                                    }
+//                                }
                                 PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
                                 List<Coverage> coverages = this.clientRegistryService.getCoverages(patient.getIdElement().getIdPart());
                                 List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
@@ -1047,17 +1056,21 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Infant and family planning counseling
-                                List<Observation> infantFeedingCounselings = getObservationsByCategory("infant-feeding-counseling", encounter, true);
-                                List<Observation> familyPlanningCounselings = getObservationsByCategory("family-planning-counseling", encounter, true);
+                                List<Observation> infantFeedingCounselings = getObservationsByCategory("infant-feeding-counseling", encounter, false);
+                                List<Observation> familyPlanningCounselings = getObservationsByCategory("family-planning-counseling", encounter, false);
                                 if (!infantFeedingCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation infantFeedingCounseling = Iterables.getLast(infantFeedingCounselings);
-                                    laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.hasValueBooleanType() ? infantFeedingCounseling.getValueBooleanType().getValue() : null);
+                                    if (infantFeedingCounseling != null && infantFeedingCounseling.hasValueBooleanType() && infantFeedingCounseling.getValueBooleanType().hasValue() ) {
+                                        laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.getValueBooleanType().getValue());
+                                    }
                                 }
                                 if (!familyPlanningCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation familyPlanningCounseling = Iterables.getLast(familyPlanningCounselings);
-                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.hasValueBooleanType() ? familyPlanningCounseling.getValueBooleanType().getValue() : null);
+                                    if (familyPlanningCounseling.hasValueBooleanType()) {
+                                        laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.getValueBooleanType().getValue());
+                                    }
                                 }
 
                                 //Before birth complications
@@ -1087,7 +1100,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Birth details observation
-                                List<Observation> birthDetailsObservations = getObservationsByCategory("labor-delivery-birth-details", encounter, true);
+                                List<Observation> birthDetailsObservations = getObservationsByCategory("labor-delivery-birth-details", encounter, false);
                                 List<BirthDetailsDTO> birthDetailsDTOS = new ArrayList<>();
                                 if (!birthDetailsObservations.isEmpty()) {
                                     for (Observation observation : birthDetailsObservations) {
@@ -1326,11 +1339,13 @@ public class SharedHealthRecordsService {
         observationBundle = observationSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
-                Observation observationGroup = (Observation) entryComponent.getResource();
-                if (forGroup && !observationGroup.hasDerivedFrom() && !observationGroup.hasHasMember()) {
-                    observations.add(observationGroup);
+                Observation observation = (Observation) entryComponent.getResource();
+                if (forGroup && !observation.hasDerivedFrom() && !observation.hasHasMember()) {
+                    observations.add(observation);
+                } else if (!forGroup) {
+                    observations.add(observation);
                 } else {
-                    observations.add(observationGroup);
+                    // Check if non-grouped obs falls here
                 }
             }
         }
