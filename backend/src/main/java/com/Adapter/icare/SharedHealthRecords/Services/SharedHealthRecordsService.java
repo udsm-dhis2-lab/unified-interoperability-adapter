@@ -979,12 +979,12 @@ public class SharedHealthRecordsService {
                                 if (!infantFeedingCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation infantFeedingCounseling = Iterables.getLast(infantFeedingCounselings);
-                                    laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.hasValueBooleanType() ? infantFeedingCounseling.getValueBooleanType().getValue() : null);
+                                    laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.hasValueBooleanType() && infantFeedingCounseling.getValueBooleanType().hasValue() ? infantFeedingCounseling.getValueBooleanType().getValue() : false);
                                 }
                                 if (!familyPlanningCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation familyPlanningCounseling = Iterables.getLast(familyPlanningCounselings);
-                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.hasValueBooleanType() ? familyPlanningCounseling.getValueBooleanType().getValue() : null);
+                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.hasValueBooleanType() && familyPlanningCounseling.getValueBooleanType().hasValue() ? familyPlanningCounseling.getValueBooleanType().getValue() : false);
                                 }
 
                                 //Before birth complications
@@ -1043,6 +1043,85 @@ public class SharedHealthRecordsService {
                                     laborAndDeliveryDetailsDTO.setBirthDetails(birthDetailsDTOS);
                                 }
                                 templateData.setLaborAndDeliveryDetails(laborAndDeliveryDetailsDTO);
+
+
+                                //Postnatal details
+                                PostnatalDetailsDTO postnatalDetailsDTO = new PostnatalDetailsDTO();
+                                List<Observation> postnatalDetailsObservations = getObservationsByCategory("postnatal-details", encounter, true);
+                                if (!postnatalDetailsObservations.isEmpty()) {
+                                    //TODO: Decide on the resource to be used here
+                                    Observation postnatalDetailObservation = Iterables.getLast(postnatalDetailsObservations);
+                                    postnatalDetailsDTO.setDate(postnatalDetailObservation.hasEffectiveDateTimeType() ? postnatalDetailObservation.getEffectiveDateTimeType().getValue() : null);
+                                    postnatalDetailsDTO.setPositiveHivStatusBeforeService(getComponentValueBoolean(postnatalDetailObservation, 0));
+                                    postnatalDetailsDTO.setReferredToCTC(getComponentValueBoolean(postnatalDetailObservation, 1));
+                                    postnatalDetailsDTO.setReferredToClinicForFurtherServices(getComponentValueBoolean(postnatalDetailObservation, 2));
+                                    postnatalDetailsDTO.setOutCome(getComponentValueString(postnatalDetailObservation, 3));
+                                    postnatalDetailsDTO.setAPGARScore(getComponentIntValue(postnatalDetailObservation, 4));
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 5)) {
+                                        ProvidedAndCodeDTO demagedNipples = new ProvidedAndCodeDTO();
+                                        demagedNipples.setProvided(true);
+                                        demagedNipples.setCode("61149-1");
+                                        postnatalDetailsDTO.setDemagedNipples(demagedNipples);
+                                    }
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 6)) {
+                                        ProvidedAndCodeDTO mastitis = new ProvidedAndCodeDTO();
+                                        mastitis.setProvided(true);
+                                        mastitis.setCode("77392-7");
+                                        postnatalDetailsDTO.setMastitis(mastitis);
+                                    }
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 7)) {
+                                        ProvidedAndCodeDTO breastAbscess = new ProvidedAndCodeDTO();
+                                        breastAbscess.setProvided(true);
+                                        breastAbscess.setCode("77391-9");
+                                        postnatalDetailsDTO.setBreastAbscess(breastAbscess);
+                                    }
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 8)) {
+                                        ProvidedAndCodeDTO fistula = new ProvidedAndCodeDTO();
+                                        fistula.setProvided(true);
+                                        fistula.setCode("37104-4");
+                                        postnatalDetailsDTO.setBreastAbscess(fistula);
+                                    }
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 9)) {
+                                        ProvidedAndCodeDTO puerperalPsychosis = new ProvidedAndCodeDTO();
+                                        puerperalPsychosis.setProvided(true);
+                                        puerperalPsychosis.setCode("77385-1");
+                                        postnatalDetailsDTO.setBreastAbscess(puerperalPsychosis);
+                                    }
+                                    postnatalDetailsDTO.setHoursSinceDelivery(getComponentIntValue(postnatalDetailObservation, 10));
+                                    //TODO: Add breast feeding details
+
+                                    //Birth details observation
+                                    List<Observation> birthDetailsPostnatalObservations = getObservationsByCategory("postnatal-birth-details", encounter, true);
+                                    List<BirthDetailsDTO> birthDetailsPostnatalDTOS = new ArrayList<>();
+                                    if (!birthDetailsPostnatalObservations.isEmpty()) {
+                                        for (Observation observation : birthDetailsPostnatalObservations) {
+                                            BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
+                                            birthDetailsDTO.setDateOfBirth(getNestedExtensionValueDateTime(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "dateOfBirth"));
+                                            birthDetailsDTO.setExclusiveBreastFed(getNestedExtensionValueBoolean(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "exclusiveBreastFed"));
+                                            birthDetailsDTO.setMotherAgeInYears(getNestedExtensionValueInteger(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherAgeInYears"));
+                                            //TODO: Add Mother HIV status
+//                                        birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherHivStatus"));
+                                            birthDetailsDTO.setProvidedWithARV(getNestedExtensionValueBoolean(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "providedWithARV"));
+                                            birthDetailsDTO.setWeightInKgs(getComponentValueQuantityInt(observation, 0) != null ? getComponentValueQuantityInt(observation, 0).floatValue() : null);
+                                            birthDetailsDTO.setMultipleBirth(getComponentValueBoolean(observation, 1));
+                                            birthDetailsDTO.setBirthOrder(getComponentIntValue(observation, 2));
+                                            birthDetailsDTO.setMarcerated(getComponentValueBoolean(observation, 3));
+                                            List<VaccinationDetailsDTO> vaccinationDetails = getVaccinationDetails(encounter.getIdElement().getIdPart(), patient, observation.getIdElement().getIdPart());
+                                            birthDetailsDTO.setVaccinationDetails(vaccinationDetails);
+                                            BreatheAssistanceDTO breatheAssistanceDTO = new BreatheAssistanceDTO();
+                                            List<Procedure> procedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "breathe-assistance", observation.getIdElement().getIdPart());
+                                            if (!procedures.isEmpty()) {
+                                                Procedure procedure = Iterables.getLast(procedures);
+                                                breatheAssistanceDTO.setCode(procedure.hasCode() && procedure.getCode().hasCoding() && !procedure.getCode().getCoding().isEmpty() ? procedure.getCode().getCoding().get(0).getCode() : null);
+                                                breatheAssistanceDTO.setProvided(procedure.hasCode() && procedure.getCode().hasCoding() && !procedure.getCode().getCoding().isEmpty());
+                                                birthDetailsDTO.setBreatheAssistance(breatheAssistanceDTO);
+                                            }
+                                            birthDetailsDTOS.add(birthDetailsDTO);
+                                        }
+                                        postnatalDetailsDTO.setBirthDetails(birthDetailsDTOS);
+                                    }
+                                    templateData.setPostnatalDetails(postnatalDetailsDTO);
+                                }
 
 
                                 sharedRecords.add(templateData.toMap());
