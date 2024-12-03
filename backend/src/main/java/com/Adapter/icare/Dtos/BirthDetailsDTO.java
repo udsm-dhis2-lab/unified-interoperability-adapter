@@ -16,14 +16,14 @@ public class BirthDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date dateOfBirth;
     private Float weightInKgs;
-    private boolean multipleBirth;
-    private boolean exclusiveBreastFed;
-    private boolean marcerated;
+    private Boolean multipleBirth;
+    private Boolean exclusiveBreastFed;
+    private Boolean marcerated;
     private boolean fresh;
     private Integer motherAgeInYears;
     private Integer birthOrder;
     private CodeAndNameDTO motherHivStatus;
-    private boolean providedWithARV;
+    private Boolean providedWithARV;
     private boolean referred;
     private List<VaccinationDetailsDTO> vaccinationDetails;
     private BreatheAssistanceDTO breatheAssistance;

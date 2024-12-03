@@ -397,7 +397,7 @@ public class SharedHealthRecordsService {
                                         chronicConditionsDTO.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() && condition.getCode().getCoding().get(0).hasCode() ? condition.getCode().getCoding().get(0).getCode() : null);
                                         chronicConditionsDTO.setName(condition.hasCategory() && !condition.getCategory().isEmpty() && condition.getCategory().get(0).getCoding().get(0).hasCode() ? condition.getCategory().get(0).getCoding().get(0).getCode() : null);
                                         chronicConditionsDTO.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() && condition.getCode().getCoding().get(0).hasDisplay() ? condition.getCode().getCoding().get(0).getDisplay() : null);
-                                        chronicConditionsDTO.setCriticality(condition.hasClinicalStatus() &&  condition.getClinicalStatus().hasCoding() && !condition.getClinicalStatus().getCoding().isEmpty() && condition.getClinicalStatus().getCoding().get(0).hasCode() ? condition.getClinicalStatus().getCoding().get(0).getCode(): null);
+                                        chronicConditionsDTO.setCriticality(condition.hasClinicalStatus() && condition.getClinicalStatus().hasCoding() && !condition.getClinicalStatus().getCoding().isEmpty() && condition.getClinicalStatus().getCoding().get(0).hasCode() ? condition.getClinicalStatus().getCoding().get(0).getCode() : null);
                                         chronicConditionsDTO.setVerificationStatus(condition.hasVerificationStatus() && condition.getVerificationStatus().getCoding().get(0).hasCode() ? condition.getVerificationStatus().getCoding().get(0).getCode() : null);
                                         chronicConditionsDTOS.add(chronicConditionsDTO);
                                     }
@@ -539,30 +539,30 @@ public class SharedHealthRecordsService {
                                 List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
                                 List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(encounter.getIdElement().getIdPart(), "LAB");
                                 if (!diagnosticReports.isEmpty()) {
-                                    for(DiagnosticReport diagnosticReport: diagnosticReports) {
+                                    for (DiagnosticReport diagnosticReport : diagnosticReports) {
                                         LabInvestigationDetailsDTO labInvestigationDetailsDTO = new LabInvestigationDetailsDTO();
                                         labInvestigationDetailsDTO.setTestCode(diagnosticReport.hasCode() &&
                                                 diagnosticReport.getCode().hasCoding() &&
                                                 !diagnosticReport.getCode().getCoding().isEmpty()
-                                                ? diagnosticReport.getCode().getCoding().get(0).getCode(): null);
+                                                ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
 
                                         List<Identifier> identifiers = diagnosticReport.getIdentifier();
-                                        for (Identifier reportIdentifier: identifiers) {
+                                        for (Identifier reportIdentifier : identifiers) {
                                             if (reportIdentifier.hasValue() && reportIdentifier.hasType() && reportIdentifier.getType().hasCoding() && !reportIdentifier.getType().getCoding().isEmpty()) {
-                                               if (reportIdentifier.getType().getCoding().get(0).getCode().equals("TEST-ORDER")) {
-                                                   labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
-                                               } else if (reportIdentifier.getType().getCoding().get(0).getCode().equals("SAMPLE-ID")) {
-                                                   labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
-                                               }
+                                                if (reportIdentifier.getType().getCoding().get(0).getCode().equals("TEST-ORDER")) {
+                                                    labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
+                                                } else if (reportIdentifier.getType().getCoding().get(0).getCode().equals("SAMPLE-ID")) {
+                                                    labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
+                                                }
                                             }
                                         }
-                                        labInvestigationDetailsDTO.setTestOrderDate(diagnosticReport.hasEffectiveDateTimeType() ? diagnosticReport.getEffectiveDateTimeType().getValue(): null);
+                                        labInvestigationDetailsDTO.setTestOrderDate(diagnosticReport.hasEffectiveDateTimeType() ? diagnosticReport.getEffectiveDateTimeType().getValue() : null);
                                         labInvestigationDetailsDTO.setTestType("Lab Test");
                                         labInvestigationDetailsDTO.setStandardCode(
                                                 diagnosticReport.hasCode() &&
                                                         diagnosticReport.getCode().hasCoding() &&
                                                         !diagnosticReport.getCode().getCoding().isEmpty()
-                                                        && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE: Boolean.FALSE);
+                                                        && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE : Boolean.FALSE);
                                         labInvestigationDetailsDTO.setCodeType(
                                                 diagnosticReport.hasCode() &&
                                                         diagnosticReport.getCode().hasCoding() &&
@@ -572,7 +572,7 @@ public class SharedHealthRecordsService {
 
                                         List<LabTestResultsDTO> labTestResultsDTOS = new ArrayList<>();
                                         if (diagnosticReport.hasResult()) {
-                                            for (Reference reference: diagnosticReport.getResult()) {
+                                            for (Reference reference : diagnosticReport.getResult()) {
                                                 LabTestResultsDTO labTestResultsDTO = new LabTestResultsDTO();
                                                 IIdType obsReference = reference.getReferenceElement();
                                                 if (obsReference.getResourceType().equals("Observation")) {
@@ -580,25 +580,25 @@ public class SharedHealthRecordsService {
                                                     labTestResultsDTO.setParameter(observation.hasCode() &&
                                                             observation.getCode().hasCoding() &&
                                                             !observation.getCode().getCoding().isEmpty() ?
-                                                            observation.getCode().getCoding().get(0).getCode(): null);
+                                                            observation.getCode().getCoding().get(0).getCode() : null);
                                                     labTestResultsDTO.setStandardCode(
                                                             diagnosticReport.hasCode() &&
                                                                     diagnosticReport.getCode().hasCoding() &&
                                                                     !diagnosticReport.getCode().getCoding().isEmpty()
-                                                                    && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE: Boolean.FALSE);
-                                                    labTestResultsDTO.setReleaseDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue(): null);
+                                                                    && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE : Boolean.FALSE);
+                                                    labTestResultsDTO.setReleaseDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
                                                     labTestResultsDTO.setValueType(observation.hasValueStringType()
                                                             ? "TEXT"
                                                             : observation.hasValueQuantity()
                                                             ? "NUMERIC"
                                                             : observation.hasValueCodeableConcept()
-                                                            ? "CODED": null);
+                                                            ? "CODED" : null);
                                                     labTestResultsDTO.setResult(observation.hasValueStringType()
                                                             ? String.valueOf(observation.getValueStringType().getValue())
-                                                        : observation.hasValueQuantity()
+                                                            : observation.hasValueQuantity()
                                                             ? String.valueOf(observation.getValueQuantity().getValue())
                                                             : observation.hasValueCodeableConcept()
-                                                            ? observation.getValueCodeableConcept().getText(): null);
+                                                            ? observation.getValueCodeableConcept().getText() : null);
                                                     labTestResultsDTO.setUnit(observation.hasValueQuantity()
                                                             ? String.valueOf(observation.getValueQuantity().getUnit())
                                                             : null);
@@ -735,7 +735,7 @@ public class SharedHealthRecordsService {
                                 if (!outcomeObservations.isEmpty()) {
                                     Observation observation = Iterables.getLast(outcomeObservations);
                                     OutcomeDetailsDTO outcomeDetailsDTO = new OutcomeDetailsDTO();
-                                    outcomeDetailsDTO.setAlive(getComponentValueBoolean(observation, 0));
+                                    outcomeDetailsDTO.setIsAlive(getComponentValueBoolean(observation, 0));
                                     outcomeDetailsDTO.setDeathLocation(getComponentValueString(observation, 1));
                                     outcomeDetailsDTO.setDeathDate(getComponentValueDateTime(observation, 2));
                                     outcomeDetailsDTO.setContactTracing(getComponentValueBoolean(observation, 3));
@@ -1055,7 +1055,7 @@ public class SharedHealthRecordsService {
                                                 laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(extension.hasValue() && extension.getValue() instanceof DecimalType ? ((DecimalType) extension.getValue()).getValue().intValue() : null);
                                             }
                                             if (extension.hasUrl() && extension.getUrl().equals("https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/isAttendantSkilled")) {
-                                                laborAndDeliveryDetailsDTO.setAttendantSkilled(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : null);
+                                                laborAndDeliveryDetailsDTO.setIsAttendantSkilled(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : null);
                                             }
                                         }
                                     }
@@ -1067,14 +1067,14 @@ public class SharedHealthRecordsService {
                                 if (!infantFeedingCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation infantFeedingCounseling = Iterables.getLast(infantFeedingCounselings);
-                                    if (infantFeedingCounseling != null && infantFeedingCounseling.hasValueBooleanType() && infantFeedingCounseling.getValueBooleanType().hasValue() ) {
+                                    if (infantFeedingCounseling != null && infantFeedingCounseling.hasValueBooleanType() && infantFeedingCounseling.getValueBooleanType().hasValue()) {
                                         laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.getValueBooleanType().getValue());
                                     }
                                 }
                                 if (!familyPlanningCounselings.isEmpty()) {
                                     //TODO: Decide what resource to use here
                                     Observation familyPlanningCounseling = Iterables.getLast(familyPlanningCounselings);
-                                    if (familyPlanningCounseling.hasValueBooleanType()) {
+                                    if (familyPlanningCounseling != null && familyPlanningCounseling.hasValueBooleanType() && familyPlanningCounseling.getValueBooleanType().hasValue()) {
                                         laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.getValueBooleanType().getValue());
                                     }
                                 }
@@ -1116,6 +1116,7 @@ public class SharedHealthRecordsService {
                                         birthDetailsDTO.setMotherAgeInYears(getNestedExtensionValueInteger(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherAgeInYears"));
                                         //TODO: Add Mother HIV status
 //                                        birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherHivStatus"));
+
                                         birthDetailsDTO.setProvidedWithARV(getNestedExtensionValueBoolean(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "providedWithARV"));
                                         birthDetailsDTO.setWeightInKgs(getComponentValueQuantityInt(observation, 0) != null ? getComponentValueQuantityInt(observation, 0).floatValue() : null);
                                         birthDetailsDTO.setMultipleBirth(getComponentValueBoolean(observation, 1));
@@ -1149,31 +1150,31 @@ public class SharedHealthRecordsService {
                                     postnatalDetailsDTO.setReferredToClinicForFurtherServices(getComponentValueBoolean(postnatalDetailObservation, 2));
                                     postnatalDetailsDTO.setOutCome(getComponentValueString(postnatalDetailObservation, 3));
                                     postnatalDetailsDTO.setAPGARScore(getComponentIntValue(postnatalDetailObservation, 4));
-                                    if (getComponentValueBoolean(postnatalDetailObservation, 5)) {
+                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 5))) {
                                         ProvidedAndCodeDTO demagedNipples = new ProvidedAndCodeDTO();
                                         demagedNipples.setProvided(true);
                                         demagedNipples.setCode("61149-1");
                                         postnatalDetailsDTO.setDemagedNipples(demagedNipples);
                                     }
-                                    if (getComponentValueBoolean(postnatalDetailObservation, 6)) {
+                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 6))) {
                                         ProvidedAndCodeDTO mastitis = new ProvidedAndCodeDTO();
                                         mastitis.setProvided(true);
                                         mastitis.setCode("77392-7");
                                         postnatalDetailsDTO.setMastitis(mastitis);
                                     }
-                                    if (getComponentValueBoolean(postnatalDetailObservation, 7)) {
+                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 7))) {
                                         ProvidedAndCodeDTO breastAbscess = new ProvidedAndCodeDTO();
                                         breastAbscess.setProvided(true);
                                         breastAbscess.setCode("77391-9");
                                         postnatalDetailsDTO.setBreastAbscess(breastAbscess);
                                     }
-                                    if (getComponentValueBoolean(postnatalDetailObservation, 8)) {
+                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 8))) {
                                         ProvidedAndCodeDTO fistula = new ProvidedAndCodeDTO();
                                         fistula.setProvided(true);
                                         fistula.setCode("37104-4");
                                         postnatalDetailsDTO.setBreastAbscess(fistula);
                                     }
-                                    if (getComponentValueBoolean(postnatalDetailObservation, 9)) {
+                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 9))) {
                                         ProvidedAndCodeDTO puerperalPsychosis = new ProvidedAndCodeDTO();
                                         puerperalPsychosis.setProvided(true);
                                         puerperalPsychosis.setCode("77385-1");
@@ -1538,7 +1539,7 @@ public class SharedHealthRecordsService {
         Bundle diagnosticReportBundle = searchDiagnosticReports.sort().descending("_lastUpdated")
                 .returnBundle(Bundle.class).execute();
         if (diagnosticReportBundle.hasEntry()) {
-            for (Bundle.BundleEntryComponent entryComponent: diagnosticReportBundle.getEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent : diagnosticReportBundle.getEntry()) {
                 DiagnosticReport diagnosticReport = (DiagnosticReport) entryComponent.getResource();
                 diagnosticReports.add(diagnosticReport);
             }
@@ -1793,7 +1794,7 @@ public class SharedHealthRecordsService {
                 return component.getValueBooleanType().booleanValue();
             }
         }
-        return false;
+        return null;
     }
 
     private String getComponentValueCodeableConceptDisplay(Observation observation, int index) {
@@ -1861,7 +1862,7 @@ public class SharedHealthRecordsService {
         return null;
     }
 
-    private boolean getNestedExtensionValueBoolean(DomainResource resource, String parentUrl, String childUrl) {
+    private Boolean getNestedExtensionValueBoolean(DomainResource resource, String parentUrl, String childUrl) {
         if (resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
@@ -1873,7 +1874,7 @@ public class SharedHealthRecordsService {
                 }
             }
         }
-        return false;
+        return null;
     }
 
 

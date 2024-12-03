@@ -10,13 +10,13 @@ import java.util.Date;
 @Getter
 @Setter
 public class OutcomeDetailsDTO {
-    private boolean isAlive;
+    private Boolean isAlive;
     private String deathLocation;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date deathDate;
-    private boolean contactTracing;
-    private boolean investigationConducted;
-    private boolean quarantined;
-    private boolean referred;
+    private Boolean contactTracing;
+    private Boolean investigationConducted;
+    private Boolean quarantined;
+    private Boolean referred;
 }
