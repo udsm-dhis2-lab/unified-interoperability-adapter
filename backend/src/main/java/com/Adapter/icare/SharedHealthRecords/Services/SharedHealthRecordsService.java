@@ -761,7 +761,7 @@ public class SharedHealthRecordsService {
                                     Observation observation = Iterables.getLast(antenatalCareObservations);
                                     AntenatalCareDetailsDTO antenatalCareDetailsDTO = new AntenatalCareDetailsDTO();
                                     antenatalCareDetailsDTO.setDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
-                                    antenatalCareDetailsDTO.setPregnancyAgeInWeeks(getComponentValueQuantityInt(observation, 0));
+                                    antenatalCareDetailsDTO.setPregnancyAgeInWeeks(getComponentValueQuantityInt(observation, 0) != null ? getComponentValueQuantityInt(observation, 0).intValue() : null);
                                     antenatalCareDetailsDTO.setPositiveHivStatusBeforeService(getComponentValueBoolean(observation, 1));
                                     antenatalCareDetailsDTO.setProvidedWithFamilyPlanningCounseling(getComponentValueBoolean(observation, 2));
                                     antenatalCareDetailsDTO.setProvidedWithInfantFeedingCounseling(getComponentValueBoolean(observation, 3));
@@ -801,7 +801,7 @@ public class SharedHealthRecordsService {
 
                                 //prophylAxisDetails
                                 List<ProphylAxisDetailsDTO> prophylAxisDetailsDTOS = new ArrayList<>();
-                                List<Procedure> prophylAxisProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), ""); //TODO: Add support to fetch by category
+                                List<Procedure> prophylAxisProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "", null); //TODO: Add support to fetch by category
                                 if (!prophylAxisProcedures.isEmpty()) {
                                     for (Procedure procedure : prophylAxisProcedures) {
                                         ProphylAxisDetailsDTO prophylAxisDetailsDTO = new ProphylAxisDetailsDTO();
@@ -823,7 +823,7 @@ public class SharedHealthRecordsService {
                                 TreatmentDetailsDTO treatmentDetailsDTO = new TreatmentDetailsDTO();
 
                                 //Chemotherapy treatment
-                                List<Procedure> chemotherapyProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "chemotherapy-treatment");
+                                List<Procedure> chemotherapyProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "chemotherapy-treatment", null);
                                 if (!chemotherapyProcedures.isEmpty()) {
                                     List<Map<String, Object>> chemotherapyTreatment = new ArrayList<>();
                                     for (Procedure procedure : chemotherapyProcedures) {
@@ -839,7 +839,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Radiotherapy treatment
-                                List<Procedure> radiotherapyProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "radiotherapy-treatment");
+                                List<Procedure> radiotherapyProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "radiotherapy-treatment", null);
                                 if (!radiotherapyProcedures.isEmpty()) {
                                     List<Map<String, Object>> radioTherapyTreatment = new ArrayList<>();
                                     for (Procedure procedure : radiotherapyProcedures) {
@@ -889,7 +889,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //surgery procedure
-                                List<Procedure> surgeryProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "surgery-treatment");
+                                List<Procedure> surgeryProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "surgery-treatment", null);
                                 if (!surgeryProcedures.isEmpty()) {
                                     List<Map<String, Object>> surgeryTreatment = new ArrayList<>();
                                     for (Procedure procedure : surgeryProcedures) {
@@ -919,7 +919,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Hormone therapy
-                                List<Procedure> hormoneTherapyTreatments = getProceduresByCategory(encounter.getIdElement().getIdPart(), "hormonetherapy-treatment");
+                                List<Procedure> hormoneTherapyTreatments = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "hormonetherapy-treatment", null);
                                 if (!hormoneTherapyTreatments.isEmpty()) {
                                     List<Map<String, Object>> hormoneTherapy = new ArrayList<>();
                                     for (Procedure procedure : hormoneTherapyTreatments) {
@@ -935,7 +935,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //medicalProcedureDetails
-                                List<Procedure> medicalProcedures = getProceduresByCategory(encounter.getIdElement().getIdPart(), "medical-procedure-details");
+                                List<Procedure> medicalProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "medical-procedure-details", null);
                                 if (!medicalProcedures.isEmpty()) {
                                     List<MedicalProcedureDetailsDTO> medicalProcedureDetails = new ArrayList<>();
                                     for (Procedure procedure : medicalProcedures) {
@@ -954,36 +954,8 @@ public class SharedHealthRecordsService {
 
                                 //Vaccination details
                                 //TODO: Add name, type and notes for this resource
-                                List<VaccinationDetailsDTO> vaccinationDetailsDTOS = new ArrayList<>();
-                                List<Immunization> vaccinationDetails = getImmunizationsByEncounterId(encounter.getIdElement().getIdPart(), patient);
-                                if (!vaccinationDetails.isEmpty()) {
-                                    for (Immunization immunization : vaccinationDetails) {
-                                        VaccinationDetailsDTO vaccinationDetailsDTO = new VaccinationDetailsDTO();
-                                        vaccinationDetailsDTO.setDate(immunization.hasOccurrenceDateTimeType() ? immunization.getOccurrenceDateTimeType().getValue() : null);
-                                        vaccinationDetailsDTO.setCode(immunization.hasVaccineCode() ? immunization.getVaccineCode().getText() : null);
-                                        vaccinationDetailsDTO.setStatus(immunization.hasStatus() ? immunization.getStatus().getDisplay() : null);
-                                        vaccinationDetailsDTO.setDosage(immunization.hasDoseQuantity() ? immunization.getDoseQuantity().getValue().intValue() : null);
-                                        if (immunization.hasNote() && !immunization.getNote().get(0).isEmpty()) {
-                                            vaccinationDetailsDTO.setNotes(immunization.getNote().get(0).getText());
-                                        }
-                                        if (immunization.hasRoute() && !immunization.getRoute().getCoding().isEmpty()) {
-                                            vaccinationDetailsDTO.setVaccinationModality(immunization.getRoute().getCoding().get(0).getDisplay());
-                                        }
-                                        ReactionDTO reaction = new ReactionDTO();
-                                        if (immunization.hasReaction() && !immunization.getReaction().isEmpty()) {
-                                            var immunizationObject = immunization.getReaction().get(0);
-                                            reaction.setReactionDate(immunizationObject.hasDate() ? immunizationObject.getDate() : null);
-                                            //TODO: Add notes
-//                                            if (immunizationObject.hasDetail() && immunizationObject.getDetail().getDisplay() != null) {
-//                                                reaction.setNotes(immunizationObject.getDetail().getDisplay());
-//                                            }
-                                            reaction.setReported(immunizationObject.hasReported() ? immunizationObject.getReported() : null);
-                                            vaccinationDetailsDTO.setReaction(reaction);
-                                        }
-                                        vaccinationDetailsDTOS.add(vaccinationDetailsDTO);
-                                    }
-                                    templateData.setVaccinationDetails(vaccinationDetailsDTOS);
-                                }
+                                List<VaccinationDetailsDTO> vaccinationDetailsDTOS = getVaccinationDetails(encounter.getIdElement().getIdPart(), patient, null);
+                                templateData.setVaccinationDetails(vaccinationDetailsDTOS);
 
 
                                 //Billing details
@@ -1011,6 +983,7 @@ public class SharedHealthRecordsService {
                                 FamilyPlanningDetailsDTO familyPlanningDetailsDTO = new FamilyPlanningDetailsDTO();
                                 List<CarePlan> carePlans = getCarePlansByCategory(encounter.getIdElement().getIdPart(), "family-planning");
                                 if (!carePlans.isEmpty()) {
+                                    //TODO: Decide on what item should be used last
                                     CarePlan carePlan = Iterables.getLast(carePlans);
                                     familyPlanningDetailsDTO.setDate(carePlan.hasPeriod() ? carePlan.getPeriod().getStart() : null);
                                     List<LongTermMethodDTO> longTermMethodDTOS = new ArrayList<>();
@@ -1018,19 +991,18 @@ public class SharedHealthRecordsService {
                                     if (carePlan.hasActivity() && !carePlan.getActivity().isEmpty()) {
                                         for (CarePlan.CarePlanActivityComponent activity : carePlan.getActivity()) {
                                             if (activity.hasDetail() && activity.getDetail().hasCode() && activity.getDetail().getCode().hasCoding() && activity.getDetail().getCode().getCoding().size() > 1) {
-                                                if (activity.getDetail().getCode().getCoding().get(1).getCode().equals("long-term-method")){
+                                                if (activity.getDetail().getCode().getCoding().get(1).getCode().equals("long-term-method")) {
                                                     LongTermMethodDTO longTermMethodDTO = new LongTermMethodDTO();
-                                                    //TODO: Add provided
                                                     longTermMethodDTO.setProvided(activity.getDetail().getCode().getCoding().get(0).hasCode());
                                                     longTermMethodDTO.setCode(activity.getDetail().getCode().getCoding().get(0).getCode());
-                                                    longTermMethodDTO.setType( activity.getDetail().getCode().getCoding().get(0).getDisplay());
+                                                    longTermMethodDTO.setType(activity.getDetail().getCode().getCoding().get(0).getDisplay());
                                                     longTermMethodDTOS.add(longTermMethodDTO);
                                                 }
-                                                if (activity.getDetail().getCode().getCoding().get(1).getCode().equals("short-term-method")){
+                                                if (activity.getDetail().getCode().getCoding().get(1).getCode().equals("short-term-method")) {
                                                     ShortTermMethodDTO shortTermMethodDTO = new ShortTermMethodDTO();
                                                     shortTermMethodDTO.setProvided(activity.getDetail().getCode().getCoding().get(0).hasCode());
                                                     shortTermMethodDTO.setCode(activity.getDetail().getCode().getCoding().get(0).getCode());
-                                                    shortTermMethodDTO.setType( activity.getDetail().getCode().getCoding().get(0).getDisplay());
+                                                    shortTermMethodDTO.setType(activity.getDetail().getCode().getCoding().get(0).getDisplay());
                                                     shortTermMethodDTOS.add(shortTermMethodDTO);
                                                 }
                                             }
@@ -1041,6 +1013,109 @@ public class SharedHealthRecordsService {
 
                                     templateData.setFamilyPlanningDetails(familyPlanningDetailsDTO);
                                 }
+
+
+                                //laborAndDeliveryDetails
+                                LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();
+
+                                //Delivery procedure
+                                List<Procedure> deliveryProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "obstetrics", null);
+                                if (!deliveryProcedures.isEmpty()) {
+                                    //TODO: Decide on what resource to be used here
+                                    Procedure deliveryProcedure = Iterables.getLast(deliveryProcedures);
+                                    laborAndDeliveryDetailsDTO.setDate(deliveryProcedure.hasPerformedDateTimeType() ? deliveryProcedure.getPerformedDateTimeType().getValue() : null);
+                                    Map<String, Object> deliveryMethod = new HashMap<>();
+                                    if (deliveryProcedure.hasCode() && deliveryProcedure.getCode().hasCoding() && !deliveryProcedure.getCode().getCoding().isEmpty()) {
+                                        deliveryMethod.put("code", deliveryProcedure.getCode().getCoding().get(0).getCode());
+                                        deliveryMethod.put("name", deliveryProcedure.getCode().getCoding().get(0).getDisplay());
+                                        laborAndDeliveryDetailsDTO.setDeliveryMethod(deliveryMethod);
+                                    }
+                                    if (deliveryProcedure.hasExtension() && !deliveryProcedure.getExtension().isEmpty()) {
+                                        for (Extension extension : deliveryProcedure.getExtension()) {
+                                            if (extension.hasUrl() && extension.getUrl().equals("https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/placeOfBirth")) {
+                                                laborAndDeliveryDetailsDTO.setPlaceOfBirth(extension.hasValue() && extension.getValue() instanceof StringType ? ((StringType) extension.getValue()).getValue() : null);
+                                            }
+                                            if (extension.hasUrl() && extension.getUrl().equals("https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs")) {
+                                                laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(extension.hasValue() && extension.getValue() instanceof DecimalType ? ((DecimalType) extension.getValue()).getValue().intValue() : null);
+                                            }
+                                            if (extension.hasUrl() && extension.getUrl().equals("https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/isAttendantSkilled")) {
+                                                laborAndDeliveryDetailsDTO.setAttendantSkilled(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : null);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                //Infant and family planning counseling
+                                List<Observation> infantFeedingCounselings = getObservationsByCategory("infant-feeding-counseling", encounter, true);
+                                List<Observation> familyPlanningCounselings = getObservationsByCategory("family-planning-counseling", encounter, true);
+                                if (!infantFeedingCounselings.isEmpty()) {
+                                    //TODO: Decide what resource to use here
+                                    Observation infantFeedingCounseling = Iterables.getLast(infantFeedingCounselings);
+                                    laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.hasValueBooleanType() ? infantFeedingCounseling.getValueBooleanType().getValue() : null);
+                                }
+                                if (!familyPlanningCounselings.isEmpty()) {
+                                    //TODO: Decide what resource to use here
+                                    Observation familyPlanningCounseling = Iterables.getLast(familyPlanningCounselings);
+                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.hasValueBooleanType() ? familyPlanningCounseling.getValueBooleanType().getValue() : null);
+                                }
+
+                                //Before birth complications
+                                List<CodeAndNameDTO> beforeBirthComplications = new ArrayList<>();
+                                List<Condition> beforeBirthComplicationConditions = getConditionsByCategory(encounter.getIdElement().getIdPart(), "before-birth-complication");
+                                if (!beforeBirthComplicationConditions.isEmpty()) {
+                                    for (Condition condition : beforeBirthComplicationConditions) {
+                                        CodeAndNameDTO beforeBirthComplication = new CodeAndNameDTO();
+                                        beforeBirthComplication.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getCode() : null);
+                                        beforeBirthComplication.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getDisplay() : null);
+                                        beforeBirthComplications.add(beforeBirthComplication);
+                                    }
+                                    laborAndDeliveryDetailsDTO.setBeforeBirthComplications(beforeBirthComplications);
+                                }
+
+                                //Birth complications
+                                List<CodeAndNameDTO> birthComplications = new ArrayList<>();
+                                List<Condition> birthComplicationConditions = getConditionsByCategory(encounter.getIdElement().getIdPart(), "birth-complication");
+                                if (!birthComplicationConditions.isEmpty()) {
+                                    for (Condition condition : beforeBirthComplicationConditions) {
+                                        CodeAndNameDTO birthComplication = new CodeAndNameDTO();
+                                        birthComplication.setCode(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getCode() : null);
+                                        birthComplication.setName(condition.hasCode() && condition.getCode().hasCoding() && !condition.getCode().getCoding().isEmpty() ? condition.getCode().getCoding().get(0).getDisplay() : null);
+                                        birthComplications.add(birthComplication);
+                                    }
+                                    laborAndDeliveryDetailsDTO.setBirthComplications(birthComplications);
+                                }
+
+                                //Birth details observation
+                                List<Observation> birthDetailsObservations = getObservationsByCategory("labor-delivery-birth-details", encounter, true);
+                                List<BirthDetailsDTO> birthDetailsDTOS = new ArrayList<>();
+                                if (!birthDetailsObservations.isEmpty()) {
+                                    for (Observation observation : birthDetailsObservations) {
+                                        BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
+                                        birthDetailsDTO.setDateOfBirth(getNestedExtensionValueDateTime(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "dateOfBirth"));
+                                        birthDetailsDTO.setExclusiveBreastFed(getNestedExtensionValueBoolean(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "exclusiveBreastFed"));
+                                        birthDetailsDTO.setMotherAgeInYears(getNestedExtensionValueInteger(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherAgeInYears"));
+                                        //TODO: Add Mother HIV status
+//                                        birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherHivStatus"));
+                                        birthDetailsDTO.setProvidedWithARV(getNestedExtensionValueBoolean(observation, "https://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "providedWithARV"));
+                                        birthDetailsDTO.setWeightInKgs(getComponentValueQuantityInt(observation, 0) != null ? getComponentValueQuantityInt(observation, 0).floatValue() : null);
+                                        birthDetailsDTO.setMultipleBirth(getComponentValueBoolean(observation, 1));
+                                        birthDetailsDTO.setBirthOrder(getComponentIntValue(observation, 2));
+                                        List<VaccinationDetailsDTO> vaccinationDetails = getVaccinationDetails(encounter.getIdElement().getIdPart(), patient, observation.getIdElement().getIdPart());
+                                        birthDetailsDTO.setVaccinationDetails(vaccinationDetails);
+                                        BreatheAssistanceDTO breatheAssistanceDTO = new BreatheAssistanceDTO();
+                                        List<Procedure> procedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "breathe-assistance", observation.getIdElement().getIdPart());
+                                        if (!procedures.isEmpty()) {
+                                            Procedure procedure = Iterables.getLast(procedures);
+                                            breatheAssistanceDTO.setCode(procedure.hasCode() && procedure.getCode().hasCoding() && !procedure.getCode().getCoding().isEmpty() ? procedure.getCode().getCoding().get(0).getCode() : null);
+                                            breatheAssistanceDTO.setProvided(procedure.hasCode() && procedure.getCode().hasCoding() && !procedure.getCode().getCoding().isEmpty());
+                                            birthDetailsDTO.setBreatheAssistance(breatheAssistanceDTO);
+                                        }
+                                        birthDetailsDTOS.add(birthDetailsDTO);
+                                    }
+                                    laborAndDeliveryDetailsDTO.setBirthDetails(birthDetailsDTOS);
+                                }
+                                templateData.setLaborAndDeliveryDetails(laborAndDeliveryDetailsDTO);
+
 
                                 sharedRecords.add(templateData.toMap());
                             }
@@ -1385,7 +1460,7 @@ public class SharedHealthRecordsService {
         return serviceRequests;
     }
 
-    public List<Procedure> getProceduresByCategory(String encounterId, String category) throws Exception {
+    public List<Procedure> getProceduresByCategoryAndObservationReference(String encounterId, String category, String observationId) throws Exception {
         List<Procedure> procedures = new ArrayList<>();
         var procedureSearch = fhirClient.search().forResource(Procedure.class).where(Procedure.ENCOUNTER.hasAnyOfIds(encounterId)).where(Procedure.CATEGORY.exactly().code(category));
 
@@ -1394,20 +1469,31 @@ public class SharedHealthRecordsService {
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
                 Procedure procedure = (Procedure) entryComponent.getResource();
-                procedures.add(procedure);
+                if (observationId != null) {
+                    if (procedure.hasReasonReference() && !procedure.getReasonReference().isEmpty() && procedure.getReasonReference().get(0).getReference().equals("Observation/" + observationId)) {
+                        procedures.add(procedure);
+                    }
+                } else {
+                    procedures.add(procedure);
+                }
             }
         }
         return procedures;
     }
 
+    public List<Immunization> getImmunizationsByEncounterIdAndObservationReference(
+            String encounterId,
+            Patient patient,
+            String observationId) throws Exception {
 
-    public List<Immunization> getImmunizationsByEncounterId(String encounterId, Patient patient) throws Exception {
         List<Immunization> immunizations = new ArrayList<>();
 
         try {
+            // Search for Immunizations related to the patient
             Bundle immunizationBundle = fhirClient
                     .search()
-                    .forResource(Immunization.class).where(Immunization.PATIENT.hasId(patient.getIdElement().getIdPart()))
+                    .forResource(Immunization.class)
+                    .where(Immunization.PATIENT.hasId(patient.getIdElement().getIdPart()))
                     .returnBundle(Bundle.class)
                     .execute();
 
@@ -1416,10 +1502,23 @@ public class SharedHealthRecordsService {
                     Resource resource = entry.getResource();
                     if (resource instanceof Immunization) {
                         Immunization immunization = (Immunization) resource;
+
                         // Check if the immunization references the specified encounter
-                        if (immunization.hasEncounter() && ("Encounter/" + encounterId).equals(immunization.getEncounter().getReference())) {
-                            immunizations.add(immunization);
+                        boolean matchesEncounter = immunization.hasEncounter()
+                                && ("Encounter/" + encounterId).equals(immunization.getEncounter().getReference());
+
+                        // Optionally check if the immunization references the specified observation
+                        if (observationId != null) {
+                            boolean matchesObservation = immunization.hasReasonReference() && !immunization.getReasonReference().isEmpty() && immunization.getReasonReference().get(0).getReference().equals("Observation/" + observationId);
+                            if (matchesEncounter && matchesObservation) {
+                                immunizations.add(immunization);
+                            }
+                        } else {
+                            if (matchesEncounter) {
+                                immunizations.add(immunization);
+                            }
                         }
+
                     }
                 }
             }
@@ -1429,6 +1528,7 @@ public class SharedHealthRecordsService {
 
         return immunizations;
     }
+
 
     public List<ChargeItem> getChargeItemsByEncounterId(String encounterId) throws Exception {
         List<ChargeItem> chargeItems = new ArrayList<>();
@@ -1466,11 +1566,90 @@ public class SharedHealthRecordsService {
         return carePlans;
     }
 
-    private Integer getComponentValueQuantityInt(Observation observation, int index) {
+    public List<VaccinationDetailsDTO> getVaccinationDetails(
+            String encounterId,
+            Patient patient,
+            String observationReference) throws Exception {
+
+        List<VaccinationDetailsDTO> vaccinationDetailsDTOS = new ArrayList<>();
+
+        // Retrieve Immunizations filtered by Encounter ID and optional Observation reference
+        List<Immunization> vaccinationDetails = getImmunizationsByEncounterIdAndObservationReference(encounterId, patient, observationReference);
+
+        if (!vaccinationDetails.isEmpty()) {
+            for (Immunization immunization : vaccinationDetails) {
+                VaccinationDetailsDTO vaccinationDetailsDTO = new VaccinationDetailsDTO();
+
+                // Map Immunization data to DTO
+                vaccinationDetailsDTO.setDate(
+                        immunization.hasOccurrenceDateTimeType()
+                                ? immunization.getOccurrenceDateTimeType().getValue()
+                                : null
+                );
+                vaccinationDetailsDTO.setCode(
+                        immunization.hasVaccineCode()
+                                ? immunization.getVaccineCode().getText()
+                                : null
+                );
+                vaccinationDetailsDTO.setStatus(
+                        immunization.hasStatus()
+                                ? immunization.getStatus().getDisplay()
+                                : null
+                );
+                vaccinationDetailsDTO.setDosage(
+                        immunization.hasDoseQuantity()
+                                ? immunization.getDoseQuantity().getValue().intValue()
+                                : null
+                );
+
+                if (immunization.hasNote() && !immunization.getNote().isEmpty()) {
+                    vaccinationDetailsDTO.setNotes(immunization.getNote().get(0).getText());
+                }
+
+                if (immunization.hasRoute() && !immunization.getRoute().getCoding().isEmpty()) {
+                    vaccinationDetailsDTO.setVaccinationModality(
+                            immunization.getRoute().getCoding().get(0).getDisplay()
+                    );
+                }
+
+                // Handle Reactions
+                if (immunization.hasReaction() && !immunization.getReaction().isEmpty()) {
+                    Immunization.ImmunizationReactionComponent reactionComponent = immunization.getReaction().get(0);
+                    ReactionDTO reaction = new ReactionDTO();
+
+                    reaction.setReactionDate(
+                            reactionComponent.hasDate()
+                                    ? reactionComponent.getDate()
+                                    : null
+                    );
+
+                    // TODO: Map notes from reaction details if required
+                    // if (reactionComponent.hasDetail() && reactionComponent.getDetail().hasDisplay()) {
+                    //     reaction.setNotes(reactionComponent.getDetail().getDisplay());
+                    // }
+
+                    reaction.setReported(
+                            reactionComponent.hasReported()
+                                    ? reactionComponent.getReported()
+                                    : null
+                    );
+
+                    vaccinationDetailsDTO.setReaction(reaction);
+                }
+
+                vaccinationDetailsDTOS.add(vaccinationDetailsDTO);
+            }
+        }
+
+        return vaccinationDetailsDTOS;
+    }
+
+
+    private BigDecimal getComponentValueQuantityInt(Observation observation, int index) {
         if (observation.hasComponent() && observation.getComponent().size() > index) {
             Observation.ObservationComponentComponent component = observation.getComponent().get(index);
             if (component.hasValueQuantity() && component.getValueQuantity().hasValue()) {
-                return component.getValueQuantity().getValue().intValue();
+                return component.getValueQuantity().getValue();
             }
         }
         return null;
@@ -1564,6 +1743,36 @@ public class SharedHealthRecordsService {
             }
         }
         return null;
+    }
+
+    private Date getNestedExtensionValueDateTime(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
+                    for (Extension childExtension : parentExtension.getExtension()) {
+                        if (childExtension.getUrl().equals(childUrl) && childExtension.hasValue() && childExtension.getValue() instanceof DateTimeType) {
+                            return ((DateTimeType) childExtension.getValue()).getValue();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    private boolean getNestedExtensionValueBoolean(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
+                    for (Extension childExtension : parentExtension.getExtension()) {
+                        if (childExtension.getUrl().equals(childUrl) && childExtension.hasValue() && childExtension.getValue() instanceof BooleanType) {
+                            return ((BooleanType) childExtension.getValue()).getValue();
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 
