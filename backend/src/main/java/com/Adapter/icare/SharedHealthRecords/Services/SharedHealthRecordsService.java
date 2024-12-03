@@ -936,17 +936,38 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Family planning details
-                                List<FamilyPlanningDetailsDTO> familyPlanningDetailsDTOS = new ArrayList<>();
+                                FamilyPlanningDetailsDTO familyPlanningDetailsDTO = new FamilyPlanningDetailsDTO();
                                 List<CarePlan> carePlans = getCarePlansByCategory(encounter.getIdElement().getIdPart(), "family-planning");
                                 if (!carePlans.isEmpty()) {
-                                    for (CarePlan carePlan : carePlans) {
-                                        FamilyPlanningDetailsDTO familyPlanningDetailsDTO = new FamilyPlanningDetailsDTO();
-                                        familyPlanningDetailsDTO.setDate(carePlan.hasPeriod() ? carePlan.getPeriod().getStart() : null);
-                                        //long term methods
-                                        List<LongTermMethodDTO> longTermMethodDTOS = new ArrayList<>();
-
-                                        familyPlanningDetailsDTOS.add(familyPlanningDetailsDTO);
+                                    CarePlan carePlan = Iterables.getLast(carePlans);
+                                    familyPlanningDetailsDTO.setDate(carePlan.hasPeriod() ? carePlan.getPeriod().getStart() : null);
+                                    List<LongTermMethodDTO> longTermMethodDTOS = new ArrayList<>();
+                                    List<ShortTermMethodDTO> shortTermMethodDTOS = new ArrayList<>();
+                                    if (carePlan.hasActivity() && !carePlan.getActivity().isEmpty()) {
+                                        for (CarePlan.CarePlanActivityComponent activity : carePlan.getActivity()) {
+                                            if (activity.hasDetail() && activity.getDetail().hasCode() && activity.getDetail().getCode().hasCoding() && activity.getDetail().getCode().getCoding().size() > 1) {
+                                                if (activity.getDetail().getCode().getCoding().get(1).getCode().equals("long-term-method")){
+                                                    LongTermMethodDTO longTermMethodDTO = new LongTermMethodDTO();
+                                                    //TODO: Add provided
+                                                    longTermMethodDTO.setProvided(activity.getDetail().getCode().getCoding().get(0).hasCode());
+                                                    longTermMethodDTO.setCode(activity.getDetail().getCode().getCoding().get(0).getCode());
+                                                    longTermMethodDTO.setType( activity.getDetail().getCode().getCoding().get(0).getDisplay());
+                                                    longTermMethodDTOS.add(longTermMethodDTO);
+                                                }
+                                                if (activity.getDetail().getCode().getCoding().get(1).getCode().equals("short-term-method")){
+                                                    ShortTermMethodDTO shortTermMethodDTO = new ShortTermMethodDTO();
+                                                    shortTermMethodDTO.setProvided(activity.getDetail().getCode().getCoding().get(0).hasCode());
+                                                    shortTermMethodDTO.setCode(activity.getDetail().getCode().getCoding().get(0).getCode());
+                                                    shortTermMethodDTO.setType( activity.getDetail().getCode().getCoding().get(0).getDisplay());
+                                                    shortTermMethodDTOS.add(shortTermMethodDTO);
+                                                }
+                                            }
+                                        }
+                                        familyPlanningDetailsDTO.setLongTermMethods(longTermMethodDTOS);
+                                        familyPlanningDetailsDTO.setShortTermMethods(shortTermMethodDTOS);
                                     }
+
+                                    templateData.setFamilyPlanningDetails(familyPlanningDetailsDTO);
                                 }
 
                                 sharedRecords.add(templateData.toMap());
