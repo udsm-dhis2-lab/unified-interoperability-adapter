@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 @RestController()
 @RequestMapping("/api/v1/dhis2")
@@ -22,7 +24,8 @@ public class ExternalSystemProxyController {
         String queryString = request.getQueryString();
         String url = requestURI.replace("/api/v1/dhis2/", "");
         if (queryString != null) {
-            url += "?" + queryString;
+            String decodedQuery = URLDecoder.decode(queryString, StandardCharsets.UTF_8.name());
+            url += "?" + decodedQuery;
         }
         return this.externalProxyingService.getExternalData(url);
     }
