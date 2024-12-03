@@ -1,14 +1,12 @@
 package com.Adapter.icare.SharedHealthRecords.Services;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
-import ca.uhn.fhir.rest.gclient.StringClientParam;
 
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
@@ -24,13 +22,9 @@ import com.google.common.collect.Iterables;
 
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import javax.security.auth.Subject;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -524,6 +518,84 @@ public class SharedHealthRecordsService {
                                 }
 
                                 templateData.setInvestigationDetails(investigationDetailsDTOList);
+
+                                // Lab investigation details using DiagnosticReport
+                                List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
+                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(encounter.getIdElement().getIdPart(), "LAB");
+                                if (!diagnosticReports.isEmpty()) {
+                                    for(DiagnosticReport diagnosticReport: diagnosticReports) {
+                                        LabInvestigationDetailsDTO labInvestigationDetailsDTO = new LabInvestigationDetailsDTO();
+                                        labInvestigationDetailsDTO.setTestCode(diagnosticReport.hasCode() &&
+                                                diagnosticReport.getCode().hasCoding() &&
+                                                !diagnosticReport.getCode().getCoding().isEmpty()
+                                                ? diagnosticReport.getCode().getCoding().get(0).getCode(): null);
+
+                                        List<Identifier> identifiers = diagnosticReport.getIdentifier();
+                                        for (Identifier reportIdentifier: identifiers) {
+                                            if (reportIdentifier.hasValue() && reportIdentifier.hasType() && reportIdentifier.getType().hasCoding() && !reportIdentifier.getType().getCoding().isEmpty()) {
+                                               if (reportIdentifier.getType().getCoding().get(0).getCode().equals("TEST-ORDER")) {
+                                                   labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
+                                               } else if (reportIdentifier.getType().getCoding().get(0).getCode().equals("SAMPLE-ID")) {
+                                                   labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
+                                               }
+                                            }
+                                        }
+                                        labInvestigationDetailsDTO.setTestOrderDate(diagnosticReport.hasEffectiveDateTimeType() ? diagnosticReport.getEffectiveDateTimeType().getValue(): null);
+                                        labInvestigationDetailsDTO.setTestType("Lab Test");
+                                        labInvestigationDetailsDTO.setStandardCode(
+                                                diagnosticReport.hasCode() &&
+                                                        diagnosticReport.getCode().hasCoding() &&
+                                                        !diagnosticReport.getCode().getCoding().isEmpty()
+                                                        && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE: Boolean.FALSE);
+                                        labInvestigationDetailsDTO.setCodeType(
+                                                diagnosticReport.hasCode() &&
+                                                        diagnosticReport.getCode().hasCoding() &&
+                                                        !diagnosticReport.getCode().getCoding().isEmpty()
+                                                        && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? "LOINC" : null
+                                        );
+
+                                        List<LabTestResultsDTO> labTestResultsDTOS = new ArrayList<>();
+                                        if (diagnosticReport.hasResult()) {
+                                            for (Reference reference: diagnosticReport.getResult()) {
+                                                LabTestResultsDTO labTestResultsDTO = new LabTestResultsDTO();
+                                                IIdType obsReference = reference.getReferenceElement();
+                                                if (obsReference.getResourceType().equals("Observation")) {
+                                                    Observation observation = fhirClient.read().resource(Observation.class).withId(obsReference.getIdPart()).execute();
+                                                    labTestResultsDTO.setParameter(observation.hasCode() &&
+                                                            observation.getCode().hasCoding() &&
+                                                            !observation.getCode().getCoding().isEmpty() ?
+                                                            observation.getCode().getCoding().get(0).getCode(): null);
+                                                    labTestResultsDTO.setStandardCode(
+                                                            diagnosticReport.hasCode() &&
+                                                                    diagnosticReport.getCode().hasCoding() &&
+                                                                    !diagnosticReport.getCode().getCoding().isEmpty()
+                                                                    && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE: Boolean.FALSE);
+                                                    labTestResultsDTO.setReleaseDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue(): null);
+                                                    labTestResultsDTO.setValueType(observation.hasValueStringType()
+                                                            ? "TEXT"
+                                                            : observation.hasValueQuantity()
+                                                            ? "NUMERIC"
+                                                            : observation.hasValueCodeableConcept()
+                                                            ? "CODED": null);
+                                                    labTestResultsDTO.setResult(observation.hasValueStringType()
+                                                            ? String.valueOf(observation.getValueStringType().getValue())
+                                                        : observation.hasValueQuantity()
+                                                            ? String.valueOf(observation.getValueQuantity().getValue())
+                                                            : observation.hasValueCodeableConcept()
+                                                            ? observation.getValueCodeableConcept().getText(): null);
+                                                    labTestResultsDTO.setUnit(observation.hasValueQuantity()
+                                                            ? String.valueOf(observation.getValueQuantity().getUnit())
+                                                            : null);
+                                                }
+                                                labTestResultsDTOS.add(labTestResultsDTO);
+                                            }
+                                        }
+                                        labInvestigationDetailsDTO.setTestResults(labTestResultsDTOS);
+                                        labInvestigationDetailsDTOS.add(labInvestigationDetailsDTO);
+                                    }
+                                }
+
+                                templateData.setLabInvestigationDetails(labInvestigationDetailsDTOS);
 
                                 ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
                                 // 1. get service request
@@ -1281,6 +1353,21 @@ public class SharedHealthRecordsService {
             }
         }
         return questionnaireResponses;
+    }
+
+    public List<DiagnosticReport> getDiagnosticReportByCategory(String encounterId, String category) throws Exception {
+        List<DiagnosticReport> diagnosticReports = new ArrayList<>();
+        var searchDiagnosticReports = fhirClient.search().forResource(DiagnosticReport.class).where(DiagnosticReport.CATEGORY.exactly().code(category));
+        searchDiagnosticReports.where(DiagnosticReport.ENCOUNTER.hasAnyOfIds(encounterId));
+        Bundle diagnosticReportBundle = searchDiagnosticReports.sort().descending("_lastUpdated")
+                .returnBundle(Bundle.class).execute();
+        if (diagnosticReportBundle.hasEntry()) {
+            for (Bundle.BundleEntryComponent entryComponent: diagnosticReportBundle.getEntry()) {
+                DiagnosticReport diagnosticReport = (DiagnosticReport) entryComponent.getResource();
+                diagnosticReports.add(diagnosticReport);
+            }
+        }
+        return diagnosticReports;
     }
 
     public List<ServiceRequest> getServiceRequestsByCategory(String encounterId, String category) throws Exception {
