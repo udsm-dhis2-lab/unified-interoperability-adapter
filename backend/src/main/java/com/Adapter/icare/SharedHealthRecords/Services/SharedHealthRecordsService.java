@@ -1215,6 +1215,19 @@ public class SharedHealthRecordsService {
                                 }
 
 
+                                //Admission details
+                                AdmissionDetailsDTO admissionDetailsDTO = new AdmissionDetailsDTO();
+                                List<Observation> admissionDetailObservations = getObservationsByCategory("admission-details", encounter, false, true);
+                                if (!admissionDetailObservations.isEmpty()) {
+                                    Observation admissionDetail = admissionDetailObservations.get(0);
+                                    admissionDetailsDTO.setAdmissionDate(admissionDetail.hasEffectiveDateTimeType() && admissionDetail.getEffectiveDateTimeType().hasValue() ? admissionDetail.getEffectiveDateTimeType().getValue() : null);
+                                    admissionDetailsDTO.setAdmissionDiagnosis(getComponentValueCodeableConceptCode(admissionDetail, 1));
+                                    admissionDetailsDTO.setDischargedOn(getComponentValueDateTime(admissionDetail, 2));
+                                    admissionDetailsDTO.setDischargeStatus(getComponentValueString(admissionDetail, 3));
+                                    templateData.setAdmissionDetails(admissionDetailsDTO);
+                                }
+
+
                                 sharedRecords.add(templateData.toMap());
                             }
 
