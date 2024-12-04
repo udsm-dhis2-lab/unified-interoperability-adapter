@@ -8,4 +8,8 @@ import { CommonModule } from '@angular/common';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent {}
+export class DashboardComponent {
+  ngOnInit() {
+    console.log('dashboard component initialized');
+  }
+}

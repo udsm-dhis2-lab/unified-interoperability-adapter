@@ -25,7 +25,8 @@
             "glob": "**/*",
             "input": "node_modules/monaco-editor",
             "output": "/assets/monaco/"
-          }
+          },
+          "apps/apps/src/manifest.webapp"
         ],
         "styles": [
           "apps/apps/src/styles.less",
@@ -70,7 +71,7 @@
         },
         "development": {
           "buildTarget": "apps:build:development",
-          "proxyConfig": "apps/login/proxy-config.json"
+          "proxyConfig": "proxy-config.json"
         }
       },
       "defaultConfiguration": "development"

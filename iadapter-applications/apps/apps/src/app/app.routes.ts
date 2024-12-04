@@ -5,9 +5,7 @@ export const appRoutes: Route[] = [
   {
     path: 'dashboard',
     loadChildren: () =>
-      import(
-        './../../../../apps/dashboard/src/app/modules/home/home.module'
-      ).then((m) => m.DashboardModule),
+      import('@iapps/d2-dashboard').then((m) => m.D2DashboardModule),
   },
   {
     path: 'client-management',
