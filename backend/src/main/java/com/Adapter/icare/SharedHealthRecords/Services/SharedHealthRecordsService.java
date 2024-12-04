@@ -1150,40 +1150,42 @@ public class SharedHealthRecordsService {
                                     postnatalDetailsDTO.setReferredToClinicForFurtherServices(getComponentValueBoolean(postnatalDetailObservation, 2));
                                     postnatalDetailsDTO.setOutCome(getComponentValueString(postnatalDetailObservation, 3));
                                     postnatalDetailsDTO.setAPGARScore(getComponentIntValue(postnatalDetailObservation, 4));
-                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 5))) {
+                                    //TODO: Consider declaring these values first before using them in the condition
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 5) != null) {
                                         ProvidedAndCodeDTO demagedNipples = new ProvidedAndCodeDTO();
-                                        demagedNipples.setProvided(true);
+                                        demagedNipples.setProvided(getComponentValueBoolean(postnatalDetailObservation, 5));
                                         demagedNipples.setCode("61149-1");
                                         postnatalDetailsDTO.setDemagedNipples(demagedNipples);
                                     }
-                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 6))) {
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 6) != null) {
                                         ProvidedAndCodeDTO mastitis = new ProvidedAndCodeDTO();
-                                        mastitis.setProvided(true);
+                                        mastitis.setProvided(getComponentValueBoolean(postnatalDetailObservation, 6));
                                         mastitis.setCode("77392-7");
                                         postnatalDetailsDTO.setMastitis(mastitis);
                                     }
-                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 7))) {
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 7) != null) {
                                         ProvidedAndCodeDTO breastAbscess = new ProvidedAndCodeDTO();
-                                        breastAbscess.setProvided(true);
+                                        breastAbscess.setProvided(getComponentValueBoolean(postnatalDetailObservation, 7));
                                         breastAbscess.setCode("77391-9");
                                         postnatalDetailsDTO.setBreastAbscess(breastAbscess);
                                     }
-                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 8))) {
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 8) != null) {
                                         ProvidedAndCodeDTO fistula = new ProvidedAndCodeDTO();
-                                        fistula.setProvided(true);
+                                        fistula.setProvided(getComponentValueBoolean(postnatalDetailObservation, 8));
                                         fistula.setCode("37104-4");
-                                        postnatalDetailsDTO.setBreastAbscess(fistula);
+                                        postnatalDetailsDTO.setFistula(fistula);
                                     }
-                                    if (Boolean.TRUE.equals(getComponentValueBoolean(postnatalDetailObservation, 9))) {
+                                    if (getComponentValueBoolean(postnatalDetailObservation, 9) != null) {
                                         ProvidedAndCodeDTO puerperalPsychosis = new ProvidedAndCodeDTO();
-                                        puerperalPsychosis.setProvided(true);
+                                        puerperalPsychosis.setProvided(getComponentValueBoolean(postnatalDetailObservation, 9));
                                         puerperalPsychosis.setCode("77385-1");
-                                        postnatalDetailsDTO.setBreastAbscess(puerperalPsychosis);
+                                        postnatalDetailsDTO.setPuerperalPsychosis(puerperalPsychosis);
                                     }
                                     postnatalDetailsDTO.setHoursSinceDelivery(getComponentIntValue(postnatalDetailObservation, 10));
                                     //TODO: Add breast feeding details
 
                                     //Birth details observation
+                                    //TODO: Consider checking hasMember property while fetching this observation
                                     List<Observation> birthDetailsPostnatalObservations = getObservationsByCategory("postnatal-birth-details", encounter, false);
                                     List<BirthDetailsDTO> birthDetailsPostnatalDTOS = new ArrayList<>();
                                     if (!birthDetailsPostnatalObservations.isEmpty()) {
@@ -1209,7 +1211,7 @@ public class SharedHealthRecordsService {
                                                 breatheAssistanceDTO.setProvided(procedure.hasCode() && procedure.getCode().hasCoding() && !procedure.getCode().getCoding().isEmpty());
                                                 birthDetailsDTO.setBreatheAssistance(breatheAssistanceDTO);
                                             }
-                                            birthDetailsDTOS.add(birthDetailsDTO);
+                                            birthDetailsPostnatalDTOS.add(birthDetailsDTO);
                                         }
                                         postnatalDetailsDTO.setBirthDetails(birthDetailsPostnatalDTOS);
                                     }
