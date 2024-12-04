@@ -213,7 +213,7 @@ public class SharedHealthRecordsService {
                                 List<Map<String, Object>> vitalSigns = new ArrayList<>();
                                 // Get Observation Group
 //                        System.out.println(encounter.getIdElement().getIdPart());
-                                List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true);
+                                List<Observation> observationGroups = getObservationsByCategory("vital-signs", encounter, true, false);
 //                        System.out.println(observationGroups.size());
                                 for (Observation observationGroup : observationGroups) {
                                     List<Observation> observationsData = getObservationsByObservationGroupId("vital-signs", encounter, observationGroup.getIdElement().getIdPart());
@@ -246,7 +246,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 List<Map<String, Object>> visitNotes = new ArrayList<>();
-                                List<Observation> visitNotesGroup = getObservationsByCategory("visit-notes", encounter, true);
+                                List<Observation> visitNotesGroup = getObservationsByCategory("visit-notes", encounter, true, false);
                                 // Visit notes
                                 if (!visitNotesGroup.isEmpty()) {
                                     for (Observation observationGroup : visitNotesGroup) {
@@ -405,7 +405,7 @@ public class SharedHealthRecordsService {
                                 templateData.setChronicConditions(chronicConditionsDTOS);
 
                                 LifeStyleInformationDTO lifeStyleInformationDTO = new LifeStyleInformationDTO();
-                                List<Observation> smokingObs = getObservationsByCategory("smoking", encounter, true);
+                                List<Observation> smokingObs = getObservationsByCategory("smoking", encounter, true, false);
                                 Map<String, Object> smoking = new LinkedHashMap<>();
                                 if (!smokingObs.isEmpty()) {
                                     for (Observation observation : smokingObs) {
@@ -418,7 +418,7 @@ public class SharedHealthRecordsService {
                                 }
                                 lifeStyleInformationDTO.setSmoking(smoking);
 
-                                List<Observation> alcoholUseObs = getObservationsByCategory("alcohol-use", encounter, true);
+                                List<Observation> alcoholUseObs = getObservationsByCategory("alcohol-use", encounter, true, false);
                                 Map<String, Object> alcoholUse = new LinkedHashMap<>();
                                 if (!alcoholUseObs.isEmpty()) {
                                     for (Observation observation : alcoholUseObs) {
@@ -431,7 +431,7 @@ public class SharedHealthRecordsService {
                                 }
                                 lifeStyleInformationDTO.setAlcoholUse(alcoholUse);
 
-                                List<Observation> drugUseObs = getObservationsByCategory("drug-use", encounter, true);
+                                List<Observation> drugUseObs = getObservationsByCategory("drug-use", encounter, true, false);
                                 Map<String, Object> drugUse = new LinkedHashMap<>();
                                 if (!drugUseObs.isEmpty()) {
                                     for (Observation observation : drugUseObs) {
@@ -466,7 +466,7 @@ public class SharedHealthRecordsService {
 
                                 // Investigation details
                                 List<InvestigationDetailsDTO> investigationDetailsDTOList = new ArrayList<>();
-                                List<Observation> investigationDetailsGroup = getObservationsByCategory("investigation-details", encounter, true);
+                                List<Observation> investigationDetailsGroup = getObservationsByCategory("investigation-details", encounter, true, false);
                                 // Visit notes
                                 if (!investigationDetailsGroup.isEmpty()) {
                                     for (Observation observationGroup : investigationDetailsGroup) {
@@ -731,9 +731,9 @@ public class SharedHealthRecordsService {
 
 
                                 //Outcome details
-                                List<Observation> outcomeObservations = getObservationsByCategory("outcome-details", encounter, false);
+                                List<Observation> outcomeObservations = getObservationsByCategory("outcome-details", encounter, false, true);
                                 if (!outcomeObservations.isEmpty()) {
-                                    Observation observation = Iterables.getLast(outcomeObservations);
+                                    Observation observation = outcomeObservations.get(0);
                                     OutcomeDetailsDTO outcomeDetailsDTO = new OutcomeDetailsDTO();
                                     outcomeDetailsDTO.setIsAlive(getComponentValueBoolean(observation, 0));
                                     outcomeDetailsDTO.setDeathLocation(getComponentValueString(observation, 1));
@@ -747,10 +747,9 @@ public class SharedHealthRecordsService {
 
 
                                 //Cause of death details
-                                List<Observation> causeOfDeathObservations = getObservationsByCategory("cause-of-death", encounter, false);
+                                List<Observation> causeOfDeathObservations = getObservationsByCategory("cause-of-death", encounter, false, true);
                                 if (!causeOfDeathObservations.isEmpty()) {
-                                    //TODO: Discuss about the resource to be used here
-                                    Observation observation = Iterables.getLast(causeOfDeathObservations);
+                                    Observation observation = causeOfDeathObservations.get(0);
                                     CausesOfDeathDetailsDTO causesOfDeathDetailsDTO = new CausesOfDeathDetailsDTO();
                                     causesOfDeathDetailsDTO.setDateOfDeath(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
                                     causesOfDeathDetailsDTO.setLineA(observation.hasComponent() && !observation.getComponent().isEmpty() ? observation.getComponent().get(0).getValueStringType().toString() : null);
@@ -772,9 +771,9 @@ public class SharedHealthRecordsService {
 
 
                                 //Antenatal care details
-                                List<Observation> antenatalCareObservations = getObservationsByCategory("anc-details", encounter, false);
+                                List<Observation> antenatalCareObservations = getObservationsByCategory("anc-details", encounter, false, true);
                                 if (!antenatalCareObservations.isEmpty()) {
-                                    Observation observation = Iterables.getLast(antenatalCareObservations);
+                                    Observation observation = antenatalCareObservations.get(0);
                                     AntenatalCareDetailsDTO antenatalCareDetailsDTO = new AntenatalCareDetailsDTO();
                                     antenatalCareDetailsDTO.setDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
                                     antenatalCareDetailsDTO.setPregnancyAgeInWeeks(getComponentValueQuantityInt(observation, 0) != null ? getComponentValueQuantityInt(observation, 0).intValue() : null);
@@ -1062,18 +1061,16 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Infant and family planning counseling
-                                List<Observation> infantFeedingCounselings = getObservationsByCategory("infant-feeding-counseling", encounter, false);
-                                List<Observation> familyPlanningCounselings = getObservationsByCategory("family-planning-counseling", encounter, false);
+                                List<Observation> infantFeedingCounselings = getObservationsByCategory("infant-feeding-counseling", encounter, false, true);
+                                List<Observation> familyPlanningCounselings = getObservationsByCategory("family-planning-counseling", encounter, false, true);
                                 if (!infantFeedingCounselings.isEmpty()) {
-                                    //TODO: Decide what resource to use here
-                                    Observation infantFeedingCounseling = Iterables.getLast(infantFeedingCounselings);
+                                    Observation infantFeedingCounseling = infantFeedingCounselings.get(0);
                                     if (infantFeedingCounseling != null && infantFeedingCounseling.hasValueBooleanType() && infantFeedingCounseling.getValueBooleanType().hasValue()) {
                                         laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(infantFeedingCounseling.getValueBooleanType().getValue());
                                     }
                                 }
                                 if (!familyPlanningCounselings.isEmpty()) {
-                                    //TODO: Decide what resource to use here
-                                    Observation familyPlanningCounseling = Iterables.getLast(familyPlanningCounselings);
+                                    Observation familyPlanningCounseling = familyPlanningCounselings.get(0);
                                     if (familyPlanningCounseling != null && familyPlanningCounseling.hasValueBooleanType() && familyPlanningCounseling.getValueBooleanType().hasValue()) {
                                         laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(familyPlanningCounseling.getValueBooleanType().getValue());
                                     }
@@ -1106,7 +1103,7 @@ public class SharedHealthRecordsService {
                                 }
 
                                 //Birth details observation
-                                List<Observation> birthDetailsObservations = getObservationsByCategory("labor-delivery-birth-details", encounter, false);
+                                List<Observation> birthDetailsObservations = getObservationsByCategory("labor-delivery-birth-details", encounter, false, false);
                                 List<BirthDetailsDTO> birthDetailsDTOS = new ArrayList<>();
                                 if (!birthDetailsObservations.isEmpty()) {
                                     for (Observation observation : birthDetailsObservations) {
@@ -1140,10 +1137,9 @@ public class SharedHealthRecordsService {
 
                                 //Postnatal details
                                 PostnatalDetailsDTO postnatalDetailsDTO = new PostnatalDetailsDTO();
-                                List<Observation> postnatalDetailsObservations = getObservationsByCategory("postnatal-details", encounter, false);
+                                List<Observation> postnatalDetailsObservations = getObservationsByCategory("postnatal-details", encounter, false, true);
                                 if (!postnatalDetailsObservations.isEmpty()) {
-                                    //TODO: Decide on the resource to be used here
-                                    Observation postnatalDetailObservation = Iterables.getLast(postnatalDetailsObservations);
+                                    Observation postnatalDetailObservation = postnatalDetailsObservations.get(0);
                                     postnatalDetailsDTO.setDate(postnatalDetailObservation.hasEffectiveDateTimeType() ? postnatalDetailObservation.getEffectiveDateTimeType().getValue() : null);
                                     postnatalDetailsDTO.setPositiveHivStatusBeforeService(getComponentValueBoolean(postnatalDetailObservation, 0));
                                     postnatalDetailsDTO.setReferredToCTC(getComponentValueBoolean(postnatalDetailObservation, 1));
@@ -1186,7 +1182,7 @@ public class SharedHealthRecordsService {
 
                                     //Birth details observation
                                     //TODO: Consider checking hasMember property while fetching this observation
-                                    List<Observation> birthDetailsPostnatalObservations = getObservationsByCategory("postnatal-birth-details", encounter, false);
+                                    List<Observation> birthDetailsPostnatalObservations = getObservationsByCategory("postnatal-birth-details", encounter, false, false);
                                     List<BirthDetailsDTO> birthDetailsPostnatalDTOS = new ArrayList<>();
                                     if (!birthDetailsPostnatalObservations.isEmpty()) {
                                         for (Observation observation : birthDetailsPostnatalObservations) {
@@ -1412,7 +1408,7 @@ public class SharedHealthRecordsService {
         return List.of();
     }
 
-    public List<Observation> getObservationsByCategory(String category, Encounter encounter, boolean forGroup) throws Exception {
+    public List<Observation> getObservationsByCategory(String category, Encounter encounter, boolean forGroup, boolean fetchLastUpdated) throws Exception {
         List<Observation> observations = new ArrayList<>();
         var observationSearch = fhirClient.search().forResource(Observation.class).where(Observation.ENCOUNTER.hasAnyOfIds(encounter.getIdElement().getIdPart()));
         observationSearch.where(Observation.CATEGORY.exactly().code(category));
@@ -1424,7 +1420,12 @@ public class SharedHealthRecordsService {
          * code-value-string, combo-code, combo-code-value-concept, combo-code-value-quantity,
          * combo-data-absent-reason, combo-value-concept, combo-value-quantity]
          */
-        observationBundle = observationSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
+        if (fetchLastUpdated) {
+            observationBundle = observationSearch.sort().descending("_lastUpdated").offset(0).count(1).returnBundle(Bundle.class).execute();
+        } else {
+            observationBundle = observationSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
+        }
+
         if (observationBundle.hasEntry()) {
             for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
                 Observation observation = (Observation) entryComponent.getResource();
