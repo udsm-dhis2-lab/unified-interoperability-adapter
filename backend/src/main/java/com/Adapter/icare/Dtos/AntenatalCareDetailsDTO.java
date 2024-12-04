@@ -16,10 +16,10 @@ public class AntenatalCareDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
     private Integer pregnancyAgeInWeeks;
-    private boolean positiveHivStatusBeforeService;
-    private boolean referredToCTC;
-    private boolean providedWithFamilyPlanningCounseling;
-    private boolean providedWithInfantFeedingCounseling;
+    private Boolean positiveHivStatusBeforeService;
+    private Boolean referredToCTC;
+    private Boolean providedWithFamilyPlanningCounseling;
+    private Boolean providedWithInfantFeedingCounseling;
     private Integer gravidity;
     private Map<String,Object> hivDetails;
     private Map<String,Object> syphilisDetails;

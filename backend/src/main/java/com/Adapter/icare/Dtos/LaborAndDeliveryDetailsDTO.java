@@ -21,9 +21,9 @@ public class LaborAndDeliveryDetailsDTO {
     private String placeOfBirth;
     private Integer timeBetweenLaborPainAndDeliveryInHrs;
     @NotNull
-    private boolean isAttendantSkilled;
-    private boolean providedWithFamilyPlanningCounseling;
-    private boolean providedWithInfantFeedingCounseling;
+    private Boolean isAttendantSkilled;
+    private Boolean providedWithFamilyPlanningCounseling;
+    private Boolean providedWithInfantFeedingCounseling;
     private List<CodeAndNameDTO> beforeBirthComplications;
     private List<CodeAndNameDTO> birthComplications;
     private List<BirthDetailsDTO> birthDetails;

@@ -14,5 +14,5 @@ public class ReactionDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date reactionDate;
     private String notes;
-    private boolean reported;
+    private Boolean reported;
 }
