@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
-import { HduApiTopBarMenuComponent } from '../../../../libs/hdu-api-top-bar-menu/src/lib/hdu-api-top-bar-menu/hdu-api-top-bar-menu.component';
-import { HduApiNavMenuComponent } from '../../../../libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
-import { antDesignModules } from './shared/ant-design-modules';
+import { Router } from '@angular/router';
+import { Fn } from '@iapps/function-analytics';
 import { Menu } from './shared/menu.model';
 import { NgxDhis2HttpClientService } from '@iapps/ngx-dhis2-http-client';
+import { manifest } from '@ant-design/icons-angular';
 
 @Component({
   providers: [],
@@ -19,9 +18,12 @@ export class AppComponent {
     private router: Router,
     private httpClient: NgxDhis2HttpClientService
   ) {
-    this.httpClient.me().subscribe((response) => {
-      console.log('user info', response);
-      // TODO: Handle user permissions and roles here
+    this.httpClient.manifest().subscribe((manifest) => {
+      if (Fn) {
+        Fn.init({
+          baseUrl: manifest?.activities?.dhis?.href,
+        });
+      }
     });
   }
 
