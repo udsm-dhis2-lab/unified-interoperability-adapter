@@ -7,11 +7,16 @@ import {
 } from '@angular/core';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { DatasetManagementService } from '../../services/dataset-management.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { ConfigurationPage, IcdCodePage } from '../../models';
+import {
+  ConfigurationPage,
+  IcdCodePage,
+  LoincCodePage,
+  dataTemplatesBlocks,
+} from '../../models';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -19,15 +24,17 @@ export interface MappingsData {
 
 interface Setting {
   name: string;
-  selectedValue?: string;
-  keyToUseInPayload?: string;
+  keyToUseInMappings: string;
+  selectedValue?: any;
+  payLoad?: any;
   options: any;
 }
 
 interface SelectedSettingOption {
-  value: string;
+  value: any;
   categoryOptionComboId: string;
   settingName: string;
+  keyToUseInMappings: string;
 }
 
 class Disaggregation {
@@ -49,6 +56,8 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  dataTemplatesBlocks = dataTemplatesBlocks;
+
   isSubmittingMapping: boolean = false;
   isDeletingMapping: boolean = false;
   mappingUuid?: string;
@@ -59,19 +68,15 @@ export class DatasetMappingComponent implements OnInit {
     message: '',
   };
 
-  useIcdCodes = false;
-
   mappingsData: MappingsData = {
     disagregations: [],
   };
-
-  selectedICdCodes: string[] = [];
 
   isLoadingDisaggregation: boolean = false;
   leftColumnSpan: number = 16;
   rightColumnSpan: number = 8;
 
-  dataSetUuid: string = '';
+  dataSetIds: { uuid: string; id: string } = { uuid: '', id: '' };
   isLoading: boolean = true;
   datasetFormContent: string = '';
   sanitizedContent!: SafeHtml;
@@ -85,6 +90,11 @@ export class DatasetMappingComponent implements OnInit {
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
 
+  selectedDataTemplateBlock: string = '';
+  onDataTemplateBlockSelect(value: string) {
+    this.selectedDataTemplateBlock = value;
+  }
+
   onSearchConfiguration(value: string): void {
     this.isLoadingConfigurations = true;
     this.searchConfigurationChange$.next(value);
@@ -96,6 +106,7 @@ export class DatasetMappingComponent implements OnInit {
 
   assignConfigurationToSelectedDisaggregation(configuration: {
     name: string;
+    keyToUseInMappings: string;
     options: any[];
   }): void {
     this.mappingsData.disagregations.forEach((item) => {
@@ -103,30 +114,62 @@ export class DatasetMappingComponent implements OnInit {
         ...(item.configurations ?? []),
         {
           name: configuration.name,
+          keyToUseInMappings: configuration.keyToUseInMappings,
           options: configuration.options,
         },
       ];
     });
   }
 
+  onRemoveConfiguration(configurationName: any) {
+    this.mappingsData.disagregations.forEach((item) => {
+      item.configurations = item.configurations?.filter(
+        (configuration) => configuration.name !== configurationName
+      );
+    });
+  }
+
+  selectedICdCodes: { name: string; code: string }[] = [];
   searchIcdCodeChange$ = new BehaviorSubject('');
   placeHolderForIcdCodeSelect: string = 'Select ICD Code';
   isLoadingIcdCodes: boolean = false;
-  selectedIcdCode?: string;
+  selectedIcdCode?: { name: string; code: string };
   icdCodeOptionList: any[] = [];
+
+  selectedLoincCodes: { name: string; code: string }[] = [];
+  searchLoincCodeChange$ = new BehaviorSubject('');
+  placeHolderForLoincCodeSelect: string = 'Select LOINC Code';
+  isLoadingLoincCodes: boolean = false;
+  selectedLoincCode?: { name: string; code: string };
+  loincCodeOptionList: any[] = [];
+
+  onSearchLoincCode(value: string): void {
+    this.isLoadingLoincCodes = true;
+    this.searchLoincCodeChange$.next(value);
+  }
+
+  onLoincCodeSelect(value: { name: string; code: string }) {
+    this.selectedLoincCodes = [...this.selectedLoincCodes, value];
+  }
+
+  onRemoveLoincCode(tag: { name: string; code: string }) {
+    this.selectedLoincCodes = this.selectedLoincCodes.filter(
+      (item) => item.code !== tag.code
+    );
+  }
 
   onSearchIcdCode(value: string): void {
     this.isLoadingIcdCodes = true;
     this.searchIcdCodeChange$.next(value);
   }
 
-  onIcdCodeSelect(value: string) {
+  onIcdCodeSelect(value: { name: string; code: string }) {
     this.selectedICdCodes = [...this.selectedICdCodes, value];
   }
 
-  onRemoveIcdCode(tag: string) {
+  onRemoveIcdCode(tag: { name: string; code: string }) {
     this.selectedICdCodes = this.selectedICdCodes.filter(
-      (item) => item !== tag
+      (item) => item.code !== tag.code
     );
   }
 
@@ -136,18 +179,25 @@ export class DatasetMappingComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private renderer: Renderer2,
     private elRef: ElementRef,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
-    this.dataSetUuid = this.route.snapshot.params['uuid'];
+    this.route.queryParams.subscribe((params) => {
+      this.dataSetIds = {
+        uuid: params['uuid'],
+        id: params['id'],
+      };
+    });
     this.searchIcdCode();
     this.searchConfigurations();
-    this.loadDatasetByIdFromServer(this.dataSetUuid);
+    this.searchLoincCodes();
+    this.loadDatasetByIdFromServer(this.dataSetIds.uuid);
   }
 
   loadDatasetByIdFromServer(uuid: string) {
-    this.dataSetManagementService.getInstanceById(uuid).subscribe({
+    this.dataSetManagementService.getDatasetById(uuid).subscribe({
       next: (data: any) => {
         this.isLoading = false;
         this.sanitizedContent = this.sanitizer.bypassSecurityTrustHtml(
@@ -176,6 +226,10 @@ export class DatasetMappingComponent implements OnInit {
     this.isLoadingDisaggregation = true;
     const inputElement = event.target as HTMLInputElement;
     this.selectedInputId = inputElement.id.split('-')[0];
+    this.selectedDataTemplateBlock = '';
+    this.selectedICdCodes = [];
+    this.selectedLoincCodes = [];
+    this.mappingUuid = undefined;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
 
@@ -205,86 +259,115 @@ export class DatasetMappingComponent implements OnInit {
             return new Disaggregation(item.id, item.name);
           });
           if (this.mappingsData.disagregations.length > 0) {
-            this.getExistingMappings(this.selectedInputId, this.dataSetUuid);
+            this.getExistingMappings(this.selectedInputId, this.dataSetIds.id);
           }
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
+          this.alert = {
+            show: true,
+            type: 'error',
+            message: error.message,
+          };
           // TODO: Handle error
         },
       });
   }
 
-  getExistingMappings(selectedInputId: string, datasetUuid: string) {
+  getExistingMappings(selectedInputId: string, datasetId: string) {
     this.dataSetManagementService
-      .getExistingMappings(selectedInputId, datasetUuid)
+      .getExistingMappings(selectedInputId, datasetId)
       .subscribe({
         next: (data: any) => {
+          if (data.uuid === null) return;
           this.mappingUuid = data.uuid;
-          if (data.mapping.mappings.length > 0) {
-            this.useIcdCodes = true;
-            this.selectedICdCodes = data.mapping.mappings.map(
-              (item: any) => item.code
+          if (data.mapping.type !== '') {
+            this.selectedDataTemplateBlock = data.mapping.type;
+          }
+
+          if (data.mapping.icdMappings.length > 0) {
+            this.selectedICdCodes = data?.mapping?.icdMappings.map(
+              (item: any) => item
             );
           }
+
+          if (data.mapping.loincMappings.length > 0) {
+            this.selectedLoincCodes = data?.mapping?.loincMappings.map(
+              (item: any) => item
+            );
+          }
+
           if (data.mapping.params.length > 0) {
+            // Consider taking one param, every param have the same number and type of configuration
+            // Find respective configurations against the prefetched list of configurations
+
             const param = data.mapping.params[0];
-            if (param.gender) {
-              const configuration = this.configurationOptionList.find(
-                (item: any) => item.label === 'Gender'
-              );
-              this.assignConfigurationToSelectedDisaggregation(
-                configuration.value
-              );
-            }
-            if (param.ageType) {
-              const configuration = this.configurationOptionList.find(
-                (item: any) => item.label === 'Agetype'
-              );
-              this.assignConfigurationToSelectedDisaggregation(
-                configuration.value
-              );
-            }
-            if (param.startAge) {
-              const configuration = this.configurationOptionList.find(
-                (item: any) => item.label === 'Agegroup'
-              );
-              this.assignConfigurationToSelectedDisaggregation(
-                configuration.value
-              );
-            }
+
+            let configurations: any[] = [];
+
+            Object.keys(param).forEach((key) => {
+              if (key === 'startAge') {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) => item.value.keyToUseInMappings === 'ageGroup'
+                );
+                this.assignConfigurationToSelectedDisaggregation(
+                  configuration.value
+                );
+                configurations = [configuration];
+              } else if (key === 'endAge' || key === 'co') {
+                return;
+              } else {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) => item.value.keyToUseInMappings === key
+                );
+                if (configuration) {
+                  this.assignConfigurationToSelectedDisaggregation(
+                    configuration.value
+                  );
+                }
+                configurations = [...configurations, configuration];
+              }
+            });
 
             for (const param of data.mapping.params) {
-              if (param.gender) {
-                const configuration = this.configurationOptionList.find(
-                  (item: any) => item.label === 'Gender'
-                );
-                this.onSelectMappingSetting({
-                  value: param.gender,
-                  categoryOptionComboId: param.co,
-                  settingName: configuration.label,
-                });
-              }
-              if (param.ageType) {
-                const configuration = this.configurationOptionList.find(
-                  (item: any) => item.label === 'Agetype'
-                );
-                this.onSelectMappingSetting({
-                  value: param.ageType,
-                  categoryOptionComboId: param.co,
-                  settingName: configuration.label,
-                });
-              }
-              if (param.startAge) {
-                const configuration = this.configurationOptionList.find(
-                  (item: any) => item.label === 'Agegroup'
-                );
-                this.onSelectMappingSetting({
-                  value: param.startAge + '-' + param.endAge,
-                  categoryOptionComboId: param.co,
-                  settingName: configuration.label,
-                });
-              }
+              Object.keys(param).forEach((key) => {
+                if (key === 'endAge' || key === 'co') {
+                  return;
+                } else if (key === 'startAge') {
+                  const configuration = configurations.find(
+                    (item: any) => item.value.keyToUseInMappings === 'ageGroup'
+                  );
+                  const selectedOption = configuration.value.options.find(
+                    (item: any) =>
+                      item.startAge === param.startAge &&
+                      item.endAge === param.endAge
+                  );
+                  this.onSelectMappingSetting({
+                    value: selectedOption,
+                    categoryOptionComboId: param.co,
+                    settingName: configuration.label,
+                    keyToUseInMappings: configuration.value.keyToUseInMappings,
+                  });
+                } else {
+                  const configuration = configurations.find(
+                    (item: any) => item.value.keyToUseInMappings === key
+                  );
+                  if (configuration) {
+                    const selectedOption = configuration.value.options.find(
+                      (item: any) =>
+                        item.code ===
+                        param[configuration.value.keyToUseInMappings]
+                    );
+                    this.onSelectMappingSetting({
+                      value: selectedOption,
+                      categoryOptionComboId: param.co,
+                      settingName: configuration.label,
+                      keyToUseInMappings:
+                        configuration.value.keyToUseInMappings,
+                    });
+                  }
+                }
+              });
             }
           }
         },
@@ -322,7 +405,10 @@ export class DatasetMappingComponent implements OnInit {
         this.icdCodeOptionList =
           data?.listOfIcdCodes?.map((item: any) => {
             return {
-              value: item.code,
+              value: {
+                code: item.code,
+                name: item.name,
+              },
               label: `${item.code}-${item.name}`,
             };
           }) ?? [];
@@ -331,6 +417,35 @@ export class DatasetMappingComponent implements OnInit {
         // TODO: Implement error handling
         this.isLoadingIcdCodes = false;
       },
+    });
+  }
+
+  searchLoincCodes() {
+    const loincList$: Observable<LoincCodePage> = this.searchLoincCodeChange$
+      .asObservable()
+      .pipe(debounceTime(500))
+      .pipe(
+        switchMap((value: string) => {
+          return this.dataSetManagementService.getLoincCodes(1, 10, [
+            { key: 'q', value: [value] },
+          ]);
+        })
+      );
+    loincList$.subscribe({
+      next: (data: any) => {
+        this.isLoadingLoincCodes = false;
+        this.loincCodeOptionList =
+          data?.listOfLoincCodes?.map((item: any) => {
+            return {
+              value: {
+                code: item.code,
+                name: item.name,
+              },
+              label: `${item.code}-${item.name}`,
+            };
+          }) ?? [];
+      },
+      error: (error: any) => {},
     });
   }
 
@@ -354,6 +469,7 @@ export class DatasetMappingComponent implements OnInit {
           data?.listOfConfigurations?.map((configuration: any) => {
             return {
               value: {
+                keyToUseInMappings: configuration.keyToUseInMappings,
                 name: configuration.name,
                 options: configuration.options,
               },
@@ -374,14 +490,15 @@ export class DatasetMappingComponent implements OnInit {
         item.configurations?.forEach((config) => {
           if (config.name === event.settingName) {
             config.selectedValue = event.value;
-            if (config.name === 'Gender') {
-              config.keyToUseInPayload = 'gender';
-            }
-            if (config.name === 'Agetype') {
-              config.keyToUseInPayload = 'ageType';
-            }
-            if (config.name === 'TEST') {
-              config.keyToUseInPayload = 'test';
+            if (event.keyToUseInMappings === 'ageGroup') {
+              config.payLoad = {
+                startAge: event.value.startAge,
+                endAge: event.value.endAge,
+              };
+            } else {
+              config.payLoad = {
+                [event.keyToUseInMappings]: event.value.code,
+              };
             }
           }
         });
@@ -392,9 +509,17 @@ export class DatasetMappingComponent implements OnInit {
   createMappingsPayload() {
     const payLoad = {
       mapping: {
-        mappings: this.selectedICdCodes.map((item) => {
+        icdMappings: this.selectedICdCodes.map((item) => {
           return {
-            code: item,
+            code: item.code,
+            name: item.name,
+          };
+        }),
+
+        loincMappings: this.selectedLoincCodes.map((item) => {
+          return {
+            code: item.code,
+            name: item.name,
           };
         }),
 
@@ -403,29 +528,41 @@ export class DatasetMappingComponent implements OnInit {
           name: '',
           code: '',
         },
-        type: '',
-        params: this.mappingsData.disagregations.map((item) => {
-          return {
-            co: item.categoryOptionComboId,
-            ...(item.configurations ?? []).reduce((acc, config: Setting) => {
-              if (config.name === 'Agegroup') {
-                const startingAge = config.selectedValue?.split('-')[0];
-                const endingAge = config.selectedValue?.split('-')[1];
-                acc['startAge'] = startingAge;
-                acc['endAge'] = endingAge;
-              } else {
-                acc[config.keyToUseInPayload as string] = config.selectedValue;
-              }
-              return acc;
-            }, {} as { [key: string]: any }),
-          };
-        }),
+        type: this.selectedDataTemplateBlock,
+        params: this.mappingsData.disagregations
+          .map((item) => {
+            const reducedConfig = (item.configurations ?? []).reduce(
+              (acc, config: Setting) => {
+                if (config.payLoad) {
+                  Object.keys(config.payLoad).forEach((key) => {
+                    acc[key] = config.payLoad[key];
+                  });
+                }
+                return acc;
+              },
+              {} as { [key: string]: any }
+            );
+
+            // Check if the accumulator object is empty
+            if (Object.keys(reducedConfig).length === 0) {
+              return null;
+            }
+
+            return {
+              co: item.categoryOptionComboId,
+              ...reducedConfig,
+            };
+          })
+          .filter((item) => item !== null),
       },
       dataKey: this.selectedInputId,
-      namespace: `MAPPINGS-${this.dataSetUuid}`,
+      namespace: `MAPPINGS-${this.dataSetIds.id}`,
       description: '',
       group: '',
     };
+    this.selectedICdCodes = [];
+    this.selectedLoincCodes = [];
+    this.selectedDataTemplateBlock = '';
     return payLoad;
   }
 
@@ -495,5 +632,11 @@ export class DatasetMappingComponent implements OnInit {
       type: '',
       message: '',
     };
+  }
+
+  goBackToDatasetList() {
+    this.router.navigate(['mapping-and-data-extraction'], {
+      queryParams: { from: 'mapping' },
+    });
   }
 }

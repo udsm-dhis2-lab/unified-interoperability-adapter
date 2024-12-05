@@ -16,10 +16,9 @@
         <!-- <span nz-icon nzType="plus"></span> -->
     </button>
 </div>
-
 <nz-table #dynamicTable [nzScroll]="{ x: scrollX, y: scrollY }" [nzData]="filteredSchedules" [nzPageSize]="12"
     [nzTableLayout]="settingValue.tableLayout" [nzBordered]="settingValue.bordered" [nzSimple]="settingValue.simple"
-    [nzLoading]="settingValue.loading" [nzPaginationType]="settingValue.paginationType"
+    [nzLoading]="(loadingSchedule$ | async) || settingValue.loading" [nzPaginationType]="settingValue.paginationType"
     [nzPaginationPosition]="settingValue.position" [nzShowSizeChanger]="settingValue.sizeChanger"
     [nzFrontPagination]="settingValue.pagination" [nzShowPagination]="settingValue.pagination"
     [nzFooter]="settingValue.footer ? '' : null" [nzTitle]="settingValue.title ? '' : null" [nzSize]="settingValue.size"

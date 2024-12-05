@@ -5,7 +5,7 @@ import { HDUAPIClientDetails } from '../../models';
 import { ClientManagementService } from '../../services/client-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
-import { SearchBarComponent } from 'search-bar';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-home',
@@ -24,6 +24,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   filterKey = [{}];
 
   isFirstLoad = true;
+  dataSetSeachQuery: string = '';
 
   constructor(
     private router: Router,
@@ -48,8 +49,7 @@ export class HomeComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           this.loading = false;
-          //TODO: Set total from data after it's support in fhir is implemented
-          this.total = 4000; //data.total;
+          this.total = data.total;
           this.pageIndex = data.pageIndex;
           this.listOfHduClients = data.listOfClients;
         },
@@ -60,13 +60,30 @@ export class HomeComponent implements OnDestroy, OnInit {
       });
   }
 
+  onDatasetsSearchInputTyping(value: string) {
+    this.dataSetSeachQuery = value;
+    if (value.length >= 3 || value === '') {
+      this.loadHduClientsFromServer(1, 10, [
+        value !== ''
+          ? { key: 'firstName', value: [value] }
+          : { key: '', value: [] },
+      ]);
+    }
+  }
+
   onQueryParamsChange(params: NzTableQueryParams): void {
     if (this.isFirstLoad) {
       this.isFirstLoad = false;
       return;
     }
     const { pageSize, pageIndex, filter } = params;
-    this.loadHduClientsFromServer(pageIndex, pageSize, filter);
+    const queryFilter = [
+      ...filter,
+      this.dataSetSeachQuery !== ''
+        ? { key: 'firstName', value: [this.dataSetSeachQuery] }
+        : { key: '', value: [] },
+    ];
+    this.loadHduClientsFromServer(pageIndex, pageSize, queryFilter);
   }
 
   ngOnInit(): void {
@@ -74,7 +91,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   viewClientDetails(client: HDUAPIClientDetails) {
-    this.router.navigate(['/client-details'], {
+    this.router.navigate(['/client-management/client-details'], {
       queryParams: { client: JSON.stringify(client) },
     });
   }

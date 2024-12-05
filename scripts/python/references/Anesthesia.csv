@@ -1,0 +1,300 @@
+CODE,SERVICE DESCRIPTION,,
+99292,CPR-Resuscitation,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+190,Anesthesia for procedure on facial bones or skull,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+192,Anesthesia for surgery of facial bones or skull,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+210,Anesthesia for procedure on brain,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+211,Anesthesia for procedure to remove blood collection in brain,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+212,Anesthesia for procedure to remove fluid in brain,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+214,Anesthesia for procedure to create holes in skull including X-ray imaging,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+215,Anesthesia for procedure to repair skull or skull fracture,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+216,Anesthesia for procedure on blood vessel in brain,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+218,Anesthesia for procedure on brain patient in sitting position,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+220,Anesthesia for procedure to drain brain and spinal cord fluid,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+222,Anesthesia for procedure on nerve in brain,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+300,Anesthesia for procedure on esophagus and neck,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+320,"Anesthesia for procedure on esophagus and neck, age 1 year or older",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+450,Anesthesia for procedure on collar bone and shoulder blade,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+454,Anesthesia for biopsy of collar bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+470,Anesthesia for partial removal of rib,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+472,Anesthesia for partial removal of rib and chest wall repair,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+474,Anesthesia for partial removal of rib and chest wall reconstruction,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+520,Anesthesia for closed procedure in chest,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+524,Anesthesia for closed drainage of lung fluid,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+532,Anesthesia for central vein access,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+600,Anesthesia for procedure on upper spine and spinal cord,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+604,"Anesthesia for procedure on spine and spinal cord, patient in sitting position",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+620,Anesthesia for procedure on middle spine and spinal cord,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+626,Anesthesia for procedure on middle spine and spinal cord with 1 lung ventilation,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+630,Anesthesia for procedure on lower spine,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+632,Anesthesia for removal of nerves in lower spine,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+635,Anesthesia for spinal tap,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+640,Anesthesia for closed manipulation of spine,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+670,Anesthesia for procedure on spine and spinal cord,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+700,Anesthesia for procedure on upper front abdominal wall,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1112,Anesthesia for bone marrow aspiration and/or biopsy at pelvic bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1120,Anesthesia for procedure on pelvic bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1130,Anesthesia for application or revision of body cast,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1140,Anesthesia for amputation of leg including pelvic bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1150,Anesthesia for removal of pelvic bone tumor,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1160,Anesthesia for procedure on pubic bone or sacroiliac joint,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1170,Anesthesia for open procedure on pubic bone or sacroiliac joint,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1173,Anesthesia for open repair of pelvic fracture,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1180,Anesthesia for removal of external pelvic nerve,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1190,Anesthesia for removal of internal pelvic nerve,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1200,Anesthesia for closed procedure on hip joint,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1202,Anesthesia for procedure on hip joint using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1210,Anesthesia for open surgical procedure on hip joint,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1212,Anesthesia for open hip joint dislocation,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1214,Anesthesia for open total hip joint replacement,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1215,Anesthesia for open revision of total hip joint replacement,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1220,Anesthesia for closed procedure on upper two-thirds of thigh bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1230,Anesthesia for open procedure on upper two-thirds of thigh bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1232,Anesthesia for open amputation at upper two-thirds of thigh bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1234,Anesthesia for open removal of muscle or tissue at upper two-thirds of thigh bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1250,"Anesthesia for procedure on nerves, muscles, tendons, fascia, and bursae of upper leg",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1260,Anesthesia for procedure on veins of upper leg,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1270,Anesthesia for procedure on arteries of upper leg,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1320,"Anesthesia for procedure on nerves, muscles, tendons, fascia, and/or bursae of knee",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1340,Anesthesia for closed procedure on lower one-third of thigh bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1360,Anesthesia for open procedure on lower one-third of thigh bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1380,Anesthesia for closed procedure on knee joint,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1382,Anesthesia for diagnostic examination of knee joint using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1390,Anesthesia for closed procedure at kneecap and/or upper foreleg bones,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1392,Anesthesia for open procedure at kneecap and upper foreleg bones,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1400,Anesthesia for open or endoscopic procedure on knee including Popliteal Area,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1402,Anesthesia for open or endoscopic total knee joint replacement,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1404,Anesthesia for open or endoscopic procedure of dislocated knee,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1420,"Anesthesia for knee joint cast application, removal, or repair",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1462,"Anesthesia for closed procedure on lower leg, ankle, and foot",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1464,Anesthesia for procedure on ankle and/or foot using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1470,"Anesthesia for procedure on nerves, muscles, tendons, and fascia of lower leg, ankle, and foot",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1472,Anesthesia for procedure to repair calf muscle tendon,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1474,Anesthesia for procedure to repair calf muscle,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1480,"Anesthesia for open procedure on bones of lower leg, ankle and foot",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1482,Anesthesia for open amputation below the knee,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1484,"Anesthesia for open reconstruction of lower leg, ankle, and/or foot bone",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1486,Anesthesia for open total ankle joint replacement,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1490,"Anesthesia for lower leg cast application, removal, or repair",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1610,"Anesthesia for procedure on nerves, muscles, tendons, fascia, and bursae of shoulder and underarm",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1620,Anesthesia for closed procedure on upper arm bone and shoulder joint,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1622,Anesthesia for diagnostic examination of shoulder joint using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1630,Anesthesia for open or endoscopic procedure at upper arm and shoulder joint including,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1634,Anesthesia for open or endoscopic procedure of dislocated shoulder joint,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1636,"Anesthesia for open or endoscopic amputation of arm, shoulder blade, and collar bone",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1638,Anesthesia for open or endoscopic total shoulder joint replacement,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1680,"Anesthesia for cast application, removal or repair",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1682,"Anesthesia for shoulder spica cast application, removal or repair",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1710,"Anesthesia for procedure on nerves, muscles, tendons, fascia, and bursae of upper arm and elbow",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1712,Anesthesia for open incision of elbow to shoulder tendon,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1714,Anesthesia for repair of elbow to shoulder tendon,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1716,Anesthesia for suture of upper arm and elbow tendon to bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1730,Anesthesia for closed procedure on upper arm and elbow,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1732,Anesthesia for diagnostic examination of elbow joint using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1740,Anesthesia for open or endoscopic procedure on elbow,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1742,Anesthesia for open or endoscopic procedure at upper arm bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1744,Anesthesia for open or endoscopic repair of non-healed fracture of upper arm bone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1756,Anesthesia for open or endoscopic surgical procedure on elbow,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1758,Anesthesia for open or endoscopic removal cyst or tumor of upper arm,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1760,Anesthesia for open or endoscopic total elbow joint replacement,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1770,Anesthesia for procedure on arteries of upper arm and elbow,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1810,"Anesthesia for procedure on nerves, muscles, tendons, fascia, and bursae of forearm, wrist, and hand",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1820,"Anesthesia for closed procedure on bones of forearm, wrist, or hand",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1829,Anesthesia for diagnostic examination of the wrist using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1830,"Anesthesia for open or endoscopic procedure on bones of forearm, wrist, or hand",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1832,Anesthesia for open or endoscopic total wrist joint replacement,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1860,"Anesthesia for forearm, wrist, or hand cast application, removal or repair",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1916,Anesthesia for diagnostic X-ray procedure on arteries or veins,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1924,Anesthesia for X-ray procedure on arteries,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1925,Anesthesia for X-ray procedure on neck or heart artery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1926,"Anesthesia for X-ray procedure on artery in brain, heart, or major vessel of chest (aorta)",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1930,Anesthesia for X-ray procedure on vein or lymph system,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1931,Anesthesia for X-ray procedure on liver vein,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1932,Anesthesia for X-ray procedure on chest or neck vein,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1933,Anesthesia for X-ray procedure on brain vein,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1935,Anesthesia for diagnostic X-ray procedure (accessed through the skin) on spine and spinal cord,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1936,Anesthesia for X-ray procedure (accessed through the skin) on spine and spinal cord,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1991,Anesthesia for nerve block and injection procedure,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1992,"Anesthesia for nerve block and injection procedure, prone position",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1996,Daily hospital management of continuous spinal drug administration,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1999,Anesthesia procedure,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+31500,"Intubation (Intravenous Anaesthesia) /LMA /Mask -- (Inhalational Anaesthesia)
+ /Mechanical Ventilation",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+62320,Epidural Anesthesia,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+62273,Epidural Patch,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64400,"Injection of anesthetic agent, trigeminal nerve",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64402,"Injection of anesthetic agent, facial nerve",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64405,"Injection of anesthetic agent, greater occipital nerve",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64408,"Injection of anesthetic agent, cranial (vagus) nerve",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64410,"Injection of anesthetic agent, upper spine (phrenic) nerve",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64413,"Injection of anesthetic agent, neck nerve bundle",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64415,"Injection of anesthetic agent, brachial (arm) nerve bundle",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64416,"Injection by continuous infusion of anesthetic agent, brachial (arm) nerve bundle",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64417,Injection of anesthetic agent underarm (axillary) nerve,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+64418,"Injection of anesthetic agent, collar bone nerve",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+36556,Insertion of central venous catheter for infusion,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+43753,NGT insertion,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+76937,Intravenous placement USS Guided,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+99152,Sedation without Respiratory support - Above 5yrs,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+99151,Sedation without Respiratory support - Under 5yrs,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+96366,IV Side Injection,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+93503,Continuous invasive CVP monitoring,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+96368,Continuous Drug infusions -Inotropes/Vasoactive drugs,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+92960,Defibrilation/Elective Cardioversion / Electrocardioversion (Resursitative Defibrillation procedure),Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+94660,Non Invasive mechanical ventilation (CPAP),Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+36620,Continuous invasive Arterial Blood Pressure (ABP) monitoring,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+530,Anesthesia for insertion of permanent heart pacemaker,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+534,Anesthesia for insertion or replace of pacing heart defibrillator,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+537,Anesthesia for procedure on heart to correct abnormal rhythm,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+539,Anesthesia for reconstruction of windpipe and lung airway,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+540,Anesthesia for procedure in chest,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+541,Anesthesia for procedure in chest with 1 lung ventilation,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+542,Anesthesia for removal of lung lining,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+546,Anesthesia for lung removal and chest wall repair,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+548,Anesthesia for procedure on windpipe and lung airway,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+550,Anesthesia for removal of breast bone tissue,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+560,Anesthesia for procedure on heart and great blood vessels,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+561,"Anesthesia for procedure on heart and great blood vessels on heart-lung machine, younger than 1 year of age",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+562,"Anesthesia for procedure on heart and great blood vessels on heart-lung machine, age 1 year or older, or re-operation more than 1 month after original procedure",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+563,Anesthesia for procedure on heart and great blood vessels on heart-lung machine,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+566,Anesthesia for heart artery bypass grafting,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+567,Anesthesia for heart artery bypass grafting on heart-lung machine,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+580,Anesthesia for heart or heart-lung transplant,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+882,Anesthesia for tying of major vein in lower abdomen,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1272,Anesthesia for groin artery bypass graft and tying of upper leg artery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1274,Anesthesia for removal of groin artery blood clot,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1430,Anesthesia for procedure on knee veins,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1432,Anesthesia for repair of abnormal artery-vein formation of knee,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1440,Anesthesia for procedure on knee arteries,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1442,Anesthesia for removal of blood clot in artery behind knee,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1444,Anesthesia for repair of bulging (aneurysm) defect in knee artery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1500,Anesthesia for procedure on arteries of lower leg including bypass graft,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1502,Anesthesia for lower leg artery bypass graft or blood clot removal,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1520,Anesthesia for procedure on veins of lower leg,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1522,Anesthesia for removal of lower leg vein obstruction,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1650,Anesthesia for procedure on arteries of shoulder and underarm,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1652,Anesthesia for repair of bulging (aneurysm) defect in upper arm artery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1654,Anesthesia for bypass graft in shoulder or underarm artery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1656,Anesthesia for bypass graft from groin artery to shoulder or underarm artery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1670,Anesthesia for procedure on veins of shoulder and underarm,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1772,Anesthesia for removal of blood clot from upper arm or elbow artery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1780,Anesthesia for procedure on veins of upper arm and elbow,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1782,Anesthesia for suture of upper arm or elbow vein,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1840,"Anesthesia for procedure on arteries of forearm, wrist, and hand",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1842,"Anesthesia for removal of blood clot from forearm, wrist, or hand artery",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1844,Anesthesia for placement or revision of blood flow shunt,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1850,"Anesthesia for procedure on veins of forearm, wrist, and hand",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1852,"Anesthesia for suture of forearm, wrist, or hand vein",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1920,Anesthesia for procedure on heart vessels and chambers,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1922,Anesthesia for X-ray or radiation therapy,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+100,Anesthesia for procedure on salivary gland with biopsy,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+102,Anesthesia for procedure to repair lip defect present at birth,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+103,Anesthesia for procedure on eyelid,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+104,Anesthesia for electric shock treatment,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+120,Anesthesia for biopsy of external middle and inner ear,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+124,Anesthesia for examination and biopsy of external middle and inner ear using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+126,Anesthesia for incision of ear drum,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+140,Anesthesia for procedure on eye,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+142,Anesthesia for lens surgery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+144,Anesthesia for procedure on eye for corneal transplant,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+145,Anesthesia for retinal surgery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+147,Anesthesia for procedure on eye for removal of iris,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+148,Anesthesia for eye examination using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+160,Anesthesia for procedure on nose and sinus,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+162,Anesthesia for surgery of nose and sinus,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+164,Anesthesia for soft tissue biopsy on nose and sinus,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+170,Anesthesia for procedure on mouth including biopsy,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+172,Anesthesia for procedure on mouth to repair palate deformity,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+174,Anesthesia for procedure on throat for removal of tumor,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+176,Anesthesia for surgery on mouth,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+322,Anesthesia for needle biopsy of thyroid,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+326,"Anesthesia for procedure on voice box and windpipe, children younger than 1 year of age",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+350,Anesthesia for procedure on major blood vessels of neck,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+352,Anesthesia for tying procedure on major blood vessels of neck,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+400,"Anesthesia for procedure on skin of arms, legs, or trunk",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+402,Anesthesia for breast reconstruction,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+404,Anesthesia for removal of breast,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+406,Anesthesia for removal of breast and lymph nodes,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+410,Anesthesia for procedure to correct abnormal heart rhythm,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+500,Anesthesia for procedure on esophagus,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+522,Anesthesia for closed needle biopsy of lung,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+528,Anesthesia for closed diagnostic examination of chest using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+529,Anesthesia for closed diagnostic examination of chest using an endoscope with 1 lung ventilation,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+625,Anesthesia for procedure on middle spine and spinal cord,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+702,Anesthesia for liver biopsy (accessed through the skin),Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+730,Anesthesia for procedure on upper rear abdominal wall,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+740,Anesthesia for procedure on gastrointestinal tract using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+750,Anesthesia for procedure to repair upper abdominal hernia,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+752,Anesthesia for procedure to repair upper abdominal incisional hernia and/or wound opening,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+754,Anesthesia for procedure to repair upper abdominal hernia present at birth,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+756,Anesthesia for procedure to repair abdominal hernia,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+770,Anesthesia for procedure on major abdominal blood vessels,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+790,Anesthesia for procedure in upper abdomen including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+792,Anesthesia for partial removal of liver or management of bleeding including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+794,Anesthesia for removal of pancreas including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+796,Anesthesia for liver transplant recipient including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+797,Anesthesia for procedure on stomach for obesity including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+800,Anesthesia for procedure on lower front abdominal wall,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+802,Anesthesia for removal of excess tissue on lower abdominal wall,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+810,Anesthesia for procedure on lower intestine using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+820,Anesthesia for procedure on lower rear abdominal wall,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+830,Anesthesia for lower abdominal hernia repair,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+832,Anesthesia for middle or incisional abdominal hernia repair,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+834,"Anesthesia for lower abdominal hernia repair, child younger than 1 year of age",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+836,"Anesthesia for lower abdominal hernia repair, infants younger than 37 weeks gestational age at birth and younger than 50 weeks gestational age at time of surgery",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+840,Anesthesia for procedure in lower abdominal cavity including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+842,Anesthesia for removal of amniotic fluid in uterus including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+844,Anesthesia for procedure in lower abdominal cavity and rectum including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+846,Anesthesia for removal of uterus including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+848,Anesthesia for removal of pelvic organs including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+851,Anesthesia for tying or incision of fallopian tubes using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+860,Anesthesia for procedure in lower abdomen including urinary tract,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+862,Anesthesia for procedure on upper urinary duct (ureter) or removal of kidney for transplant,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+864,Anesthesia for removal of urinary bladder,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+865,Anesthesia for removal of prostate,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+866,Anesthesia for removal of adrenal gland,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+868,Anesthesia for kidney transplant,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+870,Anesthesia for removal of urinary bladder stone,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+872,Anesthesia for shock wave therapy for urinary system stones,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+873,Anesthesia for shock wave therapy for urinary system stones,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+880,Anesthesia for procedure on major lower abdominal wall blood vessels,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+902,Anesthesia for procedure on anus and rectum,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+904,Anesthesia for procedure on perineum,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+906,Anesthesia for removal of external female genitalia,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+908,Anesthesia for removal of prostate,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+910,Anesthesia for procedure on urinary system including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+912,Anesthesia for removal of urinary bladder tumors including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+914,Anesthesia for removal of prostate including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+916,Anesthesia for procedure to control urinary system bleeding including use of an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+918,"Anesthesia for fragmenting, manipulation and/or removal of kidney stone including use of an endoscope",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+920,Anesthesia for procedure on male genitalia,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+921,Anesthesia for vasectomy,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+922,Anesthesia for procedure on male genitalia glands,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+924,Anesthesia for repair of undescended testicle,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+926,Anesthesia for removal of testicle through groin,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+928,Anesthesia for removal of testicle through abdomen,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+930,Anesthesia for relocation of undescended testicle into scrotum,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+932,Anesthesia for removal of penis,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+934,Anesthesia for removal of penis and lymph nodes on both sides of groin,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+936,Anesthesia for removal of penis and lymph nodes on both sides of groin,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+938,Anesthesia for insertion of penile prosthesis,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+940,"Anesthesia for vaginal biopsy of cervix, uterine lining, or external genitalia",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+942,Anesthesia for repair or removal of vagina and urinary procedure,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+944,Anesthesia for vaginal removal of uterus,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+948,Anesthesia for suture closure of cervix,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+950,Anesthesia for examination of cervix using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+952,Anesthesia for examination of uterus using an endoscope,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1951,"Anesthesia for treatment of second and third-degree burn, less than 4% total body surface",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1952,"Anesthesia for treatment of second and third-degree burn, between 4% and 9%
+ total body surface area",Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1953,Anesthesia for treatment of second and third-degree burn,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1958,Anesthesia for procedure to turn the position of fetus in uterus,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1960,Anesthesia for vaginal delivery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1961,Anesthesia for cesarean delivery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1962,Anesthesia for procedure to remove uterus following delivery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1963,Anesthesia for cesarean removal of uterus,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1965,Anesthesia for incomplete or missed abortion,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1966,Anesthesia for induced abortion,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1967,Anesthesia for labor during planned vaginal delivery,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1968,Anesthesia for cesarean delivery following labor,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1969,Anesthesia for cesarean removal of uterus following labor,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES
+1990,Physiological support for harvesting of organs,Anesthesia,ACUTE/CHRONIC AND INTENSIVE CARE SERVICES

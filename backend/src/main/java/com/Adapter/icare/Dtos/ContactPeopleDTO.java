@@ -8,13 +8,15 @@ import java.util.List;
 @Getter
 @Setter
 public class ContactPeopleDTO {
-    private String name;
-    private List<String> telecom;
+    private String firstName;
+    private String lastName;
+    private List<String> phoneNumbers;
     private String relationShip;
 
-    public ContactPeopleDTO(String name, List<String> telecom, String relationShip) {
-        this.name = name;
-        this.telecom =  telecom;
+    public ContactPeopleDTO(String firstName, String lastName, List<String> phoneNumbers, String relationShip) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumbers =  phoneNumbers;
         this.relationShip =  relationShip;
     }
 }

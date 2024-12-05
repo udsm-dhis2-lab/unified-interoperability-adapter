@@ -30,17 +30,17 @@ import { NzModalModule, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { WorkflowState } from '../../state/workflow/workflow.state';
 import { select, Store } from '@ngrx/store';
 import { WorkflowActions } from '../../state/workflow/workflow.actions';
-import { WorkflowService } from '../../services/workflow/workflow.service';
 import {
   getUpdatedWorkflowStatus,
   getWorkflows,
+  getWorkflowsLoadingStatus,
 } from '../../state/workflow/workflow.selectors';
 import {
   Workflow,
   WorkflowFormCreate,
   WorkflowTable,
 } from '../../models/workflow.model';
-import { defaultIfEmpty} from 'rxjs';
+import { defaultIfEmpty, Observable } from 'rxjs';
 import { EditComponent } from '../edit/edit.component';
 import { Router } from '@angular/router';
 import { WorkflowRunLoggingComponent } from '../workflow-run-logging/workflow-run-logging.component';
@@ -88,7 +88,7 @@ interface Setting {
     NzTagModule,
     WorkflowRunLoggingComponent,
   ],
-  providers: [WorkflowService],
+  providers: [],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
 })
@@ -100,6 +100,8 @@ export class TableComponent implements OnInit {
   scrollX: string | null = null;
   scrollY: string | null = null;
   settingValue: Setting;
+
+  loadingWorkflows$!: Observable<boolean | null>;
 
   constructor(
     private formBuilder: NonNullableFormBuilder,
@@ -163,6 +165,10 @@ export class TableComponent implements OnInit {
 
   ngOnInit(): void {
     this.workFlowState.dispatch(WorkflowActions.loadWorkflows());
+
+    this.loadingWorkflows$ = this.workFlowState.pipe(
+      select(getWorkflowsLoadingStatus)
+    );
 
     this.workFlowState
       .pipe(select(getWorkflows), defaultIfEmpty([]))
@@ -243,7 +249,7 @@ export class TableComponent implements OnInit {
     //   });
     // const decodedUrl = decodeURIComponent(workflowTable.id);
     // this.router.navigate([decodeURIComponent('main/flow')]);
-    this.router.navigate(['/', 'config', 'flow']);
+    this.router.navigate(['/', 'workflows-management', 'config', 'flow']);
   }
 
   onDeleteWorkflow(workflowTable: WorkflowTable) {
@@ -341,7 +347,13 @@ export class TableComponent implements OnInit {
         WorkflowActions.setCurrentSelectedWorkflow({ workflow: workflowTable })
       );
       // this.router.navigate([decodeURIComponent('main/flow'), decodedUrl]);
-      this.router.navigate(['/', 'config', 'flow', `${workflowTable.id}`]);
+      this.router.navigate([
+        '/',
+        'workflows-management',
+        'config',
+        'flow',
+        `${workflowTable.id}`,
+      ]);
     }
   }
 }

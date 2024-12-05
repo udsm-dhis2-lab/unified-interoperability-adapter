@@ -75,11 +75,7 @@
                 <td>{{ data.iDNumber }}</td>
                 <td>{{ data.fullName }}</td>
                 <td>
-                  <a
-                    nz-dropdown
-                    nzTrigger="click"
-                    [nzDropdownMenu]="menu"
-                  >
+                  <a nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu">
                     <Strong>...</Strong>
                   </a>
                 </td>
@@ -100,7 +96,8 @@
                 nzType="default"
                 (click)="
                   warning(
-                    'Are you sure you want to proceed with  merging request for  these selected clients details?'
+                    'Are you sure you want to proceed with  merging request for  these selected clients details?',
+                    'requestMerge'
                   )
                 "
               >
@@ -112,7 +109,8 @@
               nzType="primary"
               (click)="
                 warning(
-                  'Are you sure you want to proceed with  merging this clients details?'
+                  'Are you sure you want to proceed with  merging this clients details?',
+                  'merge'
                 )
               "
             >
@@ -123,4 +121,23 @@
       </div>
     </div>
   </nz-card>
+
+  <div class="alert-container">
+    <nz-spin [nzSpinning]="isSubmittingMappingRequest">
+      <nz-alert
+        nzCloseable
+        *ngIf="alert.show"
+        [nzType]="
+          alert.type === 'success'
+            ? 'success'
+            : alert.type === 'info'
+            ? 'info'
+            : 'error'
+        "
+        [nzMessage]="alert.message"
+        (nzOnClose)="onCloseAlert()"
+        nzShowIcon
+      ></nz-alert>
+    </nz-spin>
+  </div>
 </div>

@@ -1,4 +1,4 @@
-import { IcdCode } from '../icd-code.model';
+import { IcdCode } from '../';
 
 export class IcdCodePage {
   total!: number;

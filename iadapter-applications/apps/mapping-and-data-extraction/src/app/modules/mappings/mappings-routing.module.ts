@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './containers/home/home.component';
 import { DatasetMappingComponent } from './containers/dataset-mapping/dataset-mapping.component';
-import { SettingsComponent } from './containers/settings/settings.component';
+import { ConfigurationsComponent } from './containers/configurations/configurations.component';
 
 const routes: Routes = [
   {
@@ -10,12 +10,12 @@ const routes: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'dataset-mapping/:uuid',
+    path: 'dataset-mapping',
     component: DatasetMappingComponent,
   },
   {
-    path: 'settings',
-    component: SettingsComponent,
+    path: 'configuration',
+    component: ConfigurationsComponent,
   },
 ];
 

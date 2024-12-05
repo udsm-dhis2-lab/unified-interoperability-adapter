@@ -68,7 +68,7 @@ public class DatastoreController {
         try {
             Map<String, Object> returnObject = new HashMap<>();
             Page<Datastore> pagedDatastoreData = null;
-            pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, null, page, pageSize);
+            pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(namespace, null, null, q, null, null, page, pageSize, true);
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
             pager.put("pageSize", pageSize);

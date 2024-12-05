@@ -6,24 +6,25 @@ import {
   Dataset,
   DatasetPage,
   IcdCodePage,
-  InstancePage,
   MappingsUrls,
+  LoincCodePage,
 } from '../models';
 import { HttpParams } from '@angular/common/http';
 import {
   UnAuothorizedException,
   UnknownException,
   InternalServerException,
-} from '@models';
+} from '../../../../../../../libs/models';
 import { CategoryOptionCombo } from '../models/category-option-combo.model';
+import { Endpoints } from '../../../shared';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DatasetManagementService {
-  instanceUrl: string = MappingsUrls.GET_INSTANCES;
+  instanceUrl: string = Endpoints.INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
-  configurationUrl: string = MappingsUrls.GET_CONFIGURATIONS;
+  configurationUrl: string = MappingsUrls.CONFIGURATIONS;
   addMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
   getMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
   updateMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
@@ -51,32 +52,12 @@ export class DatasetManagementService {
       );
   }
 
-  getInstanceById(uuid: string): Observable<Dataset> {
+  getDatasetById(uuid: string): Observable<Dataset> {
     return this.httpClient
       .get<{ results: any }>(`${this.dataSetByIdUrl}/${uuid}`)
       .pipe(
         map((response: { results: any }) => {
           return Dataset.fromJson(response);
-        }),
-        catchError((error: any) => this.handleError(error))
-      );
-  }
-
-  getInstances(
-    pageIndex: number,
-    pageSize: number,
-    paging: boolean,
-    filters: Array<{ key: string; value: string[] }>
-  ) {
-    const params = this.buildHttpParams(pageIndex, pageSize, paging, filters);
-
-    return this.httpClient
-      .get<{ results: any }>(this.instanceUrl, {
-        params,
-      })
-      .pipe(
-        map((response: { results: any }) => {
-          return InstancePage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );
@@ -107,6 +88,26 @@ export class DatasetManagementService {
     );
   }
 
+  deleteConfiguration(uuid: string): Observable<any> {
+    return this.httpClient
+      .delete<any>(`${this.configurationUrl}/${uuid}`, {})
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  editConfiguration(payLoad: any): Observable<any> {
+    return this.httpClient
+      .put<any>(`${this.configurationUrl}/${payLoad.uuid}`, payLoad)
+      .pipe(
+        // TODO: return response
+        map((response: any) => console.log(response)),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
   getIcdCodes(
     pageIndex: number,
     pageSize: number,
@@ -119,6 +120,23 @@ export class DatasetManagementService {
       .pipe(
         map((response: { results: any }) => {
           return IcdCodePage.fromJson(response);
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  getLoincCodes(
+    pageIndex: number,
+    pageSize: number,
+    filters: Array<{ key: string; value: string[] }>
+  ): Observable<any> {
+    const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
+
+    return this.httpClient
+      .get<any>(MappingsUrls.GET_LOINC_CODES, { params })
+      .pipe(
+        map((response: { results: any }) => {
+          return LoincCodePage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );

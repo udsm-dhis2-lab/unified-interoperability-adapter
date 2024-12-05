@@ -1,0 +1,17 @@
+nz-form-item {
+  display: flex;
+  flex-direction: column;
+}
+
+nz-form-label {
+  margin-bottom: 8px;
+}
+
+.alert-container {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 320px;
+  z-index: 1000; /* Ensure it is above other elements */
+}

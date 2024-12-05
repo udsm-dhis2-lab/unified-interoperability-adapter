@@ -1,7 +1,12 @@
 package com.Adapter.icare.Dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import javax.validation.constraints.NotNull;
+
 public class ContactDTO {
     private String system;
+    @NotNull
     private String value;
     private String use;
 

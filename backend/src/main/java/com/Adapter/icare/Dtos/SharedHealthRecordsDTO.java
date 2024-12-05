@@ -54,6 +54,18 @@ public class SharedHealthRecordsDTO {
 
     private CausesOfDeathDetailsDTO causesOfDeathDetails;
 
+    private AntenatalCareDetailsDTO antenatalCareDetails;
+
+    private LaborAndDeliveryDetailsDTO laborAndDeliveryDetails;
+
+    private PostnatalDetailsDTO postnatalDetails;
+
+    private List<ProphylAxisDetailsDTO> prophylAxisDetails;
+
+    private List<VaccinationDetailsDTO> vaccinationDetails;
+
+    private FamilyPlanningDetailsDTO familyPlanningDetails;
+
     private List<BillingsDetailsDTO> billingsDetails;
 
     private VisitMainPaymentDetailsDTO visitMainPaymentDetails;
@@ -66,7 +78,8 @@ public class SharedHealthRecordsDTO {
         Map<String,Object> sharedRecordMap = new LinkedHashMap<>();
         sharedRecordMap.put("facilityDetails", this.getFacilityDetails());
         sharedRecordMap.put("reportingDetails", this.getReportDetails());
-        sharedRecordMap.put("demographicDetails", this.getDemographicDetails());
+        sharedRecordMap.put("mrn", this.getMrn());
+        sharedRecordMap.put("demographicDetails", this.getDemographicDetails().toMap());
         sharedRecordMap.put("visitDetails", this.getVisitDetails());
         sharedRecordMap.put("clinicalInformation", this.getClinicalInformation());
         sharedRecordMap.put("allergies", this.getAllergies());
@@ -81,6 +94,12 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("admissionDetails", this.getAdmissionDetails());
         sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
         sharedRecordMap.put("causesOfDeathDetails", this.getCausesOfDeathDetails());
+        sharedRecordMap.put("antenatalCareDetails", this.getAntenatalCareDetails());
+        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails());
+        sharedRecordMap.put("vaccinationDetails", this.getVaccinationDetails());
+        sharedRecordMap.put("familyPlanningDetails", this.getFamilyPlanningDetails());
+        sharedRecordMap.put("laborAndDeliveryDetails", this.getLaborAndDeliveryDetails());
+        sharedRecordMap.put("postnatalDetails", this.getPostnatalDetails());
         sharedRecordMap.put("billingsDetails", this.getBillingsDetails());
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());

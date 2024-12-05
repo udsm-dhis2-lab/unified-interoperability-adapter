@@ -86,7 +86,7 @@ public class Dataset extends BaseEntity implements Serializable {
 
     public Map<String,Object> toMap() {
         Map<String,Object> dataSetMap = new HashMap<>();
-
+        dataSetMap.put("id", this.getId());
         dataSetMap.put("uuid", this.getUuid());
         dataSetMap.put("code", this.getCode());
         dataSetMap.put("name", this.getDisplayName());

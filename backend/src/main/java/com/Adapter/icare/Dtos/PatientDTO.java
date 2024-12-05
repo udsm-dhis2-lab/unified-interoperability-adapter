@@ -7,6 +7,7 @@ import org.hl7.fhir.r4.model.*;
 import javax.validation.constraints.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -22,6 +23,7 @@ public class PatientDTO {
     private Organization organization;
     private List<ContactPeopleDTO> contactPeople;
     private String maritalStatus;
+    private List<PaymentDetailsDTO> paymentDetails;
     private List<Map<String,Object>> relatedClients;
 
     public PatientDTO(String id,
@@ -77,7 +79,14 @@ public class PatientDTO {
             mappedPatient.setId(this.getId());
             List<IdentifierDTO> idsList = new ArrayList<>();
             if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
-                idsList= getIdentifiersDTO(this.getIdentifiers());
+                for(Identifier identifier: this.getIdentifiers()) {
+                    IdentifierDTO identifierDTO =  new IdentifierDTO();
+                    identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): this.getId());
+                    identifierDTO.setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode(): null);
+                    identifierDTO.setUse( identifier.hasUse() ? identifier.getUse().getDisplay(): null);
+                    identifierDTO.setSystem(identifier.hasSystem() ? identifier.getSystem(): null);
+                    idsList.add(identifierDTO);
+                }
             }
             mappedPatient.setIdentifiers(idsList);
             mappedPatient.setFirstName(firstName);
@@ -86,9 +95,25 @@ public class PatientDTO {
 
             mappedPatient.setGender(this.getGender());
             mappedPatient.setDateOfBirth(this.getBirthDate());
+            List<String> phones = new ArrayList<>();
+            for (ContactDTO contactDTO: getTelecom()) {
+                if (contactDTO.getSystem().equalsIgnoreCase("phone")) {
+                    phones.add(contactDTO.getValue());
+                }
+            }
+            List<String> emails = new ArrayList<>();
+            for (ContactDTO contactDTO: getTelecom()) {
+                if (contactDTO.getSystem().equalsIgnoreCase("email")) {
+                    emails.add(contactDTO.getValue());
+                }
+            }
+            mappedPatient.setPhoneNumbers(phones);
+            mappedPatient.setEmails(emails);
 //            mappedPatient.setS(this.getStatus());
             mappedPatient.setMaritalStatus(this.getMaritalStatus());
+            mappedPatient.setAddresses(address);
             mappedPatient.setContactPeople(this.getContactPeople());
+            mappedPatient.setPaymentDetails(this.getPaymentDetails());
             List<Map<String,Object>> relatedClientsList = new ArrayList<>();
             if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
                 for (Map<String,Object> clientDetails: this.relatedClients) {
@@ -117,6 +142,15 @@ public class PatientDTO {
         return mappedPatient;
     }
 
+    public String getMRN(String orgCode) {
+        List<String> identifiers = orgCode != null ? this.getIdentifiers().stream()
+                .filter(identifier -> identifier.hasAssigner() && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType() && identifier.getType().hasCoding() &&
+                        identifier.getType().getCoding().get(0).getCode().equals("MRN"))
+                .map(Identifier::getValue)
+                .collect(Collectors.toList()): null;
+        return identifiers != null && !identifiers.isEmpty() ? identifiers.get(0): null;
+    }
+
     public @NotNull List<Map<String, Object>> getIdentifierMaps() {
         List<Map<String, Object>> identifiers = new ArrayList<>();
         if (!this.getIdentifiers().isEmpty()) {
@@ -128,7 +162,7 @@ public class PatientDTO {
                 String type = null;
                 if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
                     try {
-                       type = identifier.getType().getCoding().get(0).getCode();
+                        type = identifier.getType().getCoding().get(0).getCode();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -145,7 +179,7 @@ public class PatientDTO {
         if (identifiersList != null && !identifiersList.isEmpty()) {
             for (Identifier identifier: this.getIdentifiers()) {
                 IdentifierDTO identifierDTO = new IdentifierDTO();
-                identifierDTO.setId(identifier.getValue());
+                identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): identifier.getType().hasCoding() && identifier.getType().getCoding().get(0).getCode().equals("HCRCODE") ? this.getId(): null);
                 String type = null;
                 if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
                     try {

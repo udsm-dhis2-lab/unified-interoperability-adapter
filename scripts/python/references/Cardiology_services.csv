@@ -1,0 +1,168 @@
+CODE,SERVICE DESCRIPTION,Category,Department
+33010,Open Pericardiocentesis,Cardiology services,ADULT CARDIAC SURGERY
+33015,Closed Pericardiocentesis,Cardiology services,ADULT CARDIAC SURGERY
+33025,Pericardiectomy,Cardiology services,ADULT CARDIAC SURGERY
+33031,Pericardiectomy with CPB,Cardiology services,ADULT CARDIAC SURGERY
+33050,Pericardium Tumor Excision,Cardiology services,ADULT CARDIAC SURGERY
+33120,Pericardium Tumor Excision on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33141,Laser Cardiac Therapy,Cardiology services,ADULT CARDIAC SURGERY
+33202,Open Biventricular Pacing,Cardiology services,ADULT CARDIAC SURGERY
+33203,Biventricular Pacing Insertion,Cardiology services,ADULT CARDIAC SURGERY
+33204,Biventricular Device,Cardiology services,ADULT CARDIAC SURGERY
+33210,Temporary Pacermaker Insertion,Cardiology services,ADULT CARDIAC SURGERY
+33212,Insertion of High Power Device,Cardiology services,ADULT CARDIAC SURGERY
+33215,Reposition of Pacemaker,Cardiology services,ADULT CARDIAC SURGERY
+33216,Permanent Pacemaker Insertion,Cardiology services,ADULT CARDIAC SURGERY
+33218,D/Chamber Pacemaker,Cardiology services,ADULT CARDIAC SURGERY
+33222,Relocation of Pacemaker Skin Pocket,Cardiology services,ADULT CARDIAC SURGERY
+33227,Removal and Replacement of Single Lead Pacemaker,Cardiology services,ADULT CARDIAC SURGERY
+33228,Removal and Replacement of Dual Lead Pacemaker,Cardiology services,ADULT CARDIAC SURGERY
+33236,Removal of Permanent Pacemaker.,Cardiology services,ADULT CARDIAC SURGERY
+33243,Removal of Defibrilator Electrode,Cardiology services,ADULT CARDIAC SURGERY
+33251,Maze Procedure,Cardiology services,ADULT CARDIAC SURGERY
+33254,Atrial Reduction,Cardiology services,ADULT CARDIAC SURGERY
+33300,Cardiac Repair,Cardiology services,ADULT CARDIAC SURGERY
+33305,Cardiac Repair on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33310,Cardiac Clot Removal,Cardiology services,ADULT CARDIAC SURGERY
+33315,Cardiac Clot Removal on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33320,Main Vascular Repair,Cardiology services,ADULT CARDIAC SURGERY
+33322,Main Vascular Repair on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33330,Bental's With Aortic Valve Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33335,Valve Sparing Bental's,Cardiology services,ADULT CARDIAC SURGERY
+33361,Transcatheter Aortic Valve Replacement (TAVR),Cardiology services,ADULT CARDIAC SURGERY
+33420,Transcatheter Mitral Valvuloplast,Cardiology services,ADULT CARDIAC SURGERY
+33362,Aortic Valve Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33390,Aortic Valve Repair on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33391,Avr With Aortic Root Enlargement,Cardiology services,ADULT CARDIAC SURGERY
+33405,Bio-Synthetic Aortic Valve Replacement on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33412,Mitral Annuloplasty And Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33413,Aortic/Pulmonary Outlet Obstruction Release,Cardiology services,ADULT CARDIAC SURGERY
+33414,Left Ventricular Outlet Tractobstruction Release,Cardiology services,ADULT CARDIAC SURGERY
+33416,Left Ventriculotomy,Cardiology services,ADULT CARDIAC SURGERY
+33417,Aortic Valve Repair,Cardiology services,ADULT CARDIAC SURGERY
+33422,Open Mitral Valvotomy,Cardiology services,ADULT CARDIAC SURGERY
+33425,Mitral Valve Repair with CPB,Cardiology services,ADULT CARDIAC SURGERY
+33426,Bio-Synthetic Mitral Valve Replacement on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33430,Mitral Valve Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33460,Tricuspid Valve Annuloplasty on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33463,Tricuspid Valve Annuloplasty,Cardiology services,ADULT CARDIAC SURGERY
+33464,Tricuspid Valve Ring Annuloplasty on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33465,Tricuspid Valve Replacement on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33468,Tricuspid Valve Repositioning,Cardiology services,ADULT CARDIAC SURGERY
+33470,Closed Pulmonary Valvotomy,Cardiology services,ADULT CARDIAC SURGERY
+33474,Open Tricuspid Valvotomy,Cardiology services,ADULT CARDIAC SURGERY
+33475,Pulmonary Valve Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33476,Double Valve Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33477,Pulmonary Valve Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33478,Right Ventricular Outlet Tract Obstruction Release,Cardiology services,ADULT CARDIAC SURGERY
+33496,Re- Do Mechanical Valve Replacement,Cardiology services,ADULT CARDIAC SURGERY
+33500,Coronary Artery Reimplantation on CPB,Cardiology services,ADULT CARDIAC SURGERY
+33501,Coronary Artery Reimplantation,Cardiology services,ADULT CARDIAC SURGERY
+33502,Repair of Coronaryartery Anomaly,Cardiology services,ADULT CARDIAC SURGERY
+33503,Coronary Artery Bypass Graft (Anomaly),Cardiology services,ADULT CARDIAC SURGERY
+33504,Transection of Pulmonary Artery,Cardiology services,ADULT CARDIAC SURGERY
+33505,Repair of Sinus of Valsalva Fistula,Cardiology services,ADULT CARDIAC SURGERY
+33507,Coronary Artery Osteoplasty,Cardiology services,ADULT CARDIAC SURGERY
+33510,Single Vessel Coronary Artery Bypass Surgery,Cardiology services,ADULT CARDIAC SURGERY
+33511,Two Vessel Coronary Artery Bypass Surgery,Cardiology services,ADULT CARDIAC SURGERY
+33512,Tripple Vessel Coronary Artery Bypass Surgery,Cardiology services,ADULT CARDIAC SURGERY
+33514,Tripple Vessel Coronary Artery Bypass Surgery without CPB,Cardiology services,ADULT CARDIAC SURGERY
+33530,Reopening Cardiac Surgery- 1month,Cardiology services,ADULT CARDIAC SURGERY
+33600,Tricuspid Valve Cleft Repair,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33602,Valve Leaflets Reconstruction,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33606,Damas - Kaye Stansel Procedure,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33620,Rt And Lt Pulmonary Artery Banding,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33621,Asd Closure With Device,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33622,Complex Intracardiac Repair,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33641,"ASD Closure, Open",Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33645,ASD Closure + Roofing of SVC,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33647,VSD And ASD Closure,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33675,Multiple VSD Closure,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33676,VSD or ASD Closure- Device,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33681,"VSD Closure, Open",Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33690,Banding Pulmonary Artery,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33692,Complete Tof Repair,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33724,Tapvc Repair,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33755,Waterston Procedure,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33762,Blalock - Taussig Shunt (Bt Shunt),Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33764,Modified Blalock - Taussig Shunt (Modified BT Shunt),Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33766,Glenn Procedure,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33768,Removal of Congenital Extra Vena Cava,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33782,Arterial Switch (D-TGA),Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33783,VSD Closure and Arterial Switch,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33788,Pumonary Artery Conduit(Truncus),Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33820,"Pda Closure, Open",Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33822,Pda Device Closure,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33930,Cardio-Pulmonary Harvest,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33935,Cardio-Pulmonary Transplant,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33940,Preoperative Cardiac Preservation,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33945,Cardiac Transplant,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33952,Insertion of Extracorporeal Membrane Oxygenation (ECMO),Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33953,Extracorporeal Membrane Oxygenation (ECMO),Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33967,Insertion of Intra-Aortic Balloon Assist Device,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+33968,Removal of Intra-Aortic Balloon Assist Device,Cardiology services,PAEDIATRIC CARDIAC SURGERY (CONGENITAL)
+34101,Embolectomy Great Artery on CPD,Cardiology services,VASCULAR SURGERY
+34111,Embolectomy Great Artery,Cardiology services,VASCULAR SURGERY
+34151,Embolectomy Arterial Peripheral,Cardiology services,VASCULAR SURGERY
+34401,Embolectomy In Peripheral Veins,Cardiology services,VASCULAR SURGERY
+34421,Embolectomy In Vena Cava,Cardiology services,VASCULAR SURGERY
+34471,Embolectomy In Neck Vein,Cardiology services,VASCULAR SURGERY
+34490,Embolectomy Underarm And Upper Chest Vein,Cardiology services,VASCULAR SURGERY
+34502,Reconstruction of Vena Cava,Cardiology services,VASCULAR SURGERY
+34520,Venous Stripping,Cardiology services,VASCULAR SURGERY
+34800,Abdominal Aortic Aneurysm Repair with Prosthesis on CPD,Cardiology services,VASCULAR SURGERY
+34802,Abdominal Aortic Aneurysm Repair without Prosthesis,Cardiology services,VASCULAR SURGERY
+34813,Vasclar Surgery with Prosthesis - Thigh,Cardiology services,VASCULAR SURGERY
+34820,Vasclar Surgery without Prosthesis - Thigh,Cardiology services,VASCULAR SURGERY
+34821,Thoracic Aortic Aneurysm Stenting,Cardiology services,VASCULAR SURGERY
+34825,Abdominal or Femoral Vascular Aneurysm Stenting,Cardiology services,VASCULAR SURGERY
+34826,Abdominal Aortic Aneurysm Repair with Prosthesis,Cardiology services,VASCULAR SURGERY
+34839,Aortic Baloon Therapy,Cardiology services,VASCULAR SURGERY
+34900,Femoral Graft Placement,Cardiology services,VASCULAR SURGERY
+35572,Harvest of Saphenous Vein,Cardiology services,VASCULAR SURGERY
+35583,Peripheral Vascular Bypass Graft,Cardiology services,VASCULAR SURGERY
+35901,Infected Graft Revision- Peripheral,Cardiology services,VASCULAR SURGERY
+35907,Infected Graft Revision- Open Procedure,Cardiology services,VASCULAR SURGERY
+36000,Venous Cannulation,Cardiology services,VASCULAR SURGERY
+36002,Embolization,Cardiology services,VASCULAR SURGERY
+36479,Laser Vascular Therapy,Cardiology services,VASCULAR SURGERY
+36555,Central Venous Line,Cardiology services,VASCULAR SURGERY
+36590,Removal of Peripheral Venous Catheter,Cardiology services,VASCULAR SURGERY
+36569,Permanent Vascular Catheterazation,Cardiology services,VASCULAR SURGERY
+36640,Arterial Line Insertion,Cardiology services,VASCULAR SURGERY
+36818,Arteriovenous Fistular,Cardiology services,VASCULAR SURGERY
+37200,Transcatheter Biopsy of Blood Vessel,Cardiology services,VASCULAR SURGERY
+37237,Peripheral Vascular Stent Insertion,Cardiology services,VASCULAR SURGERY
+37605,Major Vascular Ligation,Cardiology services,VASCULAR SURGERY
+37607,Peripheral Arterio Venous Ligation,Cardiology services,VASCULAR SURGERY
+37609,Vascular Biopsy and Ligation,Cardiology services,VASCULAR SURGERY
+37722,Vascular Stripping,Cardiology services,VASCULAR SURGERY
+37735,High Ligation and Stripping,Cardiology services,VASCULAR SURGERY
+37765,Multiple Venoligation,Cardiology services,VASCULAR SURGERY
+37780,Venoligation- Trauma,Cardiology services,VASCULAR SURGERY
+37785,Venoligation- Varicose,Cardiology services,VASCULAR SURGERY
+92920,Percutaneous Coronary Balloon Angioplasty,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92929,Percutaneous Coronary Stenting,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92941,Emergency Percutaneous Coronary Embolectomy and Stenting/Balloon,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92975,Intracoronary Thrombolytic Infusion with X-Ray,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92977,Intracoronary Thrombolytic Infusion,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92986,Percutaneous Aorta Valve Repair,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92987,Percutaneous Mitral Valve Repair,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92990,Percutaneous Pulmonary Valve Repair,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+92998,Percutenous Pulmonary Artery Balloon,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93005,Electrocardiogram (ECG),Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93015,Stress Test/ Trademill Test,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93017,Drug Induced Stress ECG,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93224,Holter Monitor 48hr,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93228,Holter Monitor 24hr,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93272,Cardiac Monitor-24hr,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93297,Pacemaker Interrogation,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93299,CRDT Interrogation,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93306,Advanced/Detailed Echo,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93307,Echo Cardiogram,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93308,Echo Follow up,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93312,Trans Esophageal Echo,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93350,Stress Echo,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93530,Diagnostic Coronary Catheterization,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+93784,Ambulatory Blood Pressure,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST
+95885,EMG Standard,Cardiology services,HIGHLY SPECIALISED CARDIAC PROCEDURE/TEST

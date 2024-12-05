@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -50,11 +51,13 @@ public class MediatorsService {
         }
     }
 
+    @Transactional
     public Mediator saveMediatorConfigs(Mediator mediator) throws Exception {
         if (mediator.getUuid() == null) {
             UUID uuid = UUID.randomUUID();
             mediator.setUuid(uuid.toString());
         }
+        mediator.getApis().forEach(api -> api.setMediator(mediator));
         return mediatorsRepository.save(mediator);
     }
 
@@ -80,6 +83,7 @@ public class MediatorsService {
             String uuid = mediator.getUuid();
             Mediator mediatorToUpdate = mediatorsRepository.getMediatorByUuid(uuid);
             if (mediatorToUpdate != null) {
+                mediator.getApis().forEach(api -> api.setMediator(mediator));
                 return mediatorsRepository.save(mediator);
             } else {
                 throw new IllegalStateException("Mediator with uuid " + uuid + " does not exists");
@@ -129,12 +133,11 @@ public class MediatorsService {
     public Map<String,Object> routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
-                System.out.println(apiPath);
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
-                return sendDataToExternalSystem(mediator,payload, method, null);
+                return sendDataToExternalSystem(mediator,payload, method, apiPath);
             } else if (method.equals("PUT")) {
-                return sendDataToExternalSystem(mediator,payload, method, null);
+                return sendDataToExternalSystem(mediator,payload, method, apiPath);
             } else if (method.equals("DELETE")){
                 return deleteResourceFromExternalSystem(mediator,apiPath);
             } else {
@@ -393,11 +396,12 @@ public class MediatorsService {
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
-        String path = mediator.getPath();
+        String path = mediator.getPath() != null ? mediator.getPath() : "";
         URL url = null;
 
         try {
-            url = new URL(baseUrl + path + apiPath);
+            String pathUrl = baseUrl + path + (apiPath != null ? apiPath: "");
+            url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
@@ -447,10 +451,11 @@ public class MediatorsService {
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
-        String path = mediator.getPath();
+        String path = mediator.getPath() != null ? mediator.getPath(): "";
         URL url = null;
         try {
-            url = new URL(baseUrl + path + api);
+            String pathUrl = baseUrl + path + (api != null ? api: "");
+            url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }

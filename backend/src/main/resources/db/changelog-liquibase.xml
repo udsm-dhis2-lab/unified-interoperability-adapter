@@ -42,6 +42,12 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="2_mediator_unique_constraint" author="josephat-mwakyusa">
+        <addUniqueConstraint
+                tableName="mediator"
+                columnNames="base_url, code"
+                constraintName="uq_mediator_base_url_code"/>
+    </changeSet>
     <changeSet id="1_change_dataset_fields_column_datatype_on_datasets" author="josephat-mwakyusa">
         <modifyDataType tableName="datasets" columnName="dataset_fields" newDataType="json"/>
     </changeSet>

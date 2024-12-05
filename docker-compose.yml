@@ -1,8 +1,8 @@
-version: '3.7'
+version: "3.7"
 services:
   fhir:
     container_name: fhir
-    image: 'hapiproject/hapi:latest'
+    image: "hapiproject/hapi:latest"
     ports:
       - 8080:8080
     healthcheck:
@@ -26,21 +26,21 @@ services:
       - fhir-db-volume:/var/lib/postgresql/data
   iadapter-db:
     container_name: iadapter-db
-    restart: 'always'
+    restart: "always"
     image: mysql:8
-    command: 'mysqld --character-set-server=utf8 --collation-server=utf8_general_ci'
+    command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci"
     environment:
       MYSQL_DATABASE: ${MYSQL_DB:-hduapicoredb}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Admin123}
       MYSQL_USER: ${MYSQL_USER:-hduapicore}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
     healthcheck:
-      test: 'exit 0'
+      test: "exit 0"
     volumes:
       - iadapter-data:/var/lib/mysql
       - ./backup:/backup
   iadapter:
-    restart: 'always'
+    restart: "always"
     image: udsmdhis2/unified:2.0.0
     container_name: iadapter
     environment:
@@ -58,15 +58,51 @@ services:
     depends_on:
       - iadapter-db
       - fhir
+  dhis2-db:
+    image: mdillon/postgis:10-alpine
+    command: postgres -c max_locks_per_transaction=1000 -c max_connections=3000
+    environment:
+      - POSTGRES_USER=dhis
+      - POSTGRES_DB=dhis
+      - POSTGRES_PASSWORD=dhis2demo
+    restart: always
+    volumes:
+      - dhis-db-volume:/var/lib/postgresql/data
+      - ./backup/bmf_backup.sql:/docker-entrypoint-initdb.d/bmf_backup.sql
+  dhis2-api:
+    image: dhis2/core:2.40.2.2
+    restart: always
+    environment:
+      - DHIS_HOME=/opt/dhis2
+      - DB_HOST=db
+      - DB_NAME=dhis
+      - DB_USER=dhis
+      - DB_PASSWORD=dhis2demo
+      - WAIT_FOR_DB_CONTAINER=db:5432 -t 0
+      - TZ=Africa/Dar_es_Salaam
+    volumes:
+      - ./config/dhis2_home/dhis.conf:/opt/dhis2/dhis.conf
+      - ./config/dhis2_home/files:/opt/dhis2/files
+      # - ./config/dhis2_home/logs:/opt/dhis2/logs
+    depends_on:
+      - dhis2-db
+    ports:
+      - 8090:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 30s
+      timeout: 30s
 configs:
   hapi:
     file: ./hapi.application.yaml
 networks:
   default:
-    external:
-      name: hdu-network
+    external: true
+    name: hdu-network
 volumes:
   iadapter-data:
     driver: local
   fhir-db-volume:
+    driver: local
+  dhis-db-volume:
     driver: local

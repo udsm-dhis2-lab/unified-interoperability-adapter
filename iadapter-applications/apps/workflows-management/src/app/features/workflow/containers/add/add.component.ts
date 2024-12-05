@@ -112,8 +112,7 @@ export class AddComponent implements OnInit, AfterViewInit {
               .pipe(select(getCurrentSelectedWorkflow), take(1))
               .subscribe((workflow: Workflow | null) => {
                 if (workflow && workflow.id) {
-                  // this.router.navigate(['main/flow', `${workflow.id}`]);
-                  this.router.navigate(['/', 'config', 'flow', `${workflow.id}`]);
+                  this.router.navigate(['/', 'workflows-management', 'config', 'flow', `${workflow.id}`]);
                 }
               });
           }

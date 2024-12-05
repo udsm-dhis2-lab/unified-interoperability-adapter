@@ -23,7 +23,7 @@ public class DataElementsController {
     public ResponseEntity<Map<String,Object>> getDataElementById(
             @PathVariable(value = "uuid") String uuid) throws Exception {
         try {
-            Map<String,Object> dataElement = dataElementsServices.getDataElementById(uuid);
+            Map<String,Object> dataElement = dataElementsServices.getDataElementByDHIS2Id(uuid);
             ObjectMapper mapper = new ObjectMapper();
             String jsonString = dataElement.get("dataElement").toString();
             Map<String, Object> jsonMap = mapper.readValue(jsonString, Map.class);

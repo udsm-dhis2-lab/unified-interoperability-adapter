@@ -5,7 +5,7 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Deduplication } from '../../models/deduplication.model';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 import { Subscription } from 'rxjs';
-import { SearchBarComponent } from 'search-bar';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 
 @Component({
   selector: 'app-deduplication-home',
@@ -26,6 +26,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
   isFirstLoad = true;
 
   loadHduClientsSubscription!: Subscription;
+  dataSetSeachQuery: string = '';
 
   constructor(
     private router: Router,
@@ -48,8 +49,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           this.loading = false;
-          //TODO: Set total from data after it's support in fhir is implemented
-          this.total = 200; //data.total;
+          this.total = data.total;
           this.pageIndex = data.pageIndex;
           this.listOfDeduplications = data.data;
         },
@@ -60,13 +60,31 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
       });
   }
 
+  onDatasetsSearchInputTyping(value: string) {
+    this.dataSetSeachQuery = value;
+    if (value.length >= 3 || value === '') {
+      this.loadHduClientsFromServer(1, 10, [
+        value !== ''
+          ? { key: 'firstName', value: [value] }
+          : { key: 'firstName', value: [] },
+      ]);
+    }
+  }
+
   onQueryParamsChange(params: NzTableQueryParams): void {
     if (this.isFirstLoad) {
       this.isFirstLoad = false;
       return;
     }
     const { pageSize, pageIndex, filter } = params;
-    this.loadHduClientsFromServer(pageIndex, pageSize, filter);
+
+    const queryFilter = [
+      ...filter,
+      this.dataSetSeachQuery !== ''
+        ? { key: 'firstName', value: [this.dataSetSeachQuery] }
+        : { key: 'firstName', value: [] },
+    ];
+    this.loadHduClientsFromServer(pageIndex, pageSize, queryFilter);
   }
 
   ngOnInit(): void {

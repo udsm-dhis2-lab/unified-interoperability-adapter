@@ -102,9 +102,17 @@ public class DatastoreService {
         return datastoreRepository.getDatastoreByNamespaceByPagination(namespace, pageable, key);
     }
 
-    public Page<Datastore> getDatastoreNamespaceDetailsByPagination(String namespace, String category, String department, String q, String code, String group, Integer page, Integer pageSize) throws Exception {
+    public Page<Datastore> getDatastoreNamespaceDetailsByPagination(String namespace,
+                                                                    String category,
+                                                                    String department,
+                                                                    String q,
+                                                                    String code,
+                                                                    String group,
+                                                                    Integer page,
+                                                                    Integer pageSize,
+                                                                    boolean paging) throws Exception {
         Pageable pageable = createPageable(page, pageSize);
-        return datastoreRepository.getDatastoreByNamespaceWithPagination(namespace, category, department, q, code, group, pageable);
+        return datastoreRepository.getDatastoreByNamespaceWithPagination(namespace, category, department, q, code, group, paging ? pageable: null);
     }
 
     public Page<Datastore> getDatastoreMatchingNamespaceFilterByPagination(String namespaceFilter, String key, String q, String code, Integer page, Integer pageSize) throws Exception {

@@ -6,11 +6,10 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { SearchBarComponent } from 'search-bar';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 import {
   BehaviorSubject,
   debounceTime,
-  first,
   Observable,
   Subscription,
   switchMap,
@@ -20,15 +19,18 @@ import {
   Dataset,
   DataSetInstance,
   DatasetPage,
-  Instance,
-  InstancePage,
   MappingsUrls,
 } from '../../models';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
+import {
+  Instance,
+  InstancePage,
+} from 'apps/mapping-and-data-extraction/src/app/shared/models';
+import { InstanceManagementService } from 'apps/mapping-and-data-extraction/src/app/shared';
 
 @Component({
   selector: 'app-home',
@@ -45,6 +47,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   };
 
   selectedInstanceFetchingMechanism: string = 'remoteDatasets';
+  showMapAsDataSetAction = false;
 
   @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
   @ViewChild(SearchBarComponent) searchBarComponent!: SearchBarComponent;
@@ -66,8 +69,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
 
   constructor(
     private dataSetManagementService: DatasetManagementService,
+    private instanceManagementService: InstanceManagementService,
     private router: Router,
-    private modal: NzModalService
+    private modal: NzModalService,
+    private route: ActivatedRoute
   ) {}
 
   onInstanceSearch(value: string): void {
@@ -113,6 +118,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
           this.pageIndex = data.pageIndex;
           this.pageSize = data.pageSize;
           this.listOfDatasets = data.listOfDatasets;
+          this.selectedInstanceFetchingMechanism === 'selectedDatasets'
+            ? (this.showMapAsDataSetAction = true)
+            : (this.showMapAsDataSetAction = false);
         },
         error: (error) => {
           this.loading = false;
@@ -143,6 +151,11 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   ngOnInit(): void {
+    this.route.queryParams.subscribe((params) => {
+      if (params['from'] === 'mapping') {
+        this.selectedInstanceFetchingMechanism = 'selectedDatasets';
+      }
+    });
     this.searchInstances();
   }
 
@@ -158,7 +171,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       .pipe(debounceTime(500))
       .pipe(
         switchMap((value: string) => {
-          return this.dataSetManagementService.getInstances(1, 10, true, []);
+          return this.instanceManagementService.getInstances(1, 10, true, []);
         })
       );
 
@@ -224,12 +237,12 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   dataSetAction(event: {
-    dataSetUuid?: string;
+    dataSetUud?: string;
     dataSetInstance?: DataSetInstance;
     dataSetId: string;
   }) {
     if (this.selectedInstanceFetchingMechanism === 'selectedDatasets') {
-      this.goToDataSetMapping(event.dataSetUuid!);
+      this.goToDataSetMapping({ uuid: event.dataSetUud!, id: event.dataSetId });
     } else if (event.dataSetInstance) {
       this.removeDatasetFromMapping(event?.dataSetInstance?.uuid!);
     } else {
@@ -304,8 +317,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     );
   }
 
-  goToDataSetMapping(uuid: string) {
-    this.router.navigate(['/dataset-mapping', uuid]);
+  goToDataSetMapping(dataSetIds: { uuid: string; id: string }) {
+    this.router.navigate(['mapping-and-data-extraction/dataset-mapping'], {
+      queryParams: dataSetIds,
+    });
   }
 
   onCloseAlert() {

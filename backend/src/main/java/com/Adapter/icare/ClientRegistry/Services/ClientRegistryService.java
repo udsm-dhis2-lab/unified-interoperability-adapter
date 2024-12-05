@@ -53,8 +53,30 @@ public class ClientRegistryService {
         }
     }
 
-    public Patient savePatient(Patient patient) throws Exception {
+    public Patient savePatientToFHIR(Patient patient) throws Exception {
         return (Patient) fhirClient.create().resource(patient).execute().getResource();
+    }
+
+    public Map<String,Object> identifyDuplicates() throws Exception {
+        try {
+            Map<String,Object> response = new HashMap<>();
+            List<Map<String,Object>> clientsList = new ArrayList<>();
+            // 1 Get all clients
+            // 2. Formulate payload as per algorithm
+            // 3. Identify potential duplicates
+            // 4. Link potential duplicates
+            // 5. Save the ids of the potential duplicates
+            Bundle bundle = fhirClient.search().forResource(Patient.class).returnBundle(Bundle.class).execute();
+            if(bundle.hasEntry()) {
+                for (Bundle.BundleEntryComponent entry: bundle.getEntry()) {
+
+                }
+            }
+            return response;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
     }
 
     public MethodOutcome markPatientAsInActive(Patient patient) {
@@ -68,6 +90,7 @@ public class ClientRegistryService {
             String status,
             String identifier,
             String identifierType,
+            String hfrCode,
             String gender,
             String firstName,
             String middleName,
@@ -83,6 +106,10 @@ public class ClientRegistryService {
             var searchClient =  fhirClient.search().forResource(Patient.class);
             if (identifier != null) {
                 searchClient.where(Patient.IDENTIFIER.exactly().identifier(identifier));
+            }
+
+            if (hfrCode != null) {
+                searchClient.where(Patient.IDENTIFIER.hasSystemWithAnyCode(hfrCode));
             }
 
             if (onlyLinkedClients != null) {
@@ -114,14 +141,35 @@ public class ClientRegistryService {
                     .summaryMode(SummaryEnum.COUNT)
                     .returnBundle(Bundle.class)
                     .execute();
+            if (!response.hasEntry()) {
+                searchClient =  fhirClient.search().forResource(Patient.class);
+                if (identifier != null) {
+                    searchClient.where(Patient.RES_ID.exactly().code(identifier));
+                }
+
+                if (firstName != null) {
+                    searchClient.where(Patient.GIVEN.matches().value(firstName));
+                }
+
+                response = searchClient.count(pageSize)
+                        .offset(page -1)
+                        .returnBundle(Bundle.class)
+                        .execute();
+            }
 
             for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
                     try {
                         Patient patientData = (Patient) entry.getResource();
-                        patientData.getIdentifier();
                         PatientDTO patientDTO = mapToPatientDTO(patientData);
+                        List<Coverage> coverages = getCoverages(patientData.getIdElement().getIdPart());
+                        List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
+                        if (coverages.size() > 0) {
+                            paymentDetailsDTOs = coverages.stream().map(this::mapToPaymentDetails).collect(Collectors.toList());
+                        }
+                        patientDTO.setPaymentDetails(paymentDetailsDTOs);
                         ClientRegistrationDTO clientDetails = new ClientRegistrationDTO();
+
                         clientDetails.setDemographicDetails(patientDTO.toMap());
                         Organization managingOrganization = new Organization();
                         FacilityDetailsDTO facilityDetails = new FacilityDetailsDTO();
@@ -152,16 +200,16 @@ public class ClientRegistryService {
     }
 
     public List<DemographicDetailsDTO> getPatients(int page,
-                                                 int pageSize,
-                                                 String status,
-                                                 String identifier,
-                                                 String identifierType,
-                                                 String gender,
-                                                 String firstName,
-                                                 String middleName,
-                                                 String lastName,
-                                                 Date dateOfBirth,
-                                                 Boolean onlyLinkedClients) {
+                                                   int pageSize,
+                                                   String status,
+                                                   String identifier,
+                                                   String identifierType,
+                                                   String gender,
+                                                   String firstName,
+                                                   String middleName,
+                                                   String lastName,
+                                                   Date dateOfBirth,
+                                                   Boolean onlyLinkedClients) {
         try {
             List<DemographicDetailsDTO> patients = new ArrayList<>();
             Bundle response = new Bundle();
@@ -272,20 +320,54 @@ public class ClientRegistryService {
             for (Bundle.BundleEntryComponent entry : resourceBundle.getEntry()) {
                 if (entry.getResource() instanceof Patient) {
                    Patient patient = (Patient) entry.getResource();
+                   String patientId = patient.getIdElement().getIdPart();
                    if (patient.getIdentifier().isEmpty()) {
                        try {
                            Map<String,Object> client = new HashMap<>();
                            client.put("id", patient.getIdElement().getIdPart());
-                           client.put("name", patient.getName());
                            deleteClients.add(client);
                            MethodOutcome methodOutcome = fhirClient.delete().resource(patient).execute();
                        } catch (Exception e) {
+                           Bundle encounterBundle = fhirClient.search().forResource(Encounter.class)
+                                   .where(Encounter.PATIENT.hasId(patientId))
+                                   .returnBundle(Bundle.class).execute();
+                           Bundle conditionBundle = fhirClient.search().forResource(Condition.class)
+                                   .where(Encounter.PATIENT.hasId(patientId))
+                                   .returnBundle(Bundle.class).execute();
+                           if (encounterBundle.hasEntry() && !encounterBundle.getEntry().isEmpty()) {
+                               for (Bundle.BundleEntryComponent encounterEntry: encounterBundle.getEntry()) {
+                                   Encounter encounter = (Encounter) encounterEntry.getResource();
+                                   try {
+                                       MethodOutcome methodOutcomeEncounterDelete = fhirClient.delete().resource(encounter).execute();
+                                       MethodOutcome methodOutcomeClientDelete = fhirClient.delete().resource(patient).execute();
+                                       Map<String,Object> client = new HashMap<>();
+                                       client.put("id", patient.getIdElement().getIdPart());
+                                       deleteClients.add(client);
+                                   } catch (Exception exception) {
+                                       exception.printStackTrace();
+                                   }
+                               }
+                           }
+
+//                           if (conditionBundle.hasEntry() && !conditionBundle.getEntry().isEmpty()) {
+//                               for (Bundle.BundleEntryComponent conditionEntry: encounterBundle.getEntry()) {
+//                                   Condition condition = (Condition) conditionEntry.getResource();
+//                                   try {
+//                                       MethodOutcome methodOutcomeEncounterDelete = fhirClient.delete().resource(condition).execute();
+//                                       MethodOutcome methodOutcomeClientDelete = fhirClient.delete().resource(patient).execute();
+//                                       Map<String,Object> client = new HashMap<>();
+//                                       client.put("id", patient.getIdElement().getIdPart());
+//                                       deleteClients.add(client);
+//                                   } catch (Exception condException) {
+//                                       condException.printStackTrace();
+//                                   }
+//                               }
+//                           }
                            Map<String,Object> client = new HashMap<>();
                            client.put("id", patient.getIdElement().getIdPart());
-                           client.put("name", patient.getName());
                            client.put("reason", e.getMessage());
                            clientsFailed.add(client);
-                           e.printStackTrace();  // This will log the internal server error details
+                           e.printStackTrace();
                        }
                        Thread.sleep(100);
                    }
@@ -314,6 +396,24 @@ public class ClientRegistryService {
         } catch (Exception e) {
             e.printStackTrace();
             return Boolean.FALSE;
+        }
+    }
+
+    public List<String> activateIdentifiers(List<String> identifiers) throws Exception {
+        try {
+            List<String> idsActivated = new ArrayList<>();
+            for(String identifier: identifiers) {
+                ClientRegistryIdPool clientRegistryIdPool = clientRegistryIdsRepository.getIdPoolDetails(identifier);
+                clientRegistryIdPool.setUsed(false);
+                ClientRegistryIdPool updatedIdentifier = clientRegistryIdsRepository.save(clientRegistryIdPool);
+                if (!updatedIdentifier.isUsed()) {
+                    idsActivated.add(updatedIdentifier.getIdentifier());
+                }
+            }
+            return idsActivated;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
     }
 
@@ -366,6 +466,8 @@ public class ClientRegistryService {
                                 address.hasState() ? address.getState() : null,
                                 address.hasPostalCode() ? address.getPostalCode() : null,
                                 address.hasCountry() ? address.getCountry() : null,
+                                address.hasText() ? address.getText(): null,
+                                address.hasUse() ? address.getUse().getDisplay(): null,
                                 address.hasLine() ? address.getLine().stream().map(PrimitiveType::getValue).collect(Collectors.toList()) : new ArrayList<>()
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
@@ -373,12 +475,11 @@ public class ClientRegistryService {
         List<ContactDTO> telecomDTOs = patient.hasTelecom() ?
                 patient.getTelecom().stream()
                         .map(contactPoint -> new ContactDTO(
-                                contactPoint.hasSystem() ? contactPoint.getSystem().toCode() : null,
+                                contactPoint.hasSystem() ? contactPoint.getSystem().getDisplay() : null,
                                 contactPoint.hasValue() ? contactPoint.getValue() : null,
                                 contactPoint.hasUse() ? contactPoint.getUse().toCode() : null
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
-
         String gender = patient.hasGender() ? patient.getGender().toCode() : null;
         Date birthDate = patient.hasBirthDate() ? patient.getBirthDate() : null;
         String patientId = patient.getIdElement() != null ? patient.getIdElement().getIdPart() : null;
@@ -389,6 +490,7 @@ public class ClientRegistryService {
                 patient.getContact().stream()
                         .map(contact -> new ContactPeopleDTO(
                                 contact.hasName() ? contact.getName().getFamily() : null,
+                                contact.hasName() && !contact.getName().getGiven().isEmpty() ? contact.getName().getGiven().get(0).toString(): null,
                                 contact.hasTelecom() ? contact.getTelecom().stream()
                                         .map(telecom -> telecom.hasValue() ? telecom.getValue() : "")
                                         .collect(Collectors.toList()) // Collect the stream into a list
@@ -397,7 +499,7 @@ public class ClientRegistryService {
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
 
-        String maritalStatus = patient.hasMaritalStatus() ? patient.getMaritalStatus().getText() : null;
+        String maritalStatus = patient.hasMaritalStatus() && patient.getMaritalStatus().hasCoding() ? patient.getMaritalStatus().getCoding().get(0).getDisplay() : null;
         List<Patient.PatientLinkComponent> patientLinkComponents = patient.getLink();
         List<Map<String,Object>> relatedClients = new ArrayList();
         for (Patient.PatientLinkComponent patientLinkComponent: patientLinkComponents) {
@@ -427,5 +529,48 @@ public class ClientRegistryService {
                 maritalStatus,
                 relatedClients
         );
+    }
+
+    public PaymentDetailsDTO mapToPaymentDetails(Coverage coverage) {
+        PaymentDetailsDTO paymentDetailsDTO = new PaymentDetailsDTO();
+        paymentDetailsDTO.setInsuranceId(coverage.getSubscriberId());
+        paymentDetailsDTO.setName(coverage.hasPayor()
+                ? coverage.getPayor().get(0).getDisplay()
+                : null);
+        paymentDetailsDTO.setInsuranceCode(coverage.hasPayor() && coverage.getPayor().get(0).hasIdentifier()
+                ? coverage.getPayor().get(0).getIdentifier().getValue()
+                : null);
+        paymentDetailsDTO.setType(coverage.hasPayor() && coverage.getPayor().get(0).hasIdentifier()
+                && coverage.getPayor().get(0).getIdentifier().hasType() && coverage.getPayor().get(0).getIdentifier().getType().hasCoding()
+                ? coverage.getPayor().get(0).getIdentifier().getType().getCoding().get(0).getCode()
+                : null);
+        return paymentDetailsDTO;
+    }
+
+    public List<Coverage> getCoverages(String patientId) throws Exception {
+        try {
+            List<Coverage> coverages = new ArrayList<>();
+            var coveragesSearch = fhirClient.search().forResource(Coverage.class).where(Coverage.BENEFICIARY.hasId(patientId));
+            Bundle coverageBundle = coveragesSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class).execute();
+            if (coverageBundle.hasEntry()) {
+                for (Bundle.BundleEntryComponent entry : coverageBundle.getEntry()) {
+                    if (entry.getResource() instanceof Coverage) {
+                        coverages.add( (Coverage) entry.getResource());
+                    }
+                }
+            }
+            Map<String, Coverage> uniqueCoverageMap = coverages.stream()
+                    .filter(coverage -> coverage.hasSubscriberId())
+                    .collect(Collectors.toMap(
+                            Coverage::getSubscriberId,
+                            coverage -> coverage,
+                            (existing, replacement) -> existing
+                    ));
+
+            return new ArrayList<>(uniqueCoverageMap.values());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return List.of();
     }
 }

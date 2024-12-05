@@ -8,8 +8,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,6 +35,9 @@ public class Mediator  extends BaseEntity implements Serializable {
     @Column(name="category", nullable = true)
     private String category;
 
+    @OneToMany(mappedBy = "mediator", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<MediatorApiPath> apis = new HashSet<>();
+
     public enum AuthType{
         BASIC("BASIC"),
         TOKEN("TOKEN");
@@ -53,6 +55,8 @@ public class Mediator  extends BaseEntity implements Serializable {
         DATA_TEMPLATE("DATA_TEMPLATE"),
         FHIR("FHIR"),
         WHOICDAPI("WHOICDAPI"),
+        HEALTH_FACILITY("HEALTH_FACILITY"),
+        LABORATORY("LABORATORY"),
         OPENMRS("OPENMRS");
 
         final String value;
@@ -72,6 +76,7 @@ public class Mediator  extends BaseEntity implements Serializable {
         mediator.setCategory(mediatorDTO.getCategory());
         mediator.setAuthToken(mediatorDTO.getAuthToken());
         mediator.setAuthType(mediatorDTO.getAuthType());
+        mediator.setApis(mediatorDTO.getApis());
         return mediator;
     }
 
@@ -83,6 +88,7 @@ public class Mediator  extends BaseEntity implements Serializable {
         mappedMediator.put("path", this.getPath());
         mappedMediator.put("authType",this.authType);
         mappedMediator.put("category",this.getCategory());
+        mappedMediator.put("authToken",this.getAuthToken());
         mappedMediator.put("createdOn", this.getCreatedOn());
         Map<String, Object> createdBy = new HashMap<>();
         if (this.getCreatedBy() != null) {
@@ -102,6 +108,11 @@ public class Mediator  extends BaseEntity implements Serializable {
         } else {
             lastUpdatedBy = null;
         }
+        List<Map<String,Object>> apis = new ArrayList<>();
+        for (MediatorApiPath mediatorApiPath: this.getApis()) {
+            apis.add(mediatorApiPath.toMap());
+        }
+        mappedMediator.put("apis",apis);
         mappedMediator.put("lastUpdatedOn", this.getLastUpdatedOn());
         mappedMediator.put("lastUpdatedBy",lastUpdatedBy);
         return mappedMediator;

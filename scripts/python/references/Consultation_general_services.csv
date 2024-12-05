@@ -1,0 +1,78 @@
+CODE,SERVICE DESCRIPTION,Category,DEPARTMENT
+99241,New consultation with a Clinical Officer / Dental Therapist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99211,Follow up consultation with a Clinical Officer / Dental Therapist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99242,New consultation with an Assistant Medical Officer / Assistant Dental Officer,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99212,Follow up consultation with an Assistant Medical Officer / Assistant Dental Officer,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99243,New consultation with a Medical Officer / Dental Officer,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99213,Follow up consultation with a Medical Officer / Dental Officer,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99244,New consultation with a Medical Specialist / Dental Specialist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99214,Follow up consultation with a Medical Specialist / Dental Specialist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99245,New consultation with a Super Specialist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99215,Follow up consultation with a Super Specialist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99382,"New consultation therapist with diploma(physiotherapy, occupational therapy,speech therapy)",Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+97169,"Follow up Consultation therapist with diploma(physiotherapy, occupational therapy,speech therapy)",Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99383,"New consultation therapist with degree(physiotherapy, occupational therapy, speech therapy)",Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99386,"Follow up Consultation therapist/psychology with degree(physiotherapy, occupational therapy, speech therapy)",Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99387,"New consultation therapist/psychology specialist (physiotherapy, occupational therapy, speech therapy)",Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99429,"Follow up consultation therapist specialist (physiotherapy, occupational therapy,speech therapy)",Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+97802,New consultation Nutritionist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+97803,Follow up consultation Nutritionist,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99205,Registration (new file) for a new patient,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99251,Consultation for observation,Consultation & general services,OUTPATIENT/INPATIENT CONSULTATIONS
+99252,Cross consultation within and between hospital(s),Consultation & general services,CROSS AND PANEL CONSULTATIONS
+99253,Panel consultation within the same discipline (panel with at least three doctors),Consultation & general services,CROSS AND PANEL CONSULTATIONS
+99254,Panel multidisciplinary consultation (panel with at least three doctors),Consultation & general services,CROSS AND PANEL CONSULTATIONS
+99255,Consultation with a multidisciplinary panel plus administrators,Consultation & general services,CROSS AND PANEL CONSULTATIONS
+99217,High Dependent Unit (HDU),Consultation & general services,ACCOMODATIONS
+99218,VIP room,Consultation & general services,ACCOMODATIONS
+99219,IPPM or Private Room (grade one),Consultation & general services,ACCOMODATIONS
+99220,General ward,Consultation & general services,ACCOMODATIONS
+99234,ICU-CCU ward,Consultation & general services,ACCOMODATIONS
+99235,Rehabilitation ward,Consultation & general services,ACCOMODATIONS
+99236,Isolated or high risk ward,Consultation & general services,ACCOMODATIONS
+99341,New patient home visit with a Clinical Officer/ Clinical Physiotherapist / Occupational Therapist,Consultation & general services,HOME VISITS
+99347,Follow up patient home visit with a Clinical Officer/ Clinical Physiotherapist/ Occupational Therapist,Consultation & general services,HOME VISITS
+99342,New patient home visit with an Assistant Medical Officer (AMO),Consultation & general services,HOME VISITS
+99348,Follow up patient home visit with an Assistant Medical Officer (AMO),Consultation & general services,HOME VISITS
+99343,New patient home visit with a General Practitioner (GP/MD)/ Physiotherapy Officer/ Occupational Therapy officer,Consultation & general services,HOME VISITS
+99349,Follow up patient home visit with a General Practitioner (GP/MD)/ Physiotherapy Officer/ Occupational Therapy officer,Consultation & general services,HOME VISITS
+99344,New patient home visit with a Specialist/ Specialist Physiotherapist,Consultation & general services,HOME VISITS
+99350,Follow up patient home visit with a Specialist/ Specialist Physiotherapist,Consultation & general services,HOME VISITS
+99345,New patient home visit with a Super Specialist,Consultation & general services,HOME VISITS
+99334,Follow up patient home visit with a Super Specialist,Consultation & general services,HOME VISITS
+99339,"New patient home visit with other cardres (nurses, pharmacist, social worker, etc.)",Consultation & general services,HOME VISITS
+99340,"Follow up patient home visit with other cardres (nurses, pharmacist, social worker, etc.)",Consultation & general services,HOME VISITS
+99304,Nursing services at the Outpatient Department (OPD),Consultation & general services,NURSING CARE SERVICES
+99305,Nursing care at the general ward,Consultation & general services,NURSING CARE SERVICES
+99306,Nursing services at the Emergency Department (EMD),Consultation & general services,NURSING CARE SERVICES
+99307,Nursing care at the ICU and CCU,Consultation & general services,NURSING CARE SERVICES
+99308,Nursing care at the High Dependent Unit (HDU),Consultation & general services,NURSING CARE SERVICES
+99309,Nursing care at the VIP,Consultation & general services,NURSING CARE SERVICES
+99310,Nursing care at the IPPM or private room (grade one),Consultation & general services,NURSING CARE SERVICES
+99315,Nursing care at the rehabilitation ward,Consultation & general services,NURSING CARE SERVICES
+99316,Nursing care at the isolated or high risk ward,Consultation & general services,NURSING CARE SERVICES
+99082,Parking services,Consultation & general services,GENERAL SERVICES
+99497,Medical Nutritional Therapy (Oral / Parenteral / Enteral),Consultation & general services,GENERAL SERVICES
+99281,Ambulance services,Consultation & general services,GENERAL SERVICES
+97804,Food Services,Consultation & general services,GENERAL SERVICES
+98966,"Telephone assessment and management service, 5-10 minutes of medical discussion",Consultation & general services,TELEPHONE ASSESSMENT & MANAGEMENT SERVICES
+98967,"Telephone assessment and management service,11-20 minutes of medical discussion",Consultation & general services,TELEPHONE ASSESSMENT & MANAGEMENT SERVICES
+98968,"Telephone assessment and management service,21-30 minutes of medical discussion",Consultation & general services,TELEPHONE ASSESSMENT & MANAGEMENT SERVICES
+99381,Provider Initiating Testing and Counseling (PITC) children below 09 years,Consultation & general services,COUNSELLING SERVICES
+99384,Provider Initiating Testing and Counseling (PITC) adolescent,Consultation & general services,COUNSELLING SERVICES
+99385,Provider Initiating Testing and Counseling (PITC) adult,Consultation & general services,COUNSELLING SERVICES
+99406,Counseling,Consultation & general services,COUNSELLING SERVICES
+90476,Inactivated Poliovirus Vaccine (IPV),Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90585,Baccile Calmette Guerin (BCG ) Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90621,Meningococcus Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90649,Human Papilloma Virus (HPV) Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90670,Pneumococcal Vaccine (PCV-13),Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90675,Rabies Virus Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90680,Rotavirus Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90696,"Diphtheria, Tetanus Toxoids, Acellular Pertussis, Haemophilus Influenzae Type B, Hepatitis B (DPT+Hepb+Hib) Vaccine",Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90707,"Measles, Mumps, and Rubella (MMR) Vaccine",Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90713,Poliovirus Vaccine-Oral (OPV),Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90714,Tetanus And Diphtheria Toxoids (TT) Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90717,Yellow Fever Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90739,Hepatitis B Virus (HBV) Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES
+90471,Unspecified Vaccination Procedures E.g. New Vaccine,Consultation & general services,VACCINATION/IMMUNIZATION SERVICES

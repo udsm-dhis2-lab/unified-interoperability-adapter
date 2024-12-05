@@ -37,7 +37,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class DHISConstants {
 
-    @Value("${DHIS_URL:https://play.dhis2.org/2.36.11.1}")
+    @Value("${DHIS_URL:https://play.im.dhis2.org/stable-2-40-6}")
     public String DHIS2Instance;
 
     @Value("${DHIS_USERNAME:admin}")
@@ -48,4 +48,7 @@ public class DHISConstants {
 
     @Value("${DHIS_OU:ImspTQPwCqd}")
     public String OrgUnit;//="Yc6Dt4UL6yl"(Chuo Kikuu Health Center); // = "a6eqFyAF1Rz"; // AAR TABATA Other Clinic
+
+    @Value("${DHIS_CONTEXT_PATH:}")
+    public String DHIS2ContextPath;
 }
