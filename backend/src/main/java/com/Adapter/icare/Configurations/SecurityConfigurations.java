@@ -83,6 +83,11 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .httpBasic();
+        http
+                .sessionManagement()
+                .sessionFixation().newSession()
+                .maximumSessions(1)
+                .expiredUrl("/login");
     }
 }
 //    @Bean
