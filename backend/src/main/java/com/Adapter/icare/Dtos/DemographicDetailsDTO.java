@@ -19,7 +19,7 @@ public class DemographicDetailsDTO {
     private String lastName;
     @NotNull(message = "Date of birth can not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date dateOfBirth;
+    private String dateOfBirth;
     @NotNull(message = "Gender can not be null")
     private String gender;
     private List<String> phoneNumbers;
