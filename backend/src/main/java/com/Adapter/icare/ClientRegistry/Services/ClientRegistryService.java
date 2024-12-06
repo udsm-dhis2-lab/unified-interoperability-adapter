@@ -462,13 +462,12 @@ public class ClientRegistryService {
         List<AddressDTO> addressDTOs = patient.hasAddress() ?
                 patient.getAddress().stream()
                         .map(address -> new AddressDTO(
-                                address.hasCity() ? address.getCity() : null,
+                                address.hasText() && address.getText().contains("-") ? address.getText().split("-")[0] : null,
+                                address.hasText() && address.getText().contains("-") ? address.getText().split("-")[1] : null,
+                                address.hasDistrict() ? address.getDistrict() : null,
                                 address.hasState() ? address.getState() : null,
-                                address.hasPostalCode() ? address.getPostalCode() : null,
                                 address.hasCountry() ? address.getCountry() : null,
-                                address.hasText() ? address.getText(): null,
-                                address.hasUse() ? address.getUse().getDisplay(): null,
-                                address.hasLine() ? address.getLine().stream().map(PrimitiveType::getValue).collect(Collectors.toList()) : new ArrayList<>()
+                                address.hasUse() && address.getUse().getDisplay().contains("home") ? "Permanent" : "Temporary"
                         ))
                         .collect(Collectors.toList()) : new ArrayList<>();
 
