@@ -201,6 +201,7 @@ public class SharedHealthRecordsService {
                                 visitDetails.setId(encounter.getIdElement().getIdPart());
                                 visitDetails.setVisitDate(encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ? encounter.getPeriod().getStart() : null);
                                 visitDetails.setClosedDate(encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd() : null);
+                                visitDetails.setVisitType(encounter.hasType() && !encounter.getType().isEmpty() ? encounter.getType().get(0).getText() : null);
                                 // TODO: Find a way to retrieve these from resource
                                 visitDetails.setNewThisYear(Boolean.FALSE);
                                 visitDetails.setNew(Boolean.FALSE);
@@ -537,7 +538,7 @@ public class SharedHealthRecordsService {
 
                                 // Lab investigation details using DiagnosticReport
                                 List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
-                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(encounter.getIdElement().getIdPart(), "LAB");
+                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(encounter.getIdElement().getIdPart(), "laboratory");
                                 if (!diagnosticReports.isEmpty()) {
                                     for (DiagnosticReport diagnosticReport : diagnosticReports) {
                                         LabInvestigationDetailsDTO labInvestigationDetailsDTO = new LabInvestigationDetailsDTO();
@@ -546,13 +547,15 @@ public class SharedHealthRecordsService {
                                                 !diagnosticReport.getCode().getCoding().isEmpty()
                                                 ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
 
+                                        labInvestigationDetailsDTO.setTestResultDate(diagnosticReport.hasEffectiveDateTimeType() && diagnosticReport.getEffectiveDateTimeType().hasValue() ? diagnosticReport.getEffectiveDateTimeType().getValue() : null);
+
                                         List<Identifier> identifiers = diagnosticReport.getIdentifier();
                                         for (Identifier reportIdentifier : identifiers) {
                                             if (reportIdentifier.hasValue() && reportIdentifier.hasType() && reportIdentifier.getType().hasCoding() && !reportIdentifier.getType().getCoding().isEmpty()) {
                                                 if (reportIdentifier.getType().getCoding().get(0).getCode().equals("TEST-ORDER")) {
                                                     labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
                                                 } else if (reportIdentifier.getType().getCoding().get(0).getCode().equals("SAMPLE-ID")) {
-                                                    labInvestigationDetailsDTO.setTestOrderId(reportIdentifier.getValue());
+                                                    labInvestigationDetailsDTO.setTestSampleId(reportIdentifier.getValue());
                                                 }
                                             }
                                         }
@@ -602,6 +605,7 @@ public class SharedHealthRecordsService {
                                                     labTestResultsDTO.setUnit(observation.hasValueQuantity()
                                                             ? String.valueOf(observation.getValueQuantity().getUnit())
                                                             : null);
+                                                    labTestResultsDTO.setCodedValue(observation.hasCode() && observation.getCode().hasText() ? observation.getCode().getText() : null);
                                                 }
                                                 labTestResultsDTOS.add(labTestResultsDTO);
                                             }

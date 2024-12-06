@@ -6,6 +6,8 @@ import org.hl7.fhir.r4.model.*;
 
 import javax.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -94,7 +96,10 @@ public class PatientDTO {
             mappedPatient.setLastName(lastName);
 
             mappedPatient.setGender(this.getGender());
-            mappedPatient.setDateOfBirth(this.getBirthDate());
+            if (birthDate != null) {
+                LocalDate localDate = birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                mappedPatient.setDateOfBirth(localDate.toString());
+            }
             List<String> phones = new ArrayList<>();
             for (ContactDTO contactDTO: getTelecom()) {
                 if (contactDTO.getSystem().equalsIgnoreCase("phone")) {
