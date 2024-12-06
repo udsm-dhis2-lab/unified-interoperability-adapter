@@ -26,7 +26,8 @@ public class AddressDTO {
     public Map<String,Object> toMap() {
         Map<String,Object> addressesMap = new HashMap<>();
         addressesMap.put("village", this.getVillage());
-        addressesMap.put("ward", this.getWard() != null );
+        addressesMap.put("ward", this.getWard());
+        addressesMap.put("district", this.getDistrict());
         addressesMap.put("region", this.getRegion());
         addressesMap.put("country", this.getCountry());
         addressesMap.put("category", this.getCategory() != null ? this.getCategory(): "Temporary");
