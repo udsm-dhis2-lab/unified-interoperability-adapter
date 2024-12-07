@@ -820,7 +820,7 @@ public class SharedHealthRecordsService {
 
                                 //prophylAxisDetails
                                 List<ProphylAxisDetailsDTO> prophylAxisDetailsDTOS = new ArrayList<>();
-                                List<Procedure> prophylAxisProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "", null); //TODO: Add support to fetch by category
+                                List<Procedure> prophylAxisProcedures = getProceduresByCategoryAndObservationReference(encounter.getIdElement().getIdPart(), "prophyl-axis-details", null);
                                 if (!prophylAxisProcedures.isEmpty()) {
                                     for (Procedure procedure : prophylAxisProcedures) {
                                         ProphylAxisDetailsDTO prophylAxisDetailsDTO = new ProphylAxisDetailsDTO();
