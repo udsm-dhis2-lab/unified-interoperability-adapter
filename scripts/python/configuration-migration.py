@@ -1,10 +1,8 @@
 import requests
-from requests.auth import HTTPBasicAuth
 import asyncio
 import os
 from dotenv import load_dotenv
 import json
-import ast
 
 load_dotenv()
 
