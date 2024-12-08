@@ -215,7 +215,25 @@ public class SharedHealthRecordsService {
                                         : null);
                                 List<CareServiceDTO> careServiceDTOs = new ArrayList<>();
 
+                                List<Observation> careServicesObs = getObservationsByCategory("care-services", encounter, false, false);
+                                for (Observation careServiceObs: careServicesObs) {
+                                    CareServiceDTO careServiceDTO = new CareServiceDTO();
+                                    if (careServiceObs.hasComponent() && !careServiceObs.getComponent().isEmpty()) {
+                                        Observation.ObservationComponentComponent careTypeComponent = careServiceObs.getComponent().get(0);
+                                        if (careTypeComponent != null && careTypeComponent.hasValueStringType() && careTypeComponent.getValueBooleanType().hasValue()) {
+                                            careServiceDTO.setCareType(careTypeComponent.getValueStringType().getValueAsString());
+                                        }
+                                        if (careServiceObs.getComponent().size() > 1) {
+                                            Observation.ObservationComponentComponent visitNumberComponent = careServiceObs.getComponent().get(1);
+                                            if (visitNumberComponent != null && visitNumberComponent.hasValueIntegerType() && visitNumberComponent.getValueIntegerType().hasValue()) {
+                                                careServiceDTO.setVisitNumber(visitNumberComponent.getValueIntegerType().getValue());
+                                            }
+                                        }
+                                    }
+                                    careServiceDTOs.add(careServiceDTO);
+                                }
                                 visitDetails.setCareServices(careServiceDTOs);
+
                                 for (Extension extension : encounter.getExtension()) {
                                     if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newThisYear")) {
                                         visitDetails.setNewThisYear(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : Boolean.FALSE);
