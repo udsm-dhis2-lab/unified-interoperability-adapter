@@ -18,6 +18,8 @@ public class LabInvestigationDetailsDTO {
     private Date testOrderDate;
     private String testSampleId;
     private String testOrderId;
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date testResultDate;
     private String testStatus;
     private String testType;

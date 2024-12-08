@@ -8,30 +8,29 @@ import java.util.*;
 @Getter
 @Setter
 public class AddressDTO {
-    private String city;
-    private String state;
-    private String postalCode;
+    private String village;
+    private String ward;
+    private String district;
+    private String region;
     private String country;
-    private String text;
-    private String use;
-    private List<String> line;
-    public AddressDTO(String city, String state, String postalCode, String country, String text, String use, List<String> line) {
-        this.city = city;
-        this.state = state;
-        this.postalCode = postalCode;
+    private String category;
+    public AddressDTO(String village, String ward, String district, String region, String country, String category) {
+        this.village = village;
+        this.ward = ward;
+        this.district = district;
+        this.region = region;
         this.country = country;
-        this.text = text;
-        this.use =  use;
-        this.line = line;
+        this.category = category;
     }
 
     public Map<String,Object> toMap() {
         Map<String,Object> addressesMap = new HashMap<>();
-        addressesMap.put("village", this.getText() != null && this.getText().contains("-") ? this.getText().split("-")[1]: null);
-        addressesMap.put("ward", this.getText() != null  && this.getText().contains("-") ? this.getText().split("-")[0]: null);
-        addressesMap.put("city", this.getCity());
+        addressesMap.put("village", this.getVillage());
+        addressesMap.put("ward", this.getWard());
+        addressesMap.put("district", this.getDistrict());
+        addressesMap.put("region", this.getRegion());
         addressesMap.put("country", this.getCountry());
-        addressesMap.put("category", this.getUse() != null ? (this.getUse().equals("home") ? "Permanent": "Temporarily"): null);
+        addressesMap.put("category", this.getCategory() != null ? this.getCategory(): "Temporary");
         return addressesMap;
     }
 

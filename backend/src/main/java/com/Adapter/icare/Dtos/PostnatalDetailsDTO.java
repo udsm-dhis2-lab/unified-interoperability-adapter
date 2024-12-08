@@ -15,9 +15,9 @@ public class PostnatalDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
-    private boolean positiveHivStatusBeforeService;
-    private boolean referredToCTC;
-    private boolean referredToClinicForFurtherServices;
+    private Boolean positiveHivStatusBeforeService;
+    private Boolean referredToCTC;
+    private Boolean referredToClinicForFurtherServices;
     private Integer hoursSinceDelivery;
     private String outCome;
     private Integer APGARScore;

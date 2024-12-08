@@ -29,6 +29,7 @@ public class ExternalProxyingService {
     public Object getExternalData(String endpointUrl) throws Exception {
         try {
             String path = formulateDHIS2UrlPath(endpointUrl);
+            System.out.println(path);
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
 
@@ -49,7 +50,9 @@ public class ExternalProxyingService {
     public Object postExternalData(String endpointUrl, Map<String,Object> payload) {
         String path = formulateDHIS2UrlPath(endpointUrl);
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", buildBasicAuthHeader(this.dhisConstants.DHIS2Username, this.dhisConstants.DHIS2Password));
+        headers.set("Authorization", buildBasicAuthHeader(
+                this.dhisConstants.DHIS2Username,
+                this.dhisConstants.DHIS2Password));
 
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
         ResponseEntity<Object> response = restTemplate.exchange(
@@ -63,11 +66,23 @@ public class ExternalProxyingService {
 
     private String formulateDHIS2UrlPath(String endpointUrl) {
         String baseUrl = this.dhisConstants.DHIS2Instance +
-                (this.dhisConstants.DHIS2ContextPath != null ? "/" + this.dhisConstants.DHIS2ContextPath : "") +
-                (endpointUrl.contains("api/") ? "" : "/api/");
+                (this.dhisConstants.DHIS2ContextPath != null ? "/" +
+                        this.dhisConstants.DHIS2ContextPath : "") +
+                (endpointUrl.startsWith("api/") ? "" : "api/");
+        if (endpointUrl.contains("?")) {
+            String[] parts = endpointUrl.split("\\?", 2);
+            String path = parts[0];
+            String query = parts[1];
+            return UriComponentsBuilder.fromHttpUrl(baseUrl)
+                    .path(path)
+                    .build(false)
+                    .toUriString() + "?" + query;
+        }
         return UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .path(endpointUrl)
                 .build(false)
                 .toUriString();
     }
+
+
 }

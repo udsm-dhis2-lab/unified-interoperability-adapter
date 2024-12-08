@@ -16,13 +16,10 @@ public class ReferralDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date referralDate;
+    private String hfrCode;
     private List<String> reason;
-
     @NotNull
     private String referralNumber;
-
-    @NotNull
-    private String hfrCode;
     private Map<String,Object> referringClinician; // TODO: Add specific model
 
     public Map<String,Object> toMap() {

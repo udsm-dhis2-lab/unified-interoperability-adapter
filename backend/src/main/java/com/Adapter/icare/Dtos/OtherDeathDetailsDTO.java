@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class OtherDeathDetailsDTO {
     private String postmortemDetails;
-    private boolean marcerated;
-    private boolean fresh;
+    private Boolean marcerated;
+    private Boolean fresh;
     private String motherCondition;
 }

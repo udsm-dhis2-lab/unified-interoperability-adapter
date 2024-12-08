@@ -6,6 +6,8 @@ import org.hl7.fhir.r4.model.*;
 
 import javax.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -18,6 +20,8 @@ public class PatientDTO {
     private List<HumanNameDTO> name;
     private String gender;
     private Date birthDate;
+    private String occupation;
+    private String nationality;
     private List<AddressDTO> address;
     private List<ContactDTO> telecom;
     private Organization organization;
@@ -94,7 +98,10 @@ public class PatientDTO {
             mappedPatient.setLastName(lastName);
 
             mappedPatient.setGender(this.getGender());
-            mappedPatient.setDateOfBirth(this.getBirthDate());
+            if (birthDate != null) {
+                LocalDate localDate = birthDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                mappedPatient.setDateOfBirth(localDate.toString());
+            }
             List<String> phones = new ArrayList<>();
             for (ContactDTO contactDTO: getTelecom()) {
                 if (contactDTO.getSystem().equalsIgnoreCase("phone")) {
@@ -109,8 +116,9 @@ public class PatientDTO {
             }
             mappedPatient.setPhoneNumbers(phones);
             mappedPatient.setEmails(emails);
-//            mappedPatient.setS(this.getStatus());
             mappedPatient.setMaritalStatus(this.getMaritalStatus());
+            mappedPatient.setOccupation(this.getOccupation());
+            mappedPatient.setNationality(this.getNationality());
             mappedPatient.setAddresses(address);
             mappedPatient.setContactPeople(this.getContactPeople());
             mappedPatient.setPaymentDetails(this.getPaymentDetails());
@@ -143,12 +151,12 @@ public class PatientDTO {
     }
 
     public String getMRN(String orgCode) {
-        List<String> identifiers = this.getIdentifiers().stream()
+        List<String> identifiers = orgCode != null ? this.getIdentifiers().stream()
                 .filter(identifier -> identifier.hasAssigner() && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType() && identifier.getType().hasCoding() &&
                         identifier.getType().getCoding().get(0).getCode().equals("MRN"))
                 .map(Identifier::getValue)
-                .collect(Collectors.toList());
-        return !identifiers.isEmpty() ? identifiers.get(0): null;
+                .collect(Collectors.toList()): null;
+        return identifiers != null && !identifiers.isEmpty() ? identifiers.get(0): null;
     }
 
     public @NotNull List<Map<String, Object>> getIdentifierMaps() {
