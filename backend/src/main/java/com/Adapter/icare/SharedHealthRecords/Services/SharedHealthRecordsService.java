@@ -191,6 +191,10 @@ public class SharedHealthRecordsService {
                                     paymentDetailsDTOs = coverages.stream().map(coverage -> this.clientRegistryService.mapToPaymentDetails(coverage)).collect(Collectors.toList());
                                 }
                                 patientDTO.setPaymentDetails(paymentDetailsDTOs);
+                                String nationality = getNestedExtensionValueString(patient, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/patient-extensions", "nationality");
+                                String occupation = getNestedExtensionValueString(patient, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/patient-extensions", "occupation");
+                                patientDTO.setOccupation(occupation);
+                                patientDTO.setNationality(nationality);
                                 String mrn = patientDTO.getMRN(organization.getIdElement().getIdPart());
                                 templateData.setMrn(mrn);
                                 String orgCode = organization != null ? organization.getIdElement().getIdPart() : null;
@@ -202,9 +206,25 @@ public class SharedHealthRecordsService {
                                 visitDetails.setVisitDate(encounter.getPeriod() != null && encounter.getPeriod().getStart() != null ? encounter.getPeriod().getStart() : null);
                                 visitDetails.setClosedDate(encounter.getPeriod() != null && encounter.getPeriod().getEnd() != null ? encounter.getPeriod().getEnd() : null);
                                 visitDetails.setVisitType(encounter.hasType() && !encounter.getType().isEmpty() ? encounter.getType().get(0).getText() : null);
-                                // TODO: Find a way to retrieve these from resource
-                                visitDetails.setNewThisYear(Boolean.FALSE);
-                                visitDetails.setNew(Boolean.FALSE);
+                                visitDetails.setVisitType(encounter.hasType() &&
+                                        !encounter.getType().isEmpty() &&
+                                        encounter.getType().get(0).hasCoding() &&
+                                        !encounter.getType().get(0).getCoding().isEmpty() &&
+                                        encounter.getType().get(0).getCoding().get(0).hasCode()
+                                        ? encounter.getType().get(0).getCoding().get(0).getCode()
+                                        : null);
+                                List<CareServiceDTO> careServiceDTOs = new ArrayList<>();
+
+                                visitDetails.setCareServices(careServiceDTOs);
+                                for (Extension extension : encounter.getExtension()) {
+                                    if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newThisYear")) {
+                                        visitDetails.setNewThisYear(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : Boolean.FALSE);
+                                    }
+
+                                    if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newVisit")) {
+                                        visitDetails.setNew(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : Boolean.FALSE);
+                                    }
+                                }
                                 templateData.setVisitDetails(visitDetails);
 
 

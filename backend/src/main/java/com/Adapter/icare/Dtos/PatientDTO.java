@@ -20,6 +20,8 @@ public class PatientDTO {
     private List<HumanNameDTO> name;
     private String gender;
     private Date birthDate;
+    private String occupation;
+    private String nationality;
     private List<AddressDTO> address;
     private List<ContactDTO> telecom;
     private Organization organization;
@@ -114,8 +116,9 @@ public class PatientDTO {
             }
             mappedPatient.setPhoneNumbers(phones);
             mappedPatient.setEmails(emails);
-//            mappedPatient.setS(this.getStatus());
             mappedPatient.setMaritalStatus(this.getMaritalStatus());
+            mappedPatient.setOccupation(this.getOccupation());
+            mappedPatient.setNationality(this.getNationality());
             mappedPatient.setAddresses(address);
             mappedPatient.setContactPeople(this.getContactPeople());
             mappedPatient.setPaymentDetails(this.getPaymentDetails());
