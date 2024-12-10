@@ -46,11 +46,23 @@
           <td>{{ data?.code }}</td>
           <td class="centered-cell">
             <div nz-row>
-              <div nz-col nzSpan="12">
-                <span nz-icon nzType="delete" nzTheme="outline"></span>
+              <div nz-col nzSpan="6">
+                <span
+                  nz-icon
+                  nzType="delete"
+                  nzTheme="outline"
+                  style="color: #ff4d4f"
+                  (click)="onDeleteInstance(data)"
+                ></span>
               </div>
               <div nz-col nzSpan="12">
-                <span nz-icon nzType="edit" nzTheme="outline"></span>
+                <span
+                  nz-icon
+                  nzType="edit"
+                  nzTheme="outline"
+                  style="color: #1890ff"
+                  (click)="onEditInstance(data)"
+                ></span>
               </div>
             </div>
           </td>
@@ -61,14 +73,22 @@
   </nz-card>
 
   <div class="alert-container">
-    <nz-alert
-      nzCloseable
-      *ngIf="alert.show"
-      [nzType]="alert.type === 'success' ? 'success' : 'error'"
-      [nzMessage]="alert.message"
-      (nzOnClose)="onCloseAlert()"
-      nzShowIcon
-    ></nz-alert>
+    <nz-spin [nzSpinning]="isDeleting">
+      <nz-alert
+        nzCloseable
+        *ngIf="alert.show"
+        [nzType]="
+          alert.type === 'success'
+            ? 'success'
+            : alert.type === 'info'
+            ? 'info'
+            : 'error'
+        "
+        [nzMessage]="alert.message"
+        (nzOnClose)="onCloseAlert()"
+        nzShowIcon
+      ></nz-alert>
+    </nz-spin>
   </div>
 </div>
 
@@ -135,6 +155,7 @@
                 nz-input
                 formControlName="password"
                 placeholder="Enter password"
+                type="password"
               />
             </nz-form-control>
           </nz-form-item>

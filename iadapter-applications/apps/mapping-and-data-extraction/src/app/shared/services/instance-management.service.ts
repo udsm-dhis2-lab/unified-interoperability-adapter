@@ -45,9 +45,9 @@ export class InstanceManagementService {
       .pipe(catchError((error: any) => this.handleError(error)));
   }
 
-  updateInstance(payLoad: any) {
+  updateInstance(payLoad: any, uuid?: string) {
     return this.httpClient
-      .put(this.instanceUrl, payLoad)
+      .put(`${this.instanceUrl}/${uuid}`, payLoad)
       .pipe(catchError((error: any) => this.handleError(error)));
   }
 
@@ -63,13 +63,17 @@ export class InstanceManagementService {
     );
   }
 
-  verifyAndAddInstance(payLoad: any): Observable<any> {
-    return payLoad.uuid != null
+  verifyAndAddOrUpdateInstance(
+    payLoad: any,
+    isUpdating: boolean,
+    uuid?: string
+  ): Observable<any> {
+    return isUpdating
       ? this.verifyInstanceByCode(payLoad).pipe(
-          switchMap(() => this.addInstance(payLoad))
+          switchMap(() => this.updateInstance(payLoad, uuid))
         )
       : this.verifyInstanceByCode(payLoad).pipe(
-          switchMap(() => this.updateInstance(payLoad))
+          switchMap(() => this.addInstance(payLoad))
         );
   }
 
