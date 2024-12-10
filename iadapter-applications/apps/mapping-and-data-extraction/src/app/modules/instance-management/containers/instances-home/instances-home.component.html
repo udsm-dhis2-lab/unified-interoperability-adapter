@@ -44,7 +44,16 @@
           <td>{{ data?.name }}</td>
           <td>{{ data?.url }}</td>
           <td>{{ data?.code }}</td>
-          <td class="centered-cell"></td>
+          <td class="centered-cell">
+            <div nz-row>
+              <div nz-col nzSpan="12">
+                <span nz-icon nzType="delete" nzTheme="outline"></span>
+              </div>
+              <div nz-col nzSpan="12">
+                <span nz-icon nzType="edit" nzTheme="outline"></span>
+              </div>
+            </div>
+          </td>
         </tr>
         }
       </tbody>

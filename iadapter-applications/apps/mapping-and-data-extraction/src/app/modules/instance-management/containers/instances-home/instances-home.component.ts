@@ -19,6 +19,9 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
   styleUrl: './instances-home.component.css',
 })
 export class InstancesHomeComponent implements OnInit {
+  isDeleting: boolean = false;
+  isUpdating: boolean = false;
+
   alert = {
     show: false,
     type: '',
@@ -86,10 +89,10 @@ export class InstancesHomeComponent implements OnInit {
   onSubmit(event: Event) {
     event.stopPropagation();
     var payLoad = this.instanceForm.value;
-    this.addInstance(payLoad);
+    this.addOrUpdateInstance(payLoad);
   }
 
-  addInstance(payLoad: any) {
+  addOrUpdateInstance(payLoad: any) {
     this.isSubmitting = true;
     this.instanceManagementService.verifyAndAddInstance(payLoad).subscribe({
       next: (response) => {
@@ -110,6 +113,30 @@ export class InstancesHomeComponent implements OnInit {
           message: error.message,
         };
         this.closeSideDrawer();
+        // TODO: Implement error handling
+      },
+    });
+  }
+
+  deleteInstance(uuid: string) {
+    this.isDeleting = true;
+    this.instanceManagementService.deleteInstance(uuid).subscribe({
+      next: (response) => {
+        this.isDeleting = false;
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Added instance successfully',
+        };
+        this.reloadFetchingInstances();
+      },
+      error: (error) => {
+        this.isDeleting = false;
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
         // TODO: Implement error handling
       },
     });
