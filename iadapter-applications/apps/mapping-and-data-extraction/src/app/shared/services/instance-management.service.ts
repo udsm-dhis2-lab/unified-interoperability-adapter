@@ -45,6 +45,12 @@ export class InstanceManagementService {
       .pipe(catchError((error: any) => this.handleError(error)));
   }
 
+  updateInstance(payLoad: any, uuid?: string) {
+    return this.httpClient
+      .put(`${this.instanceUrl}/${uuid}`, payLoad)
+      .pipe(catchError((error: any) => this.handleError(error)));
+  }
+
   verifyInstanceByCode(payLoad: any) {
     return this.httpClient.post(this.verifyInstanceByCodeUrl, payLoad).pipe(
       catchError((error: any) => {
@@ -57,11 +63,26 @@ export class InstanceManagementService {
     );
   }
 
-  verifyAndAddInstance(payLoad: any): Observable<any> {
-    return this.verifyInstanceByCode(payLoad).pipe(
-      switchMap(() => this.addInstance(payLoad))
-    );
+  verifyAndAddOrUpdateInstance(
+    payLoad: any,
+    isUpdating: boolean,
+    uuid?: string
+  ): Observable<any> {
+    return isUpdating
+      ? this.verifyInstanceByCode(payLoad).pipe(
+          switchMap(() => this.updateInstance(payLoad, uuid))
+        )
+      : this.verifyInstanceByCode(payLoad).pipe(
+          switchMap(() => this.addInstance(payLoad))
+        );
   }
+
+  deleteInstance(uuid: string) {
+    return this.httpClient
+      .delete(`${this.instanceUrl}/${uuid}`)
+      .pipe(catchError((error: any) => this.handleError(error)));
+  }
+
   // TODO: These functions below need to be moved to a common shared folder
   private buildHttpParams(
     pageIndex: number,
