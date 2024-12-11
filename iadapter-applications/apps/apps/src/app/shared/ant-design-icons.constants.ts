@@ -5,6 +5,13 @@ import {
   UnorderedListOutline,
   UserOutline,
   LogoutOutline,
+  AppstoreOutline,
+  ScheduleOutline,
+  DatabaseOutline,
+  SnippetsOutline,
+  ToolOutline,
+  SettingOutline,
+  InteractionOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const antDesignIcons: any[] = [
@@ -14,4 +21,11 @@ export const antDesignIcons: any[] = [
   ApartmentOutline,
   DashboardOutline,
   LogoutOutline,
+  AppstoreOutline,
+  ScheduleOutline,
+  DatabaseOutline,
+  SnippetsOutline,
+  ToolOutline,
+  SettingOutline,
+  InteractionOutline,
 ];
