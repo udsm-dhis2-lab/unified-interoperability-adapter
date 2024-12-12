@@ -212,8 +212,8 @@ public class SharedHealthRecordsService {
                                     paymentDetailsDTOs = coverages.stream().map(coverage -> this.clientRegistryService.mapToPaymentDetails(coverage)).collect(Collectors.toList());
                                 }
                                 patientDTO.setPaymentDetails(paymentDetailsDTOs);
-                                String nationality = getNestedExtensionValueString(patient, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/patient-extensions", "nationality");
-                                String occupation = getNestedExtensionValueString(patient, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/patient-extensions", "occupation");
+                                String nationality = getNestedExtensionValueString(patient, "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions", "nationality");
+                                String occupation = getNestedExtensionValueString(patient, "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions", "occupation");
                                 patientDTO.setOccupation(occupation);
                                 patientDTO.setNationality(nationality);
                                 String mrn = patientDTO.getMRN(organization.getIdElement().getIdPart());
@@ -256,11 +256,11 @@ public class SharedHealthRecordsService {
                                 visitDetails.setCareServices(careServiceDTOs);
 
                                 for (Extension extension : encounter.getExtension()) {
-                                    if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newThisYear")) {
+                                    if (extension.hasUrl() && extension.getUrl().equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear")) {
                                         visitDetails.setNewThisYear(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : Boolean.FALSE);
                                     }
 
-                                    if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newVisit")) {
+                                    if (extension.hasUrl() && extension.getUrl().equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit")) {
                                         visitDetails.setNew(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : Boolean.FALSE);
                                     }
                                 }
@@ -907,10 +907,10 @@ public class SharedHealthRecordsService {
                                     for (Procedure procedure : chemotherapyProcedures) {
                                         Map<String, Object> chemoTherapy = new HashMap<>();
                                         chemoTherapy.put("diagnosis", procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty() && procedure.getReasonCode().get(0).hasCoding() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
-                                        chemoTherapy.put("regiment", getNestedExtensionValueString(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "regiment"));
-                                        chemoTherapy.put("stage", getNestedExtensionValueInteger(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "stage"));
-                                        chemoTherapy.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "totalExpectedCycles"));
-                                        chemoTherapy.put("currentChemotherapeuticCycles", getNestedExtensionValueInteger(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/chemotherapy-details", "currentCycles"));
+                                        chemoTherapy.put("regiment", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/chemotherapy-details", "regiment"));
+                                        chemoTherapy.put("stage", getNestedExtensionValueInteger(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/chemotherapy-details", "stage"));
+                                        chemoTherapy.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/chemotherapy-details", "totalExpectedCycles"));
+                                        chemoTherapy.put("currentChemotherapeuticCycles", getNestedExtensionValueInteger(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/chemotherapy-details", "currentCycles"));
                                         chemotherapyTreatment.add(chemoTherapy);
                                     }
                                     treatmentDetailsDTO.setChemoTherapy(chemotherapyTreatment);
@@ -924,12 +924,12 @@ public class SharedHealthRecordsService {
                                         Map<String, Object> radioTherapy = new HashMap<>();
                                         //Prescription
                                         Map<String, Object> prescription = new HashMap<>();
-                                        prescription.put("type", getNestedExtensionValueString(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "prescriptionType"));
-                                        prescription.put("intention", getNestedExtensionValueString(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "intention"));
-                                        prescription.put("technique", getNestedExtensionValueString(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "technique"));
-                                        prescription.put("site", getNestedExtensionValueString(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "site"));
-                                        prescription.put("dailyDose", getNestedExtensionValueQuantityValue(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "dailyDose"));
-                                        prescription.put("totalDose", getNestedExtensionValueQuantityValue(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-details", "totalDose"));
+                                        prescription.put("type", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details", "prescriptionType"));
+                                        prescription.put("intention", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details", "intention"));
+                                        prescription.put("technique", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details", "technique"));
+                                        prescription.put("site", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details", "site"));
+                                        prescription.put("dailyDose", getNestedExtensionValueQuantityValue(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details", "dailyDose"));
+                                        prescription.put("totalDose", getNestedExtensionValueQuantityValue(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details", "totalDose"));
                                         //TODO: Add the following values startDate, dosageDates, administrationDates and remarks
                                         //Dosage dates
                                         List<String> dosageDates = new ArrayList<>();
@@ -952,7 +952,7 @@ public class SharedHealthRecordsService {
                                                     report.put("date", documentReference.hasDate() ? documentReference.getDate() : null);
                                                     //TODO: attachments is a string but has been saved as a list in the radiologytherapy treatment
 //                                                   report.put("attachments", documentReference.hasAttachment() ? documentReference.getAttachment() : null);
-                                                    report.put("MU", getNestedExtensionValueInteger(documentReference, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/radiotherapy-report", "measurementUnits"));
+                                                    report.put("MU", getNestedExtensionValueInteger(documentReference, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-report", "measurementUnits"));
                                                 }
                                                 reports.add(report);
                                             }
@@ -1003,10 +1003,10 @@ public class SharedHealthRecordsService {
                                     for (Procedure procedure : hormoneTherapyTreatments) {
                                         Map<String, Object> treatment = new HashMap<>();
                                         treatment.put("diagnosis", procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty() ? procedure.getReasonCode().get(0).getCoding().get(0).getDisplay() : null);
-                                        treatment.put("regiment", getNestedExtensionValueString(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "regiment"));
-                                        treatment.put("stage", getNestedExtensionValueInteger(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "stage"));
-                                        treatment.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "totalExpectedCycles"));
-                                        treatment.put("currentCycles", getNestedExtensionValueInteger(procedure, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/hormone-therapy-details", "currentCycles"));
+                                        treatment.put("regiment", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/hormone-therapy-details", "regiment"));
+                                        treatment.put("stage", getNestedExtensionValueInteger(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/hormone-therapy-details", "stage"));
+                                        treatment.put("totalNumberOfExpectedCycles", getNestedExtensionValueInteger(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/hormone-therapy-details", "totalExpectedCycles"));
+                                        treatment.put("currentCycles", getNestedExtensionValueInteger(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/hormone-therapy-details", "currentCycles"));
                                         hormoneTherapy.add(treatment);
                                     }
                                     treatmentDetailsDTO.setHormoneTherapy(hormoneTherapy);
@@ -1050,8 +1050,8 @@ public class SharedHealthRecordsService {
                                         billingsDetailsDTO.setBillingCode(chargeItem.hasCode() && chargeItem.getCode().hasCoding() && !chargeItem.getCode().getCoding().isEmpty() ? chargeItem.getCode().getCoding().get(0).getCode() : null);
                                         billingsDetailsDTO.setAmountBilled(chargeItem.hasPriceOverride() ? chargeItem.getPriceOverride().getValue() : null);
                                         billingsDetailsDTO.setBillDate(chargeItem.hasOccurrenceDateTimeType() ? chargeItem.getOccurrenceDateTimeType().getValue() : null);
-                                        billingsDetailsDTO.setExemptionType(getNestedExtensionValueString(chargeItem, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/billing-details", "exemptionType"));
-                                        billingsDetailsDTO.setStandardCode(getNestedExtensionValueString(chargeItem, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/billing-details", "standardCode"));
+                                        billingsDetailsDTO.setExemptionType(getNestedExtensionValueString(chargeItem, "http://fhir.moh.go.tz/fhir/StructureDefinition/billing-details", "exemptionType"));
+                                        billingsDetailsDTO.setStandardCode(getNestedExtensionValueString(chargeItem, "http://fhir.moh.go.tz/fhir/StructureDefinition/billing-details", "standardCode"));
                                         billingsDetailsDTOS.add(billingsDetailsDTO);
                                     }
                                     templateData.setBillingsDetails(billingsDetailsDTOS);
@@ -1110,13 +1110,13 @@ public class SharedHealthRecordsService {
                                     }
                                     if (deliveryProcedure.hasExtension() && !deliveryProcedure.getExtension().isEmpty()) {
                                         for (Extension extension : deliveryProcedure.getExtension()) {
-                                            if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/placeOfBirth")) {
+                                            if (extension.hasUrl() && extension.getUrl().equals("http://fhir.moh.go.tz/fhir/StructureDefinition/placeOfBirth")) {
                                                 laborAndDeliveryDetailsDTO.setPlaceOfBirth(extension.hasValue() && extension.getValue() instanceof StringType ? ((StringType) extension.getValue()).getValue() : null);
                                             }
-                                            if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs")) {
+                                            if (extension.hasUrl() && extension.getUrl().equals("http://fhir.moh.go.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs")) {
                                                 laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(extension.hasValue() && extension.getValue() instanceof DecimalType ? ((DecimalType) extension.getValue()).getValue().intValue() : null);
                                             }
-                                            if (extension.hasUrl() && extension.getUrl().equals("http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/isAttendantSkilled")) {
+                                            if (extension.hasUrl() && extension.getUrl().equals("http://fhir.moh.go.tz/fhir/StructureDefinition/isAttendantSkilled")) {
                                                 laborAndDeliveryDetailsDTO.setIsAttendantSkilled(extension.hasValue() && extension.getValue() instanceof BooleanType ? ((BooleanType) extension.getValue()).getValue() : null);
                                             }
                                         }
@@ -1171,13 +1171,13 @@ public class SharedHealthRecordsService {
                                 if (!birthDetailsObservations.isEmpty()) {
                                     for (Observation observation : birthDetailsObservations) {
                                         BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
-                                        birthDetailsDTO.setDateOfBirth(getNestedExtensionValueDateTime(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "dateOfBirth"));
-                                        birthDetailsDTO.setExclusiveBreastFed(getNestedExtensionValueBoolean(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "exclusiveBreastFed"));
-                                        birthDetailsDTO.setMotherAgeInYears(getNestedExtensionValueInteger(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherAgeInYears"));
+                                        birthDetailsDTO.setDateOfBirth(getNestedExtensionValueDateTime(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details", "dateOfBirth"));
+                                        birthDetailsDTO.setExclusiveBreastFed(getNestedExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details", "exclusiveBreastFed"));
+                                        birthDetailsDTO.setMotherAgeInYears(getNestedExtensionValueInteger(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details", "motherAgeInYears"));
                                         //TODO: Add Mother HIV status
-//                                        birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation, "://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherHivStatus"));
+//                                        birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation, "://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details", "motherHivStatus"));
 
-                                        birthDetailsDTO.setProvidedWithARV(getNestedExtensionValueBoolean(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "providedWithARV"));
+                                        birthDetailsDTO.setProvidedWithARV(getNestedExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details", "providedWithARV"));
                                         birthDetailsDTO.setWeightInKgs(getComponentValueQuantityInt(observation, 0) != null ? getComponentValueQuantityInt(observation, 0).floatValue() : null);
                                         birthDetailsDTO.setMultipleBirth(getComponentValueBoolean(observation, 1));
                                         birthDetailsDTO.setBirthOrder(getComponentIntValue(observation, 2));
@@ -1250,12 +1250,12 @@ public class SharedHealthRecordsService {
                                     if (!birthDetailsPostnatalObservations.isEmpty()) {
                                         for (Observation observation : birthDetailsPostnatalObservations) {
                                             BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
-                                            birthDetailsDTO.setDateOfBirth(getNestedExtensionValueDateTime(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "dateOfBirth"));
-                                            birthDetailsDTO.setExclusiveBreastFed(getNestedExtensionValueBoolean(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/newborn-birth-details", "exclusiveBreastFed"));
-                                            birthDetailsDTO.setMotherAgeInYears(getNestedExtensionValueInteger(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherAgeInYears"));
+                                            birthDetailsDTO.setDateOfBirth(getNestedExtensionValueDateTime(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details", "dateOfBirth"));
+                                            birthDetailsDTO.setExclusiveBreastFed(getNestedExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details", "exclusiveBreastFed"));
+                                            birthDetailsDTO.setMotherAgeInYears(getNestedExtensionValueInteger(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details", "motherAgeInYears"));
                                             //TODO: Add Mother HIV status
-//                                        birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "motherHivStatus"));
-                                            birthDetailsDTO.setProvidedWithARV(getNestedExtensionValueBoolean(observation, "http://fhir.dhis2.udsm.ac.tz/fhir/StructureDefinition/maternal-details", "providedWithARV"));
+//                                        birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details", "motherHivStatus"));
+                                            birthDetailsDTO.setProvidedWithARV(getNestedExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details", "providedWithARV"));
                                             birthDetailsDTO.setWeightInKgs(getComponentValueQuantityInt(observation, 0) != null ? getComponentValueQuantityInt(observation, 0).floatValue() : null);
                                             birthDetailsDTO.setMultipleBirth(getComponentValueBoolean(observation, 1));
                                             birthDetailsDTO.setBirthOrder(getComponentIntValue(observation, 2));
