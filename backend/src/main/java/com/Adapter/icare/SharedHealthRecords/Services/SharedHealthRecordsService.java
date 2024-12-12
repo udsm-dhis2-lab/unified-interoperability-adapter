@@ -14,6 +14,7 @@ import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.FHIRConstants;
+import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
@@ -45,15 +46,22 @@ public class SharedHealthRecordsService {
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
+    private final SharedRecordsConstants sharedRecordsConstants;
     private final ClientRegistryService clientRegistryService;
     private final MediatorsService mediatorsService;
 
-    public SharedHealthRecordsService(FHIRConstants fhirConstants, UserService userService, ClientRegistryService clientRegistryService, MediatorsService mediatorsService, ClientRegistryConstants clientRegistryConstants) {
+    public SharedHealthRecordsService(FHIRConstants fhirConstants,
+                                      UserService userService,
+                                      ClientRegistryService clientRegistryService,
+                                      MediatorsService mediatorsService,
+                                      ClientRegistryConstants clientRegistryConstants,
+                                      SharedRecordsConstants sharedRecordsConstants) {
         this.fhirConstants = fhirConstants;
         this.userService = userService;
         this.clientRegistryService = clientRegistryService;
         this.mediatorsService = mediatorsService;
         this.clientRegistryConstants = clientRegistryConstants;
+        this.sharedRecordsConstants = sharedRecordsConstants;
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirClient = fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -65,7 +73,20 @@ public class SharedHealthRecordsService {
         }
     }
 
-    public Map<String, Object> getSharedRecordsWithPagination(Integer page, Integer pageSize, String identifier, String identifierType, String referralNumber, boolean onlyLinkedClients, String gender, String firstName, String middleName, String lastName, String hfrCode, Date dateOfBirth, boolean includeDeceased, Integer numberOfVisits) throws Exception {
+    public Map<String, Object> getSharedRecordsWithPagination(Integer page,
+                                                              Integer pageSize,
+                                                              String identifier,
+                                                              String identifierType,
+                                                              String referralNumber,
+                                                              boolean onlyLinkedClients,
+                                                              String gender,
+                                                              String firstName,
+                                                              String middleName,
+                                                              String lastName,
+                                                              String hfrCode,
+                                                              Date dateOfBirth,
+                                                              boolean includeDeceased,
+                                                              Integer numberOfVisits) throws Exception {
         List<Map<String, Object>> sharedRecords = new ArrayList<>();
         Bundle response = new Bundle();
         Bundle clientTotalBundle = new Bundle();
@@ -1274,7 +1295,7 @@ public class SharedHealthRecordsService {
                             }
 
                             // TODO: Add history when numberOfVisits > 1
-                        } else if (organization != null) {
+                        } else if (organization != null && sharedRecordsConstants.AllowRetrievingRecordsFromSourceEMR) {
                             // TODO: Request visit from facility provided
                             try {
                                 Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
