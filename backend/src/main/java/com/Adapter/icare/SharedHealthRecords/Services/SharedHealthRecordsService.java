@@ -1276,12 +1276,18 @@ public class SharedHealthRecordsService {
                             // TODO: Add history when numberOfVisits > 1
                         } else if (organization != null) {
                             // TODO: Request visit from facility provided
-                            Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
-                            Map<String, Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType, "GET", null);
-                            List<Map<String, Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
-//                        System.out.println(visits.size());
-                            sharedRecords = visits;
-                        } else {
+                            try {
+                                Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
+                                if (facilityConnectionDetails != null) {
+                                    // TODO: Add support to get the source api from mediator
+                                    Map<String, Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType, "GET", null);
+                                    List<Map<String, Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
+                                    sharedRecords = visits;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                throw new Exception("There is issue with settings to query data from source system");
+                            }
                         }
                     }
                 }
