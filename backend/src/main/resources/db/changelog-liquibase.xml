@@ -57,4 +57,7 @@
     <changeSet id="2_privileges" author="josephat-mwakyusa">
         <modifyDataType tableName="privileges" columnName="retired_by" newDataType="INT"/>
     </changeSet>
+    <changeSet id="3_privileges" author="josephat-mwakyusa">
+        <modifyDataType tableName="privileges" columnName="created_by" newDataType="INT"/>
+    </changeSet>
 </databaseChangeLog>
