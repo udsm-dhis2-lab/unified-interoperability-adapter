@@ -65,7 +65,7 @@
         },
         "development": {
           "buildTarget": "mapping-and-data-extraction:build:development",
-          "proxyConfig": "apps/mapping-and-data-extraction/proxy-config.json"
+          "proxyConfig": "proxy-config.json"
         }
       },
       "defaultConfiguration": "development"

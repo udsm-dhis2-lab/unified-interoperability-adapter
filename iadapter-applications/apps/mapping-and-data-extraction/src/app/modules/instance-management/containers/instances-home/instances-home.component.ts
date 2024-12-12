@@ -19,6 +19,10 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
   styleUrl: './instances-home.component.css',
 })
 export class InstancesHomeComponent implements OnInit {
+  isDeleting: boolean = false;
+  isUpdating: boolean = false;
+  updatedInstanceUuid?: string;
+
   alert = {
     show: false,
     type: '',
@@ -80,39 +84,89 @@ export class InstancesHomeComponent implements OnInit {
 
   closeSideDrawer(): void {
     this.clearFrom();
+    this.isUpdating = false;
+    this.updatedInstanceUuid = undefined;
     this.isDrawerVisible = false;
   }
 
   onSubmit(event: Event) {
     event.stopPropagation();
     var payLoad = this.instanceForm.value;
-    this.addInstance(payLoad);
+    this.addOrUpdateInstance(
+      payLoad,
+      this.isUpdating,
+      this.updatedInstanceUuid
+    );
   }
 
-  addInstance(payLoad: any) {
+  addOrUpdateInstance(payLoad: any, isUpdating: boolean, uuid?: string) {
     this.isSubmitting = true;
-    this.instanceManagementService.verifyAndAddInstance(payLoad).subscribe({
+    this.instanceManagementService
+      .verifyAndAddOrUpdateInstance(payLoad, isUpdating, uuid)
+      .subscribe({
+        next: (response) => {
+          this.isSubmitting = false;
+          this.alert = {
+            show: true,
+            type: 'success',
+            message: isUpdating
+              ? 'Updated instance successfully'
+              : 'Added instance successfully',
+          };
+          this.closeSideDrawer();
+          this.reloadFetchingInstances();
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          this.alert = {
+            show: true,
+            type: 'error',
+            message: error.message,
+          };
+          this.closeSideDrawer();
+          // TODO: Implement error handling
+        },
+      });
+  }
+
+  deleteInstance(uuid: string) {
+    this.isDeleting = true;
+    this.alert = {
+      show: true,
+      type: 'info',
+      message: 'Deleting instance...',
+    };
+    this.instanceManagementService.deleteInstance(uuid).subscribe({
       next: (response) => {
-        this.isSubmitting = false;
+        this.isDeleting = false;
         this.alert = {
           show: true,
           type: 'success',
-          message: 'Added instance successfully',
+          message: 'Deleted intance successfully',
         };
-        this.closeSideDrawer();
         this.reloadFetchingInstances();
       },
       error: (error) => {
-        this.isSubmitting = false;
+        this.isDeleting = false;
         this.alert = {
           show: true,
           type: 'error',
           message: error.message,
         };
-        this.closeSideDrawer();
         // TODO: Implement error handling
       },
     });
+  }
+
+  onEditInstance(instance: Instance) {
+    this.isDrawerVisible = true;
+    this.updatedInstanceUuid = instance.uuid;
+    this.isUpdating = true;
+    this.instanceForm.patchValue(instance);
+  }
+
+  onDeleteInstance(instance: Instance) {
+    this.deleteInstance(instance.uuid);
   }
 
   loadInstanceManagementFromServer(
