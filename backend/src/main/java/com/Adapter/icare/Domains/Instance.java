@@ -67,7 +67,7 @@ public class Instance extends BaseEntity implements Serializable {
         instanceMap.put("code", this.getCode());
         instanceMap.put("name", this.getName());
         instanceMap.put("url",this.getUrl());
-        instanceMap.put("ouUid",this.getOrganisationUnitId());
+        instanceMap.put("organisationUnitId",this.getOrganisationUnitId());
         instanceMap.put("createdOn", this.getCreatedOn());
         Map<String, Object> createdBy = new HashMap<>();
         if (this.getCreatedBy() != null) {

@@ -220,7 +220,7 @@ public class SharedHealthRecordsService {
                                     CareServiceDTO careServiceDTO = new CareServiceDTO();
                                     if (careServiceObs.hasComponent() && !careServiceObs.getComponent().isEmpty()) {
                                         Observation.ObservationComponentComponent careTypeComponent = careServiceObs.getComponent().get(0);
-                                        if (careTypeComponent != null && careTypeComponent.hasValueStringType() && careTypeComponent.getValueBooleanType().hasValue()) {
+                                        if (careTypeComponent != null && careTypeComponent.hasValueStringType() && careTypeComponent.getValueStringType().hasValue()) {
                                             careServiceDTO.setCareType(careTypeComponent.getValueStringType().getValueAsString());
                                         }
                                         if (careServiceObs.getComponent().size() > 1) {
