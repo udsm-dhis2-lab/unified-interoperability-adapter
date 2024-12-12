@@ -51,5 +51,10 @@
     <changeSet id="1_change_dataset_fields_column_datatype_on_datasets" author="josephat-mwakyusa">
         <modifyDataType tableName="datasets" columnName="dataset_fields" newDataType="json"/>
     </changeSet>
-
+    <changeSet id="1_privileges" author="josephat-mwakyusa">
+        <modifyDataType tableName="privileges" columnName="last_updated_by" newDataType="INT"/>
+    </changeSet>
+    <changeSet id="2_privileges" author="josephat-mwakyusa">
+        <modifyDataType tableName="privileges" columnName="retired_by" newDataType="INT"/>
+    </changeSet>
 </databaseChangeLog>
