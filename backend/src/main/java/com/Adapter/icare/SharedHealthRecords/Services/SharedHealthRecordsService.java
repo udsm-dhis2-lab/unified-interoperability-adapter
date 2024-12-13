@@ -237,7 +237,7 @@ public class SharedHealthRecordsService {
                                 List<CareServiceDTO> careServiceDTOs = new ArrayList<>();
 
                                 List<Observation> careServicesObs = getObservationsByCategory("care-services", encounter, false, false);
-                                for (Observation careServiceObs: careServicesObs) {
+                                for (Observation careServiceObs : careServicesObs) {
                                     CareServiceDTO careServiceDTO = new CareServiceDTO();
                                     if (careServiceObs.hasComponent() && !careServiceObs.getComponent().isEmpty()) {
                                         Observation.ObservationComponentComponent careTypeComponent = careServiceObs.getComponent().get(0);
@@ -887,11 +887,17 @@ public class SharedHealthRecordsService {
                                         if (procedure.hasCode() && !procedure.getCode().getCoding().isEmpty()) {
                                             prophylAxisDetailsDTO.setCode(procedure.getCode().getCoding().get(0).getCode());
                                         }
-                                        //TODO: Add prophylAxis type
-                                        //TODO: Add prophylAxis name
+                                        prophylAxisDetailsDTO.setCode(procedure.hasCode() && procedure.getCode().hasText() ? procedure.getCode().getText() : null);
+                                        prophylAxisDetailsDTO.setName(procedure.hasCode() && procedure.getCode().hasCoding() && !procedure.getCode().getCoding().isEmpty() && procedure.getCode().getCoding().get(0).hasDisplay() ? procedure.getCode().getCoding().get(0).getDisplay() : null);
                                         prophylAxisDetailsDTO.setStatus(procedure.hasStatus() ? procedure.getStatus().getDisplay() : null);
                                         prophylAxisDetailsDTO.setNotes(procedure.hasNote() && !procedure.getNote().isEmpty() ? procedure.getNote().get(0).getText() : null);
-                                        //TODO: Add prophylAxis reaction
+                                        ReactionDTO prophylAxisReaction = new ReactionDTO();
+                                        if (procedure.hasExtension() && procedure.getExtension().isEmpty()) {
+                                            prophylAxisReaction.setReactionDate(getNestedExtensionValueDateTime(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date", "reactionDate"));
+                                            prophylAxisReaction.setReported(getNestedExtensionValueBoolean(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date", "reported"));
+                                            prophylAxisReaction.setNotes(getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date", "reactionNotes"));
+                                        }
+                                        prophylAxisDetailsDTO.setReaction(prophylAxisReaction);
                                         prophylAxisDetailsDTOS.add(prophylAxisDetailsDTO);
                                     }
                                     templateData.setProphylAxisDetails(prophylAxisDetailsDTOS);
