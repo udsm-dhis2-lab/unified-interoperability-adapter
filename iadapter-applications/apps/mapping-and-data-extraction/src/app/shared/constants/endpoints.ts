@@ -1,4 +1,4 @@
 export enum Endpoints {
   INSTANCES = 'instances',
-  VERIFY_CODE = 'reports/verifyCode',
+  VERIFY_INSTANCE = 'reports/verify',
 }
