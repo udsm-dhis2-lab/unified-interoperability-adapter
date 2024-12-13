@@ -102,7 +102,7 @@ async def process_loinc_code():
                     "dataKey": "2-" + row[0],
                     "value": {
                         "code": row[0],
-                        "name": row[1],
+                        "name": row[0] +" " + row[1],
                         "longCommonName": row[25],
                         "displayName": row[39],
                         "system": row[4],
