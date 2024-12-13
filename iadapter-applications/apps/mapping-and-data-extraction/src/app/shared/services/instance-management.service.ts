@@ -15,7 +15,7 @@ import { InstancePage } from '../models';
 })
 export class InstanceManagementService {
   instanceUrl: string = Endpoints.INSTANCES;
-  verifyInstanceByCodeUrl: string = Endpoints.VERIFY_CODE;
+  verifyInstanceUrl: string = Endpoints.VERIFY_INSTANCE;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -51,8 +51,8 @@ export class InstanceManagementService {
       .pipe(catchError((error: any) => this.handleError(error)));
   }
 
-  verifyInstanceByCode(payLoad: any) {
-    return this.httpClient.post(this.verifyInstanceByCodeUrl, payLoad).pipe(
+  verifyInstance(payLoad: any) {
+    return this.httpClient.post(this.verifyInstanceUrl, payLoad).pipe(
       catchError((error: any) => {
         if (error.status === 400) {
           throw new Error('Incorrect code or credentilals');
@@ -69,10 +69,10 @@ export class InstanceManagementService {
     uuid?: string
   ): Observable<any> {
     return isUpdating
-      ? this.verifyInstanceByCode(payLoad).pipe(
+      ? this.verifyInstance(payLoad).pipe(
           switchMap(() => this.updateInstance(payLoad, uuid))
         )
-      : this.verifyInstanceByCode(payLoad).pipe(
+      : this.verifyInstance(payLoad).pipe(
           switchMap(() => this.addInstance(payLoad))
         );
   }
