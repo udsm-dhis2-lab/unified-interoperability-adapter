@@ -60,22 +60,54 @@
               </div>
             </div>
 
-            <!-- list of selected icd codes  -->
+            <div nz-row style="margin-bottom: 16px">
+              <div nz-col nzSpan="24">
+                <custom-select
+                  [placeHolder]="placeHolderForLoincCodeSelectObs"
+                  [isMultiple]="false"
+                  [isLoading]="isLoadingLoincCodesObs"
+                  [optionList]="loincCodeOptionListObs"
+                  (onSearchChange)="onSearchLoincCodeObs($event)"
+                  (onSelectChange)="onLoincCodeSelectObs($event)"
+                ></custom-select>
+              </div>
+            </div>
+
+            <!-- list of selected icd codes && loinc observation codes  -->
             <div
-              *ngIf="selectedICdCodes.length > 0"
+              *ngIf="
+                selectedICdCodes.length > 0 || selectedLoincCodesObs.length > 0
+              "
               nz-row
+              nzGutter="16"
               style="margin-top: 16px; margin-bottom: 16px"
             >
-              <nz-card style="width: 100%">
-                @for (icdCode of selectedICdCodes; track $index) {
-                <nz-tag
-                  nzMode="closeable"
-                  (nzOnClose)="onRemoveIcdCode(icdCode)"
-                  >{{ icdCode.name }}</nz-tag
-                >
-                }
-              </nz-card>
+              <div *ngIf="selectedICdCodes.length > 0" nz-col nzSpan="12">
+                <nz-card style="width: 100%">
+                  <p>ICD Codes</p>
+                  @for (icdCode of selectedICdCodes; track $index) {
+                  <nz-tag
+                    nzMode="closeable"
+                    (nzOnClose)="onRemoveIcdCode(icdCode)"
+                    >{{ icdCode.name }}</nz-tag
+                  >
+                  }
+                </nz-card>
+              </div>
+              <div *ngIf="selectedLoincCodesObs.length > 0" nz-col nzSpan="12">
+                <nz-card style="width: 100%">
+                  <p>Loinc Codes Obs</p>
+                  @for (loincCodeObs of selectedLoincCodesObs; track $index) {
+                  <nz-tag
+                    nzMode="closeable"
+                    (nzOnClose)="onRemoveLoincCodeObs(loincCodeObs)"
+                    >{{ loincCodeObs.name }}</nz-tag
+                  >
+                  }
+                </nz-card>
+              </div>
             </div>
+
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
                 <custom-select

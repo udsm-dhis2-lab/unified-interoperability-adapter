@@ -138,7 +138,7 @@ export class DatasetMappingComponent implements OnInit {
 
   selectedLoincCodes: { name: string; code: string }[] = [];
   searchLoincCodeChange$ = new BehaviorSubject('');
-  placeHolderForLoincCodeSelect: string = 'Select LOINC Code';
+  placeHolderForLoincCodeSelect: string = 'Select LOINC Code (Order)';
   isLoadingLoincCodes: boolean = false;
   selectedLoincCode?: { name: string; code: string };
   loincCodeOptionList: any[] = [];
@@ -154,6 +154,28 @@ export class DatasetMappingComponent implements OnInit {
 
   onRemoveLoincCode(tag: { name: string; code: string }) {
     this.selectedLoincCodes = this.selectedLoincCodes.filter(
+      (item) => item.code !== tag.code
+    );
+  }
+
+  selectedLoincCodesObs: { name: string; code: string }[] = [];
+  searchLoincCodeChangeObs$ = new BehaviorSubject('');
+  placeHolderForLoincCodeSelectObs: string = 'Select LOINC Code (Obs)';
+  isLoadingLoincCodesObs: boolean = false;
+  selectedLoincCodeObs?: { name: string; code: string };
+  loincCodeOptionListObs: any[] = [];
+
+  onSearchLoincCodeObs(value: string): void {
+    this.isLoadingLoincCodesObs = true;
+    this.searchLoincCodeChangeObs$.next(value);
+  }
+
+  onLoincCodeSelectObs(value: { name: string; code: string }) {
+    this.selectedLoincCodesObs = [...this.selectedLoincCodes, value];
+  }
+
+  onRemoveLoincCodeObs(tag: { name: string; code: string }) {
+    this.selectedLoincCodesObs = this.selectedLoincCodes.filter(
       (item) => item.code !== tag.code
     );
   }
@@ -193,6 +215,7 @@ export class DatasetMappingComponent implements OnInit {
     this.searchIcdCode();
     this.searchConfigurations();
     this.searchLoincCodes();
+    this.searchLoincCodesObs();
     this.loadDatasetByIdFromServer(this.dataSetIds.uuid);
   }
 
@@ -229,6 +252,7 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedDataTemplateBlock = '';
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
+    this.selectedLoincCodesObs = [];
     this.mappingUuid = undefined;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
@@ -293,6 +317,12 @@ export class DatasetMappingComponent implements OnInit {
 
           if (data.mapping.loincMappings.length > 0) {
             this.selectedLoincCodes = data?.mapping?.loincMappings.map(
+              (item: any) => item
+            );
+          }
+
+          if (data.mapping.loincObsMappings.length > 0) {
+            this.selectedLoincCodesObs = data?.mapping?.loincObsMappings.map(
               (item: any) => item
             );
           }
@@ -449,6 +479,36 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
+  searchLoincCodesObs() {
+    const loincList$: Observable<LoincCodePage> = this.searchLoincCodeChangeObs$
+      .asObservable()
+      .pipe(debounceTime(500))
+      .pipe(
+        switchMap((value: string) => {
+          return this.dataSetManagementService.getLoincCodes(1, 10, [
+            { key: 'q', value: [value] },
+          ]);
+        })
+      );
+    loincList$.subscribe({
+      next: (data: any) => {
+        this.isLoadingLoincCodesObs = false;
+        console.log('Loinc Obs: ', data);
+        this.loincCodeOptionListObs =
+          data?.listOfLoincCodes?.map((item: any) => {
+            return {
+              value: {
+                code: item.code,
+                name: item.name,
+              },
+              label: `${item.code}-${item.name}`,
+            };
+          }) ?? [];
+      },
+      error: (error: any) => {},
+    });
+  }
+
   searchConfigurations() {
     const configurationsList$: Observable<ConfigurationPage> =
       this.searchConfigurationChange$
@@ -517,6 +577,13 @@ export class DatasetMappingComponent implements OnInit {
         }),
 
         loincMappings: this.selectedLoincCodes.map((item) => {
+          return {
+            code: item.code,
+            name: item.name,
+          };
+        }),
+
+        loincObsMappings: this.selectedLoincCodesObs.map((item) => {
           return {
             code: item.code,
             name: item.name,
