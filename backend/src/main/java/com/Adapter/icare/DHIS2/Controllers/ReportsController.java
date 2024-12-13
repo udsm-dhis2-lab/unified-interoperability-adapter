@@ -44,7 +44,9 @@ import com.Adapter.icare.Domains.*;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Utils.EncryptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValueSets;
 import com.Adapter.icare.DHIS2.DHISDomains.DataValues;
@@ -201,6 +203,37 @@ public class ReportsController {
             throw new RuntimeException("Error verifying organisation unit using code: " + e);
         }
         return organisationUnit;
+    }
+
+    @PostMapping(path = "/verify",consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> authenticateDHIS2User(@RequestBody Instance instance) throws Exception {
+        String url = instance.getUrl() + "/api";
+        String username = instance.getUsername();
+        String password =instance.getPassword();
+        Map<String, Object> returnResponse = new HashMap<>();
+        try {
+            Dhis2Client dhis2Client = null;
+            try {
+                dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+            } catch (Exception e) {
+                throw new RuntimeException("Error establishing DHIS2 client: " + e);
+            }
+            if (dhis2Client != null) {
+                Map<String, Object> response = dhis2Client.get("me.json").withFields("id,name,code").transfer().returnAs(Map.class);
+                System.out.println(response);
+                if (response != null) {
+                    returnResponse = response;
+                } else {
+                    returnResponse.put("message", "Bad credentials ");
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(returnResponse);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error verifying organisation unit using code: " + e);
+        }
+        return ResponseEntity.ok(returnResponse);
     }
     
 }
