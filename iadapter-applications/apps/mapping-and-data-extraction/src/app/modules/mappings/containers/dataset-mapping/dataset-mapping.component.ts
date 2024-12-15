@@ -329,41 +329,39 @@ export class DatasetMappingComponent implements OnInit {
         next: (data: any) => {
           if (data.uuid === null) return;
           this.mappingUuid = data.uuid;
-          if (data.mapping.type !== '') {
+          if (data.mapping?.type !== '') {
             this.selectedDataTemplateBlock = data.mapping.type;
           }
 
-          if (data.mapping.icdMappings.length > 0) {
+          if (data?.mapping?.icdMappings?.length > 0) {
             this.selectedICdCodes = data?.mapping?.icdMappings.map(
               (item: any) => item
             );
           }
 
-          if (data.mapping.loincMappings.length > 0) {
+          if (data?.mapping?.loincMappings?.length > 0) {
             this.selectedLoincCodes = data?.mapping?.loincMappings.map(
               (item: any) => item
             );
           }
 
-          if (data.mapping.loincObsMappings.length > 0) {
+          if (data?.mapping?.loincObsMappings?.length > 0) {
             this.selectedLoincCodesObs = data?.mapping?.loincObsMappings.map(
               (item: any) => item
             );
           }
 
-          if (data.mapping.msdMappings.length > 0) {
+          if (data?.mapping?.msdMappings?.length > 0) {
             this.selectedMsdCodes = data?.mapping?.msdMappings.map(
               (item: any) => item
             );
           }
 
-          if (data.mapping.params.length > 0) {
+          if (data?.mapping?.params?.length > 0) {
             // Consider taking one param, every param have the same number and type of configuration
             // Find respective configurations against the prefetched list of configurations
 
             const param = data.mapping.params[0];
-
-            let configurations: any[] = [];
 
             Object.keys(param).forEach((key) => {
               if (key === 'startAge') {
@@ -373,7 +371,6 @@ export class DatasetMappingComponent implements OnInit {
                 this.assignConfigurationToSelectedDisaggregation(
                   configuration.value
                 );
-                configurations = [configuration];
               } else if (key === 'endAge' || key === 'co') {
                 return;
               } else {
@@ -385,7 +382,6 @@ export class DatasetMappingComponent implements OnInit {
                     configuration.value
                   );
                 }
-                configurations = [...configurations, configuration];
               }
             });
 
@@ -394,7 +390,7 @@ export class DatasetMappingComponent implements OnInit {
                 if (key === 'endAge' || key === 'co') {
                   return;
                 } else if (key === 'startAge') {
-                  const configuration = configurations.find(
+                  const configuration = this.configurationOptionList.find(
                     (item: any) => item.value.keyToUseInMappings === 'ageGroup'
                   );
                   const selectedOption = configuration.value.options.find(
@@ -409,7 +405,7 @@ export class DatasetMappingComponent implements OnInit {
                     keyToUseInMappings: configuration.value.keyToUseInMappings,
                   });
                 } else {
-                  const configuration = configurations.find(
+                  const configuration = this.configurationOptionList.find(
                     (item: any) => item.value.keyToUseInMappings === key
                   );
                   if (configuration) {
