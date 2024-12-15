@@ -142,6 +142,24 @@ export class DatasetManagementService {
       );
   }
 
+
+  getMsdCodes(
+    pageIndex: number,
+    pageSize: number,
+    filters: Array<{ key: string; value: string[] }>
+  ): Observable<any> {
+    const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
+
+    return this.httpClient
+      .get<any>(MappingsUrls.GET_LOINC_CODES, { params })
+      .pipe(
+        map((response: { results: any }) => {
+          return LoincCodePage.fromJson(response);
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
   selectDatasetForMapping(
     instanceUuid: string,
     datasetUuid: string
