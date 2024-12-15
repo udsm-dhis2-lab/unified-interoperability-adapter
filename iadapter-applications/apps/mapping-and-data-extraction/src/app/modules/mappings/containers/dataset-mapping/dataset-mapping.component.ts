@@ -143,6 +143,20 @@ export class DatasetMappingComponent implements OnInit {
   selectedLoincCode?: { name: string; code: string };
   loincCodeOptionList: any[] = [];
 
+  selectedLoincCodesObs: { name: string; code: string }[] = [];
+  searchLoincCodeChangeObs$ = new BehaviorSubject('');
+  placeHolderForLoincCodeSelectObs: string = 'Select LOINC Code (Obs)';
+  isLoadingLoincCodesObs: boolean = false;
+  selectedLoincCodeObs?: { name: string; code: string };
+  loincCodeOptionListObs: any[] = [];
+
+  selectedMsdCodes: { name: string; code: string }[] = [];
+  searchMsdCodesChange$ = new BehaviorSubject('');
+  placeHolderForMsdCodes: string = 'Select Msd Codes';
+  isLoadingMsdCodes: boolean = false;
+  selectedMsdCode?: { name: string; code: string };
+  msdCodesOptionList: any[] = [];
+
   onSearchLoincCode(value: string): void {
     this.isLoadingLoincCodes = true;
     this.searchLoincCodeChange$.next(value);
@@ -157,13 +171,6 @@ export class DatasetMappingComponent implements OnInit {
       (item) => item.code !== tag.code
     );
   }
-
-  selectedLoincCodesObs: { name: string; code: string }[] = [];
-  searchLoincCodeChangeObs$ = new BehaviorSubject('');
-  placeHolderForLoincCodeSelectObs: string = 'Select LOINC Code (Obs)';
-  isLoadingLoincCodesObs: boolean = false;
-  selectedLoincCodeObs?: { name: string; code: string };
-  loincCodeOptionListObs: any[] = [];
 
   onSearchLoincCodeObs(value: string): void {
     this.isLoadingLoincCodesObs = true;
@@ -195,6 +202,21 @@ export class DatasetMappingComponent implements OnInit {
     );
   }
 
+  onSearchMsdCode(value: string): void {
+    this.isLoadingMsdCodes = true;
+    this.searchMsdCodesChange$.next(value);
+  }
+
+  onMsdCodeSelect(value: { name: string; code: string }) {
+    this.selectedMsdCodes = [...this.selectedMsdCodes, value];
+  }
+
+  onRemoveMsdCode(tag: { name: string; code: string }) {
+    this.selectedMsdCodes = this.selectedMsdCodes.filter(
+      (item) => item.code !== tag.code
+    );
+  }
+
   constructor(
     private route: ActivatedRoute,
     private dataSetManagementService: DatasetManagementService,
@@ -216,6 +238,7 @@ export class DatasetMappingComponent implements OnInit {
     this.searchConfigurations();
     this.searchLoincCodes();
     this.searchLoincCodesObs();
+    this.searchMsdCodes();
     this.loadDatasetByIdFromServer(this.dataSetIds.uuid);
   }
 
@@ -253,6 +276,7 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
     this.selectedLoincCodesObs = [];
+    this.selectedMsdCodes = [];
     this.mappingUuid = undefined;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
@@ -323,6 +347,12 @@ export class DatasetMappingComponent implements OnInit {
 
           if (data.mapping.loincObsMappings.length > 0) {
             this.selectedLoincCodesObs = data?.mapping?.loincObsMappings.map(
+              (item: any) => item
+            );
+          }
+
+          if (data.mapping.msdMappings.length > 0) {
+            this.selectedMsdCodes = data?.mapping?.msdMappings.map(
               (item: any) => item
             );
           }
@@ -493,9 +523,37 @@ export class DatasetMappingComponent implements OnInit {
     loincList$.subscribe({
       next: (data: any) => {
         this.isLoadingLoincCodesObs = false;
-        console.log('Loinc Obs: ', data);
         this.loincCodeOptionListObs =
           data?.listOfLoincCodes?.map((item: any) => {
+            return {
+              value: {
+                code: item.code,
+                name: item.name,
+              },
+              label: `${item.code}-${item.name}`,
+            };
+          }) ?? [];
+      },
+      error: (error: any) => {},
+    });
+  }
+
+  searchMsdCodes() {
+    const msdList$: Observable<LoincCodePage> = this.searchMsdCodesChange$
+      .asObservable()
+      .pipe(debounceTime(500))
+      .pipe(
+        switchMap((value: string) => {
+          return this.dataSetManagementService.getMsdCodes(1, 10, [
+            { key: 'q', value: [value] },
+          ]);
+        })
+      );
+    msdList$.subscribe({
+      next: (data: any) => {
+        this.isLoadingMsdCodes = false;
+        this.msdCodesOptionList =
+          data?.listOfMsdCodes?.map((item: any) => {
             return {
               value: {
                 code: item.code,
@@ -584,6 +642,13 @@ export class DatasetMappingComponent implements OnInit {
         }),
 
         loincObsMappings: this.selectedLoincCodesObs.map((item) => {
+          return {
+            code: item.code,
+            name: item.name,
+          };
+        }),
+
+        msdMappings: this.selectedMsdCodes.map((item) => {
           return {
             code: item.code,
             name: item.name,
