@@ -17,7 +17,7 @@ public class IdentifierDTO {
     private String id;
     @NotNull
     private String type;
-    private String use;
+    private boolean preferred;
     private String system;
     private FacilityDetailsDTO organization;
 

@@ -40,7 +40,7 @@ public class OrganizationDTO {
                 IdentifierDTO identifierDTO = new IdentifierDTO();
                 identifierDTO.setId(identifier.getIdElement().getId());
                 identifierDTO.setType(identifier.getType().getText());
-                identifierDTO.setUse(identifier.getUse().getDisplay());
+                identifierDTO.setPreferred(identifier.hasUse() && (identifier.getUse().getDisplay().equals("official")));
                 identifierDTOs.add(identifierDTO);
             }
         }
