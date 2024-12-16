@@ -398,12 +398,15 @@ export class DatasetMappingComponent implements OnInit {
                       item.startAge === param.startAge &&
                       item.endAge === param.endAge
                   );
-                  this.onSelectMappingSetting({
-                    value: selectedOption,
-                    categoryOptionComboId: param.co,
-                    settingName: configuration.label,
-                    keyToUseInMappings: configuration.value.keyToUseInMappings,
-                  });
+                  if (selectedOption) {
+                    this.onSelectMappingSetting({
+                      value: selectedOption,
+                      categoryOptionComboId: param.co,
+                      settingName: configuration.label,
+                      keyToUseInMappings:
+                        configuration.value.keyToUseInMappings,
+                    });
+                  }
                 } else {
                   const configuration = this.configurationOptionList.find(
                     (item: any) => item.value.keyToUseInMappings === key
