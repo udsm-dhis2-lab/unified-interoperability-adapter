@@ -87,7 +87,7 @@ public class PatientDTO {
                     IdentifierDTO identifierDTO =  new IdentifierDTO();
                     identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): this.getId());
                     identifierDTO.setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode(): null);
-                    identifierDTO.setUse( identifier.hasUse() ? identifier.getUse().getDisplay(): null);
+                    identifierDTO.setPreferred(identifier.hasUse() && (identifier.getUse().getDisplay().equals("official")));
                     identifierDTO.setSystem(identifier.hasSystem() ? identifier.getSystem(): null);
                     idsList.add(identifierDTO);
                 }
