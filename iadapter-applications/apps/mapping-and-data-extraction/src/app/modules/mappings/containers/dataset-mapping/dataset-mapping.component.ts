@@ -178,11 +178,11 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   onLoincCodeSelectObs(value: { name: string; code: string }) {
-    this.selectedLoincCodesObs = [...this.selectedLoincCodes, value];
+    this.selectedLoincCodesObs = [...this.selectedLoincCodesObs, value];
   }
 
   onRemoveLoincCodeObs(tag: { name: string; code: string }) {
-    this.selectedLoincCodesObs = this.selectedLoincCodes.filter(
+    this.selectedLoincCodesObs = this.selectedLoincCodesObs.filter(
       (item) => item.code !== tag.code
     );
   }
