@@ -109,7 +109,7 @@
               <div *ngIf="selectedLoincCodes.length > 0" nz-col nzSpan="12">
                 Loinc codes (Order)
                 <nz-card style="width: 100%">
-                  @for (loincCode of selectedLoincCodes; track $index) {
+                  @for (loincCode of selectedLoincCodes; track loincCode.code) {
                   <nz-tag
                     nzMode="closeable"
                     (nzOnClose)="onRemoveLoincCode(loincCode)"
@@ -119,9 +119,9 @@
                 </nz-card>
               </div>
               <div *ngIf="selectedLoincCodesObs.length > 0" nz-col nzSpan="12">
+                Loinc Codes Obs
                 <nz-card style="width: 100%">
-                  <p>Loinc Codes Obs</p>
-                  @for (loincCodeObs of selectedLoincCodesObs; track $index) {
+                  @for (loincCodeObs of selectedLoincCodesObs; track loincCodeObs.code) {
                   <nz-tag
                     nzMode="closeable"
                     (nzOnClose)="onRemoveLoincCodeObs(loincCodeObs)"
@@ -165,7 +165,7 @@
               <div *ngIf="selectedICdCodes.length > 0" nz-col nzSpan="12">
                 <nz-card style="width: 100%">
                   <p>ICD Codes</p>
-                  @for (icdCode of selectedICdCodes; track $index) {
+                  @for (icdCode of selectedICdCodes; track icdCode.code) {
                   <nz-tag
                     nzMode="closeable"
                     (nzOnClose)="onRemoveIcdCode(icdCode)"
@@ -177,7 +177,7 @@
               <div *ngIf="selectedMsdCodes.length > 0" nz-col nzSpan="12">
                 Msd Codes
                 <nz-card style="width: 100%">
-                  @for (msdCode of selectedMsdCodes; track $index) {
+                  @for (msdCode of selectedMsdCodes; track msdCode.code) {
                   <nz-tag
                     nzMode="closeable"
                     (nzOnClose)="onRemoveMsdCode(msdCode)"
