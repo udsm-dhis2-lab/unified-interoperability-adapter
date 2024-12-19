@@ -37,19 +37,17 @@
 
           <nz-card>
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
-              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="8">
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="6">
                 <nz-tree-select
                   style="width: 100%"
-                  [nzExpandedKeys]="expandKeys"
                   [nzNodes]="nodes"
                   nzShowSearch
                   nzPlaceHolder="LHS Query"
-                  [(ngModel)]="value"
-                  (ngModelChange)="onChange($event)"
+                  [(ngModel)]="lhsQueryValue"
                 ></nz-tree-select>
               </div>
 
-              <div nz-col [nzSpan]="8" *ngIf="rightColumnSpan === 16">
+              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16">
                 <nz-select
                   style="width: 100%"
                   [ngModel]="selectedQueryOperator"
@@ -65,16 +63,28 @@
                 </nz-select>
               </div>
 
-              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="8">
-                <nz-tree-select
-                  style="width: 100%"
-                  [nzExpandedKeys]="expandKeys"
-                  [nzNodes]="nodes"
-                  nzShowSearch
-                  nzPlaceHolder="RHS Query"
-                  [(ngModel)]="value"
-                  (ngModelChange)="onChange($event)"
-                ></nz-tree-select>
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="12">
+                <div nz-row [nzGutter]="8">
+                  <div nz-col nzSpan="12">
+                    <nz-tree-select
+                      style="width: 100%"
+                      [nzNodes]="nodes"
+                      nzShowSearch
+                      nzPlaceHolder="RHS Query"
+                      [(ngModel)]="rhsQueryValue"
+                    ></nz-tree-select>
+                  </div>
+                  <div nz-col nzSpan="8">
+                    <input
+                      nz-input
+                      placeholder="other value"
+                      [(ngModel)]="rhsInputValue"
+                    />
+                  </div>
+                  <div nz-col nzSpan="4">
+                    <button nz-button nzType="default" (click)="onAddQuery()">Add</button>
+                  </div>
+                </div>
               </div>
 
               <div
@@ -99,27 +109,6 @@
               </div>
               <div nz-col nzSpan="12">
                 <!-- TODO Add isFirst visit and isRepeated visist check boxes  -->
-                <!-- <nz-select
-                  style="width: 100%"
-                  [ngModel]="selectedDataTemplateBlock"
-                  (ngModelChange)="onDataTemplateBlockSelect($event)"
-                >
-                  <ng-container *ngFor="let option of dataTemplatesBlocks">
-                    <nz-option
-                      [nzValue]="option.key"
-                      [nzLabel]="option.name"
-                    ></nz-option>
-                  </ng-container>
-                  <nz-option
-                    [nzValue]="selectedDataTemplateBlock"
-                    [nzLabel]="
-                      selectedDataTemplateBlock !== ''
-                        ? selectedDataTemplateBlock
-                        : 'Template blocks'
-                    "
-                    nzHide
-                  ></nz-option>
-                </nz-select> -->
               </div>
             </div>
 

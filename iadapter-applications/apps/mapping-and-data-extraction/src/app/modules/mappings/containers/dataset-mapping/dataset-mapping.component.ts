@@ -58,35 +58,62 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
-  expandKeys = ['100', '1001'];
-  value?: string;
-  nodes = [
-    {
-      title: 'parent 1',
-      key: '100',
-      children: [
-        {
-          title: 'parent 1-0',
-          key: '1001',
-          children: [
-            { title: 'leaf 1-0-0', key: '10010', isLeaf: true },
-            { title: 'leaf 1-0-1', key: '10011', isLeaf: true },
-          ],
-        },
-        {
-          title: 'parent 1-1',
-          key: '1002',
-          children: [{ title: 'leaf 1-1-0', key: '10020', isLeaf: true }],
-        },
-      ],
-    },
-  ];
+  lhsQueryValue?: any;
+  rhsQueryValue?: any;
+  rhsInputValue?: any;
+  nodes = [];
 
-  onChange($event: any): void {
-    console.log('Event', $event);
+  queries: any[] = [];
+
+  onAddQuery() {
+    let primitiveValue: any = null;
+
+    const trimmedValue = this.rhsInputValue.trim();
+
+    const parsedValue = parseFloat(trimmedValue);
+
+    if (!isNaN(parsedValue)) {
+      primitiveValue = parsedValue;
+      console.log('Values...........111', primitiveValue);
+    } else if (
+      trimmedValue.toLowerCase() === 'true' ||
+      trimmedValue.toLowerCase() === 'false'
+    ) {
+      primitiveValue = trimmedValue.toLowerCase() === 'true';
+      console.log('Values...........22222', primitiveValue);
+    } else {
+      primitiveValue = trimmedValue;
+      console.log('Values...........3333', primitiveValue);
+    }
+
+    const query = {
+      leftSideQuery: this.lhsQueryValue,
+      operator: this.selectedQueryOperator,
+      rightSideQuery:
+        this.rhsQueryValue !== null
+          ? {
+              type: 'tableField',
+              value: this.rhsQueryValue,
+            }
+          : {
+              type: 'primitiveValue',
+              value: primitiveValue,
+            },
+    };
+    this.queries = [...this.queries, query];
+    this.lhsQueryValue = null;
+    this.rhsInputValue = null;
+    this.rhsQueryValue = null;
+    this.selectedQueryOperator = '';
+    console.log('Queries', this.queries);
   }
 
   queryOperators = queryOperators;
+
+  selectedQueryOperator: string = '';
+  onQueryOperatorSelect(value: string) {
+    this.selectedQueryOperator = value;
+  }
 
   isSubmittingMapping: boolean = false;
   isDeletingMapping: boolean = false;
@@ -119,11 +146,6 @@ export class DatasetMappingComponent implements OnInit {
   isLoadingConfigurations: boolean = false;
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
-
-  selectedQueryOperator: string = '';
-  onQueryOperatorSelect(value: string) {
-    this.selectedQueryOperator = value;
-  }
 
   onSearchConfiguration(value: string): void {
     this.isLoadingConfigurations = true;
@@ -644,7 +666,12 @@ export class DatasetMappingComponent implements OnInit {
               children: item?.fields?.map((field: Field) => {
                 return {
                   title: field.name,
-                  key: field,
+                  key: {
+                    code: field.code,
+                    name: field.name,
+                    type: field.type,
+                    table: field.table,
+                  },
                   isLeaf: true,
                 };
               }),
