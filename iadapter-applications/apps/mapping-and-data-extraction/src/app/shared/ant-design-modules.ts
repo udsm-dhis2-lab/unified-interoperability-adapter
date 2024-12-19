@@ -16,6 +16,7 @@ import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -36,4 +37,5 @@ export const antDesignModules = [
   NzAlertModule,
   NzModalModule,
   NzDividerModule,
+  NzTreeSelectModule,
 ];

@@ -8,6 +8,7 @@ import {
   IcdCodePage,
   MappingsUrls,
   LoincCodePage,
+  FlatViewsTablesPage,
 } from '../models';
 import { HttpParams } from '@angular/common/http';
 import {
@@ -29,6 +30,7 @@ export class DatasetManagementService {
   getMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
   updateMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
   deleteMappingUrl: string = MappingsUrls.HDU_MAPPINGS;
+  getFlatViewsTablesUrl: string = MappingsUrls.GET_FLAT_VIEWS_TABLES;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -47,6 +49,23 @@ export class DatasetManagementService {
       .pipe(
         map((response: { results: any }) => {
           return DatasetPage.fromJson(response);
+        }),
+        catchError((error: any) => this.handleError(error))
+      );
+  }
+
+  getFlatViewsTables(
+    pageIndex: number,
+    pageSize: number,
+    filters: Array<{ key: string; value: string[] }>
+  ) {
+    const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
+
+    return this.httpClient
+      .get<{ results: any }>(this.getFlatViewsTablesUrl, { params })
+      .pipe(
+        map((response: { results: any }) => {
+          return FlatViewsTablesPage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );
@@ -141,7 +160,6 @@ export class DatasetManagementService {
         catchError((error: any) => this.handleError(error))
       );
   }
-
 
   getMsdCodes(
     pageIndex: number,

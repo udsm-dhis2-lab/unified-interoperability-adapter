@@ -13,10 +13,12 @@ import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
 import {
   ConfigurationPage,
+  Field,
   IcdCodePage,
   LoincCodePage,
-  dataTemplatesBlocks,
+  queryOperators,
 } from '../../models';
+import { NzFormatEmitEvent, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -56,7 +58,35 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
-  dataTemplatesBlocks = dataTemplatesBlocks;
+  expandKeys = ['100', '1001'];
+  value?: string;
+  nodes = [
+    {
+      title: 'parent 1',
+      key: '100',
+      children: [
+        {
+          title: 'parent 1-0',
+          key: '1001',
+          children: [
+            { title: 'leaf 1-0-0', key: '10010', isLeaf: true },
+            { title: 'leaf 1-0-1', key: '10011', isLeaf: true },
+          ],
+        },
+        {
+          title: 'parent 1-1',
+          key: '1002',
+          children: [{ title: 'leaf 1-1-0', key: '10020', isLeaf: true }],
+        },
+      ],
+    },
+  ];
+
+  onChange($event: any): void {
+    console.log('Event', $event);
+  }
+
+  queryOperators = queryOperators;
 
   isSubmittingMapping: boolean = false;
   isDeletingMapping: boolean = false;
@@ -90,9 +120,9 @@ export class DatasetMappingComponent implements OnInit {
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
 
-  selectedDataTemplateBlock: string = '';
-  onDataTemplateBlockSelect(value: string) {
-    this.selectedDataTemplateBlock = value;
+  selectedQueryOperator: string = '';
+  onQueryOperatorSelect(value: string) {
+    this.selectedQueryOperator = value;
   }
 
   onSearchConfiguration(value: string): void {
@@ -239,6 +269,7 @@ export class DatasetMappingComponent implements OnInit {
     this.searchLoincCodes();
     this.searchLoincCodesObs();
     this.searchMsdCodes();
+    this.getFlatTablesFromDatastore();
     this.loadDatasetByIdFromServer(this.dataSetIds.uuid);
   }
 
@@ -272,7 +303,6 @@ export class DatasetMappingComponent implements OnInit {
     this.isLoadingDisaggregation = true;
     const inputElement = event.target as HTMLInputElement;
     this.selectedInputId = inputElement.id.split('-')[0];
-    this.selectedDataTemplateBlock = '';
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
     this.selectedLoincCodesObs = [];
@@ -329,9 +359,6 @@ export class DatasetMappingComponent implements OnInit {
         next: (data: any) => {
           if (data.uuid === null) return;
           this.mappingUuid = data.uuid;
-          if (data.mapping?.type !== '') {
-            this.selectedDataTemplateBlock = data.mapping.type;
-          }
 
           if (data?.mapping?.icdMappings?.length > 0) {
             this.selectedICdCodes = data?.mapping?.icdMappings.map(
@@ -601,6 +628,33 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
+  getFlatTablesFromDatastore() {
+    const msdList$ = this.dataSetManagementService.getFlatViewsTables(
+      1,
+      20,
+      []
+    );
+    msdList$.subscribe({
+      next: (data: any) => {
+        this.nodes =
+          data?.listOfFlatViewsTables?.map((item: any) => {
+            return {
+              title: item.tableName,
+              key: item.tableCode,
+              children: item?.fields?.map((field: Field) => {
+                return {
+                  title: field.name,
+                  key: field,
+                  isLeaf: true,
+                };
+              }),
+            };
+          }) ?? [];
+      },
+      error: (error: any) => {},
+    });
+  }
+
   onSelectMappingSetting(event: SelectedSettingOption) {
     this.mappingsData.disagregations.forEach((item) => {
       if (item.categoryOptionComboId === event.categoryOptionComboId) {
@@ -659,7 +713,6 @@ export class DatasetMappingComponent implements OnInit {
           name: '',
           code: '',
         },
-        type: this.selectedDataTemplateBlock,
         params: this.mappingsData.disagregations
           .map((item) => {
             const reducedConfig = (item.configurations ?? []).reduce(
@@ -693,7 +746,6 @@ export class DatasetMappingComponent implements OnInit {
     };
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
-    this.selectedDataTemplateBlock = '';
     return payLoad;
   }
 
