@@ -82,7 +82,9 @@
                     />
                   </div>
                   <div nz-col nzSpan="4">
-                    <button nz-button nzType="default" (click)="onAddQuery()">Add</button>
+                    <button nz-button nzType="default" (click)="onAddQuery()">
+                      Add
+                    </button>
                   </div>
                 </div>
               </div>
@@ -94,6 +96,21 @@
                 Expand the right column to configure query.
               </div>
             </div>
+
+            <!-- list of queries -->
+            <nz-card
+              *ngIf="queries.length > 0"
+              style="width: 100%; margin-top: 16px; margin-bottom: 16px"
+            >
+              <p>Queries</p>
+              <textarea
+                nz-input
+                readonly
+                placeholder="Controlled autosize"
+                [value]="queriesAsString"
+                [nzAutosize]="{ minRows: 3, maxRows: 8 }"
+              ></textarea>
+            </nz-card>
 
             <!-- selecting configurations options -->
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
@@ -108,7 +125,18 @@
                 ></custom-select>
               </div>
               <div nz-col nzSpan="12">
-                <!-- TODO Add isFirst visit and isRepeated visist check boxes  -->
+                <div nz-row [nzGutter]="16">
+                  <div nz-col nzSpan="12">
+                    <label nz-checkbox [(ngModel)]="newThisYear"
+                      >new this year</label
+                    >
+                  </div>
+                  <div nz-col nzSpan="12">
+                    <label nz-checkbox [(ngModel)]="multipleVisits"
+                      >multiple visits</label
+                    >
+                  </div>
+                </div>
               </div>
             </div>
 

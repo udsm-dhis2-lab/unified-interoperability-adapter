@@ -18,7 +18,6 @@ import {
   LoincCodePage,
   queryOperators,
 } from '../../models';
-import { NzFormatEmitEvent, NzTreeNodeOptions } from 'ng-zorro-antd/tree';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -58,6 +57,9 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  newThisYear?: boolean = false;
+  multipleVisits?: boolean = false;
+
   lhsQueryValue?: any;
   rhsQueryValue?: any;
   rhsInputValue?: any;
@@ -65,47 +67,49 @@ export class DatasetMappingComponent implements OnInit {
 
   queries: any[] = [];
 
-  onAddQuery() {
-    let primitiveValue: any = null;
+  get queriesAsString(): string {
+    return JSON.stringify(this.queries, null, 2);
+  }
 
-    const trimmedValue = this.rhsInputValue.trim();
+  onAddQuery() {
+    let primitiveValue: any;
+
+    const trimmedValue = this.rhsInputValue?.trim();
 
     const parsedValue = parseFloat(trimmedValue);
 
     if (!isNaN(parsedValue)) {
       primitiveValue = parsedValue;
-      console.log('Values...........111', primitiveValue);
     } else if (
-      trimmedValue.toLowerCase() === 'true' ||
-      trimmedValue.toLowerCase() === 'false'
+      trimmedValue?.toLowerCase() === 'true' ||
+      trimmedValue?.toLowerCase() === 'false'
     ) {
-      primitiveValue = trimmedValue.toLowerCase() === 'true';
-      console.log('Values...........22222', primitiveValue);
+      primitiveValue = trimmedValue?.toLowerCase() === 'true';
     } else {
       primitiveValue = trimmedValue;
-      console.log('Values...........3333', primitiveValue);
     }
 
-    const query = {
-      leftSideQuery: this.lhsQueryValue,
+    var query = {
+      leftSideQuery: {
+        type: 'tableField',
+        value: this.lhsQueryValue,
+      },
       operator: this.selectedQueryOperator,
-      rightSideQuery:
-        this.rhsQueryValue !== null
-          ? {
-              type: 'tableField',
-              value: this.rhsQueryValue,
-            }
-          : {
-              type: 'primitiveValue',
-              value: primitiveValue,
-            },
+      rightSideQuery: this.rhsQueryValue
+        ? {
+            type: 'tableField',
+            value: this.rhsQueryValue,
+          }
+        : {
+            type: 'primitiveValue',
+            value: primitiveValue,
+          },
     };
     this.queries = [...this.queries, query];
     this.lhsQueryValue = null;
     this.rhsInputValue = null;
     this.rhsQueryValue = null;
     this.selectedQueryOperator = '';
-    console.log('Queries', this.queries);
   }
 
   queryOperators = queryOperators;
@@ -329,6 +333,9 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedLoincCodes = [];
     this.selectedLoincCodesObs = [];
     this.selectedMsdCodes = [];
+    this.queries = [];
+    this.newThisYear = false;
+    this.multipleVisits = false;
     this.mappingUuid = undefined;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
@@ -392,6 +399,18 @@ export class DatasetMappingComponent implements OnInit {
             this.selectedLoincCodes = data?.mapping?.loincMappings.map(
               (item: any) => item
             );
+          }
+
+          if (data?.mapping?.queries?.length > 0) {
+            this.queries = data?.mapping?.queries;
+          }
+
+          if (data?.mapping?.newThisYear) {
+            this.newThisYear = data?.mapping?.newThisYear;
+          }
+
+          if (data?.mapping?.multipleVisits) {
+            this.multipleVisits = data?.mapping?.multipleVisits;
           }
 
           if (data?.mapping?.loincObsMappings?.length > 0) {
@@ -707,6 +726,10 @@ export class DatasetMappingComponent implements OnInit {
   createMappingsPayload() {
     const payLoad = {
       mapping: {
+        queries: this.queries,
+        newThisYear: this.newThisYear,
+        multipleVisits: this.multipleVisits,
+
         icdMappings: this.selectedICdCodes.map((item) => {
           return {
             code: item.code,
