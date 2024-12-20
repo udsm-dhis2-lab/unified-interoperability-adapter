@@ -36,6 +36,82 @@
           </div>
 
           <nz-card>
+            <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="6">
+                <nz-tree-select
+                  style="width: 100%"
+                  [nzNodes]="nodes"
+                  nzShowSearch
+                  nzPlaceHolder="LHS Query"
+                  [(ngModel)]="lhsQueryValue"
+                ></nz-tree-select>
+              </div>
+
+              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16">
+                <nz-select
+                  style="width: 100%"
+                  [ngModel]="selectedQueryOperator"
+                  (ngModelChange)="onQueryOperatorSelect($event)"
+                >
+                  <ng-container *ngFor="let option of queryOperators">
+                    <nz-option
+                      [nzValue]="option.key"
+                      [nzLabel]="option.name"
+                    ></nz-option>
+                  </ng-container>
+                  <nz-option nzValue="" nzLabel="Operator" nzHide></nz-option>
+                </nz-select>
+              </div>
+
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="12">
+                <div nz-row [nzGutter]="8">
+                  <div nz-col nzSpan="12">
+                    <nz-tree-select
+                      style="width: 100%"
+                      [nzNodes]="nodes"
+                      nzShowSearch
+                      nzPlaceHolder="RHS Query"
+                      [(ngModel)]="rhsQueryValue"
+                    ></nz-tree-select>
+                  </div>
+                  <div nz-col nzSpan="8">
+                    <input
+                      nz-input
+                      placeholder="other value"
+                      [(ngModel)]="rhsInputValue"
+                    />
+                  </div>
+                  <div nz-col nzSpan="4">
+                    <button nz-button nzType="default" (click)="onAddQuery()">
+                      Add
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                *ngIf="rightColumnSpan !== 16"
+                style="margin-top: 16px; font-size: 14px; color: #888"
+              >
+                Expand the right column to configure query.
+              </div>
+            </div>
+
+            <!-- list of queries -->
+            <nz-card
+              *ngIf="queries.length > 0"
+              style="width: 100%; margin-top: 16px; margin-bottom: 16px"
+            >
+              <p>Queries</p>
+              <textarea
+                nz-input
+                readonly
+                placeholder="Controlled autosize"
+                [value]="queriesAsString"
+                [nzAutosize]="{ minRows: 3, maxRows: 8 }"
+              ></textarea>
+            </nz-card>
+
             <!-- selecting configurations options -->
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
@@ -49,27 +125,18 @@
                 ></custom-select>
               </div>
               <div nz-col nzSpan="12">
-                <nz-select
-                  style="width: 100%"
-                  [ngModel]="selectedDataTemplateBlock"
-                  (ngModelChange)="onDataTemplateBlockSelect($event)"
-                >
-                  <ng-container *ngFor="let option of dataTemplatesBlocks">
-                    <nz-option
-                      [nzValue]="option.key"
-                      [nzLabel]="option.name"
-                    ></nz-option>
-                  </ng-container>
-                  <nz-option
-                    [nzValue]="selectedDataTemplateBlock"
-                    [nzLabel]="
-                      selectedDataTemplateBlock !== ''
-                        ? selectedDataTemplateBlock
-                        : 'Template blocks'
-                    "
-                    nzHide
-                  ></nz-option>
-                </nz-select>
+                <div nz-row [nzGutter]="16">
+                  <div nz-col nzSpan="12">
+                    <label nz-checkbox [(ngModel)]="newThisYear"
+                      >new this year</label
+                    >
+                  </div>
+                  <div nz-col nzSpan="12">
+                    <label nz-checkbox [(ngModel)]="multipleVisits"
+                      >multiple visits</label
+                    >
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -121,7 +188,8 @@
               <div *ngIf="selectedLoincCodesObs.length > 0" nz-col nzSpan="12">
                 Loinc Codes Obs
                 <nz-card style="width: 100%">
-                  @for (loincCodeObs of selectedLoincCodesObs; track loincCodeObs.code) {
+                  @for (loincCodeObs of selectedLoincCodesObs; track
+                  loincCodeObs.code) {
                   <nz-tag
                     nzMode="closeable"
                     (nzOnClose)="onRemoveLoincCodeObs(loincCodeObs)"

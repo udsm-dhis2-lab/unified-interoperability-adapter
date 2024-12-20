@@ -10,4 +10,5 @@ export enum MappingsUrls {
   REMOVE_DATASET_FROM_MAPPING = 'dataSets',
   GET_CATEGORY_OPTION_COMBO = 'dataElements',
   HDU_MAPPINGS = 'hduApi/mappings',
+  GET_FLAT_VIEWS_TABLES = 'datastore/FLAT-VIEWS-TABLES',
 }

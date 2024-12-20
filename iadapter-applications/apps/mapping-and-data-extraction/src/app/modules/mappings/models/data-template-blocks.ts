@@ -1,114 +1,62 @@
-export const dataTemplatesBlocks = [
+export const queryOperators = [
   {
-    key: 'healthFacilityDetails',
-    name: 'Health facility Details',
+    key: '=',
+    name: 'Equals',
   },
   {
-    key: 'demographicDetails',
-    name: 'Demographic Details',
+    key: '!=',
+    name: 'Not Equals',
   },
   {
-    key: 'paymentDetails',
-    name: 'Payment Details',
+    key: '<',
+    name: 'Less Than',
   },
   {
-    key: 'visitDetails',
-    name: 'Visit Details',
+    key: '>',
+    name: 'Greater Than',
   },
   {
-    key: 'clinicalInformation',
-    name: 'Clinical Information',
+    key: '<=',
+    name: 'Less Than or Equal To',
   },
   {
-    key: 'allergies',
-    name: 'Vaccination Details',
+    key: '>=',
+    name: 'Greater Than or Equal To',
   },
   {
-    key: 'chronicConditions',
-    name: 'Chronic Conditions',
+    key: 'LIKE',
+    name: 'Like (Pattern Match)',
   },
   {
-    key: 'lifeStyleInformation',
-    name: 'Lifestyle Information',
+    key: 'NOT LIKE',
+    name: 'Not Like (Pattern Match)',
   },
   {
-    key: 'investigationDetails',
-    name: 'Investigation Details',
+    key: 'IN',
+    name: 'In (List)',
   },
   {
-    key: 'labInvestigationDetails',
-    name: 'Lab Investigation Details',
+    key: 'NOT IN',
+    name: 'Not In (List)',
   },
   {
-    key: 'diagnosisDetails',
-    name: 'Diagnosis Details',
+    key: 'IS NULL',
+    name: 'Is Null',
   },
   {
-    key: 'medicationDetails ',
-    name: 'Medication Details',
+    key: 'IS NOT NULL',
+    name: 'Is Not Null',
   },
   {
-    key: 'treatmentDetails',
-    name: 'Treatment Details',
+    key: 'AND',
+    name: 'Logical AND',
   },
   {
-    key: 'radiologyDetails',
-    name: 'Radiology Details',
+    key: 'OR',
+    name: 'Logical OR',
   },
   {
-    key: 'outcomeDetails',
-    name: 'Outcome Details',
-  },
-  {
-    key: 'visitMainPaymentDetails',
-    name: 'Visit Main Payment Details',
-  },
-  {
-    key: 'causesOfDeathDetails',
-    name: 'Causes of Death Details',
-  },
-  {
-    key: 'billingsDetails',
-    name: 'Billing Details',
-  },
-  {
-    key: 'admissionDetails',
-    name: 'Admission Details',
-  },
-  {
-    key: 'referralDetails',
-    name: 'Referral  Details',
-  },
-  {
-    key: 'reportDetails',
-    name: 'Report Details',
-  },
-  {
-    key: 'antenatalCareDetails',
-    name: 'Antenatal Care Details',
-  },
-  {
-    key: 'laborAndDeliveryDetails',
-    name: 'Labor and Delivery Details',
-  },
-  {
-    key: 'birthDetails',
-    name: 'Birth Details',
-  },
-  {
-    key: 'vaccinationDetails',
-    name: 'Vaccination Details',
-  },
-  {
-    key: 'prophylAxisDetails',
-    name: 'Prophylaxis Details',
-  },
-  {
-    key: 'familyPlanningDetails',
-    name: 'Family Planning Details',
-  },
-  {
-    key: 'postnatalDetails ',
-    name: 'Postnatal Details',
+    key: 'NOT',
+    name: 'Logical NOT',
   },
 ];

@@ -13,9 +13,10 @@ import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
 import {
   ConfigurationPage,
+  Field,
   IcdCodePage,
   LoincCodePage,
-  dataTemplatesBlocks,
+  queryOperators,
 } from '../../models';
 
 export interface MappingsData {
@@ -56,7 +57,67 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
-  dataTemplatesBlocks = dataTemplatesBlocks;
+  newThisYear?: boolean = false;
+  multipleVisits?: boolean = false;
+
+  lhsQueryValue?: any;
+  rhsQueryValue?: any;
+  rhsInputValue?: any;
+  nodes = [];
+
+  queries: any[] = [];
+
+  get queriesAsString(): string {
+    return JSON.stringify(this.queries, null, 2);
+  }
+
+  onAddQuery() {
+    let primitiveValue: any;
+
+    const trimmedValue = this.rhsInputValue?.trim();
+
+    const parsedValue = parseFloat(trimmedValue);
+
+    if (!isNaN(parsedValue)) {
+      primitiveValue = parsedValue;
+    } else if (
+      trimmedValue?.toLowerCase() === 'true' ||
+      trimmedValue?.toLowerCase() === 'false'
+    ) {
+      primitiveValue = trimmedValue?.toLowerCase() === 'true';
+    } else {
+      primitiveValue = trimmedValue;
+    }
+
+    var query = {
+      leftSideQuery: {
+        type: 'tableField',
+        value: this.lhsQueryValue,
+      },
+      operator: this.selectedQueryOperator,
+      rightSideQuery: this.rhsQueryValue
+        ? {
+            type: 'tableField',
+            value: this.rhsQueryValue,
+          }
+        : {
+            type: 'primitiveValue',
+            value: primitiveValue,
+          },
+    };
+    this.queries = [...this.queries, query];
+    this.lhsQueryValue = null;
+    this.rhsInputValue = null;
+    this.rhsQueryValue = null;
+    this.selectedQueryOperator = '';
+  }
+
+  queryOperators = queryOperators;
+
+  selectedQueryOperator: string = '';
+  onQueryOperatorSelect(value: string) {
+    this.selectedQueryOperator = value;
+  }
 
   isSubmittingMapping: boolean = false;
   isDeletingMapping: boolean = false;
@@ -89,11 +150,6 @@ export class DatasetMappingComponent implements OnInit {
   isLoadingConfigurations: boolean = false;
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
-
-  selectedDataTemplateBlock: string = '';
-  onDataTemplateBlockSelect(value: string) {
-    this.selectedDataTemplateBlock = value;
-  }
 
   onSearchConfiguration(value: string): void {
     this.isLoadingConfigurations = true;
@@ -239,6 +295,7 @@ export class DatasetMappingComponent implements OnInit {
     this.searchLoincCodes();
     this.searchLoincCodesObs();
     this.searchMsdCodes();
+    this.getFlatTablesFromDatastore();
     this.loadDatasetByIdFromServer(this.dataSetIds.uuid);
   }
 
@@ -272,11 +329,13 @@ export class DatasetMappingComponent implements OnInit {
     this.isLoadingDisaggregation = true;
     const inputElement = event.target as HTMLInputElement;
     this.selectedInputId = inputElement.id.split('-')[0];
-    this.selectedDataTemplateBlock = '';
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
     this.selectedLoincCodesObs = [];
     this.selectedMsdCodes = [];
+    this.queries = [];
+    this.newThisYear = false;
+    this.multipleVisits = false;
     this.mappingUuid = undefined;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
@@ -329,9 +388,6 @@ export class DatasetMappingComponent implements OnInit {
         next: (data: any) => {
           if (data.uuid === null) return;
           this.mappingUuid = data.uuid;
-          if (data.mapping?.type !== '') {
-            this.selectedDataTemplateBlock = data.mapping.type;
-          }
 
           if (data?.mapping?.icdMappings?.length > 0) {
             this.selectedICdCodes = data?.mapping?.icdMappings.map(
@@ -343,6 +399,18 @@ export class DatasetMappingComponent implements OnInit {
             this.selectedLoincCodes = data?.mapping?.loincMappings.map(
               (item: any) => item
             );
+          }
+
+          if (data?.mapping?.queries?.length > 0) {
+            this.queries = data?.mapping?.queries;
+          }
+
+          if (data?.mapping?.newThisYear) {
+            this.newThisYear = data?.mapping?.newThisYear;
+          }
+
+          if (data?.mapping?.multipleVisits) {
+            this.multipleVisits = data?.mapping?.multipleVisits;
           }
 
           if (data?.mapping?.loincObsMappings?.length > 0) {
@@ -601,6 +669,38 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
+  getFlatTablesFromDatastore() {
+    const msdList$ = this.dataSetManagementService.getFlatViewsTables(
+      1,
+      20,
+      []
+    );
+    msdList$.subscribe({
+      next: (data: any) => {
+        this.nodes =
+          data?.listOfFlatViewsTables?.map((item: any) => {
+            return {
+              title: item.tableName,
+              key: item.tableCode,
+              children: item?.fields?.map((field: Field) => {
+                return {
+                  title: field.name,
+                  key: {
+                    code: field.code,
+                    name: field.name,
+                    type: field.type,
+                    table: field.table,
+                  },
+                  isLeaf: true,
+                };
+              }),
+            };
+          }) ?? [];
+      },
+      error: (error: any) => {},
+    });
+  }
+
   onSelectMappingSetting(event: SelectedSettingOption) {
     this.mappingsData.disagregations.forEach((item) => {
       if (item.categoryOptionComboId === event.categoryOptionComboId) {
@@ -626,6 +726,10 @@ export class DatasetMappingComponent implements OnInit {
   createMappingsPayload() {
     const payLoad = {
       mapping: {
+        queries: this.queries,
+        newThisYear: this.newThisYear,
+        multipleVisits: this.multipleVisits,
+
         icdMappings: this.selectedICdCodes.map((item) => {
           return {
             code: item.code,
@@ -659,7 +763,6 @@ export class DatasetMappingComponent implements OnInit {
           name: '',
           code: '',
         },
-        type: this.selectedDataTemplateBlock,
         params: this.mappingsData.disagregations
           .map((item) => {
             const reducedConfig = (item.configurations ?? []).reduce(
@@ -693,7 +796,6 @@ export class DatasetMappingComponent implements OnInit {
     };
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
-    this.selectedDataTemplateBlock = '';
     return payLoad;
   }
 
