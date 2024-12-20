@@ -58,7 +58,7 @@ class Disaggregation {
 })
 export class DatasetMappingComponent implements OnInit {
   newThisYear?: boolean = false;
-  multipleVisits?: boolean = false;
+  newVisit?: boolean = false;
 
   lhsQueryValue?: any;
   rhsQueryValue?: any;
@@ -335,7 +335,7 @@ export class DatasetMappingComponent implements OnInit {
     this.selectedMsdCodes = [];
     this.queries = [];
     this.newThisYear = false;
-    this.multipleVisits = false;
+    this.newVisit = false;
     this.mappingUuid = undefined;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
@@ -409,8 +409,8 @@ export class DatasetMappingComponent implements OnInit {
             this.newThisYear = data?.mapping?.newThisYear;
           }
 
-          if (data?.mapping?.multipleVisits) {
-            this.multipleVisits = data?.mapping?.multipleVisits;
+          if (data?.mapping?.newVisit) {
+            this.newVisit = data?.mapping?.newVisit;
           }
 
           if (data?.mapping?.loincObsMappings?.length > 0) {
@@ -728,7 +728,7 @@ export class DatasetMappingComponent implements OnInit {
       mapping: {
         queries: this.queries,
         newThisYear: this.newThisYear,
-        multipleVisits: this.multipleVisits,
+        newVisit: this.newVisit,
 
         icdMappings: this.selectedICdCodes.map((item) => {
           return {
