@@ -78,7 +78,7 @@ async def main():
                     chapter_json_data = json.loads(chapter_response)
                     chapter = {
                         "code": chapter_json_data["code"],
-                        "name": chapter_json_data["title"]["@value"],
+                        "name": chapter_json_data["code"] + "-" + chapter_json_data["title"]["@value"],
                         "version": version,
                         "release": release,
                         "organisation": organisation,
@@ -113,7 +113,7 @@ async def main():
                     block_json_data = json.loads(block_response)
                     block = {
                         "code": blockCode,
-                        "name": block_json_data["title"]["@value"],
+                        "name": blockCode + "-" + block_json_data["title"]["@value"],
                         "version": version,
                         "release": release,
                         "organisation": organisation,
@@ -154,7 +154,7 @@ async def main():
                     print("################################################")
                     category = {
                         "code": catgoryCode,
-                        "name": category_json_data["title"]["@value"],
+                        "name": catgoryCode + "-"+ category_json_data["title"]["@value"],
                         "version": version,
                         "release": release,
                         "organisation": organisation,
@@ -206,7 +206,7 @@ async def main():
                         code_json_data = json.loads(code_response)
                         code = {
                             "code": codeCode,
-                            "name": code_json_data["title"]["@value"],
+                            "name": codeCode + "-" +code_json_data["title"]["@value"],
                             "version": version,
                             "release": release,
                             "organisation": organisation,

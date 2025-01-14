@@ -14,6 +14,7 @@ import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.FHIRConstants;
+import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
@@ -45,15 +46,22 @@ public class SharedHealthRecordsService {
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
+    private final SharedRecordsConstants sharedRecordsConstants;
     private final ClientRegistryService clientRegistryService;
     private final MediatorsService mediatorsService;
 
-    public SharedHealthRecordsService(FHIRConstants fhirConstants, UserService userService, ClientRegistryService clientRegistryService, MediatorsService mediatorsService, ClientRegistryConstants clientRegistryConstants) {
+    public SharedHealthRecordsService(FHIRConstants fhirConstants,
+                                      UserService userService,
+                                      ClientRegistryService clientRegistryService,
+                                      MediatorsService mediatorsService,
+                                      ClientRegistryConstants clientRegistryConstants,
+                                      SharedRecordsConstants sharedRecordsConstants) {
         this.fhirConstants = fhirConstants;
         this.userService = userService;
         this.clientRegistryService = clientRegistryService;
         this.mediatorsService = mediatorsService;
         this.clientRegistryConstants = clientRegistryConstants;
+        this.sharedRecordsConstants = sharedRecordsConstants;
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirClient = fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -65,7 +73,20 @@ public class SharedHealthRecordsService {
         }
     }
 
-    public Map<String, Object> getSharedRecordsWithPagination(Integer page, Integer pageSize, String identifier, String identifierType, String referralNumber, boolean onlyLinkedClients, String gender, String firstName, String middleName, String lastName, String hfrCode, Date dateOfBirth, boolean includeDeceased, Integer numberOfVisits) throws Exception {
+    public Map<String, Object> getSharedRecordsWithPagination(Integer page,
+                                                              Integer pageSize,
+                                                              String identifier,
+                                                              String identifierType,
+                                                              String referralNumber,
+                                                              boolean onlyLinkedClients,
+                                                              String gender,
+                                                              String firstName,
+                                                              String middleName,
+                                                              String lastName,
+                                                              String hfrCode,
+                                                              Date dateOfBirth,
+                                                              boolean includeDeceased,
+                                                              Integer numberOfVisits) throws Exception {
         List<Map<String, Object>> sharedRecords = new ArrayList<>();
         Bundle response = new Bundle();
         Bundle clientTotalBundle = new Bundle();
@@ -216,7 +237,7 @@ public class SharedHealthRecordsService {
                                 List<CareServiceDTO> careServiceDTOs = new ArrayList<>();
 
                                 List<Observation> careServicesObs = getObservationsByCategory("care-services", encounter, false, false);
-                                for (Observation careServiceObs: careServicesObs) {
+                                for (Observation careServiceObs : careServicesObs) {
                                     CareServiceDTO careServiceDTO = new CareServiceDTO();
                                     if (careServiceObs.hasComponent() && !careServiceObs.getComponent().isEmpty()) {
                                         Observation.ObservationComponentComponent careTypeComponent = careServiceObs.getComponent().get(0);
@@ -866,11 +887,17 @@ public class SharedHealthRecordsService {
                                         if (procedure.hasCode() && !procedure.getCode().getCoding().isEmpty()) {
                                             prophylAxisDetailsDTO.setCode(procedure.getCode().getCoding().get(0).getCode());
                                         }
-                                        //TODO: Add prophylAxis type
-                                        //TODO: Add prophylAxis name
+                                        prophylAxisDetailsDTO.setCode(procedure.hasCode() && procedure.getCode().hasText() ? procedure.getCode().getText() : null);
+                                        prophylAxisDetailsDTO.setName(procedure.hasCode() && procedure.getCode().hasCoding() && !procedure.getCode().getCoding().isEmpty() && procedure.getCode().getCoding().get(0).hasDisplay() ? procedure.getCode().getCoding().get(0).getDisplay() : null);
                                         prophylAxisDetailsDTO.setStatus(procedure.hasStatus() ? procedure.getStatus().getDisplay() : null);
                                         prophylAxisDetailsDTO.setNotes(procedure.hasNote() && !procedure.getNote().isEmpty() ? procedure.getNote().get(0).getText() : null);
-                                        //TODO: Add prophylAxis reaction
+                                        ReactionDTO prophylAxisReaction = new ReactionDTO();
+                                        if (procedure.hasExtension() && procedure.getExtension().isEmpty()) {
+                                            prophylAxisReaction.setReactionDate(getNestedExtensionValueDateTime(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date", "reactionDate"));
+                                            prophylAxisReaction.setReported(getNestedExtensionValueBoolean(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date", "reported"));
+                                            prophylAxisReaction.setNotes(getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date", "reactionNotes"));
+                                        }
+                                        prophylAxisDetailsDTO.setReaction(prophylAxisReaction);
                                         prophylAxisDetailsDTOS.add(prophylAxisDetailsDTO);
                                     }
                                     templateData.setProphylAxisDetails(prophylAxisDetailsDTOS);
@@ -1274,14 +1301,20 @@ public class SharedHealthRecordsService {
                             }
 
                             // TODO: Add history when numberOfVisits > 1
-                        } else if (organization != null) {
+                        } else if (organization != null && sharedRecordsConstants.AllowRetrievingRecordsFromSourceEMR) {
                             // TODO: Request visit from facility provided
-                            Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
-                            Map<String, Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType, "GET", null);
-                            List<Map<String, Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
-//                        System.out.println(visits.size());
-                            sharedRecords = visits;
-                        } else {
+                            try {
+                                Mediator facilityConnectionDetails = this.mediatorsService.getMediatorByCode(hfrCode);
+                                if (facilityConnectionDetails != null) {
+                                    // TODO: Add support to get the source api from mediator
+                                    Map<String, Object> emrHealthRecords = mediatorsService.routeToMediator(facilityConnectionDetails, "emrHealthRecords?id=" + identifier + "&idType=" + identifierType, "GET", null);
+                                    List<Map<String, Object>> visits = (List<Map<String, Object>>) emrHealthRecords.get("results");
+                                    sharedRecords = visits;
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                throw new Exception("There is issue with settings to query data from source system");
+                            }
                         }
                     }
                 }
