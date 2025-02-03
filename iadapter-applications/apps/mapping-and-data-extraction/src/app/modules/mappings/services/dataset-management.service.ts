@@ -18,6 +18,7 @@ import {
 } from '../../../../../../../libs/models';
 import { CategoryOptionCombo } from '../models/category-option-combo.model';
 import { Endpoints } from '../../../shared';
+import { MsdCodePage } from '../models/responses/msd-code-page';
 
 @Injectable({
   providedIn: 'root',
@@ -32,7 +33,7 @@ export class DatasetManagementService {
   deleteMappingUrl: string = MappingsUrls.HDU_MAPPINGS;
   getFlatViewsTablesUrl: string = MappingsUrls.GET_FLAT_VIEWS_TABLES;
 
-  constructor(private httpClient: HduHttpService) {}
+  constructor(private httpClient: HduHttpService) { }
 
   getDatasets(
     pageIndex: number,
@@ -169,10 +170,10 @@ export class DatasetManagementService {
     const params = this.buildHttpParams(pageIndex, pageSize, true, filters);
 
     return this.httpClient
-      .get<any>(MappingsUrls.GET_LOINC_CODES, { params })
+      .get<any>(MappingsUrls.GET_MSD_CODES, { params })
       .pipe(
         map((response: { results: any }) => {
-          return LoincCodePage.fromJson(response);
+          return MsdCodePage.fromJson(response);
         }),
         catchError((error: any) => this.handleError(error))
       );
