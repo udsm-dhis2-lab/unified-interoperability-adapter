@@ -97,13 +97,13 @@ export class DatasetMappingComponent implements OnInit {
       operator: this.selectedQueryOperator,
       rightSideQuery: this.rhsQueryValue
         ? {
-            type: 'tableField',
-            value: this.rhsQueryValue,
-          }
+          type: 'tableField',
+          value: this.rhsQueryValue,
+        }
         : {
-            type: 'primitiveValue',
-            value: primitiveValue,
-          },
+          type: 'primitiveValue',
+          value: primitiveValue,
+        },
     };
     this.queries = [...this.queries, query];
     this.lhsQueryValue = null;
@@ -281,7 +281,7 @@ export class DatasetMappingComponent implements OnInit {
     private elRef: ElementRef,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
@@ -439,8 +439,15 @@ export class DatasetMappingComponent implements OnInit {
                 this.assignConfigurationToSelectedDisaggregation(
                   configuration.value
                 );
-              } else if (key === 'endAge' || key === 'co') {
+              } else if (key === 'endAge' || key === 'co' || key === 'higherWeight') {
                 return;
+              } else if (key === 'lowerWeight') {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) => item.value.keyToUseInMappings === 'weightGroup'
+                );
+                this.assignConfigurationToSelectedDisaggregation(
+                  configuration.value
+                );
               } else {
                 const configuration = this.configurationOptionList.find(
                   (item: any) => item.value.keyToUseInMappings === key
@@ -455,7 +462,7 @@ export class DatasetMappingComponent implements OnInit {
 
             for (const param of data.mapping.params) {
               Object.keys(param).forEach((key) => {
-                if (key === 'endAge' || key === 'co') {
+                if (key === 'endAge' || key === 'co' || key === 'higherWeight') {
                   return;
                 } else if (key === 'startAge') {
                   const configuration = this.configurationOptionList.find(
@@ -465,6 +472,24 @@ export class DatasetMappingComponent implements OnInit {
                     (item: any) =>
                       item.startAge === param.startAge &&
                       item.endAge === param.endAge
+                  );
+                  if (selectedOption) {
+                    this.onSelectMappingSetting({
+                      value: selectedOption,
+                      categoryOptionComboId: param.co,
+                      settingName: configuration.label,
+                      keyToUseInMappings:
+                        configuration.value.keyToUseInMappings,
+                    });
+                  }
+                } else if (key === 'lowerWeight') {
+                  const configuration = this.configurationOptionList.find(
+                    (item: any) => item.value.keyToUseInMappings === 'weightGroup'
+                  );
+                  const selectedOption = configuration.value.options.find(
+                    (item: any) =>
+                      item.lowerWeight === param.lowerWeight &&
+                      item.higherWeight === param.higherWeight
                   );
                   if (selectedOption) {
                     this.onSelectMappingSetting({
@@ -572,7 +597,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 
@@ -601,7 +626,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 
@@ -630,7 +655,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 
@@ -697,7 +722,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 
