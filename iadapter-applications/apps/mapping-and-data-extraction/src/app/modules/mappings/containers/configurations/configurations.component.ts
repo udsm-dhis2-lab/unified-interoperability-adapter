@@ -24,6 +24,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
     { key: 'ageGroup', name: 'Age group' },
     { key: 'gender', name: 'Gender' },
     { key: 'ageType', name: 'Age type' },
+    { key: 'weightGroup', name: 'Weight Group' },
   ];
 
   selectedConfigurationType: string = '';
@@ -32,8 +33,10 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
     this.selectedConfigurationType = configurationType;
     configurationType === 'ageGroup'
       ? (this.optionPlaceHolder =
-          'Include startAge, endAge, code and name keys in your options')
-      : 'Include code and name in your options';
+        'Include startAge, endAge, code and name keys in your options')
+      : configurationType === 'weightGroup'
+        ? (this.optionPlaceHolder =
+          'Include lowerWeight, higherWeight, code and name keys in your options') : 'Include code and name in your options';
   }
 
   defaultPlaceHolder: string = 'Include code and name in your options';
