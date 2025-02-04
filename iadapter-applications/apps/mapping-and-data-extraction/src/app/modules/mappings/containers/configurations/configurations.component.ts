@@ -36,7 +36,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
         'Include startAge, endAge, code and name keys in your options')
       : configurationType === 'weightGroup'
         ? (this.optionPlaceHolder =
-          'Include lowerWeight, higherWeight, code and name keys in your options') : 'Include code and name in your options';
+          'Include lowerWeight, higherWeight, code and name keys in your options') : this.optionPlaceHolder = 'Include code and name in your options';
   }
 
   defaultPlaceHolder: string = 'Include code and name in your options';
