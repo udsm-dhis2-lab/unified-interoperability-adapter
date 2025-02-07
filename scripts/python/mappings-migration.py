@@ -14,7 +14,7 @@ headers = {
     'Content-Type': 'application/json; charset=utf8'
 }
 
-source_url ="https://iadapter.dhis2.udsm.ac.tz/api/v1/datastore"
+source_url ="http://hdu-api-dev.moh.go.tz/api/v1/datastore"
 
 async def get_mappings(namespace):
     path =source_url + "/" + namespace + "?pageSize=60"
@@ -26,13 +26,13 @@ async def get_mappings(namespace):
         return "none"
     
 async def save_mappings_by_key(key_payload):
-    response = requests.post("https://hdu-api-dev.moh.go.tz/api/v1/datastore?update=true", 
+    response = requests.post("http://hdu-api.moh.go.tz/api/v1/datastore?update=true", 
                                     json=key_payload, auth=(username,password), 
                                     headers=headers)
     return response
 
 async def main():
-    namespaces = ["MAPPINGS-Pw3c2BcqbQ5","MAPPINGS-cBPkl0M6T9I","MAPPINGS-cap79mdf6Co"]
+    namespaces = ["MAPPINGS-NDcgQeGaJC9","MAPPINGS-v6wdME3ouXu","MAPPINGS-qpcwPcj8D6u","MAPPINGS-Pw3c2BcqbQ5","MAPPINGS-cBPkl0M6T9I","MAPPINGS-V8bbSX0sFf2","MAPPINGS-RpeHQ2saIRg","MAPPINGS-cap79mdf6Co","MAPPINGS-GpPH69ru2po"]
     for namespace in namespaces:
         mappings = await get_mappings(namespace)
         if mappings != "none":

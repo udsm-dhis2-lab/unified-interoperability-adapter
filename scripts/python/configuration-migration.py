@@ -13,7 +13,7 @@ headers = {
     'Content-Type': 'application/json; charset=utf8'
 }
 
-source_url ="https://iadapter.dhis2.udsm.ac.tz/api/v1/hduApi/configurations"
+source_url ="http://hdu-api-dev.moh.go.tz/api/v1/hduApi/configurations"
 
 async def get_conigurations():
     path =source_url + "?page=1&pageSize=100"
@@ -39,7 +39,7 @@ async def save_conifguration(payload):
     payload.pop('keyToUseInMappings', None)
     payload.pop('options', None)
     print(payload)
-    response = requests.post("http://41.59.228.177/api/v1/hduApi/configurations", 
+    response = requests.post("http://hdu-api.moh.go.tz/api/v1/hduApi/configurations", 
                                     json=payload, auth=(username,password), 
                                     headers=headers)
     return response
