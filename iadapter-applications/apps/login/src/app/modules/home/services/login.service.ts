@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { catchError, Observable } from 'rxjs';
 import { LoginUrls } from '../../../shared/constants';
-import { UnAuothorizedException, UnknownException } from '@models';
+import { UnAuothorizedException, UnknownException } from 'libs/models';
 
 @Injectable({
   providedIn: 'root',

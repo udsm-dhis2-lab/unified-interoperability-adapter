@@ -761,7 +761,8 @@ public class SharedHealthRecordsService {
                                             dosagePayload.put("instructions", dosage.hasText() ? dosage.getText() : null);
                                             dosagePayload.put("quantity", quantity);
                                             dosagePayload.put("duration", duration);
-                                            dosagePayload.put("days", daysList.add(medicationDispense.hasDaysSupply() ? medicationDispense.getDaysSupply().getValue() : null));
+                                            daysList.add(medicationDispense.hasDaysSupply() ? medicationDispense.getDaysSupply().getValue() : null);
+                                            dosagePayload.put("days", daysList);
                                             dosagePayload.put("schedule", schedules);
                                             dosagePayload.put("dosageDates", schedules);
                                             medicationDetailsDTO.setDosage(dosagePayload);
