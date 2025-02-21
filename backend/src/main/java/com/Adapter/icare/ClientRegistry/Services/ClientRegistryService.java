@@ -221,7 +221,7 @@ public class ClientRegistryService {
 
             if (onlyLinkedClients != null) {
                 // TODO replace hardcoded ids with dynamic ones
-                searchClient.where(Patient.LINK.hasAnyOfIds("299","152"));
+                searchClient.where(Patient.LINK.hasAnyOfIds("HCR-F-356072-1282006","HCR-F-00101-6111991"));
             }
 
             if (gender != null) {
