@@ -60,12 +60,16 @@ export class DatasetMappingComponent implements OnInit {
   newThisYear?: boolean = false;
   newVisit?: boolean = false;
 
+  useSum?: boolean = false;
+  freeTextQuery?: boolean = false;
+
   lhsQueryValue?: any;
   rhsQueryValue?: any;
   rhsInputValue?: any;
   nodes = [];
 
   queries: any[] = [];
+  customQuery?: string = '';
 
   get queriesAsString(): string {
     return JSON.stringify(this.queries, null, 2);
@@ -337,6 +341,9 @@ export class DatasetMappingComponent implements OnInit {
     this.newThisYear = false;
     this.newVisit = false;
     this.mappingUuid = undefined;
+    this.freeTextQuery = false;
+    this.customQuery = '';
+    this.useSum = false;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
 
@@ -403,6 +410,18 @@ export class DatasetMappingComponent implements OnInit {
 
           if (data?.mapping?.queries?.length > 0) {
             this.queries = data?.mapping?.queries;
+          }
+
+          if (data?.mapping?.freeTextQuery) {
+            this.freeTextQuery = data?.mapping?.freeTextQuery;
+          }
+
+          if (data?.mapping?.customQuery) {
+            this.customQuery = data?.mapping?.customQuery ?? '';
+          }
+
+          if (data?.mapping?.useSum) {
+            this.useSum = data?.mapping?.useSum;
           }
 
           if (data?.mapping?.newThisYear) {
@@ -754,6 +773,9 @@ export class DatasetMappingComponent implements OnInit {
         queries: this.queries,
         newThisYear: this.newThisYear,
         newVisit: this.newVisit,
+        useSum: this.useSum,
+        freeTextQuery: this.freeTextQuery,
+        customQuery: this.customQuery,
 
         icdMappings: this.selectedICdCodes.map((item) => {
           return {
@@ -821,44 +843,45 @@ export class DatasetMappingComponent implements OnInit {
     };
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
-    return payLoad;
+    console.log("*************: MAPPING PAYLOADDDDDDDDD: ", payLoad);
+    // return payLoad;
   }
 
   onSubmitMappings() {
     this.isSubmittingMapping = true;
     const payLoad: any = this.createMappingsPayload();
-    let action$: Observable<any>;
+    // let action$: Observable<any>;
 
-    if (this.mappingUuid != null) {
-      payLoad.uuid = this.mappingUuid;
-      action$ = this.dataSetManagementService.updateMappings(
-        payLoad,
-        this.mappingUuid
-      );
-    } else {
-      action$ = this.dataSetManagementService.addMappings(payLoad);
-    }
+    // if (this.mappingUuid != null) {
+    //   payLoad.uuid = this.mappingUuid;
+    //   action$ = this.dataSetManagementService.updateMappings(
+    //     payLoad,
+    //     this.mappingUuid
+    //   );
+    // } else {
+    //   action$ = this.dataSetManagementService.addMappings(payLoad);
+    // }
 
-    action$.subscribe({
-      next: (data: any) => {
-        this.isSubmittingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'success',
-          message: 'Mapping added successfully',
-        };
-        // TODO: Handle response
-      },
-      error: (error: any) => {
-        this.isSubmittingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'error',
-          message: error.message,
-        };
-        // TODO: Handle error
-      },
-    });
+    // action$.subscribe({
+    //   next: (data: any) => {
+    //     this.isSubmittingMapping = false;
+    //     this.alert = {
+    //       show: true,
+    //       type: 'success',
+    //       message: 'Mapping added successfully',
+    //     };
+    //     // TODO: Handle response
+    //   },
+    //   error: (error: any) => {
+    //     this.isSubmittingMapping = false;
+    //     this.alert = {
+    //       show: true,
+    //       type: 'error',
+    //       message: error.message,
+    //     };
+    //     // TODO: Handle error
+    //   },
+    // });
   }
 
   deleteMapping() {

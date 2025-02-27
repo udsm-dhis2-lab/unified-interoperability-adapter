@@ -1,11 +1,6 @@
 <nz-spin [nzSpinning]="isLoading">
   <div class="inner-content">
-    <button
-      nz-button
-      nzType="default"
-      style="margin-bottom: 16px"
-      (click)="goBackToDatasetList()"
-    >
+    <button nz-button nzType="default" style="margin-bottom: 16px" (click)="goBackToDatasetList()">
       Go back
     </button>
 
@@ -20,66 +15,44 @@
           <div nz-row nzJustify="space-between">
             <div nz-col nzSpan="12">
               <!-- collapse button  -->
-              <button
-                nz-button
-                nzType="default"
-                (click)="onCollapse()"
-                class="collapse-button"
-              >
-                <span
-                  nz-icon
-                  [nzType]="leftColumnSpan === 8 ? 'right' : 'left'"
-                  nzTheme="outline"
-                ></span>
+              <button nz-button nzType="default" (click)="onCollapse()" class="collapse-button">
+                <span nz-icon [nzType]="leftColumnSpan === 8 ? 'right' : 'left'" nzTheme="outline"></span>
               </button>
             </div>
           </div>
 
           <nz-card>
+            <div nz-row [nzGutter]="8" style="margin-bottom: 16px;" *ngIf="rightColumnSpan === 16">
+
+              <div nz-col nzSpan="12">
+                <label nz-checkbox [(ngModel)]="useSum">Use sum to aggregate</label>
+                <label nz-checkbox [(ngModel)]="freeTextQuery">Use free text query</label>
+              </div>
+            </div>
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
-              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="6">
-                <nz-tree-select
-                  style="width: 100%"
-                  [nzNodes]="nodes"
-                  nzShowSearch
-                  nzPlaceHolder="LHS Query"
-                  [(ngModel)]="lhsQueryValue"
-                ></nz-tree-select>
+              <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="6">
+                <nz-tree-select style="width: 100%" [nzNodes]="nodes" nzShowSearch nzPlaceHolder="LHS Query"
+                  [(ngModel)]="lhsQueryValue"></nz-tree-select>
               </div>
 
-              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16">
-                <nz-select
-                  style="width: 100%"
-                  [ngModel]="selectedQueryOperator"
-                  (ngModelChange)="onQueryOperatorSelect($event)"
-                >
+              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16  && !freeTextQuery">
+                <nz-select style="width: 100%" [ngModel]="selectedQueryOperator"
+                  (ngModelChange)="onQueryOperatorSelect($event)">
                   <ng-container *ngFor="let option of queryOperators">
-                    <nz-option
-                      [nzValue]="option.key"
-                      [nzLabel]="option.name"
-                    ></nz-option>
+                    <nz-option [nzValue]="option.key" [nzLabel]="option.name"></nz-option>
                   </ng-container>
                   <nz-option nzValue="" nzLabel="Operator" nzHide></nz-option>
                 </nz-select>
               </div>
 
-              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="12">
+              <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="12">
                 <div nz-row [nzGutter]="8">
                   <div nz-col nzSpan="12">
-                    <nz-tree-select
-                      style="width: 100%"
-                      [nzNodes]="nodes"
-                      nzShowSearch
-                      nzPlaceHolder="RHS Query"
-                      [(ngModel)]="rhsQueryValue"
-                    ></nz-tree-select>
+                    <nz-tree-select style="width: 100%" [nzNodes]="nodes" nzShowSearch nzPlaceHolder="RHS Query"
+                      [(ngModel)]="rhsQueryValue"></nz-tree-select>
                   </div>
                   <div nz-col nzSpan="8">
-                    <input
-                      nz-input
-                      placeholder="other value"
-                      [(ngModel)]="rhsInputValue"
-                    />
+                    <input nz-input placeholder="other value" [(ngModel)]="rhsInputValue" />
                   </div>
                   <div nz-col nzSpan="4">
                     <button nz-button nzType="default" (click)="onAddQuery()">
@@ -89,47 +62,36 @@
                 </div>
               </div>
 
-              <div
-                *ngIf="rightColumnSpan !== 16"
-                style="margin-top: 16px; font-size: 14px; color: #888"
-              >
+              <div *ngIf="rightColumnSpan !== 16" style="margin-top: 16px; font-size: 14px; color: #888">
                 Expand the right column to configure query.
               </div>
             </div>
 
             <!-- list of queries -->
-            <nz-card
-              *ngIf="queries.length > 0"
-              style="width: 100%; margin-top: 16px; margin-bottom: 16px"
-            >
+            <nz-card *ngIf="queries.length > 0" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
               <p>Queries</p>
-              <textarea
-                nz-input
-                readonly
-                placeholder="Controlled autosize"
-                [value]="queriesAsString"
-                [nzAutosize]="{ minRows: 3, maxRows: 8 }"
-              ></textarea>
+              <textarea nz-input readonly placeholder="Controlled autosize" [value]="queriesAsString"
+                [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
+            </nz-card>
+
+            <nz-card *ngIf="freeTextQuery" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
+              <p>Free Text Query</p>
+              <textarea nz-input placeholder="Controlled autosize" [(ngModel)]="customQuery"
+                [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
             </nz-card>
 
             <!-- selecting configurations options -->
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
-                <custom-select
-                  [placeHolder]="placeHolderForConfigurationSelect"
-                  [isMultiple]="false"
-                  [isLoading]="isLoadingConfigurations"
-                  [optionList]="configurationOptionList"
+                <custom-select [placeHolder]="placeHolderForConfigurationSelect" [isMultiple]="false"
+                  [isLoading]="isLoadingConfigurations" [optionList]="configurationOptionList"
                   (onSearchChange)="onSearchConfiguration($event)"
-                  (onSelectChange)="onConfigurationSelect($event)"
-                ></custom-select>
+                  (onSelectChange)="onConfigurationSelect($event)"></custom-select>
               </div>
               <div nz-col nzSpan="12">
                 <div nz-row [nzGutter]="16">
                   <div nz-col nzSpan="12">
-                    <label nz-checkbox [(ngModel)]="newThisYear"
-                      >new this year</label
-                    >
+                    <label nz-checkbox [(ngModel)]="newThisYear">new this year</label>
                   </div>
                   <div nz-col nzSpan="12">
                     <label nz-checkbox [(ngModel)]="newVisit">new Visit</label>
@@ -140,46 +102,29 @@
 
             <div nzGutter="16" nz-row style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
-                <custom-select
-                  [placeHolder]="placeHolderForLoincCodeSelectObs"
-                  [isMultiple]="false"
-                  [isLoading]="isLoadingLoincCodesObs"
-                  [optionList]="loincCodeOptionListObs"
+                <custom-select [placeHolder]="placeHolderForLoincCodeSelectObs" [isMultiple]="false"
+                  [isLoading]="isLoadingLoincCodesObs" [optionList]="loincCodeOptionListObs"
                   (onSearchChange)="onSearchLoincCodeObs($event)"
-                  (onSelectChange)="onLoincCodeSelectObs($event)"
-                ></custom-select>
+                  (onSelectChange)="onLoincCodeSelectObs($event)"></custom-select>
               </div>
               <div nz-col nzSpan="12">
-                <custom-select
-                  [placeHolder]="placeHolderForLoincCodeSelect"
-                  [isMultiple]="false"
-                  [isLoading]="isLoadingLoincCodes"
-                  [optionList]="loincCodeOptionList"
+                <custom-select [placeHolder]="placeHolderForLoincCodeSelect" [isMultiple]="false"
+                  [isLoading]="isLoadingLoincCodes" [optionList]="loincCodeOptionList"
                   (onSearchChange)="onSearchLoincCode($event)"
-                  (onSelectChange)="onLoincCodeSelect($event)"
-                ></custom-select>
+                  (onSelectChange)="onLoincCodeSelect($event)"></custom-select>
               </div>
             </div>
 
             <!-- list of selected loinc codes && loinc observation codes  -->
-            <div
-              *ngIf="
+            <div *ngIf="
                 selectedLoincCodes.length > 0 ||
                 selectedLoincCodesObs.length > 0
-              "
-              nz-row
-              nzGutter="16"
-              style="margin-top: 16px; margin-bottom: 16px"
-            >
+              " nz-row nzGutter="16" style="margin-top: 16px; margin-bottom: 16px">
               <div *ngIf="selectedLoincCodes.length > 0" nz-col nzSpan="12">
                 Loinc codes (Order)
                 <nz-card style="width: 100%">
                   @for (loincCode of selectedLoincCodes; track loincCode.code) {
-                  <nz-tag
-                    nzMode="closeable"
-                    (nzOnClose)="onRemoveLoincCode(loincCode)"
-                    >{{ loincCode.name }}</nz-tag
-                  >
+                  <nz-tag nzMode="closeable" (nzOnClose)="onRemoveLoincCode(loincCode)">{{ loincCode.name }}</nz-tag>
                   }
                 </nz-card>
               </div>
@@ -188,11 +133,8 @@
                 <nz-card style="width: 100%">
                   @for (loincCodeObs of selectedLoincCodesObs; track
                   loincCodeObs.code) {
-                  <nz-tag
-                    nzMode="closeable"
-                    (nzOnClose)="onRemoveLoincCodeObs(loincCodeObs)"
-                    >{{ loincCodeObs.name }}</nz-tag
-                  >
+                  <nz-tag nzMode="closeable" (nzOnClose)="onRemoveLoincCodeObs(loincCodeObs)">{{ loincCodeObs.name
+                    }}</nz-tag>
                   }
                 </nz-card>
               </div>
@@ -200,43 +142,25 @@
 
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
-                <custom-select
-                  [placeHolder]="placeHolderForMsdCodes"
-                  [isMultiple]="false"
-                  [isLoading]="isLoadingMsdCodes"
-                  [optionList]="msdCodesOptionList"
-                  (onSearchChange)="onSearchMsdCode($event)"
-                  (onSelectChange)="onMsdCodeSelect($event)"
-                ></custom-select>
+                <custom-select [placeHolder]="placeHolderForMsdCodes" [isMultiple]="false"
+                  [isLoading]="isLoadingMsdCodes" [optionList]="msdCodesOptionList"
+                  (onSearchChange)="onSearchMsdCode($event)" (onSelectChange)="onMsdCodeSelect($event)"></custom-select>
               </div>
               <div nz-col nzSpan="12">
-                <custom-select
-                  [placeHolder]="placeHolderForIcdCodeSelect"
-                  [isMultiple]="false"
-                  [isLoading]="isLoadingIcdCodes"
-                  [optionList]="icdCodeOptionList"
-                  (onSearchChange)="onSearchIcdCode($event)"
-                  (onSelectChange)="onIcdCodeSelect($event)"
-                ></custom-select>
+                <custom-select [placeHolder]="placeHolderForIcdCodeSelect" [isMultiple]="false"
+                  [isLoading]="isLoadingIcdCodes" [optionList]="icdCodeOptionList"
+                  (onSearchChange)="onSearchIcdCode($event)" (onSelectChange)="onIcdCodeSelect($event)"></custom-select>
               </div>
             </div>
 
             <!-- list of selected loinc codes  && Msd Codes -->
-            <div
-              *ngIf="selectedICdCodes.length > 0 || selectedMsdCodes.length > 0"
-              nz-row
-              nzGutter="16"
-              style="margin-top: 16px; margin-bottom: 16px"
-            >
+            <div *ngIf="selectedICdCodes.length > 0 || selectedMsdCodes.length > 0" nz-row nzGutter="16"
+              style="margin-top: 16px; margin-bottom: 16px">
               <div *ngIf="selectedICdCodes.length > 0" nz-col nzSpan="12">
                 <nz-card style="width: 100%">
                   <p>ICD Codes</p>
                   @for (icdCode of selectedICdCodes; track icdCode.code) {
-                  <nz-tag
-                    nzMode="closeable"
-                    (nzOnClose)="onRemoveIcdCode(icdCode)"
-                    >{{ icdCode.name }}</nz-tag
-                  >
+                  <nz-tag nzMode="closeable" (nzOnClose)="onRemoveIcdCode(icdCode)">{{ icdCode.name }}</nz-tag>
                   }
                 </nz-card>
               </div>
@@ -244,11 +168,7 @@
                 Msd Codes
                 <nz-card style="width: 100%">
                   @for (msdCode of selectedMsdCodes; track msdCode.code) {
-                  <nz-tag
-                    nzMode="closeable"
-                    (nzOnClose)="onRemoveMsdCode(msdCode)"
-                    >{{ msdCode.name }}</nz-tag
-                  >
+                  <nz-tag nzMode="closeable" (nzOnClose)="onRemoveMsdCode(msdCode)">{{ msdCode.name }}</nz-tag>
                   }
                 </nz-card>
               </div>
@@ -256,11 +176,8 @@
 
             <!-- table  -->
             <div class="right-column">
-              <nz-table
-                [nzData]="mappingsData.disagregations"
-                [nzFrontPagination]="false"
-                [nzLoading]="isLoadingDisaggregation"
-              >
+              <nz-table [nzData]="mappingsData.disagregations" [nzFrontPagination]="false"
+                [nzLoading]="isLoadingDisaggregation">
                 <thead>
                   <tr>
                     <th>Disaggregation</th>
@@ -273,17 +190,10 @@
                   <tr>
                     <td>{{ data.categoryOptionComboName }}</td>
                     <td>
-                      <ng-container
-                        *ngFor="let config of data.configurations ?? []"
-                      >
-                        <nz-tag
-                          nzMode="closeable"
-                          (nzOnClose)="onRemoveConfiguration(config.name)"
-                          style="padding-left: 0 !important"
-                        >
-                          <nz-select
-                            [ngModel]="config.selectedValue ?? 'default'"
-                            (ngModelChange)="
+                      <ng-container *ngFor="let config of data.configurations ?? []">
+                        <nz-tag nzMode="closeable" (nzOnClose)="onRemoveConfiguration(config.name)"
+                          style="padding-left: 0 !important">
+                          <nz-select [ngModel]="config.selectedValue ?? 'default'" (ngModelChange)="
                               onSelectMappingSetting({
                                 value: $event,
                                 categoryOptionComboId:
@@ -291,26 +201,15 @@
                                 settingName: config.name,
                                 keyToUseInMappings: config.keyToUseInMappings
                               })
-                            "
-                            style="margin-right: 16px"
-                          >
-                            <ng-container
-                              *ngFor="let option of config.options ?? []"
-                            >
-                              <nz-option
-                                [nzValue]="option"
-                                [nzLabel]="option.name"
-                              ></nz-option>
+                            " style="margin-right: 16px">
+                            <ng-container *ngFor="let option of config.options ?? []">
+                              <nz-option [nzValue]="option" [nzLabel]="option.name"></nz-option>
                             </ng-container>
-                            <nz-option
-                              [nzValue]="config.selectedValue ?? 'default'"
-                              [nzLabel]="
+                            <nz-option [nzValue]="config.selectedValue ?? 'default'" [nzLabel]="
                                 config.selectedValue
                                   ? config.selectedValue.name
                                   : config.name
-                              "
-                              nzHide
-                            ></nz-option>
+                              " nzHide></nz-option>
                           </nz-select>
                         </nz-tag>
                       </ng-container>
@@ -323,17 +222,8 @@
           </nz-card>
 
           <div class="action-buttons-row">
-            <nz-spin
-              *ngIf="mappingUuid != null"
-              [nzSpinning]="isDeletingMapping"
-              class="button-padding"
-            >
-              <button
-                nz-button
-                nzType="default"
-                (click)="deleteMapping()"
-                nzDanger
-              >
+            <nz-spin *ngIf="mappingUuid != null" [nzSpinning]="isDeletingMapping" class="button-padding">
+              <button nz-button nzType="default" (click)="deleteMapping()" nzDanger>
                 Delete mappings
               </button>
             </nz-spin>
@@ -345,14 +235,8 @@
           </div>
 
           <!-- Alert  -->
-          <nz-alert
-            nzCloseable
-            *ngIf="alert.show"
-            [nzType]="alert.type === 'success' ? 'success' : 'error'"
-            [nzMessage]="alert.message"
-            (nzOnClose)="onCloseAlert()"
-            nzShowIcon
-          ></nz-alert>
+          <nz-alert nzCloseable *ngIf="alert.show" [nzType]="alert.type === 'success' ? 'success' : 'error'"
+            [nzMessage]="alert.message" (nzOnClose)="onCloseAlert()" nzShowIcon></nz-alert>
         </div>
       </div>
     </nz-card>
