@@ -843,45 +843,44 @@ export class DatasetMappingComponent implements OnInit {
     };
     this.selectedICdCodes = [];
     this.selectedLoincCodes = [];
-    console.log("*************: MAPPING PAYLOADDDDDDDDD: ", payLoad);
-    // return payLoad;
+    return payLoad;
   }
 
   onSubmitMappings() {
     this.isSubmittingMapping = true;
     const payLoad: any = this.createMappingsPayload();
-    // let action$: Observable<any>;
+    let action$: Observable<any>;
 
-    // if (this.mappingUuid != null) {
-    //   payLoad.uuid = this.mappingUuid;
-    //   action$ = this.dataSetManagementService.updateMappings(
-    //     payLoad,
-    //     this.mappingUuid
-    //   );
-    // } else {
-    //   action$ = this.dataSetManagementService.addMappings(payLoad);
-    // }
+    if (this.mappingUuid != null) {
+      payLoad.uuid = this.mappingUuid;
+      action$ = this.dataSetManagementService.updateMappings(
+        payLoad,
+        this.mappingUuid
+      );
+    } else {
+      action$ = this.dataSetManagementService.addMappings(payLoad);
+    }
 
-    // action$.subscribe({
-    //   next: (data: any) => {
-    //     this.isSubmittingMapping = false;
-    //     this.alert = {
-    //       show: true,
-    //       type: 'success',
-    //       message: 'Mapping added successfully',
-    //     };
-    //     // TODO: Handle response
-    //   },
-    //   error: (error: any) => {
-    //     this.isSubmittingMapping = false;
-    //     this.alert = {
-    //       show: true,
-    //       type: 'error',
-    //       message: error.message,
-    //     };
-    //     // TODO: Handle error
-    //   },
-    // });
+    action$.subscribe({
+      next: (data: any) => {
+        this.isSubmittingMapping = false;
+        this.alert = {
+          show: true,
+          type: 'success',
+          message: 'Mapping added successfully',
+        };
+        // TODO: Handle response
+      },
+      error: (error: any) => {
+        this.isSubmittingMapping = false;
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error.message,
+        };
+        // TODO: Handle error
+      },
+    });
   }
 
   deleteMapping() {
