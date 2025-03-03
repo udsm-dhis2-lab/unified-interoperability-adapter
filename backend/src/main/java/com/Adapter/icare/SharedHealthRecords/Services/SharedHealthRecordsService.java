@@ -619,7 +619,12 @@ public class SharedHealthRecordsService {
                                             }
                                         }
                                         labInvestigationDetailsDTO.setTestOrderDate(diagnosticReport.hasEffectiveDateTimeType() ? diagnosticReport.getEffectiveDateTimeType().getValue() : null);
-                                        labInvestigationDetailsDTO.setTestType("Lab Test");
+
+                                        labInvestigationDetailsDTO.setTestType(diagnosticReport.hasCode() &&
+                                                diagnosticReport.getCode().hasCoding() &&
+                                                !diagnosticReport.getCode().getCoding().isEmpty()
+                                                ? diagnosticReport.getCode().getCoding().get(0).getDisplay() : null);
+
                                         labInvestigationDetailsDTO.setStandardCode(
                                                 diagnosticReport.hasCode() &&
                                                         diagnosticReport.getCode().hasCoding() &&
@@ -782,6 +787,7 @@ public class SharedHealthRecordsService {
                                         radiologyDetailsDTO.setTestDate(diagnosticReport.hasIssued() ? diagnosticReport.getIssued() : null);
                                         radiologyDetailsDTO.setTestTypeName(diagnosticReport.hasCode() && diagnosticReport.getCode().hasCoding() ? diagnosticReport.getCode().getCoding().get(0).getDisplay() : null);
                                         radiologyDetailsDTO.setTestTypeCode(diagnosticReport.hasCode() && diagnosticReport.getCode().hasCoding() ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
+                                        radiologyDetailsDTO.setTestReport(diagnosticReport.hasConclusion() ? diagnosticReport.getConclusion() : null);
                                         //TODO: Add testReport and bodySite
                                         String mediaReferenceId = diagnosticReport.hasMedia() ? diagnosticReport.getMedia().get(0).getLink().getReference() : null;
                                         if (mediaReferenceId != null) {
@@ -816,18 +822,86 @@ public class SharedHealthRecordsService {
                                     Observation observation = causeOfDeathObservations.get(0);
                                     CausesOfDeathDetailsDTO causesOfDeathDetailsDTO = new CausesOfDeathDetailsDTO();
                                     causesOfDeathDetailsDTO.setDateOfDeath(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
-                                    causesOfDeathDetailsDTO.setLineA(observation.hasComponent() && !observation.getComponent().isEmpty() ? observation.getComponent().get(0).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setLineB(observation.hasComponent() && observation.getComponent().size() > 1 ? observation.getComponent().get(1).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setLineC(observation.hasComponent() && observation.getComponent().size() > 2 ? observation.getComponent().get(2).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setLineD(observation.hasComponent() && observation.getComponent().size() > 3 ? observation.getComponent().get(3).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setCauseOfDeathOther(observation.hasComponent() && observation.getComponent().size() > 4 ? observation.getComponent().get(4).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setPlaceOfDeath(observation.hasComponent() && observation.getComponent().size() > 5 ? observation.getComponent().get(5).getValueStringType().toString() : null);
-                                    causesOfDeathDetailsDTO.setMannerOfDeath(observation.hasComponent() && observation.getComponent().size() > 6 ? observation.getComponent().get(6).getValueStringType().toString() : null);
+                                    causesOfDeathDetailsDTO.setLineA(
+                                            observation.hasComponent() && !observation.getComponent().isEmpty()
+                                                    && observation.getComponent().get(0).hasValueStringType()
+                                                    ? observation.getComponent().get(0).getValueStringType().toString()
+                                                    : null
+                                    );
+
+                                    causesOfDeathDetailsDTO.setLineB(
+                                            observation.hasComponent() && observation.getComponent().size() > 1
+                                                    && observation.getComponent().get(1).hasValueStringType()
+                                                    ? observation.getComponent().get(1).getValueStringType().toString()
+                                                    : null
+                                    );
+
+                                    causesOfDeathDetailsDTO.setLineC(
+                                            observation.hasComponent() && observation.getComponent().size() > 2
+                                                    && observation.getComponent().get(2).hasValueStringType()
+                                                    ? observation.getComponent().get(2).getValueStringType().toString()
+                                                    : null
+                                    );
+
+                                    causesOfDeathDetailsDTO.setLineD(
+                                            observation.hasComponent() && observation.getComponent().size() > 3
+                                                    && observation.getComponent().get(3).hasValueStringType()
+                                                    ? observation.getComponent().get(3).getValueStringType().toString()
+                                                    : null
+                                    );
+
+                                    causesOfDeathDetailsDTO.setCauseOfDeathOther(
+                                            observation.hasComponent() && observation.getComponent().size() > 4
+                                                    && observation.getComponent().get(4).hasValueStringType()
+                                                    ? observation.getComponent().get(4).getValueStringType().toString()
+                                                    : null
+                                    );
+
+                                    causesOfDeathDetailsDTO.setPlaceOfDeath(
+                                            observation.hasComponent() && observation.getComponent().size() > 5
+                                                    && observation.getComponent().get(5).hasValueStringType()
+                                                    ? observation.getComponent().get(5).getValueStringType().toString()
+                                                    : null
+                                    );
+
+                                    causesOfDeathDetailsDTO.setMannerOfDeath(
+                                            observation.hasComponent() && observation.getComponent().size() > 6
+                                                    && observation.getComponent().get(6).hasValueStringType()
+                                                    ? observation.getComponent().get(6).getValueStringType().toString()
+                                                    : null
+                                    );
+
                                     OtherDeathDetailsDTO otherDeathDetailsDTO = new OtherDeathDetailsDTO();
-                                    otherDeathDetailsDTO.setPostmortemDetails(observation.hasComponent() && observation.getComponent().size() > 7 ? observation.getComponent().get(7).getValueStringType().toString() : null);
-                                    otherDeathDetailsDTO.setMarcerated(observation.hasComponent() && observation.getComponent().size() > 8 ? observation.getComponent().get(8).getValueBooleanType().booleanValue() : null);
-                                    otherDeathDetailsDTO.setFresh(observation.hasComponent() && observation.getComponent().size() > 9 ? observation.getComponent().get(9).getValueBooleanType().booleanValue() : null);
-                                    otherDeathDetailsDTO.setMotherCondition(observation.hasComponent() && observation.getComponent().size() > 10 ? observation.getComponent().get(10).getValueStringType().toString() : null);
+
+                                    otherDeathDetailsDTO.setPostmortemDetails(
+                                            observation.hasComponent() && observation.getComponent().size() > 7
+                                                    && observation.getComponent().get(7).hasValueStringType()
+                                                    ? observation.getComponent().get(7).getValueStringType().toString()
+                                                    : null
+                                    );
+
+                                    otherDeathDetailsDTO.setMarcerated(
+                                            observation.hasComponent() && observation.getComponent().size() > 8
+                                                    && observation.getComponent().get(8).hasValueBooleanType()
+                                                    && observation.getComponent().get(8).getValueBooleanType().getValue() != null
+                                                    ? observation.getComponent().get(8).getValueBooleanType().getValue()
+                                                    : null
+                                    );
+
+                                    otherDeathDetailsDTO.setFresh(
+                                            observation.hasComponent() && observation.getComponent().size() > 9
+                                                    && observation.getComponent().get(9).hasValueBooleanType()
+                                                    && observation.getComponent().get(9).getValueBooleanType().getValue() != null
+                                                    ? observation.getComponent().get(9).getValueBooleanType().getValue()
+                                                    : null
+                                    );
+
+                                    otherDeathDetailsDTO.setMotherCondition(
+                                            observation.hasComponent() && observation.getComponent().size() > 10
+                                                    && observation.getComponent().get(10).hasValueStringType()
+                                                    ? observation.getComponent().get(10).getValueStringType().toString()
+                                                    : null
+                                    );
                                     causesOfDeathDetailsDTO.setOtherDeathDetails(otherDeathDetailsDTO);
 
                                     templateData.setCausesOfDeathDetails(causesOfDeathDetailsDTO);
@@ -979,26 +1053,29 @@ public class SharedHealthRecordsService {
                                     List<Map<String, Object>> surgeryTreatment = new ArrayList<>();
                                     for (Procedure procedure : surgeryProcedures) {
                                         Map<String, Object> surgery = new HashMap<>();
-                                        Map<String, Object> report = new HashMap<>();
+                                        Map<String, String> surgeryReport = new HashMap<>();
                                         surgery.put("diagnosis", procedure.hasCode() && procedure.getCode().hasCoding() ? procedure.getCode().getCoding().get(0).getDisplay() : null);
                                         if (procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty()) {
                                             surgery.put("reason", procedure.getReasonCode().get(0).getText());
                                         }
+                                        surgeryReport.put("indication", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/extension-procedure-report", "indication"));
+                                        surgeryReport.put("steps", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/extension-procedure-report", "steps"));
+                                        surgeryReport.put("remarks", getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/extension-procedure-report", "remarks"));
+                                        surgery.put("report", surgeryReport);
                                         surgeryTreatment.add(surgery);
-                                        if (procedure.hasReport()) {
-                                            List<Reference> payLoadReports = procedure.getReport();
-                                            Reference reportPayload = Iterables.getLast(payLoadReports);
-                                            // Check if the reference has an ID or a reference URL
-                                            if (reportPayload.getId() == null) {
-                                                System.out.println("*2*Reference object is missing ID and Reference: " + reportPayload);
-                                                continue; // Skip this iteration
-                                            }
-                                            DocumentReference documentReference = getDocumentReferenceById(reportPayload.getId());
-                                            if (documentReference != null) {
-                                                //TODO: Surgery report has fields that are not included during saving
-                                            }
-                                        }
-                                        surgery.put("report", report);
+//                                        if (procedure.hasReport()) {
+//                                            List<Reference> payLoadReports = procedure.getReport();
+//                                            Reference reportPayload = Iterables.getLast(payLoadReports);
+//                                            // Check if the reference has an ID or a reference URL
+//                                            if (reportPayload.getId() == null) {
+//                                                System.out.println("*2*Reference object is missing ID and Reference: " + reportPayload);
+//                                                continue; // Skip this iteration
+//                                            }
+//                                            DocumentReference documentReference = getDocumentReferenceById(reportPayload.getId());
+//                                            if (documentReference != null) {
+//                                                //TODO: Surgery report has fields that are not included during saving
+//                                            }
+//                                        }
                                     }
                                     treatmentDetailsDTO.setSurgery(surgeryTreatment);
                                 }
@@ -1028,7 +1105,7 @@ public class SharedHealthRecordsService {
                                         treatment.setProcedureDate(procedure.hasPerformedDateTimeType() ? procedure.getPerformedDateTimeType().getValue() : null);
                                         treatment.setProcedureType(procedure.hasCode() ? procedure.getCode().getText() : null);
                                         treatment.setDiagnosis(procedure.hasReasonCode() && !procedure.getReasonCode().isEmpty() ? procedure.getReasonCode().get(0).getText() : null);
-                                        //TODO Add findings
+                                        treatment.setFindings(getNestedExtensionValueString(procedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/medical-procedure-details", "findings"));
                                         medicalProcedureDetails.add(treatment);
                                     }
                                     treatmentDetailsDTO.setMedicalProcedureDetails(medicalProcedureDetails);

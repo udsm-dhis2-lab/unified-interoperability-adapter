@@ -824,17 +824,12 @@ export class DatasetMappingComponent implements OnInit {
               {} as { [key: string]: any }
             );
 
-            // Check if the accumulator object is empty
-            if (Object.keys(reducedConfig).length === 0) {
-              return null;
-            }
-
             return {
               co: item.categoryOptionComboId,
               ...reducedConfig,
             };
           })
-          .filter((item) => item !== null),
+
       },
       dataKey: this.selectedInputId,
       namespace: `MAPPINGS-${this.dataSetIds.id}`,
