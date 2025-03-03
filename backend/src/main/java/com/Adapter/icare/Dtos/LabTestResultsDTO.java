@@ -21,6 +21,6 @@ public class LabTestResultsDTO {
     private String codeType;
     private String unit;
     private String lowRange;
-    private String hiRange;
+    private String highRange;
     private String remarks;
 }
