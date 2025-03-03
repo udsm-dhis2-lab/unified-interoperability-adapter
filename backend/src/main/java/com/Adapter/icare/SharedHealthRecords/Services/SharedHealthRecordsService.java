@@ -607,6 +607,7 @@ public class SharedHealthRecordsService {
                                                 ? diagnosticReport.getCode().getCoding().get(0).getCode() : null);
 
                                         labInvestigationDetailsDTO.setTestResultDate(diagnosticReport.hasEffectiveDateTimeType() && diagnosticReport.getEffectiveDateTimeType().hasValue() ? diagnosticReport.getEffectiveDateTimeType().getValue() : null);
+                                        labInvestigationDetailsDTO.setTestStatus(getNestedExtensionValueString(diagnosticReport, "http://fhir.moh.go.tz/fhir/StructureDefinition/diagonostic-report-results", "testStatus"));
 
                                         List<Identifier> identifiers = diagnosticReport.getIdentifier();
                                         for (Identifier reportIdentifier : identifiers) {
@@ -626,10 +627,7 @@ public class SharedHealthRecordsService {
                                                 ? diagnosticReport.getCode().getCoding().get(0).getDisplay() : null);
 
                                         labInvestigationDetailsDTO.setStandardCode(
-                                                diagnosticReport.hasCode() &&
-                                                        diagnosticReport.getCode().hasCoding() &&
-                                                        !diagnosticReport.getCode().getCoding().isEmpty()
-                                                        && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE : Boolean.FALSE);
+                                                getNestedExtensionValueBoolean(diagnosticReport, "http://fhir.moh.go.tz/fhir/StructureDefinition/diagonostic-report-results", "standardCode"));
                                         labInvestigationDetailsDTO.setCodeType(
                                                 diagnosticReport.hasCode() &&
                                                         diagnosticReport.getCode().hasCoding() &&
@@ -649,10 +647,7 @@ public class SharedHealthRecordsService {
 //                                                            !observation.getCode().getCoding().isEmpty() ?
 //                                                            observation.getCode().getCoding().get(0).getCode() : null);
                                                     labTestResultsDTO.setStandardCode(
-                                                            diagnosticReport.hasCode() &&
-                                                                    diagnosticReport.getCode().hasCoding() &&
-                                                                    !diagnosticReport.getCode().getCoding().isEmpty()
-                                                                    && diagnosticReport.getCode().getCoding().get(0).getSystem().contains("loinc") ? Boolean.TRUE : Boolean.FALSE);
+                                                            getNestedExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "standardCode"));
                                                     labTestResultsDTO.setReleaseDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
                                                     labTestResultsDTO.setValueType(observation.hasValueStringType()
                                                             ? "TEXT"
@@ -666,15 +661,14 @@ public class SharedHealthRecordsService {
                                                             ? String.valueOf(observation.getValueQuantity().getValue())
                                                             : observation.hasValueCodeableConcept()
                                                             ? observation.getValueCodeableConcept().getText() : null);
-                                                    labTestResultsDTO.setUnit(observation.hasValueQuantity()
-                                                            ? String.valueOf(observation.getValueQuantity().getUnit())
-                                                            : null);
+
                                                     labTestResultsDTO.setCodedValue(observation.hasCode() && observation.getCode().hasText() ? observation.getCode().getText() : null);
                                                     labTestResultsDTO.setHighRange(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "highRange"));
                                                     labTestResultsDTO.setLowRange(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "lowRange"));
                                                     labTestResultsDTO.setRemarks(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "remarks"));
                                                     labTestResultsDTO.setCodeType(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "codeType"));
                                                     labTestResultsDTO.setParameter(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "parameter"));
+                                                    labTestResultsDTO.setUnit(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "unit"));
                                                 }
                                                 labTestResultsDTOS.add(labTestResultsDTO);
                                             }
