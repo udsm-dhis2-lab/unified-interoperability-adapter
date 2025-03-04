@@ -539,11 +539,45 @@ public class ClientRegistryService {
         paymentDetailsDTO.setInsuranceCode(coverage.hasPayor() && coverage.getPayor().get(0).hasIdentifier()
                 ? coverage.getPayor().get(0).getIdentifier().getValue()
                 : null);
-        paymentDetailsDTO.setType(coverage.hasPayor() && coverage.getPayor().get(0).hasIdentifier()
-                && coverage.getPayor().get(0).getIdentifier().hasType() && coverage.getPayor().get(0).getIdentifier().getType().hasCoding()
-                ? coverage.getPayor().get(0).getIdentifier().getType().getCoding().get(0).getCode()
-                : null);
+
+        paymentDetailsDTO.setType(
+                coverage.hasType() && !coverage.getType().getCoding().isEmpty()
+                        ? coverage.getType().getCodingFirstRep().getCode()
+                        : null
+        );
+
+        paymentDetailsDTO.setShortName(
+                coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasValue()
+                        ? coverage.getClass_().get(0).getValue()
+                        : null
+        );
+
         return paymentDetailsDTO;
+    }
+
+    public VisitMainPaymentDetailsDTO mapToMainVisitPaymentDetails(Coverage coverage) {
+        VisitMainPaymentDetailsDTO visitMainPaymentDetailsDTO = new VisitMainPaymentDetailsDTO();
+        visitMainPaymentDetailsDTO.setInsuranceId(coverage.getSubscriberId());
+        visitMainPaymentDetailsDTO.setName(coverage.hasPayor()
+                ? coverage.getPayor().get(0).getDisplay()
+                : null);
+        visitMainPaymentDetailsDTO.setInsuranceCode(coverage.hasPayor() && coverage.getPayor().get(0).hasIdentifier()
+                ? coverage.getPayor().get(0).getIdentifier().getValue()
+                : null);
+
+        visitMainPaymentDetailsDTO.setType(
+                coverage.hasType() && !coverage.getType().getCoding().isEmpty()
+                        ? coverage.getType().getCodingFirstRep().getCode()
+                        : null
+        );
+
+        visitMainPaymentDetailsDTO.setShortName(
+                coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasValue()
+                        ? coverage.getClass_().get(0).getValue()
+                        : null
+        );
+
+        return visitMainPaymentDetailsDTO;
     }
 
     public List<Coverage> getCoverages(String patientId) throws Exception {

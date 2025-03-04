@@ -34,7 +34,9 @@ import org.springframework.stereotype.Service;
 import javax.security.auth.Subject;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -207,11 +209,17 @@ public class SharedHealthRecordsService {
 //                                }
                                 PatientDTO patientDTO = this.clientRegistryService.mapToPatientDTO(patient);
                                 List<Coverage> coverages = this.clientRegistryService.getCoverages(patient.getIdElement().getIdPart());
-                                List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
-                                if (coverages.size() > 0) {
-                                    paymentDetailsDTOs = coverages.stream().map(coverage -> this.clientRegistryService.mapToPaymentDetails(coverage)).collect(Collectors.toList());
+                                //TODO: Add payment details for patient
+//                                List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
+//                                if (coverages.size() > 0) {
+//                                    paymentDetailsDTOs = coverages.stream().map(coverage -> this.clientRegistryService.mapToPaymentDetails(coverage)).collect(Collectors.toList());
+//                                }
+                                List<VisitMainPaymentDetailsDTO> visitMainPaymentDetailsDTOS = new ArrayList<>();
+                                if (!coverages.isEmpty()) {
+                                    visitMainPaymentDetailsDTOS = coverages.stream().map(this.clientRegistryService::mapToMainVisitPaymentDetails).toList();
                                 }
-                                patientDTO.setPaymentDetails(paymentDetailsDTOs);
+//                                patientDTO.setPaymentDetails(paymentDetailsDTOs);
+                                templateData.setVisitMainPaymentDetails(visitMainPaymentDetailsDTOS.getFirst());
                                 String nationality = getNestedExtensionValueString(patient, "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions", "nationality");
                                 String occupation = getNestedExtensionValueString(patient, "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions", "occupation");
                                 patientDTO.setOccupation(occupation);
@@ -299,7 +307,13 @@ public class SharedHealthRecordsService {
                                             if (observation.getCode().getCoding().get(0).getCode().equals("8867-4")) {
                                                 vitalSign.put("pulseRate", observation.hasValueQuantity() ? observation.getValueQuantity().getValue() : null);
                                             }
-                                            vitalSign.put("dateTime", observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString() : null);
+                                            if (observationGroup.hasEffectiveDateTimeType() && observationGroup.getEffectiveDateTimeType().getValue() != null) {
+                                                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                                String formattedDate = sdf.format(observationGroup.getEffectiveDateTimeType().getValue());
+                                                vitalSign.put("dateTime", formattedDate);
+                                            } else {
+                                                vitalSign.put("dateTime", null);
+                                            }
                                         }
                                         vitalSigns.add(vitalSign);
                                     }
@@ -312,7 +326,13 @@ public class SharedHealthRecordsService {
                                     for (Observation observationGroup : visitNotesGroup) {
                                         // TODO: Extract for all other blocks
                                         Map<String, Object> visitNotesData = new LinkedHashMap<>();
-                                        visitNotesData.put("date", observationGroup.hasEffectiveDateTimeType() ? observationGroup.getEffectiveDateTimeType().getValueAsString() : null);
+                                        if (observationGroup.hasEffectiveDateTimeType() && observationGroup.getEffectiveDateTimeType().getValue() != null) {
+                                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                            String formattedDate = sdf.format(observationGroup.getEffectiveDateTimeType().getValue());
+                                            visitNotesData.put("date", formattedDate);
+                                        } else {
+                                            visitNotesData.put("date", null);
+                                        }
                                         // Chief complaints
                                         List<String> chiefComplaints = new ArrayList<>();
                                         List<Observation> chiefComplaintsData = getObservationsByObservationGroupId("chief-complaint", encounter, observationGroup.getIdElement().getIdPart());
@@ -642,10 +662,6 @@ public class SharedHealthRecordsService {
                                                 IIdType obsReference = reference.getReferenceElement();
                                                 if (obsReference.getResourceType().equals("Observation")) {
                                                     Observation observation = fhirClient.read().resource(Observation.class).withId(obsReference.getIdPart()).execute();
-//                                                    labTestResultsDTO.setParameter(observation.hasCode() &&
-//                                                            observation.getCode().hasCoding() &&
-//                                                            !observation.getCode().getCoding().isEmpty() ?
-//                                                            observation.getCode().getCoding().get(0).getCode() : null);
                                                     labTestResultsDTO.setStandardCode(
                                                             getNestedExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "standardCode"));
                                                     labTestResultsDTO.setReleaseDate(observation.hasEffectiveDateTimeType() ? observation.getEffectiveDateTimeType().getValue() : null);
@@ -655,12 +671,18 @@ public class SharedHealthRecordsService {
                                                             ? "NUMERIC"
                                                             : observation.hasValueCodeableConcept()
                                                             ? "CODED" : null);
-                                                    labTestResultsDTO.setResult(observation.hasValueStringType()
-                                                            ? String.valueOf(observation.getValueStringType().getValue())
-                                                            : observation.hasValueQuantity()
-                                                            ? String.valueOf(observation.getValueQuantity().getValue())
-                                                            : observation.hasValueCodeableConcept()
-                                                            ? observation.getValueCodeableConcept().getText() : null);
+
+                                                    labTestResultsDTO.setResult(
+                                                            observation.hasInterpretation() && !observation.getInterpretation().isEmpty()
+                                                                    ? observation.getInterpretationFirstRep().getText()
+                                                                    : observation.hasValueStringType()
+                                                                    ? observation.getValueStringType().getValue()
+                                                                    : observation.hasValueQuantity()
+                                                                    ? String.valueOf(observation.getValueQuantity().getValue())
+                                                                    : observation.hasValueCodeableConcept()
+                                                                    ? observation.getValueCodeableConcept().getText()
+                                                                    : null
+                                                    );
 
                                                     labTestResultsDTO.setCodedValue(observation.hasCode() && observation.getCode().hasText() ? observation.getCode().getText() : null);
                                                     labTestResultsDTO.setHighRange(getNestedExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results", "highRange"));
@@ -684,11 +706,14 @@ public class SharedHealthRecordsService {
                                 // 1. get service request
                                 // 2. Extract referral details data accordingly
                                 List<ServiceRequest> serviceRequests = getServiceRequestsByCategory(encounter.getIdElement().getIdPart(), "referral-request");
+                                System.out.println("************************: +++++++++++++ LIST OF SERVICES: " + encounter.getIdElement().getIdPart());
                                 if (!serviceRequests.isEmpty()) {
                                     for (ServiceRequest serviceRequest : serviceRequests) {
                                         if (serviceRequest.hasIdentifier() && serviceRequest.getIdentifier().get(0).hasType() && serviceRequest.getIdentifier().get(0).getType().hasCoding() && !serviceRequest.getIdentifier().get(0).getType().getCoding().isEmpty() && serviceRequest.getIdentifier().get(0).getType().getCoding().get(0).getCode().equals("REFERRAL-NUMBER")) {
                                             referralDetailsDTO.setReferralDate(serviceRequest.hasAuthoredOn() ? serviceRequest.getAuthoredOn() : null);
-                                            referralDetailsDTO.setReferralNumber(serviceRequest.getIdentifier().get(0).hasValue() ? serviceRequest.getIdentifier().get(0).getValue().replace(orgCode + "-", "") : null);
+                                            System.out.println("************************: IDENTIFIER BEFORE REPLACING: " + serviceRequest.getIdentifier().get(0).getValue());
+                                            referralDetailsDTO.setReferralNumber(serviceRequest.hasIdentifier() && !serviceRequest.getIdentifier().isEmpty() ? serviceRequest.getIdentifier().get(0).getValue().replaceFirst(Pattern.quote(orgCode + "-"), "") : null);
+                                            System.out.println("************************: IDENTIFIER AFTER REPLACING: " + serviceRequest.getIdentifier().get(0).getValue().replaceFirst(Pattern.quote(orgCode + "-"), ""));
                                             List<String> reasons = new ArrayList<>();
                                             for (Reference reasonReference : serviceRequest.getReasonReference()) {
                                                 IIdType observationReference = reasonReference.getReferenceElement();
@@ -725,6 +750,7 @@ public class SharedHealthRecordsService {
                                 }
                                 List<Identifier> identifiers = encounter.getIdentifier();
                                 for (Identifier identifierData : identifiers) {
+                                    System.out.println("************************: IDENTIFIER BEFORE REPLACING && AFTER: &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                                     referralDetailsDTO.setReferralNumber(identifierData.getValue());
                                     break;
                                 }
