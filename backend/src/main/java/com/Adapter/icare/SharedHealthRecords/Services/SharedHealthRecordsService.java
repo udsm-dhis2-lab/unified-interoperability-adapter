@@ -757,13 +757,14 @@ public class SharedHealthRecordsService {
                                             schedules.add(medicationDispense.hasWhenHandedOver() ? medicationDispense.getWhenHandedOver().toString() : null);
                                             String quantity = "";
                                             if (medicationDispense.hasQuantity()) {
-                                                quantity = medicationDispense.getQuantity().getValue() + " " + medicationDispense.getQuantity().getUnit();
+                                                String unit = medicationDispense.getQuantity().getUnit() == null ? "" : medicationDispense.getQuantity().getUnit();
+                                                quantity = medicationDispense.getQuantity().getValue() + ("null".equals(unit) ? "" : (" " + unit));
                                             }
                                             dosagePayload.put("dose", quantity);
                                             dosagePayload.put("frequency", dosage.hasTiming() && dosage.getTiming().hasRepeat() ? dosage.getTiming().getRepeat().getFrequency() : null);
                                             dosagePayload.put("route", dosage.hasRoute() && dosage.getRoute().hasCoding() ? dosage.getRoute().getCoding().get(0).getDisplay() : null);
                                             dosagePayload.put("instructions", dosage.hasText() ? dosage.getText() : null);
-                                            dosagePayload.put("quantity", quantity);
+                                            dosagePayload.put("quantity", medicationDispense.hasQuantity() ? medicationDispense.getQuantity().getValue() : null);
                                             dosagePayload.put("duration", duration);
                                             daysList.add(medicationDispense.hasDaysSupply() ? medicationDispense.getDaysSupply().getValue() : null);
                                             dosagePayload.put("days", daysList);
