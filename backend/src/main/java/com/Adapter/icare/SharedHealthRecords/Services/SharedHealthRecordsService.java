@@ -216,7 +216,7 @@ public class SharedHealthRecordsService {
 //                                }
                                 List<VisitMainPaymentDetailsDTO> visitMainPaymentDetailsDTOS = new ArrayList<>();
                                 if (!coverages.isEmpty()) {
-                                    visitMainPaymentDetailsDTOS = coverages.stream().map(this.clientRegistryService::mapToMainVisitPaymentDetails).toList();
+                                    visitMainPaymentDetailsDTOS = coverages.stream().map(coverage -> this.clientRegistryService.mapToMainVisitPaymentDetails(coverage)).collect(Collectors.toList());
                                 }
 //                                patientDTO.setPaymentDetails(paymentDetailsDTOs);
                                 templateData.setVisitMainPaymentDetails(visitMainPaymentDetailsDTOS.get(0));
