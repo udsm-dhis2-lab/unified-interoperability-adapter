@@ -745,11 +745,11 @@ public class SharedHealthRecordsService {
                                         }
                                     }
                                 }
-                                List<Identifier> identifiers = encounter.getIdentifier();
-                                for (Identifier identifierData : identifiers) {
-                                    referralDetailsDTO.setReferralNumber(identifierData.getValue());
-                                    break;
-                                }
+//                                List<Identifier> identifiers = encounter.getIdentifier();
+//                                for (Identifier identifierData : identifiers) {
+//                                    referralDetailsDTO.setReferralNumber(identifierData.getValue());
+//                                    break;
+//                                }
                                 templateData.setReferralDetails(referralDetailsDTO);
 
                                 //Medication details
