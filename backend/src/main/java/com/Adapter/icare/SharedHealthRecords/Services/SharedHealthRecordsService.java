@@ -706,14 +706,11 @@ public class SharedHealthRecordsService {
                                 // 1. get service request
                                 // 2. Extract referral details data accordingly
                                 List<ServiceRequest> serviceRequests = getServiceRequestsByCategory(encounter.getIdElement().getIdPart(), "referral-request");
-                                System.out.println("************************: +++++++++++++ LIST OF SERVICES: " + encounter.getIdElement().getIdPart());
                                 if (!serviceRequests.isEmpty()) {
                                     for (ServiceRequest serviceRequest : serviceRequests) {
                                         if (serviceRequest.hasIdentifier() && serviceRequest.getIdentifier().get(0).hasType() && serviceRequest.getIdentifier().get(0).getType().hasCoding() && !serviceRequest.getIdentifier().get(0).getType().getCoding().isEmpty() && serviceRequest.getIdentifier().get(0).getType().getCoding().get(0).getCode().equals("REFERRAL-NUMBER")) {
                                             referralDetailsDTO.setReferralDate(serviceRequest.hasAuthoredOn() ? serviceRequest.getAuthoredOn() : null);
-                                            System.out.println("************************: IDENTIFIER BEFORE REPLACING: " + serviceRequest.getIdentifier().get(0).getValue());
                                             referralDetailsDTO.setReferralNumber(serviceRequest.hasIdentifier() && !serviceRequest.getIdentifier().isEmpty() ? serviceRequest.getIdentifier().get(0).getValue().replaceFirst(Pattern.quote(orgCode + "-"), "") : null);
-                                            System.out.println("************************: IDENTIFIER AFTER REPLACING: " + serviceRequest.getIdentifier().get(0).getValue().replaceFirst(Pattern.quote(orgCode + "-"), ""));
                                             List<String> reasons = new ArrayList<>();
                                             for (Reference reasonReference : serviceRequest.getReasonReference()) {
                                                 IIdType observationReference = reasonReference.getReferenceElement();
@@ -750,7 +747,6 @@ public class SharedHealthRecordsService {
                                 }
                                 List<Identifier> identifiers = encounter.getIdentifier();
                                 for (Identifier identifierData : identifiers) {
-                                    System.out.println("************************: IDENTIFIER BEFORE REPLACING && AFTER: &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                                     referralDetailsDTO.setReferralNumber(identifierData.getValue());
                                     break;
                                 }
