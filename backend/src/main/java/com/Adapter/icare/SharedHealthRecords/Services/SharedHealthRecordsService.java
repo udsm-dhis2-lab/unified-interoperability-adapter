@@ -219,7 +219,7 @@ public class SharedHealthRecordsService {
                                     visitMainPaymentDetailsDTOS = coverages.stream().map(coverage -> this.clientRegistryService.mapToMainVisitPaymentDetails(coverage)).collect(Collectors.toList());
                                 }
 //                                patientDTO.setPaymentDetails(paymentDetailsDTOs);
-                                templateData.setVisitMainPaymentDetails(visitMainPaymentDetailsDTOS.get(0));
+                                templateData.setVisitMainPaymentDetails(!visitMainPaymentDetailsDTOS.isEmpty() ? visitMainPaymentDetailsDTOS.get(0) : null);
                                 String nationality = getNestedExtensionValueString(patient, "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions", "nationality");
                                 String occupation = getNestedExtensionValueString(patient, "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions", "occupation");
                                 patientDTO.setOccupation(occupation);
