@@ -535,7 +535,7 @@ public class SharedHealthRecordsService {
                                         diagnosisDetailsDTO.setDiagnosisCode(condition.hasCode() ? condition.getCode().getCoding().get(0).getCode().toString() : null);
                                         diagnosisDetailsDTO.setDiagnosis(condition.hasCode() ? condition.getCode().getCoding().get(0).getDisplay() : null);
                                         diagnosisDetailsDTO.setDiagnosisDate(condition.hasOnsetDateTimeType() ? condition.getOnsetDateTimeType().getValue() : null);
-                                        diagnosisDetailsDTO.setDiagnosisDescription(condition.hasCode() ? condition.getCode().getText().toString() : null);
+                                        diagnosisDetailsDTO.setDiagnosisDescription(condition.hasCode() ? condition.getCode().getText() : null);
                                         diagnosisDetailsDTO.setCertainty(condition.hasVerificationStatus() ? condition.getVerificationStatus().getCoding().get(0).getCode() : null);
                                         diagnosisDetailsDTOS.add(diagnosisDetailsDTO);
                                     }
