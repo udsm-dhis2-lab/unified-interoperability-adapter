@@ -50,6 +50,22 @@ export class HduApiNavMenuComponent implements OnInit {
       ],
     },
     {
+      name: 'Referral Management',
+      id: 'referral-management',
+      routeUrl: '/referral-management',
+      icon: 'user',
+      category: 'main',
+      subMenus: [
+        {
+          name: 'Referral Summary',
+          id: 'referral-summary',
+          routeUrl: '/referral-management/',
+          icon: 'unordered-list',
+          subMenus: [],
+        }
+      ],
+    },
+    {
       name: 'Worflows Management',
       id: 'workflows-management',
       routeUrl: '/workflows-management',
