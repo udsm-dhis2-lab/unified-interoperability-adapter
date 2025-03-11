@@ -21,6 +21,7 @@ import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
+import com.Adapter.icare.Utils.PrintOutHelper;
 import com.google.common.collect.Iterables;
 
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -104,6 +105,10 @@ public class SharedHealthRecordsService {
                     // TODO replace hardcoded ids with dynamic ones
                     searchRecords.where(Patient.LINK.hasAnyOfIds("299", "152"));
                 }
+
+                // if (withReferral) {
+                //     searchRecords.where(Patient.LINK.hasAnyOfIds("299", "152"));
+                // }
 
                 // TODO: Review the deceased concept
                 if (!includeDeceased) {
@@ -732,6 +737,7 @@ public class SharedHealthRecordsService {
                                                 if (reference.hasReferenceElement() && reference.getType().equals("Organization")) {
                                                     IIdType performerReference = reference.getReferenceElement();
                                                     Organization performer = fhirClient.read().resource(Organization.class).withId(performerReference.getIdPart()).execute();
+                                                    PrintOutHelper.print(performer.getName());
                                                     referralDetailsDTO.setHfrCode(performer.getIdElement().getIdPart());
                                                     referralDetailsDTO.setFacility(performer.getName());
                                                     break;
@@ -1424,18 +1430,6 @@ public class SharedHealthRecordsService {
                         }
                     }
                 }
-            }
-
-
-            if (withReferral) {
-                List<Map<String, Object>> filteredRecords = new ArrayList<>();
-                for (Map<String, Object> record : sharedRecords) {
-                    Map<String, Object> referralDetails = (Map<String, Object>) record.get("referralDetails");
-                    if (referralDetails != null && !referralDetails.containsValue(null)) {
-                        filteredRecords.add(record);
-                    }
-                }
-                sharedRecords = filteredRecords;
             }
 
 

@@ -14,6 +14,11 @@ import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 
+
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+
+
 export const antDesignModules = [
   NzLayoutModule,
   NzMenuModule,
@@ -30,4 +35,7 @@ export const antDesignModules = [
   NzBreadCrumbModule,
   NzSpinModule,
   NzAlertModule,
+  NzDatePickerModule,
+  NzSelectModule
+
 ];

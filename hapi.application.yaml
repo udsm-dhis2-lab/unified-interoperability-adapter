@@ -1,0 +1,53 @@
+# Server configuration
+server:
+  # address: https://fhir.dhis2.udsm.ac.tz
+  port: 8080
+# HAPI FHIR Server configuration
+hapi:
+  fhir:
+    id: UUID
+    openapi_enabled: true
+    server:
+      allow_contains_searches: true
+      paging_provider: MEMORY
+      allow_multiple_delete: true
+      allow_placeholder_references: true
+      allow_external_references: true
+      allow_external_references_on_delete: true
+      allow_override_default_search_params: true
+      allow_unqualified_references: true
+      response_highlighter_enabled: true
+      default_encoding: JSON
+      bulk_export:
+        enabled: true
+        max_results_per_file: 10000
+        max_concurrent_jobs: 5
+        retention_period_days: 30
+        storage_provider:
+          type: FILESYSTEM
+          filesystem_root: /fhir_exports
+        polling_frequency_millis: 1000
+      security:
+        oauth:
+          enabled: true
+          #serverUrl: https://fhir.dhis2.udsm.ac.tz/oauth/token
+          #tokenUrl: https://fhir.dhis2.udsm.ac.tz/oauth/token
+          #authorizationUrl: https://fhir.dhis2.udsm.ac.tz/oauth/authorize
+          supportedGrants: client_credentials
+          supportedScopes: openid,offline_access,user/*
+          tokenExpiresIn: 3600
+          tokenRefreshEnabled: true
+          tokenValidationEnabled: true
+          allowExternalAuthorize: false
+          allowAuthorizeWithoutIdToken: false
+          allowTokenEndpointParametersInRequestBody: false
+spring:
+  datasource:
+    url: 'jdbc:postgresql://fhir-db:5432/hapi'
+    username: admin
+    password: Admin321
+    driverClassName: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate.dialect: ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+      hibernate.search.enabled: false
