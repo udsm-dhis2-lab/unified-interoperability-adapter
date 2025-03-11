@@ -115,6 +115,7 @@ public class SharedHealthRecordsController {
             @RequestParam( value = "idType", required = false) String idType,
             @RequestParam( value = "referralNumber", required = false) String referralNumber,
             @RequestParam( value = "onlyLinkedClients", required = false) boolean onlyLinkedClients,
+            @RequestParam( value = "withReferral", required = false) boolean withReferral,
             @RequestParam( value = "gender", required = false) String gender,
             @RequestParam( value = "firstName", required = false) String firstName,
             @RequestParam( value = "middleName", required = false) String middleName,
@@ -140,7 +141,9 @@ public class SharedHealthRecordsController {
                     hfrCode,
                     dateOfBirth,
                     includeDeceased,
-                    numberOfVisits);
+                    numberOfVisits,
+                    withReferral
+                    );
                 return ResponseEntity.ok(sharedRecordsResponse);
             } else {
                 Map <String,Object> payload = new HashMap<>();

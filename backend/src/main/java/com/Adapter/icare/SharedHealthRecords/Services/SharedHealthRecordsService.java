@@ -88,12 +88,16 @@ public class SharedHealthRecordsService {
                                                               String hfrCode,
                                                               Date dateOfBirth,
                                                               boolean includeDeceased,
-                                                              Integer numberOfVisits) throws Exception {
+                                                              Integer numberOfVisits,
+                                                              boolean withReferral
+                                                              ) throws Exception {
+
         List<Map<String, Object>> sharedRecords = new ArrayList<>();
         Bundle response = new Bundle();
         Bundle clientTotalBundle = new Bundle();
         List<Encounter> encounters = new ArrayList<>();
         var searchRecords = fhirClient.search().forResource(Patient.class);
+
         try {
             if (referralNumber == null) {
                 if (onlyLinkedClients) {
@@ -721,6 +725,7 @@ public class SharedHealthRecordsService {
                                             }
                                             referralDetailsDTO.setReason(reasons);
 
+
                                             String facilityToCode = new String();
                                             List<Reference> performers = serviceRequest.getPerformer();
                                             for (Reference reference : performers) {
@@ -728,6 +733,7 @@ public class SharedHealthRecordsService {
                                                     IIdType performerReference = reference.getReferenceElement();
                                                     Organization performer = fhirClient.read().resource(Organization.class).withId(performerReference.getIdPart()).execute();
                                                     referralDetailsDTO.setHfrCode(performer.getIdElement().getIdPart());
+                                                    referralDetailsDTO.setFacility(performer.getName());
                                                     break;
                                                 }
                                             }
@@ -1419,6 +1425,22 @@ public class SharedHealthRecordsService {
                     }
                 }
             }
+
+
+            if (withReferral) {
+                List<Map<String, Object>> filteredRecords = new ArrayList<>();
+                for (Map<String, Object> record : sharedRecords) {
+                    Map<String, Object> referralDetails = (Map<String, Object>) record.get("referralDetails");
+                    if (referralDetails != null && !referralDetails.containsValue(null)) {
+                        filteredRecords.add(record);
+                    }
+                }
+                sharedRecords = filteredRecords;
+            }
+
+
+
+
             Map<String, Object> sharedRecordsResponse = new HashMap<>();
             sharedRecordsResponse.put("results", sharedRecords);
             Map<String, Object> pager = new HashMap<>();
