@@ -17,6 +17,7 @@ public class ReferralDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date referralDate;
     private String hfrCode;
+    private String facility;
     private List<String> reason;
     @NotNull
     private String referralNumber;
@@ -28,6 +29,7 @@ public class ReferralDetailsDTO {
         referralMap.put("reason", this.getReason());
         referralMap.put("referralNumber", this.getReferralNumber());
         referralMap.put("hfrCode", this.getHfrCode());
+        referralMap.put("facility", this.getFacility());
         referralMap.put("referringClinician", this.getReferringClinician());
         return referralMap;
     }
