@@ -1,0 +1,41 @@
+<div style="padding: 16px">
+  <button nz-button nzType="default" (click)="backToList()">
+    Back to List
+  </button>
+  <nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
+    <div nz-row [nzGutter]="16">
+      <div nz-col nzSpan="8">
+        <nz-card style="min-height: 60vh">
+          <ul class="no-bullets">
+            <li *ngFor="let key of objectKeys(basicInfo)">
+              {{ key }}: {{ basicInfo[key] }}
+            </li>
+          </ul>
+        </nz-card>
+      </div>
+      <div nz-col nzSpan="16">
+        <nz-card style="min-height: 60vh">
+          <div *ngFor="let section of extraInfo">
+            <h4>
+              <strong>{{ section.sectionTitle }}</strong>
+            </h4>
+            <ul class="no-bullets">
+              <li *ngFor="let key of objectKeys(section.info)">
+                <div nz-row>
+                  <div nz-col nzSpan="12">
+                    {{ key }}
+                  </div>
+                  <div nz-col nzSpan="12">
+                    <div nz-row nzJustify="end">
+                      {{ section.info[key] }}
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </nz-card>
+      </div>
+    </div>
+  </nz-card>
+</div>

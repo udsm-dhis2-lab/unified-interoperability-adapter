@@ -45,10 +45,10 @@ export class HomeComponent implements OnDestroy, OnInit {
   ): void {
     this.loading = true;
     this.loadHduClientsSubscription = this.clientManagementService
-      .getHduClients(pageIndex, pageSize, filter)
+      .getHduSharedRecords(pageIndex, pageSize, filter)
       .subscribe({
         next: (data: any) => {
-          console.log(data);
+          console.log(data, "data - new just saved");
           this.loading = false;
           this.total = data.total;
           this.pageIndex = data.pageIndex;

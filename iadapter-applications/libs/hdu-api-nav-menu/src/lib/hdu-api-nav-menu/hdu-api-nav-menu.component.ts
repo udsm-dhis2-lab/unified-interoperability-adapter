@@ -57,7 +57,7 @@ export class HduApiNavMenuComponent implements OnInit {
       category: 'main',
       subMenus: [
         {
-          name: 'Referral Summary',
+          name: 'Referral',
           id: 'referral-summary',
           routeUrl: '/referral-management/',
           icon: 'unordered-list',
