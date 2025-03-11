@@ -10,52 +10,6 @@
     </nz-breadcrumb>
 
     <div class="inner-content">
-      <div nz-row [nzGutter]="16" style="margin-bottom: 16px; padding: 16px">
-        <!-- Date Range Filter -->
-        <div nz-col [nzSpan]="6">
-          <nz-date-picker
-            nzPlaceHolder="Start Date"
-            [(ngModel)]="startDate"
-            (ngModelChange)="onDateFilterChange()"
-          ></nz-date-picker>
-        </div>
-        <div nz-col [nzSpan]="6">
-          <nz-date-picker
-            nzPlaceHolder="End Date"
-            [(ngModel)]="endDate"
-            (ngModelChange)="onDateFilterChange()"
-          ></nz-date-picker>
-        </div>
-
-        <!-- Health Facility Filter -->
-        <div nz-col [nzSpan]="6">
-          <nz-select
-            nzPlaceHolder="Health Facility From"
-            [(ngModel)]="selectedFacilityFrom"
-            (ngModelChange)="onFacilityFilterChange()"
-          >
-            <nz-option
-              *ngFor="let facility of facilities"
-              [nzValue]="facility.id"
-              [nzLabel]="facility.name"
-            ></nz-option>
-          </nz-select>
-        </div>
-        <div nz-col [nzSpan]="6">
-          <nz-select
-            nzPlaceHolder="Health Facility To"
-            [(ngModel)]="selectedFacilityTo"
-            (ngModelChange)="onFacilityFilterChange()"
-          >
-            <nz-option
-              *ngFor="let facility of facilities"
-              [nzValue]="facility.id"
-              [nzLabel]="facility.name"
-            ></nz-option>
-          </nz-select>
-        </div>
-      </div>
-
       <div nz-row>
         <div style="padding: 16px; width: 100%">
           <div style="margin-bottom: 16px">
@@ -93,11 +47,17 @@
               </tr>
             </thead>
             <tbody>
-              @for (data of listOfHduClients; track data.demographicDetails.fname; let i = $index) {
+              @for (data of listOfHduClients; track
+              data.demographicDetails.fname; let i = $index ) {
               <tr>
-                <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
                 <td>
-                  <span style="color: #1890ff">{{ data.demographicDetails.clientID }}</span>
+                  {{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}
+                </td>
+                <td>
+                  <!-- Use primary color from theme  -->
+                  <span style="color: #1890ff">{{
+                    data.demographicDetails.clientID
+                  }}</span>
                 </td>
                 <td>{{ data.demographicDetails.fname }}</td>
                 <td>{{ data.demographicDetails.mname }}</td>

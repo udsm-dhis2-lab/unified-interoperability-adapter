@@ -37,5 +37,4 @@ export const antDesignModules = [
   NzAlertModule,
   NzDatePickerModule,
   NzSelectModule
-
 ];
