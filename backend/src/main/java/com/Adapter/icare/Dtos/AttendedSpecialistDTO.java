@@ -13,8 +13,8 @@ public class AttendedSpecialistDTO {
 
     public Map<String,Object> toMap() {
         Map<String,Object> attendedSpecialist = new java.util.HashMap<>();
-        attendedSpecialist.put("superSpecialist", this.isSuperSpecialist());
-        attendedSpecialist.put("specialist", this.isSpecialist());
+        attendedSpecialist.put("superSpecialist", this.isSuperSpecialist() ? this.isSuperSpecialist() : false);
+        attendedSpecialist.put("specialist", this.isSpecialist() ? this.isSpecialist() : false);
         return attendedSpecialist;
     }
 }

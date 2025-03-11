@@ -25,8 +25,8 @@ public class VisitDetailsDTO {
     private Date closedDate;
     private String visitType;
     private List<CareServiceDTO> careServices;
-    private List<AttendedSpecialistDTO> attendedSpecialists;
-    private List<ServiceComplaintsDTO> complaints;
+    private List<AttendedSpecialistDTO> attendedSpecialist;
+    private ServiceComplaintsDTO serviceComplaints;
 
     public Map<String,Object> toMap() {
         Map<String,Object> visitDetails = new HashMap<>();
@@ -37,8 +37,8 @@ public class VisitDetailsDTO {
         visitDetails.put("newThisYear", this.newThisYear);
         visitDetails.put("isNew", this.isNew);
         visitDetails.put("careServices", this.getCareServices().stream().map(careService -> careService.toMap()));
-        visitDetails.put("attendedSpecialists", this.getAttendedSpecialists().stream().map(attendedSpecialist -> attendedSpecialist.toMap()));
-        visitDetails.put("serviceComplaints", this.getComplaints().stream().map(serviceComplaints -> serviceComplaints.toMap()));
+        visitDetails.put("attendedSpecialists", this.getAttendedSpecialist().stream().map(attendedSpecialist -> attendedSpecialist.toMap()));
+        visitDetails.put("serviceComplaints", this.getServiceComplaints().toMap());
         return visitDetails;
     }
 }
