@@ -10,15 +10,82 @@
     </nz-breadcrumb>
 
     <div class="inner-content">
-      <div nz-row>
-        <div style="padding: 16px; width: 100%">
-          <div style="margin-bottom: 16px">
-            <search-bar
-              [labelText]="'Search Referral:'"
-              (inputSearchValue)="onDatasetsSearchInputTyping($event)"
-            ></search-bar>
-          </div>
+      <!-- Filter Row -->
+      <div nz-row [nzGutter]="16" style="padding: 16px">
+        <!-- First Name Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="First Name"
+            [(ngModel)]="firstName"
+            class="sexy-input"
+            
+          />
+        </div>
 
+        <!-- Facility Search Inputs -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Facility From"
+            [(ngModel)]="facilityFrom"
+            class="sexy-input"
+          />
+        </div>
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Facility To"
+            [(ngModel)]="facilityTo"
+            class="sexy-input"
+          />
+        </div>
+
+        <!-- Client ID Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Client ID"
+            [(ngModel)]="clientId"
+            class="sexy-input"
+          />
+        </div>
+
+        <!-- Date Filters -->
+        <div nz-col [nzSpan]="4">
+          <nz-date-picker
+            nzPlaceHolder="Start Date"
+            [(ngModel)]="startDate"
+            class="sexy-input"
+          ></nz-date-picker>
+        </div>
+        <div nz-col [nzSpan]="4">
+          <nz-date-picker
+            nzPlaceHolder="End Date"
+            [(ngModel)]="endDate"
+            class="sexy-input"
+          ></nz-date-picker>
+        </div>
+
+
+
+        <!-- Apply Filters Button -->
+        <div nz-col [nzSpan]="4">
+          <br />
+          <button
+            nz-button
+            nzType="primary"
+            (click)="applyFilters()"
+            class="apply-button"
+          >
+            Apply Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div nz-row>
+        <div style="padding: 0 16px 16px; width: 100%">
           <nz-table
             nzShowSizeChanger
             [nzData]="listOfHduClients"
@@ -47,17 +114,11 @@
               </tr>
             </thead>
             <tbody>
-              @for (data of listOfHduClients; track
-              data.demographicDetails.fname; let i = $index ) {
+              @for (data of listOfHduClients; track data.demographicDetails.fname; let i = $index) {
               <tr>
+                <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
                 <td>
-                  {{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}
-                </td>
-                <td>
-                  <!-- Use primary color from theme  -->
-                  <span style="color: #1890ff">{{
-                    data.demographicDetails.clientID
-                  }}</span>
+                  <span style="color: #1890ff">{{ data.demographicDetails.clientID }}</span>
                 </td>
                 <td>{{ data.demographicDetails.fname }}</td>
                 <td>{{ data.demographicDetails.mname }}</td>

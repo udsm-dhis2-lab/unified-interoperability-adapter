@@ -6,16 +6,32 @@ import { ClientManagementService } from '../../services/client-management.servic
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
 import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
+
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SharedModule, RouterModule, SearchBarComponent],
+  imports: [SharedModule, RouterModule, SearchBarComponent, NzInputModule,FormsModule, NzDatePickerModule, NzIconModule],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnDestroy, OnInit {
+  startDate: Date | null = null;
+  endDate: Date | null = null;
+  facilityFrom: string = '';
+  facilityTo: string = '';
+  clientId: string = '';
+  firstName: string = '';
+
+
+
+  value?: string;
   total = 1;
   listOfHduClients: HDUAPIClientDetails[] = [];
   loading = true;
@@ -95,5 +111,28 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.router.navigate(['/client-management/client-details'], {
       queryParams: { client: JSON.stringify(client) },
     });
+  }
+
+
+  onFilterChange(): void {
+    this.filterData();
+  }
+
+  applyFilters(){
+    this.onDatasetsSearchInputTyping(this.firstName);
+  }
+
+
+  filterData(): void {
+    const filters = {
+      startDate: this.startDate,
+      endDate: this.endDate,
+      facilityFrom: this.facilityFrom,
+      facilityTo: this.facilityTo,
+      pageIndex: this.pageIndex,
+      pageSize: this.pageSize,
+      clientId: this.clientId,
+    };
+
   }
 }
