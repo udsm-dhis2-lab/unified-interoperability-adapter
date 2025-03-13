@@ -78,6 +78,8 @@ public class SharedHealthRecordsService {
         }
     }
 
+
+
     public Map<String, Object> getSharedRecordsWithPagination(Integer page,
             Integer pageSize,
             String identifier,
@@ -108,53 +110,8 @@ public class SharedHealthRecordsService {
                 }
 
                 if (withReferral) {
-                    // List<Patient> patients = new ArrayList<>();
 
-                    // // Step 1: Search for patients with an identifier of type "referral-number"
-                    // Bundle response2 = fhirClient.search()
-                    // .forResource(Patient.class)
-                    // .where(Patient.IDENTIFIER.hasSystemWithAnyCode("http://moh.go.tz"))
-                    // .and(new
-                    // TokenClientParam("identifier:type").exactly().code("REFERRAL-NUMBER"))
-                    // .returnBundle(Bundle.class)
-                    // .execute();
-
-                    // // Step 2: Extract patients from the bundle
-                    // for (Bundle.BundleEntryComponent entry : response2.getEntry()) {
-                    // if (entry.getResource() instanceof Patient) {
-                    // Patient patient = (Patient) entry.getResource();
-                    // patients.add(patient);
-                    // }
-                    // }
-
-                    
-                    Bundle responses = fhirClient.search()
-                    .forResource(Patient.class)
-                    // Use some broader criteria to narrow down results
-                    .where(Patient.IDENTIFIER.hasSystemWithAnyCode("http://moh.go.tz"))
-                    .count(100) // Limit results
-                    .returnBundle(Bundle.class)
-                    .execute();
-                    
-                    // Filter the results in Java code
-                    List<Patient> filteredPatients = responses.getEntry().stream()
-                    .map(entry -> (Patient) entry.getResource())
-                    .filter(patient -> {
-                        // Find patients with a specific identifier type
-                        return patient.getIdentifier().stream()
-                        .anyMatch(id -> {
-                            if (id.getType() != null && id.getType().getCoding() != null) {
-                                return id.getType().getCoding().stream()
-                                .anyMatch(coding -> "REFERRAL-NUMBER".equals(coding.getCode()));
-                            }
-                            return false;
-                        });
-                    })
-                    .collect(Collectors.toList());
-                    
-                    PrintOutHelper.print(filteredPatients);
-                    // searchRecords.where(Patient.IDENTIFIER.hasSystemWithAnyCode("http://moh.go.tz"));
-
+                   
                 }
 
                 // TODO: Review the deceased concept
@@ -327,13 +284,7 @@ public class SharedHealthRecordsService {
                                 visitDetails.setVisitType(encounter.hasType() && !encounter.getType().isEmpty()
                                         ? encounter.getType().get(0).getText()
                                         : null);
-                                visitDetails.setVisitType(encounter.hasType() &&
-                                        !encounter.getType().isEmpty() &&
-                                        encounter.getType().get(0).hasCoding() &&
-                                        !encounter.getType().get(0).getCoding().isEmpty() &&
-                                        encounter.getType().get(0).getCoding().get(0).hasCode()
-                                                ? encounter.getType().get(0).getCoding().get(0).getCode()
-                                                : null);
+                         
                                 List<CareServiceDTO> careServiceDTOs = new ArrayList<>();
 
                                 List<Observation> careServicesObs = getObservationsByCategory("care-services",
