@@ -1,4 +1,4 @@
-import { HDUAPIClientDetails } from '../';
+import { HDUAPIClientDetails } from '..';
 
 export class ClientPage {
   pageIndex!: number;

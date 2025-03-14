@@ -29,7 +29,7 @@ export const appRoutes: Route[] = [
       ).then((m) => m.WorkflowsManagementModule),
   },
   {
-    path: 'referral-management',
+    path: 'shr-management',
     loadChildren: () =>
       import(
         './../../../../apps/referral-management/src/app/referral-management/referral-management.module'

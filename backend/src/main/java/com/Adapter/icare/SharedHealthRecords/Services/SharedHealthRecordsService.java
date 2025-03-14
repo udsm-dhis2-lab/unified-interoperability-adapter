@@ -312,6 +312,7 @@ public class SharedHealthRecordsService {
                                     }
                                     careServiceDTOs.add(careServiceDTO);
                                 }
+
                                 visitDetails.setCareServices(careServiceDTOs);
 
                                 for (Extension extension : encounter.getExtension()) {
@@ -330,7 +331,17 @@ public class SharedHealthRecordsService {
                                                         ? ((BooleanType) extension.getValue()).getValue()
                                                         : Boolean.FALSE);
                                     }
+
+                                    if(extension.hasUrl() && extension.getUrl()
+                                    .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/superSpecialist") ){
+
                                 }
+                                List<AttendedSpecialistDTO> newAttendedSpecialists = new ArrayList<>();
+
+                                visitDetails.setAttendedSpecialist(newAttendedSpecialists);
+                                }
+
+
                                 templateData.setVisitDetails(visitDetails);
 
                                 // Get clinicalInformation
@@ -2086,6 +2097,9 @@ public class SharedHealthRecordsService {
 
     public Map<String, Object> processSharedRecords(SharedHealthRecordsDTO sharedRecordPayload,
             Map<String, Object> mandatoryClientRegistryIdTypes) throws Exception {
+
+        PrintOutHelper.print(sharedRecordPayload);
+
         try {
             Map<String, Object> response = new HashMap<>();
             DemographicDetailsDTO demographicDetails = sharedRecordPayload.getDemographicDetails();
