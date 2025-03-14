@@ -5,7 +5,6 @@ import { calculateAge } from 'apps/client-management/src/app/shared/helpers/help
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import { ClientManagementService } from '../../services/client-management.service';
 
-
 interface BasicInfo {
   [key: string]: string;
 }
@@ -50,8 +49,6 @@ export class ClientDetailsComponent implements OnInit {
       if (params) {
         const clientID = JSON.parse(params['client']);
 
-
-
         this.clientManagementService.getClientById(clientID).subscribe(
           (client: any) => {
 
@@ -60,36 +57,6 @@ export class ClientDetailsComponent implements OnInit {
             console.log(this.client);
           }
         )
-
-
-
-        // this.basicInfo = {
-        //   'Case ID': client['demographicDetails']['caseID'],
-        //   'Full name':
-        //     (client['demographicDetails']['fname'] ?? '') +
-        //     ' ' +
-        //     (client['demographicDetails']['mname'] ?? '') +
-        //     ' ' +
-        //     (client['demographicDetails']['surname'] ?? ''),
-        //   Sex: client['demographicDetails']['gender'],
-        //   'Date of Birth': client['demographicDetails']['dateOfBirth'],
-        //   Age:
-        //     calculateAge(client['demographicDetails']['dateOfBirth']) +
-        //     ' years',
-        // };
-
-        // this.extraInfo = [
-        //   {
-        //     sectionTitle: 'Contact Information',
-        //     info: {
-        //       'Phone Number': client['demographicDetails']['phoneNumbers'],
-        //       Email: client['demographicDetails']['emails'],
-        //       addresses: client['demographicDetails']['addresses'],
-        //       Occupation: client['demographicDetails']['occupation'],
-        //       Nationality: client['demographicDetails']['nationality'],
-        //     },
-        //   },
-        // ];
       }
     });
   }
