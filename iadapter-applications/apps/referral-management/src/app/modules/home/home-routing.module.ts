@@ -1,17 +1,30 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { HomeComponent } from './containers/home/home.component';
-import { ClientDetailsComponent } from './containers/referral-details/client-details.component';
+import { ClientDetailsComponent } from './containers/referral-details/referral-details.component';
+import { HealthRecordsComponent } from './containers/health-records/health-records.component';
 
 const routes: Routes = [
   {
-    path: '',
+    path: "",
+    component: HealthRecordsComponent
+  },
+  {
+    path: 'health-records',
+    component: HealthRecordsComponent,
+  },
+  {
+    path: 'referral-list',
     component: HomeComponent,
   },
   {
-    path: 'client-details',
+    path: 'referral-details',
     component: ClientDetailsComponent,
   },
+  {
+    path: "health-records-details",
+    component: ClientDetailsComponent
+  }
 ];
 
 @NgModule({
