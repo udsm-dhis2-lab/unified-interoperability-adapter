@@ -11,25 +11,32 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 
-
 import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SharedModule, RouterModule, SearchBarComponent, NzInputModule,FormsModule, NzDatePickerModule, NzIconModule],
+  imports: [
+    SharedModule,
+    RouterModule,
+    SearchBarComponent,
+    NzInputModule,
+    FormsModule,
+    NzDatePickerModule,
+    NzIconModule,
+    NzSelectModule,
+  ],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnDestroy, OnInit {
-  startDate: Date | null = null;
-  endDate: Date | null = null;
+  startDate: any = null;
+  endDate: any = null;
   facilityFrom: string = '';
   facilityTo: string = '';
   clientId: string = '';
   firstName: string = '';
-
-
+  referrals?: any = [];
 
   value?: string;
   total = 1;
@@ -42,10 +49,27 @@ export class HomeComponent implements OnDestroy, OnInit {
   isFirstLoad = true;
   dataSetSeachQuery: string = '';
 
+  selectedGender?: string;
+  surname: string = '';
+  gender: string = '';
+  referralNumber: string = '';
+
+  filters: any = {
+    clientId: '',
+    fistName: '',
+    surname: '',
+    gender: '',
+    referralNumber: '',
+    startDate: '',
+    endDate: '',
+    referringFacility: ''
+  };
+
   constructor(
     private router: Router,
     private clientManagementService: ClientManagementService
   ) {}
+
   ngOnDestroy(): void {
     if (this.loadHduClientsSubscription) {
       this.loadHduClientsSubscription.unsubscribe();
@@ -54,21 +78,17 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   loadHduClientsSubscription!: Subscription;
 
-  loadHduClientsFromServer(
-    pageIndex: number,
-    pageSize: number,
-    filter: Array<{ key: string; value: string[] }>
-  ): void {
+  loadHduClientsFromServer(): void {
     this.loading = true;
     this.loadHduClientsSubscription = this.clientManagementService
-      .getHduSharedRecords(pageIndex, pageSize, filter)
+      .getReferrals(this.filters)
       .subscribe({
         next: (data: any) => {
-          console.log(data, "data - new just saved");
+          console.log(data, 'data - new just saved');
           this.loading = false;
-          this.total = data.total;
-          this.pageIndex = data.pageIndex;
-          this.listOfHduClients = data.listOfClients;
+          this.total = 10;
+          this.pageIndex = 1;
+          this.referrals = data;
         },
         error: (error) => {
           this.loading = false;
@@ -80,11 +100,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   onDatasetsSearchInputTyping(value: string) {
     this.dataSetSeachQuery = value;
     if (value.length >= 3 || value === '') {
-      this.loadHduClientsFromServer(1, 10, [
-        value !== ''
-          ? { key: 'firstName', value: [value] }
-          : { key: '', value: [] },
-      ]);
+      this.loadHduClientsFromServer();
     }
   }
 
@@ -100,39 +116,111 @@ export class HomeComponent implements OnDestroy, OnInit {
         ? { key: 'firstName', value: [this.dataSetSeachQuery] }
         : { key: '', value: [] },
     ];
-    this.loadHduClientsFromServer(pageIndex, pageSize, queryFilter);
+    this.loadHduClientsFromServer();
   }
 
   ngOnInit(): void {
-    this.loadHduClientsFromServer(this.pageIndex, this.pageSize, []);
+    this.loadHduClientsFromServer();
+
+    this.clientManagementService
+      .getReferrals(this.referrals)
+      .subscribe((referrals) => {
+        console.log(referrals);
+      });
   }
 
-  viewClientDetails(client: HDUAPIClientDetails) {
-    this.router.navigate(['/client-management/client-details'], {
+  viewClientDetails(client: any) {
+    this.router.navigate(['/shr-management/referral-details'], {
       queryParams: { client: JSON.stringify(client) },
     });
   }
 
-
   onFilterChange(): void {
-    this.filterData();
+
   }
 
-  applyFilters(){
-    this.onDatasetsSearchInputTyping(this.firstName);
+  applyFilters() {
+
+    this.loadHduClientsFromServer();
   }
 
+  filterData(event: any, type?: string): void {
 
-  filterData(): void {
-    const filters = {
-      startDate: this.startDate,
-      endDate: this.endDate,
-      facilityFrom: this.facilityFrom,
-      facilityTo: this.facilityTo,
-      pageIndex: this.pageIndex,
-      pageSize: this.pageSize,
+    switch (type){
+      case "gender":
+        this.selectedGender = event;
+        break;
+
+      case "firstName":
+        this.firstName = event
+        break;
+
+      case "surname":
+        this.surname = event
+        break;
+
+      case "referralNumber":
+        this.referralNumber = event;
+        break;
+
+      case "clientId":
+        this.clientId = event;
+        break;
+
+      case "startDate":
+        this.startDate = event;
+        break;
+      case "endDate":
+        this.endDate = event;
+        break;
+      case "referringFacility":
+        this.facilityFrom = event;
+        break;
+
+      default:
+        break;
+    }
+
+
+    console.log(this.startDate, 'start')
+    console.log(this.endDate, 'end')
+    this.filters = {
+      ...this.filters,
+      gender: this.selectedGender,
+      firstName: this.firstName,
       clientId: this.clientId,
+      referralNumber: this.referralNumber,
+      startDate: this.formatDateToYYYYMMDD(this.startDate || ''),
+      endDate: this.formatDateToYYYYMMDD(this.endDate || ''),
+      referringFacility: this.facilityFrom
     };
 
+    console.log(this.filters, "all filters")
   }
+
+  clearFilter(){
+    this.filters = {
+
+    }
+  }
+
+  formatDateToYYYYMMDD(dateString: string): string | null {
+    try {
+      const date = new Date(dateString);
+
+      if (isNaN(date.getTime())) {
+        return null; // Invalid date
+      }
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const day = String(date.getDate()).padStart(2, '0');
+
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error("Error formatting date:", error);
+      return null;
+    }
+  }
+
 }

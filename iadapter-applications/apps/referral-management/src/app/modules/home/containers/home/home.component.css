@@ -33,6 +33,8 @@ nz-content {
 .sexy-input {
   /* border-radius: 8px !important; */
   /* border: 2px solid #e8ecef !important; */
+  width: 100%;
+  width: 100% !important;
   padding: 8px 12px !important;
   transition: all 0.3s ease !important;
   /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important; */
