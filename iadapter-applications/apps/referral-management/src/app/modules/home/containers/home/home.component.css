@@ -19,7 +19,7 @@ nz-content {
     top: 0;
     z-index: 1000;
     /* Optional shadow for visual separation */
-    /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 /* The inner-content takes remaining height and scrolls if content is overflowing */
@@ -28,43 +28,4 @@ nz-content {
     overflow-y: auto;
     background-color: #fff;
     max-height: calc(100vh - 100px);
-}
-
-.sexy-input {
-  /* border-radius: 8px !important; */
-  /* border: 2px solid #e8ecef !important; */
-  width: 100%;
-  width: 100% !important;
-  padding: 8px 12px !important;
-  transition: all 0.3s ease !important;
-  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05) !important; */
-}
-
-.sexy-input:hover {
-  border-color: #1890ff !important;
-  /* box-shadow: 0 4px 10px rgba(24, 144, 255, 0.2) !important; */
-}
-
-.sexy-input:focus {
-  border-color: #40a9ff !important;
-  /* box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.2) !important; */
-  /* outline: none !important; */
-}
-
-nz-input-group {
-  position: relative;
-}
-
-.input-icon {
-  color: #666;
-  font-size: 16px;
-  margin-right: 8px;
-}
-
-nz-date-picker {
-  width: 100%;
-}
-
-input[nz-input] {
-  height: 40px;
 }

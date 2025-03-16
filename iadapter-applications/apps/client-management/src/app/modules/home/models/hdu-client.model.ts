@@ -15,7 +15,7 @@ export class HduClient {
 
   static fromJson(json: any): HduClient {
     const hduClient = new HduClient();
-    hduClient.clientID = json['clientID'];
+    hduClient.clientID = json['id'];
     hduClient.fname = json['firstName'];
     hduClient.mname = json['middleName'];
     hduClient.surname = json['lastName'];

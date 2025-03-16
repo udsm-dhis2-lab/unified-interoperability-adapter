@@ -10,15 +10,83 @@
     </nz-breadcrumb>
 
     <div class="inner-content">
+      <div nz-row [nzGutter]="16" style="padding: 16px">
+        <!-- Client ID -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Client ID"
+            [(ngModel)]="clientId"
+            class="sexy-input"
+            (ngModelChange)="filterData($event, 'clientId')"
+          />
+        </div>
+
+        <!-- First Name Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="First Name"
+            [(ngModel)]="firstName"
+            class="sexy-input"
+            (ngModelChange)="filterData($event, 'firstName')"
+          />
+        </div>
+
+        <!-- Middle Name Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Surname"
+            [(ngModel)]="surname"
+            class="sexy-input"
+            (ngModelChange)="filterData($event, 'surname')"
+          />
+        </div>
+
+        <!-- Last Id number Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="ID Number"
+            [(ngModel)]="idNumber"
+            class="sexy-input"
+            (ngModelChange)="filterData($event, 'lastName')"
+          />
+        </div>
+
+        <!-- Gender Input -->
+        <div nz-col [nzSpan]="4">
+          <br />
+
+          <nz-select
+            ngModel="gender"
+            style="width: 100%"
+            nzAllowClear
+            nzPlaceHolder="Select a gender"
+            (ngModelChange)="filterData($event, 'gender')"
+          >
+            <nz-option nzValue="male" nzLabel="Male"></nz-option>
+            <nz-option nzValue="female" nzLabel="Female"></nz-option>
+          </nz-select>
+        </div>
+
+        <!-- Facility Search Inputs -->
+        <div nz-col [nzSpan]="4">
+          <br />
+          <button
+            nz-button
+            nzType="primary"
+            (click)="applyFilters()"
+            class="apply-button"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+
       <div nz-row>
         <div style="padding: 16px; width: 100%">
-          <div style="margin-bottom: 16px">
-            <search-bar
-              [labelText]="'Search client:'"
-              (inputSearchValue)="onDatasetsSearchInputTyping($event)"
-            ></search-bar>
-          </div>
-
           <nz-table
             nzShowSizeChanger
             [nzData]="listOfHduClients"

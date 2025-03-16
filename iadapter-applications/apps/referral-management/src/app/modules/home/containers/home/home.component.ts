@@ -84,7 +84,6 @@ export class HomeComponent implements OnDestroy, OnInit {
       .getReferrals(this.filters)
       .subscribe({
         next: (data: any) => {
-          console.log(data, 'data - new just saved');
           this.loading = false;
           this.total = 10;
           this.pageIndex = 1;
@@ -131,7 +130,7 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   viewClientDetails(client: any) {
     this.router.navigate(['/shr-management/referral-details'], {
-      queryParams: { client: JSON.stringify(client) },
+      queryParams: { client: JSON.stringify(client) , parentRoute: '/shr-management/referral-list'},
     });
   }
 
@@ -181,9 +180,6 @@ export class HomeComponent implements OnDestroy, OnInit {
         break;
     }
 
-
-    console.log(this.startDate, 'start')
-    console.log(this.endDate, 'end')
     this.filters = {
       ...this.filters,
       gender: this.selectedGender,

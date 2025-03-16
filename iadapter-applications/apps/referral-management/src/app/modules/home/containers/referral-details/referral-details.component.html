@@ -1,41 +1,60 @@
+
+
 <div style="padding: 16px">
   <button nz-button nzType="default" (click)="backToList()">
     Back to List
   </button>
-  <nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
-    <div nz-row [nzGutter]="16">
-      <div nz-col nzSpan="8">
-        <nz-card style="min-height: 60vh">
-          <ul class="no-bullets">
-            <li *ngIf="client">
-              name: {{client.demographicDetails.fname}}
-            </li>
-          </ul>
-        </nz-card>
-      </div>
-      <div nz-col nzSpan="16">
-        <nz-card style="min-height: 60vh">
-          <div *ngFor="let section of extraInfo">
-            <h4>
-              <strong>{{ section.sectionTitle }}</strong>
-            </h4>
+  <div *ngIf="loading" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 999;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+      <nz-spin nzSimple nzSize="large"></nz-spin>
+    </div>
+  </div>
+  <div *ngIf="!loading && !client">
+    <nz-empty nzNotFoundImage="simple"></nz-empty>
+  </div>
+  <div *ngIf="client">
+    <nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
+      <div nz-row [nzGutter]="16">
+        <div nz-col nzSpan="8">
+          <nz-card style="min-height: 60vh">
             <ul class="no-bullets">
-              <li *ngFor="let key of objectKeys(section.info)">
-                <div nz-row>
-                  <div nz-col nzSpan="12">
-                    {{ key }}
-                  </div>
-                  <div nz-col nzSpan="12">
-                    <div nz-row nzJustify="end">
-                      {{ section.info[key] }}
-                    </div>
-                  </div>
-                </div>
+              <li *ngFor="let key of objectKeys(basicInfo)">
+                {{ key }}: {{ basicInfo[key] }}
               </li>
             </ul>
-          </div>
-        </nz-card>
+          </nz-card>
+        </div>
+        <div nz-col nzSpan="16">
+          <nz-card style="min-height: 60vh">
+            <div>
+              <nz-tabset>
+                <div *ngFor="let section of extraInfo">
+                  <nz-tab nzTitle="{{ section.sectionTitle }}">
+                    <ul class="no-bullets">
+                      <li *ngFor="let key of objectKeys(section.info)">
+                        <div
+                          nz-row
+                          nzJustify="space-between"
+                          style="padding: 8px 0"
+                        >
+                          <div nz-col nzSpan="6">
+                            <strong>{{ key }}</strong>
+                          </div>
+                          <div nz-col nzSpan="12" style="text-align: right">
+                            <app-dynamic-list
+                              [value]="section.info[key]"
+                            ></app-dynamic-list>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </nz-tab>
+                </div>
+              </nz-tabset>
+            </div>
+          </nz-card>
+        </div>
       </div>
-    </div>
-  </nz-card>
+    </nz-card>
+  </div>
 </div>

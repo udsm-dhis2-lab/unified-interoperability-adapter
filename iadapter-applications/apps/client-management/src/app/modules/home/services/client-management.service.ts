@@ -13,6 +13,7 @@ import { ClientPage } from '../models';
 @Injectable()
 export class ClientManagementService {
   hduClientsUrl: string = ClientUrls.GET_CLIENTS;
+  hduSharedRecordsUrl: string = ClientUrls.GET_SHARED_RECORDS;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -46,6 +47,27 @@ export class ClientManagementService {
               'An unexpected error occurred. Please try again later.'
             );
           }
+        })
+      );
+  }
+
+  getClientById(
+    id: string
+  ): Observable<ClientPage> {
+
+    return this.httpClient
+      .get<{ results: any }>(`${this.hduSharedRecordsUrl}?id=${id}`)
+      .pipe(
+        map((response: { results: any }) => {
+          return ClientPage.fromJson(response);
+        }),
+        catchError((error: any) => {
+          if (error.status === 401) {
+            throw new UnAuothorizedException('Invalid username or password');
+          }
+          throw new UnknownException(
+            'An unexpected error occurred. Please try again later.'
+          );
         })
       );
   }
