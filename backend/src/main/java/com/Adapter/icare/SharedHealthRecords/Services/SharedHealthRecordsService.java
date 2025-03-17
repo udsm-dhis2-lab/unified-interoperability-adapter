@@ -314,32 +314,34 @@ public class SharedHealthRecordsService {
                                 }
 
                                 visitDetails.setCareServices(careServiceDTOs);
+                                visitDetails.setNewThisYear(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear"));
+                                visitDetails.setIsNew(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit"));
 
-                                for (Extension extension : encounter.getExtension()) {
-                                    if (extension.hasUrl() && extension.getUrl()
-                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear")) {
-                                        visitDetails.setNewThisYear(
-                                                extension.hasValue() && extension.getValue() instanceof BooleanType
-                                                        ? ((BooleanType) extension.getValue()).getValue()
-                                                        : Boolean.FALSE);
-                                    }
-
-                                    if (extension.hasUrl() && extension.getUrl()
-                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit")) {
-                                        visitDetails.setNew(
-                                                extension.hasValue() && extension.getValue() instanceof BooleanType
-                                                        ? ((BooleanType) extension.getValue()).getValue()
-                                                        : Boolean.FALSE);
-                                    }
-
-                                    if(extension.hasUrl() && extension.getUrl()
-                                    .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/superSpecialist") ){
-
-                                }
-                                List<AttendedSpecialistDTO> newAttendedSpecialists = new ArrayList<>();
-
-                                visitDetails.setAttendedSpecialist(newAttendedSpecialists);
-                                }
+//                                for (Extension extension : encounter.getExtension()) {
+//                                    if (extension.hasUrl() && extension.getUrl()
+//                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear")) {
+//                                        visitDetails.setNewThisYear(
+//                                                extension.hasValue() && extension.getValue() instanceof BooleanType
+//                                                        ? ((BooleanType) extension.getValue()).getValue()
+//                                                        : Boolean.FALSE);
+//                                    }
+//
+//                                    if (extension.hasUrl() && extension.getUrl()
+//                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit")) {
+//                                        visitDetails.setNew(
+//                                                extension.hasValue() && extension.getValue() instanceof BooleanType
+//                                                        ? ((BooleanType) extension.getValue()).getValue()
+//                                                        : Boolean.FALSE);
+//                                    }
+//
+//                                    if(extension.hasUrl() && extension.getUrl()
+//                                    .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/superSpecialist") ){
+//
+//                                }
+//                                List<AttendedSpecialistDTO> newAttendedSpecialists = new ArrayList<>();
+//
+//                                visitDetails.setAttendedSpecialist(newAttendedSpecialists);
+//                                }
 
 
                                 templateData.setVisitDetails(visitDetails);
@@ -2712,6 +2714,18 @@ public class SharedHealthRecordsService {
                             return ((BooleanType) childExtension.getValue()).getValue();
                         }
                     }
+                }
+            }
+        }
+        return null;
+    }
+
+    private Boolean getExtensionValueBoolean(DomainResource resource, String url) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof BooleanType) {
+                            return ((BooleanType) parentExtension.getValue()).getValue();
                 }
             }
         }

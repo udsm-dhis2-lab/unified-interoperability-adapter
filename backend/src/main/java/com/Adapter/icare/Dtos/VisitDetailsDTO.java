@@ -18,8 +18,8 @@ public class VisitDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date visitDate;
-    private boolean newThisYear;
-    private boolean isNew;
+    private Boolean newThisYear;
+    private Boolean isNew;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date closedDate;
