@@ -317,6 +317,20 @@ public class SharedHealthRecordsService {
                                 visitDetails.setNewThisYear(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear"));
                                 visitDetails.setIsNew(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit"));
 
+                                AttendedSpecialistDTO attendedSpecialistDTO = new AttendedSpecialistDTO();
+                                List<AttendedSpecialistDTO> attendedSpecialistDTOS = new ArrayList<>();
+                                attendedSpecialistDTO.setSuperSpecialist(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/superSpecialist"));
+                                attendedSpecialistDTO.setSpecialist((getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/specialist")));
+                                attendedSpecialistDTOS.add(attendedSpecialistDTO);
+                                visitDetails.setAttendedSpecialist(attendedSpecialistDTOS);
+
+                                ServiceComplaintsDTO serviceComplaintsDTO = new ServiceComplaintsDTO();
+                                serviceComplaintsDTO.setProvidedComplaints(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/providedComplaints"));
+                                serviceComplaintsDTO.setComplaints(getExtensionValueString(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/complaints"));
+
+                                visitDetails.setServiceComplaints(serviceComplaintsDTO);
+
+
 //                                for (Extension extension : encounter.getExtension()) {
 //                                    if (extension.hasUrl() && extension.getUrl()
 //                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear")) {
@@ -2726,6 +2740,18 @@ public class SharedHealthRecordsService {
                 if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
                         && parentExtension.getValue() instanceof BooleanType) {
                             return ((BooleanType) parentExtension.getValue()).getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getExtensionValueString(DomainResource resource, String url) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof StringType) {
+                    return ((StringType) parentExtension.getValue()).getValue();
                 }
             }
         }
