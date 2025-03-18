@@ -332,8 +332,6 @@ public class SharedHealthRecordsService {
 
                                 templateData.setVisitDetails(visitDetails);
 
-                                //Get appointment details:
-
                                 // Get clinicalInformation
                                 // 1. clinicalInformation - vital signs
                                 ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
