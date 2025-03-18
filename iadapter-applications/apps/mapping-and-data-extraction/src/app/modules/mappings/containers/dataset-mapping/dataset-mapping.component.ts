@@ -445,10 +445,17 @@ export class DatasetMappingComponent implements OnInit {
           }
 
           if (data?.mapping?.params?.length > 0) {
-            // Consider taking one param, every param have the same number and type of configuration
-            // Find respective configurations against the prefetched list of configurations
+            // Let's find a param with many keys than others
+            let maxKeys = 0;
+            let maxKeysParam: any = null;
+            for (const param of data.mapping.params) {
+              if (Object.keys(param).length > maxKeys) {
+                maxKeys = Object.keys(param).length;
+                maxKeysParam = param;
+              }
+            }
 
-            const param = data.mapping.params[0];
+            const param = maxKeysParam;
 
             Object.keys(param).forEach((key) => {
               if (key === 'startAge') {
