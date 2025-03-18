@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.hl7.fhir.r4.model.*;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -29,6 +30,7 @@ public class PatientDTO {
     private String maritalStatus;
     private List<PaymentDetailsDTO> paymentDetails;
     private List<Map<String,Object>> relatedClients;
+    private List<AppointmentDetailsDTO> appointment;
 
     public PatientDTO(String id,
                       String status,
@@ -41,7 +43,9 @@ public class PatientDTO {
                       Organization organization,
                       List<ContactPeopleDTO> contactPeople,
                       String maritalStatus,
-                      List<Map<String,Object>> relatedClients) {
+                      List<Map<String,Object>> relatedClients
+
+    ) {
         this.id = id;
         this.status = status;
         this.name = name;
@@ -123,6 +127,7 @@ public class PatientDTO {
             mappedPatient.setContactPeople(this.getContactPeople());
             mappedPatient.setPaymentDetails(this.getPaymentDetails());
             List<Map<String,Object>> relatedClientsList = new ArrayList<>();
+            mappedPatient.setAppointment(this.getAppointment());
             if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
                 for (Map<String,Object> clientDetails: this.relatedClients) {
                     Map<String, Object> clientData = new HashMap<>();
