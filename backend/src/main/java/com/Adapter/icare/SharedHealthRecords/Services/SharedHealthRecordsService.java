@@ -330,35 +330,9 @@ public class SharedHealthRecordsService {
 
                                 visitDetails.setServiceComplaints(serviceComplaintsDTO);
 
-
-//                                for (Extension extension : encounter.getExtension()) {
-//                                    if (extension.hasUrl() && extension.getUrl()
-//                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear")) {
-//                                        visitDetails.setNewThisYear(
-//                                                extension.hasValue() && extension.getValue() instanceof BooleanType
-//                                                        ? ((BooleanType) extension.getValue()).getValue()
-//                                                        : Boolean.FALSE);
-//                                    }
-//
-//                                    if (extension.hasUrl() && extension.getUrl()
-//                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit")) {
-//                                        visitDetails.setNew(
-//                                                extension.hasValue() && extension.getValue() instanceof BooleanType
-//                                                        ? ((BooleanType) extension.getValue()).getValue()
-//                                                        : Boolean.FALSE);
-//                                    }
-//
-//                                    if(extension.hasUrl() && extension.getUrl()
-//                                    .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/superSpecialist") ){
-//
-//                                }
-//                                List<AttendedSpecialistDTO> newAttendedSpecialists = new ArrayList<>();
-//
-//                                visitDetails.setAttendedSpecialist(newAttendedSpecialists);
-//                                }
-
-
                                 templateData.setVisitDetails(visitDetails);
+
+                                //Get appointment details:
 
                                 // Get clinicalInformation
                                 // 1. clinicalInformation - vital signs
