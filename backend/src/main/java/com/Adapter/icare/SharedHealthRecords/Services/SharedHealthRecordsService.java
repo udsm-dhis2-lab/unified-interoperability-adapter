@@ -364,7 +364,8 @@ public class SharedHealthRecordsService {
                                     for (PaymentNotice paymentNoticeResource : paymentNoticeResources) {
                                         AppointmentPaymentDetailsDTO paymentDetailsDTO = new AppointmentPaymentDetailsDTO();
                                         paymentDetailsDTO.setControlNumber(paymentNoticeResource.hasIdentifier() && !paymentNoticeResource.getIdentifier().isEmpty() && paymentNoticeResource.getIdentifier().get(0).hasValue() ? paymentNoticeResource.getIdentifier().get(0).getValue() : null);
-                                        paymentDetailsDTO.setStatusCode(paymentNoticeResource.hasResponse() && paymentNoticeResource.getResponse().hasIdentifier() && paymentNoticeResource.getResponse().getIdentifier().hasValue() ? paymentNoticeResource.getResponse().getIdentifier().getValue() : null);
+                                        paymentDetailsDTO.setStatusCode(paymentNoticeResource.hasResponse() && paymentNoticeResource.getResponse().hasIdentifier() && paymentNoticeResource.getResponse().getIdentifier().hasValue() ? paymentNoticeResource.getResponse().getIdentifier().getId() : null);
+                                        paymentDetailsDTO.setDescription(paymentNoticeResource.hasResponse() && paymentNoticeResource.getResponse().hasIdentifier() && paymentNoticeResource.getResponse().getIdentifier().hasValue() ? paymentNoticeResource.getResponse().getIdentifier().getValue() : null);
                                         paymentDetailsDTOS.add(paymentDetailsDTO);
                                     }
                                     appointmentDetailsDTO.setPaymentDetails(paymentDetailsDTOS);
