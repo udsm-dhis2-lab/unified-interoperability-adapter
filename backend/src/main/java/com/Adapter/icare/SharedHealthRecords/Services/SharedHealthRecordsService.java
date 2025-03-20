@@ -268,10 +268,26 @@ public class SharedHealthRecordsService {
                                 String orgCode = organization != null ? organization.getIdElement().getIdPart() : null;
                                 templateData.setDemographicDetails(patientDTO.toMap());
                                 templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
-                                templateData.setFacilityDetails(organization != null
+
+                                // BloodBags
+                                List<BiologicallyDerivedProduct>  bags = getBiologicallyDerivedProductByOrganizationId(organization.getId());
+
+                                List<BloodBagDTO> bagsDTO = new ArrayList<>();
+
+                                for (BiologicallyDerivedProduct bag : bags) {
+                                    BloodBagDTO bloodBagDTO = new BloodBagDTO();
+                                    bloodBagDTO.setBloodType(getExtensionValueString(bag, "http://fhir.moh.go.tz/fhir/StructureDefinition/blood-type-name"));
+                                    bloodBagDTO.setQuantity(getExtensionValueInt(bag, "http://fhir.moh.go.tz/fhir/StructureDefinition/blood-type-quantity"));
+                                    bagsDTO.add(bloodBagDTO);
+                                }
+
+                                FacilityDetailsDTO facilityDetailsDTO = organization != null
                                         ? new OrganizationDTO(organization.getId(), organization.getIdentifier(),
-                                                organization.getName(), organization.getActive()).toSummary()
-                                        : null);
+                                        organization.getName(), organization.getActive()).toSummary() : null;
+
+                                facilityDetailsDTO.setBloodBags(bagsDTO);
+
+                                templateData.setFacilityDetails(facilityDetailsDTO);
                                 VisitDetailsDTO visitDetails = new VisitDetailsDTO();
                                 visitDetails.setId(encounter.getIdElement().getIdPart());
                                 visitDetails.setVisitDate(
@@ -2357,6 +2373,39 @@ public class SharedHealthRecordsService {
         return medicationDispenses;
     }
 
+
+    public List<BiologicallyDerivedProduct> getBiologicallyDerivedProductByOrganizationId(String organizationId) {
+        List<BiologicallyDerivedProduct> products = new ArrayList<>();
+
+        // Step 1: Fetch all BiologicallyDerivedProduct resources (no filtering in query)
+        Bundle bundle = fhirClient
+                .search()
+                .forResource(BiologicallyDerivedProduct.class)
+                .returnBundle(Bundle.class)
+                .execute();
+
+        // Step 2: Filter manually by `collection.source.reference`
+        while (bundle != null) {
+            for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+                if (entry.getResource() instanceof BiologicallyDerivedProduct) {
+                    BiologicallyDerivedProduct product = (BiologicallyDerivedProduct) entry.getResource();
+
+                    // Check if `collection.source.reference` matches Organization/{organizationId}
+                    if (product.hasCollection() && product.getCollection().hasSource()) {
+                        String reference = product.getCollection().getSource().getReference(); // Example: "Organization/100097-5"
+                        if (reference != null && reference.equals("Organization/" + organizationId)) {
+                            products.add(product);
+                        }
+                    }
+                }
+            }
+            // Step 3: Handle pagination
+            bundle = bundle.getLink("next") != null ? fhirClient.loadPage().next(bundle).execute() : null;
+        }
+
+        return products;
+    }
+
     public List<Appointment> getAppointmentByEncounterId(String encounterId) throws Exception {
         List<Appointment> appointments = new ArrayList<>();
 
@@ -2825,6 +2874,18 @@ public class SharedHealthRecordsService {
                 if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
                         && parentExtension.getValue() instanceof StringType) {
                     return ((StringType) parentExtension.getValue()).getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private Integer getExtensionValueInt(DomainResource resource, String url) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof IntegerType) {
+                    return ((IntegerType) parentExtension.getValue()).getValue();
                 }
             }
         }
