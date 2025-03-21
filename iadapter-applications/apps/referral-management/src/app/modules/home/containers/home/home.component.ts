@@ -143,6 +143,17 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsFromServer();
   }
 
+  resetFilters() {
+    this.selectedGender = '';
+    this.clientId = '';
+    this.firstName = '';
+    this.surname = '';
+    this.referralNumber = '';
+    this.startDate = null;
+    this.endDate = null;
+    this.applyFilters();
+  }
+
   filterData(event: any, type?: string): void {
 
     switch (type){

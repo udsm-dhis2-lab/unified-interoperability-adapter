@@ -93,7 +93,7 @@
         </div>
 
         <!-- Apply Filters Button -->
-        <div nz-col [nzSpan]="4">
+        <div nz-col [nzSpan]="1.5">
           <br />
           <button
             nz-button
@@ -102,6 +102,17 @@
             class="apply-button"
           >
             Search
+          </button>
+        </div>
+
+        <div nz-col [nzSpan]="1">
+          <br />
+          <button
+            nz-button
+            nzType="default"
+            (click)="resetFilters()"
+          >
+            Reset
           </button>
         </div>
       </div>
@@ -129,6 +140,7 @@
                 <th>Referral Date</th>
                 <th>Referral No</th>
                 <th>Referring Facility</th>
+                <th>Referred Facility</th>
                 <th>Referred Abroad</th>
                 <th>Action</th>
               </tr>
@@ -150,7 +162,8 @@
                 <td>{{ referral.gender | titlecase }}</td>
                 <td>{{ referral.referral_date | date : 'mediumDate' }}</td>
                 <td>{{ referral.referral_number }}</td>
-                <td>{{ referral.referring_facility || 'N/A' }}</td>
+                <td>{{ referral.referring_facility || '-' }}</td>
+                <td>{{ referral.referring_to_facility || '-' }}</td>
                 <td>{{ referral.referred_to_other_country ? 'Yes' : 'No' }}</td>
                 <td>
                   <button

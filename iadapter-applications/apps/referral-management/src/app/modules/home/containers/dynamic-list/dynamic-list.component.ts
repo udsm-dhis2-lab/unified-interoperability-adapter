@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
     <ng-container *ngIf="!isList(value)">
       <span *ngIf="isPrimitive(value)">{{ value }}</span>
       <nz-collapse *ngIf="isObject(value) && !isPrimitive(value)">
-        <nz-collapse-panel [nzHeader]="'Object Details'" [nzActive]="false">
+        <nz-collapse-panel [nzActive]="true">
           <table class="property-table">
             <tbody>
               <tr *ngFor="let key of getObjectKeys(value)">
@@ -29,7 +29,7 @@ import { CommonModule } from '@angular/common';
     <!-- For array data -->
     <ng-container *ngIf="isList(value)">
       <nz-collapse *ngIf="value.length > 0">
-        <nz-collapse-panel [nzHeader]="value.length + ' items'" [nzActive]="false">
+        <nz-collapse-panel [nzHeader]="value.length + ' items'" [nzActive]="true">
           <div *ngFor="let item of value; let i = index" class="array-item">
             <div class="item-header">
               <span>Item {{ i }}</span>

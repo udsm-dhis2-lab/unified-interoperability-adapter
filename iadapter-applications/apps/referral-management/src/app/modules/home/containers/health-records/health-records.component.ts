@@ -189,6 +189,17 @@ export class HealthRecordsComponent implements OnDestroy, OnInit {
     this.filterSubject.next();
   }
 
+  resetFilters() {
+    this.gender = '';
+    this.clientId = '';
+    this.firstName = '';
+    this.surname = '';
+    this.idNumber = '';
+    this.startDate = null;
+    this.endDate = null;
+    this.applyFilters();
+  }
+
   private buildFilters(): Array<{ key: string; value: string[] }> {
     const filters: Array<{ key: string; value: string[] }> = [];
 

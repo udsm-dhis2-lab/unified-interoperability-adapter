@@ -1,3 +1,4 @@
+import { map, filter } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
@@ -8,15 +9,6 @@ import { ClientManagementService } from '../../services/client-management.servic
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { DynamicListComponent } from '../dynamic-list/dynamic-list.component';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
-
-interface BasicInfo {
-  [key: string]: string;
-}
-
-interface ExtraInfoSection {
-  sectionTitle: string;
-  info: { [key: string]: string };
-}
 
 @Component({
   selector: 'app-client-details',
@@ -44,6 +36,7 @@ export class ClientDetailsComponent implements OnInit {
   basicInfo: any;
 
   extraInfo: any;
+  identifiers: any;
 
   constructor(
     private router: Router,
@@ -63,7 +56,6 @@ export class ClientDetailsComponent implements OnInit {
       this.loading = true;
       console.log(JSON.parse(params['client']));
       if (params) {
-
         const clientID = JSON.parse(params['client']);
 
         this.parentRoute = params['parentRoute'];
@@ -75,103 +67,159 @@ export class ClientDetailsComponent implements OnInit {
             this.extraInfo = [
               {
                 sectionTitle: 'Facility',
-                info: this?.client?.facilityDetails || null,
+                info: {
+                  Name: this.client?.facilityDetails?.name,
+                  Code: this.client?.facilityDetails?.code,
+                },
               },
               {
                 sectionTitle: 'Visit',
-                info: this?.client?.visitDetails || null,
+                info: {
+                  ID: this.client?.visitDetails?.id,
+                  'Visit Date': this.client?.visitDetails?.visitDate,
+                  'Closed Date': this.client?.visitDetails?.closedDate,
+                  'Visit Type': this.client?.visitDetails?.visitType,
+                  'New This Year': this.client?.visitDetails?.newThisYear,
+                  New: this.client?.visitDetails?.isNew,
+                  'Care Services': this.client?.visitDetails?.careServices,
+                  'Attended Specialist':
+                    this.client?.visitDetails?.attendedSpecialist
+                      .filter(
+                        (specialist: any) =>
+                          specialist.superSpecialist !== null ||
+                          specialist.specialist !== null
+                      )
+                      .map((specalist: any) => {
+                        return {
+                          Name: specalist.name,
+                          Specialty: specalist.specialty,
+                        };
+                      }),
+                },
               },
               {
-                sectionTitle: 'Clinical',
-                info: this?.client?.clinicalInformation || null,
+                sectionTitle: 'Clinical Information',
+                info: {
+                  'Vital Signs':
+                    this.client?.clinicalInformation?.vitalSigns
+                      ?.filter((vitalSign: any) =>
+                        Object.values(vitalSign).some((value) => value !== null)
+                      )
+                      .map((vitalSign: any) => ({
+                        'Blood Pressure': vitalSign.bloodPressure || 'N/A',
+                        Weight: vitalSign.weight || 'N/A',
+                        Temperature: vitalSign.temperature || 'N/A',
+                        Height: vitalSign.height || 'N/A',
+                        Respiration: vitalSign.respiration || 'N/A',
+                        'Pulse Rate': vitalSign.pulseRate || 'N/A',
+                        'Recorded At': vitalSign.dateTime || 'N/A',
+                      })) || 'No vital signs recorded',
+                  'Visit Notes': this.client?.clinicalInformation?.visitNotes
+                    ?.length
+                    ? this.client?.clinicalInformation?.visitNotes.reduce(
+                        (acc: any, note: any) => {
+                          const visitDate = note.date || 'Unknown Date';
+                          acc[visitDate] = acc[visitDate] || [];
+                          return {
+                            'Visit Date': note.date || 'Unknown Date',
+                            'Provider Specialty':
+                              note.providerSpeciality || 'N/A',
+                            'Chief Complaints': note.chiefComplaints?.length
+                              ? note.chiefComplaints
+                              : 'None',
+                            'History of Present Illness': note
+                              .historyOfPresentIllness?.length
+                              ? note.historyOfPresentIllness
+                              : 'None',
+                            'Review of Other Systems': note.reviewOfOtherSystems
+                              ?.length
+                              ? note.reviewOfOtherSystems
+                              : 'None',
+                            'Past Medical History': note.pastMedicalHistory
+                              ?.length
+                              ? note.pastMedicalHistory
+                              : 'None',
+                            'Family and Social History': note
+                              .familyAndSocialHistory?.length
+                              ? note.familyAndSocialHistory
+                              : 'None',
+                            'General Examination': note
+                              .generalExaminationObservation?.length
+                              ? note.generalExaminationObservation
+                              : 'None',
+                            'Local Examination': note.localExamination?.length
+                              ? note.localExamination
+                              : 'None',
+                            'Systemic Examination': note
+                              .systemicExaminationObservation?.length
+                              ? note.systemicExaminationObservation
+                              : 'None',
+                            'Doctor’s Plan/Suggestion': note
+                              .doctorPlanOrSuggestion?.length
+                              ? note.doctorPlanOrSuggestion
+                              : 'None',
+                          };
+                      
+                        },
+                        {}
+                      )
+                    : 'No visit notes available',
+                },
               },
               {
-                sectionTitle: 'Allergies',
-                info: this?.client?.allergies || null,
+                sectionTitle: 'Lifestyle Information',
+                info: {
+                  Smoking: this.client?.lifeStyleInformation?.smoking?.use
+                    ? 'Yes'
+                    : 'No',
+                  'Alcohol Use': this.client?.lifeStyleInformation?.alcoholUse
+                    ?.use
+                    ? 'Yes'
+                    : 'No',
+                  'Drug Use': this.client?.lifeStyleInformation?.drugUse?.use
+                    ? 'Yes'
+                    : 'No',
+                },
               },
               {
-                sectionTitle: 'Chronic Conditions',
-                info: this?.client?.chronicConditions || null,
+                sectionTitle: 'Outcome Details',
+                info: {
+                  'Is Alive': this.client?.outcomeDetails?.isAlive
+                    ? 'Yes'
+                    : 'No',
+                  'Death Location':
+                    this.client?.outcomeDetails?.deathLocation || 'N/A',
+                  'Death Date': this.client?.outcomeDetails?.deathDate || 'N/A',
+                  Referred: this.client?.outcomeDetails?.referred
+                    ? 'Yes'
+                    : 'No',
+                },
               },
               {
-                sectionTitle: 'Lifestyle',
-                info: this?.client?.lifeStyleInformation || null,
+                sectionTitle: 'Identifiers',
+                info:
+                  this.client?.demographicDetails?.identifiers?.map(
+                    (identifier: any) => ({
+                      Type: identifier.type || 'N/A',
+                      ID: identifier.id || 'N/A',
+                      Preferred: identifier.preferred ? 'Yes' : 'No',
+                    })
+                  ) || 'No identifiers available',
               },
               {
-                sectionTitle: 'Investigations',
-                info: this?.client?.investigationDetails || null,
-              },
-              {
-                sectionTitle: 'Lab Investigations',
-                info: this?.client?.labInvestigationDetails || null,
-              },
-              {
-                sectionTitle: 'Diagnosis',
-                info: this?.client?.diagnosisDetails || null,
-              },
-              {
-                sectionTitle: 'Medications',
-                info: this?.client?.medicationDetails || null,
-              },
-              {
-                sectionTitle: 'Treatment',
-                info: this?.client?.treatmentDetails || null,
-              },
-              {
-                sectionTitle: 'Radiology',
-                info: this?.client?.radiologyDetails || null,
-              },
-              {
-                sectionTitle: 'Admission',
-                info: this?.client?.admissionDetails || null,
-              },
-              {
-                sectionTitle: 'Outcome',
-                info: this?.client?.outcomeDetails || null,
-              },
-              {
-                sectionTitle: 'Causes of Death',
-                info: this?.client?.causesOfDeathDetails || null,
-              },
-              {
-                sectionTitle: 'Antenatal Care',
-                info: this?.client?.antenatalCareDetails || null,
-              },
-              {
-                sectionTitle: 'Vaccination',
-                info: this?.client?.vaccinationDetails || null,
-              },
-              {
-                sectionTitle: 'Family Planning',
-                info: this?.client?.familyPlanningDetails || null,
-              },
-              {
-                sectionTitle: 'Labor & Delivery',
-                info: this?.client?.laborAndDeliveryDetails || null,
-              },
-              {
-                sectionTitle: 'Postnatal',
-                info: this?.client?.postnatalDetails || null,
-              },
-              {
-                sectionTitle: 'Billing',
-                info: this?.client?.billingsDetails || null,
-              },
-              {
-                sectionTitle: 'Payment',
-                info: this?.client?.visitMainPaymentDetails || null,
-              },
-              {
-                sectionTitle: 'Referral',
-                info: this?.client?.referralDetails || null,
-              },
-              {
-                sectionTitle: 'Other Information',
-                info: this?.client?.otherInformation || null,
-              },
-              {
-                sectionTitle: 'Reporting',
-                info: this?.client?.reportingDetails || null,
+                sectionTitle: 'Contact People',
+                info:
+                  this.client?.demographicDetails?.contactPeople?.map(
+                    (contact: any) => ({
+                      'First Name': contact.firstName || 'N/A',
+                      'Last Name': contact.lastName || 'N/A',
+                      'Phone Numbers':
+                        contact.phoneNumbers
+                          ?.filter((num: any) => num)
+                          ?.join(', ') || 'No contact number',
+                      Relationship: contact.relationShip || 'N/A',
+                    })
+                  ) || 'No emergency contacts available',
               },
             ].filter(
               (section) =>
@@ -181,21 +229,27 @@ export class ClientDetailsComponent implements OnInit {
                   Object.keys(section.info).length > 0)
             );
 
-
             this.basicInfo = {
-              'Full Name': `${this.client?.demographicDetails?.fname || ''} ${this.client?.demographicDetails?.surname || ''}`.trim(),
+              'Full Name': `${this.client?.demographicDetails?.fname || ''} ${
+                this.client?.demographicDetails?.surname || ''
+              }`.trim(),
               'Client ID': this.client?.demographicDetails?.clientID,
-              'Gender': this.client?.demographicDetails?.gender,
+              Gender: this.client?.demographicDetails?.gender,
               'Date of Birth': this.client?.demographicDetails?.dateOfBirth,
-              'ID Number': this.client?.demographicDetails?.idNumber,
-              'ID Type': this.client?.demographicDetails?.idType,
               'Phone Numbers': this.client?.demographicDetails?.phoneNumbers,
-              'Emails': this.client?.demographicDetails?.emails,
-              // 'Addresses': this.client?.demographicDetails?.addresses,
-              'Occupation': this.client?.demographicDetails?.occupation,
-              'Nationality': this.client?.demographicDetails?.nationality,
+              Emails: this.client?.demographicDetails?.emails,
+              Occupation: this.client?.demographicDetails?.occupation,
+              Nationality: this.client?.demographicDetails?.nationality,
               'Marital Status': this.client?.demographicDetails?.maritalStatus,
             };
+
+            this.identifiers =
+              this.client?.demographicDetails?.identifiers?.map((id: any) => {
+                return {
+                  Type: id.type,
+                  Number: id.id,
+                };
+              });
 
             this.loading = false;
 
