@@ -4,6 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.TokenClientParam;
 import com.Adapter.icare.ClientRegistry.Domains.ClientRegistryIdPool;
 import com.Adapter.icare.ClientRegistry.Repository.ClientRegistryIdsRepository;
 import com.Adapter.icare.Configurations.CustomUserDetails;
@@ -450,7 +451,7 @@ public class ClientRegistryService {
         return identifierDTOS;
     }
 
-    public PatientDTO mapToPatientDTO(Patient patient) {
+    public PatientDTO mapToPatientDTO(Patient patient) throws Exception {
         List<HumanNameDTO> nameDTOs = patient.hasName() ?
                 patient.getName().stream()
                         .map(name -> new HumanNameDTO(
@@ -514,7 +515,7 @@ public class ClientRegistryService {
 //        List<String> clientTypes = patient.hasLink() ? (List<String>) patient.getLink().stream().map(link -> link.hasType() ? link.getType().getDisplay(): null) : null;
 
         // Return the mapped PatientDTO object
-        return new PatientDTO(
+        PatientDTO patientDTO = new PatientDTO(
                 patientId,
                 status,
                 identifiers,
@@ -528,6 +529,46 @@ public class ClientRegistryService {
                 maritalStatus,
                 relatedClients
         );
+
+        List<Appointment> appointmentResourceList = getAppointmentByPatientId(patient.getIdElement().getIdPart());
+
+        List<AppointmentDetailsDTO> appointmentDetailsDTOS = new ArrayList<>();
+
+        for (Appointment appointment : appointmentResourceList) {
+            AppointmentDetailsDTO appointmentDetailsDTO = new AppointmentDetailsDTO();
+            appointmentDetailsDTO.setAppointmentId(appointment.getIdElement().getIdPart());
+            String appointmentHfrCode = extractHfrCode(appointment.getIdElement().getIdPart());
+            appointmentDetailsDTO.setHfrCode(appointmentHfrCode);
+            appointmentDetailsDTO.setAppointmentStatus(appointment.hasStatus() ? appointment.getStatus().toString() : "booked");
+
+            List<AppointmentServiceDetailsDTO> services = new ArrayList<>();
+            if (appointment.hasServiceType() && !appointment.getServiceType().isEmpty()) {
+                for (CodeableConcept serviceCode : appointment.getServiceType()) {
+                    AppointmentServiceDetailsDTO service = new AppointmentServiceDetailsDTO();
+                    service.setShortName(serviceCode.hasText() ? serviceCode.getText() : null);
+                    service.setServiceCode(serviceCode.hasCoding() && !serviceCode.getCoding().isEmpty() && serviceCode.getCoding().get(0).hasCode() ? serviceCode.getCoding().get(0).getCode() : null);
+                    service.setServiceName(serviceCode.hasCoding() && !serviceCode.getCoding().isEmpty() && serviceCode.getCoding().get(0).hasDisplay() ? serviceCode.getCoding().get(0).getDisplay() : null);
+                    services.add(service);
+                }
+            }
+            appointmentDetailsDTO.setServiceDetails(services);
+
+            // Get appointment payment details
+            List<PaymentNotice> paymentNoticeResources = getPaymentNoticesForAppointment(appointment);
+            List<AppointmentPaymentDetailsDTO> paymentDetailsDTOS = new ArrayList<>();
+            for (PaymentNotice paymentNoticeResource : paymentNoticeResources) {
+                AppointmentPaymentDetailsDTO paymentDetailsDTO = new AppointmentPaymentDetailsDTO();
+                paymentDetailsDTO.setControlNumber(paymentNoticeResource.hasIdentifier() && !paymentNoticeResource.getIdentifier().isEmpty() && paymentNoticeResource.getIdentifier().get(0).hasValue() ? paymentNoticeResource.getIdentifier().get(0).getValue() : null);
+                paymentDetailsDTO.setStatusCode(paymentNoticeResource.hasResponse() && paymentNoticeResource.getResponse().hasIdentifier() && paymentNoticeResource.getResponse().getIdentifier().hasValue() ? paymentNoticeResource.getResponse().getIdentifier().getId() : null);
+                paymentDetailsDTO.setDescription(paymentNoticeResource.hasResponse() && paymentNoticeResource.getResponse().hasIdentifier() && paymentNoticeResource.getResponse().getIdentifier().hasValue() ? paymentNoticeResource.getResponse().getIdentifier().getValue() : null);
+                paymentDetailsDTOS.add(paymentDetailsDTO);
+            }
+            appointmentDetailsDTO.setPaymentDetails(paymentDetailsDTOS);
+            appointmentDetailsDTOS.add(appointmentDetailsDTO);
+        }
+        patientDTO.setAppointment(appointmentDetailsDTOS);
+
+        return patientDTO;
     }
 
     public PaymentDetailsDTO mapToPaymentDetails(Coverage coverage) {
@@ -605,5 +646,65 @@ public class ClientRegistryService {
             e.printStackTrace();
         }
         return List.of();
+    }
+
+    public List<Appointment> getAppointmentByPatientId(String patientId) throws Exception {
+        List<Appointment> appointments = new ArrayList<>();
+
+        var appointmentsSearch = fhirClient
+                .search()
+                .forResource(Appointment.class)
+                .where(new TokenClientParam("supporting-info")
+                        .exactly()
+                        .code("Patient/" + patientId))
+                .returnBundle(org.hl7.fhir.r4.model.Bundle.class)
+                .execute();
+
+        for (var entry : appointmentsSearch.getEntry()) {
+            if (entry.getResource() instanceof Appointment) {
+                appointments.add((Appointment) entry.getResource());
+            }
+        }
+
+        return appointments;
+    }
+
+    public String extractHfrCode(String id) {
+        if (id == null || !id.contains("-")) {
+            return "";
+        }
+        String[] parts = id.split("-");
+        if (parts.length < 2) {
+            return "";
+        }
+        return parts[0] + "-" + parts[1]; // Combine the first two parts
+    }
+
+    public List<PaymentNotice> getPaymentNoticesForAppointment(Appointment appointment) throws Exception {
+        List<PaymentNotice> paymentNotices = new ArrayList<>();
+
+        // Check if the appointment has supporting information
+        if (appointment.hasSupportingInformation()) {
+            for (Reference ref : appointment.getSupportingInformation()) {
+                String reference = ref.getReference(); // Example: "PaymentNotice/12345"
+
+                // Check if the reference starts with "PaymentNotice/"
+                if (reference != null && reference.startsWith("PaymentNotice/")) {
+                    String paymentNoticeId = reference.split("/")[1]; // Extract ID
+
+                    // Fetch the PaymentNotice by ID
+                    PaymentNotice paymentNotice = fhirClient
+                            .read()
+                            .resource(PaymentNotice.class)
+                            .withId(paymentNoticeId)
+                            .execute();
+
+                    if (paymentNotice != null) {
+                        paymentNotices.add(paymentNotice);
+                    }
+                }
+            }
+        }
+        return paymentNotices;
     }
 }

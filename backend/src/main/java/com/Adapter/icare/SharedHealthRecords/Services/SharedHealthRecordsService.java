@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import scala.App;
 
 import javax.security.auth.Subject;
 
@@ -267,10 +268,26 @@ public class SharedHealthRecordsService {
                                 String orgCode = organization != null ? organization.getIdElement().getIdPart() : null;
                                 templateData.setDemographicDetails(patientDTO.toMap());
                                 templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
-                                templateData.setFacilityDetails(organization != null
+
+                                // BloodBags
+                                List<BiologicallyDerivedProduct>  bags = getBiologicallyDerivedProductByOrganizationId(organization.getIdElement().getIdPart());
+
+                                List<BloodBagDTO> bagsDTO = new ArrayList<>();
+
+                                for (BiologicallyDerivedProduct bag : bags) {
+                                    BloodBagDTO bloodBagDTO = new BloodBagDTO();
+                                    bloodBagDTO.setBloodType(getExtensionValueString(bag, "http://fhir.moh.go.tz/fhir/StructureDefinition/blood-type-name"));
+                                    bloodBagDTO.setQuantity(getExtensionValueInt(bag, "http://fhir.moh.go.tz/fhir/StructureDefinition/blood-type-quantity"));
+                                    bagsDTO.add(bloodBagDTO);
+                                }
+
+                                FacilityDetailsDTO facilityDetailsDTO = organization != null
                                         ? new OrganizationDTO(organization.getId(), organization.getIdentifier(),
-                                                organization.getName(), organization.getActive()).toSummary()
-                                        : null);
+                                        organization.getName(), organization.getActive()).toSummary() : null;
+
+                                facilityDetailsDTO.setBloodBags(bagsDTO);
+
+                                templateData.setFacilityDetails(facilityDetailsDTO);
                                 VisitDetailsDTO visitDetails = new VisitDetailsDTO();
                                 visitDetails.setId(encounter.getIdElement().getIdPart());
                                 visitDetails.setVisitDate(
@@ -314,35 +331,63 @@ public class SharedHealthRecordsService {
                                 }
 
                                 visitDetails.setCareServices(careServiceDTOs);
+                                visitDetails.setNewThisYear(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear"));
+                                visitDetails.setIsNew(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit"));
 
-                                for (Extension extension : encounter.getExtension()) {
-                                    if (extension.hasUrl() && extension.getUrl()
-                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newThisYear")) {
-                                        visitDetails.setNewThisYear(
-                                                extension.hasValue() && extension.getValue() instanceof BooleanType
-                                                        ? ((BooleanType) extension.getValue()).getValue()
-                                                        : Boolean.FALSE);
-                                    }
+                                AttendedSpecialistDTO attendedSpecialistDTO = new AttendedSpecialistDTO();
+                                List<AttendedSpecialistDTO> attendedSpecialistDTOS = new ArrayList<>();
+                                attendedSpecialistDTO.setSuperSpecialist(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/superSpecialist"));
+                                attendedSpecialistDTO.setSpecialist((getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/specialist")));
+                                attendedSpecialistDTOS.add(attendedSpecialistDTO);
+                                visitDetails.setAttendedSpecialist(attendedSpecialistDTOS);
 
-                                    if (extension.hasUrl() && extension.getUrl()
-                                            .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/newVisit")) {
-                                        visitDetails.setNew(
-                                                extension.hasValue() && extension.getValue() instanceof BooleanType
-                                                        ? ((BooleanType) extension.getValue()).getValue()
-                                                        : Boolean.FALSE);
-                                    }
+                                ServiceComplaintsDTO serviceComplaintsDTO = new ServiceComplaintsDTO();
+                                serviceComplaintsDTO.setProvidedComplaints(getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/providedComplaints"));
+                                serviceComplaintsDTO.setComplaints(getExtensionValueString(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/complaints"));
 
-                                    if(extension.hasUrl() && extension.getUrl()
-                                    .equals("http://fhir.moh.go.tz/fhir/StructureDefinition/superSpecialist") ){
-
-                                }
-                                List<AttendedSpecialistDTO> newAttendedSpecialists = new ArrayList<>();
-
-                                visitDetails.setAttendedSpecialist(newAttendedSpecialists);
-                                }
-
+                                visitDetails.setServiceComplaints(serviceComplaintsDTO);
 
                                 templateData.setVisitDetails(visitDetails);
+
+                                // Get appointment details
+
+                                List<Appointment> appointmentResourceList = getAppointmentByEncounterId(encounter.getIdElement().getIdPart());
+
+                                List<AppointmentDetailsDTO> appointmentDetailsDTOS = new ArrayList<>();
+
+                                for (Appointment appointment : appointmentResourceList) {
+                                    AppointmentDetailsDTO appointmentDetailsDTO = new AppointmentDetailsDTO();
+                                    appointmentDetailsDTO.setAppointmentId(appointment.getIdElement().getIdPart());
+                                    String appointmentHfrCode = extractHfrCode(appointment.getIdElement().getIdPart());
+                                    appointmentDetailsDTO.setHfrCode(appointmentHfrCode);
+                                    appointmentDetailsDTO.setAppointmentStatus(appointment.hasStatus() ? appointment.getStatus().toString() : "booked");
+
+                                    List<AppointmentServiceDetailsDTO> services = new ArrayList<>();
+                                    if (appointment.hasServiceType() && !appointment.getServiceType().isEmpty()) {
+                                        for (CodeableConcept serviceCode : appointment.getServiceType()) {
+                                            AppointmentServiceDetailsDTO service = new AppointmentServiceDetailsDTO();
+                                            service.setShortName(serviceCode.hasText() ? serviceCode.getText() : null);
+                                            service.setServiceCode(serviceCode.hasCoding() && !serviceCode.getCoding().isEmpty() && serviceCode.getCoding().get(0).hasCode() ? serviceCode.getCoding().get(0).getCode() : null);
+                                            service.setServiceName(serviceCode.hasCoding() && !serviceCode.getCoding().isEmpty() && serviceCode.getCoding().get(0).hasDisplay() ? serviceCode.getCoding().get(0).getDisplay() : null);
+                                            services.add(service);
+                                        }
+                                    }
+                                    appointmentDetailsDTO.setServiceDetails(services);
+
+                                    // Get appointment payment details
+                                    List<PaymentNotice> paymentNoticeResources = getPaymentNoticesForAppointment(appointment);
+                                    List<AppointmentPaymentDetailsDTO> paymentDetailsDTOS = new ArrayList<>();
+                                    for (PaymentNotice paymentNoticeResource : paymentNoticeResources) {
+                                        AppointmentPaymentDetailsDTO paymentDetailsDTO = new AppointmentPaymentDetailsDTO();
+                                        paymentDetailsDTO.setControlNumber(paymentNoticeResource.hasIdentifier() && !paymentNoticeResource.getIdentifier().isEmpty() && paymentNoticeResource.getIdentifier().get(0).hasValue() ? paymentNoticeResource.getIdentifier().get(0).getValue() : null);
+                                        paymentDetailsDTO.setStatusCode(paymentNoticeResource.hasResponse() && paymentNoticeResource.getResponse().hasIdentifier() && paymentNoticeResource.getResponse().getIdentifier().hasValue() ? paymentNoticeResource.getResponse().getIdentifier().getId() : null);
+                                        paymentDetailsDTO.setDescription(paymentNoticeResource.hasResponse() && paymentNoticeResource.getResponse().hasIdentifier() && paymentNoticeResource.getResponse().getIdentifier().hasValue() ? paymentNoticeResource.getResponse().getIdentifier().getValue() : null);
+                                        paymentDetailsDTOS.add(paymentDetailsDTO);
+                                    }
+                                    appointmentDetailsDTO.setPaymentDetails(paymentDetailsDTOS);
+                                    appointmentDetailsDTOS.add(appointmentDetailsDTO);
+                                }
+                                templateData.setAppointment(appointmentDetailsDTOS);
 
                                 // Get clinicalInformation
                                 // 1. clinicalInformation - vital signs
@@ -2328,6 +2373,98 @@ public class SharedHealthRecordsService {
         return medicationDispenses;
     }
 
+
+    public List<BiologicallyDerivedProduct> getBiologicallyDerivedProductByOrganizationId(String organizationId) {
+        List<BiologicallyDerivedProduct> products = new ArrayList<>();
+
+        // Step 1: Fetch all BiologicallyDerivedProduct resources (no filtering in query)
+        Bundle bundle = fhirClient
+                .search()
+                .forResource(BiologicallyDerivedProduct.class)
+                .returnBundle(Bundle.class)
+                .execute();
+
+        // Step 2: Filter manually by `collection.source.reference`
+        while (bundle != null) {
+            for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
+                if (entry.getResource() instanceof BiologicallyDerivedProduct) {
+                    BiologicallyDerivedProduct product = (BiologicallyDerivedProduct) entry.getResource();
+                    // Check if `collection.source.reference` matches Organization/{organizationId}
+                    if (product.hasCollection() && product.getCollection().hasSource()) {
+                        String reference = product.getCollection().getSource().getReference(); // Example: "Organization/100097-5"
+                        if (reference != null && reference.equals("Organization/" + organizationId)) {
+                            products.add(product);
+                        }
+                    }
+                }
+            }
+            // Step 3: Handle pagination
+            bundle = bundle.getLink("next") != null ? fhirClient.loadPage().next(bundle).execute() : null;
+        }
+
+        return products;
+    }
+
+    public List<Appointment> getAppointmentByEncounterId(String encounterId) throws Exception {
+        List<Appointment> appointments = new ArrayList<>();
+
+        var appointmentsSearch = fhirClient
+                .search()
+                .forResource(Appointment.class)
+                .where(new TokenClientParam("supporting-info")
+                        .exactly()
+                        .code("Encounter/" + encounterId))
+                .returnBundle(org.hl7.fhir.r4.model.Bundle.class)
+                .execute();
+
+        for (var entry : appointmentsSearch.getEntry()) {
+            if (entry.getResource() instanceof Appointment) {
+                appointments.add((Appointment) entry.getResource());
+            }
+        }
+
+        return appointments;
+    }
+
+    public String extractHfrCode(String id) {
+        if (id == null || !id.contains("-")) {
+            return "";
+        }
+        String[] parts = id.split("-");
+        if (parts.length < 2) {
+            return "";
+        }
+        return parts[0] + "-" + parts[1]; // Combine the first two parts
+    }
+
+    public List<PaymentNotice> getPaymentNoticesForAppointment(Appointment appointment) throws Exception {
+        List<PaymentNotice> paymentNotices = new ArrayList<>();
+
+        // Check if the appointment has supporting information
+        if (appointment.hasSupportingInformation()) {
+            for (Reference ref : appointment.getSupportingInformation()) {
+                String reference = ref.getReference(); // Example: "PaymentNotice/12345"
+
+                // Check if the reference starts with "PaymentNotice/"
+                if (reference != null && reference.startsWith("PaymentNotice/")) {
+                    String paymentNoticeId = reference.split("/")[1]; // Extract ID
+
+                    // Fetch the PaymentNotice by ID
+                    PaymentNotice paymentNotice = fhirClient
+                            .read()
+                            .resource(PaymentNotice.class)
+                            .withId(paymentNoticeId)
+                            .execute();
+
+                    if (paymentNotice != null) {
+                        paymentNotices.add(paymentNotice);
+                    }
+                }
+            }
+        }
+        return paymentNotices;
+    }
+
     public List<DiagnosticReport> getDiagnosticReportsByCategory(String encounterId, String category) throws Exception {
         List<DiagnosticReport> diagnosticReports = new ArrayList<>();
         var diagnosticReportSearch = fhirClient.search().forResource(DiagnosticReport.class)
@@ -2712,6 +2849,42 @@ public class SharedHealthRecordsService {
                             return ((BooleanType) childExtension.getValue()).getValue();
                         }
                     }
+                }
+            }
+        }
+        return null;
+    }
+
+    private Boolean getExtensionValueBoolean(DomainResource resource, String url) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof BooleanType) {
+                            return ((BooleanType) parentExtension.getValue()).getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private String getExtensionValueString(DomainResource resource, String url) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof StringType) {
+                    return ((StringType) parentExtension.getValue()).getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    private Integer getExtensionValueInt(DomainResource resource, String url) {
+        if (resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof IntegerType) {
+                    return ((IntegerType) parentExtension.getValue()).getValue();
                 }
             }
         }

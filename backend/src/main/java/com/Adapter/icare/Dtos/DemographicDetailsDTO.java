@@ -33,6 +33,7 @@ public class DemographicDetailsDTO {
     private List<ContactPeopleDTO> contactPeople;
     private List<PaymentDetailsDTO> paymentDetails;
     private List<Map<String,Object>> relatedClients;
+    private List<AppointmentDetailsDTO> appointment;
 
     public Map<String,Object> toMap() {
         Map<String,Object> demographicDetails = new LinkedHashMap<>();
@@ -52,6 +53,7 @@ public class DemographicDetailsDTO {
         demographicDetails.put("contactPeople", this.getContactPeople());
         demographicDetails.put("paymentDetails", this.getPaymentDetails());
         demographicDetails.put("relatedClients", this.getRelatedClients());
+        demographicDetails.put("appointment", this.getAppointment());
         return demographicDetails;
     }
 }

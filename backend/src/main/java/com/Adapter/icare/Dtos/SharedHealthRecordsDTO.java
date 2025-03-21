@@ -28,6 +28,8 @@ public class SharedHealthRecordsDTO {
     @NotNull(message = "value cannot be null")
     private VisitDetailsDTO visitDetails;
 
+    private List<AppointmentDetailsDTO> appointment;
+
     private ClinicalInformationDTO clinicalInformation;
 
     private List<AllergiesDTO> allergies;
@@ -104,6 +106,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());
         sharedRecordMap.put("otherInformation", this.getOtherInformation());
+        sharedRecordMap.put("appointment", this.getAppointment().stream().map(AppointmentDetailsDTO::toMap));
         return  sharedRecordMap;
     }
 }

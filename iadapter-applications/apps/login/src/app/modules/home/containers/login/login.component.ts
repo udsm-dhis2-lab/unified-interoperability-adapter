@@ -12,7 +12,6 @@ import {
 import { LoginService } from '../../services/login.service';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
-import 'antd/dist/antd.css'
 
 @Component({
   selector: 'app-login',

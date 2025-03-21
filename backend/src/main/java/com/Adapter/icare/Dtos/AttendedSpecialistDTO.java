@@ -8,13 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AttendedSpecialistDTO {
-    private boolean superSpecialist;
-    private boolean specialist;
+    private Boolean superSpecialist;
+    private Boolean specialist;
 
     public Map<String,Object> toMap() {
         Map<String,Object> attendedSpecialist = new java.util.HashMap<>();
-        attendedSpecialist.put("superSpecialist", this.isSuperSpecialist() ? this.isSuperSpecialist() : false);
-        attendedSpecialist.put("specialist", this.isSpecialist() ? this.isSpecialist() : false);
+        attendedSpecialist.put("superSpecialist", this.getSuperSpecialist() ? this.getSuperSpecialist() : false);
+        attendedSpecialist.put("specialist", this.getSpecialist() ? this.getSpecialist() : false);
         return attendedSpecialist;
     }
 }
