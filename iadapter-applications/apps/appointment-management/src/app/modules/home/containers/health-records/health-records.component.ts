@@ -22,17 +22,15 @@ import { FormsModule } from '@angular/forms';
     SearchBarComponent,
     RouterModule,
     SearchBarComponent,
-    RouterModule,
-    SearchBarComponent,
     NzInputModule,
     FormsModule,
     NzSelectModule,
   ],
   providers: [ClientManagementService],
-  templateUrl: './home.component.html',
-  styleUrl: './home.component.css',
+  templateUrl: './health-records.component.html',
+  styleUrl: './health-records.component.css',
 })
-export class HomeComponent implements OnDestroy, OnInit {
+export class HealthRecordsComponent implements OnDestroy, OnInit {
   total = 1;
   listOfHduClients: HDUAPIClientDetails[] = [];
   loading = true;
@@ -139,7 +137,7 @@ export class HomeComponent implements OnDestroy, OnInit {
           this.pageIndex = data.pageIndex;
           this.listOfHduClients = data.listOfClients;
         },
-        error: (error: any) => {
+        error: (error) => {
           this.loading = false;
           //TODO: Implement error handling
         },
@@ -148,23 +146,12 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   viewClientDetails(client: HDUAPIClientDetails) {
     console.log(client.demographicDetails);
-    this.router.navigate(['/client-management/client-details'], {
+    this.router.navigate(['/shr-management/health-records-details'], {
       queryParams: {
         client: JSON.stringify(client.demographicDetails.clientID),
-        parentRoute: '/client-management',
+        parentRoute: '/shr-management/health-records',
       },
     });
-  }
-
-  resetFilters() {
-    this.gender = '';
-    this.clientId = '';
-    this.firstName = '';
-    this.surname = '';
-    this.idNumber = '';
-    this.startDate = null;
-    this.endDate = null;
-    this.applyFilters();
   }
 
   filterData(event: any, type?: string): void {
@@ -200,6 +187,17 @@ export class HomeComponent implements OnDestroy, OnInit {
   applyFilters() {
     this.loading = true;
     this.filterSubject.next();
+  }
+
+  resetFilters() {
+    this.gender = '';
+    this.clientId = '';
+    this.firstName = '';
+    this.surname = '';
+    this.idNumber = '';
+    this.startDate = null;
+    this.endDate = null;
+    this.applyFilters();
   }
 
   private buildFilters(): Array<{ key: string; value: string[] }> {

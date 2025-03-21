@@ -2,10 +2,10 @@
   <nz-content>
     <nz-breadcrumb class="breadcrumb">
       <nz-breadcrumb-item>
-        <a [routerLink]="['/home']">Client Management</a>
+        <a [routerLink]="['/home']">Appointment Management</a>
       </nz-breadcrumb-item>
       <nz-breadcrumb-item>
-        <a [routerLink]="['/workflows']">Client</a>
+        <a [routerLink]="['/workflows']">Appointment</a>
       </nz-breadcrumb-item>
     </nz-breadcrumb>
 
@@ -43,6 +43,7 @@
             (ngModelChange)="filterData($event, 'surname')"
           />
         </div>
+
 
         <!-- Last Id number Input -->
         <div nz-col [nzSpan]="4">
@@ -112,8 +113,7 @@
                 <th>Middle name</th>
                 <th>Surname</th>
                 <th>Gender</th>
-                <th>National ID</th>
-                <th>ID number (others)</th>
+                <th>ID number</th>
                 <th>ID type</th>
                 <th>Action</th>
               </tr>
@@ -135,7 +135,6 @@
                 <td>{{ data.demographicDetails.mname }}</td>
                 <td>{{ data.demographicDetails.surname }}</td>
                 <td>{{ data.demographicDetails.gender }}</td>
-                <td>{{ "-" }}</td>
                 <td>{{ data.demographicDetails.idNumber }}</td>
                 <td>{{ data.demographicDetails.idType }}</td>
                 <td>

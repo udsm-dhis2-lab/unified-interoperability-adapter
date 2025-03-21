@@ -36,6 +36,13 @@ export const appRoutes: Route[] = [
       ).then((m) => m.ReferralManagementModule),
   },
   {
+    path: 'appointment-management',
+    loadChildren: () =>
+      import(
+        '../../../appointment-management/src/app/appointment-management/appointment-management.module'
+      ).then((m) => m.AppointmentManagementModule),
+  },
+  {
     path: 'settings',
     loadChildren: () =>
       import(
