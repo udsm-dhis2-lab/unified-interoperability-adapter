@@ -270,7 +270,7 @@ public class SharedHealthRecordsService {
                                 templateData.setPaymentDetails(this.getPaymentDetailsViaCoverage(patient));
 
                                 // BloodBags
-                                List<BiologicallyDerivedProduct>  bags = getBiologicallyDerivedProductByOrganizationId(organization.getId());
+                                List<BiologicallyDerivedProduct>  bags = getBiologicallyDerivedProductByOrganizationId(organization.getIdElement().getIdPart());
 
                                 List<BloodBagDTO> bagsDTO = new ArrayList<>();
 
@@ -2389,7 +2389,6 @@ public class SharedHealthRecordsService {
             for (Bundle.BundleEntryComponent entry : bundle.getEntry()) {
                 if (entry.getResource() instanceof BiologicallyDerivedProduct) {
                     BiologicallyDerivedProduct product = (BiologicallyDerivedProduct) entry.getResource();
-
                     // Check if `collection.source.reference` matches Organization/{organizationId}
                     if (product.hasCollection() && product.getCollection().hasSource()) {
                         String reference = product.getCollection().getSource().getReference(); // Example: "Organization/100097-5"
