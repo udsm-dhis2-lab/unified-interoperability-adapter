@@ -87,3 +87,6 @@ Thumbs.db
 db.json
 proxy.config.json
 .env
+
+.mvn
+backend/.mvn
