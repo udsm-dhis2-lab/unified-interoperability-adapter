@@ -24,27 +24,6 @@
           />
         </div>
 
-        <!-- Facility Search Inputs -->
-        <div nz-col [nzSpan]="4">
-          <input
-            nz-input
-            placeholder="Facility"
-            [(ngModel)]="facilityFrom"
-            (ngModelChange)="filterData($event, 'referringFacility')"
-            class="sexy-input"
-          />
-        </div>
-
-        <div nz-col [nzSpan]="4">
-          <input
-            nz-input
-            placeholder="Appointment ID"
-            [(ngModel)]="appointmentID"
-            (ngModelChange)="filterData($event, 'appointmentID')"
-            class="sexy-input"
-          />
-        </div>
-
         <div nz-col [nzSpan]="4">
           <input
             nz-input
@@ -54,26 +33,6 @@
             class="sexy-input"
           />
         </div>
-
-        <!-- Date Filters -->
-        <!-- <div nz-col [nzSpan]="4">
-          <nz-date-picker
-            style="width: 100%; width: 100% !important"
-            nzPlaceHolder="Start Date"
-            [(ngModel)]="startDate"
-            (ngModelChange)="filterData($event, 'startDate')"
-            class="sexy-input"
-          ></nz-date-picker>
-        </div>
-        <div nz-col [nzSpan]="4">
-          <nz-date-picker
-            style="width: 100%; width: 100% !important"
-            nzPlaceHolder="End Date"
-            [(ngModel)]="endDate"
-            (ngModelChange)="filterData($event, 'endDate')"
-            class="sexy-input"
-          ></nz-date-picker>
-        </div> -->
 
         <div nz-col [nzSpan]="4">
 
@@ -133,10 +92,7 @@
                 <th>Middle Name</th>
                 <th>Surname</th>
                 <th>Gender</th>
-                <th>Appointment Status</th>
-                <th>Appointment ID</th>
-                <th>Service Type</th>
-                <th>Facility</th>
+                <th>ID Type</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -149,26 +105,20 @@
                   }}
                 </td>
                 <td>
-                  <span style="color: #1890ff">{{ appointment.patient_id }}</span>
+                  <span style="color: #1890ff">{{ appointment.client_id }}</span>
                 </td>
                 <td>{{ appointment.first_name }}</td>
                 <td></td>
                 <td>{{ appointment.surname }}</td>
                 <td>{{ appointment.gender | titlecase }}</td>
-                <td>
-                  <nz-tag center [nzColor]="getStatusColor(appointment.appointment_status)">
-                    {{ appointment.appointment_status | titlecase }}
-                  </nz-tag>
-                </td>
-                <td>{{ appointment.appointment_id }}</td>
-                <td>{{ appointment.service_type_name }}</td>
-                <td>{{ appointment.referring_facility || '-' }}</td>
+              
+                <td>{{ appointment.client_id_type }}</td>
                 <td>
                   <button
                     nz-button
                     nzType="text"
                     class="view-button"
-                    (click)="viewClientDetails(appointment.patient_id)"
+                    (click)="viewClientDetails(appointment.client_id)"
                   >
                     View
                   </button>

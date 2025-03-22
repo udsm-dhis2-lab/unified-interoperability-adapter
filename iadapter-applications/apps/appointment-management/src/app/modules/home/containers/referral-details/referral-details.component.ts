@@ -196,17 +196,6 @@ export class ClientDetailsComponent implements OnInit {
                 },
               },
               {
-                sectionTitle: 'Identifiers',
-                info:
-                  this.client?.demographicDetails?.identifiers?.map(
-                    (identifier: any) => ({
-                      Type: identifier.type || 'N/A',
-                      ID: identifier.id || 'N/A',
-                      Preferred: identifier.preferred ? 'Yes' : 'No',
-                    })
-                  ) || 'No identifiers available',
-              },
-              {
                 sectionTitle: 'Contact People',
                 info:
                   this.client?.demographicDetails?.contactPeople?.map(

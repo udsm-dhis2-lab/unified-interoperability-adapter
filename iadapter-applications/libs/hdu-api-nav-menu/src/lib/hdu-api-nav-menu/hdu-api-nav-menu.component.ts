@@ -75,14 +75,14 @@ export class HduApiNavMenuComponent implements OnInit {
     {
       name: 'Appointment Management',
       id: 'appointment-management',
-      routeUrl: '/appointment-management',
+      routeUrl: '/appointment-management',  
       icon: 'user',
       category: 'main',
       subMenus: [
         {
           name: 'Appointments',
           id: 'appointments',
-          routeUrl: '/appointment-management/appointments/',
+          routeUrl: '/appointment-management/appointments-list/',
           icon: 'unordered-list',
           subMenus: [],
         }
