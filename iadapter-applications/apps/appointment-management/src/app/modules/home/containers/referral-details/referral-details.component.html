@@ -59,23 +59,25 @@
                 <div *ngFor="let section of extraInfo">
                   <nz-tab nzTitle="{{ section.sectionTitle }}">
                     <ul class="no-bullets">
-                      <li *ngFor="let key of objectKeys(section.info)">
-                        <div
-                          nz-row
-                          nzJustify="space-between"
-                          style="padding: 8px 0"
-                        >
-                          <div nz-col nzSpan="6">
-                            <strong>{{ key }}</strong>
+                      <div *ngFor="let infos of section.info">
+                        <li *ngFor="let key of objectKeys(infos)">
+                          <div
+                            nz-row
+                            nzJustify="space-between"
+                            style="padding: 8px 0"
+                          >
+                            <div nz-col nzSpan="6">
+                              <strong>{{ key }}</strong>
+                            </div>
+                            <div nz-col nzSpan="12" style="text-align: right">
+                              <app-dynamic-list
+                                [value]="infos[key]"
+                              ></app-dynamic-list>
+                              
+                            </div>
                           </div>
-                          <div nz-col nzSpan="12" style="text-align: right">
-                            <app-dynamic-list
-                              [value]="section.info[key]"
-                            ></app-dynamic-list>
-                            
-                          </div>
-                        </div>
-                      </li>
+                        </li>
+                      </div>
                     </ul>
                   </nz-tab>
                 </div>

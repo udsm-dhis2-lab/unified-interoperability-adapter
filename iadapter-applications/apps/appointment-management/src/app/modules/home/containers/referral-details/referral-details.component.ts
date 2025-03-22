@@ -48,7 +48,7 @@ export class ClientDetailsComponent implements OnInit {
   }
 
   objectKeys(obj: any): string[] {
-    return Object.keys(obj);
+    return Object?.keys(obj || {}) || [];
   }
 
   ngOnInit(): void {
@@ -66,157 +66,10 @@ export class ClientDetailsComponent implements OnInit {
             this.client = client.listOfClients[0];
             this.extraInfo = [
               {
-                sectionTitle: 'Facility',
-                info: {
-                  Name: this.client?.facilityDetails?.name,
-                  Code: this.client?.facilityDetails?.code,
-                },
-              },
-              {
-                sectionTitle: 'Visit',
-                info: {
-                  ID: this.client?.visitDetails?.id,
-                  'Visit Date': this.client?.visitDetails?.visitDate,
-                  'Closed Date': this.client?.visitDetails?.closedDate,
-                  'Visit Type': this.client?.visitDetails?.visitType,
-                  'New This Year': this.client?.visitDetails?.newThisYear,
-                  New: this.client?.visitDetails?.isNew,
-                  'Care Services': this.client?.visitDetails?.careServices,
-                  'Attended Specialist':
-                    this.client?.visitDetails?.attendedSpecialist
-                      .filter(
-                        (specialist: any) =>
-                          specialist.superSpecialist !== null ||
-                          specialist.specialist !== null
-                      )
-                      .map((specalist: any) => {
-                        return {
-                          Name: specalist.name,
-                          Specialty: specalist.specialty,
-                        };
-                      }),
-                },
-              },
-              {
-                sectionTitle: 'Clinical Information',
-                info: {
-                  'Vital Signs':
-                    this.client?.clinicalInformation?.vitalSigns
-                      ?.filter((vitalSign: any) =>
-                        Object.values(vitalSign).some((value) => value !== null)
-                      )
-                      .map((vitalSign: any) => ({
-                        'Blood Pressure': vitalSign.bloodPressure || 'N/A',
-                        Weight: vitalSign.weight || 'N/A',
-                        Temperature: vitalSign.temperature || 'N/A',
-                        Height: vitalSign.height || 'N/A',
-                        Respiration: vitalSign.respiration || 'N/A',
-                        'Pulse Rate': vitalSign.pulseRate || 'N/A',
-                        'Recorded At': vitalSign.dateTime || 'N/A',
-                      })) || 'No vital signs recorded',
-                  'Visit Notes': this.client?.clinicalInformation?.visitNotes
-                    ?.length
-                    ? this.client?.clinicalInformation?.visitNotes.reduce(
-                        (acc: any, note: any) => {
-                          const visitDate = note.date || 'Unknown Date';
-                          acc[visitDate] = acc[visitDate] || [];
-                          return {
-                            'Visit Date': note.date || 'Unknown Date',
-                            'Provider Specialty':
-                              note.providerSpeciality || 'N/A',
-                            'Chief Complaints': note.chiefComplaints?.length
-                              ? note.chiefComplaints
-                              : 'None',
-                            'History of Present Illness': note
-                              .historyOfPresentIllness?.length
-                              ? note.historyOfPresentIllness
-                              : 'None',
-                            'Review of Other Systems': note.reviewOfOtherSystems
-                              ?.length
-                              ? note.reviewOfOtherSystems
-                              : 'None',
-                            'Past Medical History': note.pastMedicalHistory
-                              ?.length
-                              ? note.pastMedicalHistory
-                              : 'None',
-                            'Family and Social History': note
-                              .familyAndSocialHistory?.length
-                              ? note.familyAndSocialHistory
-                              : 'None',
-                            'General Examination': note
-                              .generalExaminationObservation?.length
-                              ? note.generalExaminationObservation
-                              : 'None',
-                            'Local Examination': note.localExamination?.length
-                              ? note.localExamination
-                              : 'None',
-                            'Systemic Examination': note
-                              .systemicExaminationObservation?.length
-                              ? note.systemicExaminationObservation
-                              : 'None',
-                            'Doctor’s Plan/Suggestion': note
-                              .doctorPlanOrSuggestion?.length
-                              ? note.doctorPlanOrSuggestion
-                              : 'None',
-                          };
-                      
-                        },
-                        {}
-                      )
-                    : 'No visit notes available',
-                },
-              },
-              {
-                sectionTitle: 'Lifestyle Information',
-                info: {
-                  Smoking: this.client?.lifeStyleInformation?.smoking?.use
-                    ? 'Yes'
-                    : 'No',
-                  'Alcohol Use': this.client?.lifeStyleInformation?.alcoholUse
-                    ?.use
-                    ? 'Yes'
-                    : 'No',
-                  'Drug Use': this.client?.lifeStyleInformation?.drugUse?.use
-                    ? 'Yes'
-                    : 'No',
-                },
-              },
-              {
-                sectionTitle: 'Outcome Details',
-                info: {
-                  'Is Alive': this.client?.outcomeDetails?.isAlive
-                    ? 'Yes'
-                    : 'No',
-                  'Death Location':
-                    this.client?.outcomeDetails?.deathLocation || 'N/A',
-                  'Death Date': this.client?.outcomeDetails?.deathDate || 'N/A',
-                  Referred: this.client?.outcomeDetails?.referred
-                    ? 'Yes'
-                    : 'No',
-                },
-              },
-              {
-                sectionTitle: 'Contact People',
-                info:
-                  this.client?.demographicDetails?.contactPeople?.map(
-                    (contact: any) => ({
-                      'First Name': contact.firstName || 'N/A',
-                      'Last Name': contact.lastName || 'N/A',
-                      'Phone Numbers':
-                        contact.phoneNumbers
-                          ?.filter((num: any) => num)
-                          ?.join(', ') || 'No contact number',
-                      Relationship: contact.relationShip || 'N/A',
-                    })
-                  ) || 'No emergency contacts available',
-              },
-            ].filter(
-              (section) =>
-                section.info !== null &&
-                section.info !== undefined &&
-                (typeof section.info !== 'object' ||
-                  Object.keys(section.info).length > 0)
-            );
+                sectionTitle: 'Appointment',
+                info: this.client?.demographicDetails?.appointment,
+              }
+            ]
 
             this.basicInfo = {
               'Full Name': `${this.client?.demographicDetails?.fname || ''} ${

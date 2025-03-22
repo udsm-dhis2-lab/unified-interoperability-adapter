@@ -8,7 +8,6 @@ import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-ht
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { ClientManagementService } from '../../services/client-management.service';
-import { resourceLimits } from 'worker_threads';
 
 @Component({
   selector: 'app-client-details',

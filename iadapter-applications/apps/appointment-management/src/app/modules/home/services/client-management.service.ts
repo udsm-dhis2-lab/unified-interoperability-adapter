@@ -120,7 +120,7 @@ export class ClientManagementService {
     });
   }
 
-  getAppointments(filters: any): Observable<Referral[]> {
+  getAppointments(filters: any): Observable<any> {
     return this.http.post<Referral[]>(this.apiUrl,
       filters
       ,

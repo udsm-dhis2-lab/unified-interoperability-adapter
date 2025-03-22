@@ -28,6 +28,7 @@ export class HduClient {
   }[];
   paymentDetails?: any; // Placeholder for complex payment data
   relatedClients?: any[]; // Placeholder for related client references
+  appointment?: any[]
 
   static fromJson(json: any): HduClient {
     const hduClient = new HduClient();
@@ -47,6 +48,7 @@ export class HduClient {
     hduClient.identifiers = json['identifiers'] || [];
     hduClient.paymentDetails = json['paymentDetails'];
     hduClient.relatedClients = json['relatedClients'] || [];
+    hduClient.appointment = json['appointment'] || [];
 
     // Handle identifiers for idNumber and idType
     hduClient.idNumber = json['identifiers'] && json['identifiers'][0] ? json['identifiers'][0]['id'] : '';
