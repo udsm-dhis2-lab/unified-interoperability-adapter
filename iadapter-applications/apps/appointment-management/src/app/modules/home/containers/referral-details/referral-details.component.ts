@@ -9,6 +9,7 @@ import { ClientManagementService } from '../../services/client-management.servic
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { DynamicListComponent } from '../dynamic-list/dynamic-list.component';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 @Component({
   selector: 'app-client-details',
@@ -19,6 +20,7 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
     NzCollapseModule,
     DynamicListComponent,
     NzEmptyModule,
+    NzDividerModule,
   ],
   providers: [ClientManagementService],
   templateUrl: './referral-details.component.html',
@@ -67,9 +69,42 @@ export class ClientDetailsComponent implements OnInit {
             this.extraInfo = [
               {
                 sectionTitle: 'Appointment',
-                info: this.client?.demographicDetails?.appointment,
-              }
-            ]
+                info: this.client?.demographicDetails?.appointment.map(
+                  (appointment: any) => {
+                    return {
+                      'Appointment ID': appointment?.appointmentId,
+                      'HFR Code': appointment?.hfrCode,
+                      Status: appointment?.appointmentStatus,
+                      'Payment Details': appointment?.paymentDetails?.map(
+                        (payment: any) => {
+                          return {
+                            'Payment Control Number': payment?.controlNumber,
+                            'Payment Status':
+                              payment?.statusCode === '200'
+                                ? 'Successful'
+                                : 'Failed',
+                            Description: payment?.description,
+                          };
+                        }
+                      ),
+                      'Service Details': appointment.serviceDetails?.map(
+                        (service: any) => {
+                          console.log(service);
+                          return {
+                            'Service Code':
+                            service?.serviceCode,
+                            'Service Name':
+                            service?.serviceName,
+                            'Service Short Name':
+                            service?.shortName,
+                          };
+                        }
+                      ),
+                    };
+                  }
+                ),
+              },
+            ];
 
             this.basicInfo = {
               'Full Name': `${this.client?.demographicDetails?.fname || ''} ${
