@@ -53,6 +53,10 @@ export class ClientDetailsComponent implements OnInit {
     return Object?.keys(obj || {}) || [];
   }
 
+  drop(event: any) {
+    console.log(event);
+  }
+
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
@@ -71,35 +75,45 @@ export class ClientDetailsComponent implements OnInit {
                 sectionTitle: 'Appointment',
                 info: this.client?.demographicDetails?.appointment.map(
                   (appointment: any) => {
+                    console.log(appointment.paymentDetails, "appointment");
                     return {
                       'Appointment ID': appointment?.appointmentId,
                       'HFR Code': appointment?.hfrCode,
                       Status: appointment?.appointmentStatus,
-                      'Payment Details': appointment?.paymentDetails?.map(
-                        (payment: any) => {
-                          return {
-                            'Payment Control Number': payment?.controlNumber,
-                            'Payment Status':
-                              payment?.statusCode === '200'
+                      'Payment Status':
+                      appointment.paymentDetails[0]?.statusCode === '200'
                                 ? 'Successful'
                                 : 'Failed',
-                            Description: payment?.description,
-                          };
-                        }
-                      ),
-                      'Service Details': appointment.serviceDetails?.map(
-                        (service: any) => {
-                          console.log(service);
-                          return {
-                            'Service Code':
-                            service?.serviceCode,
-                            'Service Name':
-                            service?.serviceName,
-                            'Service Short Name':
-                            service?.shortName,
-                          };
-                        }
-                      ),
+                      'Service Name':
+                      appointment.serviceDetails[0]?.serviceName,
+
+
+                      
+                      // 'Payment Details': appointment?.paymentDetails?.map(
+                      //   (payment: any) => {
+                      //     return {
+                      //       'Payment Control Number': payment?.controlNumber,
+                      //       'Payment Status':
+                      //         payment?.statusCode === '200'
+                      //           ? 'Successful'
+                      //           : 'Failed',
+                      //       Description: payment?.description,
+                      //     };
+                      //   }
+                      // ),
+                      // 'Service Details': appointment.serviceDetails?.map(
+                      //   (service: any) => {
+                      //     console.log(service);
+                      //     return {
+                      //       'Service Code':
+                      //       service?.serviceCode,
+                            // 'Service Name':
+                            // service?.serviceName,
+                      //       'Service Short Name':
+                      //       service?.shortName,
+                      //     };
+                      //   }
+                      // ),
                     };
                   }
                 ),

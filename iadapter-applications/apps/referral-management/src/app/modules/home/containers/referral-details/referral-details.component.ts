@@ -106,13 +106,13 @@ export class ClientDetailsComponent implements OnInit {
                         Object.values(vitalSign).some((value) => value !== null)
                       )
                       .map((vitalSign: any) => ({
-                        'Blood Pressure': vitalSign.bloodPressure || 'N/A',
-                        Weight: vitalSign.weight || 'N/A',
-                        Temperature: vitalSign.temperature || 'N/A',
-                        Height: vitalSign.height || 'N/A',
-                        Respiration: vitalSign.respiration || 'N/A',
-                        'Pulse Rate': vitalSign.pulseRate || 'N/A',
-                        'Recorded At': vitalSign.dateTime || 'N/A',
+                        'Blood Pressure': vitalSign.bloodPressure || '-',
+                        Weight: vitalSign.weight || '-',
+                        Temperature: vitalSign.temperature || '-',
+                        Height: vitalSign.height || '-',
+                        Respiration: vitalSign.respiration || '-',
+                        'Pulse Rate': vitalSign.pulseRate || '-',
+                        'Recorded At': vitalSign.dateTime || '-',
                       })) || 'No vital signs recorded',
                   'Visit Notes': this.client?.clinicalInformation?.visitNotes
                     ?.length
@@ -123,7 +123,7 @@ export class ClientDetailsComponent implements OnInit {
                           return {
                             'Visit Date': note.date || 'Unknown Date',
                             'Provider Specialty':
-                              note.providerSpeciality || 'N/A',
+                              note.providerSpeciality || '-',
                             'Chief Complaints': note.chiefComplaints?.length
                               ? note.chiefComplaints
                               : 'None',
@@ -188,8 +188,8 @@ export class ClientDetailsComponent implements OnInit {
                     ? 'Yes'
                     : 'No',
                   'Death Location':
-                    this.client?.outcomeDetails?.deathLocation || 'N/A',
-                  'Death Date': this.client?.outcomeDetails?.deathDate || 'N/A',
+                    this.client?.outcomeDetails?.deathLocation || '-',
+                  'Death Date': this.client?.outcomeDetails?.deathDate || '-',
                   Referred: this.client?.outcomeDetails?.referred
                     ? 'Yes'
                     : 'No',
@@ -200,8 +200,8 @@ export class ClientDetailsComponent implements OnInit {
                 info:
                   this.client?.demographicDetails?.identifiers?.map(
                     (identifier: any) => ({
-                      Type: identifier.type || 'N/A',
-                      ID: identifier.id || 'N/A',
+                      Type: identifier.type || '-',
+                      ID: identifier.id || '-',
                       Preferred: identifier.preferred ? 'Yes' : 'No',
                     })
                   ) || 'No identifiers available',
@@ -211,13 +211,13 @@ export class ClientDetailsComponent implements OnInit {
                 info:
                   this.client?.demographicDetails?.contactPeople?.map(
                     (contact: any) => ({
-                      'First Name': contact.firstName || 'N/A',
-                      'Last Name': contact.lastName || 'N/A',
+                      'First Name': contact.firstName || '-',
+                      'Last Name': contact.lastName || '-',
                       'Phone Numbers':
                         contact.phoneNumbers
                           ?.filter((num: any) => num)
                           ?.join(', ') || 'No contact number',
-                      Relationship: contact.relationShip || 'N/A',
+                      Relationship: contact.relationShip || '-',
                     })
                   ) || 'No emergency contacts available',
               },
