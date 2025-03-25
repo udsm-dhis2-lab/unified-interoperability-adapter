@@ -159,7 +159,7 @@ export class ClientDetailsComponent implements OnInit {
                               ? note.doctorPlanOrSuggestion
                               : 'None',
                           };
-                      
+
                         },
                         {}
                       )
@@ -195,17 +195,17 @@ export class ClientDetailsComponent implements OnInit {
                     : 'No',
                 },
               },
-              {
-                sectionTitle: 'Identifiers',
-                info:
-                  this.client?.demographicDetails?.identifiers?.map(
-                    (identifier: any) => ({
-                      Type: identifier.type || '-',
-                      ID: identifier.id || '-',
-                      Preferred: identifier.preferred ? 'Yes' : 'No',
-                    })
-                  ) || 'No identifiers available',
-              },
+              // {
+              //   sectionTitle: 'Identifiers',
+              //   info:
+              //     this.client?.demographicDetails?.identifiers?.map(
+              //       (identifier: any) => ({
+              //         Type: identifier.type || '-',
+              //         ID: identifier.id || '-',
+              //         Preferred: identifier.preferred ? 'Yes' : 'No',
+              //       })
+              //     ) || 'No identifiers available',
+              // },
               {
                 sectionTitle: 'Contact People',
                 info:
@@ -219,7 +219,7 @@ export class ClientDetailsComponent implements OnInit {
                           ?.join(', ') || 'No contact number',
                       Relationship: contact.relationShip || '-',
                     })
-                  ) || 'No emergency contacts available',
+                  )[0] || 'No emergency contacts available',
               },
             ].filter(
               (section) =>
