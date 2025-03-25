@@ -12,6 +12,7 @@ export class HduClient {
   addresses!: string;
   occupation!: string;
   nationality!: string;
+  nida!: string;
 
   static fromJson(json: any): HduClient {
     const hduClient = new HduClient();
@@ -26,6 +27,7 @@ export class HduClient {
     hduClient.addresses = json['addresses'];
     hduClient.occupation = json['occupation'];
     hduClient.nationality = json['nationality'];
+    hduClient.nida = json['identifiers'].filter((id: any) => id['type'] === 'NIDA').map((id: any)=> id['id']);
     hduClient.idNumber = json['identifiers'][0]
       ? json['identifiers'][0]['id']
       : '';
