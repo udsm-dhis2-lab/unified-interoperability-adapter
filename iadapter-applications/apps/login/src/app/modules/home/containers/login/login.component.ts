@@ -42,7 +42,6 @@ export class LoginComponent implements OnDestroy {
   constructor(
     private fb: NonNullableFormBuilder,
     private loginService: LoginService,
-    private router: Router
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],

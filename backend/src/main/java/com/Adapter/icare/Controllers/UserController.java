@@ -1,15 +1,13 @@
 package com.Adapter.icare.Controllers;
 
-import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Group;
-import com.Adapter.icare.Domains.Privilege;
-import com.Adapter.icare.Domains.Role;
-import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.LoginDTO;
-import com.Adapter.icare.Mappers.Mappers;
-import com.Adapter.icare.Services.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,31 +15,31 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Domains.Group;
+import com.Adapter.icare.Domains.Privilege;
+import com.Adapter.icare.Domains.Role;
+import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.LoginDTO;
+import com.Adapter.icare.Services.UserService;
 
 @RestController
 @RequestMapping("/api/v1")
 public class UserController {
     private final UserService userService;
-    private Mappers mappers;
     private Authentication authentication;
     private final AuthenticationManager authenticationManager;
     private User authenticatedUser;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-    @Autowired
-    private HttpServletRequest request;
 
     public UserController(UserService userService, AuthenticationManager authenticationManager) {
         this.userService = userService;
