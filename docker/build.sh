@@ -19,7 +19,7 @@ cd "$FRONTEND_DIR" || exit 1
 echo "Installing dependencies inside Docker..."
 docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm install --legacy-peer-deps
 
-APPS=("login" "client-management" "dashboard" "mapping-and-data-extraction" "workflows-management", "referral-management", "settings")
+APPS=("login" "client-management" "dashboard" "mapping-and-data-extraction" "workflows-management" "referral-management" "settings")
 
 for app in "${APPS[@]}"; do
     echo "Building $app inside Docker..."
