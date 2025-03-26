@@ -61,36 +61,13 @@ public class UserInterfaceController {
         String appPath = appsRoutesToResourceMap.get(appRoute);
         if (appPath != null) {
             return "forward:" + appPath + "/index.html";
-        } else if (appRoute.equals("login")) {
-            // Special case for login
-            return "forward:/login/index.html";
         } else {
-            // For any other route not found in the map, redirect to login
-            return "redirect:/login";
+            return "forward:/login/index.html";
         }
     }
 
-    // Update this method to handle the apps/dashboard path correctly
-    @GetMapping("apps/{path:.*}")
-    public String forwardToApp(@PathVariable String path) {
-        // Check if the path is a known app route
-        String appPath = appsRoutesToResourceMap.get(path);
-        if (appPath != null) {
-            return "forward:" + appPath + "/index.html";
-        }
-
-        // If it's not a known app or contains a file extension, try to serve the file
-        if (path.contains(".")) {
-            return "forward:/apps/" + path;
-        }
-
-        // For SPA routing, forward to the app's index.html
-        return "forward:/dashboard/index.html";
+    @GetMapping("apps/{path:^(?!.*\\..*$).*}")
+    public String forwardToAngular() {
+        return "forward:/apps/index.html";
     }
-
-    // Remove or update the existing apps path handler that's causing issues
-    // @GetMapping("apps/{path:^(?!.*\\..*$).*}")
-    // public String forwardToAngular() {
-    // return "forward:/apps/index.html";
-    // }
 }
