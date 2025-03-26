@@ -91,3 +91,5 @@ proxy.config.json
 .mvn
 backend/.mvn
 backup
+
+.github/apps-builds/*
