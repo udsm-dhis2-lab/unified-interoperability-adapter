@@ -10,7 +10,6 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-
 import { FormsModule } from '@angular/forms';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
@@ -26,32 +25,29 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
     NzDatePickerModule,
     NzIconModule,
     NzSelectModule,
-    NzTagModule
+    NzTagModule,
   ],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnDestroy, OnInit {
+  // Filter properties
   startDate: any = null;
   endDate: any = null;
   facilityFrom: string = '';
   facilityTo: string = '';
   clientId: string = '';
   firstName: string = '';
-  appointments?: any = [];
 
-  value?: string;
-  total = 1;
-  listOfHduClients: HDUAPIClientDetails[] = [];
-  loading = true;
+  allAppointments: any[] = []; // Stores all data from API
+  displayedAppointments: any[] = []; // Stores current page data
+  total = 0;
   pageSize = 10;
   pageIndex = 1;
-  filterKey = [{}];
+  loading = false;
 
-  isFirstLoad = true;
-  dataSetSeachQuery: string = '';
-
+  // Search/filter properties
   selectedGender?: string;
   surname: string = '';
   gender: string = '';
@@ -59,13 +55,13 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   filters: any = {
     clientId: '',
-    fistName: '',
+    firstName: '',
     surname: '',
     gender: '',
     appointmentID: '',
     startDate: '',
     endDate: '',
-    referringFacility: ''
+    referringFacility: '',
   };
 
   constructor(
@@ -88,61 +84,54 @@ export class HomeComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           this.loading = false;
-          this.total = 10;
-          this.pageIndex = 1;
-          this.appointments = data;
+          this.allAppointments = data; // Store all data
+          this.total = data.length; // Set total to length of all data
+
+          this.allAppointments = data;
+          this.total = this.allAppointments.length;
+          this.updateDisplayedAppointments();
         },
         error: (error) => {
           this.loading = false;
-          //TODO: Implement error handling
+          console.error('Error loading appointments:', error);
         },
       });
   }
 
-  onDatasetsSearchInputTyping(value: string) {
-    this.dataSetSeachQuery = value;
-    if (value.length >= 3 || value === '') {
-      this.loadHduClientsFromServer();
-    }
+  // Handle pagination changes
+  updateDisplayedAppointments(): void {
+    const startIndex = (this.pageIndex - 1) * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.displayedAppointments = this.allAppointments.slice(
+      startIndex,
+      endIndex
+    );
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
-    if (this.isFirstLoad) {
-      this.isFirstLoad = false;
-      return;
-    }
-    const { pageSize, pageIndex, filter } = params;
-    const queryFilter = [
-      ...filter,
-      this.dataSetSeachQuery !== ''
-        ? { key: 'firstName', value: [this.dataSetSeachQuery] }
-        : { key: '', value: [] },
-    ];
-    this.loadHduClientsFromServer();
+    const { pageSize, pageIndex } = params;
+    console.log('Query params changed:', params);
+    this.pageSize = pageSize;
+    this.pageIndex = pageIndex;
+    this.updateDisplayedAppointments();
   }
 
   ngOnInit(): void {
     this.loadHduClientsFromServer();
-
-    this.clientManagementService
-      .getAppointments(this.appointments)
-      .subscribe((referrals) => {
-        console.log(referrals);
-      });
   }
 
   viewClientDetails(client: any) {
     this.router.navigate(['/appointment-management/referral-details'], {
-      queryParams: { client: JSON.stringify(client) , parentRoute: '/appointment-management/appointments-list'},
+      queryParams: {
+        client: JSON.stringify(client),
+        parentRoute: '/appointment-management/appointments-list',
+      },
     });
   }
 
-  onFilterChange(): void {
-
-  }
-
   applyFilters() {
-
+    // Reset to first page when filters change
+    this.pageIndex = 1;
     this.loadHduClientsFromServer();
   }
 
@@ -154,42 +143,49 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.appointmentID = '';
     this.startDate = null;
     this.endDate = null;
+
+    // Reset filters object
+    this.filters = {
+      clientId: '',
+      firstName: '',
+      surname: '',
+      gender: '',
+      appointmentID: '',
+      startDate: '',
+      endDate: '',
+      referringFacility: '',
+    };
+
+    this.pageIndex = 1;
     this.applyFilters();
   }
 
   filterData(event: any, type?: string): void {
-
-    switch (type){
-      case "gender":
+    switch (type) {
+      case 'gender':
         this.selectedGender = event;
         break;
-
-      case "firstName":
-        this.firstName = event
+      case 'firstName':
+        this.firstName = event;
         break;
-
-      case "surname":
-        this.surname = event
+      case 'surname':
+        this.surname = event;
         break;
-
-      case "appointmentID":
+      case 'appointmentID':
         this.appointmentID = event;
         break;
-
-      case "clientId":
+      case 'clientId':
         this.clientId = event;
         break;
-
-      case "startDate":
+      case 'startDate':
         this.startDate = event;
         break;
-      case "endDate":
+      case 'endDate':
         this.endDate = event;
         break;
-      case "referringFacility":
+      case 'referringFacility':
         this.facilityFrom = event;
         break;
-
       default:
         break;
     }
@@ -198,48 +194,41 @@ export class HomeComponent implements OnDestroy, OnInit {
       ...this.filters,
       gender: this.selectedGender,
       firstName: this.firstName,
+      surname: this.surname,
       clientId: this.clientId,
       appointmentID: this.appointmentID,
       startDate: this.formatDateToYYYYMMDD(this.startDate || ''),
       endDate: this.formatDateToYYYYMMDD(this.endDate || ''),
-      referringFacility: this.facilityFrom
+      referringFacility: this.facilityFrom,
     };
-
-    console.log(this.filters, "all filters")
-  }
-
-  clearFilter(){
-    this.filters = {
-
-    }
   }
 
   formatDateToYYYYMMDD(dateString: string): string | null {
     try {
       const date = new Date(dateString);
-
       if (isNaN(date.getTime())) {
-        return null; // Invalid date
+        return null;
       }
-
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const month = String(date.getMonth() + 1).padStart(2, '0');
       const day = String(date.getDate()).padStart(2, '0');
-
       return `${year}-${month}-${day}`;
     } catch (error) {
-      console.error("Error formatting date:", error);
+      console.error('Error formatting date:', error);
       return null;
     }
   }
 
   getStatusColor(status: any) {
     switch (status) {
-      case 'booked': return 'blue';
-      case 'completed': return 'green';
-      case 'cancelled': return 'red';
-      default: return 'gray';
+      case 'booked':
+        return 'blue';
+      case 'completed':
+        return 'green';
+      case 'cancelled':
+        return 'red';
+      default:
+        return 'gray';
     }
   }
-
 }
