@@ -80,7 +80,10 @@ export class HomeComponent implements OnDestroy, OnInit {
   loadHduClientsFromServer(): void {
     this.loading = true;
     this.loadHduClientsSubscription = this.clientManagementService
-      .getAppointments(this.filters)
+      .getAppointments({
+        ...(this.filters ?? {}),
+        code: 'FHIR-APPOINTMENT-QUERY',
+      })
       .subscribe({
         next: (data: any) => {
           this.loading = false;

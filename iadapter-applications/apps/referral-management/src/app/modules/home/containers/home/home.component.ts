@@ -62,7 +62,7 @@ export class HomeComponent implements OnDestroy, OnInit {
     referralNumber: '',
     startDate: '',
     endDate: '',
-    referringFacility: ''
+    referringFacility: '',
   };
 
   constructor(
@@ -81,7 +81,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   loadHduClientsFromServer(): void {
     this.loading = true;
     this.loadHduClientsSubscription = this.clientManagementService
-      .getReferrals(this.filters)
+      .getReferrals({ ...(this.referrals ?? {}), code: 'FHIR-REFERRAL-QUERY' })
       .subscribe({
         next: (data: any) => {
           this.loading = false;
@@ -122,7 +122,7 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsFromServer();
 
     this.clientManagementService
-      .getReferrals(this.referrals)
+      .getReferrals({ ...(this.referrals ?? {}), code: 'FHIR-REFERRAL-QUERY' })
       .subscribe((referrals) => {
         console.log(referrals);
       });
@@ -130,16 +130,16 @@ export class HomeComponent implements OnDestroy, OnInit {
 
   viewClientDetails(client: any) {
     this.router.navigate(['/shr-management/referral-details'], {
-      queryParams: { client: JSON.stringify(client) , parentRoute: '/shr-management/referral-list'},
+      queryParams: {
+        client: JSON.stringify(client),
+        parentRoute: '/shr-management/referral-list',
+      },
     });
   }
 
-  onFilterChange(): void {
-
-  }
+  onFilterChange(): void {}
 
   applyFilters() {
-
     this.loadHduClientsFromServer();
   }
 
@@ -155,35 +155,34 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   filterData(event: any, type?: string): void {
-
-    switch (type){
-      case "gender":
+    switch (type) {
+      case 'gender':
         this.selectedGender = event;
         break;
 
-      case "firstName":
-        this.firstName = event
+      case 'firstName':
+        this.firstName = event;
         break;
 
-      case "surname":
-        this.surname = event
+      case 'surname':
+        this.surname = event;
         break;
 
-      case "referralNumber":
+      case 'referralNumber':
         this.referralNumber = event;
         break;
 
-      case "clientId":
+      case 'clientId':
         this.clientId = event;
         break;
 
-      case "startDate":
+      case 'startDate':
         this.startDate = event;
         break;
-      case "endDate":
+      case 'endDate':
         this.endDate = event;
         break;
-      case "referringFacility":
+      case 'referringFacility':
         this.facilityFrom = event;
         break;
 
@@ -199,16 +198,14 @@ export class HomeComponent implements OnDestroy, OnInit {
       referralNumber: this.referralNumber,
       startDate: this.formatDateToYYYYMMDD(this.startDate || ''),
       endDate: this.formatDateToYYYYMMDD(this.endDate || ''),
-      referringFacility: this.facilityFrom
+      referringFacility: this.facilityFrom,
     };
 
-    console.log(this.filters, "all filters")
+    console.log(this.filters, 'all filters');
   }
 
-  clearFilter(){
-    this.filters = {
-
-    }
+  clearFilter() {
+    this.filters = {};
   }
 
   formatDateToYYYYMMDD(dateString: string): string | null {
@@ -225,9 +222,8 @@ export class HomeComponent implements OnDestroy, OnInit {
 
       return `${year}-${month}-${day}`;
     } catch (error) {
-      console.error("Error formatting date:", error);
+      console.error('Error formatting date:', error);
       return null;
     }
   }
-
 }

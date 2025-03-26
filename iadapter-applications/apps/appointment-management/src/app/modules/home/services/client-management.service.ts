@@ -1,27 +1,18 @@
 import { Injectable } from '@angular/core';
 
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
-import { ClientUrls } from '../models';
 import { catchError, map, Observable } from 'rxjs';
-import { HttpHeaders, HttpParams, HttpClient } from '@angular/common/http';
 import {
   UnAuothorizedException,
   UnknownException,
 } from '../../../../../../../libs/models/src';
-import { ClientPage } from '../models';
+import { ClientPage, ClientUrls } from '../models';
 
 @Injectable()
 export class ClientManagementService {
   hduClientsUrl: string = ClientUrls.GET_CLIENTS;
   hduSharedRecordsUrl: string = ClientUrls.GET_SHARED_RECORDS;
-
-  // TODO: softcode authentification credentials
-  private readonly apiUrl =
-    'http://41.59.228.177/engine/processes/FHIR-APPOINTMENT-QUERY/run?async=true';
-  private readonly credentials = {
-    username: 'admin',
-    password: 'Admin123',
-  };
 
   constructor(private httpClient: HduHttpService, private http: HttpClient) {}
 
@@ -110,20 +101,12 @@ export class ClientManagementService {
       );
   }
 
-  private getHeaders(): HttpHeaders {
-    const authHeader =
-      'Basic ' +
-      btoa(`${this.credentials.username}:${this.credentials.password}`);
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: authHeader,
-    });
-  }
-
   getAppointments(filters: any): Observable<any> {
-    return this.http.post<Referral[]>(this.apiUrl, filters, {
-      headers: this.getHeaders(),
-    });
+    return this.http.post<Referral[]>(
+      `${ClientUrls.BASE_URL}/processes`,
+      filters,
+      {}
+    );
   }
 }
 
