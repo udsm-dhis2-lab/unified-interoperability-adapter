@@ -26,6 +26,7 @@ WORKDIR /usr/local/tomcat/webapps/
 # COPY ./backend/src/config/application.properties /opt/config/application.properties
 
 COPY ./backend/target/icare-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
+COPY ./backend/src/main/resources/static /usr/local/tomcat/webapps/ROOT/static
 #COPY --from=ui /app/dist /usr/local/tomcat/webapps/ROOT
 #COPY ./ui/dist /usr/local/tomcat/webapps/ROOT
 
