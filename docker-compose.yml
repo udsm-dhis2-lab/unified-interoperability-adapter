@@ -1,4 +1,3 @@
-version: "3.7"
 services:
   fhir:
     container_name: fhir
@@ -38,7 +37,7 @@ services:
       test: "exit 0"
     volumes:
       - iadapter-data:/var/lib/mysql
-      - ./backup:/backup
+      - ./backup:/docker-entrypoint-initdb.d
   iadapter:
     restart: "always"
     image: udsmdhis2/unified:2.0.0
