@@ -16,13 +16,14 @@ export class ClientManagementService {
   hduSharedRecordsUrl: string = ClientUrls.GET_SHARED_RECORDS;
 
   // TODO: softcode authentification credentials
-  private readonly apiUrl = 'http://41.59.228.177/engine/processes/FHIR-APPOINTMENT-QUERY/run?async=true';
+  private readonly apiUrl =
+    'http://41.59.228.177/engine/processes/FHIR-APPOINTMENT-QUERY/run?async=true';
   private readonly credentials = {
     username: 'admin',
-    password: 'Admin123'
+    password: 'Admin123',
   };
 
-  constructor(private httpClient: HduHttpService,private http: HttpClient) {}
+  constructor(private httpClient: HduHttpService, private http: HttpClient) {}
 
   getHduClients(
     pageIndex: number,
@@ -91,10 +92,7 @@ export class ClientManagementService {
       );
   }
 
-  getClientById(
-    id: string
-  ): Observable<ClientPage> {
-
+  getClientById(id: string): Observable<ClientPage> {
     return this.httpClient
       .get<{ results: any }>(`${this.hduSharedRecordsUrl}?id=${id}`)
       .pipe(
@@ -113,24 +111,21 @@ export class ClientManagementService {
   }
 
   private getHeaders(): HttpHeaders {
-    const authHeader = 'Basic ' + btoa(`${this.credentials.username}:${this.credentials.password}`);
+    const authHeader =
+      'Basic ' +
+      btoa(`${this.credentials.username}:${this.credentials.password}`);
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': authHeader
+      Authorization: authHeader,
     });
   }
 
   getAppointments(filters: any): Observable<any> {
-    return this.http.post<Referral[]>(this.apiUrl,
-      filters
-      ,
-      {
-      headers: this.getHeaders()
-
+    return this.http.post<Referral[]>(this.apiUrl, filters, {
+      headers: this.getHeaders(),
     });
   }
 }
-
 
 export interface Referral {
   client_id: string;
