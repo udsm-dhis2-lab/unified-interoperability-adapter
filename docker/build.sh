@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 cd "$(dirname "$0")/.." || exit 1
 
@@ -19,9 +19,9 @@ cd "$FRONTEND_DIR" || exit 1
 echo "Installing dependencies inside Docker..."
 docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm install --legacy-peer-deps
 
-APPS=("login" "client-management" "dashboard" "mapping-and-data-extraction" "workflows-management" "referral-management" "settings")
+APPS="login client-management dashboard mapping-and-data-extraction workflows-management referral-management settings"
 
-for app in "${APPS[@]}"; do
+for app in $APPS; do
     echo "Building $app inside Docker..."
     docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npx nx build "$app" --configuration production
 done
@@ -30,7 +30,8 @@ cd ..
 
 mkdir -p "$TARGET_DIR"
 
-for app in "${APPS[@]}"; do
+# Loop through apps again using standard shell syntax
+for app in $APPS; do
     SOURCE_DIR="$BUILD_DIR/$app/browser"
     DEST_DIR="$TARGET_DIR/$app"
 
