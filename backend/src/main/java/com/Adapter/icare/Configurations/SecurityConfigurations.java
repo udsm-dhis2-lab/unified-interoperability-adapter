@@ -2,6 +2,7 @@ package com.Adapter.icare.Configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -49,24 +50,37 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers(
+                        "/",
+                        "/error",
                         "/login",
-                        "/api/v1/login",
-                        "/logout",
-                        "/error")
+                        "/login/**",
+                        "/customError",
+                        "/swagger-ui/**",
+                        "/swagger-ui/index.html",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**")
+                .permitAll()
+                .antMatchers("/**/styles-*.css", "/**/runtime-*.js", "/**/polyfills-*.js", "/**/chunk-*.js",
+                        "/**/main-*.js", "/**/favicon.ico", "*.js", "*.css", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                .permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/login")
+                .permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/login")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
-                .permitAll()
-                .defaultSuccessUrl("/dashboard", true)
+                .disable()
+                .httpBasic()
                 .and()
-                .logout()
-                .logoutUrl("/logout")
-                .logoutSuccessUrl("/login")
-                .permitAll()
-                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) -> {
+                    response.sendRedirect("/login");
+                });
+
+        http
                 .sessionManagement()
                 .sessionFixation().newSession()
                 .maximumSessions(1)
