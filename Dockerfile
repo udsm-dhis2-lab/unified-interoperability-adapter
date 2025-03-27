@@ -1,33 +1,19 @@
-# FROM maven:3.6.3 as maven
+FROM maven:3.6.3 as maven
 
-# WORKDIR /usr/src/app
-# COPY backend/* /usr/src/app/
-# COPY backend/src /usr/src/app/src
-# RUN mvn package -Dmaven.test.skip=true
-
-
-# FROM node:16.13.0 as ui
-
-# WORKDIR /app
-# COPY ui/* /app/
-# RUN npm i --legacy-peer-deps
-# COPY ui/src /app/src
-# RUN npm run build
+WORKDIR /usr/src/app
+COPY backend/pom.xml backend/src /usr/src/app/
+RUN mvn package -Dmaven.test.skip=true
 
 FROM tomcat:8.5-jdk15-openjdk-oracle
 
-#Data & Config - Persistent Mount Point
 ENV APP_DATA_FOLDER=/var/lib/adaptor
 ENV SAMPLE_APP_CONFIG=${APP_DATA_FOLDER}/config/
 
-#Move over the War file from previous build step
 WORKDIR /usr/local/tomcat/webapps/
-#COPY --from=maven /usr/src/app/target/icare-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
-# COPY ./backend/src/config/application.properties /opt/config/application.properties
 
-COPY ./backend/target/icare-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
-#COPY --from=ui /app/dist /usr/local/tomcat/webapps/ROOT
-#COPY ./ui/dist /usr/local/tomcat/webapps/ROOT
+COPY backend/src/main/webapp/WEB-INF/web.xml /usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml
+
+COPY --from=maven /usr/src/app/target/icare-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 
 WORKDIR $APP_DATA_FOLDER
 
