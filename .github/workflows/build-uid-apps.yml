@@ -8,9 +8,9 @@ on:
         default: "login,apps"
         required: true
         type: string
-  push:
-    branches:
-      - develop
+  # push:
+  #   branches:
+  #     - develop
   pull_request:
     branches:
       - develop
