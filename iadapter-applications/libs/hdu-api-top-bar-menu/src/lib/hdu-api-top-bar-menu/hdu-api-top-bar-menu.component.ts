@@ -43,17 +43,20 @@ export class HduApiTopBarMenuComponent implements OnInit {
     this.selectedSideMenuName = this.sideMenuService.getMenuNameByRoute();
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
-      if (user && user.displayName) {
-        this.currentUserInitials = getInitials(user.displayName);
+      if (user) {
+        this.currentUserInitials = getInitials(
+          `${user.firstName} ${user.lastName}`
+        );
+      } else {
+        this.currentUserInitials = getInitials('AA');
       }
     });
   }
 
   logOut() {
-    //TODO: Remove subscription here
     this.authService.logout().subscribe({
       next: () => {
-        window.location.reload();
+        window.location.href = '/login';
       },
       error: (error) => {},
     });

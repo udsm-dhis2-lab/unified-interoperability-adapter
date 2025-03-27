@@ -1,8 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { User } from './models/user.model';
 import { HduHttpService } from '../../../../hdu-api-http-client/src/index';
+import { User } from './models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -24,8 +23,13 @@ export class AuthService {
       .pipe(tap((user) => this.currentUserSubject.next(user)));
   }
 
-  logout(): Observable<string> {
-    return this.hduHttpService.get<string>('logout');
+  logout(): Observable<unknown> {
+    return this.hduHttpService.get<unknown>('logout').pipe(
+      tap(() => {
+        this.currentUserSubject.next(null);
+        window.location.href = '/login';
+      })
+    );
   }
 
   fetchCurrentUser(): Observable<User> {
