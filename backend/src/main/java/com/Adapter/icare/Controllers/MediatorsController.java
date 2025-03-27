@@ -1,6 +1,5 @@
 package com.Adapter.icare.Controllers;
 
-
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
@@ -27,48 +26,48 @@ import java.util.Map;
 @RequestMapping("/api/v1/")
 public class MediatorsController {
 
-    private final  MediatorsService mediatorsService;
+    private final MediatorsService mediatorsService;
     private final DatastoreService datastoreService;
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
 
     public MediatorsController(MediatorsService mediatorsService,
-                               DatastoreService datastoreService,
-                               UserService userService) {
+            DatastoreService datastoreService,
+            UserService userService) {
         this.mediatorsService = mediatorsService;
         this.datastoreService = datastoreService;
         this.userService = userService;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
-            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+            this.authenticatedUser = this.userService
+                    .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
         } else {
             this.authenticatedUser = null;
             // TODO: Redirect to login page
         }
     }
 
-
     @GetMapping("mediators")
-    public ResponseEntity<Map<String,Object>> getMediators(
+    public ResponseEntity<Map<String, Object>> getMediators(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "code", required = false) String code,
-            @RequestParam(value = "category", required = false) String category
-    ) throws Exception {
+            @RequestParam(value = "category", required = false) String category) throws Exception {
         try {
             List<Map<String, Object>> mediatorsList = new ArrayList<>();
-            Page<Mediator> pagedMediatorData = mediatorsService.getMediatorsByPagination( page, pageSize, code, category);
-            for (Mediator mediator: pagedMediatorData.getContent()) {
+            Page<Mediator> pagedMediatorData = mediatorsService.getMediatorsByPagination(page, pageSize, code,
+                    category);
+            for (Mediator mediator : pagedMediatorData.getContent()) {
                 mediatorsList.add(mediator.toMap());
             }
-            Map<String, Object> returnObject =  new HashMap<>();
+            Map<String, Object> returnObject = new HashMap<>();
             Map<String, Object> pager = new HashMap<>();
             pager.put("page", page);
             pager.put("pageSize", pageSize);
-            pager.put("totalPages",pagedMediatorData.getTotalPages());
+            pager.put("totalPages", pagedMediatorData.getTotalPages());
             pager.put("total", pagedMediatorData.getTotalElements());
-            returnObject.put("pager",pager);
+            returnObject.put("pager", pager);
             returnObject.put("results", mediatorsList);
             return ResponseEntity.ok(returnObject);
         } catch (Exception e) {
@@ -77,7 +76,7 @@ public class MediatorsController {
     }
 
     @PostMapping("mediators")
-    public ResponseEntity<Map<String,Object>> saveMediator( @Valid @RequestBody MediatorDTO mediatorDTO) {
+    public ResponseEntity<Map<String, Object>> saveMediator(@Valid @RequestBody MediatorDTO mediatorDTO) {
         try {
             Mediator mediator = new Mediator().fromMap(mediatorDTO);
             if (this.authentication != null && this.authenticatedUser != null) {
@@ -90,7 +89,8 @@ public class MediatorsController {
     }
 
     @PutMapping("mediators/{uuid}")
-    public ResponseEntity<Map<String,Object>> updateMediator(@PathVariable("uuid") String uuid, @Valid @RequestBody MediatorDTO mediatorDTO) {
+    public ResponseEntity<Map<String, Object>> updateMediator(@PathVariable("uuid") String uuid,
+            @Valid @RequestBody MediatorDTO mediatorDTO) {
         try {
             Mediator mediator = new Mediator().fromMap(mediatorDTO);
             if (mediator.getUuid() == null) {
@@ -106,16 +106,19 @@ public class MediatorsController {
     }
 
     @DeleteMapping("mediators/{uuid}")
-    public void deleteMediator(@PathVariable("uuid") String uuid) throws Exception {
-         try {
-             Mediator mediator = mediatorsService.getMediatorByUuid(uuid);
-             if (mediator !=null) {
-                 mediatorsService.deleteMediator(uuid);
-             } else {
-                 throw new Exception("Mediator with uuid " + uuid + " does not exists");
-             }
-         } catch (Exception e) {
-             throw new Exception("Issue with deleting resource");
-         }
+    public ResponseEntity<Object> deleteMediator(@PathVariable("uuid") String uuid) throws Exception {
+        try {
+            Mediator mediator = mediatorsService.getMediatorByUuid(uuid);
+            if (mediator != null) {
+                mediatorsService.deleteMediator(uuid);
+                Map<String, String> response = new HashMap<>();
+                response.put("message", "Mediator deleted successfully");
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            } else {
+                throw new Exception("Mediator with uuid " + uuid + " does not exists");
+            }
+        } catch (Exception e) {
+            throw new Exception("Issue with deleting resource");
+        }
     }
 }
