@@ -1,24 +1,13 @@
 package com.Adapter.icare.Services;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.json.JSONObject;
+import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Domains.Datastore;
+import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Repository.MediatorsRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.data.domain.Page;
+import org.json.JSONObject;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -26,12 +15,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Datastore;
-import com.Adapter.icare.Domains.Mediator;
-import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Repository.MediatorsRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.*;
 
 @Service
 public class MediatorsService {
@@ -118,7 +112,7 @@ public class MediatorsService {
 
     public List<Map<String, Object>> getDataTemplatesList() throws Exception {
         // To be used in case data templates can be stored on FHIR resource
-        // TODO: Implement as per FHIR resource
+        // TODO: Implement as per FHIR resources
         List<Map<String, Object>> dataTemplates = new ArrayList<>();
         return dataTemplates;
     }
@@ -159,7 +153,6 @@ public class MediatorsService {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public Map<String, Object> sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
         /**
          * TODO: The base url, path and authentication details should be put on
@@ -340,6 +333,40 @@ public class MediatorsService {
 
     }
 
+    public Map<String, Object> getCodeSystems() throws Exception {
+        Map<String, Object> codeSystemsData = new HashMap<>();
+        Mediator FHIRMediator = mediatorsRepository.getMediatorByCategory("FHIR");
+        String authType = FHIRMediator.getAuthType();
+        String authToken = FHIRMediator.getAuthToken();
+        String baseUrl = FHIRMediator.getBaseUrl();
+        String path = "CodeSystem";
+        URL url = new URL(baseUrl + path);
+        return codeSystemsData;
+    }
+
+    private Map<String, Object> updateClientData(Map<String, Object> existingClientData,
+            Map<String, Object> incomingClientData) throws Exception {
+        Map<String, Object> clientData = existingClientData;
+        clientData.put("demographicDetails", existingClientData.get("demographicDetails"));
+        List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
+        diagnosisDetails = (List<Map<String, Object>>) existingClientData.get("diagnosisDetails");
+        for (Map<String, Object> diagnosisDetail : (List<Map<String, Object>>) incomingClientData
+                .get("diagnosisDetails")) {
+            diagnosisDetails.add(diagnosisDetail);
+        }
+
+        clientData.put("diagnosisDetails", diagnosisDetails);
+        List<Map<String, Object>> investigationDetails = (List<Map<String, Object>>) existingClientData
+                .get("investigationDetails");
+        for (Map<String, Object> investigationDetail : (List<Map<String, Object>>) incomingClientData
+                .get("investigationDetails")) {
+            investigationDetails.add(investigationDetail);
+        }
+
+        clientData.put("investigationDetails", investigationDetails);
+        return clientData;
+    }
+
     private Map<String, Object> calculateByDateOfBirthAge(String dateOfBirth) throws Exception {
         LocalDate today = LocalDate.now();
         LocalDate dob = LocalDate.parse(dateOfBirth);
@@ -376,48 +403,8 @@ public class MediatorsService {
         return response;
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> handleExternalResponse(String responseContent, ObjectMapper mapper) throws IOException {
-        if (responseContent == null || responseContent.trim().isEmpty()) {
-            return new HashMap<>();
-        }
-        return mapper.readValue(responseContent.trim(), Map.class);
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> updateClientData(Map<String, Object> existingClientData,
-            Map<String, Object> incomingClientData) throws Exception {
-        if (existingClientData == null || incomingClientData == null) {
-            throw new IllegalArgumentException("Both existing and incoming client data must not be null");
-        }
-
-        Map<String, Object> clientData = new HashMap<>(existingClientData);
-
-        // Handle diagnosis details
-        List<Map<String, Object>> diagnosisDetails = (List<Map<String, Object>>) existingClientData
-                .getOrDefault("diagnosisDetails", new ArrayList<>());
-        List<Map<String, Object>> incomingDiagnosis = (List<Map<String, Object>>) incomingClientData
-                .getOrDefault("diagnosisDetails", new ArrayList<>());
-        diagnosisDetails.addAll(incomingDiagnosis);
-        clientData.put("diagnosisDetails", diagnosisDetails);
-
-        // Handle investigation details
-        List<Map<String, Object>> investigationDetails = (List<Map<String, Object>>) existingClientData
-                .getOrDefault("investigationDetails", new ArrayList<>());
-        List<Map<String, Object>> incomingInvestigations = (List<Map<String, Object>>) incomingClientData
-                .getOrDefault("investigationDetails", new ArrayList<>());
-        investigationDetails.addAll(incomingInvestigations);
-        clientData.put("investigationDetails", investigationDetails);
-
-        return clientData;
-    }
-
-    @SuppressWarnings("unchecked")
     public Map<String, Object> getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
-        if (mediator == null) {
-            throw new IllegalArgumentException("Mediator cannot be null");
-        }
-
+        String response = new String();
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
@@ -434,6 +421,7 @@ public class MediatorsService {
         BufferedReader reader;
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
+        Map<String, Object> responseMap = new HashMap<>();
 
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -447,6 +435,7 @@ public class MediatorsService {
                 httpURLConnection.setRequestProperty("Authorization", authentication);
             }
 
+            // Set the request method to GET
             httpURLConnection.setRequestMethod("GET");
             httpURLConnection.setRequestProperty("Content-Type", "application/json");
             httpURLConnection.setRequestProperty("Accept", "application/json");
@@ -456,79 +445,137 @@ public class MediatorsService {
                 responseContent.append(dataLine);
             }
             reader.close();
+            ObjectMapper mapper = new ObjectMapper();
+            String responseString = responseContent.toString();
+            responseMap = mapper.readValue(responseString, Map.class);
 
-            return new ObjectMapper().readValue(responseContent.toString(), Map.class);
         } catch (Exception e) {
-            throw new Exception("Failed to get data: " + e.getMessage(), e);
+            e.printStackTrace(); // Print any exception details
         }
+        return responseMap;
+    }
+
+    public Object sendDataToExternalSystemGeneric(Mediator mediator,
+            Map<String, Object> data,
+            String method,
+            String api) throws Exception {
+        // TODO: Make this valid for async true
+        String authType = mediator.getAuthType();
+        String authToken = mediator.getAuthToken();
+        String baseUrl = mediator.getBaseUrl();
+        String path = mediator.getPath() != null ? mediator.getPath() : "";
+        URL url;
+
+        try {
+            String pathUrl = baseUrl + path + (api != null ? api : "");
+            url = new URL(pathUrl);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        BufferedReader reader;
+        String dataLine;
+        StringBuilder responseContent = new StringBuilder();
+        Object responseObject;
+
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+            if ("basic".equalsIgnoreCase(authType)) {
+                httpURLConnection.setRequestProperty("Authorization", "Basic " + authToken);
+            } else if ("token".equalsIgnoreCase(authType)) {
+                httpURLConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+            }
+
+            httpURLConnection.setRequestMethod(method);
+            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setDoOutput(true);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = mapper.writeValueAsString(data);
+
+            try (OutputStream os = httpURLConnection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Read the response
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((dataLine = reader.readLine()) != null) {
+                responseContent.append(dataLine);
+            }
+            reader.close();
+
+            // Convert response JSON string to a generic Object
+            String responseString = responseContent.toString();
+            responseObject = mapper.readValue(responseString, Object.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+        return responseObject;
     }
 
     public Map<String, Object> sendDataToExternalSystem(Mediator mediator,
             Map<String, Object> data,
             String method,
             String api) throws Exception {
-        if (mediator == null || mediator.getBaseUrl() == null) {
-            throw new IllegalArgumentException("Mediator or Base URL cannot be null");
-        }
-
+        // TODO: Make this valid for async true
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
         String path = mediator.getPath() != null ? mediator.getPath() : "";
-        String pathUrl = baseUrl + path + (api != null ? api : "");
-        ObjectMapper mapper = new ObjectMapper();
-
-        URL url;
+        URL url = null;
         try {
+            String pathUrl = baseUrl + path + (api != null ? api : "");
             url = new URL(pathUrl);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Invalid URL: " + pathUrl, e);
+            throw new RuntimeException(e);
         }
-
-        HttpURLConnection httpURLConnection = null;
-
+        BufferedReader reader;
+        String dataLine;
+        StringBuffer responseContent = new StringBuffer();
+        Map<String, Object> responseMap = new HashMap<>();
         try {
-            httpURLConnection = (HttpURLConnection) url.openConnection();
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+            String authentication = "";
+            if (authType.toLowerCase().equals("basic")) {
+                authentication = "Basic " + authToken;
+                // System.out.println(authentication);
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            } else if (authType.toLowerCase().equals("token")) {
+                authentication = "Bearer " + authToken;
+                httpURLConnection.setRequestProperty("Authorization", authentication);
+            }
             httpURLConnection.setRequestMethod(method);
             httpURLConnection.setRequestProperty("Content-Type", "application/json");
             httpURLConnection.setRequestProperty("Accept", "application/json");
             httpURLConnection.setDoOutput(true);
 
-            // Set Authorization Header
-            if (authType != null) {
-                if ("basic".equalsIgnoreCase(authType)) {
-                    httpURLConnection.setRequestProperty("Authorization", "Basic " + authToken);
-                } else if ("token".equalsIgnoreCase(authType)) {
-                    httpURLConnection.setRequestProperty("Authorization", "Bearer " + authToken);
-                }
-            }
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = mapper.writeValueAsString(data);
 
-            // Write JSON body
             try (OutputStream os = httpURLConnection.getOutputStream()) {
-                byte[] input = mapper.writeValueAsBytes(data);
+                byte[] input = jsonString.getBytes("utf-8");
                 os.write(input, 0, input.length);
             }
 
-            // Read response
-            int responseCode = httpURLConnection.getResponseCode();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    responseCode >= 200 && responseCode < 300 ? httpURLConnection.getInputStream()
-                            : httpURLConnection.getErrorStream()))) {
-                StringBuilder responseContent = new StringBuilder();
-                String dataLine;
-                while ((dataLine = reader.readLine()) != null) {
-                    responseContent.append(dataLine);
-                }
-                return new ObjectMapper().readValue(responseContent.toString(), Map.class);
+            // Read the response
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((dataLine = reader.readLine()) != null) {
+                responseContent.append(dataLine);
             }
+            reader.close();
 
-        } catch (IOException e) {
-            throw new Exception("HTTP Request failed: " + e.getMessage(), e);
-        } finally {
-            if (httpURLConnection != null) {
-                httpURLConnection.disconnect();
-            }
+            // Convert the response JSON string to a Map
+            String responseString = responseContent.toString();
+            responseMap = mapper.readValue(responseString, Map.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
         }
+        return responseMap;
     }
 
     public Map<String, Object> deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
@@ -572,13 +619,14 @@ public class MediatorsService {
                 responseContent.append(dataLine);
             }
             reader.close();
-
-            return handleExternalResponse(responseContent.toString(), new ObjectMapper());
+            ObjectMapper mapper = new ObjectMapper();
+            responseMap = mapper.readValue(responseContent.toString(), Map.class);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return new HashMap<>();
         }
+
+        return responseMap;
     }
 
     private Pageable createPageable(Integer page, Integer pageSize) throws Exception {

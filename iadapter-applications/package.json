@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build:apps": "rm -rf dist/apps/apps &&  npx nx build apps && cd dist/apps/apps/browser/ && zip -r apps.zip ."
+    "build:apps": "npx nx build apps && cd dist/apps/apps/browser/ && zip -r apps.zip ."
   },
   "private": true,
   "dependencies": {

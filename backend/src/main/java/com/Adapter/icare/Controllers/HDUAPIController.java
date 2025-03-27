@@ -744,7 +744,7 @@ public class HDUAPIController {
     }
 
     @PostMapping(value = "processes/execute")
-    public ResponseEntity<Map<String, Object>> runProcess(
+    public ResponseEntity<Object> runProcess(
             @RequestBody Map<String, Object> process,
             @RequestParam Map<String, String> allRequestParams) throws Exception {
         try {
@@ -761,8 +761,9 @@ public class HDUAPIController {
                 }
 
                 return ResponseEntity
-                        .ok(mediatorsService.routeToMediator(workflowEngine, urlBuilder.toString(), "POST",
-                                process));
+                        .ok(mediatorsService.sendDataToExternalSystemGeneric(workflowEngine, process,
+                                "POST", urlBuilder.toString()));
+
             } else {
                 throw new Exception("Can not access route/mediator due to missing configurations");
             }
