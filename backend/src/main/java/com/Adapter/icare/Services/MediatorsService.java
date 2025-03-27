@@ -342,32 +342,16 @@ public class MediatorsService {
 
     @SuppressWarnings("unchecked")
     private Map<String, Object> handleExternalResponse(String responseContent, ObjectMapper mapper) throws IOException {
-        Map<String, Object> responseMap = new HashMap<>();
-
         if (responseContent == null || responseContent.trim().isEmpty()) {
-            return responseMap;
+            return new HashMap<>();
         }
-
-        String content = responseContent.trim();
         try {
-            if (content.startsWith("[")) {
-                // Handle array response
-                List<?> arrayResponse = mapper.readValue(content, List.class);
-                responseMap.put("data", arrayResponse);
-            } else if (content.startsWith("{")) {
-                // Handle object response
-                responseMap = mapper.readValue(content, Map.class);
-            } else {
-                // Handle non-JSON response
-                responseMap.put("response", content);
-            }
+            return mapper.readValue(responseContent, Map.class);
         } catch (IOException e) {
-            // Handle invalid JSON
-            responseMap.put("rawResponse", content);
-            throw e;
+            Map<String, Object> wrapper = new HashMap<>();
+            wrapper.put("data", responseContent);
+            return wrapper;
         }
-
-        return responseMap;
     }
 
     public Map<String, Object> getCodeSystems() throws Exception {
