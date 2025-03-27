@@ -1,3 +1,4 @@
+import { filter } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
@@ -60,16 +61,14 @@ export class ClientDetailsComponent implements OnInit {
               'Demographic Details'
             ];
 
-
-            this.identifiers = this.client.demographicDetails.identifiers.map(
-              (id: any) => {
+            this.identifiers = this.client.demographicDetails.identifiers
+              .filter((id: any) => id.type !== 'REFERRAL-NUMBER')
+              .map((id: any) => {
                 return {
                   Type: id.type,
-                  Number: id.id
+                  Number: id.id,
                 };
-              }
-            );
-
+              });
 
             this.appointmentDetails = this.formatApiResponse(this.client)[
               'Appointments'
@@ -106,7 +105,7 @@ export class ClientDetailsComponent implements OnInit {
         };
       }),
 
-      'Appointments': result?.demographicDetails?.appointmentDetails || '-',
+      Appointments: result?.demographicDetails?.appointmentDetails || '-',
       'Contact People':
         result.demographicDetails.contactPeople?.join(', ') || '-',
       'Payment Details':
@@ -126,6 +125,8 @@ export class ClientDetailsComponent implements OnInit {
         'Related Clients':
           result.demographicDetails.relatedClients?.join(', ') || '-',
         Appointment: result.demographicDetails.appointment || '-',
+        Address: result.demographicDetails.addresses[0] || '-',
+
       },
 
       'Facility Details': {
