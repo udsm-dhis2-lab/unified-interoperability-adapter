@@ -18,6 +18,7 @@ cd "$FRONTEND_DIR" || exit 1
 
 echo "Installing dependencies inside Docker..."
 docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm install --legacy-peer-deps
+docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm i -g nx
 
 APPS="login apps"
 
