@@ -1,13 +1,24 @@
 package com.Adapter.icare.Services;
 
-import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Datastore;
-import com.Adapter.icare.Domains.Mediator;
-import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Repository.MediatorsRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.data.domain.Page;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.json.JSONObject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -15,18 +26,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.ConnectException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.*;
+import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Domains.Datastore;
+import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Repository.MediatorsRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class MediatorsService {
@@ -154,6 +159,7 @@ public class MediatorsService {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
         /**
          * TODO: The base url, path and authentication details should be put on
@@ -334,6 +340,36 @@ public class MediatorsService {
 
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> handleExternalResponse(String responseContent, ObjectMapper mapper) throws IOException {
+        Map<String, Object> responseMap = new HashMap<>();
+
+        if (responseContent == null || responseContent.trim().isEmpty()) {
+            return responseMap;
+        }
+
+        String content = responseContent.trim();
+        try {
+            if (content.startsWith("[")) {
+                // Handle array response
+                List<?> arrayResponse = mapper.readValue(content, List.class);
+                responseMap.put("data", arrayResponse);
+            } else if (content.startsWith("{")) {
+                // Handle object response
+                responseMap = mapper.readValue(content, Map.class);
+            } else {
+                // Handle non-JSON response
+                responseMap.put("response", content);
+            }
+        } catch (IOException e) {
+            // Handle invalid JSON
+            responseMap.put("rawResponse", content);
+            throw e;
+        }
+
+        return responseMap;
+    }
+
     public Map<String, Object> getCodeSystems() throws Exception {
         Map<String, Object> codeSystemsData = new HashMap<>();
         Mediator FHIRMediator = mediatorsRepository.getMediatorByCategory("FHIR");
@@ -445,20 +481,13 @@ public class MediatorsService {
                 responseContent.append(dataLine);
             }
             reader.close();
-            ObjectMapper mapper = new ObjectMapper();
-            String content = responseContent.toString();
 
-            if (content.startsWith("[")) {
-                List<?> arrayResponse = mapper.readValue(content, List.class);
-                responseMap.put("data", arrayResponse);
-            } else {
-                responseMap = mapper.readValue(content, Map.class);
-            }
+            return handleExternalResponse(responseContent.toString(), new ObjectMapper());
 
         } catch (Exception e) {
             e.printStackTrace();
+            return new HashMap<>();
         }
-        return responseMap;
     }
 
     @SuppressWarnings("unchecked")
@@ -519,17 +548,7 @@ public class MediatorsService {
                 while ((dataLine = reader.readLine()) != null) {
                     responseContent.append(dataLine);
                 }
-
-                // Handle both array and object responses
-                String content = responseContent.toString();
-                if (content.startsWith("[")) {
-                    // If response is an array, wrap it in a map
-                    List<?> arrayResponse = mapper.readValue(content, List.class);
-                    responseMap.put("data", arrayResponse);
-                } else {
-                    // If response is an object, read it as a map
-                    responseMap = mapper.readValue(content, Map.class);
-                }
+                return handleExternalResponse(responseContent.toString(), mapper);
             }
 
         } catch (IOException e) {
@@ -539,8 +558,6 @@ public class MediatorsService {
                 httpURLConnection.disconnect();
             }
         }
-
-        return responseMap;
     }
 
     public Map<String, Object> deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
@@ -584,14 +601,13 @@ public class MediatorsService {
                 responseContent.append(dataLine);
             }
             reader.close();
-            ObjectMapper mapper = new ObjectMapper();
-            responseMap = mapper.readValue(responseContent.toString(), Map.class);
+
+            return handleExternalResponse(responseContent.toString(), new ObjectMapper());
 
         } catch (Exception e) {
             e.printStackTrace();
+            return new HashMap<>();
         }
-
-        return responseMap;
     }
 
     private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
