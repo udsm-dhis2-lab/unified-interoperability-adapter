@@ -51,8 +51,6 @@ done
 
 echo "Unzipping completed. Check the $EXTRACT_DIR directory for extracted contents."
 
-docker run -w="/app" -v "$(pwd)":/app node:20.18.0 bash -c "
-    # Ensure the backend static directory exists
     mkdir -p /app/backend/src/main/resources/static && \
     
     # Remove existing static content if any
