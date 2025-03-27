@@ -1,8 +1,7 @@
 FROM maven:3.6.3 as maven
 
 WORKDIR /usr/src/app
-COPY backend/pom.xml backend/src /usr/src/app/
-RUN mvn package -Dmaven.test.skip=true
+COPY backend/ /usr/src/app/
 
 FROM tomcat:8.5-jdk15-openjdk-oracle
 
