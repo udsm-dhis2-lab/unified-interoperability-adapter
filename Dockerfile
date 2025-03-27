@@ -10,7 +10,7 @@ ENV SAMPLE_APP_CONFIG=${APP_DATA_FOLDER}/config/
 
 WORKDIR /usr/local/tomcat/webapps/
 
-COPY backend/src/main/webapp/WEB-INF/web.xml /usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml
+# COPY backend/src/main/webapp/WEB-INF/web.xml /usr/local/tomcat/webapps/ROOT/WEB-INF/web.xml
 
 COPY --from=maven /usr/src/app/target/icare-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
 
