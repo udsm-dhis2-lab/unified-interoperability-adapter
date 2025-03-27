@@ -340,54 +340,6 @@ public class MediatorsService {
 
     }
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> handleExternalResponse(String responseContent, ObjectMapper mapper) throws IOException {
-        if (responseContent == null || responseContent.trim().isEmpty()) {
-            return new HashMap<>();
-        }
-        try {
-            return mapper.readValue(responseContent, Map.class);
-        } catch (IOException e) {
-            Map<String, Object> wrapper = new HashMap<>();
-            wrapper.put("data", responseContent);
-            return wrapper;
-        }
-    }
-
-    public Map<String, Object> getCodeSystems() throws Exception {
-        Map<String, Object> codeSystemsData = new HashMap<>();
-        Mediator FHIRMediator = mediatorsRepository.getMediatorByCategory("FHIR");
-        String authType = FHIRMediator.getAuthType();
-        String authToken = FHIRMediator.getAuthToken();
-        String baseUrl = FHIRMediator.getBaseUrl();
-        String path = "CodeSystem";
-        URL url = new URL(baseUrl + path);
-        return codeSystemsData;
-    }
-
-    private Map<String, Object> updateClientData(Map<String, Object> existingClientData,
-            Map<String, Object> incomingClientData) throws Exception {
-        Map<String, Object> clientData = existingClientData;
-        clientData.put("demographicDetails", existingClientData.get("demographicDetails"));
-        List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
-        diagnosisDetails = (List<Map<String, Object>>) existingClientData.get("diagnosisDetails");
-        for (Map<String, Object> diagnosisDetail : (List<Map<String, Object>>) incomingClientData
-                .get("diagnosisDetails")) {
-            diagnosisDetails.add(diagnosisDetail);
-        }
-
-        clientData.put("diagnosisDetails", diagnosisDetails);
-        List<Map<String, Object>> investigationDetails = (List<Map<String, Object>>) existingClientData
-                .get("investigationDetails");
-        for (Map<String, Object> investigationDetail : (List<Map<String, Object>>) incomingClientData
-                .get("investigationDetails")) {
-            investigationDetails.add(investigationDetail);
-        }
-
-        clientData.put("investigationDetails", investigationDetails);
-        return clientData;
-    }
-
     private Map<String, Object> calculateByDateOfBirthAge(String dateOfBirth) throws Exception {
         LocalDate today = LocalDate.now();
         LocalDate dob = LocalDate.parse(dateOfBirth);
@@ -425,7 +377,46 @@ public class MediatorsService {
     }
 
     @SuppressWarnings("unchecked")
+    private Map<String, Object> handleExternalResponse(String responseContent, ObjectMapper mapper) throws IOException {
+        if (responseContent == null || responseContent.trim().isEmpty()) {
+            return new HashMap<>();
+        }
+        return mapper.readValue(responseContent.trim(), Map.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> updateClientData(Map<String, Object> existingClientData,
+            Map<String, Object> incomingClientData) throws Exception {
+        if (existingClientData == null || incomingClientData == null) {
+            throw new IllegalArgumentException("Both existing and incoming client data must not be null");
+        }
+
+        Map<String, Object> clientData = new HashMap<>(existingClientData);
+
+        // Handle diagnosis details
+        List<Map<String, Object>> diagnosisDetails = (List<Map<String, Object>>) existingClientData
+                .getOrDefault("diagnosisDetails", new ArrayList<>());
+        List<Map<String, Object>> incomingDiagnosis = (List<Map<String, Object>>) incomingClientData
+                .getOrDefault("diagnosisDetails", new ArrayList<>());
+        diagnosisDetails.addAll(incomingDiagnosis);
+        clientData.put("diagnosisDetails", diagnosisDetails);
+
+        // Handle investigation details
+        List<Map<String, Object>> investigationDetails = (List<Map<String, Object>>) existingClientData
+                .getOrDefault("investigationDetails", new ArrayList<>());
+        List<Map<String, Object>> incomingInvestigations = (List<Map<String, Object>>) incomingClientData
+                .getOrDefault("investigationDetails", new ArrayList<>());
+        investigationDetails.addAll(incomingInvestigations);
+        clientData.put("investigationDetails", investigationDetails);
+
+        return clientData;
+    }
+
     public Map<String, Object> getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
+        if (mediator == null) {
+            throw new IllegalArgumentException("Mediator cannot be null");
+        }
+
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
@@ -442,7 +433,6 @@ public class MediatorsService {
         BufferedReader reader;
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
-        Map<String, Object> responseMap = new HashMap<>();
 
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -466,7 +456,8 @@ public class MediatorsService {
             }
             reader.close();
 
-            return handleExternalResponse(responseContent.toString(), new ObjectMapper());
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(responseContent.toString(), Map.class);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -474,7 +465,6 @@ public class MediatorsService {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public Map<String, Object> sendDataToExternalSystem(Mediator mediator,
             Map<String, Object> data,
             String method,
@@ -497,7 +487,6 @@ public class MediatorsService {
             throw new RuntimeException("Invalid URL: " + pathUrl, e);
         }
 
-        Map<String, Object> responseMap = new HashMap<>();
         HttpURLConnection httpURLConnection = null;
 
         try {
