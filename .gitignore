@@ -90,3 +90,5 @@ proxy.config.json
 
 .mvn
 backend/.mvn
+
+backup
