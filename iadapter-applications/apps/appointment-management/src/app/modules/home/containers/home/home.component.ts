@@ -86,16 +86,14 @@ export class HomeComponent implements OnDestroy, OnInit {
       .subscribe({
         next: (data: any) => {
           this.loading = false;
-          this.allAppointments = data; // Store all data
-          this.total = data.length; // Set total to length of all data
-
-          this.allAppointments = data;
+          this.allAppointments = JSON.parse(data.data);
+          this.total = data.data.length;
           this.total = this.allAppointments.length;
           this.updateDisplayedAppointments();
         },
         error: (error) => {
           this.loading = false;
-          console.error('Error loading appointments:', error);
+          console.error('Error Loading Appointments:', error);
         },
       });
   }
@@ -104,10 +102,12 @@ export class HomeComponent implements OnDestroy, OnInit {
   updateDisplayedAppointments(): void {
     const startIndex = (this.pageIndex - 1) * this.pageSize;
     const endIndex = startIndex + this.pageSize;
-    this.displayedAppointments = this.allAppointments.slice(
-      startIndex,
-      endIndex
-    );
+    if (this.allAppointments.length > 0) {
+      this.displayedAppointments = this.allAppointments.slice(
+        startIndex,
+        endIndex
+      );
+    }
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
@@ -123,7 +123,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   viewClientDetails(client: any) {
-    this.router.navigate(['/appointment-management/referral-details'], {
+    this.router.navigate(['/appointment-management/appointment-details'], {
       queryParams: {
         client: JSON.stringify(client),
         parentRoute: '/appointment-management/appointments-list',

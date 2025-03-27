@@ -56,29 +56,44 @@
           <nz-card style="min-height: 60vh">
             <div>
               <nz-tabset>
+
                 <div *ngFor="let section of extraInfo">
                   <nz-tab nzTitle="{{ section.sectionTitle }}">
-                    <ul class="no-bullets">
-                      <li *ngFor="let key of objectKeys(section.info)">
-                        <div
-                          nz-row
-                          nzJustify="space-between"
-                          style="padding: 8px 0"
-                        >
-                          <div nz-col nzSpan="6">
-                            <strong>{{ key }}</strong>
-                          </div>
-                          <div nz-col nzSpan="12" style="text-align: right">
-                            <app-dynamic-list
-                              [value]="section.info[key]"
-                            ></app-dynamic-list>
 
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
+                    <nz-table [nzData]="section.info" [nzFrontPagination]="false" [nzShowPagination]="false">
+                      <thead>
+                        <tr>
+                          <th>SN</th>
+                          <th>Referral Date</th>
+                          <th>Referral No</th>
+                          <th>Referring Facility</th>
+                          <th>Referred Facility</th>
+                          <th>Referred Abroad</th>
+                          <th>Action</th>
+
+                        </tr>
+                      </thead>
+                      <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+                        @for (data of section.info; track data; let i = $index) {
+                          <tr cdkDrag>
+                            <td>
+                              {{
+                                 i + 1
+                              }}
+                            </td>
+                            <td>{{ data['Appointment ID'] }}</td>
+                            <td>{{ data['HFR Code'] }}</td>
+                            <td>{{ data['Status'] }}</td>
+                            <td>{{ data['Service Name'] }}</td>
+                            <td>{{ data['Payment Status'] }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </nz-table>
+
                   </nz-tab>
                 </div>
+
               </nz-tabset>
             </div>
           </nz-card>

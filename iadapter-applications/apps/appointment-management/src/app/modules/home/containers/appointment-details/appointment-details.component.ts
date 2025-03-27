@@ -23,8 +23,8 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
     NzDividerModule,
   ],
   providers: [ClientManagementService],
-  templateUrl: './referral-details.component.html',
-  styleUrl: './referral-details.component.css',
+  templateUrl: './appointment-details.component.html',
+  styleUrl: './appointment-details.component.css',
 })
 export class ClientDetailsComponent implements OnInit {
   loading: boolean = false;
@@ -88,7 +88,7 @@ export class ClientDetailsComponent implements OnInit {
                       appointment.serviceDetails[0]?.serviceName,
 
 
-                      
+
                       // 'Payment Details': appointment?.paymentDetails?.map(
                       //   (payment: any) => {
                       //     return {

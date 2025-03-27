@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     NzDatePickerModule,
     NzIconModule,
-    NzSelectModule,
+    NzSelectModule
   ],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
@@ -83,17 +83,21 @@ export class HomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsSubscription = this.clientManagementService
       .getReferrals({ ...this.filters, code: 'FHIR-REFERRAL-QUERY' })
       .subscribe({
+
         next: (data: any) => {
+      console.log("console down", data);
+
           this.loading = false;
           this.total = 10;
           this.pageIndex = 1;
-          this.referrals = data;
+          this.referrals = JSON.parse(data.data);
         },
         error: (error) => {
           this.loading = false;
           //TODO: Implement error handling
         },
       });
+
   }
 
   onDatasetsSearchInputTyping(value: string) {
@@ -121,11 +125,11 @@ export class HomeComponent implements OnDestroy, OnInit {
   ngOnInit(): void {
     this.loadHduClientsFromServer();
 
-    this.clientManagementService
-      .getReferrals(this.referrals)
-      .subscribe((referrals) => {
-        console.log(referrals);
-      });
+    // this.clientManagementService
+    //   .getReferrals(this.referrals)
+    //   .subscribe((referrals) => {
+    //     console.log(referrals);
+    //   });
   }
 
   viewClientDetails(client: any) {

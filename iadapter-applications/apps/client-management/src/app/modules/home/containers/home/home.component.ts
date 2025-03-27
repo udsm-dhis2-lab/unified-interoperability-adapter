@@ -154,6 +154,10 @@ export class HomeComponent implements OnDestroy, OnInit {
     });
   }
 
+  deleteClient(client: HDUAPIClientDetails) {
+    // this.clientManagementService.deleteClient(client.demographicDetails.clientID);
+  }
+
   resetFilters() {
     this.gender = '';
     this.clientId = '';
