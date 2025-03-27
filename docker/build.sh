@@ -26,7 +26,7 @@ for app in $APPS; do
     echo "Building $app inside Docker..."
     docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npx nx build "$app" --configuration production
 done
-
+docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npx nx build apps
 cd ..
 
 mkdir -p "$TARGET_DIR"
