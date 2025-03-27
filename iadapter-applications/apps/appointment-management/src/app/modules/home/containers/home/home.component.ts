@@ -194,6 +194,7 @@ export class HomeComponent implements OnDestroy, OnInit {
 
     this.filters = {
       ...this.filters,
+      code: 'FHIR-APPOINTMENT-QUERY',
       gender: this.selectedGender,
       firstName: this.firstName,
       surname: this.surname,

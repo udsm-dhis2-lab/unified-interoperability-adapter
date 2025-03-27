@@ -750,7 +750,7 @@ public class HDUAPIController {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 // Build the URL with query parameters
-                StringBuilder urlBuilder = new StringBuilder("processes/execute?async=true");
+                StringBuilder urlBuilder = new StringBuilder("processes/execute");
 
                 // Add all other request parameters except 'async' which is already included
                 for (Map.Entry<String, String> entry : allRequestParams.entrySet()) {
