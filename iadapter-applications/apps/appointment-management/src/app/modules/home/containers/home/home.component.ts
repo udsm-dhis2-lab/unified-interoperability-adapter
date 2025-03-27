@@ -85,9 +85,12 @@ export class HomeComponent implements OnDestroy, OnInit {
       })
       .subscribe({
         next: (data: any) => {
+          console.log(data, data)
           this.loading = false;
-          this.allAppointments = JSON.parse(data.data);
-          this.total = data.data.length;
+          this.allAppointments = data.filter(
+            (appointment: any) => appointment.supporting_patient_id !== ''
+          );
+          this.total = data.length;
           this.total = this.allAppointments.length;
           this.updateDisplayedAppointments();
         },
