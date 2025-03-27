@@ -49,9 +49,9 @@ public class UserController {
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
     }
 
-
     @PostMapping(path = "/login")
-    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody LoginDTO loginData) throws IllegalAccessException{
+    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody LoginDTO loginData)
+            throws IllegalAccessException {
         try {
             Map<String, Object> userDetails = userService.authenticate(loginData);
             // Here, you can return user info or a token, depending on your needs
@@ -61,7 +61,8 @@ public class UserController {
                         new UsernamePasswordAuthenticationToken(loginData.getUsername(),
                                 loginData.getPassword()));
                 SecurityContextHolder.getContext().setAuthentication(this.authentication);
-                this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+                this.authenticatedUser = this.userService
+                        .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
                 response = this.authenticatedUser.toMap();
                 response.put("authenticated", true);
                 return ResponseEntity.ok(response);
@@ -77,20 +78,25 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public String logout(HttpServletRequest request,
-                         HttpServletResponse response) throws Exception {
+    public ResponseEntity<Void> logout(HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
-        return "redirect:/login/index.html";
+
+        // Redirect to the frontend login page
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .header("Location", "/")
+                .build();
     }
 
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> getLoggedInUser() throws Exception {
         try {
             if (authentication != null) {
-                User authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+                User authenticatedUser = this.userService
+                        .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
                 return ResponseEntity.ok(authenticatedUser.toMap());
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
@@ -101,11 +107,11 @@ public class UserController {
     }
 
     @GetMapping(path = "/users")
-    public List<Map<String,Object>> getUsers() throws Exception{
-        List<Map<String,Object>> usersMap = new ArrayList<>();
+    public List<Map<String, Object>> getUsers() throws Exception {
+        List<Map<String, Object>> usersMap = new ArrayList<>();
         try {
             List<User> users = userService.getUsers();
-            for(User user : users){
+            for (User user : users) {
                 usersMap.add(user.toMap());
             }
         } catch (Exception e) {
@@ -114,8 +120,7 @@ public class UserController {
         return usersMap;
     }
 
-
-    @PostMapping(path = "/users", consumes = MediaType.APPLICATION_JSON_VALUE,produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public User createUser(@RequestBody User user) throws Exception {
         User userResponse = new User();
         try {
@@ -128,7 +133,7 @@ public class UserController {
     }
 
     @GetMapping("/users/{uuid}")
-    public Map<String,Object> getUser(@PathVariable String uuid) throws Exception {
+    public Map<String, Object> getUser(@PathVariable String uuid) throws Exception {
         User user = userService.getUSer(uuid);
         return user.toMap();
     }
@@ -139,9 +144,9 @@ public class UserController {
     }
 
     @PostMapping("/users/roles")
-    public List<Map<String,Object>> createRoles(@RequestBody List<Map<String,Object>> rolesMap){
-        List<Map<String,Object>> createdRoles = new ArrayList<>();
-        for(Map<String, Object> roleMap: rolesMap){
+    public List<Map<String, Object>> createRoles(@RequestBody List<Map<String, Object>> rolesMap) {
+        List<Map<String, Object>> createdRoles = new ArrayList<>();
+        for (Map<String, Object> roleMap : rolesMap) {
             Role role = Role.fromMap(roleMap);
             if (this.authenticatedUser != null) {
                 role.setCreatedBy(this.authenticatedUser);
@@ -153,18 +158,19 @@ public class UserController {
     }
 
     @GetMapping("/users/roles")
-    public List<Map<String,Object>> getRoles(@RequestParam(defaultValue = "false") boolean withPrivileges ){
-        List<Map<String,Object>> savedRoles = new ArrayList<>();
+    public List<Map<String, Object>> getRoles(@RequestParam(defaultValue = "false") boolean withPrivileges) {
+        List<Map<String, Object>> savedRoles = new ArrayList<>();
         List<Role> roles = userService.getRoles();
 
-        for(Role role : roles){
+        for (Role role : roles) {
             savedRoles.add(role.toMap(withPrivileges));
         }
         return savedRoles;
     }
 
     @GetMapping("/users/roles/{uuid}")
-    public Map<String,Object> getRole(@RequestParam(defaultValue = "true") boolean withPrivileges, @PathVariable String uuid) throws Exception {
+    public Map<String, Object> getRole(@RequestParam(defaultValue = "true") boolean withPrivileges,
+            @PathVariable String uuid) throws Exception {
 
         Role role = userService.getRole(uuid);
         return role.toMap(withPrivileges);
@@ -172,19 +178,20 @@ public class UserController {
     }
 
     @PutMapping("/users/roles/{uuid}")
-    public Map<String,Object> updateRole(@RequestBody Map<String,Object> roleMap,@PathVariable String uuid) throws Exception {
+    public Map<String, Object> updateRole(@RequestBody Map<String, Object> roleMap, @PathVariable String uuid)
+            throws Exception {
         Role role = Role.fromMap(roleMap);
         if (this.authenticatedUser != null) {
             role.setLastUpdatedBy(this.authenticatedUser);
         }
-        Role updateRole = userService.updateRole(role,uuid);
+        Role updateRole = userService.updateRole(role, uuid);
         return updateRole.toMap(true);
     }
 
     @PostMapping("/users/privileges")
-    public List<Map<String,Object>> createPrivileges(@RequestBody List<Map<String,Object>> privilegesMap){
-        List<Map<String,Object>> createdPrivileges = new ArrayList<>();
-        for(Map<String,Object> priviligeMap : privilegesMap){
+    public List<Map<String, Object>> createPrivileges(@RequestBody List<Map<String, Object>> privilegesMap) {
+        List<Map<String, Object>> createdPrivileges = new ArrayList<>();
+        for (Map<String, Object> priviligeMap : privilegesMap) {
             Privilege privilege = Privilege.fromMap(priviligeMap);
             if (this.authenticatedUser != null) {
                 privilege.setCreatedBy(this.authenticatedUser);
@@ -196,11 +203,11 @@ public class UserController {
     }
 
     @GetMapping("/users/privileges")
-    public List<Map<String,Object>> getPrivileges(){
-        List<Map<String,Object>> privilegesMap = new ArrayList<>();
+    public List<Map<String, Object>> getPrivileges() {
+        List<Map<String, Object>> privilegesMap = new ArrayList<>();
         List<Privilege> privileges = userService.getPrivileges();
 
-        for(Privilege privilege : privileges){
+        for (Privilege privilege : privileges) {
             privilegesMap.add(privilege.toMap(false));
         }
 
@@ -208,22 +215,24 @@ public class UserController {
     }
 
     @GetMapping("/users/privileges/{uuid}")
-    public Map<String,Object> getPrivilege(@PathVariable String uuid, @RequestParam(defaultValue = "true") boolean withRoles) throws Exception {
+    public Map<String, Object> getPrivilege(@PathVariable String uuid,
+            @RequestParam(defaultValue = "true") boolean withRoles) throws Exception {
         Privilege privilege = userService.getPrivilege(uuid);
         return privilege.toMap(withRoles);
     }
 
     @PutMapping("/user/privileges/{uuid}")
-    public Map<String,Object> updatePrivilege(@RequestBody Map<String,Object> privilegeMap,@PathVariable String uuid) throws Exception {
+    public Map<String, Object> updatePrivilege(@RequestBody Map<String, Object> privilegeMap, @PathVariable String uuid)
+            throws Exception {
         Privilege privilege = Privilege.fromMap(privilegeMap);
-        Privilege updatedPrivilege = userService.updatePrivilege(privilege,uuid);
+        Privilege updatedPrivilege = userService.updatePrivilege(privilege, uuid);
         return updatedPrivilege.toMap(false);
     }
 
     @PostMapping("/users/groups")
-    public List<Map<String,Object>> createGroups(@RequestBody List<Map<String,Object>> groupsMap){
-        List<Map<String,Object>> savedGroupsMap = new ArrayList<>();
-        for(Map<String,Object> groupMap : groupsMap){
+    public List<Map<String, Object>> createGroups(@RequestBody List<Map<String, Object>> groupsMap) {
+        List<Map<String, Object>> savedGroupsMap = new ArrayList<>();
+        for (Map<String, Object> groupMap : groupsMap) {
             Group group = Group.fromMap(groupMap);
             if (this.authenticatedUser != null) {
                 group.setCreatedBy(this.authenticatedUser);
@@ -235,17 +244,18 @@ public class UserController {
     }
 
     @GetMapping("/users/groups")
-    public List<Map<String,Object>> getGroups(@RequestParam(defaultValue = "false") boolean withUsers){
-        List<Map<String,Object>> groupsMap = new ArrayList<>();
+    public List<Map<String, Object>> getGroups(@RequestParam(defaultValue = "false") boolean withUsers) {
+        List<Map<String, Object>> groupsMap = new ArrayList<>();
         List<Group> groups = userService.getGroups();
-        for(Group group : groups){
+        for (Group group : groups) {
             groupsMap.add(group.toMap(withUsers));
         }
         return groupsMap;
     }
 
     @GetMapping("/users/group/{uuid}")
-    public Map<String,Object> getGroup(@PathVariable String uuid,@RequestParam(defaultValue = "true") boolean withUsers) throws Exception {
+    public Map<String, Object> getGroup(@PathVariable String uuid,
+            @RequestParam(defaultValue = "true") boolean withUsers) throws Exception {
         Group group = userService.getGroup(uuid);
         return group.toMap(withUsers);
     }
