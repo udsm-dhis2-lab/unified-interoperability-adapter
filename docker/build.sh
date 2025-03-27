@@ -51,27 +51,25 @@ done
 
 echo "Unzipping completed. Check the $EXTRACT_DIR directory for extracted contents."
 
-    # Ensure the backend static directory exists
-    mkdir -p /app/backend/src/main/resources/static && \
-    
-    # Remove existing static content if any
-    rm -rf /app/backend/src/main/resources/static/* && \
-    
-    # Iterate through each directory in the extracted UI apps
-    for dir in /app/ui-apps/*; do
-        if [ -d \"\$dir\" ]; then
-            app_name=\$(basename \"\$dir\")
-            
-            # Ensure the app's target directory exists
-            mkdir -p \"/app/backend/src/main/resources/static/\$app_name\" && \
-            
-            # Copy the directory into the backend static resources directory
-            cp -r \"\$dir\"/* \"/app/backend/src/main/resources/static/\$app_name\" && \
-            echo \"Copied \$app_name to /app/backend/src/main/resources/static/\$app_name\"
-        fi
-    done
-"
+# Ensure the backend static directory exists
+mkdir -p backend/src/main/resources/static
 
+# Remove existing static content if any
+rm -rf backend/src/main/resources/static/*
+
+# Iterate through each directory in the extracted UI apps
+for dir in $EXTRACT_DIR/*; do
+    if [ -d "$dir" ]; then
+        app_name=$(basename "$dir")
+        
+        # Ensure the app's target directory exists
+        mkdir -p "backend/src/main/resources/static/$app_name"
+        
+        # Copy the directory into the backend static resources directory
+        cp -r "$dir"/* "backend/src/main/resources/static/$app_name"
+        echo "Copied $app_name to backend/src/main/resources/static/$app_name"
+    fi
+done
 
 docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/backend:/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
 docker build --no-cache -f Dockerfile  -t udsmdhis2/unified:2.0.0 .
