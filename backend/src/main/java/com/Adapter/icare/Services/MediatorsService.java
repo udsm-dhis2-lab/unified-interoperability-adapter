@@ -412,6 +412,7 @@ public class MediatorsService {
         return clientData;
     }
 
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
         if (mediator == null) {
             throw new IllegalArgumentException("Mediator cannot be null");
@@ -456,12 +457,9 @@ public class MediatorsService {
             }
             reader.close();
 
-            ObjectMapper mapper = new ObjectMapper();
-            return mapper.readValue(responseContent.toString(), Map.class);
-
+            return new ObjectMapper().readValue(responseContent.toString(), Map.class);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new HashMap<>();
+            throw new Exception("Failed to get data: " + e.getMessage(), e);
         }
     }
 
@@ -521,7 +519,7 @@ public class MediatorsService {
                 while ((dataLine = reader.readLine()) != null) {
                     responseContent.append(dataLine);
                 }
-                return handleExternalResponse(responseContent.toString(), mapper);
+                return new ObjectMapper().readValue(responseContent.toString(), Map.class);
             }
 
         } catch (IOException e) {
