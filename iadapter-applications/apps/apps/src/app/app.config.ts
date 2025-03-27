@@ -1,3 +1,6 @@
+import { registerLocaleData } from '@angular/common';
+import { provideHttpClient } from '@angular/common/http';
+import en from '@angular/common/locales/en';
 import {
   ApplicationConfig,
   importProvidersFrom,
@@ -5,39 +8,38 @@ import {
   NgModule,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter, RouterModule } from '@angular/router';
-import { provideClientHydration } from '@angular/platform-browser';
-import { BrowserModule } from '@angular/platform-browser';
+import { ReactiveFormsModule } from '@angular/forms';
+import {
+  BrowserModule,
+  provideClientHydration,
+} from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClient, provideHttpClient } from '@angular/common/http';
+import { provideRouter, RouterModule } from '@angular/router';
 import { IconDefinition } from '@ant-design/icons-angular';
-import { antDesignIcons } from './shared/ant-design-icons.constants';
-import { NZ_ICONS } from 'ng-zorro-antd/icon';
-import { appRoutes } from './app.routes';
-import { provideStore, StoreModule } from '@ngrx/store';
+import { D2DashboardModule } from '@iapps/d2-dashboard';
+import { NgxDhis2HttpClientModule } from '@iapps/ngx-dhis2-http-client';
 import { EffectsModule, provideEffects } from '@ngrx/effects';
 import {
+  provideRouterStore,
   routerReducer,
   StoreRouterConnectingModule,
-  provideRouterStore,
 } from '@ngrx/router-store';
+import { provideStore, StoreModule } from '@ngrx/store';
 import {
   provideStoreDevtools,
   StoreDevtoolsModule,
 } from '@ngrx/store-devtools';
-import { appEffects, appReducers, metaReducers } from './store/app.state';
-import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
-import en from '@angular/common/locales/en';
-import { registerLocaleData } from '@angular/common';
-import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
-import { LogMonitorModule } from 'ngx-log-monitor';
-import { ReactiveFormsModule } from '@angular/forms';
-import { D2DashboardModule } from '@iapps/d2-dashboard';
-import { NgxDhis2HttpClientModule } from '@iapps/ngx-dhis2-http-client';
 import { AppComponent } from 'apps/apps/src/app/app.component';
-import { HduApiTopBarMenuComponent } from '../../../../libs/hdu-api-top-bar-menu/src/lib/hdu-api-top-bar-menu/hdu-api-top-bar-menu.component';
+import { en_US, NZ_I18N } from 'ng-zorro-antd/i18n';
+import { NZ_ICONS } from 'ng-zorro-antd/icon';
+import { LogMonitorModule } from 'ngx-log-monitor';
+import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
 import { HduApiNavMenuComponent } from '../../../../libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
+import { HduApiTopBarMenuComponent } from '../../../../libs/hdu-api-top-bar-menu/src/lib/hdu-api-top-bar-menu/hdu-api-top-bar-menu.component';
+import { appRoutes } from './app.routes';
+import { antDesignIcons } from './shared/ant-design-icons.constants';
 import { antDesignModules } from './shared/ant-design-modules';
+import { appEffects, appReducers, metaReducers } from './store/app.state';
 
 const icons: IconDefinition[] = [...antDesignIcons];
 registerLocaleData(en);

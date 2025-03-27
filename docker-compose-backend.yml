@@ -1,0 +1,51 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./Dockerfile-backend
+    volumes:
+      - ./backend:/app
+      - ~/.m2:/root/.m2
+    ports:
+      - "8080:8091"
+      - "8000:8000"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:mysql://iadapter-db:3306/${MYSQL_DB:-hduapicoredb}?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-hduapicore}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
+      JAVA_OPTS: "-Xmx1024m -Xms512m"
+    depends_on:
+      iadapter-db:
+        condition: service_healthy
+    restart: on-failure
+    # Add memory limits
+    deploy:
+      resources:
+        limits:
+          memory: 1.5G
+        reservations:
+          memory: 512M
+
+  iadapter-db:
+    restart: "always"
+    image: mysql:8
+    command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DB:-hduapicoredb}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Admin123}
+      MYSQL_USER: ${MYSQL_USER:-hduapicore}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-Admin123}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./backup/iadapter-data:/var/lib/mysql
+      - ./backup:/docker-entrypoint-initdb.d
+
+networks:
+  default:
+    external: true
+    name: local-docker-network

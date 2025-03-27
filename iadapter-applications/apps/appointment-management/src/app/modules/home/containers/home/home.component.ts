@@ -1,17 +1,16 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
+import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { HDUAPIClientDetails } from '../../models';
-import { ClientManagementService } from '../../services/client-management.service';
-import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { Subscription } from 'rxjs';
-import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzInputModule } from 'ng-zorro-antd/input';
+import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { FormsModule } from '@angular/forms';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { Subscription } from 'rxjs';
+import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
+import { ClientManagementService } from '../../services/client-management.service';
 
 @Component({
   selector: 'app-home',
@@ -80,7 +79,10 @@ export class HomeComponent implements OnDestroy, OnInit {
   loadHduClientsFromServer(): void {
     this.loading = true;
     this.loadHduClientsSubscription = this.clientManagementService
-      .getAppointments(this.filters)
+      .getAppointments({
+        ...(this.filters ?? {}),
+        code: 'FHIR-APPOINTMENT-QUERY',
+      })
       .subscribe({
         next: (data: any) => {
           this.loading = false;
@@ -192,6 +194,7 @@ export class HomeComponent implements OnDestroy, OnInit {
 
     this.filters = {
       ...this.filters,
+      code: 'FHIR-APPOINTMENT-QUERY',
       gender: this.selectedGender,
       firstName: this.firstName,
       surname: this.surname,
