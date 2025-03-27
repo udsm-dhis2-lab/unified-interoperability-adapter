@@ -47,6 +47,7 @@
     "mermaid": "^11.3.0",
     "monaco-editor": "^0.52.0",
     "monaco-editor-webpack-plugin": "^7.1.0",
+    "ngrx": "^0.0.1-security",
     "ngx-log-monitor": "^1.2.0",
     "ngx-monaco-editor-v2": "^18.1.0",
     "ngx-print": "^1.5.1",
