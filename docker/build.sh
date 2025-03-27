@@ -34,8 +34,17 @@ mkdir -p "$TARGET_DIR"
 # Move all built apps from dist directory to backend
 if [ -d "$BUILD_DIR" ]; then
     echo "Moving all apps from $BUILD_DIR to backend static directory..."
+    # First handle the apps directory if it exists
+    if [ -d "$BUILD_DIR/apps/browser" ]; then
+        echo "Moving apps directory to backend static directory..."
+        mkdir -p "$TARGET_DIR/apps"
+        cp -r "$BUILD_DIR/apps/browser/"* "$TARGET_DIR/apps/"
+        echo "Moved apps successfully!"
+    fi
+    
+    # Then handle other directories
     for dir in "$BUILD_DIR"/*/; do
-        if [ -d "$dir" ]; then
+        if [ -d "$dir" ] && [ "$(basename "$dir")" != "apps" ]; then
             app_name=$(basename "$dir")
             if [ -d "$dir/browser" ]; then
                 echo "Moving $app_name to backend static directory..."
