@@ -44,7 +44,6 @@ export class ClientDetailsComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
-      console.log(JSON.parse(params['client']));
       if (params) {
         const clientID = JSON.parse(params['client']);
 
@@ -55,158 +54,35 @@ export class ClientDetailsComponent implements OnInit {
           .subscribe((client: any) => {
             this.client = client.listOfClients[0];
 
-            console.log(client);
-            const sampleClient = [
-              {
-                facilityDetails: {
-                  code: null,
-                  name: null,
-                },
-                demographicDetails: {
-                  id: 'HCR-M-096748-09052021',
-                  firstName: 'MUDI',
-                  middleName: null,
-                  lastName: 'TEST',
-                  dateOfBirth: '2025-03-02',
-                  gender: 'male',
-                  phoneNumbers: ['0752043246'],
-                  emails: [],
-                  occupation: null,
-                  maritalStatus: 'Single',
-                  nationality: null,
-                  addresses: [
-                    {
-                      village: 'Tenge',
-                      ward: 'Tabata',
-                      district: 'Ilala',
-                      region: 'Dar es salaam',
-                      country: 'Tanzania',
-                      category: 'Temporary',
-                    },
-                  ],
-                  identifiers: [
-                    {
-                      id: '689609',
-                      type: 'MRN',
-                      preferred: false,
-                      system: 'HDU',
-                      organization: null,
-                    },
-                    {
-                      id: 'HCR-M-096748-09052021',
-                      type: 'HCRCODE',
-                      preferred: false,
-                      system: 'HDU',
-                      organization: null,
-                    },
-                    {
-                      id: '102557-6-61580',
-                      type: 'REFERRAL-NUMBER',
-                      preferred: false,
-                      system: null,
-                      organization: null,
-                    },
-                    {
-                      id: '102557-6-61583',
-                      type: 'REFERRAL-NUMBER',
-                      preferred: false,
-                      system: null,
-                      organization: null,
-                    },
-                    {
-                      id: '111890-0-56430-096-2024',
-                      type: 'REFERRAL-NUMBER',
-                      preferred: false,
-                      system: null,
-                      organization: null,
-                    },
-                    {
-                      id: 'F-2025-786181',
-                      type: 'MRN',
-                      preferred: false,
-                      system: 'HDU',
-                      organization: null,
-                    },
-                    {
-                      id: '79519785631',
-                      type: 'INSURANCE',
-                      preferred: false,
-                      system: 'HDU',
-                      organization: null,
-                    },
-                    {
-                      id: '19740509-187090-00003-21',
-                      type: 'NIDA',
-                      preferred: false,
-                      system: 'HDU',
-                      organization: null,
-                    },
-                    {
-                      id: '102557-6-61585',
-                      type: 'REFERRAL-NUMBER',
-                      preferred: false,
-                      system: null,
-                      organization: null,
-                    },
-                  ],
-                  contactPeople: [
-                    {
-                      firstName: 'ASHURA',
-                      lastName: 'BAKARI',
-                      phoneNumbers: ['0753524208'],
-                      relationShip: null,
-                    },
-                  ],
-                  paymentDetails: [
-                    {
-                      type: 'CASH',
-                      shortName: 'CASH',
-                      name: 'CASH',
-                      status: null,
-                      insuranceId: '4',
-                      insuranceCode: null,
-                      policyNumber: null,
-                      groupNumber: null,
-                    },
-                    {
-                      type: 'INSURANCE',
-                      shortName: 'NHIF',
-                      name: 'National Health Insurance Fund',
-                      status: null,
-                      insuranceId: '7383738389393',
-                      insuranceCode: 'INS001',
-                      policyNumber: null,
-                      groupNumber: null,
-                    },
-                  ],
-                  relatedClients: [],
-                  appointmentDetails: [{
-                    Date: '2021-05-09',
-                    Location: 'Muhimbili National Hospital',
-                    Provider: 'Dr. John Doe',
-                    Status: 'Scheduled',
-                    Time: '09:00',
-                  }],
-                },
-              },
-            ];
+            console.log(this.client, 'identifiers');
 
-            this.basicInfo = this.formatApiResponse(sampleClient[0])[
+            this.basicInfo = this.formatApiResponse(this.client)[
               'Demographic Details'
             ];
-            this.identifiers = this.formatApiResponse(sampleClient[0])[
-              'Identifiers'
-            ];
 
-            this.appointmentDetails = this.formatApiResponse(sampleClient[0])[
+
+            this.identifiers = this.client.demographicDetails.identifiers.map(
+              (id: any) => {
+                return {
+                  Type: id.type,
+                  Number: id.id
+                };
+              }
+            );
+
+
+            this.appointmentDetails = this.formatApiResponse(this.client)[
               'Appointments'
             ];
-            console.log(this.identifiers, 'identifiers');
 
             this.loading = false;
           });
       }
     });
+  }
+
+  drop(event: any) {
+    console.log(event);
   }
 
   objectKeys(obj: any): string[] {
@@ -237,10 +113,8 @@ export class ClientDetailsComponent implements OnInit {
         result.demographicDetails.paymentDetails?.join(', ') || '-',
 
       'Demographic Details': {
-        'Full Name': `${result.demographicDetails.firstName || ''} ${
-          result.demographicDetails.middleName || ''
-        } ${result.demographicDetails.lastName || ''}`.trim(),
-        'Client ID': result.demographicDetails.id,
+        'Full Name': result.demographicDetails.fullName,
+        'Client ID': result.demographicDetails.clientID,
         Gender: result.demographicDetails.gender,
         'Date of Birth': result.demographicDetails.dateOfBirth,
         'Marital Status': result.demographicDetails.maritalStatus || '-',

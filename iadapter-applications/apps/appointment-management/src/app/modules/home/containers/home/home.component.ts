@@ -121,7 +121,7 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   viewClientDetails(client: any) {
-    this.router.navigate(['/appointment-management/referral-details'], {
+    this.router.navigate(['/appointment-management/appointment-details'], {
       queryParams: {
         client: JSON.stringify(client),
         parentRoute: '/appointment-management/appointments-list',

@@ -3,6 +3,7 @@ export class HduClient {
   fname!: string;
   mname!: string;
   surname!: string;
+  fullName!: string;
   gender!: string;
   idNumber!: string;
   idType!: string;
@@ -13,10 +14,12 @@ export class HduClient {
   occupation!: string;
   nationality!: string;
   nida!: string;
+  identifiers!: any;
 
   static fromJson(json: any): HduClient {
     const hduClient = new HduClient();
     hduClient.clientID = json['id'];
+    hduClient.fullName = `${json['firstName']} ${json['middleName']} ${json['lastName']}`;
     hduClient.fname = json['firstName'];
     hduClient.mname = json['middleName'];
     hduClient.surname = json['lastName'];
@@ -27,6 +30,7 @@ export class HduClient {
     hduClient.addresses = json['addresses'];
     hduClient.occupation = json['occupation'];
     hduClient.nationality = json['nationality'];
+    hduClient.identifiers = json['identifiers'];
     hduClient.nida = json['identifiers'].filter((id: any) => id['type'] === 'NIDA').map((id: any)=> id['id']);
     hduClient.idNumber = json['identifiers'][0]
       ? json['identifiers'][0]['id']
