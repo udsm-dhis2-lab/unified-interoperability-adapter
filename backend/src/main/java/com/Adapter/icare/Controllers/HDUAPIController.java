@@ -749,12 +749,15 @@ public class HDUAPIController {
             @RequestParam Map<String, String> allRequestParams) throws Exception {
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
-                // Build the URL with query parameters
                 StringBuilder urlBuilder = new StringBuilder("processes/execute");
 
-                // Add all other request parameters except 'async' which is already included
+                boolean isFirstParam = true;
                 for (Map.Entry<String, String> entry : allRequestParams.entrySet()) {
-                    urlBuilder.append("&").append(entry.getKey()).append("=").append(entry.getValue());
+                    urlBuilder.append(isFirstParam ? "?" : "&")
+                            .append(entry.getKey())
+                            .append("=")
+                            .append(entry.getValue());
+                    isFirstParam = false;
                 }
 
                 return ResponseEntity
