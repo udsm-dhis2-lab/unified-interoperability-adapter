@@ -30,22 +30,25 @@ cd ..
 
 mkdir -p "$TARGET_DIR"
 
-# Loop through apps again using standard shell syntax
-for app in $APPS; do
-    SOURCE_DIR="$BUILD_DIR/$app/browser"
-    DEST_DIR="$TARGET_DIR/$app/"
+# Move all built apps from dist directory to backend
+if [ -d "$BUILD_DIR" ]; then
+    echo "Moving all apps from $BUILD_DIR to backend static directory..."
+    for dir in "$BUILD_DIR"/*/; do
+        if [ -d "$dir" ]; then
+            app_name=$(basename "$dir")
+            if [ -d "$dir/browser" ]; then
+                echo "Moving $app_name to backend static directory..."
+                mkdir -p "$TARGET_DIR/$app_name"
+                cp -r "$dir/browser/"* "$TARGET_DIR/$app_name/"
+                echo "Moved $app_name successfully!"
+            fi
+        fi
+    done
+else
+    echo "Build directory $BUILD_DIR not found, no apps to copy."
+fi
 
-    if [ -d "$SOURCE_DIR" ]; then
-        echo "Copying $app to backend static directory..."
-        mkdir -p "$DEST_DIR"
-        cp -r "$SOURCE_DIR"/* "$DEST_DIR"
-        echo "Copied $app successfully!"
-    else
-        echo "Build directory $SOURCE_DIR not found, skipping copy for $app."
-    fi
-done
-
-echo "All UI apps have been built and copied to the backend."
+echo "All UI apps have been moved to the backend."
 
 docker run --rm -v maven-repo:/root/.m2 -v "$(pwd)/backend":/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
 docker build --no-cache -f Dockerfile -t udsmdhis2/unified:2.0.0 .
