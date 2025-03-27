@@ -1,6 +1,8 @@
 package com.Adapter.icare.ClientRegistry.Controllers;
 
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import com.Adapter.icare.ClientRegistry.Domains.ClientRegistryIdPool;
 import com.Adapter.icare.ClientRegistry.Dtos.ClientRegistryIdDTO;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
@@ -39,6 +41,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/hduApi/cr")
+@Tag(name = "Client Registry", description = "APIs for managing client registry")
 public class ClientRegistryController {
     private final ClientRegistryService clientRegistryService;
     private final DatastoreService datastoreService;
