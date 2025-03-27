@@ -446,8 +446,14 @@ public class MediatorsService {
             }
             reader.close();
             ObjectMapper mapper = new ObjectMapper();
-            String responseString = responseContent.toString();
-            responseMap = mapper.readValue(responseString, Map.class);
+            String content = responseContent.toString();
+
+            if (content.startsWith("[")) {
+                List<?> arrayResponse = mapper.readValue(content, List.class);
+                responseMap.put("data", arrayResponse);
+            } else {
+                responseMap = mapper.readValue(content, Map.class);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -513,7 +519,17 @@ public class MediatorsService {
                 while ((dataLine = reader.readLine()) != null) {
                     responseContent.append(dataLine);
                 }
-                responseMap = mapper.readValue(responseContent.toString(), Map.class);
+
+                // Handle both array and object responses
+                String content = responseContent.toString();
+                if (content.startsWith("[")) {
+                    // If response is an array, wrap it in a map
+                    List<?> arrayResponse = mapper.readValue(content, List.class);
+                    responseMap.put("data", arrayResponse);
+                } else {
+                    // If response is an object, read it as a map
+                    responseMap = mapper.readValue(content, Map.class);
+                }
             }
 
         } catch (IOException e) {
