@@ -15,6 +15,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-hduapicore}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
       JAVA_OPTS: "-Xmx1024m -Xms512m"
+      FHIR_URL: 'URL_ADDRESSapter:8080/fhir'
     depends_on:
       iadapter-db:
         condition: service_healthy
