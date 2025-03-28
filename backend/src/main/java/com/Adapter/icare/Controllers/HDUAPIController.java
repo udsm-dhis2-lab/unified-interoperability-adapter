@@ -1,7 +1,39 @@
 package com.Adapter.icare.Controllers;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.rest.client.api.IGenericClient;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
+import java.math.BigInteger;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.validation.Valid;
+
+import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.CodeSystem;
+import org.hl7.fhir.r4.model.IdType;
+import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.ValueSet;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
@@ -11,34 +43,28 @@ import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Dtos.DataTemplateDTO;
+import com.Adapter.icare.Dtos.DataTemplateDataDTO;
+import com.Adapter.icare.Dtos.DatastoreConfigurationsDTO;
+import com.Adapter.icare.Dtos.GeneralCodesDTO;
+import com.Adapter.icare.Dtos.IdentifierDTO;
+import com.Adapter.icare.Dtos.MappingsDTO;
+import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
+import com.Adapter.icare.Dtos.VisitDetailsDTO;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.google.common.collect.Maps;
 
-import org.hl7.fhir.r4.model.*;
-import org.hl7.fhir.r4.utils.SnomedExpressions;
-import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
-
-import java.math.BigInteger;
-import java.nio.Buffer;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.api.IGenericClient;
 
 @RestController
 @RequestMapping("/api/v1/hduApi")
 public class HDUAPIController {
+
+    @Autowired
+    private Environment environment;
 
     private final DatastoreService datastoreService;
     private final MediatorsService mediatorsService;
@@ -76,7 +102,7 @@ public class HDUAPIController {
                     .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
         } else {
             this.authenticatedUser = null;
-            // TODO: Redirect to login page
+            // TODO: Redirect to login pages
         }
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(
                 datastoreConstants.ConfigurationsNamespace,
@@ -748,6 +774,7 @@ public class HDUAPIController {
             @RequestBody Map<String, Object> process,
             @RequestParam Map<String, String> allRequestParams) throws Exception {
         try {
+            System.out.println("MY ENV: " + environment.getProperty("FHIR_URL"));
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 StringBuilder urlBuilder = new StringBuilder("processes/execute");
 

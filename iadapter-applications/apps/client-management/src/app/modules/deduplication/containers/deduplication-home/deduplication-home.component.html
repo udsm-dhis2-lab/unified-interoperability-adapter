@@ -1,9 +1,9 @@
 <div style="padding: 16px">
   <div style="margin-bottom: 16px">
-    <search-bar
+    <lib-search-bar
       [labelText]="'Search client:'"
       (inputSearchValue)="onDatasetsSearchInputTyping($event)"
-    ></search-bar>
+    ></lib-search-bar>
   </div>
 
   <nz-table
@@ -18,7 +18,7 @@
   >
     <thead>
       <tr>
-        <th>SN</th>
+        <th>S#</th>
         <th>Client ID</th>
         <th>First name</th>
         <th>Middle name</th>

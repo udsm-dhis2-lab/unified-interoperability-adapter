@@ -12,7 +12,7 @@ import { BehaviorSubject, debounceTime, switchMap } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'search-bar',
+  selector: 'lib-search-bar',
   standalone: true,
   imports: [CommonModule, FormsModule, ...antDesignModules],
   templateUrl: './search-bar.component.html',
@@ -23,19 +23,19 @@ export class SearchBarComponent implements OnInit {
     this.searchOnInputField();
   }
 
-  searchQuery: string = '';
+  searchQuery = '';
   searchInputChange$ = new BehaviorSubject('');
 
   @Input({
     required: true,
   })
-  labelText: string = '';
+  labelText = '';
 
   @Output() search: EventEmitter<string> = new EventEmitter();
 
   @Output() inputSearchValue: EventEmitter<string> = new EventEmitter();
 
-  additionalContent: TemplateRef<any> | null = null;
+  additionalContent: TemplateRef<unknown> | null = null;
 
   onSearch(value: string) {
     this.search.emit(value);
@@ -59,13 +59,14 @@ export class SearchBarComponent implements OnInit {
       next: (value: string) => {
         this.inputSearchValue.emit(value);
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         // TODO: Implement error handling
+        console.log('Error', error);
       },
     });
   }
 
-  setAdditionalContent(content: TemplateRef<any>) {
+  setAdditionalContent(content: TemplateRef<unknown>) {
     this.additionalContent = content;
   }
 }

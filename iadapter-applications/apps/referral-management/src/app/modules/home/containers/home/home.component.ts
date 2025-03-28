@@ -90,7 +90,8 @@ export class HomeComponent implements OnDestroy, OnInit {
           this.loading = false;
           this.total = 10;
           this.pageIndex = 1;
-          this.referrals = JSON.parse(data.data);
+          this.referrals = data.filter(
+            (referral: any) => referral.client_id);
         },
         error: (error) => {
           this.loading = false;

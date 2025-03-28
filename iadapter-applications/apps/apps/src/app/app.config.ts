@@ -1,5 +1,5 @@
 import { registerLocaleData } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, provideHttpClient } from '@angular/common/http';
 import en from '@angular/common/locales/en';
 import {
   ApplicationConfig,
@@ -40,6 +40,7 @@ import { appRoutes } from './app.routes';
 import { antDesignIcons } from './shared/ant-design-icons.constants';
 import { antDesignModules } from './shared/ant-design-modules';
 import { appEffects, appReducers, metaReducers } from './store/app.state';
+import { AuthInterceptor } from '../../../../libs/models/src/lib/exceptions/exceptions';
 
 const icons: IconDefinition[] = [...antDesignIcons];
 registerLocaleData(en);
@@ -115,6 +116,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     { provide: NZ_ICONS, useValue: icons },
     { provide: NZ_I18N, useValue: en_US },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true, // Allows multiple interceptors
+    },
   ],
   bootstrap: [AppComponent],
 })
