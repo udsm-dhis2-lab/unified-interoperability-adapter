@@ -6,7 +6,7 @@ import { Deduplication } from '../../models/deduplication.model';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 import { Subscription } from 'rxjs';
 import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
-
+// import { SearchBarComponent } from '@iadapter/search-bar';
 @Component({
   selector: 'app-deduplication-home',
   standalone: true,
@@ -26,7 +26,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
   isFirstLoad = true;
 
   loadHduClientsSubscription!: Subscription;
-  dataSetSeachQuery: string = '';
+  dataSetSeachQuery = '';
 
   constructor(
     private router: Router,

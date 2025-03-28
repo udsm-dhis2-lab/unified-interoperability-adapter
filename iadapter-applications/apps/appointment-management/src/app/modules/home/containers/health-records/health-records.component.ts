@@ -1,15 +1,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router, RouterModule } from '@angular/router';
-import { HDUAPIClientDetails } from '../../models';
-import { ClientManagementService } from '../../services/client-management.service';
+import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { debounceTime, Subject, Subscription, switchMap } from 'rxjs';
 import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { NzIconModule } from 'ng-zorro-antd/icon';
+import { HDUAPIClientDetails } from '../../models';
+import { ClientManagementService } from '../../services/client-management.service';
 
 import { FormsModule } from '@angular/forms';
 

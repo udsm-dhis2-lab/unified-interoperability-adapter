@@ -1,5 +1,7 @@
 package com.Adapter.icare.Configurations;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -77,7 +79,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, authException) -> {
-                    response.sendRedirect("/login");
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write("{\"message\": \"Unauthorized\"}");
                 });
 
         http

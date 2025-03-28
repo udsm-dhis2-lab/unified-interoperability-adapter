@@ -102,7 +102,7 @@ public class HDUAPIController {
                     .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
         } else {
             this.authenticatedUser = null;
-            // TODO: Redirect to login page
+            // TODO: Redirect to login pages
         }
         Datastore WESystemConfigurations = datastoreService.getDatastoreByNamespaceAndKey(
                 datastoreConstants.ConfigurationsNamespace,

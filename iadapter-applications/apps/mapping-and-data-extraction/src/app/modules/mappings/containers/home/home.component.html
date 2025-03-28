@@ -5,7 +5,7 @@
       <div nz-row>
         <div style="padding: 16px; width: 100%">
           <div style="margin-bottom: 16px">
-            <search-bar
+            <lib-search-bar
               [labelText]="'Search Dataset:'"
               (search)="onDatasetsSearch()"
               (inputSearchValue)="onDatasetsSearchInputTyping($event)"
@@ -54,7 +54,7 @@
                   </div>
                 </div>
               </ng-template>
-            </search-bar>
+            </lib-search-bar>
           </div>
 
           <nz-table
