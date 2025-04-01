@@ -81,7 +81,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint((request, response, authException) -> {
                     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                     response.setContentType("application/json");
-                    response.getWriter().write("{\"message\": \"Unauthorized\"}");
+                    response.getWriter().write("{\"message\": \"Unauthorized\", \"error\": \"Unauthorized\"}");
                 });
 
         http
