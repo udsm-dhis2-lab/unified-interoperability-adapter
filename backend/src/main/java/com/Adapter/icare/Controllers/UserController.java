@@ -106,6 +106,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<Map<String, Object>> getLoggedInUser() throws Exception {
         try {
+            System.out.println("Getting logged in user " + authentication);
             if (authentication != null) {
                 User authenticatedUser = this.userService
                         .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
@@ -114,6 +115,9 @@ public class UserController {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
             }
         } catch (Exception e) {
+            System.out.println("Error getting logged in user: " + e);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", "User not found");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
     }
