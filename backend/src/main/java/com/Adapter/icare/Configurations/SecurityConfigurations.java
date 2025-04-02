@@ -1,7 +1,5 @@
 package com.Adapter.icare.Configurations;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -55,7 +53,15 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                         "/",
                         "/error",
                         "/login",
+                        "/dashboard",
+                        "/client-management",
+                        "/workflows-management",
+                        "/apps",
                         "/login/**",
+                        "/dashboard/**",
+                        "/client-management/**",
+                        "/workflows-management/**",
+                        "/apps/**",
                         "/customError",
                         "/swagger-ui/**",
                         "/swagger-ui/index.html",
@@ -64,7 +70,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                         "/webjars/**")
                 .permitAll()
                 .antMatchers("/**/styles-*.css", "/**/runtime-*.js", "/**/polyfills-*.js", "/**/chunk-*.js",
-                        "/**/main-*.js", "/**/favicon.ico", "*.js", "*.css", "*.png", "*.jpg", "*.jpeg", "*.gif")
+                        "/**/main-*.js", "/**/favicon.ico")
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/login")
                 .permitAll()
@@ -73,17 +79,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin()
-                .disable()
-                .httpBasic()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"message\": \"Unauthorized\"}");
-                });
-
+                .httpBasic();
         http
                 .sessionManagement()
                 .sessionFixation().newSession()
@@ -91,3 +87,17 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .expiredUrl("/login");
     }
 }
+// @Bean
+// public CorsConfigurationSource corsConfigurationSource() {
+// UrlBasedCorsConfigurationSource source = new
+// UrlBasedCorsConfigurationSource();
+// CorsConfiguration config = new CorsConfiguration();
+// config.setAllowedOrigins(Arrays.asList("*")); // Allow all origins
+// config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE",
+// "OPTIONS"));
+// config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control",
+// "Content-Type"));
+// config.setAllowCredentials(true); // Allow credentials
+// source.registerCorsConfiguration("/**", config);
+// return source;
+// }

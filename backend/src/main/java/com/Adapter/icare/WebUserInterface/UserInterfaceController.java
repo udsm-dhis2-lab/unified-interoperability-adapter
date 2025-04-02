@@ -20,9 +20,6 @@ import java.util.Map;
 @RequestMapping("/")
 public class UserInterfaceController {
 
-    private final DatastoreService datastoreService;
-    private final DatastoreConstants datastoreConstants;
-    private final WebUIConstants webUIConstants;
     private final List<Map<String, Object>> apps = new ArrayList<>();
     private Map<String, String> appsRoutesToResourceMap = new HashMap<>();
 
@@ -30,13 +27,9 @@ public class UserInterfaceController {
             DatastoreService datastoreService,
             DatastoreConstants datastoreConstants,
             WebUIConstants webUIConstants) throws Exception {
-        this.datastoreService = datastoreService;
-        this.datastoreConstants = datastoreConstants;
-        this.webUIConstants = webUIConstants;
-
         List<Datastore> appsList = datastoreService.getDatastoreNamespaceDetails(datastoreConstants.AppsNameSpace);
         if (appsList != null && !appsList.isEmpty()) {
-            for(Datastore appConfigs: appsList) {
+            for (Datastore appConfigs : appsList) {
                 Map<String, Object> app = appConfigs.getValue();
                 app.put("key", appConfigs.getDataKey());
                 apps.add(app);
@@ -73,5 +66,10 @@ public class UserInterfaceController {
     @GetMapping("apps/{path:^(?!.*\\..*$).*}")
     public String forwardToAngular() {
         return "forward:/apps/index.html";
+    }
+
+    @GetMapping("dashboard/{path:^(?!.*\\..*$).*}")
+    public String dashboard() {
+        return "forward:/apps/dashboard/index.html";
     }
 }
