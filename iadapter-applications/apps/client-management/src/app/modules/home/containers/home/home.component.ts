@@ -155,7 +155,14 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   deleteClient(client: HDUAPIClientDetails) {
-    // this.clientManagementService.deleteClient(client.demographicDetails.clientID);
+
+    this.loading = true;
+    this.listOfHduClients = [];
+    this.clientManagementService.deleteClient(client.demographicDetails.clientID).subscribe((response) => {
+      this.filterSubject.next();
+      console.log(response);
+
+    });
   }
 
   resetFilters() {
