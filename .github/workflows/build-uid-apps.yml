@@ -147,3 +147,8 @@ jobs:
 
           # Push changes
           git push origin develop
+
+      - name: 🔀 Merge PR
+        uses: BaharaJr/merge-pr@0.0.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
