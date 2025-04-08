@@ -65,21 +65,21 @@ public class ReportsController {
     private final DatastoreService datastoreService;
     private final DataSetsService dataSetsService;
 
-
-    public ReportsController(ReportsService reportsService, DatastoreService datastoreService, DataSetsService dataSetsService) {
+    public ReportsController(ReportsService reportsService, DatastoreService datastoreService,
+            DataSetsService dataSetsService) {
         this.reportsService = reportsService;
         this.datastoreService = datastoreService;
         this.dataSetsService = dataSetsService;
     }
 
-
     @PostMapping
-    public List<DataValueSets> SearchDataSetElementsPerDataSet(@RequestBody ReportValuesSent reportValuesSent) throws Exception {
-        
-        //String dataSetId = reportValuesSent.getDataSetID();
+    public List<DataValueSets> SearchDataSetElementsPerDataSet(@RequestBody ReportValuesSent reportValuesSent)
+            throws Exception {
+
+        // String dataSetId = reportValuesSent.getDataSetID();
         List<DataValueSets> dvslist = new ArrayList<DataValueSets>();
         List<DataSetElement> dSetElementsList = reportsService.SearchDataSetElementsPerDataSet(reportValuesSent);
-      
+
         for (DataSetElement dataSetElement : dSetElementsList) {
 
             String dataElementId = dataSetElement.getDataElement();
@@ -87,11 +87,12 @@ public class ReportsController {
             String query = dataSetElement.getSqlQuery();
             String periodStart = reportValuesSent.getPeriodStart();
             String periodEnd = reportValuesSent.getPeriodEnd();
-            
-            //Query manipulation
-            String newQuery = query.replaceAll("\\$\\{period-start\\}",periodStart).replaceAll("\\$\\{period-end\\}",periodEnd);
 
-            //Query execution
+            // Query manipulation
+            String newQuery = query.replaceAll("\\$\\{period-start\\}", periodStart).replaceAll("\\$\\{period-end\\}",
+                    periodEnd);
+
+            // Query execution
             String dataSourceUrl = dataSetElement.getDatasource().getUrl();
             String dataSourceUserName = dataSetElement.getDatasource().getUsername();
             String decryptedPassword = EncryptionUtils.decrypt(dataSetElement.getDatasource().getPassword());
@@ -100,31 +101,32 @@ public class ReportsController {
             ResultSet rs = con.prepareStatement(newQuery).executeQuery();
             rs.next();
             String queryResult = rs.getString(1);
-            String dataElementCatCombo = dataElementId + "-" +categoryComboId +"-val";
-            
-            //Adding to a list
-            dvslist.add(new DataValueSets(dataElementCatCombo,queryResult));
+            String dataElementCatCombo = dataElementId + "-" + categoryComboId + "-val";
+
+            // Adding to a list
+            dvslist.add(new DataValueSets(dataElementCatCombo, queryResult));
             rs.close();
-            con.close();    
+            con.close();
         }
         return dvslist;
     }
 
     @PostMapping("/sendValues")
     public String SendDataToDHIS(@RequestBody Map<String, Object> reportData) throws Exception {
-        List<DataValues> dataValues =  (List<DataValues>) reportData.get("dataValues");
+        List<DataValues> dataValues = (List<DataValues>) reportData.get("dataValues");
         String datasetInstanceUuid = reportData.get("dataSet").toString();
         String period = reportData.get("period").toString();
         String attributeOptCombo = null;
         if (reportData.get("attributeOptCombo") != null) {
-            attributeOptCombo =  reportData.get("attributeOptCombo").toString();
+            attributeOptCombo = reportData.get("attributeOptCombo").toString();
         }
         String completeDate = java.time.LocalDate.now().toString();
 
-        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetInstanceUuid, completeDate,period, "",attributeOptCombo,dataValues);
-        String DHIS2Response = reportsService.SendDataToDHIS(dhisAggregateValues,datasetInstanceUuid);
+        DhisAggregateValues dhisAggregateValues = new DhisAggregateValues(datasetInstanceUuid, completeDate, period, "",
+                attributeOptCombo, dataValues);
+        String DHIS2Response = reportsService.SendDataToDHIS(dhisAggregateValues, datasetInstanceUuid);
         Map<String, Object> jsonObjectForDatastore = new HashMap<>();
-        Dataset datasetInstanceDetails =dataSetsService.getDataSetInstanceByUuid(datasetInstanceUuid);
+        Dataset datasetInstanceDetails = dataSetsService.getDataSetInstanceByUuid(datasetInstanceUuid);
         jsonObjectForDatastore.put("dataValues", dhisAggregateValues);
         jsonObjectForDatastore.put("period", period);
         Map<String, Object> dataSet = new HashMap<>();
@@ -132,12 +134,12 @@ public class ReportsController {
         dataSet.put("code", datasetInstanceDetails.getCode());
         dataSet.put("name", datasetInstanceDetails.getDisplayName());
         dataSet.put("instanceUuid", datasetInstanceDetails.getInstances().getUuid());
-        jsonObjectForDatastore.put("dataSet",dataSet);
+        jsonObjectForDatastore.put("dataSet", dataSet);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime now = LocalDateTime.now();
-        jsonObjectForDatastore.put("pushedOn",dtf.format(now));
-        jsonObjectForDatastore.put("dataSet",dataSet);
-        jsonObjectForDatastore.put("response",DHIS2Response);
+        jsonObjectForDatastore.put("pushedOn", dtf.format(now));
+        jsonObjectForDatastore.put("dataSet", dataSet);
+        jsonObjectForDatastore.put("response", DHIS2Response);
         Datastore datastore = new Datastore();
         String namespace = datasetInstanceDetails.getUuid();
         String key = period;
@@ -155,71 +157,74 @@ public class ReportsController {
         return DHIS2Response;
     }
 
-
     @GetMapping("/dhisConnection")
     public Map<String, Object> Dhis2Connection() throws Exception {
         Dhis2Client dhis2Client = null;
         Map<String, Object> me = new HashMap<>();
         try {
-            dhis2Client = Dhis2ClientBuilder.newClient( "https://play.dhis2.org/2.39.1/api", "admin","district" ).build();
+            dhis2Client = Dhis2ClientBuilder.newClient("https://play.dhis2.org/2.39.1/api", "admin", "district")
+                    .build();
         } catch (Exception e) {
             System.err.println("Error establishing DHIS2 client: " + e.getMessage());
             e.printStackTrace();
-
         }
         if (dhis2Client != null) {
             me = dhis2Client.get("me").transfer().returnAs(Map.class);
         }
-        return  me;
+        return me;
     }
 
-    @PostMapping(path = "/verifyCode",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/verifyCode", consumes = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, Object> getDHIS2OrgUnitViaCode(@RequestBody Instance instance) throws Exception {
         String url = instance.getUrl() + "/api";
         String username = instance.getUsername();
-        String password =instance.getPassword();
+        String password = instance.getPassword();
         String code = instance.getCode();
         Map<String, Object> organisationUnit = new HashMap<>();
         try {
-//            organisationUnit = reportsService.fetchOrgUnitUsingCode(url,username,password,code);
-//            System.out.println(organisationUnit);
+            // organisationUnit =
+            // reportsService.fetchOrgUnitUsingCode(url,username,password,code);
+            // System.out.println(organisationUnit);
             Dhis2Client dhis2Client = null;
             try {
-                dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+                dhis2Client = Dhis2ClientBuilder.newClient(url, username, password).build();
             } catch (Exception e) {
                 throw new RuntimeException("Error establishing DHIS2 client: " + e);
             }
             if (dhis2Client != null) {
-                Map<String, Object> response = dhis2Client.get("organisationUnits.json").withFields("id,name,code").withFilter("code:eq:" + code).transfer().returnAs(Map.class);
-                if (response != null && response.get("organisationUnits") != null && ((List) response.get("organisationUnits")).size() > 0) {
-                    organisationUnit =(Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
+                Map<String, Object> response = dhis2Client.get("organisationUnits.json").withFields("id,name,code")
+                        .withFilter("code:eq:" + code).transfer().returnAs(Map.class);
+                if (response != null && response.get("organisationUnits") != null
+                        && ((List) response.get("organisationUnits")).size() > 0) {
+                    organisationUnit = (Map<String, Object>) ((List) response.get("organisationUnits")).get(0);
                 } else {
                     organisationUnit.put("message", "No organisation unit matching the code " + code);
                     organisationUnit.put("status", "OK");
                 }
             }
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("Error verifying organisation unit using code: " + e);
         }
         return organisationUnit;
     }
 
-    @PostMapping(path = "/verify",consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/verify", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> authenticateDHIS2User(@RequestBody Instance instance) throws Exception {
         String url = instance.getUrl() + "/api";
         String username = instance.getUsername();
-        String password =instance.getPassword();
+        String password = instance.getPassword();
         Map<String, Object> returnResponse = new HashMap<>();
         try {
             Dhis2Client dhis2Client = null;
             try {
-                dhis2Client = Dhis2ClientBuilder.newClient( url, username,password ).build();
+                dhis2Client = Dhis2ClientBuilder.newClient(url, username, password).build();
             } catch (Exception e) {
                 throw new RuntimeException("Error establishing DHIS2 client: " + e);
             }
             if (dhis2Client != null) {
-                Map<String, Object> response = dhis2Client.get("me.json").withFields("id,name,code").transfer().returnAs(Map.class);
+                Map<String, Object> response = dhis2Client.get("me.json").withFields("id,name,code").transfer()
+                        .returnAs(Map.class);
                 System.out.println(response);
                 if (response != null) {
                     returnResponse = response;
@@ -235,5 +240,5 @@ public class ReportsController {
         }
         return ResponseEntity.ok(returnResponse);
     }
-    
+
 }

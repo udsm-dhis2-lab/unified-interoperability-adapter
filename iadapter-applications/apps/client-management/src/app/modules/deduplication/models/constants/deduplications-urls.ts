@@ -1,4 +1,4 @@
 export enum DeduplicationUrls {
-  GET_DEDUPLICATIONS = 'hduApi/cr/clients/potentialDuplicates',
+  GET_DEDUPLICATIONS = 'hduApi/processes/execute?async=true',
   DATASTORE = 'datastore',
 }
