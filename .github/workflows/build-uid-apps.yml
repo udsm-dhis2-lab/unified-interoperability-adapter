@@ -26,7 +26,7 @@ jobs:
 
     env:
       # Default list of apps to build for push and pull request events
-      DEFAULT_APP_NAMES: "login,client-management,dashboard,mapping-and-data-extraction,workflows-management"
+      DEFAULT_APP_NAMES: "login,client-management,dashboard,mapping-and-data-extraction,workflows-management,apps"
 
     steps:
       - name: Checkout repository
