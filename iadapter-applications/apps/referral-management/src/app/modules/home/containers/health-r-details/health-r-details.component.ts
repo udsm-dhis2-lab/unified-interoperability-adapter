@@ -251,7 +251,7 @@ export class HealthRecordsDetailsComponent implements OnInit {
               Nationality: this.client?.demographicDetails?.nationality,
               'Marital Status': this.client?.demographicDetails?.maritalStatus,
               Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
-                return `${address?.village || ''} ${address?.ward  || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address.state || ''} ${address.country}`
+                return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
               }) || '-',
             };
 

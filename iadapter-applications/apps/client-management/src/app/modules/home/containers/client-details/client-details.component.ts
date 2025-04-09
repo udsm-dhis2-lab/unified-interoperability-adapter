@@ -126,7 +126,9 @@ export class ClientDetailsComponent implements OnInit {
         'Related Clients':
           result.demographicDetails.relatedClients?.join(', ') || '-',
         Appointment: result.demographicDetails.appointment || '-',
-        Address: result.demographicDetails.addresses[0] || '-',
+        Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
+          return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
+        }) || '-',
 
 
       },

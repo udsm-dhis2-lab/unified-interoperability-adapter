@@ -85,10 +85,14 @@ export class ClientDetailsComponent implements OnInit {
               Gender: this.client?.demographicDetails?.gender,
               'Date of Birth': this.client?.demographicDetails?.dateOfBirth,
               'Phone Numbers': this.client?.demographicDetails?.phoneNumbers,
+              "NIDA": this.client?.demographicDetails.nida || '-',
               Emails: this.client?.demographicDetails?.emails,
               Occupation: this.client?.demographicDetails?.occupation,
               Nationality: this.client?.demographicDetails?.nationality,
               'Marital Status': this.client?.demographicDetails?.maritalStatus,
+              Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
+                return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
+              }) || '-',
             };
 
             this.identifiers =
