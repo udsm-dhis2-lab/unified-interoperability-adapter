@@ -22,8 +22,8 @@
         <th>First Name</th>
         <th>Surname</th>
         <th>Gender</th>
-        <!-- <th>Types</th> -->
-        <!-- <th>Keys</th> -->
+        <th>IDs (MRN)</th>
+        <th>IDs (HCR)</th>
         <th>Duplicates</th>
         <th>Action</th>
       </tr>
@@ -35,7 +35,8 @@
         <td>{{ data.given }}</td>
         <td>{{ data.family }}</td>
         <td>{{ data.getGender() }}</td>
-        <!-- <td>{{ data.types?.join(', ') }}</td> -->
+        <td>{{ data.getAllMRNs()}}</td>
+        <td>{{ data.getAllHCRCodes()}}</td>
         <!-- <td>
           {{ data.keys && data.keys.length > 0 ? data.keys[0] : 'N/A' }}
         </td> -->

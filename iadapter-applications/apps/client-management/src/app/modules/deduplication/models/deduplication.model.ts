@@ -18,6 +18,7 @@ export class Deduplication {
     patient_id: string;
     identifiers: Record<string, string>;
   }>;
+  IdNumber?: string
 
   static fromJson(json: any): Deduplication {
     const deduplication = new Deduplication();
@@ -78,6 +79,8 @@ export class Deduplication {
     }
     return this.name || '';
   }
+
+
 
   // Get gender from HCRCODE (if available)
   getGender(): string {

@@ -81,7 +81,7 @@
                             <td>{{ data.referral_number }}</td>
                             <td>{{ data.referring_facility || "Buguruni Health Center"}}</td>
                             <td>{{ data.referred_to_facility || "Amana Hospital" }}</td>
-                            <td>{{ data.referred_to_other_country  }}</td>
+                            <td>{{ data.referred_to_other_country === false ? "No" : "Yes"  }}</td>
                           </tr>
                         }
                       </tbody>
