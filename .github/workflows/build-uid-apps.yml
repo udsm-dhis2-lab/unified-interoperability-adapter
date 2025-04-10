@@ -143,16 +143,21 @@ jobs:
           branch_name="${GITHUB_HEAD_REF}"
           echo "PR branch name: $branch_name"
 
-          git fetch origin ${branch_name}
-          
-          git reset --soft origin/${branch_name}
+          # Fetch all branches
+          git fetch origin
+
+          # Update PR branch with latest develop changes
+          git fetch origin develop:develop
+          git checkout ${branch_name}
+          git merge develop
 
           git add .github/apps-builds
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-          git push --force origin HEAD:${branch_name}
+          git push origin ${branch_name}
 
       - name: 🔀 Merge PR
+        if: success()
         uses: BaharaJr/merge-pr@0.0.1
         with:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
