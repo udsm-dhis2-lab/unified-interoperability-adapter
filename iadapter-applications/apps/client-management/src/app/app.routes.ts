@@ -15,7 +15,7 @@ export const appRoutes: Route[] = [
       ),
   },
   {
-    path: 'deduplication/deduplication-details',
+    path: 'client-management/deduplication/deduplication-details',
     component: DeduplicationDetailsComponent,
   },
 ];
