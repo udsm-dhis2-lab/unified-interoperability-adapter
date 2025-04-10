@@ -14,10 +14,10 @@ import java.util.Map;
 @Setter
 public class SharedHealthRecordsDTO {
 
-    @NotNull(message = "value cannot be null")
+//    @NotNull(message = "value cannot be null")
     private String mrn;
 
-    @NotNull(message = "value cannot be null")
+//    @NotNull(message = "value cannot be null")
     private FacilityDetailsDTO facilityDetails;
 
 //    @NotNull(message = "value cannot be null")
