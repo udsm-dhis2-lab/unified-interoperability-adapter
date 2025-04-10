@@ -29,6 +29,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -140,21 +144,13 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          branch_name="${GITHUB_HEAD_REF}"
-          echo "PR branch name: $branch_name"
-
-          # Fetch all branches
-          git fetch origin
-
-          # Update PR branch with latest develop changes
-          git fetch origin develop:develop
-          git checkout ${branch_name}
-          git merge develop
+          # Update local branch with remote changes
+          git pull origin develop --no-rebase
 
           git add .github/apps-builds
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-          git push origin ${branch_name}
+          git push origin HEAD
 
       - name: 🔀 Merge PR
         if: success()
