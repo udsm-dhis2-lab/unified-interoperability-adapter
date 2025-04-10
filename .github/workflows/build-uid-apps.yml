@@ -29,13 +29,17 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install NX
+      - name:  NX
         run: npm install -g nx
 
       - name: Cache Node modules
@@ -140,19 +144,16 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          branch_name="${GITHUB_HEAD_REF}"
-          echo "PR branch name: $branch_name"
-
-          git fetch origin ${branch_name}
-          
-          git reset --soft origin/${branch_name}
+          # Update local branch with remote changes
+          git pull origin develop --no-rebase
 
           git add .github/apps-builds
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-          git push --force origin HEAD:${branch_name}
+          git push origin HEAD
 
       - name: 🔀 Merge PR
+        if: success()
         uses: BaharaJr/merge-pr@0.0.1
         with:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
