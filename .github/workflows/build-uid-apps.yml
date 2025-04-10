@@ -140,16 +140,13 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # Get current branch name
-          current_branch=$(git rev-parse --abbrev-ref HEAD)
-          echo "Current branch: $current_branch"
+          branch_name="${GITHUB_HEAD_REF}"
+          echo "PR branch name: $branch_name"
 
-          # Add and commit only if there are changes
           git add .github/apps-builds
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-          # Push changes to current branch
-          git push origin $current_branch
+          git push origin HEAD:${branch_name}
 
       - name: 🔀 Merge PR
         uses: BaharaJr/merge-pr@0.0.1
