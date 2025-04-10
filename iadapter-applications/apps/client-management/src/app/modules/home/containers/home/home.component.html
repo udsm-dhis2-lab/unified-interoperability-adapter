@@ -70,7 +70,7 @@
         </div>
 
         <!-- Facility Search Inputs -->
-        <div nz-col [nzSpan]="4">
+        <div nz-col [nzSpan]="1.5">
           <button
             nz-button
             nzType="primary"
@@ -78,6 +78,16 @@
             class="apply-button"
           >
             Search
+          </button>
+        </div>
+
+        <div nz-col [nzSpan]="1">
+          <button
+            nz-button
+            nzType="default"
+            (click)="resetFilters()"
+          >
+            Reset
           </button>
         </div>
       </div>
@@ -102,7 +112,8 @@
                 <th>Middle name</th>
                 <th>Surname</th>
                 <th>Gender</th>
-                <th>ID number</th>
+                <th>National ID</th>
+                <th>ID number (others)</th>
                 <th>ID type</th>
                 <th>Action</th>
               </tr>
@@ -124,6 +135,7 @@
                 <td>{{ data.demographicDetails.mname }}</td>
                 <td>{{ data.demographicDetails.surname }}</td>
                 <td>{{ data.demographicDetails.gender }}</td>
+                <td>{{ data.demographicDetails.nida }}</td>
                 <td>{{ data.demographicDetails.idNumber }}</td>
                 <td>{{ data.demographicDetails.idType }}</td>
                 <td>
@@ -134,6 +146,14 @@
                     (click)="viewClientDetails(data)"
                   >
                     View
+                  </button>
+                  <button
+                    nz-button
+                    nzType="text"
+                    class="view-button"
+                    (click)="deleteClient(data)"
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>

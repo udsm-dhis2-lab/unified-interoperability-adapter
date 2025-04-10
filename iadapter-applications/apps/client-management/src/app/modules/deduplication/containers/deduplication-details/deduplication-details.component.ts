@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
+import { SharedModule } from '../../../../shared/shared.module';
+import { calculateAge } from '../../../../shared/helpers/helpers';
 
 interface BasicInfo {
   [key: string]: string;
@@ -151,6 +151,7 @@ export class DeduplicationDetailsComponent implements OnInit {
   ) {}
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
+      console.log(params);
       if (params['deduplicate']) {
         const deduplicate = JSON.parse(params['deduplicate']);
         this.basicInfo = {

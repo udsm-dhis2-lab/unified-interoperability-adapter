@@ -1,3 +1,4 @@
+import { filter } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
@@ -27,6 +28,8 @@ export class ClientDetailsComponent implements OnInit {
   client?: any;
 
   basicInfo: any;
+  identifiers: any;
+  appointmentDetails: any;
 
   extraInfo: any;
 
@@ -39,14 +42,9 @@ export class ClientDetailsComponent implements OnInit {
     this.router.navigate([this.parentRoute]);
   }
 
-  objectKeys(obj: any): string[] {
-    return Object.keys(obj);
-  }
-
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
-      console.log(JSON.parse(params['client']));
       if (params) {
         const clientID = JSON.parse(params['client']);
 
@@ -57,30 +55,90 @@ export class ClientDetailsComponent implements OnInit {
           .subscribe((client: any) => {
             this.client = client.listOfClients[0];
 
-            console.log(this.client);
+            console.log(this.client, 'identifiers');
 
-            this.basicInfo = {
-              'Full Name': `${this.client?.demographicDetails?.fname || ''} ${
-                this.client?.demographicDetails?.surname || ''
-              }`.trim(),
-              'Client ID': this.client?.demographicDetails?.clientID,
-              Gender: this.client?.demographicDetails?.gender,
-              'Date of Birth': this.client?.demographicDetails?.dateOfBirth,
-              'ID Number': this.client?.demographicDetails?.idNumber,
-              'ID Type': this.client?.demographicDetails?.idType,
-              'Phone Numbers': this.client?.demographicDetails?.phoneNumbers,
-              Emails: this.client?.demographicDetails?.emails,
-              // 'Addresses': this.client?.demographicDetails?.addresses,
-              Occupation: this.client?.demographicDetails?.occupation,
-              Nationality: this.client?.demographicDetails?.nationality,
-              'Marital Status': this.client?.demographicDetails?.maritalStatus,
-            };
+            this.basicInfo = this.formatApiResponse(this.client)[
+              'Demographic Details'
+            ];
+
+            this.identifiers = this.client.demographicDetails.identifiers
+              .filter((id: any) => id.type !== 'REFERRAL-NUMBER')
+              .map((id: any) => {
+                return {
+                  Type: id.type,
+                  Number: id.id,
+                };
+              });
+
+            this.appointmentDetails = this.formatApiResponse(this.client)[
+              'Appointments'
+            ];
 
             this.loading = false;
-
-            console.log(this.client);
           });
       }
     });
+  }
+
+  drop(event: any) {
+    console.log(event);
+  }
+
+  objectKeys(obj: any): string[] {
+    return Object.keys(obj);
+  }
+
+  // Utility function to format keys and values
+  formatApiResponse(result: any): { [key: string]: any } {
+    if (!result) {
+      return {};
+    }
+
+    const formattedResponse: { [key: string]: any } = {};
+
+    return {
+      // {`${id.type}: ${id.id}`}
+      Identifiers: result.demographicDetails.identifiers?.map((id: any) => {
+        return {
+          Type: id.type,
+          Number: id.id,
+        };
+      }),
+
+      Appointments: result?.demographicDetails?.appointmentDetails || '-',
+      'Contact People':
+        result.demographicDetails.contactPeople?.join(', ') || '-',
+      'Payment Details':
+        result.demographicDetails.paymentDetails?.join(', ') || '-',
+
+      'Demographic Details': {
+        'Full Name': result.demographicDetails.fullName,
+        'Client ID': result.demographicDetails.clientID,
+        Gender: result.demographicDetails.gender,
+        'Date of Birth': result.demographicDetails.dateOfBirth,
+        'Marital Status': result.demographicDetails.maritalStatus || '-',
+        'Phone Numbers':
+          result.demographicDetails.phoneNumbers?.join(', ') || '-',
+        Emails: result.demographicDetails.emails?.join(', ') || '-',
+        "NIDA": result.demographicDetails.nida || '-',
+        Occupation: result.demographicDetails.occupation || '-',
+        Nationality: result.demographicDetails.nationality || '-',
+        'Related Clients':
+          result.demographicDetails.relatedClients?.join(', ') || '-',
+        Appointment: result.demographicDetails.appointment || '-',
+        Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
+          return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
+        }) || '-',
+
+
+      },
+
+      'Facility Details': {
+        'Facility Code': result.facilityDetails.code || '-',
+        'Facility Name': result.facilityDetails.name || '-',
+      },
+    };
+
+    return formattedResponse;
   }
 }

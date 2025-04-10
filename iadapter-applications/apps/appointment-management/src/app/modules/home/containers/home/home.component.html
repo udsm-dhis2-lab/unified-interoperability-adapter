@@ -1,0 +1,133 @@
+<nz-layout>
+  <nz-content>
+    <nz-breadcrumb class="breadcrumb">
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/home']">Appointment Management</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/workflows']">Appointment</a>
+      </nz-breadcrumb-item>
+    </nz-breadcrumb>
+
+    <div class="inner-content">
+      <!-- Filter Row -->
+      <div nz-row [nzGutter]="16" style="padding: 16px">
+        <!-- First Name Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="First Name"
+            [(ngModel)]="firstName"
+            class="sexy-input"
+            (ngModelChange)="filterData($event, 'firstName')"
+          />
+        </div>
+
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Client ID"
+            [(ngModel)]="clientId"
+            (ngModelChange)="filterData($event, 'clientId')"
+            class="sexy-input"
+          />
+        </div>
+
+        <div nz-col [nzSpan]="4">
+          <nz-select
+            [(ngModel)]="selectedGender"
+            style="width: 100%"
+            nzAllowClear
+            nzPlaceHolder="Select a gender"
+            (ngModelChange)="filterData($event, 'gender')"
+          >
+            <nz-option nzValue="male" nzLabel="Male"></nz-option>
+            <nz-option nzValue="female" nzLabel="Female"></nz-option>
+          </nz-select>
+        </div>
+
+        <!-- Apply Filters Button -->
+        <div nz-col [nzSpan]="1.5">
+          <button
+            nz-button
+            nzType="primary"
+            (click)="applyFilters()"
+            class="apply-button"
+          >
+            Search
+          </button>
+        </div>
+
+        <div nz-col [nzSpan]="1">
+          <button
+            nz-button
+            nzType="default"
+            (click)="resetFilters()"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div nz-row>
+        <div style="padding: 0 16px 16px; width: 100%">
+          <nz-table
+            nzShowSizeChanger
+            [nzData]="allAppointments"
+            [nzFrontPagination]="true"
+            [nzLoading]="loading"
+            [nzTotal]="total"
+            [nzPageSize]="pageSize"
+            [nzPageIndex]="pageIndex"
+            (nzQueryParams)="onQueryParamsChange($event)"
+          >
+            <thead>
+              <tr>
+                <th>total</th>
+                <th>Client ID</th>
+                <th>First Name</th>
+                <th>Middle Name</th>
+                <th>Surname</th>
+                <th>Gender</th>
+                <th>National ID</th>
+                <th>ID Number</th>
+                <th>ID Type</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (appointment of displayedAppointments; track appointment.client_id; let i = $index) {
+              <tr>
+                <td>
+                  {{ (pageIndex - 1) * pageSize + i + 1 }}  <!-- Simplified serial number calculation -->
+                </td>
+                <td>
+                  <span style="color: #1890ff">{{ appointment.client_id || '' }}</span>
+                </td>
+                <td>{{ appointment.first_name || '' }}</td>
+                <td></td>  <!-- Middle name column (empty as not in data) -->
+                <td>{{ appointment.surname || '' }}</td>
+                <td>{{ appointment.gender | titlecase }}</td>
+                <td>{{ appointment.nida || '' | titlecase }}</td>
+                <td>{{ appointment.id_number || '' | titlecase }}</td>
+                <td>{{ appointment.client_id_type || '' }}</td>
+                <td>
+                  <button
+                    nz-button
+                    nzType="text"
+                    class="view-button"
+                    (click)="viewClientDetails(appointment)"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+    </div>
+  </nz-content>
+</nz-layout>

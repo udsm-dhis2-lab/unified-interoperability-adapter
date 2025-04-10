@@ -1,17 +1,11 @@
 package com.Adapter.icare.Services;
 
-import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Group;
-import com.Adapter.icare.Domains.Privilege;
-import com.Adapter.icare.Domains.Role;
-import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.LoginDTO;
-import com.Adapter.icare.Repository.GroupRepository;
-import com.Adapter.icare.Repository.PrivilegeRepository;
-import com.Adapter.icare.Repository.RoleRepository;
-import com.Adapter.icare.Repository.UserRepository;
-import com.Adapter.icare.Utils.EncryptionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,13 +16,22 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import com.Adapter.icare.Configurations.CustomUserDetails;
+import com.Adapter.icare.Domains.Group;
+import com.Adapter.icare.Domains.Privilege;
+import com.Adapter.icare.Domains.Role;
+import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.LoginDTO;
+import com.Adapter.icare.Repository.GroupRepository;
+import com.Adapter.icare.Repository.PrivilegeRepository;
+import com.Adapter.icare.Repository.RoleRepository;
+import com.Adapter.icare.Repository.UserRepository;
 
 @Service
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
 
-    private  final RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
     private final PrivilegeRepository privilegeRepository;
 
@@ -57,14 +60,15 @@ public class UserService implements UserDetailsService {
         return user.toMap();
     }
 
-    public UserService(UserRepository userRepository,RoleRepository roleRepository, PrivilegeRepository privilegeRepository, GroupRepository groupRepository) {
+    public UserService(UserRepository userRepository, RoleRepository roleRepository,
+            PrivilegeRepository privilegeRepository, GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.privilegeRepository = privilegeRepository;
         this.groupRepository = groupRepository;
     }
 
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         return userRepository.findAll();
     }
 
@@ -126,7 +130,7 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         User user = userRepository.findByUsername(username);
-        if(user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("User Not found");
         }
         return new CustomUserDetails(user);
@@ -134,52 +138,52 @@ public class UserService implements UserDetailsService {
 
     public User getUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
-        if(user == null){
+        if (user == null) {
             throw new UsernameNotFoundException("User Not found");
         }
         return user;
     }
 
-    public Role saveRole(Role role){
+    public Role saveRole(Role role) {
         UUID uuid = UUID.randomUUID();
         role.setUuid(uuid.toString());
         return roleRepository.save(role);
     }
 
-    public List<Role> getRoles(){
-        return  roleRepository.findAll();
+    public List<Role> getRoles() {
+        return roleRepository.findAll();
     }
 
-    public Role getRoleByName(String name){
-        return  roleRepository.findByName(name);
+    public Role getRoleByName(String name) {
+        return roleRepository.findByName(name);
     }
 
-    public Privilege savePrivilege(Privilege privilege){
+    public Privilege savePrivilege(Privilege privilege) {
         UUID uuid = UUID.randomUUID();
         privilege.setUuid(uuid.toString());
         return privilegeRepository.save(privilege);
     }
 
-    public List<Privilege> getPrivileges(){
+    public List<Privilege> getPrivileges() {
         return privilegeRepository.findAll();
     }
 
-    public Privilege getPrivilegeByName(String name){
+    public Privilege getPrivilegeByName(String name) {
         return privilegeRepository.findByName(name);
     }
 
     public User getUSer(String uuid) throws Exception {
         User user = userRepository.findByUuid(uuid);
-        if(user == null){
-            throw new Exception("User with uuid "+uuid+" does not exist");
+        if (user == null) {
+            throw new Exception("User with uuid " + uuid + " does not exist");
         }
         return user;
     }
 
     public Role getRole(String uuid) throws Exception {
         Role role = roleRepository.findByUuid(uuid);
-        if(role == null){
-            throw new Exception("The role with uuid "+uuid+" does not exist");
+        if (role == null) {
+            throw new Exception("The role with uuid " + uuid + " does not exist");
         }
         return roleRepository.findByUuid(uuid);
     }
@@ -193,8 +197,8 @@ public class UserService implements UserDetailsService {
 
     public Privilege getPrivilege(String uuid) throws Exception {
         Privilege privilege = privilegeRepository.findByUuid(uuid);
-        if(privilege == null){
-            throw new Exception("Privilege with uuid "+uuid+" does not exist");
+        if (privilege == null) {
+            throw new Exception("Privilege with uuid " + uuid + " does not exist");
         }
         return privilege;
     }
@@ -219,8 +223,8 @@ public class UserService implements UserDetailsService {
 
     public Group getGroup(String uuid) throws Exception {
         Group group = groupRepository.findByUuid(uuid);
-        if(group == null){
-            throw new Exception("The group with uuid "+uuid+" does not exist");
+        if (group == null) {
+            throw new Exception("The group with uuid " + uuid + " does not exist");
         }
         return group;
     }

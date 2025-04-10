@@ -13,7 +13,7 @@ import { ClientPage } from '../models';
 @Injectable()
 export class ClientManagementService {
   hduClientsUrl: string = ClientUrls.GET_CLIENTS;
-  hduSharedRecordsUrl: string = ClientUrls.GET_SHARED_RECORDS;
+  hduClientRecordsUrl: string = ClientUrls.GET_CLIENTS;
 
   constructor(private httpClient: HduHttpService) {}
 
@@ -51,12 +51,22 @@ export class ClientManagementService {
       );
   }
 
+  deleteClient(id: any): Observable<any[]> {
+    return this.httpClient.post<any>(
+      `../../../../../api/v1/hduApi/processes/execute?async=true`,
+      {
+        hcr: id,
+        code: 'FHIR-DELETE-PATIENT'
+      }
+    );
+  }
+
   getClientById(
     id: string
   ): Observable<ClientPage> {
 
     return this.httpClient
-      .get<{ results: any }>(`${this.hduSharedRecordsUrl}?id=${id}`)
+      .get<{ results: any }>(`${this.hduClientRecordsUrl}?id=${id}`)
       .pipe(
         map((response: { results: any }) => {
           return ClientPage.fromJson(response);

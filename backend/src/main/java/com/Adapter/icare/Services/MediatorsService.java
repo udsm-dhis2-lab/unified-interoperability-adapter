@@ -44,7 +44,8 @@ public class MediatorsService {
         this.userService = userService;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
-            this.authenticatedUser = this.userService.getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+            this.authenticatedUser = this.userService
+                    .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
         } else {
             this.authenticatedUser = null;
             // TODO: Redirect to login page
@@ -65,17 +66,18 @@ public class MediatorsService {
         return mediatorsRepository.findAll();
     }
 
-    public Page<Mediator> getMediatorsByPagination(Integer page, Integer pageSize, String code, String category) throws Exception {
+    public Page<Mediator> getMediatorsByPagination(Integer page, Integer pageSize, String code, String category)
+            throws Exception {
         Pageable pageable = createPageable(page, pageSize);
-        return mediatorsRepository.getMediatorsListByPagination(code,category,pageable);
+        return mediatorsRepository.getMediatorsListByPagination(code, category, pageable);
     }
 
     public Mediator getMediatorByUuid(String uuid) throws Exception {
-        return  mediatorsRepository.getMediatorByUuid(uuid);
+        return mediatorsRepository.getMediatorByUuid(uuid);
     }
 
     public Mediator getMediatorByCode(String code) throws Exception {
-        return  mediatorsRepository.getMediatorByCode(code);
+        return mediatorsRepository.getMediatorByCode(code);
     }
 
     public Mediator updateMediator(Mediator mediator) throws Exception {
@@ -110,36 +112,38 @@ public class MediatorsService {
 
     public List<Map<String, Object>> getDataTemplatesList() throws Exception {
         // To be used in case data templates can be stored on FHIR resource
-        // TODO: Implement as per FHIR resource
+        // TODO: Implement as per FHIR resources
         List<Map<String, Object>> dataTemplates = new ArrayList<>();
-        return  dataTemplates;
+        return dataTemplates;
     }
 
     public Map<String, Object> getDataTemplateById(String id) throws Exception {
         // To be used in case data templates can be stored on FHIR resource
         // TODO: Implement as per FHIR resource
-        return  new HashMap<>();
+        return new HashMap<>();
     }
 
-    public Map<String,Object> processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data, String api) throws Exception {
+    public Map<String, Object> processWorkflowInAWorkflowEngine(Mediator mediator, Map<String, Object> data, String api)
+            throws Exception {
         try {
-            return sendDataToExternalSystem(mediator,data, "POST", api);
+            return sendDataToExternalSystem(mediator, data, "POST", api);
         } catch (Exception e) {
             System.err.println(e.getMessage());
             throw new Exception(e.getMessage());
         }
     }
 
-    public Map<String,Object> routeToMediator(Mediator mediator, String apiPath, String method, Map<String, Object> payload) throws Exception {
+    public Map<String, Object> routeToMediator(Mediator mediator, String apiPath, String method,
+            Map<String, Object> payload) throws Exception {
         try {
             if (method == null || method.equals("GET")) {
                 return getDataFromExternalSystem(mediator, apiPath);
             } else if (method.equals("POST")) {
-                return sendDataToExternalSystem(mediator,payload, method, apiPath);
+                return sendDataToExternalSystem(mediator, payload, method, apiPath);
             } else if (method.equals("PUT")) {
-                return sendDataToExternalSystem(mediator,payload, method, apiPath);
-            } else if (method.equals("DELETE")){
-                return deleteResourceFromExternalSystem(mediator,apiPath);
+                return sendDataToExternalSystem(mediator, payload, method, apiPath);
+            } else if (method.equals("DELETE")) {
+                return deleteResourceFromExternalSystem(mediator, apiPath);
             } else {
                 return null;
             }
@@ -149,12 +153,15 @@ public class MediatorsService {
         }
     }
 
-    public Map<String,Object> sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
+    public Map<String, Object> sendDataToMediatorWorkflow(Map<String, Object> data) throws Exception {
         /**
-         * TODO: The base url, path and authentication details should be put on configurations
+         * TODO: The base url, path and authentication details should be put on
+         * configurations
          */
-//        System.out.println(JSONObject.valueToString((Map<String, Object>) data.get("templateDetails")));
-        Map<String, Object> workflow =(Map<String, Object>) ((Map<String, Object>) data.get("templateDetails")).get("workflow");
+        // System.out.println(JSONObject.valueToString((Map<String, Object>)
+        // data.get("templateDetails")));
+        Map<String, Object> workflow = (Map<String, Object>) ((Map<String, Object>) data.get("templateDetails"))
+                .get("workflow");
         if (workflow == null) {
             throw new IllegalStateException("Workflow not set");
         } else if (data.get("data") == null) {
@@ -173,9 +180,9 @@ public class MediatorsService {
                 } else if (workflow.get("id") != null) {
                     id = workflow.get("id").toString();
                 }
-//                System.out.println(id);
+                // System.out.println(id);
                 Mediator mediator = mediatorsRepository.getMediatorByUuid(id);
-//                System.out.println(mediator.getUuid());
+                // System.out.println(mediator.getUuid());
                 String authType = mediator.getAuthType();
                 String authToken = mediator.getAuthToken();
                 String baseUrl = mediator.getBaseUrl();
@@ -190,11 +197,11 @@ public class MediatorsService {
                     HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
                     String authentication = "";
                     if (authType.toLowerCase().equals("basic")) {
-                        authentication =  "Basic " + authToken;
-//                        System.out.println(authentication);
+                        authentication = "Basic " + authToken;
+                        // System.out.println(authentication);
                         httpURLConnection.setRequestProperty("Authorization", authentication);
                     } else if (authType.toLowerCase().equals("token")) {
-                       authentication = "Bearer " + authToken;
+                        authentication = "Bearer " + authToken;
                         httpURLConnection.setRequestProperty("Authorization", authentication);
                     }
                     httpURLConnection.setRequestMethod("POST");
@@ -217,7 +224,7 @@ public class MediatorsService {
                     reader.close();
                     // System.out.println(js);
                     responseJsonObject = new JSONObject(responseContent.toString());
-                    returnStr  = responseJsonObject.toString();
+                    returnStr = responseJsonObject.toString();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -226,14 +233,14 @@ public class MediatorsService {
                 Map<String, Object> dataSection = ((Map<String, Object>) data.get("data"));
                 List<Map<String, Object>> listGrid = new ArrayList<>();
                 listGrid = (List<Map<String, Object>>) dataSection.get("listGrid");
-                Map<String, Object> facilityDetails = (Map<String, Object>)dataSection.get("facilityDetails");
+                Map<String, Object> facilityDetails = (Map<String, Object>) dataSection.get("facilityDetails");
                 String hfrCode = facilityDetails.get("HFCode").toString();
                 Datastore healthFacilityData = new Datastore();
                 healthFacilityData.setNamespace("Health-facilities");
                 healthFacilityData.setDataKey(hfrCode);
                 facilityDetails.put("code", hfrCode);
                 healthFacilityData.setValue(facilityDetails);
-                for(Map<String, Object> clientData: listGrid ) {
+                for (Map<String, Object> clientData : listGrid) {
                     // TODO: Add support to retrieve client details before saving
                     Map<String, Object> demographicDetails = (Map<String, Object>) clientData.get("demographicDetails");
                     String namespace = "clients-" + hfrCode;
@@ -245,7 +252,7 @@ public class MediatorsService {
                     }
                     Datastore clientDetailsDatastore = new Datastore();
                     Datastore clientResponse = new Datastore();
-                    clientDetailsDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace,key);
+                    clientDetailsDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, key);
                     if (clientDetailsDatastore != null) {
                         clientResponse = clientDetailsDatastore;
                         // TODO: Add support to update if there are changes
@@ -274,7 +281,7 @@ public class MediatorsService {
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
                     String visitDateFormatted = simpleDateFormat.format(visitDate);
                     String visitId;
-                    if (visitDetails.get("visitId") !=null) {
+                    if (visitDetails.get("visitId") != null) {
                         visitId = visitDetails.get("visitId").toString();
                     } else {
                         visitId = visitDetails.get("id").toString();
@@ -286,14 +293,15 @@ public class MediatorsService {
 
                     if (serviceDetails != null) {
                         // Update incoming data
-                        Map<String, Object> updatedClientData  = updateClientData(serviceDetails.getValue(), clientData);
+                        Map<String, Object> updatedClientData = updateClientData(serviceDetails.getValue(), clientData);
                         serviceDetails.setValue(updatedClientData);
                         visitDetailsResponse = datastoreService.updateDatastore(serviceDetails);
                     } else {
                         serviceDetails = new Datastore();
                         serviceDetails.setNamespace(visitDataNamespace);
-                        serviceDetails.setDataKey( visitDataKey);
-                        Map<String, Object> ageDetails = calculateByDateOfBirthAge(demographicDetails.get("dateOfBirth").toString());
+                        serviceDetails.setDataKey(visitDataKey);
+                        Map<String, Object> ageDetails = calculateByDateOfBirthAge(
+                                demographicDetails.get("dateOfBirth").toString());
                         // TODO: Review age calculation process
                         if ((Integer) ageDetails.get("years") == 0 && (Integer) ageDetails.get("months") == 0) {
                             clientData.put("ageType", "days");
@@ -307,7 +315,7 @@ public class MediatorsService {
                         }
                         clientData.put("gender", formatGender(demographicDetails.get("gender").toString()));
                         clientData.put("orgUnit", hfrCode);
-                        clientData.put("visitDate",visitDateString);
+                        clientData.put("visitDate", visitDateString);
                         serviceDetails.setValue(clientData);
                         visitDetailsResponse = datastoreService.saveDatastore(serviceDetails);
                     }
@@ -317,7 +325,7 @@ public class MediatorsService {
                 returnResults.put("statusText", "OK");
                 returnResults.put("statusCode", 200);
                 returnResults.put("workOrder", returnStr);
-                return  returnResults;
+                return returnResults;
             } else {
                 throw new IllegalStateException("Workflow uuid or id is missing");
             }
@@ -333,21 +341,25 @@ public class MediatorsService {
         String baseUrl = FHIRMediator.getBaseUrl();
         String path = "CodeSystem";
         URL url = new URL(baseUrl + path);
-        return  codeSystemsData;
+        return codeSystemsData;
     }
 
-    private Map<String, Object> updateClientData(Map<String, Object> existingClientData, Map<String, Object> incomingClientData) throws Exception {
+    private Map<String, Object> updateClientData(Map<String, Object> existingClientData,
+            Map<String, Object> incomingClientData) throws Exception {
         Map<String, Object> clientData = existingClientData;
         clientData.put("demographicDetails", existingClientData.get("demographicDetails"));
-        List<Map<String, Object>> diagnosisDetails =new ArrayList<>();
-        diagnosisDetails =  (List<Map<String, Object>>) existingClientData.get("diagnosisDetails");
-        for (Map<String, Object> diagnosisDetail: (List<Map<String, Object>>) incomingClientData.get("diagnosisDetails")) {
+        List<Map<String, Object>> diagnosisDetails = new ArrayList<>();
+        diagnosisDetails = (List<Map<String, Object>>) existingClientData.get("diagnosisDetails");
+        for (Map<String, Object> diagnosisDetail : (List<Map<String, Object>>) incomingClientData
+                .get("diagnosisDetails")) {
             diagnosisDetails.add(diagnosisDetail);
         }
 
         clientData.put("diagnosisDetails", diagnosisDetails);
-        List<Map<String, Object>> investigationDetails = (List<Map<String, Object>>) existingClientData.get("investigationDetails");
-        for (Map<String, Object> investigationDetail: (List<Map<String, Object>>) incomingClientData.get("investigationDetails")) {
+        List<Map<String, Object>> investigationDetails = (List<Map<String, Object>>) existingClientData
+                .get("investigationDetails");
+        for (Map<String, Object> investigationDetail : (List<Map<String, Object>>) incomingClientData
+                .get("investigationDetails")) {
             investigationDetails.add(investigationDetail);
         }
 
@@ -371,7 +383,7 @@ public class MediatorsService {
             return "M";
         } else if (gender.toLowerCase().equals("female") || gender.toLowerCase().equals("f")) {
             return "F";
-        }  else {
+        } else {
             return "U";
         }
     }
@@ -381,7 +393,7 @@ public class MediatorsService {
         Datastore response;
         String namespace = healthFacilitiesData.getNamespace();
         String dataKey = healthFacilitiesData.getDataKey();
-        Datastore existingHealthFacilityData = datastoreService.getDatastoreByNamespaceAndKey(namespace,dataKey);
+        Datastore existingHealthFacilityData = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
         if (existingHealthFacilityData != null) {
             existingHealthFacilityData.setValue(healthFacilitiesData.getValue());
             response = datastoreService.updateDatastore(existingHealthFacilityData);
@@ -391,7 +403,7 @@ public class MediatorsService {
         return response;
     }
 
-    public Map<String,Object> getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
+    public Map<String, Object> getDataFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
         String response = new String();
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -400,7 +412,7 @@ public class MediatorsService {
         URL url = null;
 
         try {
-            String pathUrl = baseUrl + path + (apiPath != null ? apiPath: "");
+            String pathUrl = baseUrl + path + (apiPath != null ? apiPath : "");
             url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -409,7 +421,7 @@ public class MediatorsService {
         BufferedReader reader;
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
-        Map<String,Object> responseMap = new HashMap<>();
+        Map<String, Object> responseMap = new HashMap<>();
 
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -443,18 +455,80 @@ public class MediatorsService {
         return responseMap;
     }
 
-    public Map<String,Object> sendDataToExternalSystem(Mediator mediator,
-                                                       Map<String, Object> data,
-                                                       String method,
-                                                       String api) throws Exception {
+    public Object sendDataToExternalSystemGeneric(Mediator mediator,
+            Map<String, Object> data,
+            String method,
+            String api) throws Exception {
         // TODO: Make this valid for async true
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
         String baseUrl = mediator.getBaseUrl();
-        String path = mediator.getPath() != null ? mediator.getPath(): "";
+        String path = mediator.getPath() != null ? mediator.getPath() : "";
+        URL url;
+
+        try {
+            String pathUrl = baseUrl + path + (api != null ? api : "");
+            url = new URL(pathUrl);
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+
+        BufferedReader reader;
+        String dataLine;
+        StringBuilder responseContent = new StringBuilder();
+        Object responseObject;
+
+        try {
+            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+
+            if ("basic".equalsIgnoreCase(authType)) {
+                httpURLConnection.setRequestProperty("Authorization", "Basic " + authToken);
+            } else if ("token".equalsIgnoreCase(authType)) {
+                httpURLConnection.setRequestProperty("Authorization", "Bearer " + authToken);
+            }
+
+            httpURLConnection.setRequestMethod(method);
+            httpURLConnection.setRequestProperty("Content-Type", "application/json");
+            httpURLConnection.setRequestProperty("Accept", "application/json");
+            httpURLConnection.setDoOutput(true);
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = mapper.writeValueAsString(data);
+
+            try (OutputStream os = httpURLConnection.getOutputStream()) {
+                byte[] input = jsonString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            // Read the response
+            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
+            while ((dataLine = reader.readLine()) != null) {
+                responseContent.append(dataLine);
+            }
+            reader.close();
+
+            // Convert response JSON string to a generic Object
+            String responseString = responseContent.toString();
+            responseObject = mapper.readValue(responseString, Object.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception(e.getMessage());
+        }
+        return responseObject;
+    }
+
+    public Map<String, Object> sendDataToExternalSystem(Mediator mediator,
+            Map<String, Object> data,
+            String method,
+            String api) throws Exception {
+        // TODO: Make this valid for async true
+        String authType = mediator.getAuthType();
+        String authToken = mediator.getAuthToken();
+        String baseUrl = mediator.getBaseUrl();
+        String path = mediator.getPath() != null ? mediator.getPath() : "";
         URL url = null;
         try {
-            String pathUrl = baseUrl + path + (api != null ? api: "");
+            String pathUrl = baseUrl + path + (api != null ? api : "");
             url = new URL(pathUrl);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -467,8 +541,8 @@ public class MediatorsService {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             String authentication = "";
             if (authType.toLowerCase().equals("basic")) {
-                authentication =  "Basic " + authToken;
-//                        System.out.println(authentication);
+                authentication = "Basic " + authToken;
+                // System.out.println(authentication);
                 httpURLConnection.setRequestProperty("Authorization", authentication);
             } else if (authType.toLowerCase().equals("token")) {
                 authentication = "Bearer " + authToken;
@@ -504,7 +578,7 @@ public class MediatorsService {
         return responseMap;
     }
 
-    public Map<String,Object> deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
+    public Map<String, Object> deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
         String response = new String();
         String authType = mediator.getAuthType();
         String authToken = mediator.getAuthToken();
@@ -522,7 +596,7 @@ public class MediatorsService {
         BufferedReader reader;
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
-        Map<String,Object> responseMap = new HashMap<>();
+        Map<String, Object> responseMap = new HashMap<>();
 
         try {
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
@@ -559,7 +633,7 @@ public class MediatorsService {
         if (page < 1) {
             throw new Exception("Page can not be less than zero");
         } else {
-            return PageRequest.of(page-1, pageSize);
+            return PageRequest.of(page - 1, pageSize);
         }
     }
 }

@@ -23,7 +23,7 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     NzDatePickerModule,
     NzIconModule,
-    NzSelectModule,
+    NzSelectModule
   ],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
@@ -62,7 +62,7 @@ export class HomeComponent implements OnDestroy, OnInit {
     referralNumber: '',
     startDate: '',
     endDate: '',
-    referringFacility: ''
+    referringFacility: '',
   };
 
   constructor(
@@ -81,19 +81,24 @@ export class HomeComponent implements OnDestroy, OnInit {
   loadHduClientsFromServer(): void {
     this.loading = true;
     this.loadHduClientsSubscription = this.clientManagementService
-      .getReferrals(this.filters)
+      .getReferrals({ ...this.filters, code: 'FHIR-REFERRAL-QUERY' })
       .subscribe({
+
         next: (data: any) => {
+      console.log("console down", data);
+
           this.loading = false;
           this.total = 10;
           this.pageIndex = 1;
-          this.referrals = data;
+          this.referrals = data.filter(
+            (referral: any) => referral.client_id);
         },
         error: (error) => {
           this.loading = false;
           //TODO: Implement error handling
         },
       });
+
   }
 
   onDatasetsSearchInputTyping(value: string) {
@@ -121,58 +126,68 @@ export class HomeComponent implements OnDestroy, OnInit {
   ngOnInit(): void {
     this.loadHduClientsFromServer();
 
-    this.clientManagementService
-      .getReferrals(this.referrals)
-      .subscribe((referrals) => {
-        console.log(referrals);
-      });
+    // this.clientManagementService
+    //   .getReferrals(this.referrals)
+    //   .subscribe((referrals) => {
+    //     console.log(referrals);
+    //   });
   }
 
   viewClientDetails(client: any) {
     this.router.navigate(['/shr-management/referral-details'], {
-      queryParams: { client: JSON.stringify(client) , parentRoute: '/shr-management/referral-list'},
+      queryParams: {
+        client: JSON.stringify(client),
+        parentRoute: '/shr-management/referral-list',
+      },
     });
   }
 
-  onFilterChange(): void {
-
-  }
+  onFilterChange(): void {}
 
   applyFilters() {
-
     this.loadHduClientsFromServer();
   }
 
-  filterData(event: any, type?: string): void {
+  resetFilters() {
+    this.selectedGender = '';
+    this.clientId = '';
+    this.firstName = '';
+    this.surname = '';
+    this.referralNumber = '';
+    this.startDate = null;
+    this.endDate = null;
+    this.applyFilters();
+  }
 
-    switch (type){
-      case "gender":
+  filterData(event: any, type?: string): void {
+    switch (type) {
+      case 'gender':
         this.selectedGender = event;
         break;
 
-      case "firstName":
-        this.firstName = event
+      case 'firstName':
+        this.firstName = event;
         break;
 
-      case "surname":
-        this.surname = event
+      case 'surname':
+        this.surname = event;
         break;
 
-      case "referralNumber":
+      case 'referralNumber':
         this.referralNumber = event;
         break;
 
-      case "clientId":
+      case 'clientId':
         this.clientId = event;
         break;
 
-      case "startDate":
+      case 'startDate':
         this.startDate = event;
         break;
-      case "endDate":
+      case 'endDate':
         this.endDate = event;
         break;
-      case "referringFacility":
+      case 'referringFacility':
         this.facilityFrom = event;
         break;
 
@@ -188,16 +203,14 @@ export class HomeComponent implements OnDestroy, OnInit {
       referralNumber: this.referralNumber,
       startDate: this.formatDateToYYYYMMDD(this.startDate || ''),
       endDate: this.formatDateToYYYYMMDD(this.endDate || ''),
-      referringFacility: this.facilityFrom
+      referringFacility: this.facilityFrom,
     };
 
-    console.log(this.filters, "all filters")
+    console.log(this.filters, 'all filters');
   }
 
-  clearFilter(){
-    this.filters = {
-
-    }
+  clearFilter() {
+    this.filters = {};
   }
 
   formatDateToYYYYMMDD(dateString: string): string | null {
@@ -214,9 +227,8 @@ export class HomeComponent implements OnDestroy, OnInit {
 
       return `${year}-${month}-${day}`;
     } catch (error) {
-      console.error("Error formatting date:", error);
+      console.error('Error formatting date:', error);
       return null;
     }
   }
-
 }

@@ -50,7 +50,7 @@ export class HduApiNavMenuComponent implements OnInit {
       ],
     },
     {
-      name: 'SHR Managament',
+      name: 'SHR Management',
       id: 'referral-management',
       routeUrl: '/shr-management',
       icon: 'user',
@@ -67,6 +67,22 @@ export class HduApiNavMenuComponent implements OnInit {
           name: 'Referral',
           id: 'referral',
           routeUrl: '/shr-management/referral-list',
+          icon: 'unordered-list',
+          subMenus: [],
+        }
+      ],
+    },
+    {
+      name: 'Appointment Management',
+      id: 'appointment-management',
+      routeUrl: '/appointment-management',  
+      icon: 'user',
+      category: 'main',
+      subMenus: [
+        {
+          name: 'Appointments',
+          id: 'appointments',
+          routeUrl: '/appointment-management/appointments-list/',
           icon: 'unordered-list',
           subMenus: [],
         }

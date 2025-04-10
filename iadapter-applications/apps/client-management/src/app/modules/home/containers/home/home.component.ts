@@ -21,9 +21,7 @@ import { FormsModule } from '@angular/forms';
     RouterModule,
     SearchBarComponent,
     RouterModule,
-    SearchBarComponent,
     RouterModule,
-    SearchBarComponent,
     NzInputModule,
     FormsModule,
     NzSelectModule,
@@ -154,6 +152,28 @@ export class HomeComponent implements OnDestroy, OnInit {
         parentRoute: '/client-management',
       },
     });
+  }
+
+  deleteClient(client: HDUAPIClientDetails) {
+
+    this.loading = true;
+    this.listOfHduClients = [];
+    this.clientManagementService.deleteClient(client.demographicDetails.clientID).subscribe((response) => {
+      this.filterSubject.next();
+      console.log(response);
+
+    });
+  }
+
+  resetFilters() {
+    this.gender = '';
+    this.clientId = '';
+    this.firstName = '';
+    this.surname = '';
+    this.idNumber = '';
+    this.startDate = null;
+    this.endDate = null;
+    this.applyFilters();
   }
 
   filterData(event: any, type?: string): void {

@@ -71,7 +71,7 @@
         </div>
 
         <!-- Facility Search Inputs -->
-        <div nz-col [nzSpan]="4">
+        <div nz-col [nzSpan]="1.5">
           <button
             nz-button
             nzType="primary"
@@ -79,6 +79,16 @@
             class="apply-button"
           >
             Search
+          </button>
+        </div>
+
+        <div nz-col [nzSpan]="1">
+          <button
+            nz-button
+            nzType="default"
+            (click)="resetFilters()"
+          >
+            Reset
           </button>
         </div>
       </div>

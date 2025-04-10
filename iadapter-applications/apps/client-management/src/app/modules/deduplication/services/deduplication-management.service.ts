@@ -1,13 +1,12 @@
 import { HttpParams } from '@angular/common/http';
-import { Injectable, model } from '@angular/core';
-import { catchError, map, Observable, tap } from 'rxjs';
-import { DeduplicationUrls } from '../models';
-import { DeduplicationPage } from '../models';
+import { Injectable } from '@angular/core';
+import { catchError, map, Observable } from 'rxjs';
 import { HduHttpService } from '../../../../../../../libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import {
   UnAuothorizedException,
   UnknownException,
 } from '../../../../../../../libs/models';
+import { DeduplicationPage, DeduplicationUrls } from '../models';
 
 @Injectable()
 export class DeduplicationManagementService {
@@ -29,12 +28,15 @@ export class DeduplicationManagementService {
       });
     });
     return this.httpClient
-      .get<{ results: any }>(`${this.hduDeduplicationUrl}`, {
-        params,
-      })
+      .post<{ results: any }>(
+        `${this.hduDeduplicationUrl}`,
+        { code: 'DEDUPLICATION' },
+        {
+          params,
+        }
+      )
       .pipe(
         map((response: { results: any }) => {
-          // console.log('RESPONSE PAYLOAD', response);
           return DeduplicationPage.fromJson(response);
         }),
         catchError((error: any) => {
@@ -54,7 +56,10 @@ export class DeduplicationManagementService {
     const time = new Date().toISOString;
     const dataKey = `MG${payload['id']}${time}`;
     return this.httpClient
-      .post<any>(`${DeduplicationUrls.DATASTORE}/${namespace}/${dataKey}`, payload)
+      .post<any>(
+        `${DeduplicationUrls.DATASTORE}/${namespace}/${dataKey}`,
+        payload
+      )
       .pipe(
         map((response: any) => response)
         //TODO: Implement error handling

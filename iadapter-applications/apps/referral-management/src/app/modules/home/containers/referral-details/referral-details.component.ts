@@ -1,3 +1,4 @@
+import { map, filter } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
@@ -8,15 +9,6 @@ import { ClientManagementService } from '../../services/client-management.servic
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { DynamicListComponent } from '../dynamic-list/dynamic-list.component';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
-
-interface BasicInfo {
-  [key: string]: string;
-}
-
-interface ExtraInfoSection {
-  sectionTitle: string;
-  info: { [key: string]: string };
-}
 
 @Component({
   selector: 'app-client-details',
@@ -44,6 +36,7 @@ export class ClientDetailsComponent implements OnInit {
   basicInfo: any;
 
   extraInfo: any;
+  identifiers: any;
 
   constructor(
     private router: Router,
@@ -58,12 +51,14 @@ export class ClientDetailsComponent implements OnInit {
     return Object.keys(obj);
   }
 
+  drop(event: any) {
+    console.log(event);
+  }
+
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
-      console.log(JSON.parse(params['client']));
       if (params) {
-
         const clientID = JSON.parse(params['client']);
 
         this.parentRoute = params['parentRoute'];
@@ -72,134 +67,44 @@ export class ClientDetailsComponent implements OnInit {
           .getClientById(clientID)
           .subscribe((client: any) => {
             this.client = client.listOfClients[0];
+
+
             this.extraInfo = [
               {
-                sectionTitle: 'Facility',
-                info: this?.client?.facilityDetails || null,
-              },
-              {
-                sectionTitle: 'Visit',
-                info: this?.client?.visitDetails || null,
-              },
-              {
-                sectionTitle: 'Clinical',
-                info: this?.client?.clinicalInformation || null,
-              },
-              {
-                sectionTitle: 'Allergies',
-                info: this?.client?.allergies || null,
-              },
-              {
-                sectionTitle: 'Chronic Conditions',
-                info: this?.client?.chronicConditions || null,
-              },
-              {
-                sectionTitle: 'Lifestyle',
-                info: this?.client?.lifeStyleInformation || null,
-              },
-              {
-                sectionTitle: 'Investigations',
-                info: this?.client?.investigationDetails || null,
-              },
-              {
-                sectionTitle: 'Lab Investigations',
-                info: this?.client?.labInvestigationDetails || null,
-              },
-              {
-                sectionTitle: 'Diagnosis',
-                info: this?.client?.diagnosisDetails || null,
-              },
-              {
-                sectionTitle: 'Medications',
-                info: this?.client?.medicationDetails || null,
-              },
-              {
-                sectionTitle: 'Treatment',
-                info: this?.client?.treatmentDetails || null,
-              },
-              {
-                sectionTitle: 'Radiology',
-                info: this?.client?.radiologyDetails || null,
-              },
-              {
-                sectionTitle: 'Admission',
-                info: this?.client?.admissionDetails || null,
-              },
-              {
-                sectionTitle: 'Outcome',
-                info: this?.client?.outcomeDetails || null,
-              },
-              {
-                sectionTitle: 'Causes of Death',
-                info: this?.client?.causesOfDeathDetails || null,
-              },
-              {
-                sectionTitle: 'Antenatal Care',
-                info: this?.client?.antenatalCareDetails || null,
-              },
-              {
-                sectionTitle: 'Vaccination',
-                info: this?.client?.vaccinationDetails || null,
-              },
-              {
-                sectionTitle: 'Family Planning',
-                info: this?.client?.familyPlanningDetails || null,
-              },
-              {
-                sectionTitle: 'Labor & Delivery',
-                info: this?.client?.laborAndDeliveryDetails || null,
-              },
-              {
-                sectionTitle: 'Postnatal',
-                info: this?.client?.postnatalDetails || null,
-              },
-              {
-                sectionTitle: 'Billing',
-                info: this?.client?.billingsDetails || null,
-              },
-              {
-                sectionTitle: 'Payment',
-                info: this?.client?.visitMainPaymentDetails || null,
-              },
-              {
                 sectionTitle: 'Referral',
-                info: this?.client?.referralDetails || null,
+                info: [],
               },
-              {
-                sectionTitle: 'Other Information',
-                info: this?.client?.otherInformation || null,
-              },
-              {
-                sectionTitle: 'Reporting',
-                info: this?.client?.reportingDetails || null,
-              },
-            ].filter(
-              (section) =>
-                section.info !== null &&
-                section.info !== undefined &&
-                (typeof section.info !== 'object' ||
-                  Object.keys(section.info).length > 0)
-            );
 
+            ];
 
             this.basicInfo = {
-              'Full Name': `${this.client?.demographicDetails?.fname || ''} ${this.client?.demographicDetails?.surname || ''}`.trim(),
+              'Full Name': `${this.client?.demographicDetails?.fname || ''} ${
+                this.client?.demographicDetails?.surname || ''
+              }`.trim(),
               'Client ID': this.client?.demographicDetails?.clientID,
-              'Gender': this.client?.demographicDetails?.gender,
+              Gender: this.client?.demographicDetails?.gender,
               'Date of Birth': this.client?.demographicDetails?.dateOfBirth,
-              'ID Number': this.client?.demographicDetails?.idNumber,
-              'ID Type': this.client?.demographicDetails?.idType,
               'Phone Numbers': this.client?.demographicDetails?.phoneNumbers,
-              'Emails': this.client?.demographicDetails?.emails,
-              // 'Addresses': this.client?.demographicDetails?.addresses,
-              'Occupation': this.client?.demographicDetails?.occupation,
-              'Nationality': this.client?.demographicDetails?.nationality,
+              "NIDA": this.client?.demographicDetails.nida || '-',
+              Emails: this.client?.demographicDetails?.emails,
+              Occupation: this.client?.demographicDetails?.occupation,
+              Nationality: this.client?.demographicDetails?.nationality,
               'Marital Status': this.client?.demographicDetails?.maritalStatus,
+              Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
+                return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
+              }) || '-',
             };
+
+            this.identifiers =
+              this.client?.demographicDetails?.identifiers?.map((id: any) => {
+                return {
+                  Type: id.type,
+                  Number: id.id,
+                };
+              });
 
             this.loading = false;
 
-            console.log(this.client);
           });
       }
     });

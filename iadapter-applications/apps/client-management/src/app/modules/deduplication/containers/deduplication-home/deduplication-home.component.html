@@ -1,9 +1,9 @@
 <div style="padding: 16px">
   <div style="margin-bottom: 16px">
-    <search-bar
+    <lib-search-bar
       [labelText]="'Search client:'"
       (inputSearchValue)="onDatasetsSearchInputTyping($event)"
-    ></search-bar>
+    ></lib-search-bar>
   </div>
 
   <nz-table
@@ -18,14 +18,15 @@
   >
     <thead>
       <tr>
-        <th>SN</th>
-        <th>Client ID</th>
-        <th>First name</th>
-        <th>Middle name</th>
-        <th>Surname</th>
-        <th>Gender</th>
-        <th>ID number</th>
-        <th>ID type</th>
+        <th>S#</th>
+        <!-- <th>Client ID</th> -->
+        <th>Name</th>
+        <th>Criteria</th>
+        <th>Formula</th>
+        <!-- <th>Surname</th> -->
+        <!-- <th>Gender</th> -->
+        <!-- <th>ID number</th> -->
+        <!-- <th>ID type</th> -->
         <th>Associated duplicates</th>
         <th>Action</th>
       </tr>
@@ -34,17 +35,18 @@
       @for (data of listOfDeduplications; track data.fname; let i = $index;) {
       <tr>
         <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
-        <td>
-          <!-- Use primary color from theme  -->
+        <!-- <td>
           <span style="color: #1890ff">{{ data.clientID }}</span>
-        </td>
+        </td> -->
         <td>{{ data.fname }}</td>
-        <td>{{ data.mname }}</td>
-        <td>{{ data.surname }}</td>
-        <td>{{ data.gender }}</td>
-        <td>{{ data.idNumber }}</td>
+        <!-- <td>{{ data.mname }}</td> -->
+        <!-- <td>{{ data.surname }}</td> -->
+        <!-- <td>{{ data.gender }}</td> -->
         <td>{{ data.idType }}</td>
-        <td style="text-align: center">{{ data.associatedDuplicates }}</td>
+        <td>
+          {{ data.keys.length > 1 ? data.keys[1] : data.keys[0] }}
+        </td>
+        <td>{{ data.associatedDuplicates }}</td>
         <td>
           <button
             nz-button

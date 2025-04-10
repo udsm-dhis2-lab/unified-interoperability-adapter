@@ -8,12 +8,12 @@ export class DeduplicationPage {
 
   static fromJson(json: any): DeduplicationPage {
     const deduplicationPage = new DeduplicationPage();
-    deduplicationPage.data = (json?.results ?? []).map((item: any) =>
+    deduplicationPage.data = (json?.records ?? []).map((item: any) =>
       Deduplication.fromJson(item)
     );
-    deduplicationPage.total = json?.pager?.total ?? 0;
-    deduplicationPage.pageIndex = json?.pager?.page ?? 0;
-    deduplicationPage.pageSize = json?.pager?.pageSize ?? 0;
+    deduplicationPage.total = json?.total ?? 0;
+    deduplicationPage.pageIndex = json?.page ?? 0;
+    deduplicationPage.pageSize = json?.pageSize ?? 0;
     return deduplicationPage;
   }
 }
