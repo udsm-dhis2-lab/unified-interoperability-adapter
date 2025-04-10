@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -14,13 +17,16 @@ import java.util.Map;
 @Setter
 public class DemographicDetailsDTO {
     private String id;
+    @NotBlank(message = "firstName cannot be blank")
     private String firstName;
+    @NotBlank(message = "middleName cannot be blank")
     private String middleName;
+    @NotBlank(message = "lastName cannot be blank")
     private String lastName;
     @NotNull(message = "Date of birth can not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String dateOfBirth;
-    @NotNull(message = "Gender can not be null")
+    @NotBlank(message = "Gender can not be null")
     private String gender;
     private List<String> phoneNumbers;
     private List<String> emails;
@@ -28,8 +34,9 @@ public class DemographicDetailsDTO {
     private String maritalStatus;
     private String nationality;
     private List<AddressDTO> addresses;
-    @NotNull(message = "Identifiers can not be null")
-    private List<IdentifierDTO> identifiers;
+    @NotNull(message = "Identifiers list cannot be null")
+    @NotEmpty(message = "At least one identifier must be provided")
+    private List<@Valid IdentifierDTO> identifiers;
     private List<ContactPeopleDTO> contactPeople;
     private List<PaymentDetailsDTO> paymentDetails;
     private List<Map<String,Object>> relatedClients;
@@ -49,7 +56,9 @@ public class DemographicDetailsDTO {
         demographicDetails.put("maritalStatus", this.getMaritalStatus());
         demographicDetails.put("nationality", this.getNationality());
         demographicDetails.put("addresses", this.getAddresses().stream().map(address -> address.toMap()));
-        demographicDetails.put("identifiers", this.getIdentifiers().stream().map(identifier -> identifier.toMap()));
+        if (this.getIdentifiers() != null) {
+            demographicDetails.put("identifiers", this.getIdentifiers().stream().map(identifier -> identifier.toMap()));
+        }
         demographicDetails.put("contactPeople", this.getContactPeople());
         demographicDetails.put("paymentDetails", this.getPaymentDetails());
         demographicDetails.put("relatedClients", this.getRelatedClients());
