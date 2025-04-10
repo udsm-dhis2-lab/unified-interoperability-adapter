@@ -18,35 +18,28 @@
   >
     <thead>
       <tr>
-        <th>S#</th>
-        <!-- <th>Client ID</th> -->
-        <th>Name</th>
-        <th>Criteria</th>
-        <th>Formula</th>
-        <!-- <th>Surname</th> -->
-        <!-- <th>Gender</th> -->
-        <!-- <th>ID number</th> -->
-        <!-- <th>ID type</th> -->
-        <th>Associated duplicates</th>
+        <th>SN</th>
+        <th>First Name</th>
+        <th>Surname</th>
+        <th>Gender</th>
+        <!-- <th>Types</th> -->
+        <!-- <th>Keys</th> -->
+        <th>Duplicates</th>
         <th>Action</th>
       </tr>
     </thead>
     <tbody>
-      @for (data of listOfDeduplications; track data.fname; let i = $index;) {
+      @for (data of listOfDeduplications; track data.name; let i = $index;) {
       <tr>
         <td>{{ pageIndex === 1 ? i + 1 : (pageIndex - 1) * 10 + i + 1 }}</td>
+        <td>{{ data.given }}</td>
+        <td>{{ data.family }}</td>
+        <td>{{ data.getGender() }}</td>
+        <!-- <td>{{ data.types?.join(', ') }}</td> -->
         <!-- <td>
-          <span style="color: #1890ff">{{ data.clientID }}</span>
+          {{ data.keys && data.keys.length > 0 ? data.keys[0] : 'N/A' }}
         </td> -->
-        <td>{{ data.fname }}</td>
-        <!-- <td>{{ data.mname }}</td> -->
-        <!-- <td>{{ data.surname }}</td> -->
-        <!-- <td>{{ data.gender }}</td> -->
-        <td>{{ data.idType }}</td>
-        <td>
-          {{ data.keys.length > 1 ? data.keys[1] : data.keys[0] }}
-        </td>
-        <td>{{ data.associatedDuplicates }}</td>
+        <td>{{ data.total }}</td>
         <td>
           <button
             nz-button

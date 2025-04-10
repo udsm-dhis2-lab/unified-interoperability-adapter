@@ -208,7 +208,7 @@ export class DeduplicationDetailsComponent implements OnInit {
   }
 
   objectKeys(obj: any): string[] {
-    return Object.keys(obj);
+    return Object?.keys(obj) || [];
   }
 
   createMappingRequest(payload: any) {

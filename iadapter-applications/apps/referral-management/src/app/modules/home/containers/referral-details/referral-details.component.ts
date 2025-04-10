@@ -38,6 +38,9 @@ export class ClientDetailsComponent implements OnInit {
   extraInfo: any;
   identifiers: any;
 
+  clientID!: any;
+  referrals: any[] = [];
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -48,7 +51,7 @@ export class ClientDetailsComponent implements OnInit {
   }
 
   objectKeys(obj: any): string[] {
-    return Object.keys(obj);
+    return Object?.keys(obj) || [];
   }
 
   drop(event: any) {
@@ -56,10 +59,13 @@ export class ClientDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
       if (params) {
         const clientID = JSON.parse(params['client']);
+
+        this.clientID = clientID;
 
         this.parentRoute = params['parentRoute'];
 
@@ -68,13 +74,11 @@ export class ClientDetailsComponent implements OnInit {
           .subscribe((client: any) => {
             this.client = client.listOfClients[0];
 
-
             this.extraInfo = [
               {
                 sectionTitle: 'Referral',
                 info: [],
               },
-
             ];
 
             this.basicInfo = {
@@ -85,14 +89,34 @@ export class ClientDetailsComponent implements OnInit {
               Gender: this.client?.demographicDetails?.gender,
               'Date of Birth': this.client?.demographicDetails?.dateOfBirth,
               'Phone Numbers': this.client?.demographicDetails?.phoneNumbers,
-              "NIDA": this.client?.demographicDetails.nida || '-',
+              NIDA: this.client?.demographicDetails.nida || '-',
               Emails: this.client?.demographicDetails?.emails,
               Occupation: this.client?.demographicDetails?.occupation,
               Nationality: this.client?.demographicDetails?.nationality,
               'Marital Status': this.client?.demographicDetails?.maritalStatus,
-              Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
-                return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
-              }) || '-',
+              Address:
+                this.client?.demographicDetails?.addresses?.map(
+                  (address: any) => {
+                    const addressParts = [
+                      address?.village,
+                      address?.ward,
+                      address?.district,
+                      address?.region,
+                      address?.city,
+                      address?.state,
+                      address?.country,
+                    ].filter(
+                      (part) =>
+                        part &&
+                        part.trim() !== '' &&
+                        part.trim() !== 'undefined'
+                    ); // Filter out null, undefined, and empty strings
+
+                    return addressParts.length > 0
+                      ? addressParts.join(', ')
+                      : '-';
+                  }
+                ) || '-',
             };
 
             this.identifiers =
@@ -104,9 +128,32 @@ export class ClientDetailsComponent implements OnInit {
               });
 
             this.loading = false;
-
           });
       }
     });
+
+this.loadHduClientsFromServer()
+
+  }
+
+  loadHduClientsFromServer() {
+    this.loading = true;
+
+    return this.clientManagementService
+      .getReferrals({
+        clientId: this.clientID,
+        code: 'FHIR-REFERRAL-QUERY',
+      })
+      .subscribe({
+        next: (data: any) => {
+          console.log(data, "data")
+          this.loading = false;
+          this.referrals = data;
+        },
+        error: (error) => {
+          this.loading = false;
+          //TODO: Implement error handling
+        },
+      });
   }
 }

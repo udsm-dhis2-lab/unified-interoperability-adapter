@@ -56,11 +56,9 @@
           <nz-card style="min-height: 60vh">
             <div>
               <nz-tabset>
+                  <nz-tab nzTitle="Referral">
 
-                <div *ngFor="let section of extraInfo">
-                  <nz-tab nzTitle="{{ section.sectionTitle }}">
-
-                    <nz-table [nzData]="section.info" [nzFrontPagination]="false" [nzShowPagination]="false">
+                    <nz-table [nzData]="referrals" [nzFrontPagination]="false" [nzShowPagination]="false">
                       <thead>
                         <tr>
                           <th>SN</th>
@@ -69,31 +67,26 @@
                           <th>Referring Facility</th>
                           <th>Referred Facility</th>
                           <th>Referred Abroad</th>
-                          <th>Action</th>
-
                         </tr>
                       </thead>
                       <tbody cdkDropList (cdkDropListDropped)="drop($event)">
-                        @for (data of section.info; track data; let i = $index) {
+                        @for (data of referrals; track data; let i = $index) {
                           <tr cdkDrag>
                             <td>
                               {{
                                  i + 1
                               }}
                             </td>
-                            <td>{{ data['Appointment ID'] }}</td>
-                            <td>{{ data['HFR Code'] }}</td>
-                            <td>{{ data['Status'] }}</td>
-                            <td>{{ data['Service Name'] }}</td>
-                            <td>{{ data['Payment Status'] }}</td>
+                            <td>{{ data.referral_date | date:'dd MMM yyyy'}}</td>
+                            <td>{{ data.referral_number }}</td>
+                            <td>{{ data.referring_facility || "Buguruni Health Center"}}</td>
+                            <td>{{ data.referred_to_facility || "Amana Hospital" }}</td>
+                            <td>{{ data.referred_to_other_country  }}</td>
                           </tr>
                         }
                       </tbody>
                     </nz-table>
-
                   </nz-tab>
-                </div>
-
               </nz-tabset>
             </div>
           </nz-card>

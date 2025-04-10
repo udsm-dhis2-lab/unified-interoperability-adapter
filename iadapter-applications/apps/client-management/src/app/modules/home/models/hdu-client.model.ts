@@ -10,7 +10,7 @@ export class HduClient {
   dateOfBirth!: string;
   phoneNumbers!: string;
   emails!: string;
-  addresses!: string;
+  addresses!: any;
   occupation!: string;
   nationality!: string;
   nida!: string;

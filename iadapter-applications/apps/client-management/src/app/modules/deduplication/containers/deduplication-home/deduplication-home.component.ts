@@ -48,6 +48,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
       .getDeduplicationClients(pageIndex, pageSize, filter)
       .subscribe({
         next: (data: any) => {
+          console.log(data, "data")
           this.loading = false;
           this.total = data.total;
           this.pageIndex = data.pageIndex;
