@@ -10,6 +10,7 @@ import java.util.Date;
 @Getter
 @Setter
 public class OutcomeDetailsDTO {
+    @NotNull(message = "isAlive cannot be null")
     private Boolean isAlive;
     private String deathLocation;
 

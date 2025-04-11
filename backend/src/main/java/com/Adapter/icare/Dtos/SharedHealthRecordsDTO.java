@@ -55,6 +55,8 @@ public class SharedHealthRecordsDTO {
 
     private AdmissionDetailsDTO admissionDetails;
 
+    @NotNull(message = "Outcome details block cannot be null")
+    @Valid
     private OutcomeDetailsDTO outcomeDetails;
 
     private CausesOfDeathDetailsDTO causesOfDeathDetails;
