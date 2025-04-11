@@ -18,7 +18,11 @@ jobs:
   build-and-zip:
     if: |
       (github.event_name == 'workflow_dispatch' && github.actor != 'github-actions[bot]') ||
-      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'github-actions[bot]' && !contains(github.event.pull_request.title, 'Update zipped builds for apps'))
+      (github.event_name == 'pull_request' && 
+       github.event.pull_request.user.login != 'github-actions[bot]' && 
+       !contains(github.event.pull_request.title, 'Update zipped builds for apps') &&
+       github.event.pull_request.head.user.login != 'github-actions[bot]' &&
+       !contains(github.event.pull_request.head.ref, 'github-actions-bot'))
     runs-on: ubuntu-latest
 
     strategy:
@@ -152,6 +156,14 @@ jobs:
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
           git push origin HEAD
+
+      - name: Merge to develop
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git fetch origin develop
+          git checkout develop
+          git merge --no-ff ${{ github.head_ref }} -m "Merge workflow dispatch build for apps: ${{ env.app_names }}"
+          git push origin develop
 
       - name: Push to production
         run: |
