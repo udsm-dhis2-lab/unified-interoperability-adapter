@@ -358,31 +358,29 @@ public class HDUAPIController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
                 }
 
-                DataTemplateDataDTO validatedDataTemplatePayload = new DataTemplateDataDTO();
-                validatedDataTemplatePayload.setListGrid(new ArrayList<>(validatedListGrid));
-                List<IdentifierDTO> clientIds = validatedListGrid.isEmpty() ? new ArrayList<>() :
-                        this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
-
-                validatedDataTemplatePayload.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
-                validatedDataTemplatePayload.setReportDetails(dataTemplate.getData().getReportDetails());
-                validatedDataTemplatePayload.setClientIdentifiersPool(clientIds);
-                payload.put("payload", validatedDataTemplatePayload);
-
-                // --- Call the workflow engine ---
-                log.info("Sending {} valid records to workflow engine.", validatedListGrid.size());
-                Map<String, Object> workflowResponse = this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload,
-                        "processes/execute?async=true");
-
-                // Enhance the response with validation failure details if any
                 if (!recordsWithIssues.isEmpty()) {
+                    Map<String, Object> workflowResponse = new HashMap<>();
                     workflowResponse.put("statusDetails", "Completed with validation issues");
                     workflowResponse.put("validationSkippedRecordsCount", recordsWithIssues.size());
                     workflowResponse.put("validationFailures", recordsWithIssues);
-                } else {
-                    workflowResponse.put("statusDetails", "Completed successfully");
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(workflowResponse);
                 }
 
-                return ResponseEntity.ok(workflowResponse);
+                    DataTemplateDataDTO validatedDataTemplatePayload = new DataTemplateDataDTO();
+                    validatedDataTemplatePayload.setListGrid(new ArrayList<>(validatedListGrid));
+                    List<IdentifierDTO> clientIds = validatedListGrid.isEmpty() ? new ArrayList<>() :
+                            this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
+
+                    validatedDataTemplatePayload.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
+                    validatedDataTemplatePayload.setReportDetails(dataTemplate.getData().getReportDetails());
+                    validatedDataTemplatePayload.setClientIdentifiersPool(clientIds);
+                    payload.put("payload", validatedDataTemplatePayload);
+
+                    // --- Call the workflow engine ---
+                    log.info("Sending {} valid records to workflow engine.", validatedListGrid.size());
+                    Map<String, Object> workflowResponse = this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload,
+                            "processes/execute?async=true");
+                    return ResponseEntity.ok(workflowResponse);
 
             } else if (!shouldUseWorkflowEngine) {
                 log.warn("Workflow engine disabled. Sending data directly to mediator workflow. Validation via annotations might still occur if @Valid is on RequestBody, but parallel processing/composite validator logic is SKIPPED here.");
