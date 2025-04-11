@@ -144,7 +144,6 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # Update local branch with remote changes
           git pull origin develop --no-rebase
 
           git add .github/apps-builds
