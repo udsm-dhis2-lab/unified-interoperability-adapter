@@ -2,7 +2,6 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable } from 'rxjs';
-import { ClientDetails } from '../../../../../../../index';
 import { HduHttpService } from '../../../../../../../libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 import {
   UnAuothorizedException,
@@ -10,6 +9,7 @@ import {
 } from '../../../../../../../libs/models';
 import { ClientUrls } from '../../home/models';
 import { DeduplicationPage, DeduplicationUrls } from '../models';
+import { ClientDetails } from '../interfaces/client.interface';
 
 @Injectable()
 export class DeduplicationManagementService {

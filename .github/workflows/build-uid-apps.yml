@@ -169,9 +169,3 @@ jobs:
               echo "Warning: ${app}.zip not found in .github/apps-builds/"
             fi
           done
-
-      - name: 🔀 Merge PR
-        if: success()
-        uses: BaharaJr/merge-pr@0.0.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
