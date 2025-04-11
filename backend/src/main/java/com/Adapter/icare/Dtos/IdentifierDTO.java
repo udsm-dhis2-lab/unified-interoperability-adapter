@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hl7.fhir.r4.model.Identifier;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,9 +14,9 @@ import java.util.Map;
 @Getter
 @Setter
 public class IdentifierDTO {
-    @NotNull
+    @NotBlank(message = "Identifier ID/value cannot be blank")
     private String id;
-    @NotNull
+    @NotBlank(message = "Identifier Type cannot be blank")
     private String type;
     private boolean preferred;
     private String system;
