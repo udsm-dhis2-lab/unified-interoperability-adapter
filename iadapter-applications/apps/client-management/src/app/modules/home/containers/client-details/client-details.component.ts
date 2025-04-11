@@ -46,29 +46,27 @@ export class ClientDetailsComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
       if (params) {
-        const clientID = JSON.parse(params['client']);
+        const client = params['client'] ?? '';
+        console.log(client, 'client');
+        console.log(params['client']?.startsWith('HCR'), 'client');
+        const clientID = client?.startsWith('HCR')
+          ? client
+          : JSON.parse(client);
 
         this.parentRoute = params['parentRoute'];
 
         this.clientManagementService
           .getClientById(clientID)
           .subscribe((client: any) => {
-            this.client = client.listOfClients[0];
+            this.client = client?.listOfClients[0] || {};
 
-            console.log(this.client, 'identifiers');
+            console.log(this?.client, 'clients');
 
             this.basicInfo = this.formatApiResponse(this.client)[
               'Demographic Details'
             ];
 
-            this.identifiers = this.client.demographicDetails.identifiers
-              .filter((id: any) => id.type !== 'REFERRAL-NUMBER')
-              .map((id: any) => {
-                return {
-                  Type: id.type,
-                  Number: id.id,
-                };
-              });
+            console.log(this.basicInfo, 'basic info');
 
             this.appointmentDetails = this.formatApiResponse(this.client)[
               'Appointments'
@@ -85,7 +83,7 @@ export class ClientDetailsComponent implements OnInit {
   }
 
   objectKeys(obj: any): string[] {
-    return Object.keys(obj);
+    return Object?.keys(obj) || [];
   }
 
   // Utility function to format keys and values
@@ -95,6 +93,7 @@ export class ClientDetailsComponent implements OnInit {
     }
 
     const formattedResponse: { [key: string]: any } = {};
+    console.log(result?.demographicDetails?.addresses, 'hulk');
 
     return {
       // {`${id.type}: ${id.id}`}
@@ -120,17 +119,29 @@ export class ClientDetailsComponent implements OnInit {
         'Phone Numbers':
           result.demographicDetails.phoneNumbers?.join(', ') || '-',
         Emails: result.demographicDetails.emails?.join(', ') || '-',
-        "NIDA": result.demographicDetails.nida || '-',
+        "NIDA": result.demographicDetails.dummyNida || '-',
         Occupation: result.demographicDetails.occupation || '-',
         Nationality: result.demographicDetails.nationality || '-',
         'Related Clients':
           result.demographicDetails.relatedClients?.join(', ') || '-',
         Appointment: result.demographicDetails.appointment || '-',
-        Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
-          return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
-        }) || '-',
+        Address:
+          result?.demographicDetails?.addresses?.map((address: any) => {
+            const addressParts = [
+              address?.village,
+              address?.ward,
+              address?.district,
+              address?.region,
+              address?.city,
+              address?.state,
+              address?.country,
+            ].filter(
+              (part) =>
+                part && part.trim() !== '' && part.trim() !== 'undefined'
+            ); // Filter out null, undefined, and empty strings
 
-
+            return addressParts.length > 0 ? addressParts.join(', ') : '-';
+          }) || '-',
       },
 
       'Facility Details': {

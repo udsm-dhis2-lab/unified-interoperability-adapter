@@ -103,6 +103,7 @@ export class ClientManagementService {
   }
 
   getReferrals(filters: any): Observable<Referral[]> {
+    console.log(filters, "filters");
     return this.http.post<Referral[]>(
       `../../../../../api/v1/hduApi/processes/execute?async=true`,
       filters

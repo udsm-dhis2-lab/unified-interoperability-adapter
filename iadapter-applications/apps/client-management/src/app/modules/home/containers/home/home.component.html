@@ -82,11 +82,7 @@
         </div>
 
         <div nz-col [nzSpan]="1">
-          <button
-            nz-button
-            nzType="default"
-            (click)="resetFilters()"
-          >
+          <button nz-button nzType="default" (click)="resetFilters()">
             Reset
           </button>
         </div>
@@ -132,30 +128,48 @@
                   }}</span>
                 </td>
                 <td>{{ data.demographicDetails.fname }}</td>
-                <td>{{ data.demographicDetails.mname }}</td>
-                <td>{{ data.demographicDetails.surname }}</td>
+                <td nzCellControl="name">{{ data.demographicDetails.surname }}</td>
+                <td nzCellControl="name">{{ data.demographicDetails.surname }}</td>
                 <td>{{ data.demographicDetails.gender }}</td>
-                <td>{{ data.demographicDetails.nida }}</td>
+                <td>{{ data.demographicDetails.dummyNida }}</td>
                 <td>{{ data.demographicDetails.idNumber }}</td>
                 <td>{{ data.demographicDetails.idType }}</td>
-                <td>
-                  <button
-                    nz-button
-                    nzType="text"
-                    class="view-button"
-                    (click)="viewClientDetails(data)"
-                  >
-                    View
-                  </button>
-                  <button
-                    nz-button
-                    nzType="text"
-                    class="view-button"
-                    (click)="deleteClient(data)"
-                  >
-                    Delete
-                  </button>
+                <td  nzCellControl="action" [nzRight]="false" >
+                  <!-- <a href="#">View</a>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <a href="#">Delete</a> -->
+                  <a>
+                    <button
+                      nz-button
+                      nzType="text"
+                      class="view-button"
+                      (click)="viewClientDetails(data)"
+                    >
+                      View
+                    </button>
+                  </a>
+                  <nz-divider nzType="vertical"></nz-divider>
+                  <a>
+                    <button
+                      nz-button
+                      nzType="text"
+                      class="view-button"
+                      (click)="deleteClient(data)"
+                    >
+                      Delete
+                    </button>
+                  </a>
                 </td>
+                <!-- <app-reusable-modal
+                  [visible]="isDeleteModalVisible"
+                  (visibleChange)="isDeleteModalVisible = $event"
+                  title="Delete Confirmation"
+                  content=`Are you sure you want to delete this client?`
+                  (ok)="confirmDelete()"
+                  (cancel)="cancelDelete()"
+                >
+                  <p>Are you sure you want to delete this item?</p>
+                </app-reusable-modal> -->
               </tr>
               }
             </tbody>
@@ -163,5 +177,8 @@
         </div>
       </div>
     </div>
+
   </nz-content>
 </nz-layout>
+
+

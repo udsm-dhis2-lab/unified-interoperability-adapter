@@ -11,9 +11,12 @@ on:
   pull_request:
     branches:
       - develop
+    paths-ignore:
+      - '.github/apps-builds/**'
 
 jobs:
   build-and-zip:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     strategy:
@@ -26,14 +29,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install NX globally
-        run: npm install -g nx@19.8.3
+      - name:  NX
+        run: npm install -g nx
 
       - name: Cache Node modules
         uses: actions/cache@v3
@@ -137,18 +144,16 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # Fetch and checkout develop branch (ensure it exists locally)
-          git fetch origin develop:develop
-          git checkout develop
+          # Update local branch with remote changes
+          git pull origin develop --no-rebase
 
-          # Add and commit only if there are changes
           git add .github/apps-builds
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-          # Push changes
-          git push origin develop
+          git push origin HEAD
 
       - name: 🔀 Merge PR
+        if: success()
         uses: BaharaJr/merge-pr@0.0.1
         with:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}

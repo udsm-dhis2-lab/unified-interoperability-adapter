@@ -1,12 +1,14 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { NzModalService } from 'ng-zorro-antd/modal';
 import { Deduplication } from '../../models/deduplication.model';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 import { Subscription } from 'rxjs';
 import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
-// import { SearchBarComponent } from '@iadapter/search-bar';
+import { DeduplicationDetailsComponent } from '../deduplication-details/deduplication-details.component';
 @Component({
   selector: 'app-deduplication-home',
   standalone: true,
@@ -30,7 +32,8 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
 
   constructor(
     private router: Router,
-    private dedupicationManagementService: DeduplicationManagementService
+    private dedupicationManagementService: DeduplicationManagementService,
+    private modal: NzModalService
   ) {}
   ngOnDestroy(): void {
     if (this.loadHduClientsSubscription) {
@@ -48,6 +51,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
       .getDeduplicationClients(pageIndex, pageSize, filter)
       .subscribe({
         next: (data: any) => {
+          console.log(data, 'data');
           this.loading = false;
           this.total = data.total;
           this.pageIndex = data.pageIndex;
@@ -92,8 +96,24 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
   }
 
   viewDeduplicationDetails(deduplicate: Deduplication) {
-    this.router.navigate(['/deduplication/deduplication-details'], {
-      queryParams: { deduplicate: JSON.stringify(deduplicate) },
+    this.modal.create({
+      nzTitle: 'Deduplication Details',
+      nzContent: DeduplicationDetailsComponent,
+      nzWidth: '80%',
+      nzMaskClosable: false,
+      nzData: {
+        data: deduplicate,
+      },
+      nzFooter: null,
+    });
+  }
+
+  navigateToClientView(deduplicate: Deduplication) {
+    this.router.navigate(['/client-management/client-details'], {
+      queryParams: {
+        client: deduplicate.id,
+        parentRoute: '/client-management/deduplication',
+      },
     });
   }
 }
