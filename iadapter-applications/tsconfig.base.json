@@ -17,9 +17,12 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
+    "typeRoots": ["node_modules/@types", "index.d.ts"],
     "paths": {
-"@iadapter/search-bar": ["iadapter-applications/libs/search-bar/src/index.ts"],      
-"@iadapter-applications/hdu-api-http-client": [
+      "@iadapter/search-bar": [
+        "iadapter-applications/libs/search-bar/src/index.ts"
+      ],
+      "@iadapter-applications/hdu-api-http-client": [
         "libs/hdu-api-http-client/src/index.ts"
       ],
       "@iadapter-applications/hdu-api-nav-menu": [

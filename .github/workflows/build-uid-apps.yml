@@ -144,13 +144,31 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # Update local branch with remote changes
           git pull origin develop --no-rebase
 
           git add .github/apps-builds
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
           git push origin HEAD
+
+      - name: Push to production
+        run: |
+          app_names="${{ env.app_names }}"
+          IFS=',' read -ra APPS <<< "$app_names"
+          
+          for app in "${APPS[@]}"; do
+            if [ -f ".github/apps-builds/${app}.zip" ]; then
+              echo "Pushing ${app}.zip to production..."
+              curl --request POST \
+                --url ${{secrets.URL}} \
+                --header "Authorization: Basic ${{secrets.AUTH}}" \
+                --form "file=@.github/apps-builds/${app}.zip" \
+                --fail || exit 1
+              echo "${app} deployed successfully"
+            else
+              echo "Warning: ${app}.zip not found in .github/apps-builds/"
+            fi
+          done
 
       - name: 🔀 Merge PR
         if: success()
