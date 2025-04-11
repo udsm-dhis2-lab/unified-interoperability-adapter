@@ -16,7 +16,9 @@ on:
 
 jobs:
   build-and-zip:
-    if: github.actor != 'github-actions[bot]'
+    if: |
+      github.actor != 'github-actions[bot]' &&
+      github.event.pull_request.user.login != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     strategy:
