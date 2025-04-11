@@ -46,7 +46,12 @@ export class ClientDetailsComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
       if (params) {
-        const clientID = JSON.parse(params['client']);
+        const client = params['client'] ?? '';
+        console.log(client, 'client');
+        console.log(params['client']?.startsWith('HCR'), 'client');
+        const clientID = client?.startsWith('HCR')
+          ? client
+          : JSON.parse(client);
 
         this.parentRoute = params['parentRoute'];
 
@@ -88,7 +93,7 @@ export class ClientDetailsComponent implements OnInit {
     }
 
     const formattedResponse: { [key: string]: any } = {};
-    console.log(result?.demographicDetails?.addresses, "hulk")
+    console.log(result?.demographicDetails?.addresses, 'hulk');
 
     return {
       // {`${id.type}: ${id.id}`}
@@ -98,7 +103,6 @@ export class ClientDetailsComponent implements OnInit {
           Number: id.id,
         };
       }),
-
 
       Appointments: result?.demographicDetails?.appointmentDetails || '-',
       'Contact People':
@@ -121,21 +125,23 @@ export class ClientDetailsComponent implements OnInit {
         'Related Clients':
           result.demographicDetails.relatedClients?.join(', ') || '-',
         Appointment: result.demographicDetails.appointment || '-',
-        Address: result?.demographicDetails?.addresses?.map((address: any) => {
-          const addressParts = [
-            address?.village,
-            address?.ward,
-            address?.district,
-            address?.region,
-            address?.city,
-            address?.state,
-            address?.country
-          ].filter(part => part && part.trim() !== '' && part.trim() !== 'undefined');  // Filter out null, undefined, and empty strings
+        Address:
+          result?.demographicDetails?.addresses?.map((address: any) => {
+            const addressParts = [
+              address?.village,
+              address?.ward,
+              address?.district,
+              address?.region,
+              address?.city,
+              address?.state,
+              address?.country,
+            ].filter(
+              (part) =>
+                part && part.trim() !== '' && part.trim() !== 'undefined'
+            ); // Filter out null, undefined, and empty strings
 
-          return addressParts.length > 0 ? addressParts.join(', ') : '-';
-        }) || '-'
-
-
+            return addressParts.length > 0 ? addressParts.join(', ') : '-';
+          }) || '-',
       },
 
       'Facility Details': {
