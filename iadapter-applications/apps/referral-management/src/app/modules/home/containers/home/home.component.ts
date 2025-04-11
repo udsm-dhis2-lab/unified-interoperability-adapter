@@ -85,7 +85,6 @@ export class HomeComponent implements OnDestroy, OnInit {
       .subscribe({
 
         next: (data: any) => {
-      console.log("console down", data);
 
           this.loading = false;
           this.total = 10;
@@ -98,7 +97,6 @@ export class HomeComponent implements OnDestroy, OnInit {
           //TODO: Implement error handling
         },
       });
-
   }
 
   onDatasetsSearchInputTyping(value: string) {
@@ -231,4 +229,6 @@ export class HomeComponent implements OnDestroy, OnInit {
       return null;
     }
   }
+
+
 }

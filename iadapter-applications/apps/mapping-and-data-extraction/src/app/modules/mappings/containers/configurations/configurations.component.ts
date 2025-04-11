@@ -240,7 +240,7 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
   }
 
   getKeys(obj: any): string[] {
-    return Object.keys(obj);
+    return Object?.keys(obj) || [];
   }
 
   showDeleteConfirm(uuid: string): void {

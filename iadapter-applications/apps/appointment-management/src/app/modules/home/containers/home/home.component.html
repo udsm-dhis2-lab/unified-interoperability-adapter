@@ -84,7 +84,7 @@
           >
             <thead>
               <tr>
-                <th>total</th>
+                <th>SN</th>
                 <th>Client ID</th>
                 <th>First Name</th>
                 <th>Middle Name</th>
@@ -106,7 +106,7 @@
                   <span style="color: #1890ff">{{ appointment.client_id || '' }}</span>
                 </td>
                 <td>{{ appointment.first_name || '' }}</td>
-                <td></td>  <!-- Middle name column (empty as not in data) -->
+                <td>{{appointment.surname}}</td>  <!-- Middle name column (empty as not in data) -->
                 <td>{{ appointment.surname || '' }}</td>
                 <td>{{ appointment.gender | titlecase }}</td>
                 <td>{{ appointment.nida || '' | titlecase }}</td>

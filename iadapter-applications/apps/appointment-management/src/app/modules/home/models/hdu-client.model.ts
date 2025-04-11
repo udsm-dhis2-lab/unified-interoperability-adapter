@@ -9,7 +9,7 @@ export class HduClient {
   dateOfBirth!: string;
   phoneNumbers!: string; // Consider making this an array if multiple numbers are common
   emails!: string; // Consider making this an array if multiple emails are common
-  addresses!: string; // Consider making this an array of address objects
+  addresses!: any; // Consider making this an array of address objects
   occupation!: string;
   nationality!: string;
 
@@ -40,7 +40,7 @@ export class HduClient {
     hduClient.dateOfBirth = json['dateOfBirth'] || '';
     hduClient.phoneNumbers = json['phoneNumbers'] ? json['phoneNumbers'].join(', ') : '';
     hduClient.emails = json['emails'] ? json['emails'].join(', ') : '';
-    hduClient.addresses = json['addresses'] ? JSON.stringify(json['addresses']) : '';
+    hduClient.addresses = json['addresses'] ? json['addresses'] : '';
     hduClient.occupation = json['occupation'] || '';
     hduClient.nationality = json['nationality'] || '';
     hduClient.maritalStatus = json['maritalStatus'];

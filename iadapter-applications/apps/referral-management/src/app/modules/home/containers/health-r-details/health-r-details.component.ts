@@ -48,7 +48,7 @@ export class HealthRecordsDetailsComponent implements OnInit {
   }
 
   objectKeys(obj: any): string[] {
-    return Object.keys(obj);
+    return Object?.keys(obj) || [];
   }
 
   drop(event: any) {
@@ -250,12 +250,22 @@ export class HealthRecordsDetailsComponent implements OnInit {
               Occupation: this.client?.demographicDetails?.occupation,
               Nationality: this.client?.demographicDetails?.nationality,
               'Marital Status': this.client?.demographicDetails?.maritalStatus,
-              Address: JSON.parse(this.client?.demographicDetails?.addresses).map((address: any)=> {
-                return `${address?.village || ''} ${address?.ward || ''} ${address?.district || ''} ${address?.region || ''} ${address?.city || ''} ${address?.state || ''} ${address?.country || ''}`
-              }) || '-',
+              Address: this.client?.demographicDetails?.addresses?.map((address: any) => {
+                const addressParts = [
+                  address?.village,
+                  address?.ward,
+                  address?.district,
+                  address?.region,
+                  address?.city,
+                  address?.state,
+                  address?.country
+                ].filter(part => part && part.trim() !== '' && part.trim() !== 'undefined');  // Filter out null, undefined, and empty strings
+
+                return addressParts.length > 0 ? addressParts.join(', ') : '-';
+              }) || '-'
             };
 
-            console.log(JSON.parse(this.client?.demographicDetails?.addresses))
+            // console.log(JSON.parse(this.client?.demographicDetails?.addresses))
 
             this.identifiers =
               this.client?.demographicDetails?.identifiers?.map((id: any) => {

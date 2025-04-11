@@ -88,7 +88,7 @@ export class HomeComponent implements OnDestroy, OnInit {
           console.log(data, data)
           this.loading = false;
           this.allAppointments = data.filter(
-            (appointment: any) => appointment.supporting_patient_id !== ''
+            (appointment: any) => appointment.client_id !== ''
           );
           this.total = data.length;
           this.total = this.allAppointments.length;
@@ -126,9 +126,10 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   viewClientDetails(client: any) {
+    console.log(client, 'client');
     this.router.navigate(['/appointment-management/appointment-details'], {
       queryParams: {
-        client: JSON.stringify(client),
+        client: JSON.stringify(client?.client_id),
         parentRoute: '/appointment-management/appointments-list',
       },
     });
