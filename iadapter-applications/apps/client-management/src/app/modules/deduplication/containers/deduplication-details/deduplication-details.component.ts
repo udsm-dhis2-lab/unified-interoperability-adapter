@@ -77,7 +77,9 @@ export class DeduplicationDetailsComponent implements OnInit {
           }`,
           sex: results[0]?.demographicDetails?.gender ?? '',
           dateOfBirth: results[0]?.demographicDetails?.dateOfBirth ?? '',
-          // age: results[0]?.demographicDetails?.age ?? 0,
+          age: this.calculateDetailedAge(
+            results[0]?.demographicDetails?.dateOfBirth ?? ''
+          ),
           contactInfo: {
             phoneNumber:
               (results[0]?.demographicDetails.phoneNumbers ?? []).join(',') ??
@@ -106,14 +108,11 @@ export class DeduplicationDetailsComponent implements OnInit {
           },
         } as unknown as Client;
 
-        console.log(this?.client, 'clients');
-
         this.loading = false;
       });
   }
 
   requestMerge() {
-    console.log(this.selected);
     const selectedDuplicates = (this.data?.duplicates ?? []).filter((d) =>
       this.selected.includes((d.identifiers ?? {})['HCRCODE'])
     );
@@ -121,7 +120,6 @@ export class DeduplicationDetailsComponent implements OnInit {
       this.showAlert('error', 'Please select duplicates to merge');
       return;
     }
-    console.log('selectedDuplicates', selectedDuplicates);
     this.showAlert('info', 'Merge request submitted');
   }
 
@@ -158,7 +156,6 @@ export class DeduplicationDetailsComponent implements OnInit {
           : (this.data.duplicates ?? []).map(
               (d) => (d.identifiers ?? {})['HCRCODE']
             );
-      console.log(this.selected);
       return;
     }
     if (this.selected.includes(id)) {
@@ -167,4 +164,36 @@ export class DeduplicationDetailsComponent implements OnInit {
       this.selected.push(id);
     }
   }
+
+  calculateDetailedAge = (birthDate: Date | string): string => {
+    const birthDateObj =
+      typeof birthDate === 'string' ? new Date(birthDate) : birthDate;
+
+    if (isNaN(birthDateObj.getTime())) {
+      return '-';
+    }
+
+    const today = new Date();
+    let years = today.getFullYear() - birthDateObj.getFullYear();
+    let months = today.getMonth() - birthDateObj.getMonth();
+    let days = today.getDate() - birthDateObj.getDate();
+
+    if (days < 0) {
+      months--;
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days += lastMonth.getDate();
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    if (years == 0) return `${months} ${months == 1 ? 'Month' : 'Months'}`;
+    if (months == 0) return `${days} ${days == 1 ? 'Day' : 'Days'}`;
+    if (days == 0) return `${years} ${years == 1 ? 'Year' : 'Years'}`;
+    return `${years} ${years > 1 ? 'Years' : 'Year'} | ${months} ${
+      months > 1 ? 'Months' : 'Month'
+    } | ${days} ${days > 1 ? 'Days' : 'Day'}`;
+  };
 }
