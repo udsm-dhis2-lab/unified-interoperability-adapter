@@ -88,7 +88,7 @@ export class HomeComponent implements OnDestroy, OnInit {
           console.log(data, data)
           this.loading = false;
           this.allAppointments = data.filter(
-            (appointment: any) => appointment.supporting_patient_id !== ''
+            (appointment: any) => appointment.client_id !== ''
           );
           this.total = data.length;
           this.total = this.allAppointments.length;

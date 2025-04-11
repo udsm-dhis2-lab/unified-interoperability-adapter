@@ -128,10 +128,10 @@
                   }}</span>
                 </td>
                 <td>{{ data.demographicDetails.fname }}</td>
-                <td nzCellControl="name">{{ data.demographicDetails.mname }}</td>
+                <td nzCellControl="name">{{ data.demographicDetails.surname }}</td>
                 <td nzCellControl="name">{{ data.demographicDetails.surname }}</td>
                 <td>{{ data.demographicDetails.gender }}</td>
-                <td>{{ data.demographicDetails.nida }}</td>
+                <td>{{ data.demographicDetails.dummyNida }}</td>
                 <td>{{ data.demographicDetails.idNumber }}</td>
                 <td>{{ data.demographicDetails.idType }}</td>
                 <td  nzCellControl="action" [nzRight]="false" >
@@ -154,7 +154,7 @@
                       nz-button
                       nzType="text"
                       class="view-button"
-                      (click)="showDeleteModal()"
+                      (click)="deleteClient(data)"
                     >
                       Delete
                     </button>

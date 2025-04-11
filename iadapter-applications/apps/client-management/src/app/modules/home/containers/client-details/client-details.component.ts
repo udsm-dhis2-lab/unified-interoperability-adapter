@@ -115,7 +115,7 @@ export class ClientDetailsComponent implements OnInit {
         'Phone Numbers':
           result.demographicDetails.phoneNumbers?.join(', ') || '-',
         Emails: result.demographicDetails.emails?.join(', ') || '-',
-        "NIDA": result.demographicDetails.nida || '-',
+        "NIDA": result.demographicDetails.dummyNida || '-',
         Occupation: result.demographicDetails.occupation || '-',
         Nationality: result.demographicDetails.nationality || '-',
         'Related Clients':
