@@ -11,9 +11,18 @@ on:
   pull_request:
     branches:
       - develop
+    paths-ignore:
+      - '.github/apps-builds/**'
 
 jobs:
   build-and-zip:
+    if: |
+      (github.event_name == 'workflow_dispatch' && github.actor != 'github-actions[bot]') ||
+      (github.event_name == 'pull_request' && 
+       github.event.pull_request.user.login != 'github-actions[bot]' && 
+       !contains(github.event.pull_request.title, 'Update zipped builds for apps') &&
+       github.event.pull_request.head.user.login != 'github-actions[bot]' &&
+       !contains(github.event.pull_request.head.ref, 'github-actions-bot'))
     runs-on: ubuntu-latest
 
     strategy:
@@ -26,14 +35,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install NX globally
-        run: npm install -g nx@19.8.3
+      - name:  NX
+        run: npm install -g nx
 
       - name: Cache Node modules
         uses: actions/cache@v3
@@ -137,18 +150,36 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          # Fetch and checkout develop branch (ensure it exists locally)
-          git fetch origin develop:develop
-          git checkout develop
+          git pull origin develop --no-rebase
 
-          # Add and commit only if there are changes
           git add .github/apps-builds
           git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-          # Push changes
+          git push origin HEAD
+
+      - name: Merge to develop
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git fetch origin develop
+          git checkout develop
+          git merge --no-ff ${{ github.head_ref }} -m "Merge workflow dispatch build for apps: ${{ env.app_names }}"
           git push origin develop
 
-      - name: 🔀 Merge PR
-        uses: BaharaJr/merge-pr@0.0.1
-        with:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      - name: Push to production
+        run: |
+          app_names="${{ env.app_names }}"
+          IFS=',' read -ra APPS <<< "$app_names"
+          
+          for app in "${APPS[@]}"; do
+            if [ -f ".github/apps-builds/${app}.zip" ]; then
+              echo "Pushing ${app}.zip to production..."
+              curl --request POST \
+                --url ${{secrets.URL}} \
+                --header "Authorization: Basic ${{secrets.AUTH}}" \
+                --form "file=@.github/apps-builds/${app}.zip" \
+                --fail || exit 1
+              echo "${app} deployed successfully"
+            else
+              echo "Warning: ${app}.zip not found in .github/apps-builds/"
+            fi
+          done

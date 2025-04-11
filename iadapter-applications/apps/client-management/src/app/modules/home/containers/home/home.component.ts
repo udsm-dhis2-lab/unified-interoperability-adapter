@@ -10,8 +10,10 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 import { FormsModule } from '@angular/forms';
+import { ReusableModalComponent } from '../modal/modal.component';
 
 @Component({
   selector: 'app-home',
@@ -25,12 +27,16 @@ import { FormsModule } from '@angular/forms';
     NzInputModule,
     FormsModule,
     NzSelectModule,
+   NzDividerModule,
+   ReusableModalComponent
   ],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
 export class HomeComponent implements OnDestroy, OnInit {
+  isDeleteModalVisible = false;
+
   total = 1;
   listOfHduClients: HDUAPIClientDetails[] = [];
   loading = true;
@@ -155,7 +161,14 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   deleteClient(client: HDUAPIClientDetails) {
-    // this.clientManagementService.deleteClient(client.demographicDetails.clientID);
+
+    this.loading = true;
+    this.listOfHduClients = [];
+    this.clientManagementService.deleteClient(client.demographicDetails.clientID).subscribe((response) => {
+      this.filterSubject.next();
+      console.log(response);
+
+    });
   }
 
   resetFilters() {
@@ -230,5 +243,18 @@ export class HomeComponent implements OnDestroy, OnInit {
     }
 
     return filters;
+  }
+
+
+  showDeleteModal(): void {
+    this.isDeleteModalVisible = true;
+  }
+
+  confirmDelete(): void {
+    console.log('Item deleted!');
+  }
+
+  cancelDelete(): void {
+    console.log('Delete cancelled.');
   }
 }

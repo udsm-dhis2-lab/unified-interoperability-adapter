@@ -65,6 +65,15 @@ jobs:
           sh docker/build.sh
           sh docker/push.sh
 
+      - name: ⬇️
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.PORT }}
+          script: sh update-iadapter.sh
+
       - name: 🔀 Merge PR
         uses: BaharaJr/merge-pr@0.0.1
         with:

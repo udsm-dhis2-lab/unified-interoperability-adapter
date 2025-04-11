@@ -1,143 +1,167 @@
-<div style="padding: 16px">
-  <button nz-button nzType="default" (click)="backToList()">
-    Back to List
-  </button>
-  <nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
-    <div nz-row [nzGutter]="16">
-      <div nz-col nzSpan="8">
-        <nz-card style="min-height: 60vh">
-          <ul class="no-bullets">
-            <li *ngFor="let key of objectKeys(basicInfo)">
-              {{ key }}: {{ basicInfo[key] }}
-            </li>
-          </ul>
-          <nz-card style="margin-top: 16px; margin-bottom: 16px">
-            <div
-              *ngFor="let section of extraInfo"
-              style="margin-top: 16px; margin-bottom: 16px"
-            >
-              <h4>
-                <strong>{{ section.sectionTitle }}</strong>
-              </h4>
-              <ul class="no-bullets">
-                <li *ngFor="let key of objectKeys(section.info)">
-                  <div nz-row>
-                    <div nz-col nzSpan="12">
-                      {{ key }}
-                    </div>
-                    <div nz-col nzSpan="12">
-                      <div nz-row nzJustify="end">
-                        {{ section.info[key] }}
-                      </div>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </nz-card>
-
-          <h4>
-            <strong>Associated health records: 16</strong>
-          </h4>
-        </nz-card>
-      </div>
-      <div nz-col nzSpan="16">
-        <nz-card style="min-height: 60vh">
-          <h3>Associated duplicates (3)</h3>
-          <nz-table
-            #basicTable
-            [nzData]="listOfData"
-            (nzCurrentPageDataChange)="onCurrentPageDataChange($event)"
-          >
-            <thead>
-              <tr>
-                <th
-                  [(nzChecked)]="checked"
-                  [nzIndeterminate]="indeterminate"
-                  (nzCheckedChange)="onAllChecked($event)"
-                ></th>
-                <th>Client ID</th>
-                <th>ID number</th>
-                <th>Full name</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (data of basicTable.data; track data) {
-              <tr>
-                <td
-                  [nzChecked]="setOfCheckedId.has(data.id)"
-                  (nzCheckedChange)="onItemChecked(data.id, $event)"
-                ></td>
-                <td>
-                  <span style="color: #1890ff"> {{ data.clientID }}</span>
-                </td>
-                <td>{{ data.iDNumber }}</td>
-                <td>{{ data.fullName }}</td>
-                <td>
-                  <a nz-dropdown nzTrigger="click" [nzDropdownMenu]="menu">
-                    <Strong>...</Strong>
-                  </a>
-                </td>
-              </tr>
-              }
-              <nz-dropdown-menu #menu="nzDropdownMenu">
-                <ul nz-menu>
-                  <li nz-menu-item>View</li>
-                  <li nz-menu-item>Add primary client</li>
-                </ul>
-              </nz-dropdown-menu>
-            </tbody>
-          </nz-table>
-          <div nz-row nzJustify="end" [nzGutter]="16">
-            <div style="margin-right: 16px">
-              <button
-                nz-button
-                nzType="default"
-                (click)="
-                  warning(
-                    'Are you sure you want to proceed with  merging request for  these selected clients details?',
-                    'requestMerge'
-                  )
-                "
-              >
-                Request For Merge
-              </button>
-            </div>
-            <button
-              nz-button
-              nzType="primary"
-              (click)="
-                warning(
-                  'Are you sure you want to proceed with  merging this clients details?',
-                  'merge'
-                )
-              "
-            >
-              Merge
-            </button>
-          </div>
-        </nz-card>
+<nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
+  <div class="client-details-container">
+    <div
+      *ngIf="loading"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.8);
+        z-index: 999;
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        "
+      >
+        <nz-spin nzSimple nzSize="large"></nz-spin>
       </div>
     </div>
-  </nz-card>
+    <div class="profile-card">
+      <h2>Profile Information</h2>
+      <div class="profile-info">
+        <div class="info-row">
+          <label for="caseId">Case ID:</label>
+          <span id="caseId" aria-label="Case ID">{{ client?.id }}</span>
+        </div>
+        <div class="info-row">
+          <span id="fullName" aria-label="Full name">Full name: </span>
+          <span>{{ client?.fullName }}</span>
+        </div>
+        <div class="info-row">
+          <label for="sex">Sex:</label>
+          <span>{{ client?.sex }}</span>
+        </div>
+        <div class="info-row">
+          <label for="dateOfBirth">Date of birth:</label>
+          <span>{{ client?.dateOfBirth }}</span>
+        </div>
+        <div class="info-row">
+          <label for="age">Age:</label>
+          <span>{{ client?.age }}</span>
+        </div>
 
-  <div class="alert-container">
-    <nz-spin [nzSpinning]="isSubmittingMappingRequest">
-      <nz-alert
-        nzCloseable
-        *ngIf="alert.show"
-        [nzType]="
-          alert.type === 'success'
-            ? 'success'
-            : alert.type === 'info'
-            ? 'info'
-            : 'error'
-        "
-        [nzMessage]="alert.message"
-        (nzOnClose)="onCloseAlert()"
-        nzShowIcon
-      ></nz-alert>
-    </nz-spin>
+        <h3>Contact Information</h3>
+        <div class="info-row">
+          <label for="phoneNumber">Phone Number:</label>
+          <span>{{ client?.contactInfo?.phoneNumber }}</span>
+        </div>
+        <div class="info-row">
+          <label for="email">Email:</label>
+          <span>{{ client?.contactInfo?.email }}</span>
+        </div>
+        <div class="info-row">
+          <label for="permanentAddress">Permanent address:</label>
+          <span>{{ client?.contactInfo?.permanentAddress }}</span>
+        </div>
+        <div class="info-row">
+          <label for="currentAddress">Current address:</label>
+          <span>{{ client?.contactInfo?.currentAddress }}</span>
+        </div>
+
+        <h3>Next of Kin</h3>
+        <div class="info-row">
+          <label for="fullName">Full name:</label>
+          <span>{{ client?.nextOfKin?.fullName }}</span>
+        </div>
+        <div class="info-row">
+          <label for="relationship">Relationship:</label>
+          <span>{{ client?.nextOfKin?.relationship }}</span>
+        </div>
+        <div class="info-row">
+          <label for="phoneNumber">Phone number:</label>
+          <span>{{ client?.nextOfKin?.phoneNumber }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="duplicates-card">
+      <h2>Associated duplicates ({{ data.total }})</h2>
+      <nz-table [nzData]="data.duplicates ?? []" [nzShowPagination]="false">
+        <thead>
+          <tr>
+            <th>
+              <label nz-checkbox>
+                <input
+                  type="checkbox"
+                  [checked]="selected.length === data.duplicates?.length"
+                  (change)="select('', true)"
+                />
+              </label>
+            </th>
+            <th>Client ID</th>
+            <!-- <th>ID Number</th> -->
+            <th>Full Name</th>
+            <!-- <th>Health Records</th> -->
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let duplicate of data.duplicates">
+            <td>
+              <label nz-checkbox>
+                <input
+                  type="checkbox"
+                  [checked]="
+                    selected.includes(duplicate.identifiers['HCRCODE'])
+                  "
+                  (change)="select(duplicate.identifiers['HCRCODE'])"
+                />
+              </label>
+            </td>
+            <td>{{ duplicate.identifiers['HCRCODE'] }}</td>
+            <td>{{ duplicate.given }} {{ duplicate.family }}</td>
+            <!-- <td>{{ duplicate.healthRecords }}</td> -->
+            <td>
+              <button nz-button nzType="text">...</button>
+            </td>
+          </tr>
+        </tbody>
+      </nz-table>
+
+      <div class="action-buttons">
+        <button
+          [disabled]="!selected.length"
+          nz-button
+          nzType="default"
+          (click)="requestMerge()"
+        >
+          Request for Merge
+        </button>
+        <button
+          [disabled]="!selected.length"
+          nz-button
+          nzType="primary"
+          (click)="merge()"
+        >
+          Merge
+        </button>
+      </div>
+    </div>
   </div>
+</nz-card>
+
+<div class="alert-container">
+  <nz-spin [nzSpinning]="isSubmittingMappingRequest">
+    <nz-alert
+      nzCloseable
+      *ngIf="alert.show"
+      [nzType]="
+        alert.type === 'success'
+          ? 'success'
+          : alert.type === 'info'
+          ? 'info'
+          : 'error'
+      "
+      [nzMessage]="alert.message"
+      (nzOnClose)="onCloseAlert()"
+      nzShowIcon
+    ></nz-alert>
+  </nz-spin>
 </div>

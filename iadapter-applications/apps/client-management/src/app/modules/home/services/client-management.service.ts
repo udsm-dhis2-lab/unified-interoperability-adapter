@@ -51,6 +51,16 @@ export class ClientManagementService {
       );
   }
 
+  deleteClient(id: any): Observable<any[]> {
+    return this.httpClient.post<any>(
+      `../../../../../api/v1/hduApi/processes/execute?async=true`,
+      {
+        hcr: id,
+        code: 'FHIR-DELETE-PATIENT'
+      }
+    );
+  }
+
   getClientById(
     id: string
   ): Observable<ClientPage> {

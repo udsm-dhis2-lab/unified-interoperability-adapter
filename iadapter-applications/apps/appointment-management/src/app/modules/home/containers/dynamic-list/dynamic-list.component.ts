@@ -121,6 +121,6 @@ export class DynamicListComponent {
     if (!this.isObject(obj)) {
       return [];
     }
-    return Object.keys(obj);
+    return Object?.keys(obj) || [];
   }
 }

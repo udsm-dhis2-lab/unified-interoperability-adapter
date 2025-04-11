@@ -24,7 +24,8 @@ const routes: Routes = [
   {
     path: "health-records-details",
     component: ClientDetailsComponent
-  }
+  },
+  
 ];
 
 @NgModule({

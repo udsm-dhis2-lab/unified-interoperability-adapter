@@ -92,3 +92,5 @@ proxy.config.json
 backend/.mvn
 
 backup
+
+deploy.sh

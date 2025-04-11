@@ -127,6 +127,7 @@ export class ClientDetailsComponent implements OnInit {
               'Client ID': this.client?.demographicDetails?.clientID,
               Gender: this.client?.demographicDetails?.gender,
               'Date of Birth': this.client?.demographicDetails?.dateOfBirth,
+              "NIDA": this.client?.demographicDetails.nida || '-',
               'Phone Numbers': this.client?.demographicDetails?.phoneNumbers,
               Emails: this.client?.demographicDetails?.emails,
               Occupation: this.client?.demographicDetails?.occupation,
