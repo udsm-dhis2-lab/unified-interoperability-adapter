@@ -17,8 +17,8 @@ on:
 jobs:
   build-and-zip:
     if: |
-      github.actor != 'github-actions[bot]' &&
-      github.event.pull_request.user.login != 'github-actions[bot]'
+      (github.event_name == 'workflow_dispatch' && github.actor != 'github-actions[bot]') ||
+      (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'github-actions[bot]' && !contains(github.event.pull_request.title, 'Update zipped builds for apps'))
     runs-on: ubuntu-latest
 
     strategy:
