@@ -126,10 +126,22 @@
       </nz-table>
 
       <div class="action-buttons">
-        <button nz-button nzType="default" (click)="requestMerge()">
+        <button
+          [disabled]="!selected.length"
+          nz-button
+          nzType="default"
+          (click)="requestMerge()"
+        >
           Request for Merge
         </button>
-        <button nz-button nzType="primary" (click)="merge()">Merge</button>
+        <button
+          [disabled]="!selected.length"
+          nz-button
+          nzType="primary"
+          (click)="merge()"
+        >
+          Merge
+        </button>
       </div>
     </div>
   </div>

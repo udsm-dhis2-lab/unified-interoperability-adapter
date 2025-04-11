@@ -5,7 +5,7 @@ import { NzModalRef } from 'ng-zorro-antd/modal';
 import { SharedModule } from '../../../../shared/shared.module';
 import { Deduplication } from '../../models';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
-import { ClientDetails } from '../../../../../../../../index';
+import { ClientDetails } from '../../interfaces/client.interface';
 
 interface Client {
   id: string;
