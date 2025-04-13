@@ -39,27 +39,17 @@
                 <strong> {{ key }} </strong>: {{ basicInfo[key] }}
               </li>
             </ul>
-
-            <br />
-
-            <!-- <h2>Other Informations</h2>
-            <ul class="no-bullets">
-              <div *ngFor="let id of identifiers">
-                <li *ngFor="let key of objectKeys(id)">
-                  <strong>{{ key }} </strong> : {{ id[key] }}
-                </li>
-              </div>
-            </ul> -->
           </nz-card>
         </div>
         <div nz-col nzSpan="17">
           <nz-card style="min-height: 60vh">
             <div>
-              <nz-tabset>
-                <div *ngFor="let section of extraInfo">
-                  <nz-tab nzTitle="{{ section.sectionTitle }}">
+            <h2>Appointments</h2>
+              <nz-collapse nzAccordion>
+                @for (panel of extraInfo; track panel; let i = $index) {
+                  <nz-collapse-panel [nzHeader]="(i+1) + '. ' + panel.sectionTitle">
 
-                    <nz-table [nzData]="section.info" [nzFrontPagination]="false" [nzShowPagination]="false">
+                    <nz-table [nzData]="panel.info" [nzFrontPagination]="false" [nzShowPagination]="false">
                       <thead>
                         <tr>
                           <th>SN</th>
@@ -68,19 +58,14 @@
                           <th>Status</th>
                           <th>Service</th>
                           <th>Payment Status</th>
-
                         </tr>
                       </thead>
                       <tbody cdkDropList (cdkDropListDropped)="drop($event)">
-                        @for (data of section.info; track data; let i = $index) {
+                        @for (data of panel.info; track data; let j = $index) {
                           <tr cdkDrag>
-                            <td>
-                              {{
-                                 i + 1
-                              }}
-                            </td>
+                            <td>{{ j + 1 }}</td>
                             <td>{{ data['Appointment ID'] }}</td>
-                            <td>{{ data['HFR Code'] }}</td>
+                            <td>{{ data['Facility'] }}</td>
                             <td>{{ data['Status'] }}</td>
                             <td>{{ data['Service Name'] }}</td>
                             <td>{{ data['Payment Status'] }}</td>
@@ -88,31 +73,9 @@
                         }
                       </tbody>
                     </nz-table>
-                    <!-- <ul class="no-bullets">
-                      <div *ngFor="let infos of section.info">
-                        <li *ngFor="let key of objectKeys(infos)">
-                          <div
-                            nz-row
-                            nzJustify="space-between"
-                            style="padding: 8px 0"
-                          >
-                            <div nz-col nzSpan="6">
-                              <strong>{{ key }}</strong>
-                            </div>
-                            <div nz-col nzSpan="12" style="text-align: right">
-                              <app-dynamic-list
-                                [value]="infos[key]"
-                              ></app-dynamic-list>
-
-                            </div>
-                          </div>
-                        </li>
-                        <nz-divider></nz-divider>
-                      </div>
-                    </ul> -->
-                  </nz-tab>
-                </div>
-              </nz-tabset>
+                  </nz-collapse-panel>
+                }
+              </nz-collapse>
             </div>
           </nz-card>
         </div>
