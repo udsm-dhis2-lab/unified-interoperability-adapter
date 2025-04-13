@@ -3,6 +3,7 @@ package com.Adapter.icare.Dtos;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -13,14 +14,16 @@ import java.util.Map;
 @Setter
 public class SharedHealthRecordsDTO {
 
-    @NotNull(message = "value cannot be null")
+//    @NotNull(message = "value cannot be null")
     private String mrn;
 
-    @NotNull(message = "value cannot be null")
+//    @NotNull(message = "value cannot be null")
     private FacilityDetailsDTO facilityDetails;
 
 //    @NotNull(message = "value cannot be null")
     private ReportDetailsDTO reportDetails;
+
+    @Valid
     private DemographicDetailsDTO demographicDetails;
 
     private List<PaymentDetailsDTO> paymentDetails;
@@ -52,6 +55,8 @@ public class SharedHealthRecordsDTO {
 
     private AdmissionDetailsDTO admissionDetails;
 
+    @NotNull(message = "Outcome details block cannot be null")
+    @Valid
     private OutcomeDetailsDTO outcomeDetails;
 
     private CausesOfDeathDetailsDTO causesOfDeathDetails;

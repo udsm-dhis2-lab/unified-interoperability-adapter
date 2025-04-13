@@ -1,8 +1,11 @@
+/* eslint-disable @nx/enforce-module-boundaries */
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NzModalRef } from 'ng-zorro-antd/modal';
 import { SharedModule } from '../../../../shared/shared.module';
 import { Deduplication } from '../../models';
+import { DeduplicationManagementService } from '../../services/deduplication-management.service';
+import { ClientDetails } from '../../interfaces/client.interface';
 
 interface Client {
   id: string;
@@ -28,6 +31,7 @@ interface Client {
   selector: 'app-deduplication-details',
   standalone: true,
   imports: [SharedModule, FormsModule],
+  providers: [DeduplicationManagementService],
   templateUrl: './deduplication-details.component.html',
   styleUrls: ['./deduplication-details.component.css'],
 })
@@ -35,6 +39,7 @@ export class DeduplicationDetailsComponent implements OnInit {
   data!: Deduplication;
   client?: Client;
   selected: string[] = [];
+  loading = true;
   isSubmittingMappingRequest = false;
   alert = {
     show: false,
@@ -42,22 +47,72 @@ export class DeduplicationDetailsComponent implements OnInit {
     message: '',
   };
 
-  constructor(private modalRef: NzModalRef) {}
+  constructor(
+    private modalRef: NzModalRef,
+    private service: DeduplicationManagementService
+  ) {}
 
   ngOnInit() {
     const modalData = this.modalRef.getConfig().nzData;
     this.data = modalData?.data;
-    this.client = {
-      id: modalData?.data?.id ?? '',
-      fullName: modalData?.data?.name ?? '',
-      sex: modalData?.data?.gender ?? '',
-      dateOfBirth: '',
-      age: 0,
-    } as Client;
+    this.data.duplicates = (modalData?.data?.duplicates ?? []).filter(
+      (d: Deduplication) =>
+        (d.identifiers ?? {})['HCRCODE'] !== modalData?.data?.id
+    );
+    this.service
+      .getClientById(modalData?.data?.id ?? '')
+      .subscribe((client: ClientDetails) => {
+        const { results } = client;
+
+        const permanentAddress = (
+          results[0]?.demographicDetails?.addresses ?? []
+        ).find(({ category }) => category == 'Permanent');
+        const currentAddress = (
+          results[0]?.demographicDetails?.addresses ?? []
+        ).find(({ category }) => category == 'Temporary');
+        this.client = {
+          id: modalData?.data?.id ?? '',
+          fullName: `${results[0]?.demographicDetails?.firstName ?? ''} ${
+            results[0]?.demographicDetails?.lastName ?? ''
+          }`,
+          sex: results[0]?.demographicDetails?.gender ?? '',
+          dateOfBirth: results[0]?.demographicDetails?.dateOfBirth ?? '',
+          age: this.calculateDetailedAge(
+            results[0]?.demographicDetails?.dateOfBirth ?? ''
+          ),
+          contactInfo: {
+            phoneNumber:
+              (results[0]?.demographicDetails.phoneNumbers ?? []).join(',') ??
+              '',
+            email:
+              (results[0]?.demographicDetails?.emails ?? [])?.join(',') ?? '',
+            permanentAddress: permanentAddress?.district ?? '',
+            currentAddress: currentAddress?.district ?? '',
+          },
+          nextOfKin: {
+            fullName:
+              `${
+                results[0].demographicDetails.contactPeople?.[0].firstName ?? ''
+              }` +
+              ' ' +
+              `${
+                results[0].demographicDetails.contactPeople?.[0].lastName ?? ''
+              }`,
+            phoneNumber:
+              results[0]?.demographicDetails?.contactPeople?.[0].phoneNumbers?.join(
+                ','
+              ) ?? '',
+            relationShip:
+              results[0]?.demographicDetails?.contactPeople?.[0].relationShip ??
+              '',
+          },
+        } as unknown as Client;
+
+        this.loading = false;
+      });
   }
 
   requestMerge() {
-    console.log(this.selected);
     const selectedDuplicates = (this.data?.duplicates ?? []).filter((d) =>
       this.selected.includes((d.identifiers ?? {})['HCRCODE'])
     );
@@ -65,7 +120,6 @@ export class DeduplicationDetailsComponent implements OnInit {
       this.showAlert('error', 'Please select duplicates to merge');
       return;
     }
-    console.log('selectedDuplicates', selectedDuplicates);
     this.showAlert('info', 'Merge request submitted');
   }
 
@@ -94,11 +148,52 @@ export class DeduplicationDetailsComponent implements OnInit {
     this.modalRef.close();
   }
 
-  select(id: string) {
+  select(id: string, all?: boolean) {
+    if (all) {
+      this.selected =
+        this.selected.length == this.data.duplicates?.length
+          ? []
+          : (this.data.duplicates ?? []).map(
+              (d) => (d.identifiers ?? {})['HCRCODE']
+            );
+      return;
+    }
     if (this.selected.includes(id)) {
       this.selected = this.selected.filter((s) => s !== id);
     } else {
       this.selected.push(id);
     }
   }
+
+  calculateDetailedAge = (birthDate: Date | string): string => {
+    const birthDateObj =
+      typeof birthDate === 'string' ? new Date(birthDate) : birthDate;
+
+    if (isNaN(birthDateObj.getTime())) {
+      return '-';
+    }
+
+    const today = new Date();
+    let years = today.getFullYear() - birthDateObj.getFullYear();
+    let months = today.getMonth() - birthDateObj.getMonth();
+    let days = today.getDate() - birthDateObj.getDate();
+
+    if (days < 0) {
+      months--;
+      const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+      days += lastMonth.getDate();
+    }
+
+    if (months < 0) {
+      years--;
+      months += 12;
+    }
+
+    if (years == 0) return `${months} ${months == 1 ? 'Month' : 'Months'}`;
+    if (months == 0) return `${days} ${days == 1 ? 'Day' : 'Days'}`;
+    if (days == 0) return `${years} ${years == 1 ? 'Year' : 'Years'}`;
+    return `${years} ${years > 1 ? 'Years' : 'Year'} | ${months} ${
+      months > 1 ? 'Months' : 'Month'
+    } | ${days} ${days > 1 ? 'Days' : 'Day'}`;
+  };
 }

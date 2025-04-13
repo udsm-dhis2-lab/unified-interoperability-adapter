@@ -50,6 +50,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsSubscription = this.dedupicationManagementService
       .getDeduplicationClients(pageIndex, pageSize, filter)
       .subscribe({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         next: (data: any) => {
           console.log(data, 'data');
           this.loading = false;
@@ -57,7 +58,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
           this.pageIndex = data.pageIndex;
           this.listOfDeduplications = data.data;
         },
-        error: (error) => {
+        error: () => {
           this.loading = false;
           //TODO: Implement error handling
         },
