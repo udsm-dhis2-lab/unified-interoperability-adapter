@@ -1,7 +1,7 @@
 <nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
   <div class="client-details-container">
     <div
-      *ngIf="loading"
+      *ngIf="loading || deleting"
       style="
         position: fixed;
         top: 0;
@@ -99,7 +99,33 @@
             <!-- <th>ID Number</th> -->
             <th>Full Name</th>
             <!-- <th>Health Records</th> -->
-            <th>Action</th>
+            <th>
+              <span *ngIf="selected.length > 1">
+                <button
+                  nz-button
+                  nzType="text"
+                  (click)="
+                    showDeleteConfirm(
+                      'Are you sure you want to delete ' +
+                        '<b>' +
+                        selected.length +
+                        ' selected duplicates' +
+                        '</b>' +
+                        '? This action cannot be undone.'
+                    )
+                  "
+                  style="padding: 0; border: none; height: auto"
+                >
+                  <i
+                    nz-icon
+                    nzType="delete"
+                    nzTheme="outline"
+                    style="color: #ff4d4f"
+                  ></i>
+                </button>
+              </span>
+              <span *ngIf="selected.length <= 1"> Action </span>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -119,7 +145,35 @@
             <td>{{ duplicate.given }} {{ duplicate.family }}</td>
             <!-- <td>{{ duplicate.healthRecords }}</td> -->
             <td>
-              <button nz-button nzType="text">...</button>
+              <a nz-dropdown [nzDropdownMenu]="menu">
+                <button nz-button nzType="text">...</button>
+              </a>
+              <nz-dropdown-menu #menu="nzDropdownMenu">
+                <ul nz-menu>
+                  <li
+                    tabindex="0"
+                    nz-menu-item
+                    nzDanger
+                    (click)="
+                      showDeleteConfirm(
+                        'You are about to delete the selecte duplicate. This action not be undone.',
+                        false,
+                        duplicate
+                      )
+                    "
+                    (keyup.enter)="
+                      showDeleteConfirm(
+                        'You are about to delete the selecte duplicate. This action not be undone.',
+                        false,
+                        duplicate
+                      )
+                    "
+                  >
+                    <i nz-icon nzType="delete" nzTheme="outline"></i>
+                    Delete
+                  </li>
+                </ul>
+              </nz-dropdown-menu>
             </td>
           </tr>
         </tbody>
