@@ -1,11 +1,12 @@
-/* eslint-disable @nx/enforce-module-boundaries */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { NzModalRef } from 'ng-zorro-antd/modal';
+import { NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { SharedModule } from '../../../../shared/shared.module';
 import { Deduplication } from '../../models';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 import { ClientDetails } from '../../interfaces/client.interface';
+import { Duplicate } from '../../models/deduplication.model';
 
 interface Client {
   id: string;
@@ -40,6 +41,7 @@ export class DeduplicationDetailsComponent implements OnInit {
   client?: Client;
   selected: string[] = [];
   loading = true;
+  deleting = false;
   isSubmittingMappingRequest = false;
   alert = {
     show: false,
@@ -49,7 +51,8 @@ export class DeduplicationDetailsComponent implements OnInit {
 
   constructor(
     private modalRef: NzModalRef,
-    private service: DeduplicationManagementService
+    private service: DeduplicationManagementService,
+    private modal: NzModalService
   ) {}
 
   ngOnInit() {
@@ -212,4 +215,75 @@ export class DeduplicationDetailsComponent implements OnInit {
     }
     return birthDateObj.toDateString();
   };
+
+  deleteDuplicate = (duplicate: Duplicate, showMessage = true): any => {
+    if (!duplicate?.id) return;
+    this.deleting = true;
+    this.service
+      .runProcess('FHIR-DELETE-PATIENT', {
+        hcr: (duplicate.identifiers ?? {})['HCRCODE'],
+      })
+      .subscribe((res) => {
+        this.service
+          .runProcess('DEDUPLICATION', {
+            filters: [
+              { key: 'ids', value: [duplicate.id] },
+              { key: 'delete', value: [true] },
+            ],
+          })
+          .subscribe(() => {
+            this.data.duplicates = (this.data.duplicates ?? []).filter(
+              (d) => d.id !== duplicate.id
+            );
+            this.data.total = this.data.duplicates?.length?.toString() ?? '0';
+            if (showMessage) {
+              this.deleting = false;
+              this.showAlert('success', 'Duplicate deleted successfully');
+            }
+          });
+        return res;
+      });
+  };
+
+  deleteAllDuplicates = async () => {
+    this.deleting = true;
+    try {
+      for (const duplicate of this.data.duplicates ?? []) {
+        const res = await this.deleteDuplicate(duplicate, false)?.toPromise();
+        if (res?.error) {
+          this.showAlert(
+            'error',
+            `Error deleting duplicate: [${duplicate.identifiers['HCRCODE']}]`
+          );
+          return;
+        }
+      }
+      this.deleting = false;
+      this.showAlert('success', 'Duplicates deleted successfully');
+    } catch (e: any) {
+      this.showAlert('error', `Error deleting duplicates: ${e?.message}`);
+    }
+  };
+
+  showDeleteConfirm(
+    nzContent: string,
+    all = true,
+    duplicate?: Duplicate
+  ): void {
+    this.modal.create({
+      nzTitle: 'Delete Confirmation',
+      nzContent,
+      nzOkText: 'Delete',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzOnOk: () =>
+        all
+          ? this.deleteAllDuplicates()
+          : this.deleteDuplicate(duplicate as Duplicate),
+      nzCancelText: 'Cancel',
+      nzCentered: true,
+      nzClassName: 'custom-confirm-modal',
+      // nzStyle: { top: '5%' },
+    });
+  }
 }
