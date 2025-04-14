@@ -86,7 +86,7 @@ export class ClientManagementService {
 
   getClientById(id: string): Observable<ClientPage> {
     return this.httpClient
-      .get<{ results: any }>(`${this.hduSharedRecordsUrl}?id=${id}`)
+      .get<{ results: any }>(`${this.hduSharedRecordsUrl}?id=${id}&numberOfVisits=6`)
       .pipe(
         map((response: { results: any }) => {
           return ClientPage.fromJson(response);
