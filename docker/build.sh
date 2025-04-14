@@ -17,24 +17,50 @@ fi
 cd "$FRONTEND_DIR" || exit 1
 
 echo "Installing dependencies inside Docker..."
-docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm install --legacy-peer-deps
-docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm i -g nx
+mkdir -p .nx/cache
+mkdir -p dist
+
+NODE_VERSION="18.19.1"
+NPM_VERSION="11.3.0"
+NX_VERSION="16.5.5"
+
+docker run --rm \
+  -v "$(pwd):/app" \
+  -v "$(pwd)/node_modules:/app/node_modules" \
+  -w="/app" \
+  node:${NODE_VERSION} bash -c "npm install -g npm@${NPM_VERSION} && npm ci --legacy-peer-deps --no-audit"
+
+docker run --rm \
+  -v "$(pwd):/app" \
+  -v "$(pwd)/node_modules:/app/node_modules" \
+  -w="/app" \
+  node:${NODE_VERSION} bash -c "npm i -g nx@${NX_VERSION} && npx nx reset"
 
 APPS="login apps"
-
 for app in $APPS; do
     echo "Building $app inside Docker..."
-    docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npx nx build "$app" --configuration production
+    docker run --rm \
+      -v "$(pwd):/app" \
+      -v "$(pwd)/node_modules:/app/node_modules" \
+      -v "$(pwd)/dist:/app/dist" \
+      -e NODE_OPTIONS="--max-old-space-size=8192" \
+      -w="/app" \
+      node:${NODE_VERSION} npx nx build "$app" --configuration production --max-parallel=1
+    docker run --rm \
+      -v "$(pwd):/app" \
+      -v "$(pwd)/node_modules:/app/node_modules" \
+      -v "$(pwd)/dist:/app/dist" \
+      -e NODE_OPTIONS="--max-old-space-size=8192" \
+      -w="/app" \
+      node:${NODE_VERSION} npx nx reset
 done
-docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npx nx build apps
+
 cd ..
 
 mkdir -p "$TARGET_DIR"
 
-# Move all built apps from dist directory to backend
 if [ -d "$BUILD_DIR" ]; then
     echo "Moving all apps from $BUILD_DIR to backend static directory..."
-    # First handle the apps directory if it exists
     if [ -d "$BUILD_DIR/apps/browser" ]; then
         echo "Moving apps directory to backend static directory..."
         mkdir -p "$TARGET_DIR/apps"
@@ -42,7 +68,6 @@ if [ -d "$BUILD_DIR" ]; then
         echo "Moved apps successfully!"
     fi
     
-    # Then handle other directories
     for dir in "$BUILD_DIR"/*/; do
         if [ -d "$dir" ] && [ "$(basename "$dir")" != "apps" ]; then
             app_name=$(basename "$dir")

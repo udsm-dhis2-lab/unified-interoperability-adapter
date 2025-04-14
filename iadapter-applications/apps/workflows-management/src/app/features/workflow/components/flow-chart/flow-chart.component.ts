@@ -67,6 +67,8 @@ import { WorkflowRunLoggingComponent } from '../../containers/workflow-run-loggi
 import { UpdateProcessComponent } from '../update-process/update-process.component';
 import { omit } from 'lodash';
 
+// Replace lodash imports with specific ES module imports
+
 @Component({
   selector: 'app-flow-chart',
   standalone: true,

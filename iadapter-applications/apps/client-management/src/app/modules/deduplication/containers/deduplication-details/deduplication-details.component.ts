@@ -76,7 +76,9 @@ export class DeduplicationDetailsComponent implements OnInit {
             results[0]?.demographicDetails?.lastName ?? ''
           }`,
           sex: results[0]?.demographicDetails?.gender ?? '',
-          dateOfBirth: results[0]?.demographicDetails?.dateOfBirth ?? '',
+          dateOfBirth: this.getDateOfBirth(
+            results[0]?.demographicDetails?.dateOfBirth ?? ''
+          ),
           age: this.calculateDetailedAge(
             results[0]?.demographicDetails?.dateOfBirth ?? ''
           ),
@@ -188,12 +190,26 @@ export class DeduplicationDetailsComponent implements OnInit {
       years--;
       months += 12;
     }
-
     if (years == 0) return `${months} ${months == 1 ? 'Month' : 'Months'}`;
-    if (months == 0) return `${days} ${days == 1 ? 'Day' : 'Days'}`;
-    if (days == 0) return `${years} ${years == 1 ? 'Year' : 'Years'}`;
+    if (months == 0)
+      return `${years} ${years > 1 ? 'Years' : 'Year'} | ${days} ${
+        days == 1 ? 'Day' : 'Days'
+      }`;
+    if (days == 0)
+      return `${years} ${years == 1 ? 'Year' : 'Years'} | ${months} ${
+        months > 1 ? 'Months' : 'Month'
+      }`;
     return `${years} ${years > 1 ? 'Years' : 'Year'} | ${months} ${
       months > 1 ? 'Months' : 'Month'
     } | ${days} ${days > 1 ? 'Days' : 'Day'}`;
+  };
+
+  getDateOfBirth = (birthDate: Date | string): string => {
+    const birthDateObj =
+      typeof birthDate === 'string' ? new Date(birthDate) : birthDate;
+    if (isNaN(birthDateObj.getTime())) {
+      return '-';
+    }
+    return birthDateObj.toDateString();
   };
 }
