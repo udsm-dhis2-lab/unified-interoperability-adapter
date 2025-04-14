@@ -100,18 +100,18 @@
             <th>Full Name</th>
             <!-- <th>Health Records</th> -->
             <th>
-              <span
-                *ngIf="
-                  selected?.length === data?.duplicates?.length &&
-                  selected.length !== 0
-                "
-              >
+              <span *ngIf="selected.length > 1">
                 <button
                   nz-button
                   nzType="text"
                   (click)="
                     showDeleteConfirm(
-                      'Are you sure you want to delete all selected duplicates? This action cannot be undone.'
+                      'Are you sure you want to delete ' +
+                        '<b>' +
+                        selected.length +
+                        ' selected duplicates' +
+                        '</b>' +
+                        '? This action cannot be undone.'
                     )
                   "
                   style="padding: 0; border: none; height: auto"
@@ -124,14 +124,7 @@
                   ></i>
                 </button>
               </span>
-              <span
-                *ngIf="
-                  selected?.length !== data?.duplicates?.length ||
-                  selected.length === 0
-                "
-              >
-                Action
-              </span>
+              <span *ngIf="selected.length <= 1"> Action </span>
             </th>
           </tr>
         </thead>

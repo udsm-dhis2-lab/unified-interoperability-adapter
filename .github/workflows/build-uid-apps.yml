@@ -8,45 +8,37 @@ on:
         default: "login,apps"
         required: true
         type: string
+  # push:
+  #   branches:
+  #     - develop
   pull_request:
     branches:
       - develop
-    paths-ignore:
-      - '.github/apps-builds/**'
 
 jobs:
   build-and-zip:
-    if: |
-      (github.event_name == 'workflow_dispatch' && github.actor != 'github-actions[bot]') ||
-      (github.event_name == 'pull_request' && 
-       github.event.pull_request.user.login != 'github-actions[bot]' && 
-       !contains(github.event.pull_request.title, 'Update zipped builds for apps') &&
-       github.event.pull_request.head.user.login != 'github-actions[bot]' &&
-       !contains(github.event.pull_request.head.ref, 'github-actions-bot'))
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
+        # Use a specific Node.js version compatible with your NX workspace
         node-version: [20.x]
 
     env:
+      # Default list of apps to build for push and pull request events
       DEFAULT_APP_NAMES: "login,apps"
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: ${{ github.head_ref }}
-          token: ${{ secrets.TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name:  NX
-        run: npm install -g nx
+      - name: Install NX globally
+        run: npm install -g nx@19.8.3
 
       - name: Cache Node modules
         uses: actions/cache@v3
@@ -65,21 +57,23 @@ jobs:
       - name: Determine apps to build
         id: determine-apps
         run: |
+          # Use the app_names input if available, otherwise use the default value
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             app_names="${{ github.event.inputs.app_names }}"
           else
             app_names="${{ env.DEFAULT_APP_NAMES }}"
           fi
           echo "Apps to build: $app_names"
-          echo "app_names=$app_names" >> $GITHUB_ENV
+          echo "app_names=$app_names" >> $GITHUB_ENV  # Export as environment variable for future steps
 
       - name: Build NX apps
         run: |
+          # Get the comma-separated list of apps and convert to an array
           echo "Raw app_names input: '${{ env.app_names }}'"
           app_names="${{ env.app_names }}"
           if [ -z "$app_names" ]; then
             echo "The 'app_names' input is empty. Please provide a list of apps to build."
-            exit 1
+            exit 1  # Exit with error status if the input is empty
           fi
 
           IFS=',' read -ra APPS <<< "$app_names"
@@ -92,7 +86,6 @@ jobs:
             echo "Building $app in NX workspace..."
             npx nx build "$app" --configuration production
           done
-
           if [ -d dist ]; then
             echo "Successfully created 'dist' directory."
             ls dist/
@@ -118,68 +111,58 @@ jobs:
               cp -r dist/apps/${app}/browser builds/
               cd builds || exit 1
               mv browser "${app}"
+              ls
+              pwd
+              echo "Zipping $app build output..."
               zip -r "$zip_file" "${app}"/*
               cd ..
               echo "Zipped $app build output to $zip_file"
+              pwd
             else
               echo "Build directory $build_dir not found, skipping zipping for $app."
             fi
           done
-          ls builds/
+          ls builds/  # List zipped files for debugging
         working-directory: iadapter-applications
 
       - name: Move zipped files to .github/apps-builds
         run: |
           mkdir -p .github/apps-builds
 
+          # Delete existing contents in .github/apps-builds to ensure a clean state
           if [ -d ".github/apps-builds" ]; then
             echo "Clearing existing contents in .github/apps-builds..."
             rm -rf .github/apps-builds/*
+            ls -al .github/apps-builds/
           fi
 
+          # Check if there are zip files in the builds directory
           if ls iadapter-applications/builds/*.zip 1> /dev/null 2>&1; then
             echo "Moving new zipped files to .github/apps-builds..."
             mv iadapter-applications/builds/*.zip .github/apps-builds/
+
+            # List the contents of the .github/apps-builds directory for verification
+            echo "Moved zipped files to .github/apps-builds:"
             ls -al .github/apps-builds/
           else
             echo "No zip files found in builds directory to move."
           fi
-
       - name: Commit zipped builds to repository
         run: |
+          # Set up Git configuration for commit
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
 
-          git pull origin develop --no-rebase
+          # Checkout the branch to commit the changes
+          # ${{ github.ref_name }}
+          git branch -a
+          git checkout develop  # Checkout to the current branch, replace with ${{ github.ref_name }} in future
 
+          # Add changes to the git index
           git add .github/apps-builds
-          git diff --cached --quiet || git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-          git push origin HEAD
+          # Commit changes with a message
+          git commit -m "Update zipped builds for apps: ${{ env.app_names }}"
 
-      - name: Merge to develop
-        if: github.event_name == 'workflow_dispatch'
-        run: |
-          git fetch origin develop
-          git checkout develop
-          git merge --no-ff ${{ github.head_ref }} -m "Merge workflow dispatch build for apps: ${{ env.app_names }}"
-          git push origin develop
-
-      - name: Push to production
-        run: |
-          app_names="${{ env.app_names }}"
-          IFS=',' read -ra APPS <<< "$app_names"
-          
-          for app in "${APPS[@]}"; do
-            if [ -f ".github/apps-builds/${app}.zip" ]; then
-              echo "Pushing ${app}.zip to production..."
-              curl --request POST \
-                --url ${{secrets.URL}} \
-                --header "Authorization: Basic ${{secrets.AUTH}}" \
-                --form "file=@.github/apps-builds/${app}.zip" \
-                --fail || exit 1
-              echo "${app} deployed successfully"
-            else
-              echo "Warning: ${app}.zip not found in .github/apps-builds/"
-            fi
-          done
+          # Push the changes back to the repository
+          git push origin develop  # Replace with ${{ github.ref_name }}

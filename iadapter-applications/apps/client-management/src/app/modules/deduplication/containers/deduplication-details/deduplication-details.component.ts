@@ -248,14 +248,24 @@ export class DeduplicationDetailsComponent implements OnInit {
   deleteAllDuplicates = async () => {
     this.deleting = true;
     try {
-      for (const duplicate of this.data.duplicates ?? []) {
+      for (const selectedDuplicate of this.selected) {
+        const duplicate = (this.data.duplicates ?? []).find(
+          (d) => (d.identifiers ?? {})['HCRCODE'] == selectedDuplicate
+        );
+        if (!duplicate) {
+          this.showAlert(
+            'error',
+            `Duplicate not found: [${selectedDuplicate}]`
+          );
+          continue;
+        }
         const res = await this.deleteDuplicate(duplicate, false)?.toPromise();
         if (res?.error) {
           this.showAlert(
             'error',
             `Error deleting duplicate: [${duplicate.identifiers['HCRCODE']}]`
           );
-          return;
+          continue;
         }
       }
       this.deleting = false;
