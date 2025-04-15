@@ -22,6 +22,8 @@ public class MedicationDetailsDTO {
     private String treatmentType; // TODO: Enumerate treatmentType
     // TODO: Change this to accommodate dosage parameters
     private Map<String,Object> dosage;
+    private String refillStatus;
+    private MedicationDetailPaymentDetailsDTO paymentDetails;
 
     public Map<String,Object> toMap() {
         Map<String,Object> medicationDetailsMap = new LinkedHashMap<>();
@@ -32,6 +34,8 @@ public class MedicationDetailsDTO {
         medicationDetailsMap.put("codeStandard", this.getCodeStandard());
         medicationDetailsMap.put("treatmentType", this.getTreatmentType());
         medicationDetailsMap.put("dosage", this.getDosage());
+        medicationDetailsMap.put("refillStatus", this.getRefillStatus());
+        medicationDetailsMap.put("paymentDetails", this.getPaymentDetails());
         return medicationDetailsMap;
     }
 }
