@@ -1,302 +1,96 @@
-[nz-row] {
-  // background-color: rgba(128, 128, 128, 0.08);
-  // margin: 10px;
-
-  // display: flex; /* Use flexbox for horizontal alignment */
-  // align-items: center; /* Center align items vertically */
-  // justify-content: center; /* Center align items horizontally */
-
-  div {
-    // margin: 10px;
-    padding: 10px;
-  }
-}
-
-/* Ensure the full width of the select box */
-.full-width-select {
-  width: 100%;
-  /* Make the select box take the full width of the column */
-}
-
-/* Optional: Adjust spacing between the elements */
-.nz-col {
-  margin-right: 16px;
-  /* Add right margin to create space between columns */
-}
-
-/* Remove margin from the last column */
-.nz-col:last-child {
-  margin-right: 0;
-  /* Remove margin from the last column */
-}
-
-.ng-flow-checkbox {
-  text-align: center;
-  padding: 5px;
-}
-
-/* Style when the item is selected */
-.selected-class {
-  background-color: #eee;
-  border: 2px dashed green !important;
-  font-weight: bold;
-  cursor: pointer;
-  /* Change cursor when item is selected */
-}
-
-/* Style when the item is not selected */
-.non-selected-class {
-  background-color: none;
-  cursor: default;
-  /* Default cursor for non-selected */
-}
-
-/* Style for the root node */
-.root-node {
-  background-color: #fcf8e3;
-  /* Soft pale yellow for root distinction */
-  font-weight: bold;
-  /* Bold font for prominence */
-  padding: 5px;
-  cursor: default;
-  /* Default cursor for non-clickable */
-  box-shadow: 0 0 8px rgba(0, 115, 230, 0.2);
-  /* Soft shadow for clarity */
-  border-radius: 4px;
-  /* Smooth corners for a subtle visual touch */
-  transition: transform 0.3s;
-}
-
-.root-node::before {
-  content: '🌳';
-  /* Example icon */
-  margin-right: 5px;
-  /* Space between icon and text */
-}
-
-.root-node:hover {
-  background-color: #e0f7fa;
-  /* Light cyan on hover */
-  transition: background-color 0.3s;
-  /* Smooth transition */
-  transform: scale(1.02);
-  /* Slightly enlarge on hover */
-}
-
-/* Change cursor when hovering over a non-selected item */
-.non-selected-class:hover {
-  cursor: pointer;
-  /* Change cursor to pointer when hovering on non-selected item */
-}
-
-.card-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px;
-  border: 1px solid #d9d9d9;
-  cursor: pointer;
-  width: 15vw;
-}
-
-.item-content {
-  display: inline-block;
-  margin: 0 !important;
-}
-
-.item-actions {
-  display: flex;
-  align-items: center;
-}
-
-.status-icon {
-  margin-left: 10px;
-  color: #52c41a;
-  /* Green color for running status */
-}
-
-.add-new-button {
-  margin-top: 20px;
-}
-
-.button-gap {
-  margin-right: 10px;
-  /* Adjust the value to control the gap */
-}
-
-.button-gap:last-child {
-  margin-right: 0;
-  /* Remove margin from the last button */
-}
-
-.full-width-select {
-  width: 100%;
-}
-
-.button-container {
-  display: flex;
-  /* Use flexbox for alignment */
-  gap: 10px;
-  /* Adjust the value to control the gap between buttons */
-}
-
+// Common styles
 * {
   box-sizing: border-box;
 }
 
-main {
-  display: flex;
-  // height: 100vh;
+.full-width-select {
   width: 100%;
 }
 
+// Layout
+[nz-row] div {
+  padding: 10px;
+}
+
+.nz-col {
+  margin-right: 16px;
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+// Canvas
 #canvas {
-  // height: calc(100vh - 120px);
   height: 35vh;
   background: #fff;
   flex: 1;
-  margin: 0px 0px 0 0px;
   background-size: 30px 30px;
-  // background-image: linear-gradient(to right, #d9d9d9 1px, transparent 1px),
-  // linear-gradient(to bottom, #d9d9d9 1px, transparent 1px);
+  &[disabled='true'] {
+    opacity: 0.7;
+    ::ng-deep.ngflowchart-step-wrapper {
+      opacity: 0.7;
+    }
+  }
 }
 
+// Components
 .palette {
   padding: 16px;
-
   background-color: #fff;
   width: 100%;
-
-  & .plugin-op {
+  .plugin-op {
     padding: 12px;
     user-select: none;
     display: block;
-
     &:hover {
       background: rgba(0, 0, 0, 0.04);
     }
   }
 }
 
-section {
-  padding: 1em;
-  border-bottom: 1px solid lightgrey;
-
-  & .wide {
-    width: 100%;
-  }
-}
-
-.sub-section {
-  padding: 0.5em 0;
-}
-
-select {
-  padding: 0.3em;
-}
-
-.card {
-  padding: 1em;
-  background: white;
-  border-radius: 1px;
-  min-width: 12em;
-  height: 4em;
-  text-align: center;
-  border: 1px solid #000;
-  font-weight: bold;
-  font-size: 25px !important;
-}
-
-div#canvas[disabled='true'] {
-  opacity: 0.7;
-}
-
-div#canvas[disabled='true'] ::ng-deep.ngflowchart-step-wrapper {
-  opacity: 0.7;
-}
-
-.workflow-run-logging {
-  max-height: 62vh !important;
-  overflow-y: auto;
-  font-family: 'Roboto', sans-serif;
-  max-width: 100% !important;
-  // background-color: #000;
-  scroll-padding-bottom: 0 !important;
-}
-
-// ******************************************************************
-//    START::: PROCESS CARD DETAILS
-// ******************************************************************
+// Process cards and badges
 .process-card {
   border: 1px solid #e0e0e0;
-  // border-radius: 8px;
-  // padding: 16px;
-  // margin: 16px;
-  background-color: #ffffff;
-  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
   transition: transform 0.2s;
-
-  // &:hover {
-  //   transform: translateY(-4px);
-  //   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  // }
 
   .process-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background-color: #eee;
-
     h3 {
       margin: 0;
     }
+  }
+}
 
-    .badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: bold;
-      text-transform: uppercase;
+// Badge styles
+.badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+@each $status,
+  $color
+    in (
+      running: #29b6f6,
+      completed: #66bb6a,
+      failed: #ef5350,
+      error: #ffa726,
+      not-started: #bdbdbd
+    )
+{
+  .badge-#{$status} {
+    background-color: $color;
+    @if $status == running {
+      animation: pulse 2s infinite;
     }
   }
-
-  .description {
-    color: #616161;
-    margin: 12px 0;
-  }
-
-  .timestamps {
-    small {
-      display: block;
-      color: #9e9e9e;
-    }
-  }
-}
-
-.badge-running {
-  background-color: #29b6f6;
-  color: #ffffff;
-  animation: pulse 2s infinite;
-}
-
-.badge-completed {
-  background-color: #66bb6a;
-  color: #ffffff;
-}
-
-.badge-failed {
-  background-color: #ef5350;
-  color: #ffffff;
-}
-
-.badge-error {
-  background-color: #ffa726;
-  color: #ffffff;
-}
-
-.badge-not-started {
-  background-color: #bdbdbd;
-  color: #ffffff;
 }
 
 @keyframes pulse {
@@ -309,20 +103,4 @@ div#canvas[disabled='true'] ::ng-deep.ngflowchart-step-wrapper {
   100% {
     box-shadow: 0 0 0 0 rgba(41, 182, 246, 0);
   }
-}
-
-// ******************************************************************
-//    END::: PROCESS CARD DETAILS
-// ******************************************************************
-
-
-.horizontal-buttons {
-  display: flex;
-  gap: 0px; /* Space between buttons */
-  justify-content: flex-start; /* Align to the left */
-  align-items: center; /* Center align vertically */
-}
-
-button {
-  /* Optional: Add some padding or other button styles if needed */
 }

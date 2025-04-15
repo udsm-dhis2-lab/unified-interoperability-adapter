@@ -1,13 +1,13 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router } from '@angular/router';
-import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { NzModalService } from 'ng-zorro-antd/modal';
-import { Deduplication } from '../../models/deduplication.model';
-import { DeduplicationManagementService } from '../../services/deduplication-management.service';
+import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
 import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
+import { Deduplication } from '../../models/deduplication.model';
+import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 import { DeduplicationDetailsComponent } from '../deduplication-details/deduplication-details.component';
 @Component({
   selector: 'app-deduplication-home',
@@ -50,14 +50,14 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
     this.loadHduClientsSubscription = this.dedupicationManagementService
       .getDeduplicationClients(pageIndex, pageSize, filter)
       .subscribe({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         next: (data: any) => {
-          console.log(data, 'data');
           this.loading = false;
           this.total = data.total;
           this.pageIndex = data.pageIndex;
           this.listOfDeduplications = data.data;
         },
-        error: (error) => {
+        error: () => {
           this.loading = false;
           //TODO: Implement error handling
         },
@@ -96,16 +96,20 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
   }
 
   viewDeduplicationDetails(deduplicate: Deduplication) {
-    this.modal.create({
-      nzTitle: 'Deduplication Details',
-      nzContent: DeduplicationDetailsComponent,
-      nzWidth: '80%',
-      nzMaskClosable: false,
-      nzData: {
-        data: deduplicate,
-      },
-      nzFooter: null,
-    });
+    this.modal
+      .create({
+        nzTitle: 'Deduplication Details',
+        nzContent: DeduplicationDetailsComponent,
+        nzWidth: '80%',
+        nzMaskClosable: false,
+        nzData: {
+          data: deduplicate,
+        },
+        nzFooter: null,
+      })
+      .afterClose.subscribe((res) => {
+        console.log(res);
+      });
   }
 
   navigateToClientView(deduplicate: Deduplication) {

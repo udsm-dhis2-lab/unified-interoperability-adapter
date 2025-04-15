@@ -1,3 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+export interface Duplicate {
+  id: string;
+  given: string;
+  family: string;
+  birth_date: string;
+  patient_id: string;
+  identifiers: Record<string, string>;
+}
+
 export class Deduplication {
   id?: string;
   given?: string;
@@ -14,15 +24,8 @@ export class Deduplication {
   keys?: string[];
   total?: string;
   associatedDuplicates?: number;
-  duplicates?: Array<{
-    id: string;
-    given: string;
-    family: string;
-    birth_date: string;
-    patient_id: string;
-    identifiers: Record<string, string>;
-  }>;
-  IdNumber?: string
+  duplicates?: Duplicate[];
+  IdNumber?: string;
 
   static fromJson(json: any): Deduplication {
     const deduplication = new Deduplication();
@@ -55,8 +58,6 @@ export class Deduplication {
     }
     return this.name || '';
   }
-
-
 
   // Get gender from HCRCODE (if available)
   getGender(): string {
