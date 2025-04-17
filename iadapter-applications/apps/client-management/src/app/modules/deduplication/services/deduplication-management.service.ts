@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @nx/enforce-module-boundaries */
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -50,6 +51,36 @@ export class DeduplicationManagementService {
       .post<{ results: any }>(
         `${this.hduDeduplicationUrl}`,
         { code: 'DEDUPLICATION' },
+        {
+          params,
+        }
+      )
+      .pipe(
+        map((response: { results: any }) => {
+          return DeduplicationPage.fromJson(response);
+        }),
+        catchError((error: any) => {
+          if (error.status === 401) {
+            throw new UnAuothorizedException('Invalid username or password');
+          } else {
+            throw new UnknownException(
+              'An unexpected error occurred. Please try again later.'
+            );
+          }
+        })
+      );
+  }
+  runProcess(code: string, parameters: any): Observable<any> {
+    let params = new HttpParams();
+    parameters?.filters?.forEach((filter: any) => {
+      filter?.value?.forEach((value: string) => {
+        params = params.append(filter.key, value);
+      });
+    });
+    return this.httpClient
+      .post<{ results: any }>(
+        `${this.hduDeduplicationUrl}`,
+        { code, ...(parameters ?? {}) },
         {
           params,
         }

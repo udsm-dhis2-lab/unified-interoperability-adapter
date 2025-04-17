@@ -75,10 +75,11 @@ export class ClientDetailsComponent implements OnInit {
                 sectionTitle: 'Appointment',
                 info: this.client?.demographicDetails?.appointment.map(
                   (appointment: any) => {
-                    console.log(appointment.paymentDetails, "appointment");
+                    console.log(this.client?.demographicDetails?.appointment, "appointment");
                     return {
                       'Appointment ID': appointment?.appointmentId,
                       'HFR Code': appointment?.hfrCode,
+                      "Facility": this.client?.facilityDetails.name,
                       Status: appointment?.appointmentStatus,
                       'Payment Status':
                       appointment.paymentDetails[0]?.statusCode === '200'

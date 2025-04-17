@@ -1,64 +1,78 @@
-#!/bin/sh
+#!/bin/bash
 
-cd "$(dirname "$0")/.." || exit 1
+# cd iadapter-applications
+# docker run -w="/app" -v "$(pwd)"/iadapter-applications:/app node:20.18.0 npm i --legacy-peer-deps
+# docker run -w="/app" -v "$(pwd)"/iadapter-applications:/app node:20.18.0 npx nx build client-management
+# docker run -w="/app" -v "$(pwd)"/:/app node:20.18.0 bash -c "rm -rf /app/backend/src/main/resources/static && cp -r /app/iadapter-applications/dist/apps/client-management/browser /app/backend/src/main/resources/static/ClientManagementService"
 
-FRONTEND_DIR="iadapter-applications"
-BUILD_DIR="$FRONTEND_DIR/dist/apps"
-TARGET_DIR="backend/src/main/resources/static"
+# Directory where the zipped build files are stored
+BUILD_DIR=".github/apps-builds"
+# Directory where you want to extract the builds
+EXTRACT_DIR="ui-apps"
 
-if [ ! -d "$FRONTEND_DIR" ]; then
-    echo "Error: Frontend directory '$FRONTEND_DIR' not found."
-    echo "Current directory: $(pwd)"
-    echo "Contents of current directory:"
-    ls -la
+# Check if the build directory exists
+if [ ! -d "$BUILD_DIR" ]; then
+    echo "Build directory $BUILD_DIR not found. Please ensure that the zipped files are present."
     exit 1
 fi
 
-cd "$FRONTEND_DIR" || exit 1
+# Create the extract directory if it doesn't exist
+mkdir -p "$EXTRACT_DIR"
 
-echo "Installing dependencies inside Docker..."
-docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm install --legacy-peer-deps
-docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npm i -g nx
+# List all zip files in the build directory
+echo "Found the following zip files in $BUILD_DIR:"
+ls "$BUILD_DIR"/*.zip
 
-APPS="login apps"
+# Iterate through each zip file in the build directory and unzip them
+for zip_file in "$BUILD_DIR"/*.zip; do
+    # Check if there are any zip files to process
+    if [ -f "$zip_file" ]; then
+        # Extract the app name from the zip file name (remove .zip extension)
+        app_name=$(basename "$zip_file" .zip)
 
-for app in $APPS; do
-    echo "Building $app inside Docker..."
-    docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npx nx build "$app" --configuration production
-done
-docker run --rm -w="/app" -v "$(pwd)":/app node:20.18.0 npx nx build apps
-cd ..
+        # Create a target directory for each app based on the zip file name
+        target_dir="$EXTRACT_DIR"
+        mkdir -p "$target_dir"
 
-mkdir -p "$TARGET_DIR"
-
-# Move all built apps from dist directory to backend
-if [ -d "$BUILD_DIR" ]; then
-    echo "Moving all apps from $BUILD_DIR to backend static directory..."
-    # First handle the apps directory if it exists
-    if [ -d "$BUILD_DIR/apps/browser" ]; then
-        echo "Moving apps directory to backend static directory..."
-        mkdir -p "$TARGET_DIR/apps"
-        cp -r "$BUILD_DIR/apps/browser/"* "$TARGET_DIR/apps/"
-        echo "Moved apps successfully!"
+        # Unzip the file into the target directory, overwriting existing files if necessary
+        echo "Unzipping $zip_file into $target_dir..."
+        unzip -o "$zip_file" -d "$target_dir"
+        
+        # Verify extraction success and print result
+        if [ $? -eq 0 ]; then
+            echo "Successfully unzipped $zip_file into $target_dir."
+        else
+            echo "Failed to unzip $zip_file. Please check the file and try again."
+        fi
+    else
+        echo "No zip files found in $BUILD_DIR."
     fi
+done
+
+echo "Unzipping completed. Check the $EXTRACT_DIR directory for extracted contents."
+
+docker run -w="/app" -v "$(pwd)":/app node:20.18.0 bash -c "
+    # Ensure the backend static directory exists
+    mkdir -p /app/backend/src/main/resources/static && \
     
-    # Then handle other directories
-    for dir in "$BUILD_DIR"/*/; do
-        if [ -d "$dir" ] && [ "$(basename "$dir")" != "apps" ]; then
-            app_name=$(basename "$dir")
-            if [ -d "$dir/browser" ]; then
-                echo "Moving $app_name to backend static directory..."
-                mkdir -p "$TARGET_DIR/$app_name"
-                cp -r "$dir/browser/"* "$TARGET_DIR/$app_name/"
-                echo "Moved $app_name successfully!"
-            fi
+    # Remove existing static content if any
+    rm -rf /app/backend/src/main/resources/static/* && \
+    
+    # Iterate through each directory in the extracted UI apps
+    for dir in /app/ui-apps/*; do
+        if [ -d \"\$dir\" ]; then
+            app_name=\$(basename \"\$dir\")
+            
+            # Ensure the app's target directory exists
+            mkdir -p \"/app/backend/src/main/resources/static/\$app_name\" && \
+            
+            # Copy the directory into the backend static resources directory
+            cp -r \"\$dir\"/* \"/app/backend/src/main/resources/static/\$app_name\" && \
+            echo \"Copied \$app_name to /app/backend/src/main/resources/static/\$app_name\"
         fi
     done
-else
-    echo "Build directory $BUILD_DIR not found, no apps to copy."
-fi
+"
 
-echo "All UI apps have been moved to the backend."
 
-docker run --rm -v maven-repo:/root/.m2 -v "$(pwd)/backend":/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
-docker build --no-cache -f Dockerfile -t udsmdhis2/unified:2.0.0 .
+docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/backend:/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
+docker build --no-cache -f Dockerfile  -t udsmdhis2/unified:2.0.0 .
