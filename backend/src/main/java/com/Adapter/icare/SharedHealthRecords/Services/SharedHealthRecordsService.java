@@ -1985,9 +1985,7 @@ public class SharedHealthRecordsService {
                                                                                                                                                                                 
                                                                                                                                                         
                                                                                                                                                         
-                                                                                                                                                // PrintOutHelper.print(stringify(paymentNoticeForMedication.get(0)
-                                                                                                                                                //         .getIdentifier()
-                                                                                                                                                //         .get(0)));
+                                                                                                                                               
 
 
                                                                                                                                                 PrintOutHelper.print(paymentDetailsPayload);
@@ -1997,31 +1995,9 @@ public class SharedHealthRecordsService {
                                                                                                                                                                                 paymentDetailsPayload
                                                                                                                                                                         );
 
-                                                                                                                                                        // PrintOutHelper.print(paymentNoticeForMedication.get(0));
+                                                                                                                                                        
                                                                                                         }
 
-
-
-                                                                                                        // if (medicationDispense.hasSupportingInformation()) {
-                                                                                                        //         for (Reference ref : medicationDispense.getSupportingInformation()) {
-                                                                                                        //                 String reference = ref.getReference(); // Example: "PaymentNotice/12345"
-                                                                                        
-                                                                                                        //                 // Check if the reference starts with "PaymentNotice/"
-                                                                                                        //                 if (reference != null && reference.startsWith("PaymentNotice/")) {
-                                                                                                        //                         // String paymentNoticeId = reference.split("/")[1]; // Extract ID
-                                                                                                        //                         String paymentNoticeId = "1418524"; // Extract ID
-                                                                                        
-                                                                                                        //                         // Fetch the PaymentNotice by ID
-                                                                                                        //                         PaymentNotice paymentNotice = fhirClient
-                                                                                                        //                                         .read()
-                                                                                                        //                                         .resource(PaymentNotice.class)
-                                                                                                        //                                         .withId(paymentNoticeId).execute();
-                                                                                        
-                                                                                                                                                
-                                                                                                                                
-                                                                                                        //                 }
-                                                                                                        //         }
-                                                                                                        // }
                                                                                 }
                                                                                 medicationDetailsDTOS.add(
                                                                                                 medicationDetailsDTO);
