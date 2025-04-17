@@ -82,27 +82,27 @@ export class HealthRecordsDetailsComponent implements OnInit {
                     Code: visit?.facilityDetails?.code || '-',
                   },
                 },
-                {
-                  sectionTitle: 'Visit',
-                  info: {
-                    ID: visit?.visitDetails?.id || '-',
-                    'Visit Date': visit?.visitDetails?.visitDate || '-',
-                    'Closed Date': visit?.visitDetails?.closedDate || '-',
-                    'Visit Type': visit?.visitDetails?.visitType || '-',
-                    'New This Year': visit?.visitDetails?.newThisYear ? 'Yes' : 'No',
-                    New: visit?.visitDetails?.isNew ? 'Yes' : 'No',
-                    'Care Services': visit?.visitDetails?.careServices?.join(', ') || '-',
-                    'Attended Specialist': visit?.visitDetails?.attendedSpecialist
-                      ?.filter(
-                        (specialist: any) =>
-                          specialist.superSpecialist !== null || specialist.specialist !== null
-                      )
-                      .map((specialist: any) => ({
-                        Name: specialist.name || '-',
-                        Specialty: specialist.specialty || '-',
-                      })) || '-',
-                  },
-                },
+                // {
+                //   sectionTitle: 'Visit',
+                //   info: {
+                //     ID: visit?.visitDetails?.id || '-',
+                //     'Visit Date': visit?.visitDetails?.visitDate || '-',
+                //     'Closed Date': visit?.visitDetails?.closedDate || '-',
+                //     'Visit Type': visit?.visitDetails?.visitType || '-',
+                //     'New This Year': visit?.visitDetails?.newThisYear ? 'Yes' : 'No',
+                //     New: visit?.visitDetails?.isNew ? 'Yes' : 'No',
+                //     'Care Services': visit?.visitDetails?.careServices?.join(', ') || '-',
+                //     'Attended Specialist': visit?.visitDetails?.attendedSpecialist
+                //       ?.filter(
+                //         (specialist: any) =>
+                //           specialist.superSpecialist !== null || specialist.specialist !== null
+                //       )
+                //       .map((specialist: any) => ({
+                //         Name: specialist.name || '-',
+                //         Specialty: specialist.specialty || '-',
+                //       })) || '-',
+                //   },
+                // },
                 {
                   sectionTitle: 'Clinical Information',
                   info: {
@@ -185,7 +185,13 @@ export class HealthRecordsDetailsComponent implements OnInit {
                           contact.phoneNumbers?.filter((num: any) => num).join(', ') ||
                           'No contact number',
                         Relationship: contact.relationShip || '-',
-                      }))[0] || 'No emergency contacts available',
+                      }))[0] || {'No emergency contacts available': ''},
+                },
+                {
+                  sectionTitle: 'Prescription',
+                  info: {
+                    'Prescription': visit?.prescription?.prescription || 'No prescription',
+                  },
                 },
               ].filter(
                 (section) =>
