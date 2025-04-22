@@ -2006,7 +2006,7 @@ public class SharedHealthRecordsService {
                                                                                         medicationDetailsDTOS);
                                                                 }
 
-                                                                // Radiology details
+                                                                // Radiology detail
                                                                 List<RadiologyDetailsDTO> radiologyDetailsDTOS = new ArrayList<>();
                                                                 List<DiagnosticReport> diagnosticReportsList = getDiagnosticReportsByCategory(
                                                                                 encounter.getIdElement().getIdPart(),
