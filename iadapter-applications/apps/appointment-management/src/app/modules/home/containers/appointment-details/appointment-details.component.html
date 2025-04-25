@@ -47,9 +47,9 @@
             <h2>Appointments</h2>
               <nz-collapse nzAccordion>
                 @for (panel of extraInfo; track panel; let i = $index) {
-                  <nz-collapse-panel [nzHeader]="(i+1) + '. ' + panel.sectionTitle">
+                  <nz-collapse-panel [nzHeader]="" [nzActive]="true" >
 
-                    <nz-table [nzData]="panel.info" [nzFrontPagination]="false" [nzShowPagination]="false">
+                    <nz-table [nzData]="panel.info" [nzFrontPagination]="false" [nzShowPagination]="false" >
                       <thead>
                         <tr>
                           <th>SN</th>

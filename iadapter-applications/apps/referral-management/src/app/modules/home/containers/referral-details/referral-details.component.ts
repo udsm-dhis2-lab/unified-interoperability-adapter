@@ -147,7 +147,7 @@ this.loadHduClientsFromServer()
       .subscribe({
         next: (data: any) => {
           console.log(data, "data")
-          this.loading = false;
+          // this.loading = false;
           this.referrals = data;
         },
         error: (error) => {
