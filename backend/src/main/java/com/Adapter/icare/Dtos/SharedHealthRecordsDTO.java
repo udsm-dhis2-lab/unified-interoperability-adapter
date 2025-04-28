@@ -53,6 +53,8 @@ public class SharedHealthRecordsDTO {
 
     private TreatmentDetailsDTO treatmentDetails;
 
+    private EyeClinicDetailsDTO eyeClinicDetails;
+
     private List<RadiologyDetailsDTO> radiologyDetails;
 
     private AdmissionDetailsDTO admissionDetails;
