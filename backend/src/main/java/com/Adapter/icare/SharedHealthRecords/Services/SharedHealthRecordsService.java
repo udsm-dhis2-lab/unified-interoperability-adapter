@@ -380,10 +380,9 @@ public class SharedHealthRecordsService {
                                                                                                 && careTypeComponent
                                                                                                                 .getValueStringType()
                                                                                                                 .hasValue()) {
-                                                                                        careServiceDTO.setCareType(
-                                                                                                        careTypeComponent
-                                                                                                                        .getValueStringType()
-                                                                                                                        .getValueAsString());
+                                                                                        careServiceDTO.setCareType(CareType.fromString(careTypeComponent
+                                                                                                .getValueStringType()
+                                                                                                .getValueAsString()));
                                                                                 }
                                                                                 if (careServiceObs.getComponent()
                                                                                                 .size() > 1) {

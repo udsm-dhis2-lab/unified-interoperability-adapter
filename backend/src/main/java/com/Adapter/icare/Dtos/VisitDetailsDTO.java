@@ -28,6 +28,9 @@ public class VisitDetailsDTO {
     private List<AttendedSpecialistDTO> attendedSpecialist;
     private ServiceComplaintsDTO serviceComplaints;
 
+    private Boolean referredIn;
+    private Boolean disabled;
+
     public Map<String,Object> toMap() {
         Map<String,Object> visitDetails = new HashMap<>();
         visitDetails.put("id", this.getId());

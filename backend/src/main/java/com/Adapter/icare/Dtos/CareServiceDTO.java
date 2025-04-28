@@ -9,7 +9,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class CareServiceDTO {
-    private String careType;
+    private CareType careType;
     private Integer visitNumber;
 
     public Map<String,Object> toMap() {

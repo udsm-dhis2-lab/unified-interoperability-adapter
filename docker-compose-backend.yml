@@ -37,6 +37,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Admin123}
       MYSQL_USER: ${MYSQL_USER:-hduapicore}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
+    ports:
+      - 3308:3306
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-Admin123}"]
       interval: 10s
