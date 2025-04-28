@@ -1,14 +1,12 @@
 package com.Adapter.icare.SharedHealthRecords.Services;
 
 import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
-import ca.uhn.fhir.rest.gclient.StringClientParam;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
 
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
@@ -19,6 +17,8 @@ import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Enums.CareType;
+import com.Adapter.icare.Enums.STATUS;
 import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -29,14 +29,9 @@ import com.google.common.collect.Iterables;
 
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.hl7.fhir.r4.model.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import scala.App;
-
-import javax.security.auth.Subject;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -2313,16 +2308,6 @@ public class SharedHealthRecordsService {
                                                                                                         getComponentValueBoolean(
                                                                                                                         observation,
                                                                                                                         1));
-                                                                        antenatalCareDetailsDTO
-                                                                                        .setProvidedWithFamilyPlanningCounseling(
-                                                                                                        getComponentValueBoolean(
-                                                                                                                        observation,
-                                                                                                                        2));
-                                                                        antenatalCareDetailsDTO
-                                                                                        .setProvidedWithInfantFeedingCounseling(
-                                                                                                        getComponentValueBoolean(
-                                                                                                                        observation,
-                                                                                                                        3));
                                                                         antenatalCareDetailsDTO.setReferredToCTC(
                                                                                         getComponentValueBoolean(
                                                                                                         observation,
@@ -2340,13 +2325,11 @@ public class SharedHealthRecordsService {
                                                                         antenatalCareDetailsDTO
                                                                                         .setHivDetails(hivDetails);
 
-                                                                        Map<String, Object> syphilisDetails = new HashMap<>();
-                                                                        syphilisDetails.put("status",
-                                                                                        getComponentValueCodeableConceptDisplay(
-                                                                                                        observation,
-                                                                                                        8));
-                                                                        syphilisDetails.put("code",
-                                                                                        getComponentValueCodeableConceptCode(
+                                                                        DiseaseStatusDTO syphilisDetails = new DiseaseStatusDTO();
+                                                                        syphilisDetails.setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
+                                                                                observation,
+                                                                                8)));
+                                                                        syphilisDetails.setCode(getComponentValueCodeableConceptCode(
                                                                                                         observation,
                                                                                                         8));
                                                                         antenatalCareDetailsDTO.setSyphilisDetails(
@@ -2364,10 +2347,8 @@ public class SharedHealthRecordsService {
                                                                                         getComponentValueCodeableConceptCode(
                                                                                                         observation,
                                                                                                         6));
-                                                                        spouseHivDetails.setStatus(
-                                                                                        getComponentValueCodeableConceptDisplay(
-                                                                                                        observation,
-                                                                                                        6));
+                                                                        spouseHivDetails.setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
+                                                                                observation,6)));
 
                                                                         DiseaseStatusDTO spouseSyphilisDetails = new DiseaseStatusDTO();
                                                                         spouseSyphilisDetails.setCode(
@@ -2375,9 +2356,9 @@ public class SharedHealthRecordsService {
                                                                                                         observation,
                                                                                                         7));
                                                                         spouseSyphilisDetails
-                                                                                        .setStatus(getComponentValueCodeableConceptDisplay(
-                                                                                                        observation,
-                                                                                                        7));
+                                                                                        .setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
+                                                                                                observation,
+                                                                                                7)));
 
                                                                         spouseDetails.setHivDetails(spouseHivDetails);
                                                                         spouseDetails.setSyphilisDetails(

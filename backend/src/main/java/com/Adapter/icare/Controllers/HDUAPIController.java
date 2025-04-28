@@ -301,7 +301,7 @@ public class HDUAPIController {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 Map<String, Object> payload = new HashMap<>();
                 payload.put("code", "dataTemplates");
-
+                System.out.println("Here now: "+ dataTemplate.getData().getListGrid().get(0).getAntenatalCareDetails().getSpouseDetails().getHepatitisB().getStatus());
                 List<SharedHealthRecordsDTO> listGrid = Optional.ofNullable(dataTemplate.getData())
                         .map(DataTemplateDataDTO::getListGrid)
                         .orElse(Collections.emptyList());

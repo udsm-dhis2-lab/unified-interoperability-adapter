@@ -18,11 +18,21 @@ public class AntenatalCareDetailsDTO {
     private Integer pregnancyAgeInWeeks;
     private Boolean positiveHivStatusBeforeService;
     private Boolean referredToCTC;
-    private Boolean providedWithFamilyPlanningCounseling;
-    private Boolean providedWithInfantFeedingCounseling;
     private Integer gravidity;
     private Map<String,Object> hivDetails;
-    private Map<String,Object> syphilisDetails;
+    private DiseaseStatusDTO syphilisDetails;
     private SpouseDetailsDTO spouseDetails;
     private List<Map<String,Object>> otherSpouseDetails;
+
+    private String lastAncVisitDate;
+    private boolean referredIn;
+    private boolean referredOut;
+    private List<CounsellingDTO> counselling;
+    private boolean providedWithHivCounsellingBeforeLabTest;
+    private boolean providedWithHivCounsellingAfterLabTest;
+    private ANCProphylaxisDetailsDTO prophylaxis;
+    private boolean diagnosedWithOtherSTDs;
+    private boolean providedWithTreatmentForOtherSTDs;
+
+
 }

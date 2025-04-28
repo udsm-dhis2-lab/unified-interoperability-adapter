@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.DischargedLocation;
 import com.Adapter.icare.validators.annotations.ValidOutcomeDetails;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;

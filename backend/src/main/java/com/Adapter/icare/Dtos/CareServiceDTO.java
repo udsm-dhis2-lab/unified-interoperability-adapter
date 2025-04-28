@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.CareType;
 import lombok.Getter;
 import lombok.Setter;
 

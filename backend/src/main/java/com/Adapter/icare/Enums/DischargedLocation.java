@@ -1,4 +1,4 @@
-package com.Adapter.icare.Dtos;
+package com.Adapter.icare.Enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 
