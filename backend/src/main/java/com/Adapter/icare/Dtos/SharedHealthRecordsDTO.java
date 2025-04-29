@@ -31,6 +31,8 @@ public class SharedHealthRecordsDTO {
     @NotNull(message = "value cannot be null")
     private VisitDetailsDTO visitDetails;
 
+    private SelfMonitoringClinicalInformationDTO selfMonitoringClinicalInformation;
+
     private List<AppointmentDetailsDTO> appointment;
 
     private ClinicalInformationDTO clinicalInformation;
@@ -50,6 +52,8 @@ public class SharedHealthRecordsDTO {
     private List<MedicationDetailsDTO> medicationDetails;
 
     private TreatmentDetailsDTO treatmentDetails;
+
+    private EyeClinicDetailsDTO eyeClinicDetails;
 
     private List<RadiologyDetailsDTO> radiologyDetails;
 

@@ -294,14 +294,13 @@ public class HDUAPIController {
 //    }
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate) {
+    public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate,  @RequestParam(name = "validation", required = false, defaultValue = "true") boolean performValidation) {
         Map<String, Object> baseResponse = new HashMap<>();
 
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 Map<String, Object> payload = new HashMap<>();
                 payload.put("code", "dataTemplates");
-
                 List<SharedHealthRecordsDTO> listGrid = Optional.ofNullable(dataTemplate.getData())
                         .map(DataTemplateDataDTO::getListGrid)
                         .orElse(Collections.emptyList());
@@ -319,16 +318,18 @@ public class HDUAPIController {
                 Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
                 List<SharedHealthRecordsDTO> validatedListGrid = Collections.synchronizedList(new ArrayList<>());
 
-                IntStream.range(0, listGrid.size()).parallel().forEach(index -> {
-                    SharedHealthRecordsDTO currentRecord = listGrid.get(index);
-                    List<String> errors = sharedHealthRecordValidator.validate(currentRecord);
-
-                    if (errors.isEmpty()) {
-                        validatedListGrid.add(currentRecord);
-                    } else {
-                        validationErrorsMap.put(index, errors);
-                    }
-                });
+                    IntStream.range(0, listGrid.size()).parallel().forEach(index -> {
+                        SharedHealthRecordsDTO currentRecord = listGrid.get(index);
+                        List<String> errors = new ArrayList<String>();
+                        if (performValidation) {
+                            errors = sharedHealthRecordValidator.validate(currentRecord);
+                        }
+                        if (errors.isEmpty()) {
+                            validatedListGrid.add(currentRecord);
+                        } else {
+                            validationErrorsMap.put(index, errors);
+                        }
+                    });
 
                 List<Map<String, Object>> recordsWithIssues = validationErrorsMap.entrySet().stream()
                         .map(entry -> {

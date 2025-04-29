@@ -82,47 +82,28 @@ export class HealthRecordsDetailsComponent implements OnInit {
                     Code: visit?.facilityDetails?.code || '-',
                   },
                 },
-                // {
-                //   sectionTitle: 'Visit',
-                //   info: {
-                //     ID: visit?.visitDetails?.id || '-',
-                //     'Visit Date': visit?.visitDetails?.visitDate || '-',
-                //     'Closed Date': visit?.visitDetails?.closedDate || '-',
-                //     'Visit Type': visit?.visitDetails?.visitType || '-',
-                //     'New This Year': visit?.visitDetails?.newThisYear ? 'Yes' : 'No',
-                //     New: visit?.visitDetails?.isNew ? 'Yes' : 'No',
-                //     'Care Services': visit?.visitDetails?.careServices?.join(', ') || '-',
-                //     'Attended Specialist': visit?.visitDetails?.attendedSpecialist
-                //       ?.filter(
-                //         (specialist: any) =>
-                //           specialist.superSpecialist !== null || specialist.specialist !== null
-                //       )
-                //       .map((specialist: any) => ({
-                //         Name: specialist.name || '-',
-                //         Specialty: specialist.specialty || '-',
-                //       })) || '-',
-                //   },
-                // },
                 {
                   sectionTitle: 'Clinical Information',
                   info: {
                     'Vital Signs':
-                      visit?.clinicalInformation?.vitalSigns
-                        ?.filter((vitalSign: any) =>
-                          Object.values(vitalSign).some((value) => value !== null)
-                        )
-                        .map((vitalSign: any) => ({
-                          'Blood Pressure': vitalSign.bloodPressure || '-',
-                          Weight: vitalSign.weight || '-',
-                          Temperature: vitalSign.temperature || '-',
-                          Height: vitalSign.height || '-',
-                          Respiration: vitalSign.respiration || '-',
-                          'Pulse Rate': vitalSign.pulseRate || '-',
-                          'Recorded At': vitalSign.dateTime || '-',
-                        })) || 'No vital signs recorded',
+                      visit?.clinicalInformation?.vitalSigns?.length
+                        ? visit.clinicalInformation.vitalSigns
+                            .filter((vitalSign: any) =>
+                              Object.values(vitalSign).some((value) => value !== null)
+                            )
+                            .map((vitalSign: any) => ({
+                              'Blood Pressure': vitalSign.bloodPressure || '-',
+                              Weight: vitalSign.weight || '-',
+                              Temperature: vitalSign.temperature || '-',
+                              Height: vitalSign.height || '-',
+                              Respiration: vitalSign.respiration || '-',
+                              'Pulse Rate': vitalSign.pulseRate || '-',
+                              'Recorded At': vitalSign.dateTime || '-',
+                            }))
+                        : 'No vital signs recorded',
                     'Visit Notes':
                       visit?.clinicalInformation?.visitNotes?.length
-                        ? visit?.clinicalInformation?.visitNotes.map((note: any) => ({
+                        ? visit.clinicalInformation.visitNotes.map((note: any) => ({
                             'Visit Date': note.date || 'Unknown Date',
                             'Provider Specialty': note.providerSpeciality || '-',
                             'Chief Complaints': note.chiefComplaints?.length
@@ -157,11 +138,112 @@ export class HealthRecordsDetailsComponent implements OnInit {
                   },
                 },
                 {
+                  sectionTitle: 'Allergies',
+                  info: {
+                    Allergies: visit?.allergies?.length
+                      ? visit.allergies.map((allergy: any) => allergy.name || allergy).join(', ')
+                      : 'No allergies recorded',
+                  },
+                },
+                {
+                  sectionTitle: 'Chronic Conditions',
+                  info: {
+                    Conditions: visit?.chronicConditions?.length
+                      ? visit.chronicConditions
+                          .map((condition: any) =>
+                            condition && typeof condition === 'object' && condition.name
+                              ? condition.name
+                              : ''
+                          )
+                          .join(', ')
+                      : 'No chronic conditions recorded',
+                  },
+                },
+                {
                   sectionTitle: 'Lifestyle Information',
                   info: {
                     Smoking: visit?.lifeStyleInformation?.smoking?.use ? 'Yes' : 'No',
                     'Alcohol Use': visit?.lifeStyleInformation?.alcoholUse?.use ? 'Yes' : 'No',
                     'Drug Use': visit?.lifeStyleInformation?.drugUse?.use ? 'Yes' : 'No',
+                  },
+                },
+                {
+                  sectionTitle: 'Investigation Details',
+                  info: {
+                    Investigations: visit?.investigationDetails?.length
+                      ? visit.investigationDetails.map((inv: any) => ({
+                          Name: inv.name || '-',
+                          Date: inv.date || '-',
+                          Result: inv.result || '-',
+                        }))
+                      : 'No investigation details available',
+                  },
+                },
+                {
+                  sectionTitle: 'Lab Investigation Details',
+                  info: {
+                    'Lab Results': visit?.labInvestigationDetails?.length
+                      ? visit.labInvestigationDetails.map((lab: any) => ({
+                          Test: lab.testName || '-',
+                          Result: lab.result || '-',
+                          Date: lab.date || '-',
+                        }))
+                      : 'No lab investigation details available',
+                  },
+                },
+                {
+                  sectionTitle: 'Diagnosis Details',
+                  info: {
+                    Diagnoses: visit?.diagnosisDetails?.length
+                      ? visit.diagnosisDetails.map((diag: any) => ({
+                          Condition: diag.condition || '-',
+                          Date: diag.date || '-',
+                          Notes: diag.notes || '-',
+                        }))
+                      : 'No diagnosis details available',
+                  },
+                },
+                {
+                  sectionTitle: 'Medication Details',
+                  info: {
+                    Medications: visit?.medicationDetails?.length
+                      ? visit.medicationDetails.map((med: any) => ({
+                          Name: med.name || '-',
+                          Dosage: med.dosage || '-',
+                          Frequency: med.frequency || '-',
+                          StartDate: med.startDate || '-',
+                          EndDate: med.endDate || '-',
+                        }))
+                      : 'No medication details available',
+                  },
+                },
+                {
+                  sectionTitle: 'Treatment Details',
+                  info: {
+                    Treatments: visit?.treatmentDetails
+                      ? {
+                          Chemotherapy: visit.treatmentDetails.chemoTherapy || 'None',
+                          Radiotherapy: visit.treatmentDetails.radioTherapy || 'None',
+                          'Palliative Care': visit.treatmentDetails.palliativeCare || 'None',
+                          Surgery: visit.treatmentDetails.surgery || 'None',
+                          'Hormone Therapy': visit.treatmentDetails.hormoneTherapy || 'None',
+                          Symptomatic: visit.treatmentDetails.symptomatic || 'None',
+                          'Alternative Treatment': visit.treatmentDetails.alternativeTreatment || 'None',
+                          'Medical Procedure': visit.treatmentDetails.medicalProcedureDetails || 'None',
+                        }
+                      : 'No treatment details available',
+                  },
+                },
+                {
+                  sectionTitle: 'Radiology Details',
+                  info: {
+                    'Radiology Reports': visit?.radiologyDetails?.length
+                      ? visit.radiologyDetails.map((rad: any) => ({
+                          Type: rad.type || '-',
+                          Findings: rad.findings || '-',
+                          Date: rad.date || '-',
+                        }))
+                      : 'No radiology details available',
                   },
                 },
                 {
@@ -174,23 +256,71 @@ export class HealthRecordsDetailsComponent implements OnInit {
                   },
                 },
                 {
+                  sectionTitle: 'Causes of Death Details',
+                  info: {
+                    'Cause of Death': visit?.causesOfDeathDetails?.primaryCause || '-',
+                    'Contributing Factors': visit?.causesOfDeathDetails?.contributingFactors?.length
+                      ? visit.causesOfDeathDetails.contributingFactors.join(', ')
+                      : 'None',
+                  },
+                },
+                {
+                  sectionTitle: 'Prophylaxis Details',
+                  info: {
+                    Prophylaxis: visit?.prophylAxisDetails?.length
+                      ? visit.prophylAxisDetails.map((pro: any) => ({
+                          Type: pro.type || '-',
+                          Date: pro.date || '-',
+                          Notes: pro.notes || '-',
+                        }))
+                      : 'No prophylaxis details available',
+                  },
+                },
+                {
+                  sectionTitle: 'Vaccination Details',
+                  info: {
+                    Vaccinations: visit?.vaccinationDetails?.length
+                      ? visit.vaccinationDetails.map((vac: any) => ({
+                          Name: vac.name || '-',
+                          Date: vac.date || '-',
+                          Dose: vac.dose || '-',
+                        }))
+                      : 'No vaccination details available',
+                  },
+                },
+                {
+                  sectionTitle: 'Billings Details',
+                  info: {
+                    Billings: visit?.billingsDetails?.length
+                      ? visit.billingsDetails.map((bill: any) => ({
+                          Service: bill.service || '-',
+                          Amount: bill.amount || '-',
+                          Date: bill.date || '-',
+                          Status: bill.status || '-',
+                        }))
+                      : 'No billings details available',
+                  },
+                },
+                {
                   sectionTitle: 'Contact People',
                   info:
-                    visit?.demographicDetails?.contactPeople
-                      ?.filter((contact: any) => contact.relationShip !== null)
-                      .map((contact: any) => ({
-                        'First Name': contact.firstName || '-',
-                        'Last Name': contact.lastName || '-',
-                        'Phone Numbers':
-                          contact.phoneNumbers?.filter((num: any) => num).join(', ') ||
-                          'No contact number',
-                        Relationship: contact.relationShip || '-',
-                      }))[0] || {'No emergency contacts available': ''},
+                    visit?.demographicDetails?.contactPeople?.length
+                      ? visit.demographicDetails.contactPeople
+                          .filter((contact: any) => contact.relationShip !== null)
+                          .map((contact: any) => ({
+                            'First Name': contact.firstName || '-',
+                            'Last Name': contact.lastName || '-',
+                            'Phone Numbers':
+                              contact.phoneNumbers?.filter((num: any) => num).join(', ') ||
+                              'No contact number',
+                            Relationship: contact.relationShip || '-',
+                          }))[0] || { 'No emergency contacts available': '' }
+                      : { 'No emergency contacts available': '' },
                 },
                 {
                   sectionTitle: 'Prescription',
                   info: {
-                    'Prescription': visit?.prescription?.prescription || 'No prescription',
+                    Prescription: visit?.prescription?.prescription || 'No prescription',
                   },
                 },
               ].filter(
@@ -200,177 +330,6 @@ export class HealthRecordsDetailsComponent implements OnInit {
                   (typeof section.info !== 'object' || Object.keys(section.info).length > 0)
               ),
             }));
-
-            console.log(this.objectKeys(this.visits[0]));
-
-            // this.extraInfo = [
-            //   {
-            //     sectionTitle: 'Facility',
-            //     info: {
-            //       Name: this.client?.facilityDetails?.name,
-            //       Code: this.client?.facilityDetails?.code,
-            //     },
-            //   },
-            //   {
-            //     sectionTitle: 'Visit',
-            //     info: {
-            //       ID: this.client?.visitDetails?.id,
-            //       'Visit Date': this.client?.visitDetails?.visitDate,
-            //       'Closed Date': this.client?.visitDetails?.closedDate,
-            //       'Visit Type': this.client?.visitDetails?.visitType,
-            //       'New This Year': this.client?.visitDetails?.newThisYear,
-            //       New: this.client?.visitDetails?.isNew,
-            //       'Care Services': this.client?.visitDetails?.careServices,
-            //       'Attended Specialist':
-            //         this.client?.visitDetails?.attendedSpecialist
-            //           .filter(
-            //             (specialist: any) =>
-            //               specialist.superSpecialist !== null ||
-            //               specialist.specialist !== null
-            //           )
-            //           .map((specalist: any) => {
-            //             return {
-            //               Name: specalist.name,
-            //               Specialty: specalist.specialty,
-            //             };
-            //           }),
-            //     },
-            //   },
-            //   {
-            //     sectionTitle: 'Clinical Information',
-            //     info: {
-            //       'Vital Signs':
-            //         this.client?.clinicalInformation?.vitalSigns
-            //           ?.filter((vitalSign: any) =>
-            //             Object.values(vitalSign).some((value) => value !== null)
-            //           )
-            //           .map((vitalSign: any) => ({
-            //             'Blood Pressure': vitalSign.bloodPressure || '-',
-            //             Weight: vitalSign.weight || '-',
-            //             Temperature: vitalSign.temperature || '-',
-            //             Height: vitalSign.height || '-',
-            //             Respiration: vitalSign.respiration || '-',
-            //             'Pulse Rate': vitalSign.pulseRate || '-',
-            //             'Recorded At': vitalSign.dateTime || '-',
-            //           })) || 'No vital signs recorded',
-            //       'Visit Notes': this.client?.clinicalInformation?.visitNotes
-            //         ?.length
-            //         ? this.client?.clinicalInformation?.visitNotes.reduce(
-            //             (acc: any, note: any) => {
-            //               const visitDate = note.date || 'Unknown Date';
-            //               acc[visitDate] = acc[visitDate] || [];
-            //               return {
-            //                 'Visit Date': note.date || 'Unknown Date',
-            //                 'Provider Specialty':
-            //                   note.providerSpeciality || '-',
-            //                 'Chief Complaints': note.chiefComplaints?.length
-            //                   ? note.chiefComplaints
-            //                   : 'None',
-            //                 'History of Present Illness': note
-            //                   .historyOfPresentIllness?.length
-            //                   ? note.historyOfPresentIllness
-            //                   : 'None',
-            //                 'Review of Other Systems': note.reviewOfOtherSystems
-            //                   ?.length
-            //                   ? note.reviewOfOtherSystems
-            //                   : 'None',
-            //                 'Past Medical History': note.pastMedicalHistory
-            //                   ?.length
-            //                   ? note.pastMedicalHistory
-            //                   : 'None',
-            //                 'Family and Social History': note
-            //                   .familyAndSocialHistory?.length
-            //                   ? note.familyAndSocialHistory
-            //                   : 'None',
-            //                 'General Examination': note
-            //                   .generalExaminationObservation?.length
-            //                   ? note.generalExaminationObservation
-            //                   : 'None',
-            //                 'Local Examination': note.localExamination?.length
-            //                   ? note.localExamination
-            //                   : 'None',
-            //                 'Systemic Examination': note
-            //                   .systemicExaminationObservation?.length
-            //                   ? note.systemicExaminationObservation
-            //                   : 'None',
-            //                 'Doctor’s Plan/Suggestion': note
-            //                   .doctorPlanOrSuggestion?.length
-            //                   ? note.doctorPlanOrSuggestion
-            //                   : 'None',
-            //               };
-            //             },
-            //             {}
-            //           )
-            //         : 'No visit notes available',
-            //     },
-            //   },
-            //   {
-            //     sectionTitle: 'Lifestyle Information',
-            //     info: {
-            //       Smoking: this.client?.lifeStyleInformation?.smoking?.use
-            //         ? 'Yes'
-            //         : 'No',
-            //       'Alcohol Use': this.client?.lifeStyleInformation?.alcoholUse
-            //         ?.use
-            //         ? 'Yes'
-            //         : 'No',
-            //       'Drug Use': this.client?.lifeStyleInformation?.drugUse?.use
-            //         ? 'Yes'
-            //         : 'No',
-            //     },
-            //   },
-            //   {
-            //     sectionTitle: 'Outcome Details',
-            //     info: {
-            //       'Is Alive': this.client?.outcomeDetails?.isAlive
-            //         ? 'Yes'
-            //         : 'No',
-            //       'Death Location':
-            //         this.client?.outcomeDetails?.deathLocation || '-',
-            //       'Death Date': this.client?.outcomeDetails?.deathDate || '-',
-            //       Referred: this.client?.outcomeDetails?.referred
-            //         ? 'Yes'
-            //         : 'No',
-            //     },
-            //   },
-            //   {
-            //     sectionTitle: 'Contact People',
-            //     info: {
-            //       'Contact People': this.client?.demographicDetails?.contactPeople?.filter(
-            //         (contact: any) => contact.relationShip !== null
-            //       ).map(
-            //         (contact: any) => ({
-            //           'First Name': contact.firstName || '-',
-            //           'Last Name': contact.lastName || '-',
-            //           'Phone Numbers':
-            //             contact.phoneNumbers
-            //               ?.filter((num: any) => num)
-            //               ?.join(', ') || 'No contact number',
-            //           Relationship: contact.relationShip || '-',
-            //         })
-            //       )[0] || 'No emergency contacts available',
-            //     }
-            //       // [this.client?.demographicDetails?.contactPeople?.filter(
-            //       //   (contact: any) => contact.relationShip !== null
-            //       // ).map(
-            //       //   (contact: any) => ({
-            //       //     'First Name': contact.firstName || '-',
-            //       //     'Last Name': contact.lastName || '-',
-            //       //     'Phone Numbers':
-            //       //       contact.phoneNumbers
-            //       //         ?.filter((num: any) => num)
-            //       //         ?.join(', ') || 'No contact number',
-            //       //     Relationship: contact.relationShip || '-',
-            //       //   })
-            //       // )[0] || 'No emergency contacts available',]
-            //   },
-            // ].filter(
-            //   (section) =>
-            //     section.info !== null &&
-            //     section.info !== undefined &&
-            //     (typeof section.info !== 'object' ||
-            //       Object.keys(section.info).length > 0)
-            // );
 
             this.basicInfo = {
               'Full Name': `${this.client?.demographicDetails?.fname || ''} ${

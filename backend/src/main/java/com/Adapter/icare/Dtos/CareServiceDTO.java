@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.CareType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +10,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class CareServiceDTO {
-    private String careType;
+    private CareType careType;
     private Integer visitNumber;
 
     public Map<String,Object> toMap() {
