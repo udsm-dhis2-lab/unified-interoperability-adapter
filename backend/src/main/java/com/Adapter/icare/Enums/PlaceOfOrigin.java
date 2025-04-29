@@ -26,7 +26,8 @@ public enum PlaceOfOrigin {
     @JsonCreator
     public static PlaceOfOrigin fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_PLACE_OF_ORIGIN +" Input place of origin value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+//            throw new IllegalArgumentException(INVALID_PLACE_OF_ORIGIN +" Input place of origin value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return PlaceOfOrigin.valueOf(value.toUpperCase());

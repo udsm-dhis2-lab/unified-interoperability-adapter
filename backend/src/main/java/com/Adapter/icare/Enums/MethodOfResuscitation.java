@@ -20,7 +20,8 @@ public enum MethodOfResuscitation {
     @JsonCreator
     public static MethodOfResuscitation fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_METHOD_OF_RESUSCITATION +" Input method of resuscitation value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            //throw new IllegalArgumentException(INVALID_METHOD_OF_RESUSCITATION +" Input method of resuscitation value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return MethodOfResuscitation.valueOf(value.toUpperCase());

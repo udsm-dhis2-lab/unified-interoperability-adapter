@@ -22,7 +22,8 @@ public enum ServiceLocations {
     @JsonCreator
     public static ServiceLocations fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_SERVICE_LOCATION +" Input service location value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            //throw new IllegalArgumentException(INVALID_SERVICE_LOCATION +" Input service location value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return ServiceLocations.valueOf(value.toUpperCase());

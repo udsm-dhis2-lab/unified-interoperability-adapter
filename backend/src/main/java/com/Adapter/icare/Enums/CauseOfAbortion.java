@@ -21,7 +21,8 @@ public enum CauseOfAbortion {
     @JsonCreator
     public static CauseOfAbortion fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_CAUSE_OF_ABORTION +" Input cause of abortion value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            //throw new IllegalArgumentException(INVALID_CAUSE_OF_ABORTION +" Input cause of abortion value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return CauseOfAbortion.valueOf(value.toUpperCase());
