@@ -20,7 +20,8 @@ public enum InfantFeeding {
     @JsonCreator
     public static InfantFeeding fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_INFANT_FEEDING +" Input infant feeding value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+//            throw new IllegalArgumentException(INVALID_INFANT_FEEDING +" Input infant feeding value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return InfantFeeding.valueOf(value.toUpperCase());

@@ -19,7 +19,8 @@ public enum GENDER {
     @JsonCreator
     public static GENDER fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_GENDER +" Input gender value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+//            throw new IllegalArgumentException(INVALID_GENDER +" Input gender value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+                return null;
         }
         try {
             return GENDER.valueOf(value.toUpperCase());

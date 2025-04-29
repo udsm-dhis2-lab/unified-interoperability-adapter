@@ -19,7 +19,8 @@ public enum ServiceModality {
     @JsonCreator
     public static ServiceModality fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_SERVICE_MODALITY +" Input service modality value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            //throw new IllegalArgumentException(INVALID_SERVICE_MODALITY +" Input service modality value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return ServiceModality.valueOf(value.toUpperCase());

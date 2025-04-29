@@ -24,7 +24,8 @@ public enum BirthPlace {
     @JsonCreator
     public static BirthPlace fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_BIRTH_PLACE +" Input birth place value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            //throw new IllegalArgumentException(INVALID_BIRTH_PLACE +" Input birth place value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return BirthPlace.valueOf(value.toUpperCase());

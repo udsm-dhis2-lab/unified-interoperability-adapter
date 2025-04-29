@@ -19,7 +19,8 @@ public enum ReferReason {
     @JsonCreator
     public static ReferReason fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_REFER_REASON +" Input refer reason value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            //throw new IllegalArgumentException(INVALID_REFER_REASON +" Input refer reason value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return ReferReason.valueOf(value.toUpperCase());

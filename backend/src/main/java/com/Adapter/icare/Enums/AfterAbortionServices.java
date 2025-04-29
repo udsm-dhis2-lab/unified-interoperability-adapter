@@ -20,7 +20,8 @@ public enum AfterAbortionServices {
     @JsonCreator
     public static AfterAbortionServices fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException(INVALID_AFTER_ABORTION_SERVICE +" Input after abortion service value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            //throw new IllegalArgumentException(INVALID_AFTER_ABORTION_SERVICE +" Input after abortion service value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            return null;
         }
         try {
             return AfterAbortionServices.valueOf(value.toUpperCase());
