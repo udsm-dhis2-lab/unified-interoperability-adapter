@@ -6,5 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CecapDTO {
-    private CancerScreeningDetailsDTO cancerScreeningDetailsDTO;
+    private CancerScreeningDetailsDTO cancerScreeningDetails;
 }

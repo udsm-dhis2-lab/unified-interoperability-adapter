@@ -10,7 +10,6 @@ public class CervicalCancer {
     private boolean screenedWithVIA;
     private boolean viaTestPositive;
     private Boolean screenedWithHPVDNA;
-    private Boolean viaTestPositive;
     private Boolean hpvDNAPositive;
     private Boolean diagnosedWithLargeLesion;
     private Boolean diagnosedWithSmallOrModerateLesion;

@@ -36,5 +36,5 @@ public class LaborAndDeliveryDetailsDTO {
     private Integer pregnancyAgeInWeeks;
     private Boolean wasProvidedWithAntenatalCorticosteroid;
     private Boolean hasHistoryOfFGM;
-    private Map<String, Object> hivTestDetails;
+    private HiVDetailsDTO hivDetails;
 }
