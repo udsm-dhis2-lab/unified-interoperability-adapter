@@ -77,6 +77,14 @@ public class SharedHealthRecordsDTO {
 
     private FamilyPlanningDetailsDTO familyPlanningDetails;
 
+    private ChildHealthDetailsDTO childHealthDetails;
+
+    private CpacDetailsDTO cpacDetails;
+
+    private CecapDTO cecap;
+
+    private ContraceptivesDTO contraceptives;
+
     private List<BillingsDetailsDTO> billingsDetails;
 
     private VisitMainPaymentDetailsDTO visitMainPaymentDetails;

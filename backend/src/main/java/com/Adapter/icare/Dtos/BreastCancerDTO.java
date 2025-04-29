@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class breastCancerDTO {
+public class BreastCancerDTO {
     private Boolean foundWithBreastCancerSymptoms;
     private Boolean screened;
 }
