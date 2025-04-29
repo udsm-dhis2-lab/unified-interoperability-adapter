@@ -18,5 +18,10 @@ public class ContraceptivesDTO {
     private boolean didReceiveInjection;
     private int numberOfFemaleCondomsProvided;
     private int numberOfMaleCondomsProvided;
+    private Boolean didReceiveSDM;
+    private Boolean didUseLAM;
+    private Boolean didOptToUseEmergencyMethods;
+    private Boolean didRemoveIUD;
+    private Boolean didHaveVasectomy;
 
 }
