@@ -9,5 +9,5 @@ import lombok.Setter;
 public class DiseaseStatusDTO {
     private STATUS status;
     private String code;
-    private boolean providedWithTreatment;
+    private Boolean providedWithTreatment;
 }

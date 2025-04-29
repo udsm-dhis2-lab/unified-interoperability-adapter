@@ -79,6 +79,8 @@ public class SharedHealthRecordsDTO {
 
     private ChildHealthDetailsDTO childHealthDetails;
 
+    private CpacDetailsDTO cpacDetails;
+
     private List<BillingsDetailsDTO> billingsDetails;
 
     private VisitMainPaymentDetailsDTO visitMainPaymentDetails;
