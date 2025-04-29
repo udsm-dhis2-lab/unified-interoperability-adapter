@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 public enum InfantFeeding {
     EBF,
+    RF,
     MF;
 
     public static final String INVALID_INFANT_FEEDING = "Invalid infant feeding:";

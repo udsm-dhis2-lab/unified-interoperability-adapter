@@ -3352,10 +3352,7 @@ public class SharedHealthRecordsService {
                                                                                                 .setPuerperalPsychosis(
                                                                                                                 puerperalPsychosis);
                                                                         }
-                                                                        postnatalDetailsDTO.setHoursSinceDelivery(
-                                                                                        getComponentIntValue(
-                                                                                                        postnatalDetailObservation,
-                                                                                                        10));
+
                                                                         // TODO: Add breast feeding details
 
                                                                         // Birth details observation

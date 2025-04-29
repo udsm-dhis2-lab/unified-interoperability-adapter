@@ -1,5 +1,8 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.BirthPlace;
+import com.Adapter.icare.Enums.PlaceOfOrigin;
+import com.Adapter.icare.Enums.STATUS;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,9 +19,15 @@ public class PostnatalDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
     private Boolean positiveHivStatusBeforeService;
+    private STATUS hivStatusAsSeenFromAncCard;
+    private HiVDetailsDTO hivDetails;
+    private PlaceOfOrigin motherAndChildOrigin;
     private Boolean referredToCTC;
+    private BirthPlace placeOfBirth;
+    private PNCProphylaxisDTO prophylaxis;
+    private List<CounsellingDTO> counselling;
     private Boolean referredToClinicForFurtherServices;
-    private Integer hoursSinceDelivery;
+    private int daysSinceDelivery;
     private String outCome;
     private Integer APGARScore;
     private Map<String,Object> breastFeedingDetails;

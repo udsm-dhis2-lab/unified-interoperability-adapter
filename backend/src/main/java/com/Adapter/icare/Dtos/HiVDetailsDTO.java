@@ -9,6 +9,7 @@ import lombok.Setter;
 @Setter
 public class HiVDetailsDTO {
     private STATUS status;
+    private String code;
     private int hivTestNumber;
     private boolean referredToCTC;
     private AncHivStatusDTO ancHivStatus;
