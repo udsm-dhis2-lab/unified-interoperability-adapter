@@ -2934,12 +2934,6 @@ public class SharedHealthRecordsService {
                                                                                                 }
                                                                                         }
                                                                                 }
-                                                                                familyPlanningDetailsDTO
-                                                                                                .setLongTermMethods(
-                                                                                                                longTermMethodDTOS);
-                                                                                familyPlanningDetailsDTO
-                                                                                                .setShortTermMethods(
-                                                                                                                shortTermMethodDTOS);
                                                                         }
 
                                                                         templateData.setFamilyPlanningDetails(
