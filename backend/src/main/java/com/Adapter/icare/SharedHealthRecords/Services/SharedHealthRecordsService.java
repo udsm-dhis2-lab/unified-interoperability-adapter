@@ -17,6 +17,7 @@ import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Enums.BirthPlace;
 import com.Adapter.icare.Enums.CareType;
 import com.Adapter.icare.Enums.STATUS;
 import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
@@ -3000,9 +3001,9 @@ public class SharedHealthRecordsService {
                                                                                                                 .setPlaceOfBirth(
                                                                                                                                 extension.hasValue()
                                                                                                                                                 && extension.getValue() instanceof StringType
-                                                                                                                                                                ? ((StringType) extension
-                                                                                                                                                                                .getValue())
-                                                                                                                                                                                .getValue()
+                                                                                                                                                                ? BirthPlace.fromString(((StringType) extension
+                                                                                                                                        .getValue())
+                                                                                                                                        .getValue())
                                                                                                                                                                 : null);
                                                                                         }
                                                                                         if (extension.hasUrl()
@@ -3247,8 +3248,6 @@ public class SharedHealthRecordsService {
                                                                                                                         && !procedure.getCode()
                                                                                                                                         .getCoding()
                                                                                                                                         .isEmpty());
-                                                                                        birthDetailsDTO.setBreatheAssistance(
-                                                                                                        breatheAssistanceDTO);
                                                                                 }
                                                                                 birthDetailsDTOS.add(birthDetailsDTO);
                                                                         }
@@ -3460,8 +3459,6 @@ public class SharedHealthRecordsService {
                                                                                                                                                 && !procedure.getCode()
                                                                                                                                                                 .getCoding()
                                                                                                                                                                 .isEmpty());
-                                                                                                birthDetailsDTO.setBreatheAssistance(
-                                                                                                                breatheAssistanceDTO);
                                                                                         }
                                                                                         birthDetailsPostnatalDTOS.add(
                                                                                                         birthDetailsDTO);

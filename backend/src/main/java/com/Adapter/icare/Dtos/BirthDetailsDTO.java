@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.MethodOfResuscitation;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,6 +27,13 @@ public class BirthDetailsDTO {
     private Boolean providedWithARV;
     private boolean referred;
     private List<VaccinationDetailsDTO> vaccinationDetails;
-    private BreatheAssistanceDTO breatheAssistance;
     private List<Map<String,Object>> otherServices;
+    private boolean bornWithDisabilities;
+    private Boolean hivDnaPCRTested;
+    private Boolean childHivStatus;
+    private ApgaScoreDTO apgaScore;
+    private Boolean wasBreastFedWithinOneHourAfterDelivery;
+    private OutcomeDetailsDTO outcomeDetails;
+    private MethodOfResuscitation methodOfResuscitation;
+
 }

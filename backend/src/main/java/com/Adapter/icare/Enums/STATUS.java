@@ -19,7 +19,7 @@ public enum STATUS {
     @JsonCreator
     public static STATUS fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Input status value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            throw new IllegalArgumentException(INVALID_STATUS_PREFIX+ " Input status value cannot be null. " + ALLOWED_VALUES_MESSAGE);
         }
         try {
             return STATUS.valueOf(value.toUpperCase());

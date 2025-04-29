@@ -22,7 +22,7 @@ public enum CareType {
     @JsonCreator
     public static CareType fromString(String value) {
         if (value == null) {
-            throw new IllegalArgumentException("Input CareType value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+            throw new IllegalArgumentException(INVALID_CARE_TYPE_PREFIX + " Input CareType value cannot be null. " + ALLOWED_VALUES_MESSAGE);
         }
         try {
             return CareType.valueOf(value.toUpperCase());
