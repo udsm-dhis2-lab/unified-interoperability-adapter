@@ -70,8 +70,8 @@
             <!-- list of queries -->
             <nz-card *ngIf="queries.length > 0" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
               <p>Queries</p>
-              <textarea nz-input placeholder="Controlled autosize" [value]="queriesAsString"
-                [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
+              <textarea nz-input placeholder="Controlled autosize" (input)="onQueryChange($event)"
+                [value]="queriesAsString" [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
             </nz-card>
 
             <nz-card *ngIf="freeTextQuery" style="width: 100%; margin-top: 16px; margin-bottom: 16px">

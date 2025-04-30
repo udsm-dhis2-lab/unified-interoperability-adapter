@@ -75,6 +75,10 @@ export class DatasetMappingComponent implements OnInit {
     return JSON.stringify(this.queries, null, 2);
   }
 
+  onQueryChange(event: any) {
+    this.queries = JSON.parse(event.target.value);
+  }
+
   onAddQuery() {
     let primitiveValue: any;
 
