@@ -966,7 +966,7 @@ public class SharedHealthRecordsService {
                                         encounter, true, false);
                                 // System.out.println(observationGroups.size());
                                 for (Observation observationGroup : selfObservationGroups) {
-                                    List<Observation> observationsData = getObservationsByObservationGroupId(fhirClient,"self-vital-signs", encounter, observationGroup.getIdElement().getIdPart());git
+                                    List<Observation> observationsData = getObservationsByObservationGroupId(fhirClient,"self-vital-signs", encounter, observationGroup.getIdElement().getIdPart());
                                     if (!observationsData.isEmpty()) {
                                         Map<String, Object> vitalSign = new LinkedHashMap<>();
                                         for (Observation observation : observationsData) {
