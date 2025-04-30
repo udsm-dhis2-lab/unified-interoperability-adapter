@@ -365,6 +365,14 @@ public class SharedHealthRecordsService {
                                         .getText()
                                         : null);
 
+                                visitDetails.setReferredIn(
+                                        getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/visitDetails-referredIn")
+                                );
+
+                                visitDetails.setDisabled(
+                                        getExtensionValueBoolean(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/visitDetails-disabled")
+                                );
+
                                 List<CareServiceDTO> careServiceDTOs = new ArrayList<>();
 
                                 List<Observation> careServicesObs = getObservationsByCategory(
