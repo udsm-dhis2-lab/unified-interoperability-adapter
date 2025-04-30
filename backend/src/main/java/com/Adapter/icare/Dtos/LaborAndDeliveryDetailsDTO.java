@@ -1,5 +1,7 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.BirthPlace;
+import com.Adapter.icare.Enums.PlaceOfOrigin;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +20,7 @@ public class LaborAndDeliveryDetailsDTO {
     @NotNull
     private Map<String,Object> deliveryMethod;
     @NotNull
-    private String placeOfBirth;
+    private BirthPlace placeOfBirth;
     private Integer timeBetweenLaborPainAndDeliveryInHrs;
     @NotNull
     private Boolean isAttendantSkilled;
@@ -28,4 +30,11 @@ public class LaborAndDeliveryDetailsDTO {
     private List<CodeAndNameDTO> birthComplications;
     private List<BirthDetailsDTO> birthDetails;
     private Map<String,Object> others;
+    private PlaceOfOrigin motherOrigin;
+    private Boolean hasComeWithSpouse;
+    private Boolean hasComeWithCompanion;
+    private Integer pregnancyAgeInWeeks;
+    private Boolean wasProvidedWithAntenatalCorticosteroid;
+    private Boolean hasHistoryOfFGM;
+    private HiVDetailsDTO hivDetails;
 }

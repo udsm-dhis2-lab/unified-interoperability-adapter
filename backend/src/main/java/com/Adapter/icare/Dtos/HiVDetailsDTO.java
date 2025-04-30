@@ -4,10 +4,13 @@ import com.Adapter.icare.Enums.STATUS;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Getter
 @Setter
-public class DiseaseStatusDTO {
+public class HiVDetailsDTO {
     private STATUS status;
     private String code;
-    private Boolean providedWithTreatment;
+    private int hivTestNumber;
+    private boolean referredToCTC;
+    private AncHivStatusDTO ancHivStatus;
 }

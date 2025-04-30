@@ -1,0 +1,24 @@
+package com.Adapter.icare.Dtos;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class CervicalCancer {
+    private boolean suspected;
+    private boolean screenedWithVIA;
+    private boolean viaTestPositive;
+    private Boolean screenedWithHPVDNA;
+    private Boolean hpvDNAPositive;
+    private Boolean diagnosedWithLargeLesion;
+    private Boolean diagnosedWithSmallOrModerateLesion;
+    private Boolean treatedWithCryo;
+    private Boolean treatedWithThermo;
+    private Boolean treatedWithLEEP;
+    private Boolean firstTimeScreening;
+    private Boolean treatedOnTheSameDay;
+    private Boolean complicationsAfterTreatment;
+    private Boolean foundWithHivAndReferredToCTC;
+
+}

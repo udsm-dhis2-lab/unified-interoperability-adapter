@@ -11,5 +11,8 @@ import java.util.Map;
 public class SpouseDetailsDTO {
     private DiseaseStatusDTO hivDetails;
     private DiseaseStatusDTO syphilisDetails;
+    private DiseaseStatusDTO hepatitisB;
+    private boolean diagnosedWithOtherSTDs;
+    private boolean providedWithTreatmentForOtherSTDs;
     private List<Map<String,Object>> otherSpouseDetails;
 }
