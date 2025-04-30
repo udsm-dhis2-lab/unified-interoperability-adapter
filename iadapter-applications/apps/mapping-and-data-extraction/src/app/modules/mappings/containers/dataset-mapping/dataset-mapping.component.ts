@@ -5,11 +5,9 @@ import {
   OnInit,
   Renderer2,
 } from '@angular/core';
-import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { DatasetManagementService } from '../../services/dataset-management.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { SelectComponent } from 'apps/mapping-and-data-extraction/src/app/shared/components';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
 import {
   ConfigurationPage,
@@ -18,6 +16,8 @@ import {
   LoincCodePage,
   queryOperators,
 } from '../../models';
+import { SelectComponent } from '../../../../shared';
+import { SharedModule } from '../../../../shared/shared.module';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -97,7 +97,7 @@ export class DatasetMappingComponent implements OnInit {
       primitiveValue = trimmedValue;
     }
 
-    var query = {
+    const query = {
       leftSideQuery: {
         type: 'tableField',
         value: this.lhsQueryValue,
@@ -105,13 +105,13 @@ export class DatasetMappingComponent implements OnInit {
       operator: this.selectedQueryOperator,
       rightSideQuery: this.rhsQueryValue
         ? {
-          type: 'tableField',
-          value: this.rhsQueryValue,
-        }
+            type: 'tableField',
+            value: this.rhsQueryValue,
+          }
         : {
-          type: 'primitiveValue',
-          value: primitiveValue,
-        },
+            type: 'primitiveValue',
+            value: primitiveValue,
+          },
     };
     this.queries = [...this.queries, query];
     this.lhsQueryValue = null;
@@ -122,13 +122,13 @@ export class DatasetMappingComponent implements OnInit {
 
   queryOperators = queryOperators;
 
-  selectedQueryOperator: string = '';
+  selectedQueryOperator = '';
   onQueryOperatorSelect(value: string) {
     this.selectedQueryOperator = value;
   }
 
-  isSubmittingMapping: boolean = false;
-  isDeletingMapping: boolean = false;
+  isSubmittingMapping = false;
+  isDeletingMapping = false;
   mappingUuid?: string;
 
   alert = {
@@ -141,21 +141,21 @@ export class DatasetMappingComponent implements OnInit {
     disagregations: [],
   };
 
-  isLoadingDisaggregation: boolean = false;
-  leftColumnSpan: number = 16;
-  rightColumnSpan: number = 8;
+  isLoadingDisaggregation = false;
+  leftColumnSpan = 16;
+  rightColumnSpan = 8;
 
   dataSetIds: { uuid: string; id: string } = { uuid: '', id: '' };
-  isLoading: boolean = true;
-  datasetFormContent: string = '';
+  isLoading = true;
+  datasetFormContent = '';
   sanitizedContent!: SafeHtml;
 
   inputElements: HTMLInputElement[] = [];
-  selectedInputId: string = '';
+  selectedInputId = '';
 
   searchConfigurationChange$ = new BehaviorSubject('');
-  placeHolderForConfigurationSelect: string = 'Select configuration';
-  isLoadingConfigurations: boolean = false;
+  placeHolderForConfigurationSelect = 'Select configuration';
+  isLoadingConfigurations = false;
   selectedConfiguration?: string;
   configurationOptionList: any[] = [];
 
@@ -195,29 +195,29 @@ export class DatasetMappingComponent implements OnInit {
 
   selectedICdCodes: { name: string; code: string }[] = [];
   searchIcdCodeChange$ = new BehaviorSubject('');
-  placeHolderForIcdCodeSelect: string = 'Select ICD Code';
-  isLoadingIcdCodes: boolean = false;
+  placeHolderForIcdCodeSelect = 'Select ICD Code';
+  isLoadingIcdCodes = false;
   selectedIcdCode?: { name: string; code: string };
   icdCodeOptionList: any[] = [];
 
   selectedLoincCodes: { name: string; code: string }[] = [];
   searchLoincCodeChange$ = new BehaviorSubject('');
-  placeHolderForLoincCodeSelect: string = 'Select LOINC Code (Order)';
-  isLoadingLoincCodes: boolean = false;
+  placeHolderForLoincCodeSelect = 'Select LOINC Code (Order)';
+  isLoadingLoincCodes = false;
   selectedLoincCode?: { name: string; code: string };
   loincCodeOptionList: any[] = [];
 
   selectedLoincCodesObs: { name: string; code: string }[] = [];
   searchLoincCodeChangeObs$ = new BehaviorSubject('');
-  placeHolderForLoincCodeSelectObs: string = 'Select LOINC Code (Obs)';
-  isLoadingLoincCodesObs: boolean = false;
+  placeHolderForLoincCodeSelectObs = 'Select LOINC Code (Obs)';
+  isLoadingLoincCodesObs = false;
   selectedLoincCodeObs?: { name: string; code: string };
   loincCodeOptionListObs: any[] = [];
 
   selectedMsdCodes: { name: string; code: string }[] = [];
   searchMsdCodesChange$ = new BehaviorSubject('');
-  placeHolderForMsdCodes: string = 'Select Msd Codes';
-  isLoadingMsdCodes: boolean = false;
+  placeHolderForMsdCodes = 'Select Msd Codes';
+  isLoadingMsdCodes = false;
   selectedMsdCode?: { name: string; code: string };
   msdCodesOptionList: any[] = [];
 
@@ -257,6 +257,10 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   onIcdCodeSelect(value: { name: string; code: string }) {
+    if (Array.isArray(value)) {
+      this.selectedICdCodes = value;
+      return;
+    }
     this.selectedICdCodes = [...this.selectedICdCodes, value];
   }
 
@@ -289,7 +293,7 @@ export class DatasetMappingComponent implements OnInit {
     private elRef: ElementRef,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
@@ -469,7 +473,11 @@ export class DatasetMappingComponent implements OnInit {
                 this.assignConfigurationToSelectedDisaggregation(
                   configuration.value
                 );
-              } else if (key === 'endAge' || key === 'co' || key === 'higherWeight') {
+              } else if (
+                key === 'endAge' ||
+                key === 'co' ||
+                key === 'higherWeight'
+              ) {
                 return;
               } else if (key === 'lowerWeight') {
                 const configuration = this.configurationOptionList.find(
@@ -492,7 +500,11 @@ export class DatasetMappingComponent implements OnInit {
 
             for (const param of data.mapping.params) {
               Object.keys(param).forEach((key) => {
-                if (key === 'endAge' || key === 'co' || key === 'higherWeight') {
+                if (
+                  key === 'endAge' ||
+                  key === 'co' ||
+                  key === 'higherWeight'
+                ) {
                   return;
                 } else if (key === 'startAge') {
                   const configuration = this.configurationOptionList.find(
@@ -514,7 +526,8 @@ export class DatasetMappingComponent implements OnInit {
                   }
                 } else if (key === 'lowerWeight') {
                   const configuration = this.configurationOptionList.find(
-                    (item: any) => item.value.keyToUseInMappings === 'weightGroup'
+                    (item: any) =>
+                      item.value.keyToUseInMappings === 'weightGroup'
                   );
                   const selectedOption = configuration.value.options.find(
                     (item: any) =>
@@ -627,7 +640,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => { },
+      error: (error: any) => {},
     });
   }
 
@@ -656,7 +669,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => { },
+      error: (error: any) => {},
     });
   }
 
@@ -685,7 +698,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => { },
+      error: (error: any) => {},
     });
   }
 
@@ -752,7 +765,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => { },
+      error: (error: any) => {},
     });
   }
 
@@ -821,26 +834,24 @@ export class DatasetMappingComponent implements OnInit {
           name: '',
           code: '',
         },
-        params: this.mappingsData.disagregations
-          .map((item) => {
-            const reducedConfig = (item.configurations ?? []).reduce(
-              (acc, config: Setting) => {
-                if (config.payLoad) {
-                  Object.keys(config.payLoad).forEach((key) => {
-                    acc[key] = config.payLoad[key];
-                  });
-                }
-                return acc;
-              },
-              {} as { [key: string]: any }
-            );
+        params: this.mappingsData.disagregations.map((item) => {
+          const reducedConfig = (item.configurations ?? []).reduce(
+            (acc, config: Setting) => {
+              if (config.payLoad) {
+                Object.keys(config.payLoad).forEach((key) => {
+                  acc[key] = config.payLoad[key];
+                });
+              }
+              return acc;
+            },
+            {} as { [key: string]: any }
+          );
 
-            return {
-              co: item.categoryOptionComboId,
-              ...reducedConfig,
-            };
-          })
-
+          return {
+            co: item.categoryOptionComboId,
+            ...reducedConfig,
+          };
+        }),
       },
       dataKey: this.selectedInputId,
       namespace: `MAPPINGS-${this.dataSetIds.id}`,
@@ -924,5 +935,12 @@ export class DatasetMappingComponent implements OnInit {
     this.router.navigate(['mapping-and-data-extraction'], {
       queryParams: { from: 'mapping' },
     });
+  }
+
+  getCodeName(icdCode: any): string {
+    if (Array.isArray(icdCode)) {
+      return icdCode[0].name;
+    }
+    return icdCode.name;
   }
 }
