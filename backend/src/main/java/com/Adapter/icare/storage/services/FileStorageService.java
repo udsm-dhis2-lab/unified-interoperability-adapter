@@ -23,6 +23,15 @@ public class FileStorageService {
     public FileStorageService(
             FileSystemResource fileSystemResource) {
         this.fileStorageLocation = Paths.get(fileSystemResource.getPath().toString());
+
+        try {
+            if (!Files.exists(this.fileStorageLocation)) {
+                Files.createDirectories(this.fileStorageLocation);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create the root directory where the uploaded files will be stored.", e);
+        }
+                    
     }
 
     public String storeFile(MultipartFile file) throws IOException {
