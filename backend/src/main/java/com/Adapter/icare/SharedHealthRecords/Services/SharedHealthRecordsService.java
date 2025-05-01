@@ -2611,6 +2611,14 @@ public class SharedHealthRecordsService {
                                     antenatalCareDetailsDTO.setSyphilisDetails(
                                             syphilisDetails);
 
+                                    antenatalCareDetailsDTO.setDiagnosedWithOtherSTDs(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-diagnosedWithOtherSTDs")
+                                    );
+
+                                    antenatalCareDetailsDTO.setProvidedWithTreatmentForOtherSTDs(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-providedWithTreatmentForOtherSTDs")
+                                    );
+
                                     antenatalCareDetailsDTO.setGravidity(
                                             getComponentIntValue(
                                                     observation,
@@ -2626,6 +2634,33 @@ public class SharedHealthRecordsService {
                                     spouseHivDetails.setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
                                             observation, 6)));
 
+                                    spouseHivDetails.setHivTestNumber(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-spouseDetails-hivDetails-hivTestNumber"));
+
+                                    DiseaseStatusDTO spouseHepatitisBDetails = new DiseaseStatusDTO();
+
+                                    List<Observation.ObservationComponentComponent> spouseHepatitisBDetailsComponents = getComponentsByCode(observation, "http://loinc.org", "16935-9");
+
+                                    spouseHepatitisBDetails.setCode(
+                                            !spouseHepatitisBDetailsComponents.isEmpty() && spouseHepatitisBDetailsComponents.get(0).hasValueCodeableConcept() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().hasCoding() &&
+                                                    !spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().isEmpty() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).hasCode() ?
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).getCode() : null
+                                    );
+
+                                    spouseHepatitisBDetails.setStatus( STATUS.fromString(
+                                            !spouseHepatitisBDetailsComponents.isEmpty() && spouseHepatitisBDetailsComponents.get(0).hasValueCodeableConcept() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().hasCoding() &&
+                                                    !spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().isEmpty() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).hasDisplay() ?
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).getDisplay() : null
+                                    ));
+
+                                    spouseHepatitisBDetails.setProvidedWithTreatment(
+                                            getExtensionValueBoolean(observation,"http://fhir.moh.go.tz/fhir/StructureDefinition/anc-spouseDetails-hepatitisB-providedWithTreatments")
+                                    );
+
+
                                     DiseaseStatusDTO spouseSyphilisDetails = new DiseaseStatusDTO();
                                     spouseSyphilisDetails.setCode(
                                             getComponentValueCodeableConceptCode(
@@ -2635,8 +2670,12 @@ public class SharedHealthRecordsService {
                                             .setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
                                                     observation,
                                                     7)));
+                                    spouseSyphilisDetails.setProvidedWithTreatment(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-spouseDetails-syphilisDetails-providedWithTreatment")
+                                    );
 
                                     spouseDetails.setHivDetails(spouseHivDetails);
+                                    spouseDetails.setHepatitisB(spouseHepatitisBDetails);
                                     spouseDetails.setSyphilisDetails(
                                             spouseSyphilisDetails);
 
