@@ -279,9 +279,7 @@ public class SharedHealthRecordsService {
                                 List<VisitMainPaymentDetailsDTO> visitMainPaymentDetailsDTOS = new ArrayList<>();
                                 if (!coverages.isEmpty()) {
                                     visitMainPaymentDetailsDTOS = coverages.stream()
-                                            .map(coverage -> this.clientRegistryService
-                                                    .mapToMainVisitPaymentDetails(
-                                                            coverage))
+                                            .map(this.clientRegistryService::mapToMainVisitPaymentDetails)
                                             .collect(Collectors.toList());
                                 }
                                 // patientDTO.setPaymentDetails(paymentDetailsDTOs);
@@ -679,7 +677,7 @@ public class SharedHealthRecordsService {
                                                     !observation.getCategory().isEmpty() && observation.getCategory().get(0).hasCoding() &&
                                                             !observation.getCategory().get(0).getCoding().isEmpty() &&
                                                             observation.getCategory().get(0).getCoding().get(0).hasCode() &&
-                                                            observation.getCategory().get(0).getCoding().get(0).getCode() == "vital-signs-notes"
+                                                            observation.getCategory().get(0).getCoding().get(0).getCode().equals("vital-signs")
                                             ) {
                                                 vitalSign.put("notes",
                                                         observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
@@ -1082,12 +1080,11 @@ public class SharedHealthRecordsService {
                                                         null);
                                             }
 
-                                            System.out.println(observation.hasCategory());
                                             if (observation.hasCategory() &&
                                                     !observation.getCategory().isEmpty() && observation.getCategory().get(0).hasCoding() &&
                                                     !observation.getCategory().get(0).getCoding().isEmpty() &&
                                                     observation.getCategory().get(0).getCoding().get(0).hasCode() &&
-                                                    observation.getCategory().get(0).getCoding().get(0).getCode() == "vital-signs-notes"
+                                                    Objects.equals(observation.getCategory().get(0).getCoding().get(0).getCode(), "self-vital-signs")
                                             ) {
                                                 vitalSign.put("notes",
                                                         observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
