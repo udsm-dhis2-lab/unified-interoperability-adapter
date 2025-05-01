@@ -148,8 +148,7 @@
               <div nz-col nzSpan="12">
                 <app-custom-select [placeHolder]="placeHolderForIcdCodeSelect" [isMultiple]="true"
                   [isLoading]="isLoadingIcdCodes" [optionList]="icdCodeOptionList"
-                  (onSearchChange)="onSearchIcdCode($event)"
-                  (onSelectChange)="onIcdCodeSelect($event)"></app-custom-select>
+                  (searchChange)="onSearchIcdCode($event)" (selectChange)="onIcdCodeSelect($event)"></app-custom-select>
               </div>
             </div>
 

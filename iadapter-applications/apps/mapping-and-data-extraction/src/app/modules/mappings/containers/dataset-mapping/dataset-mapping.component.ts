@@ -105,13 +105,13 @@ export class DatasetMappingComponent implements OnInit {
       operator: this.selectedQueryOperator,
       rightSideQuery: this.rhsQueryValue
         ? {
-            type: 'tableField',
-            value: this.rhsQueryValue,
-          }
+          type: 'tableField',
+          value: this.rhsQueryValue,
+        }
         : {
-            type: 'primitiveValue',
-            value: primitiveValue,
-          },
+          type: 'primitiveValue',
+          value: primitiveValue,
+        },
     };
     this.queries = [...this.queries, query];
     this.lhsQueryValue = null;
@@ -289,7 +289,7 @@ export class DatasetMappingComponent implements OnInit {
     private elRef: ElementRef,
     private cdr: ChangeDetectorRef,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
@@ -636,7 +636,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 
@@ -665,7 +665,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 
@@ -694,7 +694,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 
@@ -761,7 +761,7 @@ export class DatasetMappingComponent implements OnInit {
             };
           }) ?? [];
       },
-      error: (error: any) => {},
+      error: (error: any) => { },
     });
   }
 

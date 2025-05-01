@@ -38,7 +38,6 @@ export class SelectComponent {
 
   onSelect(value: any): void {
     if (!this.isMultiple) {
-      console.log('value', value);
       this.selectChange.emit(value);
       return;
     }
