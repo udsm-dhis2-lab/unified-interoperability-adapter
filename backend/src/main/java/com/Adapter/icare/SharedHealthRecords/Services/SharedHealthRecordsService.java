@@ -674,6 +674,20 @@ public class SharedHealthRecordsService {
                                                 vitalSign.put("dateTime",
                                                         null);
                                             }
+
+                                            if (observation.hasCategory() &&
+                                                    !observation.getCategory().isEmpty() && observation.getCategory().get(0).hasCoding() &&
+                                                            !observation.getCategory().get(0).getCoding().isEmpty() &&
+                                                            observation.getCategory().get(0).getCoding().get(0).hasCode() &&
+                                                            observation.getCategory().get(0).getCoding().get(0).getCode() == "vital-signs-notes"
+                                            ) {
+                                                vitalSign.put("notes",
+                                                        observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
+                                                                ? observation.getNote().get(0).getText()
+                                                                : null);
+                                            } else {
+                                                vitalSign.put("notes", null);
+                                            }
                                         }
                                         vitalSigns.add(vitalSign);
                                     }
@@ -725,6 +739,7 @@ public class SharedHealthRecordsService {
                                         }
                                         visitNotesData.put("chiefComplaints",
                                                 chiefComplaints);
+                                        // TO_BE_ADDED: -> SInjured
                                         // historyOfPresentIllness
                                         List<String> historyOfPresentIllness = new ArrayList<>();
                                         List<Observation> historyOfPresentIllnessData = getObservationsByObservationGroupId(
@@ -966,7 +981,7 @@ public class SharedHealthRecordsService {
 
                                 // Self Monitoring Clinical Information
                                 SelfMonitoringClinicalInformationDTO selfMonitoringClinicalInformationDTO = new SelfMonitoringClinicalInformationDTO();
-                                List<Map<String, Object>> selfvitalSigns = new ArrayList<>();
+                                List<Map<String, Object>> selfVitalSigns = new ArrayList<>();
                                 // Get Observation Group
                                 List<Observation> selfObservationGroups = getObservationsByCategory(
                                         fhirClient,
@@ -1066,12 +1081,27 @@ public class SharedHealthRecordsService {
                                                 vitalSign.put("dateTime",
                                                         null);
                                             }
+
+                                            System.out.println(observation.hasCategory());
+                                            if (observation.hasCategory() &&
+                                                    !observation.getCategory().isEmpty() && observation.getCategory().get(0).hasCoding() &&
+                                                    !observation.getCategory().get(0).getCoding().isEmpty() &&
+                                                    observation.getCategory().get(0).getCoding().get(0).hasCode() &&
+                                                    observation.getCategory().get(0).getCoding().get(0).getCode() == "vital-signs-notes"
+                                            ) {
+                                                vitalSign.put("notes",
+                                                        observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
+                                                                ? observation.getNote().get(0).getText()
+                                                                : null);
+                                            } else {
+                                                vitalSign.put("notes", null);
+                                            }
                                         }
-                                        selfvitalSigns.add(vitalSign);
+                                        selfVitalSigns.add(vitalSign);
                                     }
                                 }
 
-                                selfMonitoringClinicalInformationDTO.setVitalSigns(selfvitalSigns);
+                                selfMonitoringClinicalInformationDTO.setVitalSigns(selfVitalSigns);
                                 templateData.setSelfMonitoringClinicalInformation(selfMonitoringClinicalInformationDTO);
 
                                 // End Self Monitoring
