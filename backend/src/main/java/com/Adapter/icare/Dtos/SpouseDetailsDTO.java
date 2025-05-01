@@ -15,4 +15,5 @@ public class SpouseDetailsDTO {
     private boolean diagnosedWithOtherSTDs;
     private boolean providedWithTreatmentForOtherSTDs;
     private List<Map<String,Object>> otherSpouseDetails;
+    private Integer hivTestNumber;
 }

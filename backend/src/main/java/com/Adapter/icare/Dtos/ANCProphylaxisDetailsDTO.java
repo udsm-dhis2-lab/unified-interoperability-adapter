@@ -6,10 +6,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ANCProphylaxisDetailsDTO {
-    private boolean providedWithLLIN;
-    private boolean providedWithIPT2;
-    private boolean providedWithIPT3;
-    private boolean providedWithIPT4;
-    private boolean providedWithMebendazoleOrAlbendazole;
-    private boolean providedWithIFFolic60Tablets;
+    private Boolean providedWithLLIN;
+    private Boolean providedWithIPT2;
+    private Boolean providedWithIPT3;
+    private Boolean providedWithIPT4;
+    private Boolean providedWithMebendazoleOrAlbendazole;
+    private Boolean providedWithIFFolic60Tablets;
 }

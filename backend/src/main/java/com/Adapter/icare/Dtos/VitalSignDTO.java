@@ -14,7 +14,7 @@ public class VitalSignDTO {
     private Integer weight;
     private Integer temperature;
     private Integer height;
-    private String respiration;
+    private Integer respiration;
     private Integer pulseRate;
     private String dateTime;
     private String notes;

@@ -1,10 +1,12 @@
 package com.Adapter.icare.Enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+@Slf4j
 public enum DischargedLocation {
     H,
     RD,
@@ -21,14 +23,17 @@ public enum DischargedLocation {
 
     @JsonCreator
     public static DischargedLocation fromString(String value) {
-        if (value == null) {
-            //throw new IllegalArgumentException(INVALID_DISCHARGED_LOCATION_PREFIX + " Input DischargedLocation value cannot be null. " + ALLOWED_VALUES_MESSAGE);
-            return null;
-        }
         try {
+            if (value == null) {
+                //throw new IllegalArgumentException(INVALID_DISCHARGED_LOCATION_PREFIX + " Input DischargedLocation value cannot be null. " + ALLOWED_VALUES_MESSAGE);
+                log.error(INVALID_DISCHARGED_LOCATION_PREFIX + " Input DischargedLocation value cannot be null. {} ", ALLOWED_VALUES_MESSAGE);
+                return null;
+            }
             return DischargedLocation.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
-            throw new IllegalArgumentException(INVALID_DISCHARGED_LOCATION_PREFIX + " '" + value + "'. " + ALLOWED_VALUES_MESSAGE, ex);
+            // throw new IllegalArgumentException(INVALID_DISCHARGED_LOCATION_PREFIX + " '" + value + "'. " + ALLOWED_VALUES_MESSAGE, ex);
+            log.error(INVALID_DISCHARGED_LOCATION_PREFIX + " '{}'. {}", value, ALLOWED_VALUES_MESSAGE);
+            return null;
         }
     }
 }

@@ -10,4 +10,6 @@ import java.util.Map;
 @Setter
 public class SelfMonitoringClinicalInformationDTO {
     private List<Map<String,Object>> vitalSigns;
+
+
 }

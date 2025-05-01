@@ -121,6 +121,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("postnatalDetails", this.getPostnatalDetails());
         sharedRecordMap.put("billingsDetails", this.getBillingsDetails());
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
+        sharedRecordMap.put("selfMonitoringClinicalInformation", this.getSelfMonitoringClinicalInformation());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());
         sharedRecordMap.put("otherInformation", this.getOtherInformation());
         sharedRecordMap.put("appointment", this.getAppointment().stream().map(AppointmentDetailsDTO::toMap));
