@@ -17,10 +17,7 @@ import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
-import com.Adapter.icare.Enums.BirthPlace;
-import com.Adapter.icare.Enums.CareType;
-import com.Adapter.icare.Enums.DischargedLocation;
-import com.Adapter.icare.Enums.STATUS;
+import com.Adapter.icare.Enums.*;
 import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -3351,6 +3348,44 @@ public class SharedHealthRecordsService {
                                         }
                                     }
                                 }
+
+                                List<Observation> laborAndDeliveryObservations = getObservationsByCategory(
+                                        fhirClient,
+                                        "family-planning-counseling", encounter,
+                                        false, true);
+
+                                Observation laborAndDeliveryObservation = !laborAndDeliveryObservations.isEmpty() ? laborAndDeliveryObservations.get(0) : null;
+
+                                if(laborAndDeliveryObservation != null){
+                                    laborAndDeliveryDetailsDTO.setMotherOrigin(PlaceOfOrigin.fromString(
+                                            getExtensionValueString(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-mother-origin")
+                                    ));
+
+                                    laborAndDeliveryDetailsDTO.setHasComeWithSpouse(getExtensionValueBoolean(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-spouse-accompaniment"));
+
+                                    laborAndDeliveryDetailsDTO.setHasComeWithCompanion(getExtensionValueBoolean(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-companion-accompaniment"));
+
+                                    laborAndDeliveryDetailsDTO.setPregnancyAgeInWeeks(getExtensionValueInt(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-pregnancy-age-in-weeks"));
+
+                                    laborAndDeliveryDetailsDTO.setWasProvidedWithAntenatalCorticosteroid(getExtensionValueBoolean(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-antenatal-corticosteroid-provided"));
+
+                                    laborAndDeliveryDetailsDTO.setHasHistoryOfFGM(getExtensionValueBoolean(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-history-of-fgm"));
+
+                                    LDHivDetailsDTO ldHivDetailsDTO = new LDHivDetailsDTO();
+                                    ldHivDetailsDTO.setStatus(STATUS.fromString(getExtensionValueString(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-status")));
+
+                                    ldHivDetailsDTO.setHivTestNumber(getExtensionValueInt(laborAndDeliveryObservation,"http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-hivTestNumber"));
+
+                                    ldHivDetailsDTO.setReferredToCTC(getExtensionValueBoolean(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-referredToCTC"));
+
+                                    AncHivStatusDTO ldAncHivStatusDTO = new AncHivStatusDTO();
+                                    ldAncHivStatusDTO.setStatus(STATUS.fromString(getExtensionValueString(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-status")));
+                                    ldAncHivStatusDTO.setNumberOfTestTaken(getExtensionValueInt(laborAndDeliveryObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-numberOfTestsTaken"));
+
+                                    ldHivDetailsDTO.setAncHivStatus(ldAncHivStatusDTO);
+                                    laborAndDeliveryDetailsDTO.setHivDetails(ldHivDetailsDTO);
+                                }
+
 
                                 // Infant and family planning counseling
                                 List<Observation> infantFeedingCounselings = getObservationsByCategory(

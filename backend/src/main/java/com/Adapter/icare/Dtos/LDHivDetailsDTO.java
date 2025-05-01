@@ -7,10 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class HiVDetailsDTO {
+public class LDHivDetailsDTO {
     private STATUS status;
     private String code;
-    private int hivTestNumber;
-    private boolean referredToCTC;
+    private Integer hivTestNumber;
+    private Boolean referredToCTC;
     private AncHivStatusDTO ancHivStatus;
 }
