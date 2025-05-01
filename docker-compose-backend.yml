@@ -6,32 +6,46 @@ services:
     volumes:
       - ./backend:/app
       - ~/.m2:/root/.m2
+      - ./files:/app/files
     ports:
       - "8080:8091"
       - "8000:8000"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:mysql://iadapter-db:3306/${MYSQL_DB:-hduapicoredb}?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://iadapter-db:3306/${MYSQL_DB:-hduapicoredb}?useSSL=false&allowPublicKeyRetrieval=true&connectTimeout=30000&socketTimeout=60000&autoReconnect=true&maxReconnects=10
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-hduapicore}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
       JAVA_OPTS: "-Xmx1024m -Xms512m"
       FHIR_URL: 'URL_ADDRESSapter:8080/fhir'
+      SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: 10
+      SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: 5
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000
+      SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT: 600000
+      SPRING_DATASOURCE_HIKARI_MAX_LIFETIME: 1800000
+      FILE_STORAGE_PATH: /app/files
+      SPRING_LIQUIBASE_ENABLED: true
+      SPRING_LIQUIBASE_CHANGE_LOG: classpath:/db/changelog-liquibase.xml
     depends_on:
       iadapter-db:
         condition: service_healthy
     restart: on-failure
-    # Add memory limits
     deploy:
       resources:
         limits:
           memory: 1.5G
         reservations:
           memory: 512M
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8091/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   iadapter-db:
     restart: "always"
     image: mysql:8
-    command: "mysqld --character-set-server=utf8 --collation-server=utf8_general_ci"
+    command: ["mysqld", "--character-set-server=utf8", "--collation-server=utf8_general_ci", "--max-connections=1000", "--wait-timeout=28800", "--interactive-timeout=28800", "--net_read_timeout=3600", "--net_write_timeout=3600"]
     environment:
       MYSQL_DATABASE: ${MYSQL_DB:-hduapicoredb}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Admin123}
@@ -47,6 +61,12 @@ services:
     volumes:
       - ./backup/iadapter-data:/var/lib/mysql
       - ./backup:/docker-entrypoint-initdb.d
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
 
 networks:
   default:

@@ -36,9 +36,7 @@
             <h2>Basic Information</h2>
             <ul class="no-bullets">
               <li *ngFor="let key of objectKeys(basicInfo)">
-                <strong>
-                  {{ key }} </strong
-                >: {{ basicInfo[key] }}
+                <strong> {{ key }} </strong>: {{ basicInfo[key] }}
               </li>
             </ul>
           </nz-card>
@@ -60,18 +58,48 @@
         </div> -->
         <div nz-col nzSpan="8">
           <nz-card style="min-height: 60vh">
-            <!-- <h2>Appointments</h2> -->
-
-            <!-- <div *ngFor="let app of appointmentDetails">
-              <ul class="no-bullets">
-                <li *ngFor="let key of objectKeys(app)">
-                  <strong>
-                    {{ key }}
-                  </strong>
-                  : {{ app[key] }}
-                </li>
-              </ul>
-            </div> -->
+            <div nz-row nzJustify="space-between" nzAlign="middle">
+              <div nz-col nzSpan="12">
+                <h2>Files</h2>
+              </div>
+              <div nz-col nzSpan="12">
+                <nz-upload
+                  [nzAction]="getAddress()"
+                  (nzChange)="handleChange($event)"
+                >
+                  <button nz-button>
+                    <span nz-icon nzType="upload" nzTheme="outline"></span>
+                    Add
+                  </button>
+                </nz-upload>
+              </div>
+            </div>
+            <nz-table #basicTable [nzData]="files" *ngIf="files.length">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let file of files">
+                  <td>{{ file.name }}</td>
+                  <td>
+                    <a
+                      href="javascript:void(0)"
+                      (click)="viewFile(file.url)"
+                      (keyup.enter)="viewFile(file.url)"
+                      tabindex="0"
+                      >View</a
+                    >
+                  </td>
+                  <td>
+                    <a href="javascript:void(0)" tabindex="1">Delete</a>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
           </nz-card>
         </div>
       </div>

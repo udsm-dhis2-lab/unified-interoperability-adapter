@@ -232,69 +232,9 @@ public class HDUAPIController {
         }
     }
 
-//    @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-//    public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate) {
-//        Map<String, Object> response = new HashMap<>();
-//        try {
-//            if (shouldUseWorkflowEngine && workflowEngine != null) {
-//                Map<String, Object> payload = new HashMap<>();
-//                payload.put("code", "dataTemplates");
-//                List<IdentifierDTO> clientIds = new ArrayList<>();
-//                List<Map<String, Object>> recordsWithIssues = new ArrayList<>();
-//                if (clientRegistryConstants.ValidateDataTemplate) {
-//                    // Validate data template
-//                    DataTemplateDataDTO validatedDataTemplate = new DataTemplateDataDTO();
-//                    List<SharedHealthRecordsDTO> listGrid = dataTemplate.getData().getListGrid();
-//                    List<SharedHealthRecordsDTO> validatedListGrid = new ArrayList<>();
-//
-//                    for (SharedHealthRecordsDTO sharedHealthRecordsDTO : listGrid) {
-//                        Map<String, Object> recordWithIssue = new HashMap<>();
-//                        VisitDetailsDTO visitDetailsDTO = sharedHealthRecordsDTO.getVisitDetails();
-//                        recordWithIssue.put("patientDetails", sharedHealthRecordsDTO.getDemographicDetails());
-//                        recordWithIssue.put("visitDetails", visitDetailsDTO);
-//                        recordWithIssue.put("issue",
-//                                "Not enough details for registering the client and saving associated records");
-//                        recordsWithIssues.add(recordWithIssue);
-//                        validatedListGrid.add(sharedHealthRecordsDTO);
-//                    }
-//
-//                    validatedDataTemplate.setListGrid(validatedListGrid);
-//                    clientIds = this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
-//                    validatedDataTemplate.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
-//                    validatedDataTemplate.setReportDetails(dataTemplate.getData().getReportDetails());
-//                    validatedDataTemplate.setClientIdentifiersPool(clientIds);
-//                    payload.put("payload", validatedDataTemplate);
-//                } else {
-//                    DataTemplateDataDTO updatedDataTemplateData = dataTemplate.getData();
-//                    clientIds = this.clientRegistryService
-//                            .getClientRegistryIdentifiers(dataTemplate.getData().getListGrid().size());
-//                    updatedDataTemplateData.setClientIdentifiersPool(clientIds);
-//                    payload.put("payload", updatedDataTemplateData);
-//                }
-//                return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload,
-//                        "processes/execute?async=true"));
-//            } else if (!shouldUseWorkflowEngine) {
-//                return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataTemplate.toMap()));
-//            } else {
-//                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(response);
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            Map<String, Object> statusResponse = new LinkedHashMap<>();
-//            statusResponse.put("status", "BAD_REQUEST");
-//            statusResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
-//            statusResponse.put("newClients", 0);
-//            statusResponse.put("updatedClients", 0);
-//            statusResponse.put("failedClients", 0);
-//            statusResponse.put("ignoredClients", 0);
-//            statusResponse.put("summary", new ArrayList<>());
-//            statusResponse.put("message", e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(statusResponse);
-//        }
-//    }
-
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate,  @RequestParam(name = "validation", required = false, defaultValue = "true") boolean performValidation) {
+    public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate,
+            @RequestParam(name = "validation", required = false, defaultValue = "true") boolean performValidation) {
         Map<String, Object> baseResponse = new HashMap<>();
 
         try {
@@ -309,8 +249,9 @@ public class HDUAPIController {
                     log.warn("Received data template with empty listGrid.");
                     DataTemplateDataDTO emptyData = createEmptyDataTemplateData(dataTemplate);
                     payload.put("payload", emptyData);
-                    return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload,
-                            "processes/execute?async=true"));
+                    return ResponseEntity
+                            .ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload,
+                                    "processes/execute?async=true"));
                 }
 
                 log.info("Processing {} records from listGrid.", listGrid.size());
@@ -318,18 +259,18 @@ public class HDUAPIController {
                 Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
                 List<SharedHealthRecordsDTO> validatedListGrid = Collections.synchronizedList(new ArrayList<>());
 
-                    IntStream.range(0, listGrid.size()).parallel().forEach(index -> {
-                        SharedHealthRecordsDTO currentRecord = listGrid.get(index);
-                        List<String> errors = new ArrayList<String>();
-                        if (performValidation) {
-                            errors = sharedHealthRecordValidator.validate(currentRecord);
-                        }
-                        if (errors.isEmpty()) {
-                            validatedListGrid.add(currentRecord);
-                        } else {
-                            validationErrorsMap.put(index, errors);
-                        }
-                    });
+                IntStream.range(0, listGrid.size()).parallel().forEach(index -> {
+                    SharedHealthRecordsDTO currentRecord = listGrid.get(index);
+                    List<String> errors = new ArrayList<String>();
+                    if (performValidation) {
+                        errors = sharedHealthRecordValidator.validate(currentRecord);
+                    }
+                    if (errors.isEmpty()) {
+                        validatedListGrid.add(currentRecord);
+                    } else {
+                        validationErrorsMap.put(index, errors);
+                    }
+                });
 
                 List<Map<String, Object>> recordsWithIssues = validationErrorsMap.entrySet().stream()
                         .map(entry -> {
@@ -338,7 +279,8 @@ public class HDUAPIController {
                             SharedHealthRecordsDTO originalRecord = listGrid.get(index);
                             Map<String, Object> issueDetail = new HashMap<>();
                             issueDetail.put("index", index);
-                            issueDetail.put("identifier", generateUserFriendlyIdentifier(originalRecord.getDemographicDetails(), index));
+                            issueDetail.put("identifier",
+                                    generateUserFriendlyIdentifier(originalRecord.getDemographicDetails(), index));
                             issueDetail.put("validationIssues", errors);
                             return issueDetail;
                         })
@@ -346,7 +288,8 @@ public class HDUAPIController {
                         .collect(Collectors.toList());
 
                 if (!recordsWithIssues.isEmpty()) {
-                    log.warn("Validation finished. {} out of {} records had issues.", recordsWithIssues.size(), listGrid.size());
+                    log.warn("Validation finished. {} out of {} records had issues.", recordsWithIssues.size(),
+                            listGrid.size());
                 }
 
                 if (validatedListGrid.isEmpty() && !listGrid.isEmpty()) {
@@ -354,7 +297,8 @@ public class HDUAPIController {
                     Map<String, Object> errorResponse = new LinkedHashMap<>();
                     errorResponse.put("status", "VALIDATION_ERROR");
                     errorResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
-                    errorResponse.put("message", "All submitted records failed validation. See 'validationFailures' for details.");
+                    errorResponse.put("message",
+                            "All submitted records failed validation. See 'validationFailures' for details.");
                     errorResponse.put("validationFailures", recordsWithIssues);
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
                 }
@@ -367,27 +311,31 @@ public class HDUAPIController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(workflowResponse);
                 }
 
-                    DataTemplateDataDTO validatedDataTemplatePayload = new DataTemplateDataDTO();
-                    validatedDataTemplatePayload.setListGrid(new ArrayList<>(validatedListGrid));
-                    List<IdentifierDTO> clientIds = validatedListGrid.isEmpty() ? new ArrayList<>() :
-                            this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
+                DataTemplateDataDTO validatedDataTemplatePayload = new DataTemplateDataDTO();
+                validatedDataTemplatePayload.setListGrid(new ArrayList<>(validatedListGrid));
+                List<IdentifierDTO> clientIds = validatedListGrid.isEmpty() ? new ArrayList<>()
+                        : this.clientRegistryService.getClientRegistryIdentifiers(validatedListGrid.size());
 
-                    validatedDataTemplatePayload.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
-                    validatedDataTemplatePayload.setReportDetails(dataTemplate.getData().getReportDetails());
-                    validatedDataTemplatePayload.setClientIdentifiersPool(clientIds);
-                    payload.put("payload", validatedDataTemplatePayload);
+                validatedDataTemplatePayload.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
+                validatedDataTemplatePayload.setReportDetails(dataTemplate.getData().getReportDetails());
+                validatedDataTemplatePayload.setClientIdentifiersPool(clientIds);
+                payload.put("payload", validatedDataTemplatePayload);
 
-                    // --- Call the workflow engine ---
-                    log.info("Sending {} valid records to workflow engine.", validatedListGrid.size());
-                    Map<String, Object> workflowResponse = this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload,
-                            "processes/execute?async=true");
-                    return ResponseEntity.ok(workflowResponse);
+                // --- Call the workflow engine ---
+                log.info("Sending {} valid records to workflow engine.", validatedListGrid.size());
+                Map<String, Object> workflowResponse = this.mediatorsService.processWorkflowInAWorkflowEngine(
+                        workflowEngine, payload,
+                        "processes/execute?async=true");
+                return ResponseEntity.ok(workflowResponse);
 
             } else if (!shouldUseWorkflowEngine) {
-                log.warn("Workflow engine disabled. Sending data directly to mediator workflow. Validation via annotations might still occur if @Valid is on RequestBody, but parallel processing/composite validator logic is SKIPPED here.");
-                // TODO: Decide if validation (parallel or sequential) is needed here too for consistency.
+                log.warn(
+                        "Workflow engine disabled. Sending data directly to mediator workflow. Validation via annotations might still occur if @Valid is on RequestBody, but parallel processing/composite validator logic is SKIPPED here.");
+                // TODO: Decide if validation (parallel or sequential) is needed here too for
+                // consistency.
                 Map<String, Object> dataToSend = dataTemplate.toMap(); // TODO Ensure toMap() handles nulls safely
-                log.info("Sending {} records directly.", Optional.ofNullable(dataTemplate.getData()).map(d -> d.getListGrid().size()).orElse(0));
+                log.info("Sending {} records directly.",
+                        Optional.ofNullable(dataTemplate.getData()).map(d -> d.getListGrid().size()).orElse(0));
                 return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataToSend));
 
             } else {
@@ -1702,14 +1650,17 @@ public class HDUAPIController {
         // Try MRN from identifiers
         if (!CollectionUtils.isEmpty(details.getIdentifiers())) {
             Optional<IdentifierDTO> mrn = details.getIdentifiers().stream()
-                    .filter(id -> id != null && "MRN".equalsIgnoreCase(id.getType()) && !StringUtils.isEmpty(id.getId()))
+                    .filter(id -> id != null && "MRN".equalsIgnoreCase(id.getType())
+                            && !StringUtils.isEmpty(id.getId()))
                     .findFirst();
-            if (mrn.isPresent()) return "MRN=" + mrn.get().getId().trim();
+            if (mrn.isPresent())
+                return "MRN=" + mrn.get().getId().trim();
 
             Optional<IdentifierDTO> first = details.getIdentifiers().stream()
                     .filter(id -> id != null && !StringUtils.isEmpty(id.getType()) && !StringUtils.isEmpty(id.getId()))
                     .findFirst();
-            if (first.isPresent()) return first.get().getType() + "=" + first.get().getId().trim();
+            if (first.isPresent())
+                return first.get().getType() + "=" + first.get().getId().trim();
         }
         // Try Name + DOB
         String name = Stream.of(details.getFirstName(), details.getLastName())
