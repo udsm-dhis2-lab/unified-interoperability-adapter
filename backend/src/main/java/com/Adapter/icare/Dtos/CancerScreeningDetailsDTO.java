@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class CancerScreeningDetailsDTO {
     private BreastCancerDTO breastCancer;
-    private CervicalCancer cervicalCancer;
+    private FPCervicalCancerDTO cervicalCancer;
 }

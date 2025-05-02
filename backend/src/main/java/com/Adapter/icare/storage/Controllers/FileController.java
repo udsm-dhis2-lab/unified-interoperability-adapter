@@ -45,7 +45,7 @@ public class FileController {
                     .queryParam("id", id)
                     .toUriString();
 
-            String fhirResource = fhirResourceService.createAndSubmitImagingStudyResource(
+             fhirResourceService.createAndSubmitImagingStudyResource(
                     id, justFileName, file.getOriginalFilename(), file.getContentType(),
                     justFileName);
 
@@ -55,7 +55,6 @@ public class FileController {
             response.put("fileType", file.getContentType());
             response.put("size", String.valueOf(file.getSize()));
             response.put("id", id);
-            response.put("fhirResource", fhirResource);
 
             return ResponseEntity.ok(response);
         } catch (IOException e) {

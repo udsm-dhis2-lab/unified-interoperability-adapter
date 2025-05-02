@@ -23,25 +23,26 @@ public class BirthDetailsDTO {
     private Boolean multipleBirth;
     private Boolean exclusiveBreastFed;
     private Boolean marcerated;
-    private boolean fresh;
+    private Boolean fresh;
     private Integer motherAgeInYears;
     private Integer birthOrder;
     private InfantFeeding infantFeeding;
     private GENDER gender;
-    private boolean providedWithKmc;
-    private int bp;
-    private boolean hbigTested;
+    private Boolean providedWithKmc;
+    private Integer bp;
+    private Boolean hbigTested;
     private STATUS childHivStatus;
     private InfectionsDTO infections;
-    private PNCOutcomeDetailsDTO outcomeDetails;
+    private BDOutcomeDetailsDTO outcomeDetails;
     private CodeAndNameDTO motherHivStatus;
     private Boolean providedWithARV;
-    private boolean referred;
+    private Boolean referred;
     private List<VaccinationDetailsDTO> vaccinationDetails;
     private List<Map<String,Object>> otherServices;
-    private boolean bornWithDisabilities;
+    private Boolean bornWithDisabilities;
     private ApgaScoreDTO apgaScore;
     private Boolean wasBreastFedWithinOneHourAfterDelivery;
     private MethodOfResuscitation methodOfResuscitation;
+    private Boolean hivDnaPCRTested;
 
 }
