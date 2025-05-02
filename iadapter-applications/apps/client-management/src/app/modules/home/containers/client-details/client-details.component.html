@@ -87,15 +87,34 @@
                   <td>{{ file.name }}</td>
                   <td>
                     <a
-                      href="javascript:void(0)"
-                      (click)="viewFile(file.url)"
-                      (keyup.enter)="viewFile(file.url)"
+                      (click)="viewFile(file)"
+                      (keyup.enter)="viewFile(file)"
                       tabindex="0"
                       >View</a
                     >
                   </td>
                   <td>
-                    <a href="javascript:void(0)" tabindex="1">Delete</a>
+                    <button
+                      nz-button
+                      nzType="text"
+                      (click)="
+                        showDeleteConfirm(
+                          'Are you sure you want to delete ' +
+                            ' ' +
+                            file.name +
+                            '? This action cannot be undone.',
+                          file
+                        )
+                      "
+                      style="padding: 0; border: none; height: auto"
+                    >
+                      <i
+                        nz-icon
+                        nzType="delete"
+                        nzTheme="outline"
+                        style="color: #ff4d4f"
+                      ></i>
+                    </button>
                   </td>
                 </tr>
               </tbody>
