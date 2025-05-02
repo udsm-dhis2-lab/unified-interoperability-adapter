@@ -6,9 +6,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostAbortionsMedicationsDTO {
-    private boolean providedWithAntibiotics;
-    private boolean providedWithPainKillers;
-    private boolean providedWithOxytocin;
-    private boolean providedWithMisoprostol;
-    private boolean providedWithIvInfusion;
+    private Boolean providedWithAntibiotics;
+    private Boolean providedWithPainKillers;
+    private Boolean providedWithOxytocin;
+    private Boolean providedWithMisoprostol;
+    private Boolean providedWithIvInfusion;
 }

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ContraceptivesDTO {
+public class CpacContraceptivesDTO {
     private Boolean didReceiveOralPillsPOP;
     private Integer popCyclesProvided;
     private Boolean didReceiveOralPillsCOC;
@@ -18,10 +18,4 @@ public class ContraceptivesDTO {
     private Boolean didReceiveInjection;
     private Integer numberOfFemaleCondomsProvided;
     private Integer numberOfMaleCondomsProvided;
-    private Boolean didReceiveSDM;
-    private Boolean didUseLAM;
-    private Boolean didOptToUseEmergencyMethods;
-    private Boolean didRemoveIUD;
-    private Boolean didHaveVasectomy;
-
 }
