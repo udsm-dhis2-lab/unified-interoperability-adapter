@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CervicalCancer {
-    private boolean suspected;
-    private boolean screenedWithVIA;
-    private boolean viaTestPositive;
+public class CervicalCancerDTO {
+    private Boolean suspected;
+    private Boolean screenedWithVIA;
     private Boolean screenedWithHPVDNA;
+    private Boolean viaTestPositive;
     private Boolean hpvDNAPositive;
     private Boolean diagnosedWithLargeLesion;
     private Boolean diagnosedWithSmallOrModerateLesion;
@@ -20,5 +20,5 @@ public class CervicalCancer {
     private Boolean treatedOnTheSameDay;
     private Boolean complicationsAfterTreatment;
     private Boolean foundWithHivAndReferredToCTC;
-
 }
+
