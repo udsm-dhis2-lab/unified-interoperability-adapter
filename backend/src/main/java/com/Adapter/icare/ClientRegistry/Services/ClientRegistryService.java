@@ -855,7 +855,6 @@ public class ClientRegistryService {
         List<ImagingStudy> imagingStudies = new ArrayList<>();
 
         try {
-            // Search for ImagingStudy resources that reference this patient
             Bundle response = fhirClient.search()
                     .forResource(ImagingStudy.class)
                     .where(ImagingStudy.PATIENT.hasId(patientId))
