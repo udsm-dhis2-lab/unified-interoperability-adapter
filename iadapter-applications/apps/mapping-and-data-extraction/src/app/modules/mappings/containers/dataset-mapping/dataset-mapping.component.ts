@@ -257,7 +257,7 @@ export class DatasetMappingComponent implements OnInit {
   }
 
   onIcdCodeSelect(value: any) {
-    this.selectedICdCodes = value;
+    this.selectedICdCodes = [...this.selectedICdCodes, ...value];
   }
 
   onRemoveIcdCode(tag: { name: string; code: string }) {
