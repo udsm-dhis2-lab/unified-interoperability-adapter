@@ -25,11 +25,11 @@ public class AntenatalCareDetailsDTO {
     private List<Map<String,Object>> otherSpouseDetails;
 
     private String lastAncVisitDate;
-    private boolean referredIn;
-    private boolean referredOut;
+    private Boolean referredIn;
+    private Boolean referredOut;
     private List<CounsellingDTO> counselling;
-    private boolean providedWithHivCounsellingBeforeLabTest;
-    private boolean providedWithHivCounsellingAfterLabTest;
+    private Boolean providedWithHivCounsellingBeforeLabTest;
+    private Boolean providedWithHivCounsellingAfterLabTest;
     private ANCProphylaxisDetailsDTO prophylaxis;
     private Boolean diagnosedWithOtherSTDs;
     private Boolean providedWithTreatmentForOtherSTDs;

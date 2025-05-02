@@ -83,7 +83,7 @@ public class ExtensionUtils {
                 }
             }
         }
-        return Boolean.FALSE;
+        return null;
     }
 
     public static String getExtensionValueString(DomainResource resource, String url) {
