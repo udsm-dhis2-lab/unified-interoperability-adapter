@@ -3908,8 +3908,6 @@ public class SharedHealthRecordsService {
                                             admissionDetailsDTO);
                                 }
 
-                                PrintOutHelper.print(templateData.toMap());
-
                                 sharedRecords.add(templateData.toMap());
                             }
 
