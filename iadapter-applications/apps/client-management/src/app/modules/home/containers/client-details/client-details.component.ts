@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
-// import { ClientManagementService } from '../../services/client-management.service';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzUploadChangeParam, NzUploadModule } from 'ng-zorro-antd/upload';
@@ -22,14 +21,13 @@ import { NzModalService } from 'ng-zorro-antd/modal';
     NzEmptyModule,
     NzUploadModule,
     NzIconModule,
-    DicomViewerComponent,
   ],
   providers: [ClientManagementService],
   templateUrl: './client-details.component.html',
   styleUrl: './client-details.component.css',
 })
 export class ClientDetailsComponent implements OnInit {
-  loading: boolean = false;
+  loading = false;
 
   parentRoute?: string;
 
@@ -95,6 +93,23 @@ export class ClientDetailsComponent implements OnInit {
 
   objectKeys(obj: any): string[] {
     return Object?.keys(obj) || [];
+  }
+
+  showDeleteConfirm(
+    nzContent: string,
+    file: { name: string; url: string }
+  ): void {
+    console.log(file);
+    this.modal.create({
+      nzTitle: 'Delete Confirmation',
+      nzContent,
+      nzOkText: 'Delete',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzCancelText: 'Cancel',
+      nzCentered: true,
+      nzClassName: 'custom-confirm-modal',
+    });
   }
 
   // Utility function to format keys and values
@@ -179,17 +194,17 @@ export class ClientDetailsComponent implements OnInit {
   }
 
   getAddress() {
-    return `api/v1/files/${this.hcrCode}/uploads`;
+    return `../../../../../api/v1/files/${this.hcrCode}/uploads`;
   }
 
-  viewFile(url: string) {
+  viewFile(file: { name: string; url: string }) {
     this.modal.create({
-      nzTitle: 'Dicom Viewer',
+      nzTitle: file.name,
       nzContent: DicomViewerComponent,
       nzWidth: '50%',
       nzMaskClosable: false,
       nzData: {
-        data: `api/v1/files/${url}/downloads?id=${this.hcrCode}`,
+        data: `../../../../../api/v1/files/${file.url}/downloads?id=${this.hcrCode}`,
       },
       nzFooter: null,
     });
