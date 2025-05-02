@@ -1,17 +1,19 @@
 package com.Adapter.icare.Dtos;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Getter;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -39,11 +41,12 @@ public class DemographicDetailsDTO {
     private List<@Valid IdentifierDTO> identifiers;
     private List<ContactPeopleDTO> contactPeople;
     private List<PaymentDetailsDTO> paymentDetails;
-    private List<Map<String,Object>> relatedClients;
+    private List<Map<String, Object>> relatedClients;
+    private List<FileDTO> files;
     private List<AppointmentDetailsDTO> appointment;
 
-    public Map<String,Object> toMap() {
-        Map<String,Object> demographicDetails = new LinkedHashMap<>();
+    public Map<String, Object> toMap() {
+        Map<String, Object> demographicDetails = new LinkedHashMap<>();
         demographicDetails.put("id", this.getId());
         demographicDetails.put("firstName", this.getFirstName());
         demographicDetails.put("middleName", this.getMiddleName());
@@ -63,6 +66,11 @@ public class DemographicDetailsDTO {
         demographicDetails.put("paymentDetails", this.getPaymentDetails());
         demographicDetails.put("relatedClients", this.getRelatedClients());
         demographicDetails.put("appointment", this.getAppointment());
+        if (this.getFiles() != null) {
+            demographicDetails.put("files", this.getFiles().stream().map(file -> file.toMap()));
+        } else {
+            demographicDetails.put("files", new ArrayList<>());
+        }
         return demographicDetails;
     }
 }

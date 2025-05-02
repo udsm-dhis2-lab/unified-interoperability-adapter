@@ -29,12 +29,12 @@ public class LaborAndDeliveryDetailsDTO {
     private List<CodeAndNameDTO> beforeBirthComplications;
     private List<CodeAndNameDTO> birthComplications;
     private List<BirthDetailsDTO> birthDetails;
-    private Map<String,Object> others;
+    private LDOthersDTO others;
     private PlaceOfOrigin motherOrigin;
     private Boolean hasComeWithSpouse;
     private Boolean hasComeWithCompanion;
     private Integer pregnancyAgeInWeeks;
     private Boolean wasProvidedWithAntenatalCorticosteroid;
     private Boolean hasHistoryOfFGM;
-    private HiVDetailsDTO hivDetails;
+    private LDHivDetailsDTO hivDetails;
 }

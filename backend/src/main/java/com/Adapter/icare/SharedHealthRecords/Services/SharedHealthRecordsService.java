@@ -17,9 +17,7 @@ import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
-import com.Adapter.icare.Enums.BirthPlace;
-import com.Adapter.icare.Enums.CareType;
-import com.Adapter.icare.Enums.STATUS;
+import com.Adapter.icare.Enums.*;
 import com.Adapter.icare.Organisations.Dtos.OrganizationDTO;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
@@ -2282,6 +2280,13 @@ public class SharedHealthRecordsService {
                                             getComponentValueBoolean(
                                                     observation,
                                                     6));
+
+                                    List<Observation.ObservationComponentComponent> dischargedLocationComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/ValueSet/otucome-category", "outcome-discharged-location");
+
+                                    outcomeDetailsDTO.setDischargedLocation(
+                                            !dischargedLocationComponents.isEmpty() && dischargedLocationComponents.get(0).hasValueStringType() ?
+                                                    DischargedLocation.fromString(dischargedLocationComponents.get(0).getValueStringType().getValueAsString()) : null
+                                    );
                                     templateData.setOutcomeDetails(
                                             outcomeDetailsDTO);
                                 }
@@ -2493,6 +2498,90 @@ public class SharedHealthRecordsService {
                                                     observation,
                                                     4));
 
+                                    antenatalCareDetailsDTO.setLastAncVisitDate(
+                                            getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-lastAncVisitDate")
+                                    );
+
+                                    antenatalCareDetailsDTO.setReferredIn(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-referredIn")
+                                    );
+
+                                    antenatalCareDetailsDTO.setReferredOut(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-referredIn")
+                                    );
+
+                                    List<CounsellingDTO> counsellingDTOList =  new ArrayList<CounsellingDTO>();
+
+                                    List<Observation.ObservationComponentComponent> counsellingComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/counselling-types", "counselling");
+                                    for(Observation.ObservationComponentComponent counsellingComponent: counsellingComponents){
+                                        CounsellingDTO counsellingDTO = new CounsellingDTO();
+                                        counsellingDTO.setCode(
+                                                counsellingComponent.hasValueCodeableConcept() &&
+                                                        counsellingComponent.getValueCodeableConcept().hasCoding() &&
+                                                        !counsellingComponent.getValueCodeableConcept().getCoding().isEmpty() &&
+                                                        counsellingComponent.getValueCodeableConcept().getCoding().get(0).hasCode() ? counsellingComponent.getValueCodeableConcept().getCoding().get(0).getCode() : null
+                                        );
+
+                                        counsellingDTO.setName(
+                                                counsellingComponent.hasValueCodeableConcept() &&
+                                                        counsellingComponent.getValueCodeableConcept().hasCoding() &&
+                                                        !counsellingComponent.getValueCodeableConcept().getCoding().isEmpty() &&
+                                                        counsellingComponent.getValueCodeableConcept().getCoding().get(0).hasDisplay() ? counsellingComponent.getValueCodeableConcept().getCoding().get(0).getDisplay() : null
+                                        );
+
+                                        counsellingDTOList.add(counsellingDTO);
+                                    }
+
+                                    antenatalCareDetailsDTO.setCounselling(counsellingDTOList);
+
+                                    antenatalCareDetailsDTO.setProvidedWithHivCounsellingBeforeLabTest(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-providedWithHivCounsellingBeforeLabTest")
+                                    );
+
+                                    antenatalCareDetailsDTO.setProvidedWithHivCounsellingAfterLabTest(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-providedWithHivCounsellingAfterLabTest")
+                                    );
+
+                                    ANCProphylaxisDetailsDTO ancProphylaxisDetailsDTO = new ANCProphylaxisDetailsDTO();
+
+                                    List<Observation.ObservationComponentComponent> proxylaxisWithLLINComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-llin");
+
+                                    List<Observation.ObservationComponentComponent> proxylaxisWithIPT2Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt2");
+
+                                    List<Observation.ObservationComponentComponent> proxylaxisWithIPT3Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt3");
+
+                                    List<Observation.ObservationComponentComponent> proxylaxisWithIPT4Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt4");
+
+                                    List<Observation.ObservationComponentComponent> providedWithIFFolic60TabletsComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-if-folic");
+
+                                    List<Observation.ObservationComponentComponent> providedWithMebendazoleOrAlbendazoleComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-mebendazole");
+
+                                    ancProphylaxisDetailsDTO.setProvidedWithLLIN(
+                                            !proxylaxisWithLLINComponents.isEmpty() && proxylaxisWithLLINComponents.get(0).hasValueBooleanType() ? proxylaxisWithLLINComponents.get(0).getValueBooleanType().getValue() : null
+                                    );
+
+                                    ancProphylaxisDetailsDTO.setProvidedWithIPT2(
+                                            !proxylaxisWithIPT2Components.isEmpty() && proxylaxisWithIPT2Components.get(0).hasValueBooleanType() ? proxylaxisWithIPT2Components.get(0).getValueBooleanType().getValue() : null
+                                    );
+
+                                    ancProphylaxisDetailsDTO.setProvidedWithIFFolic60Tablets(
+                                            !providedWithIFFolic60TabletsComponents.isEmpty() && providedWithIFFolic60TabletsComponents.get(0).hasValueBooleanType() ? providedWithIFFolic60TabletsComponents.get(0).getValueBooleanType().getValue() : null
+                                    );
+
+                                    ancProphylaxisDetailsDTO.setProvidedWithMebendazoleOrAlbendazole(
+                                            !providedWithMebendazoleOrAlbendazoleComponents.isEmpty() && providedWithMebendazoleOrAlbendazoleComponents.get(0).hasValueBooleanType() ? providedWithMebendazoleOrAlbendazoleComponents.get(0).getValueBooleanType().getValue() : null
+                                    );
+
+                                    ancProphylaxisDetailsDTO.setProvidedWithIPT3(
+                                            !proxylaxisWithIPT3Components.isEmpty() && proxylaxisWithIPT3Components.get(0).hasValueBooleanType() ? proxylaxisWithIPT3Components.get(0).getValueBooleanType().getValue() : null
+                                    );
+
+                                    ancProphylaxisDetailsDTO.setProvidedWithIPT4(
+                                            !proxylaxisWithIPT4Components.isEmpty() && proxylaxisWithIPT4Components.get(0).hasValueBooleanType() ? proxylaxisWithIPT4Components.get(0).getValueBooleanType().getValue() : null
+                                    );
+
+                                    antenatalCareDetailsDTO.setProphylaxis(ancProphylaxisDetailsDTO);
+
                                     Map<String, Object> hivDetails = new HashMap<>();
                                     hivDetails.put("status",
                                             getComponentValueCodeableConceptDisplay(
@@ -2502,6 +2591,7 @@ public class SharedHealthRecordsService {
                                             getComponentValueCodeableConceptCode(
                                                     observation,
                                                     9));
+                                    hivDetails.put("hivTestNumber", getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-hivDetails-hivTestNumber"));
                                     antenatalCareDetailsDTO
                                             .setHivDetails(hivDetails);
 
@@ -2512,8 +2602,19 @@ public class SharedHealthRecordsService {
                                     syphilisDetails.setCode(getComponentValueCodeableConceptCode(
                                             observation,
                                             8));
+                                    syphilisDetails.setProvidedWithTreatment(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-syphilisDetails-providedWithTreatment")
+                                    );
                                     antenatalCareDetailsDTO.setSyphilisDetails(
                                             syphilisDetails);
+
+                                    antenatalCareDetailsDTO.setDiagnosedWithOtherSTDs(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-diagnosedWithOtherSTDs")
+                                    );
+
+                                    antenatalCareDetailsDTO.setProvidedWithTreatmentForOtherSTDs(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-providedWithTreatmentForOtherSTDs")
+                                    );
 
                                     antenatalCareDetailsDTO.setGravidity(
                                             getComponentIntValue(
@@ -2530,6 +2631,33 @@ public class SharedHealthRecordsService {
                                     spouseHivDetails.setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
                                             observation, 6)));
 
+                                    spouseHivDetails.setHivTestNumber(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-spouseDetails-hivDetails-hivTestNumber"));
+
+                                    DiseaseStatusDTO spouseHepatitisBDetails = new DiseaseStatusDTO();
+
+                                    List<Observation.ObservationComponentComponent> spouseHepatitisBDetailsComponents = getComponentsByCode(observation, "http://loinc.org", "16935-9");
+
+                                    spouseHepatitisBDetails.setCode(
+                                            !spouseHepatitisBDetailsComponents.isEmpty() && spouseHepatitisBDetailsComponents.get(0).hasValueCodeableConcept() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().hasCoding() &&
+                                                    !spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().isEmpty() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).hasCode() ?
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).getCode() : null
+                                    );
+
+                                    spouseHepatitisBDetails.setStatus( STATUS.fromString(
+                                            !spouseHepatitisBDetailsComponents.isEmpty() && spouseHepatitisBDetailsComponents.get(0).hasValueCodeableConcept() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().hasCoding() &&
+                                                    !spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().isEmpty() &&
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).hasDisplay() ?
+                                                    spouseHepatitisBDetailsComponents.get(0).getValueCodeableConcept().getCoding().get(0).getDisplay() : null
+                                    ));
+
+                                    spouseHepatitisBDetails.setProvidedWithTreatment(
+                                            getExtensionValueBoolean(observation,"http://fhir.moh.go.tz/fhir/StructureDefinition/anc-spouseDetails-hepatitisB-providedWithTreatments")
+                                    );
+
+
                                     DiseaseStatusDTO spouseSyphilisDetails = new DiseaseStatusDTO();
                                     spouseSyphilisDetails.setCode(
                                             getComponentValueCodeableConceptCode(
@@ -2539,8 +2667,12 @@ public class SharedHealthRecordsService {
                                             .setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
                                                     observation,
                                                     7)));
+                                    spouseSyphilisDetails.setProvidedWithTreatment(
+                                            getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-spouseDetails-syphilisDetails-providedWithTreatment")
+                                    );
 
                                     spouseDetails.setHivDetails(spouseHivDetails);
+                                    spouseDetails.setHepatitisB(spouseHepatitisBDetails);
                                     spouseDetails.setSyphilisDetails(
                                             spouseSyphilisDetails);
 
@@ -3257,6 +3389,58 @@ public class SharedHealthRecordsService {
                                                                 .getValueBooleanType()
                                                                 .getValue());
                                     }
+
+                                    if(familyPlanningCounseling != null){
+                                        laborAndDeliveryDetailsDTO.setMotherOrigin(PlaceOfOrigin.fromString(
+                                                getExtensionValueString(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-mother-origin")
+                                        ));
+
+                                        laborAndDeliveryDetailsDTO.setHasComeWithSpouse(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-spouse-accompaniment"));
+
+                                        laborAndDeliveryDetailsDTO.setHasComeWithCompanion(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-companion-accompaniment"));
+
+                                        laborAndDeliveryDetailsDTO.setPregnancyAgeInWeeks(getExtensionValueInt(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-pregnancy-age-in-weeks"));
+
+                                        laborAndDeliveryDetailsDTO.setWasProvidedWithAntenatalCorticosteroid(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-antenatal-corticosteroid-provided"));
+
+                                        laborAndDeliveryDetailsDTO.setHasHistoryOfFGM(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-history-of-fgm"));
+
+                                        LDHivDetailsDTO ldHivDetailsDTO = new LDHivDetailsDTO();
+                                        ldHivDetailsDTO.setStatus(STATUS.fromString(getExtensionValueString(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-status")));
+
+                                        ldHivDetailsDTO.setHivTestNumber(getExtensionValueInt(familyPlanningCounseling,"http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-hivTestNumber"));
+
+                                        ldHivDetailsDTO.setReferredToCTC(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-referredToCTC"));
+
+                                        AncHivStatusDTO ldAncHivStatusDTO = new AncHivStatusDTO();
+                                        ldAncHivStatusDTO.setStatus(STATUS.fromString(getExtensionValueString(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-status")));
+                                        ldAncHivStatusDTO.setNumberOfTestTaken(getExtensionValueInt(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-numberOfTestsTaken"));
+
+                                        ldHivDetailsDTO.setAncHivStatus(ldAncHivStatusDTO);
+                                        laborAndDeliveryDetailsDTO.setHivDetails(ldHivDetailsDTO);
+
+                                        LDOthersDTO ldOthers = new LDOthersDTO();
+                                        EmocDTO emoc = new EmocDTO();
+                                        AmstlDTO amstl = new AmstlDTO();
+
+                                        emoc.setProvidedAntibiotic(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-emoc-providedAntibiotic"));
+                                        emoc.setProvidedUterotonic(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-emoc-providedUterotonic"));
+                                        emoc.setProvidedMagnesiumSulphate(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-emoc-providedMagnesiumSulphate"));
+                                        emoc.setRemovedPlacenta(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-emoc-removedPlacenta"));
+                                        emoc.setPerformedMvaOrDc(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-emoc-performedMvaOrDc"));
+                                        emoc.setAdministeredBlood(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-emoc-administeredBlood"));
+
+                                        amstl.setCordTractionUsed(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-amstl-cordTractionUsed"));
+                                        amstl.setUterineMassageDone(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-amstl-uterineMassageDone"));
+                                        amstl.setAdministeredOxytocin(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-amstl-administeredOxytocin"));
+                                        amstl.setAdministeredEgometrine(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-amstl-administeredEgometrine"));
+                                        amstl.setAdministeredMisoprostol(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-others-amstl-administeredMisoprostol"));
+
+                                        ldOthers.setEmoc(emoc);
+                                        ldOthers.setAmstl(amstl);
+
+                                        laborAndDeliveryDetailsDTO.setOthers(ldOthers);
+                                    }
                                 }
 
                                 // Before birth complications
@@ -3369,6 +3553,42 @@ public class SharedHealthRecordsService {
                                         // birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation,
                                         // "://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details",
                                         // "motherHivStatus"));
+
+                                        birthDetailsDTO.setMarcerated(
+                                                getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-macerated")
+                                        );
+
+                                        birthDetailsDTO.setFresh(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-fresh"));
+
+                                        birthDetailsDTO.setBornWithDisabilities(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-bornWithDisabilities"));
+
+                                        birthDetailsDTO.setHivDnaPCRTested(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-hivDnaPCRTested"));
+
+                                        birthDetailsDTO.setChildHivStatus(STATUS.fromString(
+                                                getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-childHivStatus")
+                                        ));
+
+                                        ApgaScoreDTO ldBirthDetailsApgaScore = new ApgaScoreDTO();
+                                        ldBirthDetailsApgaScore.setOneMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-oneMinute"));
+
+                                        ldBirthDetailsApgaScore.setFiveMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-fiveMinute"));
+
+                                        birthDetailsDTO.setApgaScore(ldBirthDetailsApgaScore);
+
+                                        birthDetailsDTO.setWasBreastFedWithinOneHourAfterDelivery(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-wasBreastFedWithinOneHourAfterDelivery"));
+
+                                        BDOutcomeDetailsDTO ldBdOutcomeDetails = new BDOutcomeDetailsDTO();
+                                        ldBdOutcomeDetails.setIsAlive(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-isAlive"));
+                                        ldBdOutcomeDetails.setReferredToPNC(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-referredToPNC"));
+                                        ldBdOutcomeDetails.setReferredToHospital(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-referredToHospital"));
+                                        ldBdOutcomeDetails.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-referredTohealthFacility"));
+
+                                        birthDetailsDTO.setOutcomeDetails(ldBdOutcomeDetails);
+
+                                        birthDetailsDTO.setMethodOfResuscitation(MethodOfResuscitation.fromString(
+                                                getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-methodOfResuscitation")
+                                        ));
+
 
                                         birthDetailsDTO.setProvidedWithARV(
                                                 getNestedExtensionValueBoolean(

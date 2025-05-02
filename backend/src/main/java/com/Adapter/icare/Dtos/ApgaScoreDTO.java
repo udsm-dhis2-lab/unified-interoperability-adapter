@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ApgaScoreDTO {
-    private int oneMinute;
-    private int fiveMinute;
+    private Integer oneMinute;
+    private Integer fiveMinute;
 }

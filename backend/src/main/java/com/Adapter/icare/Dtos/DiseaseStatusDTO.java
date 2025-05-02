@@ -10,4 +10,5 @@ public class DiseaseStatusDTO {
     private STATUS status;
     private String code;
     private Boolean providedWithTreatment;
+    private Integer hivTestNumber;
 }

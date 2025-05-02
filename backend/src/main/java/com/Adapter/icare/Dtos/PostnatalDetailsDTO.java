@@ -20,7 +20,7 @@ public class PostnatalDetailsDTO {
     private Date date;
     private Boolean positiveHivStatusBeforeService;
     private STATUS hivStatusAsSeenFromAncCard;
-    private HiVDetailsDTO hivDetails;
+    private LDHivDetailsDTO hivDetails;
     private PlaceOfOrigin motherAndChildOrigin;
     private Boolean referredToCTC;
     private BirthPlace placeOfBirth;

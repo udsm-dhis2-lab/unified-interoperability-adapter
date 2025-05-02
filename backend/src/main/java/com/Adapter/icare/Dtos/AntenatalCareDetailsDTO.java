@@ -31,6 +31,6 @@ public class AntenatalCareDetailsDTO {
     private boolean providedWithHivCounsellingBeforeLabTest;
     private boolean providedWithHivCounsellingAfterLabTest;
     private ANCProphylaxisDetailsDTO prophylaxis;
-
-
+    private Boolean diagnosedWithOtherSTDs;
+    private Boolean providedWithTreatmentForOtherSTDs;
 }

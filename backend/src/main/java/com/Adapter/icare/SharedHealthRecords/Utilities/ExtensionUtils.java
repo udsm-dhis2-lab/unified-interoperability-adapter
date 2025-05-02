@@ -6,8 +6,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class ExtensionUtils {
-    public static  String getNestedExtensionValueString(DomainResource resource, String parentUrl, String childUrl) {
-        if (resource.hasExtension()) {
+    public static String getNestedExtensionValueString(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
                     for (Extension childExtension : parentExtension.getExtension()) {
@@ -23,8 +23,8 @@ public class ExtensionUtils {
         return null;
     }
 
-    public static  Integer getNestedExtensionValueInteger(DomainResource resource, String parentUrl, String childUrl) {
-        if (resource.hasExtension()) {
+    public static Integer getNestedExtensionValueInteger(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
                     for (Extension childExtension : parentExtension.getExtension()) {
@@ -40,8 +40,8 @@ public class ExtensionUtils {
         return null;
     }
 
-    public static  Date getNestedExtensionValueDateTime(DomainResource resource, String parentUrl, String childUrl) {
-        if (resource.hasExtension()) {
+    public static Date getNestedExtensionValueDateTime(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
                     for (Extension childExtension : parentExtension.getExtension()) {
@@ -57,8 +57,8 @@ public class ExtensionUtils {
         return null;
     }
 
-    public static  Boolean getNestedExtensionValueBoolean(DomainResource resource, String parentUrl, String childUrl) {
-        if (resource.hasExtension()) {
+    public static Boolean getNestedExtensionValueBoolean(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
                     for (Extension childExtension : parentExtension.getExtension()) {
@@ -71,11 +71,11 @@ public class ExtensionUtils {
                 }
             }
         }
-        return null;
+        return Boolean.FALSE;
     }
 
-    public static  Boolean getExtensionValueBoolean(DomainResource resource, String url) {
-        if (resource.hasExtension()) {
+    public static Boolean getExtensionValueBoolean(DomainResource resource, String url) {
+        if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
                         && parentExtension.getValue() instanceof BooleanType) {
@@ -83,11 +83,11 @@ public class ExtensionUtils {
                 }
             }
         }
-        return null;
+        return Boolean.FALSE;
     }
 
-    public static  String getExtensionValueString(DomainResource resource, String url) {
-        if (resource.hasExtension()) {
+    public static String getExtensionValueString(DomainResource resource, String url) {
+        if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
                         && parentExtension.getValue() instanceof StringType) {
@@ -95,11 +95,11 @@ public class ExtensionUtils {
                 }
             }
         }
-        return null;
+        return "";
     }
 
-    public static  Integer getExtensionValueInt(DomainResource resource, String url) {
-        if (resource.hasExtension()) {
+    public static Integer getExtensionValueInt(DomainResource resource, String url) {
+        if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
                 if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
                         && parentExtension.getValue() instanceof IntegerType) {
@@ -107,12 +107,12 @@ public class ExtensionUtils {
                 }
             }
         }
-        return null;
+        return 0;
     }
 
-    public static  BigDecimal getNestedExtensionValueQuantityValue(Procedure procedure, String parentUrl,
-                                                            String childUrl) {
-        if (procedure.hasExtension()) {
+    public static BigDecimal getNestedExtensionValueQuantityValue(Procedure procedure, String parentUrl,
+            String childUrl) {
+        if (procedure != null && procedure.hasExtension()) {
             for (Extension parentExtension : procedure.getExtension()) {
                 if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
                     for (Extension childExtension : parentExtension.getExtension()) {
