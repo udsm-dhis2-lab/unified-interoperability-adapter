@@ -9,8 +9,8 @@ import lombok.Setter;
 public class ChildHealthDetailsDTO {
     private CHProphylaxisDTO prophylaxis;
     private InfantFeeding infantFeeding;
-    private boolean providedWithInfantFeedingCounselling;
-    private boolean isStillBreastFed;
+    private Boolean providedWithInfantFeedingCounselling;
+    private Boolean isStillBreastFed;
     private MotherHivStatusDTO motherHivStatus;
-    private boolean referredToCTC;
+    private Boolean referredToCTC;
 }

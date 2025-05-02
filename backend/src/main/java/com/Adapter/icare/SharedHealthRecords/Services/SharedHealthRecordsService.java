@@ -46,6 +46,7 @@ import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
 import static com.Adapter.icare.Utils.CarePlanUtils.getCarePlansByCategory;
+import static com.Adapter.icare.Utils.DateUtils.stringToDateOrNull;
 
 @Service
 public class SharedHealthRecordsService {
@@ -3297,6 +3298,53 @@ public class SharedHealthRecordsService {
                                     templateData.setFamilyPlanningDetails(
                                             familyPlanningDetailsDTO);
                                 }
+
+                                // Child Health Details
+                                ChildHealthDetailsDTO childHealthDetailsDTO = new ChildHealthDetailsDTO();
+
+                                List<Observation> childHealthObservations = getObservationsByCategory(fhirClient, "child-health", encounter, false, true);
+
+                                if(!childHealthObservations.isEmpty()){
+                                    Observation observation = childHealthObservations.get(0);
+
+                                    CHProphylaxisDTO chProphylaxisDTO = new CHProphylaxisDTO();
+                                    ProphylaxisAdministrationDTO prophylaxisAdministrationDTO = new ProphylaxisAdministrationDTO();
+                                    prophylaxisAdministrationDTO.setAdministered(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-albendazole-administered"));
+                                    prophylaxisAdministrationDTO.setServiceModality(ServiceModality.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-albendazole-serviceModality")));
+                                    chProphylaxisDTO.setAlbendazole(prophylaxisAdministrationDTO);
+
+                                    prophylaxisAdministrationDTO.setAdministered(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-vitaminA-administered"));
+                                    prophylaxisAdministrationDTO.setServiceModality(ServiceModality.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-vitaminA-serviceModality")));
+                                    chProphylaxisDTO.setVitaminA(prophylaxisAdministrationDTO);
+
+                                    chProphylaxisDTO.setProvidedWithLLIN(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-providedWithLLIN"));
+
+                                    childHealthDetailsDTO.setProphylaxis(chProphylaxisDTO);
+
+                                    childHealthDetailsDTO.setInfantFeeding(InfantFeeding.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-infantFeeding")));
+
+                                    childHealthDetailsDTO.setProvidedWithInfantFeedingCounselling(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-providedWithInfantFeedingCounselling"));
+
+                                    childHealthDetailsDTO.setIsStillBreastFed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-isStillBreastFed"));
+
+                                    MotherHivStatusDTO motherHivStatusDTO = new MotherHivStatusDTO();
+                                    List<Observation.ObservationComponentComponent> motherHICStatusComponents = getComponentsByCode(observation, "http://loinc.org", "55277-8");
+
+                                    motherHivStatusDTO.setStatus(STATUS.fromString(
+                                            !motherHICStatusComponents.isEmpty() && motherHICStatusComponents.get(0).hasValueCodeableConcept() &&
+                                                    motherHICStatusComponents.get(0).getValueCodeableConcept().hasCoding() &&
+                                                    !motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().isEmpty() &&
+                                                    motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().get(0).hasCode() ?
+                                                    motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().get(0).getCode() : null)
+                                    );
+                                    motherHivStatusDTO.setTestingDate(stringToDateOrNull(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-motherHivstatus-testingDate"), "yyyy-MM-dd"));
+
+                                    childHealthDetailsDTO.setMotherHivStatus(motherHivStatusDTO);
+
+                                    childHealthDetailsDTO.setReferredToCTC(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-referredToCTC"));
+                                }
+                                templateData.setChildHealthDetails(childHealthDetailsDTO);
+
 
                                 // laborAndDeliveryDetails
                                 LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();

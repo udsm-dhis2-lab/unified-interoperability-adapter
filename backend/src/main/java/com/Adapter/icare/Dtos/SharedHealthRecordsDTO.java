@@ -109,6 +109,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("diagnosisDetails", this.getDiagnosisDetails());
         sharedRecordMap.put("medicationDetails", this.getMedicationDetails());
         sharedRecordMap.put("treatmentDetails", this.getTreatmentDetails());
+        sharedRecordMap.put("childHealthDetails", this.getChildHealthDetails());
         sharedRecordMap.put("radiologyDetails", this.getRadiologyDetails());
         sharedRecordMap.put("admissionDetails", this.getAdmissionDetails());
         sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
