@@ -31,7 +31,7 @@ for zip_file in "$BUILD_DIR"/*.zip; do
         app_name=$(basename "$zip_file" .zip)
 
         # Create a target directory for each app based on the zip file name
-        target_dir="$EXTRACT_DIR"
+        target_dir="$EXTRACT_DIR"/"$app_name"
         mkdir -p "$target_dir"
 
         # Unzip the file into the target directory, overwriting existing files if necessary
@@ -74,5 +74,5 @@ docker run -w="/app" -v "$(pwd)":/app node:20.18.0 bash -c "
 "
 
 
-docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/backend:/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
-docker build --no-cache -f Dockerfile  -t udsmdhis2/unified:2.0.0 .
+# docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/backend:/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
+# docker build --no-cache -f Dockerfile  -t udsmdhis2/unified:2.0.0 .

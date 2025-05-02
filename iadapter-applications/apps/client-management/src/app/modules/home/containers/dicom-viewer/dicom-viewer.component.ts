@@ -70,7 +70,7 @@ export class DicomViewerComponent implements OnInit, OnDestroy {
       this.loading = false;
       this.errorMessage = event['error'];
       if (typeof this.errorMessage !== 'string') {
-        this.errorMessage = JSON.stringify(this.errorMessage);
+        this.errorMessage = JSON.stringify(event);
       }
     });
     this.dwvApp.loadURLs([url]);

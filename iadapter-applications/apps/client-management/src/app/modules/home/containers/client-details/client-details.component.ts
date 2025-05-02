@@ -201,7 +201,7 @@ export class ClientDetailsComponent implements OnInit {
     this.modal.create({
       nzTitle: file.name,
       nzContent: DicomViewerComponent,
-      nzWidth: '50%',
+      nzWidth: '40%',
       nzMaskClosable: false,
       nzData: {
         data: `../../../../../api/v1/files/${file.url}/downloads?id=${this.hcrCode}`,
