@@ -15,14 +15,14 @@ public class FamilyPlanningDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date date;
-    private boolean positiveHivStatusBeforeService;
-    private boolean wasCounselled;
-    private boolean hasComeWithSpouse;
+    private Boolean positiveHivStatusBeforeService;
+    private Boolean wasCounselled;
+    private Boolean hasComeWithSpouse;
     private ServiceLocations serviceLocation;
-    private boolean referred;
+    private Boolean referred;
     private CancerScreeningDetailsDTO cancerScreeningDetails;
     private FPHivStatusDTO hivStatus;
     private FPHivStatusDTO spouseHivStatus;
-    private boolean breastFeeding;
+    private Boolean breastFeeding;
     private SideEffectsDTO sideEffects;
 }
