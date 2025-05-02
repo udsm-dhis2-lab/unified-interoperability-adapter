@@ -1,14 +1,11 @@
-import { map, filter } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { ActivatedRoute, Router } from '@angular/router';
-import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
-import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
-import { ClientManagementService } from '../../services/client-management.service';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
-import { DynamicListComponent } from '../dynamic-list/dynamic-list.component';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { ClientManagementService } from '../../services/client-management.service';
+import { DynamicListComponent } from '../dynamic-list/dynamic-list.component';
+import { SharedModule } from '../../../../shared/shared.module';
 
 @Component({
   selector: 'app-client-details',
@@ -59,7 +56,6 @@ export class ClientDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
     this.route.queryParams.subscribe((params) => {
       this.loading = true;
       if (params) {
@@ -132,8 +128,7 @@ export class ClientDetailsComponent implements OnInit {
       }
     });
 
-this.loadHduClientsFromServer()
-
+    this.loadHduClientsFromServer();
   }
 
   loadHduClientsFromServer() {
@@ -146,7 +141,7 @@ this.loadHduClientsFromServer()
       })
       .subscribe({
         next: (data: any) => {
-          console.log(data, "data")
+          console.log(data, 'data');
           // this.loading = false;
           this.referrals = data;
         },
