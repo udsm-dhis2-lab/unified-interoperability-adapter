@@ -30,8 +30,9 @@
             </div>
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="6">
-                <nz-tree-select style="width: 100%" [nzNodes]="nodes" nzShowSearch nzPlaceHolder="LHS Query"
-                  [(ngModel)]="lhsQueryValue"></nz-tree-select>
+                <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
+                  nzCheckStrictly="true" nzShowExpand="true" nzVirtualHeight="450px" [nzNodes]="nodes" nzShowSearch
+                  nzPlaceHolder="LHS Query" [(ngModel)]="lhsQueryValue"></nz-tree-select>
               </div>
 
               <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16 && !freeTextQuery">
@@ -47,8 +48,9 @@
               <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="12">
                 <div nz-row [nzGutter]="8">
                   <div nz-col nzSpan="12">
-                    <nz-tree-select style="width: 100%" [nzNodes]="nodes" nzShowSearch nzPlaceHolder="RHS Query"
-                      [(ngModel)]="rhsQueryValue"></nz-tree-select>
+                    <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
+                      nzCheckStrictly="true" nzShowExpand="true" nzVirtualHeight="450px" [nzNodes]="nodes" nzShowSearch
+                      nzPlaceHolder="RHS Query" [(ngModel)]="rhsQueryValue"></nz-tree-select>
                   </div>
                   <div nz-col nzSpan="8">
                     <input nz-input placeholder="other value" [(ngModel)]="rhsInputValue" />
