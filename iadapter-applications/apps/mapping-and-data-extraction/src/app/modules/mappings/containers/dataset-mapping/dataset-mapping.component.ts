@@ -256,9 +256,12 @@ export class DatasetMappingComponent implements OnInit {
     this.searchIcdCodeChange$.next(value);
   }
 
-  onIcdCodeSelect(value: any) {
-    this.selectedICdCodes = [...this.selectedICdCodes, ...value];
+  onIcdCodeSelect(value: { name: string; code: string }[]) {
+    const existingCodes = new Set(this.selectedICdCodes.map(item => item.code));
+    const newItems = value.filter(item => !existingCodes.has(item.code));
+    this.selectedICdCodes = [...this.selectedICdCodes, ...newItems];
   }
+
 
   onRemoveIcdCode(tag: { name: string; code: string }) {
     this.selectedICdCodes = this.selectedICdCodes.filter(
