@@ -3400,6 +3400,22 @@ public class SharedHealthRecordsService {
 
                                 templateData.setCpacDetails(cpacDetailsDTO);
 
+                                // CECAP DETAILS
+                                CecapDTO cecapDTO = new CecapDTO();
+                                CancerScreeningDetailsDTO cancerScreeningDetailsDTO = new CancerScreeningDetailsDTO();
+
+                                List<Observation> cecapObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "cancer-screening-comprehensive");
+
+                                if(!cpacObservations.isEmpty()){
+                                    for(Observation observation: cecapObservations){
+                                        BreastCancerDTO breastCancerDTO = new BreastCancerDTO();
+                                        breastCancerDTO.setScreened(getComponentValueBoolean(observation,"http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
+
+                                    }
+                                }
+
+
+
                                 // laborAndDeliveryDetails
                                 LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();
 

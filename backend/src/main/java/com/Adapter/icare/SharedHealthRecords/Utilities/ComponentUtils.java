@@ -1,15 +1,15 @@
 package com.Adapter.icare.SharedHealthRecords.Utilities;
 
+import lombok.extern.slf4j.Slf4j;
+import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.CodeableConcept;
 import org.hl7.fhir.r4.model.Observation;
 
 import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class ComponentUtils {
     public static  BigDecimal getComponentValueQuantityInt(Observation observation, int index) {
         if (observation.hasComponent() && observation.getComponent().size() > index) {
@@ -136,5 +136,37 @@ public class ComponentUtils {
                 .filter(coding -> coding.hasSystem() && coding.hasCode())
                 .anyMatch(coding -> targetSystem.equals(coding.getSystem()) &&
                         targetCode.equals(coding.getCode()));
+    }
+
+    /**
+     * Finds the first component matching the target system and code
+     * within a GIVEN Observation object, and returns its valueBoolean.
+     * THIS IS THE CLIENT-SIDE PROCESSING LOGIC.
+     *
+     * @param observation The specific Observation object already retrieved.
+     * @param targetSystem The system URL of the component code.
+     * @param targetCode The code value of the component code.
+     * @return The Boolean value if found, otherwise null.
+     */
+    public static Boolean getComponentValueBoolean(Observation observation, String targetSystem, String targetCode) {
+        if (observation == null || !observation.hasComponent() || targetSystem == null || targetCode == null) {
+            return null;
+        }
+
+        Optional<Boolean> resultOptional = observation.getComponent().stream()
+                .filter(comp -> comp.hasCode() && comp.getCode().getCoding().stream()
+                        .anyMatch(coding -> targetSystem.equals(coding.getSystem()) &&
+                                targetCode.equals(coding.getCode())))
+                .findFirst() // Get the first matching component
+                // Extract the boolean value if present and correct type
+                .flatMap(comp -> {
+                    if (comp.hasValue() && comp.getValue() instanceof BooleanType) {
+                        return Optional.ofNullable(((BooleanType) comp.getValue()).getValue());
+                    } else {
+                        return Optional.empty(); // Not a boolean or no value
+                    }
+                });
+
+        return resultOptional.orElse(null); // Return Boolean or null
     }
 }
