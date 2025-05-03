@@ -8,5 +8,5 @@ import lombok.Setter;
 public class ProvidedAndCodeDTO {
     private String code;
     private String name;
-    private boolean provided;
+    private Boolean provided;
 }

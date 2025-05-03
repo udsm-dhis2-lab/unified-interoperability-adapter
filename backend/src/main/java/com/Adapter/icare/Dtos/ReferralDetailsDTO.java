@@ -22,7 +22,7 @@ public class ReferralDetailsDTO {
     @NotNull
     private String referralNumber;
     private Map<String,Object> referringClinician; // TODO: Add specific model
-    private boolean referredToOtherCountry;
+    private Boolean referredToOtherCountry;
 
     public Map<String,Object> toMap() {
         Map<String,Object> referralMap = new HashMap<>();
@@ -32,7 +32,7 @@ public class ReferralDetailsDTO {
         referralMap.put("hfrCode", this.getHfrCode());
         referralMap.put("facility", this.getFacility());
         referralMap.put("referringClinician", this.getReferringClinician());
-        referralMap.put("referredToOtherCountry", this.isReferredToOtherCountry());
+        referralMap.put("referredToOtherCountry", this.getReferredToOtherCountry());
         return referralMap;
     }
 }

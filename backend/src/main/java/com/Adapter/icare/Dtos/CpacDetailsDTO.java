@@ -9,13 +9,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CpacDetailsDTO {
-    private int pregnancyAgeInWeeks;
+    private Integer pregnancyAgeInWeeks;
     private CauseOfAbortion causeOfAbortion;
     private AfterAbortionServices afterAbortionServices;
     private Boolean positiveHIVStatusBeforeAbortion;
-    private DiseaseStatusDTO hivTest;
+    private CpacHivTestDTO hivTest;
     private ReferReason referReason;
     private PostAbortionsMedicationsDTO postAbortionsMedications;
     private PostAbortionCounsellingDTO postAbortionCounselling;
-    private ContraceptivesDTO contraceptives;
+    private CpacContraceptivesDTO contraceptives;
 }

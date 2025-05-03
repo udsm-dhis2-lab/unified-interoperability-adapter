@@ -1,6 +1,12 @@
 package com.Adapter.icare.SharedHealthRecords.Utilities;
 
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.SortOrderEnum;
+import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.TokenClientParam;
+import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
+import ca.uhn.fhir.util.BundleUtil;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Encounter;
 import org.hl7.fhir.r4.model.Observation;
@@ -67,5 +73,50 @@ public class ObservationsUtils {
         }
 
         return observations;
+    }
+
+    /**
+     * Finds Observation resources matching a specific category code and observation code.
+     * Only matches the code part of the token.
+     *
+     * @param categoryCode    The code for the Observation category (e.g., "vital-signs").
+     * @param observationCode The code for the Observation itself (e.g., "8302-2" for body height).
+     * @return A list of matching Observation resources, or an empty list if none found.
+     */
+    public static List<Observation> getObservationsByCategoryAndCode(
+            IGenericClient fhirClient,
+            FhirContext ctx,
+            String categoryCode,
+            String observationCode) {
+
+        if (fhirClient == null || ctx == null || categoryCode == null || categoryCode.isBlank() || observationCode == null || observationCode.isBlank()) {
+            System.err.println("FHIR client, context, category code, and observation code must be provided.");
+            return List.of();
+        }
+
+        try {
+            var searchBuilder = fhirClient.search()
+                    .forResource(Observation.class)
+                    .where(Observation.CATEGORY.exactly().code(categoryCode))
+                    .and(Observation.CODE.exactly().code(observationCode));
+
+            searchBuilder = searchBuilder.sort(new SortSpec(Observation.DATE.getParamName())
+                    .setOrder(SortOrderEnum.DESC));
+            Bundle resultsBundle = searchBuilder
+                    .returnBundle(Bundle.class)
+                    .execute();
+
+            List<Observation> observations = BundleUtil.toListOfResourcesOfType(ctx, resultsBundle, Observation.class);
+
+            System.out.println("Found " + observations.size() + " observations matching category code '" + categoryCode + "' and observation code '" + observationCode + "' (sorted by date descending).");
+            return observations;
+
+        } catch (BaseServerResponseException e) {
+            System.err.println("Error response from FHIR server: " + e.getStatusCode() + " " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("An error occurred while searching for observations: " + e.getMessage());
+        }
+
+        return List.of();
     }
 }
