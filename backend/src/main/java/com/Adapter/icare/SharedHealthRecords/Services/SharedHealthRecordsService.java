@@ -41,16 +41,17 @@ import java.util.stream.Collectors;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.getObservationsByCategory;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.getObservationsByObservationGroupId;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
 import static com.Adapter.icare.Utils.CarePlanUtils.getCarePlansByCategory;
+import static com.Adapter.icare.Utils.DateUtils.stringToDateOrNull;
 
 @Service
 public class SharedHealthRecordsService {
 
     private final IGenericClient fhirClient;
+    private final FhirContext fhirContext;
     private final FHIRConstants fhirConstants;
     private final ClientRegistryConstants clientRegistryConstants;
     private final UserService userService;
@@ -72,8 +73,8 @@ public class SharedHealthRecordsService {
         this.mediatorsService = mediatorsService;
         this.clientRegistryConstants = clientRegistryConstants;
         this.sharedRecordsConstants = sharedRecordsConstants;
-        FhirContext fhirContext = FhirContext.forR4();
-        this.fhirClient = fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
+        this.fhirContext = FhirContext.forR4();
+        this.fhirClient = this.fhirContext.newRestfulGenericClient(fhirConstants.FHIRServerUrl);
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             this.authenticatedUser = this.userService
@@ -3297,6 +3298,107 @@ public class SharedHealthRecordsService {
                                     templateData.setFamilyPlanningDetails(
                                             familyPlanningDetailsDTO);
                                 }
+
+                                // Child Health Details
+                                ChildHealthDetailsDTO childHealthDetailsDTO = new ChildHealthDetailsDTO();
+
+                                List<Observation> childHealthObservations = getObservationsByCategory(fhirClient, "child-health", encounter, false, true);
+
+                                if(!childHealthObservations.isEmpty()){
+                                    Observation observation = childHealthObservations.get(0);
+
+                                    CHProphylaxisDTO chProphylaxisDTO = new CHProphylaxisDTO();
+                                    ProphylaxisAdministrationDTO prophylaxisAdministrationDTO = new ProphylaxisAdministrationDTO();
+                                    prophylaxisAdministrationDTO.setAdministered(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-albendazole-administered"));
+                                    prophylaxisAdministrationDTO.setServiceModality(ServiceModality.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-albendazole-serviceModality")));
+                                    chProphylaxisDTO.setAlbendazole(prophylaxisAdministrationDTO);
+
+                                    prophylaxisAdministrationDTO.setAdministered(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-vitaminA-administered"));
+                                    prophylaxisAdministrationDTO.setServiceModality(ServiceModality.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-vitaminA-serviceModality")));
+                                    chProphylaxisDTO.setVitaminA(prophylaxisAdministrationDTO);
+
+                                    chProphylaxisDTO.setProvidedWithLLIN(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-providedWithLLIN"));
+
+                                    childHealthDetailsDTO.setProphylaxis(chProphylaxisDTO);
+
+                                    childHealthDetailsDTO.setInfantFeeding(InfantFeeding.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-infantFeeding")));
+
+                                    childHealthDetailsDTO.setProvidedWithInfantFeedingCounselling(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-providedWithInfantFeedingCounselling"));
+
+                                    childHealthDetailsDTO.setIsStillBreastFed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-isStillBreastFed"));
+
+                                    MotherHivStatusDTO motherHivStatusDTO = new MotherHivStatusDTO();
+                                    List<Observation.ObservationComponentComponent> motherHICStatusComponents = getComponentsByCode(observation, "http://loinc.org", "55277-8");
+
+                                    motherHivStatusDTO.setStatus(STATUS.fromString(
+                                            !motherHICStatusComponents.isEmpty() && motherHICStatusComponents.get(0).hasValueCodeableConcept() &&
+                                                    motherHICStatusComponents.get(0).getValueCodeableConcept().hasCoding() &&
+                                                    !motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().isEmpty() &&
+                                                    motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().get(0).hasCode() ?
+                                                    motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().get(0).getCode() : null)
+                                    );
+                                    motherHivStatusDTO.setTestingDate(stringToDateOrNull(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-motherHivstatus-testingDate"), "yyyy-MM-dd"));
+
+                                    childHealthDetailsDTO.setMotherHivStatus(motherHivStatusDTO);
+
+                                    childHealthDetailsDTO.setReferredToCTC(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-referredToCTC"));
+                                }
+                                templateData.setChildHealthDetails(childHealthDetailsDTO);
+
+                                // CPAC DETAILS
+                                CpacDetailsDTO cpacDetailsDTO = new CpacDetailsDTO();
+
+                                List<Observation> cpacObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "post-abortion-care-comprehensive");
+
+                                if(!cpacObservations.isEmpty()){
+                                    for(Observation observation: cpacObservations){
+                                        cpacDetailsDTO.setPregnancyAgeInWeeks(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-pregnancyAgeInWeeks"));
+                                        cpacDetailsDTO.setCauseOfAbortion(CauseOfAbortion.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-causeOfAbortion")));
+                                        cpacDetailsDTO.setAfterAbortionServices(AfterAbortionServices.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-afterAbortionServices")));
+                                        cpacDetailsDTO.setPositiveHIVStatusBeforeAbortion(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-positiveHIVStatusBeforeAbortion"));
+
+                                        CpacHivTestDTO cpacHivTestDTO = new CpacHivTestDTO();
+                                        cpacHivTestDTO.setStatus(STATUS.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-hivTest-status")));
+                                        cpacDetailsDTO.setHivTest(cpacHivTestDTO);
+
+                                        cpacDetailsDTO.setReferReason(ReferReason.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-referReason")));
+
+                                        PostAbortionsMedicationsDTO postAbortionsMedicationsDTO = new PostAbortionsMedicationsDTO();
+                                        PostAbortionCounsellingDTO postAbortionCounsellingDTO = new PostAbortionCounsellingDTO();
+
+                                        postAbortionsMedicationsDTO.setProvidedWithAntibiotics(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionsMedications-providedWithAntibiotics"));
+                                        postAbortionsMedicationsDTO.setProvidedWithPainKillers(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionsMedications-providedWithPainKillers"));
+                                        postAbortionsMedicationsDTO.setProvidedWithOxytocin(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionsMedications-providedWithOxytocin"));
+                                        postAbortionsMedicationsDTO.setProvidedWithMisoprostol(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionsMedications-providedWithMisoprostol"));
+                                        postAbortionsMedicationsDTO.setProvidedWithIvInfusion(getExtensionValueBoolean(observation,"http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionsMedications-providedWithIvInfusion"));
+
+                                        postAbortionCounsellingDTO.setProvidedWithHIVCounselling(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionCounselling-providedWithHIVCounselling"));
+                                        postAbortionCounsellingDTO.setProvidedWithSTDsPreventionCounselling(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionCounselling-providedWithSTDsPreventionCounselling"));
+                                        postAbortionCounsellingDTO.setProvidedWithFamilyPlanningCounselling(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-postAbortionCounselling-providedWithFamilyPlanningCounselling"));
+
+                                        cpacDetailsDTO.setPostAbortionsMedications(postAbortionsMedicationsDTO);
+                                        cpacDetailsDTO.setPostAbortionCounselling(postAbortionCounsellingDTO);
+
+                                        CpacContraceptivesDTO contraceptivesDTO = new CpacContraceptivesDTO();
+
+                                        contraceptivesDTO.setDidReceiveOralPillsCOC(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-didReceiveOralPillsCOC"));
+                                        contraceptivesDTO.setCocCyclesProvided(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-cocCyclesProvided"));
+                                        contraceptivesDTO.setDidReceiveOralPillsPOP(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-didReceiveOralPillsPOP"));
+                                        contraceptivesDTO.setPopCyclesProvided(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-popCyclesProvided"));
+                                        contraceptivesDTO.setDidReceivePillCycles(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-didReceivePillCycles"));
+                                        contraceptivesDTO.setWasInsertedWithImplanon(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-wasInsertedWithImplanon"));
+                                        contraceptivesDTO.setWasInsertedWithJadelle(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-wasInsertedWithJadelle"));
+                                        contraceptivesDTO.setDidReceiveIUD(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-didReceiveIUD"));
+                                        contraceptivesDTO.setDidHaveTubalLigation(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-didHaveTubalLigation"));
+                                        contraceptivesDTO.setDidReceiveInjection(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-didReceiveInjection"));
+                                        contraceptivesDTO.setNumberOfFemaleCondomsProvided(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-numberOfFemaleCondomsProvided"));
+                                        contraceptivesDTO.setNumberOfMaleCondomsProvided(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/cpac-contraceptives-numberOfMaleCondomsProvided"));
+
+                                        cpacDetailsDTO.setContraceptives(contraceptivesDTO);
+                                    }
+                                }
+
+                                templateData.setCpacDetails(cpacDetailsDTO);
 
                                 // laborAndDeliveryDetails
                                 LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();

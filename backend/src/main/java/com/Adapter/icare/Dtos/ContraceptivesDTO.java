@@ -6,18 +6,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContraceptivesDTO {
-    private boolean didReceiveOralPillsPOP;
-    private int popCyclesProvided;
-    private boolean didReceiveOralPillsCOC;
-    private int cocCyclesProvided;
-    private boolean didReceivePillCycles;
-    private boolean wasInsertedWithImplanon;
-    private boolean wasInsertedWithJadelle;
-    private boolean didReceiveIUD;
-    private boolean didHaveTubalLigation;
-    private boolean didReceiveInjection;
-    private int numberOfFemaleCondomsProvided;
-    private int numberOfMaleCondomsProvided;
+    private Boolean didReceiveOralPillsPOP;
+    private Integer popCyclesProvided;
+    private Boolean didReceiveOralPillsCOC;
+    private Integer cocCyclesProvided;
+    private Boolean didReceivePillCycles;
+    private Boolean wasInsertedWithImplanon;
+    private Boolean wasInsertedWithJadelle;
+    private Boolean didReceiveIUD;
+    private Boolean didHaveTubalLigation;
+    private Boolean didReceiveInjection;
+    private Integer numberOfFemaleCondomsProvided;
+    private Integer numberOfMaleCondomsProvided;
     private Boolean didReceiveSDM;
     private Boolean didUseLAM;
     private Boolean didOptToUseEmergencyMethods;

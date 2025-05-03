@@ -8,5 +8,5 @@ import lombok.Setter;
 public class CHProphylaxisDTO {
     private ProphylaxisAdministrationDTO albendazole;
     private ProphylaxisAdministrationDTO vitaminA;
-    private boolean providedWithLLIN;
+    private Boolean providedWithLLIN;
 }
