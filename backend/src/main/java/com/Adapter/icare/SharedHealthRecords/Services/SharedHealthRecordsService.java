@@ -3472,6 +3472,23 @@ public class SharedHealthRecordsService {
 
                                 templateData.setContraceptives(contraceptivesDTO);
 
+                                // EYE DETAILS
+                                EyeClinicDetailsDTO eyeClinicDetailsDTO = new EyeClinicDetailsDTO();
+                                List<Observation> eyeObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "eye-clinic-exam");
+
+                                if(!eyeObservations.isEmpty()){
+                                    Observation observation = eyeObservations.get(0);
+
+                                    eyeClinicDetailsDTO.setRefracted(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-refracted"));
+                                    eyeClinicDetailsDTO.setSpectaclesPrescribed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-spectaclesPrescribed"));
+                                    eyeClinicDetailsDTO.setSpectaclesDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-spectacleDispensed"));
+                                    eyeClinicDetailsDTO.setContactLensDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-contactLenseDispensed"));
+                                    eyeClinicDetailsDTO.setPrescribedWithLowVision(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-prescribedWithLowVision"));
+                                    eyeClinicDetailsDTO.setIsDispensedWithLowVisionDevice(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-isDispensedWithLowVisionDevice"));
+                                }
+
+                                templateData.setEyeClinicDetails(eyeClinicDetailsDTO);
+
                                 // laborAndDeliveryDetails
                                 LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();
 
