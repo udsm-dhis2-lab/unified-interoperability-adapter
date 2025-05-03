@@ -120,7 +120,9 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("familyPlanningDetails", this.getFamilyPlanningDetails());
         sharedRecordMap.put("laborAndDeliveryDetails", this.getLaborAndDeliveryDetails());
         sharedRecordMap.put("cpacDetails", this.getCpacDetails());
+        sharedRecordMap.put("cecapDetails", this.getCecap());
         sharedRecordMap.put("postnatalDetails", this.getPostnatalDetails());
+        sharedRecordMap.put("contraceptives", this.getContraceptives());
         sharedRecordMap.put("billingsDetails", this.getBillingsDetails());
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
         sharedRecordMap.put("selfMonitoringClinicalInformation", this.getSelfMonitoringClinicalInformation());

@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
@@ -2864,12 +2865,12 @@ public class SharedHealthRecordsService {
                                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details",
                                                         "site"));
                                         prescription.put("dailyDose",
-                                                getNestedExtensionValueQuantityValue(
+                                                getResourceNestedExtensionQuantityValue(
                                                         procedure,
                                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details",
                                                         "dailyDose"));
                                         prescription.put("totalDose",
-                                                getNestedExtensionValueQuantityValue(
+                                                getResourceNestedExtensionQuantityValue(
                                                         procedure,
                                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details",
                                                         "totalDose"));
@@ -3434,6 +3435,42 @@ public class SharedHealthRecordsService {
                                 }
 
                                 cecapDTO.setCancerScreeningDetails(cancerScreeningDetailsDTO);
+                                templateData.setCecap(cecapDTO);
+
+                                // CONTRACEPTIVES
+                                ContraceptivesDTO contraceptivesDTO = new ContraceptivesDTO();
+                                CodeableConcept contraceptiveCodeableConcept = new CodeableConcept();
+                                Coding contraceptiveCodeableConceptCoding = new Coding();
+
+                                contraceptiveCodeableConceptCoding.setSystem("http://fhir.moh.go.tz/fhir/CodeSystem/contraceptive-methods");
+                                contraceptiveCodeableConceptCoding.setCode("contraceptive-services");
+                                contraceptiveCodeableConcept.addCoding(contraceptiveCodeableConceptCoding);
+
+                                List<MedicationStatement> contaceptivesMedicationStatements= getMedicationStatementsByCategoryAndCodeableConcept(fhirClient, fhirContext, "contraceptive", contraceptiveCodeableConcept);
+
+                                if(!contaceptivesMedicationStatements.isEmpty()){
+                                    MedicationStatement statement = contaceptivesMedicationStatements.get(0);
+                                    String statementExtenstionParentUrl = "http://fhir.moh.go.tz/fhir/StructureDefinition/contraceptive-details";
+
+                                    contraceptivesDTO.setPopCyclesProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtenstionParentUrl,"http://fhir.moh.go.tz/fhir/StructureDefinition/pop-cycles"));
+                                    contraceptivesDTO.setPopCyclesProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtenstionParentUrl,"http://fhir.moh.go.tz/fhir/StructureDefinition/coc-cycles"));
+                                    contraceptivesDTO.setDidReceiveSDM(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/sdm-provided"));
+                                    contraceptivesDTO.setDidUseLAM(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/lam-used"));
+                                    contraceptivesDTO.setDidOptToUseEmergencyMethods(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/emergency-methods"));
+                                    contraceptivesDTO.setWasInsertedWithImplanon(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/implanon-inserted"));
+                                    contraceptivesDTO.setWasInsertedWithJadelle(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/jadelle-inserted"));
+                                    contraceptivesDTO.setDidRemoveImplanon(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/implanon-removed"));
+                                    contraceptivesDTO.setDidRemoveJadelle(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/jadelle-removed"));
+                                    contraceptivesDTO.setDidReceiveIUD(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/iud-received"));
+                                    contraceptivesDTO.setDidRemoveIUD(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/iud-removed"));
+                                    contraceptivesDTO.setDidHaveTubalLigation(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/tubal-ligation"));
+                                    contraceptivesDTO.setDidHaveVasectomy(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/vasectomy"));
+                                    contraceptivesDTO.setDidReceiveInjection(getNestedExtensionValueBoolean(statement, statementExtenstionParentUrl,"http://fhir.moh.go.tz/fhir/StructureDefinition/injection-received"));
+                                    contraceptivesDTO.setNumberOfFemaleCondomsProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/female-condoms-provided"));
+                                    contraceptivesDTO.setNumberOfMaleCondomsProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtenstionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/male-condoms-provided"));
+                                }
+
+                                templateData.setContraceptives(contraceptivesDTO);
 
                                 // laborAndDeliveryDetails
                                 LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();
