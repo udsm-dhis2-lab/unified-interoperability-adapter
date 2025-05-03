@@ -3406,15 +3406,34 @@ public class SharedHealthRecordsService {
 
                                 List<Observation> cecapObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "cancer-screening-comprehensive");
 
-                                if(!cpacObservations.isEmpty()){
-                                    for(Observation observation: cecapObservations){
-                                        BreastCancerDTO breastCancerDTO = new BreastCancerDTO();
-                                        breastCancerDTO.setScreened(getComponentValueBoolean(observation,"http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
+                                if(!cecapObservations.isEmpty()){
+                                    Observation observation =  cecapObservations.get(0);
+                                    BreastCancerDTO breastCancerDTO = new BreastCancerDTO();
+                                    breastCancerDTO.setScreened(getComponentValueBoolean(observation,"http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
+                                    breastCancerDTO.setFoundWithBreastCancerSymptoms(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
 
-                                    }
+                                    cancerScreeningDetailsDTO.setBreastCancer(breastCancerDTO);
+                                    CervicalCancerDTO cervicalCancerDTO = new CervicalCancerDTO();
+
+                                    cervicalCancerDTO.setSuspected(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "cervical-cancer-suspected"));
+                                    cervicalCancerDTO.setScreenedWithVIA(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "via-screening-performed"));
+                                    cervicalCancerDTO.setScreenedWithHPVDNA(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "hpv-dna-screening-performed"));
+                                    cervicalCancerDTO.setViaTestPositive(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "via-test-result"));
+                                    cervicalCancerDTO.setHpvDNAPositive(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "hpv-dna-test-result"));
+                                    cervicalCancerDTO.setDiagnosedWithLargeLesion(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "diagnosed-with-large-lesion"));
+                                    cervicalCancerDTO.setDiagnosedWithSmallOrModerateLesion(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "diagnosed-with-small-or-moderate-lesion"));
+                                    cervicalCancerDTO.setTreatedWithCryo(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-with-cryo"));
+                                    cervicalCancerDTO.setTreatedWithThermo(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-with-thermo"));
+                                    cervicalCancerDTO.setTreatedWithLEEP(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-with-leep"));
+                                    cervicalCancerDTO.setFirstTimeScreening(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "first-time-screening"));
+                                    cervicalCancerDTO.setTreatedOnTheSameDay(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-same-day"));
+                                    cervicalCancerDTO.setComplicationsAfterTreatment(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "complications-after-treatment"));
+                                    cervicalCancerDTO.setFoundWithHivAndReferredToCTC(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "hiv-found-referred-ctc"));
+
+                                    cancerScreeningDetailsDTO.setCervicalCancer(cervicalCancerDTO);
                                 }
 
-
+                                cecapDTO.setCancerScreeningDetails(cancerScreeningDetailsDTO);
 
                                 // laborAndDeliveryDetails
                                 LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();

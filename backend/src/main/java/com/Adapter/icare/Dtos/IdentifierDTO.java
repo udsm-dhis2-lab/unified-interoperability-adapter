@@ -18,7 +18,7 @@ public class IdentifierDTO {
     private String id;
     @NotBlank(message = "Identifier Type cannot be blank")
     private String type;
-    private boolean preferred;
+    private Boolean preferred;
     private String system;
     private FacilityDetailsDTO organization;
 

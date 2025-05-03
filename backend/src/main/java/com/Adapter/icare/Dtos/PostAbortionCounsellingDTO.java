@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class PostAbortionCounsellingDTO {
-    private boolean providedWithSTDsPreventionCounselling;
-    private boolean providedWithHIVCounselling;
-    private boolean providedWithFamilyPlanningCounselling;
+    private Boolean providedWithSTDsPreventionCounselling;
+    private Boolean providedWithHIVCounselling;
+    private Boolean providedWithFamilyPlanningCounselling;
 }

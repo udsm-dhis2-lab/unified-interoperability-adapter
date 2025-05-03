@@ -1,6 +1,8 @@
 package com.Adapter.icare.SharedHealthRecords.Utilities;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.SortOrderEnum;
+import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
@@ -81,7 +83,11 @@ public class ObservationsUtils {
      * @param observationCode The code for the Observation itself (e.g., "8302-2" for body height).
      * @return A list of matching Observation resources, or an empty list if none found.
      */
-    public static List<Observation> getObservationsByCategoryAndCode(IGenericClient fhirClient, FhirContext ctx, String categoryCode, String observationCode) {
+    public static List<Observation> getObservationsByCategoryAndCode(
+            IGenericClient fhirClient,
+            FhirContext ctx,
+            String categoryCode,
+            String observationCode) {
 
         if (fhirClient == null || ctx == null || categoryCode == null || categoryCode.isBlank() || observationCode == null || observationCode.isBlank()) {
             System.err.println("FHIR client, context, category code, and observation code must be provided.");
@@ -89,17 +95,20 @@ public class ObservationsUtils {
         }
 
         try {
-            // Build the search query using .hasCode()
-            Bundle resultsBundle = fhirClient.search()
+            var searchBuilder = fhirClient.search()
                     .forResource(Observation.class)
                     .where(Observation.CATEGORY.exactly().code(categoryCode))
-                    .and(Observation.CODE.exactly().code(observationCode))
+                    .and(Observation.CODE.exactly().code(observationCode));
+
+            searchBuilder = searchBuilder.sort(new SortSpec(Observation.DATE.getParamName())
+                    .setOrder(SortOrderEnum.DESC));
+            Bundle resultsBundle = searchBuilder
                     .returnBundle(Bundle.class)
                     .execute();
 
             List<Observation> observations = BundleUtil.toListOfResourcesOfType(ctx, resultsBundle, Observation.class);
 
-            System.out.println("Found " + observations.size() + " observations matching category code '" + categoryCode + "' and observation code '" + observationCode + "'.");
+            System.out.println("Found " + observations.size() + " observations matching category code '" + categoryCode + "' and observation code '" + observationCode + "' (sorted by date descending).");
             return observations;
 
         } catch (BaseServerResponseException e) {

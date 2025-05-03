@@ -157,16 +157,15 @@ public class ComponentUtils {
                 .filter(comp -> comp.hasCode() && comp.getCode().getCoding().stream()
                         .anyMatch(coding -> targetSystem.equals(coding.getSystem()) &&
                                 targetCode.equals(coding.getCode())))
-                .findFirst() // Get the first matching component
-                // Extract the boolean value if present and correct type
+                .findFirst()
                 .flatMap(comp -> {
                     if (comp.hasValue() && comp.getValue() instanceof BooleanType) {
                         return Optional.ofNullable(((BooleanType) comp.getValue()).getValue());
                     } else {
-                        return Optional.empty(); // Not a boolean or no value
+                        return Optional.empty();
                     }
                 });
 
-        return resultOptional.orElse(null); // Return Boolean or null
+        return resultOptional.orElse(null);
     }
 }

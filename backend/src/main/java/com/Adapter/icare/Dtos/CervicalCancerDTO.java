@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CervicalCancerDTO {
+public class CervicalCancerDTO extends ParentCervicalCancerDTO {
     private Boolean suspected;
     private Boolean screenedWithVIA;
     private Boolean screenedWithHPVDNA;
