@@ -74,5 +74,5 @@ docker run -w="/app" -v "$(pwd)":/app node:20.18.0 bash -c "
 "
 
 
-# docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/backend:/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
-# docker build --no-cache -f Dockerfile  -t udsmdhis2/unified:2.0.0 .
+docker run --rm -v maven-repo:/root/.m2 -v $(pwd)/backend:/usr/src/omod -w /usr/src/omod maven:3.6.3 mvn clean package -Dmaven.test.skip=true
+docker build --no-cache -f Dockerfile  -t udsmdhis2/unified:2.0.0 .
