@@ -3448,7 +3448,7 @@ public class SharedHealthRecordsService {
                                 contraceptiveCodeableConceptCoding.setCode("contraceptive-services");
                                 contraceptiveCodeableConcept.addCoding(contraceptiveCodeableConceptCoding);
 
-                                List<MedicationStatement> contaceptivesMedicationStatements= getMedicationStatementsByCategoryAndCodeableConcept(fhirClient, fhirContext, "contraceptive", contraceptiveCodeableConcept);
+                                List<MedicationStatement> contaceptivesMedicationStatements= getMedicationStatementsByCategoryAndCodeableConcept(fhirClient, fhirContext, encounter, "contraceptive", contraceptiveCodeableConcept);
 
                                 if(!contaceptivesMedicationStatements.isEmpty()){
                                     MedicationStatement statement = contaceptivesMedicationStatements.get(0);

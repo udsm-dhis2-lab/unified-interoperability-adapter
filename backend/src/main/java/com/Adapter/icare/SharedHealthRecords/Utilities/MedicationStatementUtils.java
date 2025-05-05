@@ -4,10 +4,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.util.BundleUtil;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MedicationStatement;
+import org.hl7.fhir.r4.model.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -73,6 +70,7 @@ public class MedicationStatementUtils {
     public static List<MedicationStatement> getMedicationStatementsByCategoryAndCodeableConcept(
             IGenericClient fhirClient,
             FhirContext ctx,
+            Encounter encounter,
             String categoryCode,
             CodeableConcept medicationCodeableConcept) {
 
