@@ -95,7 +95,8 @@ public class MedicationStatementUtils {
         try {
             Bundle resultsBundle = fhirClient.search()
                     .forResource(MedicationStatement.class)
-                    .where(MedicationStatement.CATEGORY.exactly().code(categoryCode))
+                    .where(Observation.ENCOUNTER.hasId(encounter.getIdElement().getIdPart()))
+                    .and(MedicationStatement.CATEGORY.exactly().code(categoryCode))
                     .and(MedicationStatement.CODE.exactly().systemAndCode(medicationSystem, medicationCode))
                     .returnBundle(Bundle.class)
                     .execute();
