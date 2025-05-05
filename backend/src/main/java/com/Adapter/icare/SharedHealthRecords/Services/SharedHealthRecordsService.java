@@ -3351,7 +3351,7 @@ public class SharedHealthRecordsService {
                                 // CPAC DETAILS
                                 CpacDetailsDTO cpacDetailsDTO = new CpacDetailsDTO();
 
-                                List<Observation> cpacObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "post-abortion-care-comprehensive");
+                                List<Observation> cpacObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, encounter, "procedure", "post-abortion-care-comprehensive");
 
                                 if(!cpacObservations.isEmpty()){
                                     for(Observation observation: cpacObservations){
@@ -3407,7 +3407,7 @@ public class SharedHealthRecordsService {
                                 CecapDTO cecapDTO = new CecapDTO();
                                 CancerScreeningDetailsDTO cancerScreeningDetailsDTO = new CancerScreeningDetailsDTO();
 
-                                List<Observation> cecapObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "cancer-screening-comprehensive");
+                                List<Observation> cecapObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, encounter, "procedure", "cancer-screening-comprehensive");
 
                                 if(!cecapObservations.isEmpty()){
                                     Observation observation =  cecapObservations.get(0);
@@ -3476,7 +3476,7 @@ public class SharedHealthRecordsService {
 
                                 // EYE DETAILS
                                 EyeClinicDetailsDTO eyeClinicDetailsDTO = new EyeClinicDetailsDTO();
-                                List<Observation> eyeObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "eye-clinic-exam");
+                                List<Observation> eyeObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, encounter, "procedure", "eye-clinic-exam");
 
                                 if(!eyeObservations.isEmpty()){
                                     Observation observation = eyeObservations.get(0);

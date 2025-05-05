@@ -86,6 +86,7 @@ public class ObservationsUtils {
     public static List<Observation> getObservationsByCategoryAndCode(
             IGenericClient fhirClient,
             FhirContext ctx,
+            Encounter encounter,
             String categoryCode,
             String observationCode) {
 
@@ -97,7 +98,8 @@ public class ObservationsUtils {
         try {
             var searchBuilder = fhirClient.search()
                     .forResource(Observation.class)
-                    .where(Observation.CATEGORY.exactly().code(categoryCode))
+                    .where(Observation.ENCOUNTER.hasId(encounter.getIdElement().getIdPart()))
+                    .and(Observation.CATEGORY.exactly().code(categoryCode))
                     .and(Observation.CODE.exactly().code(observationCode));
 
             searchBuilder = searchBuilder.sort(new SortSpec(Observation.DATE.getParamName())
