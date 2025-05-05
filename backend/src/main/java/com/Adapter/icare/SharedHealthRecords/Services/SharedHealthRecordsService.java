@@ -2005,6 +2005,8 @@ public class SharedHealthRecordsService {
                                                 medicationDispense
                                                         .hasType() ? medicationDispense.getType().getText()
                                                         : null);
+                                        medicationDetailsDTO.setCurrentRefill(getExtensionValueInt(medicationDispense, "http://fhir.moh.go.tz/fhir/StructureDefinition/medication-current-refill"));
+                                        medicationDetailsDTO.setMaxRefill(getExtensionValueInt(medicationDispense, "http://fhir.moh.go.tz/fhir/StructureDefinition/medication-max-refill"));
                                         if (medicationDispense
                                                 .hasDosageInstruction()) {
                                             Dosage dosage = Iterables
@@ -3914,6 +3916,105 @@ public class SharedHealthRecordsService {
                                                     getComponentValueBoolean(
                                                             postnatalDetailObservation,
                                                             0));
+                                    List<Observation.ObservationComponentComponent> hivStatusDetailsComponents = getComponentsByCode(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/CodeSystem/maternal-child-health-codes", "hivStatusAsSeenFromAncCard");
+
+                                    if(!hivStatusDetailsComponents.isEmpty()){
+                                        Observation.ObservationComponentComponent component  = hivStatusDetailsComponents.get(0);
+                                        postnatalDetailsDTO.setHivStatusAsSeenFromAncCard(
+                                                STATUS.fromString(component.hasValue() && component.hasValueStringType() ? component.getValueStringType().getValue() : null)
+                                        );
+                                    }
+
+                                    hivStatusDetailsComponents = getComponentsByCode(postnatalDetailObservation, "http://loinc.org", "55277-8");
+
+                                    if(!hivStatusDetailsComponents.isEmpty()){
+                                        PNCHivDetailsDTO pncHivDetailsDTO = new PNCHivDetailsDTO();
+                                        Observation.ObservationComponentComponent component  = hivStatusDetailsComponents.get(0);
+                                        pncHivDetailsDTO.setStatus(
+                                                STATUS.fromString(
+                                                        component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && !component.getValueCodeableConcept().getCoding().isEmpty() && component.getValueCodeableConcept().getCoding().get(0).hasDisplay() ? component.getValueCodeableConcept().getCoding().get(0).getDisplay() : null
+                                                )
+                                        );
+
+                                        pncHivDetailsDTO.setCode(
+                                                        component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && component.getValueCodeableConcept().getCoding().get(0).hasCode() ? component.getValueCodeableConcept().getCoding().get(0).getCode() : null
+                                        );
+
+                                        pncHivDetailsDTO.setHivTestNumber(getExtensionValueInt(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-hivDetails-hivTestNumber"));
+
+                                        postnatalDetailsDTO.setHivDetails(pncHivDetailsDTO);
+                                    }
+
+                                    postnatalDetailsDTO.setMotherAndChildOrigin(PlaceOfOrigin.fromString(getExtensionValueString(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-motherAndChildOrigin")));
+
+                                    postnatalDetailsDTO.setPlaceOfBirth(BirthPlace.fromString(getExtensionValueString(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-placeOfBirth")));
+
+                                    PNCProphylaxisDTO pncProphylaxisDTO = new PNCProphylaxisDTO();
+                                    pncProphylaxisDTO.setProvideWithVitaminA(getExtensionValueBoolean(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-prophylaxis-provideWithVitaminA"));
+                                    pncProphylaxisDTO.setProvidedWithAntenatalCorticosteroids(getExtensionValueBoolean(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-prophylaxis-providedWithAntenatalCorticosteroids"));
+                                    pncProphylaxisDTO.setProvidedWithFEFO(getExtensionValueBoolean(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-prophylaxis-providedWithFEFO"));
+
+                                    postnatalDetailsDTO.setProphylaxis(pncProphylaxisDTO);
+
+                                    List<CounsellingDTO> pncCounselling = new ArrayList<>();
+
+                                    List<Observation.ObservationComponentComponent> pncCounsellingComponents = getComponentsByCode(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/CodeSystem/pnc-prophylaxis-codes", "counselling");
+
+                                    for(Observation.ObservationComponentComponent component: pncCounsellingComponents){
+                                        CounsellingDTO counselling = new CounsellingDTO();
+                                        counselling.setName(component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && !component.getValueCodeableConcept().getCoding().isEmpty() && component.getValueCodeableConcept().getCoding().get(0).hasDisplay()
+                                         ? component.getValueCodeableConcept().getCoding().get(0).getDisplay() : null);
+
+                                        counselling.setCode(component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && !component.getValueCodeableConcept().getCoding().isEmpty() && component.getValueCodeableConcept().getCoding().get(0).hasCode()
+                                                ? component.getValueCodeableConcept().getCoding().get(0).getCode() : null);
+
+                                        pncCounselling.add(counselling);
+                                    }
+
+                                    postnatalDetailsDTO.setCounselling(pncCounselling);
+
+                                    postnatalDetailsDTO.setDaysSinceDelivery(
+                                            getExtensionValueInt(postnatalDetailObservation, "url: 'http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-daysSinceDelivery")
+                                    );
+
+                                    List<BirthDetailsDTO> birthDetailsDTOList = new ArrayList<>();
+
+                                    List<Observation> pncBirthDetailsComponents = getObservationsByCategory(fhirClient, "postnatal-birth-details", encounter, false, true);
+
+                                    for(Observation observation: pncBirthDetailsComponents){
+                                        BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
+                                        birthDetailsDTO.setInfantFeeding(InfantFeeding.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infantFeeding")));
+                                        birthDetailsDTO.setGender(GENDER.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-gender")));
+                                        birthDetailsDTO.setProvidedWithKmc(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-providedWithKmc"));
+                                        birthDetailsDTO.setHb(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-hb"));
+                                        birthDetailsDTO.setHbigTested(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-hbigTested"));
+                                        birthDetailsDTO.setHivDnaPCRTested(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-hivDnaPCRTested"));
+                                        birthDetailsDTO.setChildHivStatus(STATUS.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-childHivStatus")));
+
+                                        InfectionsDTO infectionsDTO = new InfectionsDTO();
+                                        infectionsDTO.setHasSepticaemia(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasSepticaemia"));
+                                        infectionsDTO.setHasOmphalitis(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasOmphalitis"));
+                                        infectionsDTO.setHasSkinInfection(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasSkinInfection"));
+                                        infectionsDTO.setHasOcularInfection(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasOcularInfection"));
+                                        infectionsDTO.setHasJaundice(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasJaundice"));
+
+                                        birthDetailsDTO.setInfections(infectionsDTO);
+
+                                        PNCBirthOutcomeDetailsDTO outcomeDetailsDTO = new PNCBirthOutcomeDetailsDTO();
+                                        outcomeDetailsDTO.setDischargedHome(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-dischargedHome"));
+                                        outcomeDetailsDTO.setReferredToNCU(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToNCU"));
+                                        outcomeDetailsDTO.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHospital"));
+                                        outcomeDetailsDTO.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHealthFacility"));
+
+                                        birthDetailsDTO.setOutcomeDetails(outcomeDetailsDTO);
+
+                                        birthDetailsDTOList.add(birthDetailsDTO);
+
+                                    }
+
+                                    postnatalDetailsDTO.setBirthDetails(birthDetailsDTOList);
+
+
                                     postnatalDetailsDTO
                                             .setReferredToCTC(
                                                     getComponentValueBoolean(
