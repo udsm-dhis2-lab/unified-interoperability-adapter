@@ -1,6 +1,8 @@
 package com.Adapter.icare.SharedHealthRecords.Utilities;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.SortOrderEnum;
+import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.util.BundleUtil;
@@ -70,7 +72,7 @@ public class MedicationStatementUtils {
     public static List<MedicationStatement> getMedicationStatementsByCategoryAndCodeableConcept(
             IGenericClient fhirClient,
             FhirContext ctx,
-            Encounter encounter,
+            Patient patient,
             String categoryCode,
             CodeableConcept medicationCodeableConcept) {
 
@@ -93,13 +95,19 @@ public class MedicationStatementUtils {
         }
 
         try {
-            Bundle resultsBundle = fhirClient.search()
+            var searchBuilder = fhirClient.search()
                     .forResource(MedicationStatement.class)
-                    .where(Observation.ENCOUNTER.hasId(encounter.getIdElement().getIdPart()))
+                    .where(MedicationStatement.PATIENT.hasAnyOfIds(patient.getIdElement().getIdPart()))
                     .and(MedicationStatement.CATEGORY.exactly().code(categoryCode))
-                    .and(MedicationStatement.CODE.exactly().systemAndCode(medicationSystem, medicationCode))
+                    .and(MedicationStatement.CODE.exactly().systemAndCode(medicationSystem, medicationCode));
+
+            searchBuilder = searchBuilder.sort(new SortSpec(MedicationStatement.EFFECTIVE.getParamName())
+                    .setOrder(SortOrderEnum.DESC));
+
+            Bundle resultsBundle = searchBuilder
                     .returnBundle(Bundle.class)
                     .execute();
+
 
             List<MedicationStatement> statements = BundleUtil.toListOfResourcesOfType(ctx, resultsBundle, MedicationStatement.class);
 

@@ -9,7 +9,5 @@ import java.util.Map;
 @Getter
 @Setter
 public class SelfMonitoringClinicalInformationDTO {
-    private List<Map<String,Object>> vitalSigns;
-
-
+    private List<VitalSignDTO> vitalSigns;
 }
