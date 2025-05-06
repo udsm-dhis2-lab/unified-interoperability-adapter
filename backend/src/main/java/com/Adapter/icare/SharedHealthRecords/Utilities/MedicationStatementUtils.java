@@ -1,13 +1,12 @@
 package com.Adapter.icare.SharedHealthRecords.Utilities;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.SortOrderEnum;
+import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.server.exceptions.BaseServerResponseException;
 import ca.uhn.fhir.util.BundleUtil;
-import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.CodeableConcept;
-import org.hl7.fhir.r4.model.Coding;
-import org.hl7.fhir.r4.model.MedicationStatement;
+import org.hl7.fhir.r4.model.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -73,6 +72,7 @@ public class MedicationStatementUtils {
     public static List<MedicationStatement> getMedicationStatementsByCategoryAndCodeableConcept(
             IGenericClient fhirClient,
             FhirContext ctx,
+            Patient patient,
             String categoryCode,
             CodeableConcept medicationCodeableConcept) {
 
@@ -95,12 +95,19 @@ public class MedicationStatementUtils {
         }
 
         try {
-            Bundle resultsBundle = fhirClient.search()
+            var searchBuilder = fhirClient.search()
                     .forResource(MedicationStatement.class)
-                    .where(MedicationStatement.CATEGORY.exactly().code(categoryCode))
-                    .and(MedicationStatement.CODE.exactly().systemAndCode(medicationSystem, medicationCode))
+                    .where(MedicationStatement.PATIENT.hasAnyOfIds(patient.getIdElement().getIdPart()))
+                    .and(MedicationStatement.CATEGORY.exactly().code(categoryCode))
+                    .and(MedicationStatement.CODE.exactly().systemAndCode(medicationSystem, medicationCode));
+
+            searchBuilder = searchBuilder.sort(new SortSpec(MedicationStatement.EFFECTIVE.getParamName())
+                    .setOrder(SortOrderEnum.DESC));
+
+            Bundle resultsBundle = searchBuilder
                     .returnBundle(Bundle.class)
                     .execute();
+
 
             List<MedicationStatement> statements = BundleUtil.toListOfResourcesOfType(ctx, resultsBundle, MedicationStatement.class);
 
