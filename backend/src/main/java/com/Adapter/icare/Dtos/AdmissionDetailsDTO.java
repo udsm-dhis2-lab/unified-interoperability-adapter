@@ -15,6 +15,7 @@ public class AdmissionDetailsDTO {
     private Date admissionDate;
     @NotNull
     private String admissionDiagnosis;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date dischargedOn;
     private String dischargeStatus;
 }
