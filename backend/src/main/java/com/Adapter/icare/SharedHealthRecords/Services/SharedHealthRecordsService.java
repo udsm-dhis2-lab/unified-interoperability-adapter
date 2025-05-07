@@ -4181,7 +4181,7 @@ public class SharedHealthRecordsService {
                                                     .hasValue()
                                                     ? admissionDetail
                                                     .getEffectiveDateTimeType()
-                                                    .getValue()
+                                                    .getValue().toString()
                                                     : null);
                                     admissionDetailsDTO.setAdmissionDiagnosis(
                                             getComponentValueCodeableConceptCode(
@@ -4190,7 +4190,7 @@ public class SharedHealthRecordsService {
                                     admissionDetailsDTO.setDischargedOn(
                                             getComponentValueDateTime(
                                                     admissionDetail,
-                                                    2));
+                                                    2).toString());
                                     admissionDetailsDTO.setDischargeStatus(
                                             getComponentValueString(
                                                     admissionDetail,
