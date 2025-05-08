@@ -7,10 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EyeClinicDetailsDTO {
-    private boolean refracted;
-    private boolean spectaclesPrescribed;
-    private boolean spectaclesDispensed;
-    private boolean contactLensDispensed;
-    private boolean prescribedWithLowVision;
-    private boolean isDispensedWithLowVisionDevice;
+    private Boolean refracted;
+    private Boolean spectaclesPrescribed;
+    private Boolean spectaclesDispensed;
+    private Boolean contactLensDispensed;
+    private Boolean prescribedWithLowVision;
+    private Boolean isDispensedWithLowVisionDevice;
 }

@@ -4,7 +4,9 @@ import com.Adapter.icare.Enums.GENDER;
 import com.Adapter.icare.Enums.InfantFeeding;
 import com.Adapter.icare.Enums.MethodOfResuscitation;
 import com.Adapter.icare.Enums.STATUS;
+import com.Adapter.icare.Utils.OutcomeDetailsDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,11 +31,13 @@ public class BirthDetailsDTO {
     private InfantFeeding infantFeeding;
     private GENDER gender;
     private Boolean providedWithKmc;
-    private Integer bp;
+    private Integer hb;
     private Boolean hbigTested;
     private STATUS childHivStatus;
     private InfectionsDTO infections;
-    private BDOutcomeDetailsDTO outcomeDetails;
+
+    @JsonDeserialize(using = OutcomeDetailsDeserializer.class)
+    private ParentOutcomeDetailsDTO outcomeDetails;
     private CodeAndNameDTO motherHivStatus;
     private Boolean providedWithARV;
     private Boolean referred;

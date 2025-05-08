@@ -7,6 +7,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProphylaxisAdministrationDTO {
-    private boolean administered;
-    private ServiceModality serviceModality;
+    private Boolean administered;
 }

@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
@@ -567,7 +568,7 @@ public class SharedHealthRecordsService {
                                 // Get clinicalInformation
                                 // 1. clinicalInformation - vital signs
                                 ClinicalInformationDTO clinicalInformationDTO = new ClinicalInformationDTO();
-                                List<Map<String, Object>> vitalSigns = new ArrayList<>();
+                                List<VitalSignDTO> vitalSigns = new ArrayList<>();
                                 // Get Observation Group
                                 // System.out.println(encounter.getIdElement().getIdPart());
                                 List<Observation> observationGroups = getObservationsByCategory(
@@ -582,7 +583,7 @@ public class SharedHealthRecordsService {
                                             observationGroup.getIdElement()
                                                     .getIdPart());
                                     if (!observationsData.isEmpty()) {
-                                        Map<String, Object> vitalSign = new LinkedHashMap<>();
+                                        VitalSignDTO vitalSign = new VitalSignDTO();
                                         for (Observation observation : observationsData) {
                                             // TODO: Improve the code to use
                                             // dynamically fetched LOINC
@@ -594,8 +595,7 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("85354-9")) {
-                                                vitalSign.put("bloodPressure",
-                                                        observation.hasValueStringType()
+                                                vitalSign.setBloodPressure(observation.hasValueStringType()
                                                                 ? observation.getValueStringType()
                                                                 .getValue()
                                                                 : null);
@@ -605,10 +605,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("29463-7")) {
-                                                vitalSign.put("weight",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setWeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -616,10 +615,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("8310-5")) {
-                                                vitalSign.put("temperature",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setTemperature(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -627,10 +625,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("8302-2")) {
-                                                vitalSign.put("height",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setHeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -638,10 +635,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("9279-1")) {
-                                                vitalSign.put("respiration",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setRespiration(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -649,10 +645,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("8867-4")) {
-                                                vitalSign.put("pulseRate",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setPulseRate(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observationGroup
@@ -666,11 +661,7 @@ public class SharedHealthRecordsService {
                                                         .format(observationGroup
                                                                 .getEffectiveDateTimeType()
                                                                 .getValue());
-                                                vitalSign.put("dateTime",
-                                                        formattedDate);
-                                            } else {
-                                                vitalSign.put("dateTime",
-                                                        null);
+                                                vitalSign.setDateTime(formattedDate);
                                             }
 
                                             if (observation.hasCategory() &&
@@ -679,19 +670,16 @@ public class SharedHealthRecordsService {
                                                             observation.getCategory().get(0).getCoding().get(0).hasCode() &&
                                                             observation.getCategory().get(0).getCoding().get(0).getCode().equals("vital-signs")
                                             ) {
-                                                vitalSign.put("notes",
-                                                        observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
+                                                vitalSign.setNotes(observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
                                                                 ? observation.getNote().get(0).getText()
                                                                 : null);
-                                            } else {
-                                                vitalSign.put("notes", null);
                                             }
                                         }
                                         vitalSigns.add(vitalSign);
                                     }
                                 }
 
-                                List<Map<String, Object>> visitNotes = new ArrayList<>();
+                                List<VisitNotesDTO> visitNotes = new ArrayList<>();
                                 List<Observation> visitNotesGroup = getObservationsByCategory(
                                         fhirClient,
                                         "visit-notes", encounter,
@@ -700,7 +688,7 @@ public class SharedHealthRecordsService {
                                 if (!visitNotesGroup.isEmpty()) {
                                     for (Observation observationGroup : visitNotesGroup) {
                                         // TODO: Extract for all other blocks
-                                        Map<String, Object> visitNotesData = new LinkedHashMap<>();
+                                        VisitNotesDTO visitNotesData = new VisitNotesDTO();
                                         if (observationGroup
                                                 .hasEffectiveDateTimeType()
                                                 && observationGroup
@@ -712,12 +700,9 @@ public class SharedHealthRecordsService {
                                                     .format(observationGroup
                                                             .getEffectiveDateTimeType()
                                                             .getValue());
-                                            visitNotesData.put("date",
-                                                    formattedDate);
-                                        } else {
-                                            visitNotesData.put("date",
-                                                    null);
+                                            visitNotesData.setDate(formattedDate);
                                         }
+
                                         // Chief complaints
                                         List<String> chiefComplaints = new ArrayList<>();
                                         List<Observation> chiefComplaintsData = getObservationsByObservationGroupId(
@@ -735,9 +720,13 @@ public class SharedHealthRecordsService {
                                                                 : null);
                                             }
                                         }
-                                        visitNotesData.put("chiefComplaints",
-                                                chiefComplaints);
+                                        visitNotesData.setChiefComplains(chiefComplaints);
                                         // TO_BE_ADDED: -> SInjured
+                                        List<Observation> injuredObservations = getObservationsByCategory(fhirClient, "visit-note-injured", encounter, false, true);
+                                        if(!injuredObservations.isEmpty()){
+                                            var observation = injuredObservations.get(0);
+                                            visitNotesData.setInjured(observation.hasValueBooleanType() ? observation.getValueBooleanType().getValue() : null);
+                                        }
                                         // historyOfPresentIllness
                                         List<String> historyOfPresentIllness = new ArrayList<>();
                                         List<Observation> historyOfPresentIllnessData = getObservationsByObservationGroupId(
@@ -756,13 +745,11 @@ public class SharedHealthRecordsService {
                                                                 : null);
                                             }
                                         }
-                                        visitNotesData.put(
-                                                "historyOfPresentIllness",
-                                                historyOfPresentIllness);
+                                        visitNotesData.setHistoryOfPresentIllness(historyOfPresentIllness);
 
                                         // reviewOfOtherSystems -
                                         // review-of-other-system
-                                        List<Map<String, Object>> reviewOfOtherSystems = new ArrayList<>();
+                                        List<ReviewOfOtherSystemsDTO> reviewOfOtherSystems = new ArrayList<>();
                                         List<Observation> reviewOfOtherSystemsData = getObservationsByObservationGroupId(
                                                 fhirClient,
                                                 "review-of-other-system",
@@ -772,32 +759,27 @@ public class SharedHealthRecordsService {
                                         if (!reviewOfOtherSystemsData
                                                 .isEmpty()) {
                                             for (Observation observation : reviewOfOtherSystemsData) {
-                                                Map<String, Object> data = new LinkedHashMap<>();
-                                                data.put("code",
-                                                        observation.hasCode()
+                                                ReviewOfOtherSystemsDTO data = new ReviewOfOtherSystemsDTO();
+                                                data.setCode(observation.hasCode()
                                                                 ? observation.getCode()
                                                                 .getCoding()
                                                                 .get(0)
                                                                 .getCode()
                                                                 .toString()
                                                                 : null);
-                                                data.put("name",
-                                                        observation.hasCode()
+                                                data.setName(observation.hasCode()
                                                                 ? observation.getCode()
                                                                 .getCoding()
                                                                 .get(0)
                                                                 .getDisplay()
                                                                 : null);
-                                                data.put("notes",
-                                                        observation.getValueStringType()
+                                                data.setNotes(observation.getValueStringType()
                                                                 .toString());
                                                 reviewOfOtherSystems
                                                         .add(data);
                                             }
                                         }
-                                        visitNotesData.put(
-                                                "reviewOfOtherSystems",
-                                                reviewOfOtherSystems);
+                                        visitNotesData.setReviewOfOtherSystems(reviewOfOtherSystems);
 
                                         // pastMedicalHistory -
                                         // past-medical-history
@@ -817,8 +799,7 @@ public class SharedHealthRecordsService {
                                                                 : null);
                                             }
                                         }
-                                        visitNotesData.put("pastMedicalHistory",
-                                                pastMedicalHistory);
+                                        visitNotesData.setPastMedicalHistory(pastMedicalHistory);
 
                                         // familyAndSocialHistory -
                                         // family-and-social-history
@@ -839,9 +820,7 @@ public class SharedHealthRecordsService {
                                                                 : null);
                                             }
                                         }
-                                        visitNotesData.put(
-                                                "familyAndSocialHistory",
-                                                familyAndSocialHistory);
+                                        visitNotesData.setFamilyAndSocialHistory(familyAndSocialHistory);
 
                                         // generalExaminationObservation -
                                         // general-examination
@@ -862,9 +841,7 @@ public class SharedHealthRecordsService {
                                                                 : null);
                                             }
                                         }
-                                        visitNotesData.put(
-                                                "generalExaminationObservation",
-                                                generalExaminationObservation);
+                                        visitNotesData.setGeneralExaminationObservation(generalExaminationObservation);
 
                                         // localExamination - local-examination
                                         List<String> localExamination = new ArrayList<>();
@@ -883,12 +860,11 @@ public class SharedHealthRecordsService {
                                                                 : null);
                                             }
                                         }
-                                        visitNotesData.put("localExamination",
-                                                localExamination);
+                                        visitNotesData.setLocalExamination(localExamination);
 
                                         // systemicExaminationObservation -
                                         // systemic-examination
-                                        List<Map<String, Object>> systemicExaminationObservation = new ArrayList<>();
+                                        List<ReviewOfOtherSystemsDTO> systemicExaminationObservation = new ArrayList<>();
                                         List<Observation> systemicExaminationObservationData = getObservationsByObservationGroupId(
                                                 fhirClient,
                                                 "systemic-examination",
@@ -898,32 +874,26 @@ public class SharedHealthRecordsService {
                                         if (!systemicExaminationObservationData
                                                 .isEmpty()) {
                                             for (Observation observation : systemicExaminationObservationData) {
-                                                Map<String, Object> data = new LinkedHashMap<>();
-                                                data.put("code",
-                                                        observation.hasCode()
+                                                ReviewOfOtherSystemsDTO data = new ReviewOfOtherSystemsDTO();
+                                                data.setCode(observation.hasCode()
                                                                 ? observation.getCode()
                                                                 .getCoding()
                                                                 .get(0)
                                                                 .getCode()
-                                                                .toString()
                                                                 : null);
-                                                data.put("name",
-                                                        observation.hasCode()
+                                                data.setName(observation.hasCode()
                                                                 ? observation.getCode()
                                                                 .getCoding()
                                                                 .get(0)
                                                                 .getDisplay()
                                                                 : null);
-                                                data.put("notes",
-                                                        observation.getValueStringType()
+                                                data.setNotes(observation.getValueStringType()
                                                                 .toString());
                                                 systemicExaminationObservation
                                                         .add(data);
                                             }
                                         }
-                                        visitNotesData.put(
-                                                "systemicExaminationObservation",
-                                                systemicExaminationObservation);
+                                        visitNotesData.setSystemicExaminationObservation(systemicExaminationObservation);
 
                                         // doctorPlanOrSuggestion - doctor-plan
                                         List<String> doctorPlanOrSuggestion = new ArrayList<>();
@@ -943,9 +913,7 @@ public class SharedHealthRecordsService {
                                                                 : null);
                                             }
                                         }
-                                        visitNotesData.put(
-                                                "doctorPlanOrSuggestion",
-                                                doctorPlanOrSuggestion);
+                                        visitNotesData.setDoctorPlanOrSuggestion(doctorPlanOrSuggestion);
 
                                         // providerSpeciality -
                                         // provider-speciality
@@ -966,8 +934,7 @@ public class SharedHealthRecordsService {
                                                 }
                                             }
                                         }
-                                        visitNotesData.put("providerSpeciality",
-                                                providerSpeciality);
+                                        visitNotesData.setProviderSpeciality(providerSpeciality);
                                         visitNotes.add(visitNotesData);
                                     }
                                 }
@@ -979,7 +946,7 @@ public class SharedHealthRecordsService {
 
                                 // Self Monitoring Clinical Information
                                 SelfMonitoringClinicalInformationDTO selfMonitoringClinicalInformationDTO = new SelfMonitoringClinicalInformationDTO();
-                                List<Map<String, Object>> selfVitalSigns = new ArrayList<>();
+                                List<VitalSignDTO> selfVitalSigns = new ArrayList<>();
                                 // Get Observation Group
                                 List<Observation> selfObservationGroups = getObservationsByCategory(
                                         fhirClient,
@@ -989,7 +956,7 @@ public class SharedHealthRecordsService {
                                 for (Observation observationGroup : selfObservationGroups) {
                                     List<Observation> observationsData = getObservationsByObservationGroupId(fhirClient,"self-vital-signs", encounter, observationGroup.getIdElement().getIdPart());
                                     if (!observationsData.isEmpty()) {
-                                        Map<String, Object> vitalSign = new LinkedHashMap<>();
+                                        VitalSignDTO vitalSign = new VitalSignDTO();
                                         for (Observation observation : observationsData) {
                                             // TODO: Improve the code to use
                                             // dynamically fetched LOINC
@@ -1001,8 +968,7 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("85354-9")) {
-                                                vitalSign.put("bloodPressure",
-                                                        observation.hasValueStringType()
+                                                vitalSign.setBloodPressure(observation.hasValueStringType()
                                                                 ? observation.getValueStringType()
                                                                 .getValue()
                                                                 : null);
@@ -1012,10 +978,8 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("29463-7")) {
-                                                vitalSign.put("weight",
-                                                        observation.hasValueQuantity()
-                                                                ? observation.getValueQuantity()
-                                                                .getValue()
+                                                vitalSign.setWeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
+                                                                ? observation.getValueQuantity().getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -1023,10 +987,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("8310-5")) {
-                                                vitalSign.put("temperature",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setTemperature(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -1034,10 +997,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("8302-2")) {
-                                                vitalSign.put("height",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setHeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -1045,10 +1007,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("9279-1")) {
-                                                vitalSign.put("respiration",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setRespiration(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -1056,10 +1017,9 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("8867-4")) {
-                                                vitalSign.put("pulseRate",
-                                                        observation.hasValueQuantity()
+                                                vitalSign.setPulseRate(observation.hasValueQuantity()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue()
+                                                                .getValue().intValue()
                                                                 : null);
                                             }
                                             if (observationGroup
@@ -1073,11 +1033,9 @@ public class SharedHealthRecordsService {
                                                         .format(observationGroup
                                                                 .getEffectiveDateTimeType()
                                                                 .getValue());
-                                                vitalSign.put("dateTime",
-                                                        formattedDate);
+                                                vitalSign.setDateTime(formattedDate);
                                             } else {
-                                                vitalSign.put("dateTime",
-                                                        null);
+                                                vitalSign.setDateTime(null);
                                             }
 
                                             if (observation.hasCategory() &&
@@ -1086,12 +1044,11 @@ public class SharedHealthRecordsService {
                                                     observation.getCategory().get(0).getCoding().get(0).hasCode() &&
                                                     Objects.equals(observation.getCategory().get(0).getCoding().get(0).getCode(), "self-vital-signs")
                                             ) {
-                                                vitalSign.put("notes",
-                                                        observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
+                                                vitalSign.setNotes(observation.hasNote() && !observation.getNote().isEmpty() && observation.getNote().get(0).hasText()
                                                                 ? observation.getNote().get(0).getText()
                                                                 : null);
                                             } else {
-                                                vitalSign.put("notes", null);
+                                                vitalSign.setNotes(null);
                                             }
                                         }
                                         selfVitalSigns.add(vitalSign);
@@ -2004,6 +1961,8 @@ public class SharedHealthRecordsService {
                                                 medicationDispense
                                                         .hasType() ? medicationDispense.getType().getText()
                                                         : null);
+                                        medicationDetailsDTO.setCurrentRefill(getExtensionValueInt(medicationDispense, "http://fhir.moh.go.tz/fhir/StructureDefinition/medication-current-refill"));
+                                        medicationDetailsDTO.setMaxRefill(getExtensionValueInt(medicationDispense, "http://fhir.moh.go.tz/fhir/StructureDefinition/medication-max-refill"));
                                         if (medicationDispense
                                                 .hasDosageInstruction()) {
                                             Dosage dosage = Iterables
@@ -2864,12 +2823,12 @@ public class SharedHealthRecordsService {
                                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details",
                                                         "site"));
                                         prescription.put("dailyDose",
-                                                getNestedExtensionValueQuantityValue(
+                                                getResourceNestedExtensionQuantityValue(
                                                         procedure,
                                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details",
                                                         "dailyDose"));
                                         prescription.put("totalDose",
-                                                getNestedExtensionValueQuantityValue(
+                                                getResourceNestedExtensionQuantityValue(
                                                         procedure,
                                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/radiotherapy-details",
                                                         "totalDose"));
@@ -3307,14 +3266,16 @@ public class SharedHealthRecordsService {
                                 if(!childHealthObservations.isEmpty()){
                                     Observation observation = childHealthObservations.get(0);
 
+                                    childHealthDetailsDTO.setServiceModality(ServiceModality.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-serviceModality")));
+
+                                    childHealthDetailsDTO.setMotherAge(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-motherAge"));
+
                                     CHProphylaxisDTO chProphylaxisDTO = new CHProphylaxisDTO();
                                     ProphylaxisAdministrationDTO prophylaxisAdministrationDTO = new ProphylaxisAdministrationDTO();
                                     prophylaxisAdministrationDTO.setAdministered(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-albendazole-administered"));
-                                    prophylaxisAdministrationDTO.setServiceModality(ServiceModality.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-albendazole-serviceModality")));
                                     chProphylaxisDTO.setAlbendazole(prophylaxisAdministrationDTO);
 
                                     prophylaxisAdministrationDTO.setAdministered(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-vitaminA-administered"));
-                                    prophylaxisAdministrationDTO.setServiceModality(ServiceModality.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-vitaminA-serviceModality")));
                                     chProphylaxisDTO.setVitaminA(prophylaxisAdministrationDTO);
 
                                     chProphylaxisDTO.setProvidedWithLLIN(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-prophylaxis-providedWithLLIN"));
@@ -3325,7 +3286,7 @@ public class SharedHealthRecordsService {
 
                                     childHealthDetailsDTO.setProvidedWithInfantFeedingCounselling(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-providedWithInfantFeedingCounselling"));
 
-                                    childHealthDetailsDTO.setIsStillBreastFed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-isStillBreastFed"));
+                                    childHealthDetailsDTO.setHasBeenBreastFedFor24Month(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-hasBeenBreastFedFor24Month"));
 
                                     MotherHivStatusDTO motherHivStatusDTO = new MotherHivStatusDTO();
                                     List<Observation.ObservationComponentComponent> motherHICStatusComponents = getComponentsByCode(observation, "http://loinc.org", "55277-8");
@@ -3348,7 +3309,7 @@ public class SharedHealthRecordsService {
                                 // CPAC DETAILS
                                 CpacDetailsDTO cpacDetailsDTO = new CpacDetailsDTO();
 
-                                List<Observation> cpacObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, "procedure", "post-abortion-care-comprehensive");
+                                List<Observation> cpacObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, encounter, "procedure", "post-abortion-care-comprehensive");
 
                                 if(!cpacObservations.isEmpty()){
                                     for(Observation observation: cpacObservations){
@@ -3399,6 +3360,94 @@ public class SharedHealthRecordsService {
                                 }
 
                                 templateData.setCpacDetails(cpacDetailsDTO);
+
+                                // CECAP DETAILS
+                                CecapDTO cecapDTO = new CecapDTO();
+                                CancerScreeningDetailsDTO cancerScreeningDetailsDTO = new CancerScreeningDetailsDTO();
+
+                                List<Observation> cecapObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, encounter, "procedure", "cancer-screening-comprehensive");
+
+                                if(!cecapObservations.isEmpty()){
+                                    Observation observation =  cecapObservations.get(0);
+                                    BreastCancerDTO breastCancerDTO = new BreastCancerDTO();
+                                    breastCancerDTO.setScreened(getComponentValueBoolean(observation,"http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
+                                    breastCancerDTO.setFoundWithBreastCancerSymptoms(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
+
+                                    cancerScreeningDetailsDTO.setBreastCancer(breastCancerDTO);
+                                    CervicalCancerDTO cervicalCancerDTO = new CervicalCancerDTO();
+
+                                    cervicalCancerDTO.setSuspected(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "cervical-cancer-suspected"));
+                                    cervicalCancerDTO.setScreenedWithVIA(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "via-screening-performed"));
+                                    cervicalCancerDTO.setScreenedWithHPVDNA(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "hpv-dna-screening-performed"));
+                                    cervicalCancerDTO.setViaTestPositive(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "via-test-result"));
+                                    cervicalCancerDTO.setHpvDNAPositive(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "hpv-dna-test-result"));
+                                    cervicalCancerDTO.setDiagnosedWithLargeLesion(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "diagnosed-with-large-lesion"));
+                                    cervicalCancerDTO.setDiagnosedWithSmallOrModerateLesion(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "diagnosed-with-small-or-moderate-lesion"));
+                                    cervicalCancerDTO.setTreatedWithCryo(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-with-cryo"));
+                                    cervicalCancerDTO.setTreatedWithThermo(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-with-thermo"));
+                                    cervicalCancerDTO.setTreatedWithLEEP(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-with-leep"));
+                                    cervicalCancerDTO.setFirstTimeScreening(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "first-time-screening"));
+                                    cervicalCancerDTO.setTreatedOnTheSameDay(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "treated-same-day"));
+                                    cervicalCancerDTO.setComplicationsAfterTreatment(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "complications-after-treatment"));
+                                    cervicalCancerDTO.setFoundWithHivAndReferredToCTC(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "hiv-found-referred-ctc"));
+
+                                    cancerScreeningDetailsDTO.setCervicalCancer(cervicalCancerDTO);
+                                }
+
+                                cecapDTO.setCancerScreeningDetails(cancerScreeningDetailsDTO);
+                                templateData.setCecap(cecapDTO);
+
+                                // CONTRACEPTIVES
+                                ContraceptivesDTO contraceptivesDTO = new ContraceptivesDTO();
+                                CodeableConcept contraceptiveCodeableConcept = new CodeableConcept();
+                                Coding contraceptiveCodeableConceptCoding = new Coding();
+
+                                contraceptiveCodeableConceptCoding.setSystem("http://fhir.moh.go.tz/fhir/CodeSystem/contraceptive-methods");
+                                contraceptiveCodeableConceptCoding.setCode("contraceptive-services");
+                                contraceptiveCodeableConcept.addCoding(contraceptiveCodeableConceptCoding);
+
+                                List<MedicationStatement> contraceptivesMedicationStatements= getMedicationStatementsByCategoryAndCodeableConcept(fhirClient, fhirContext, patient, "contraceptive", contraceptiveCodeableConcept);
+
+                                if(!contraceptivesMedicationStatements.isEmpty()){
+                                    MedicationStatement statement = contraceptivesMedicationStatements.get(0);
+                                    String statementExtensionParentUrl = "http://fhir.moh.go.tz/fhir/StructureDefinition/contraceptive-details";
+
+                                    contraceptivesDTO.setPopCyclesProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtensionParentUrl,"http://fhir.moh.go.tz/fhir/StructureDefinition/pop-cycles"));
+                                    contraceptivesDTO.setPopCyclesProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtensionParentUrl,"http://fhir.moh.go.tz/fhir/StructureDefinition/coc-cycles"));
+                                    contraceptivesDTO.setDidReceiveSDM(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/sdm-provided"));
+                                    contraceptivesDTO.setDidUseLAM(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/lam-used"));
+                                    contraceptivesDTO.setDidOptToUseEmergencyMethods(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/emergency-methods"));
+                                    contraceptivesDTO.setWasInsertedWithImplanon(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/implanon-inserted"));
+                                    contraceptivesDTO.setWasInsertedWithJadelle(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/jadelle-inserted"));
+                                    contraceptivesDTO.setDidRemoveImplanon(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/implanon-removed"));
+                                    contraceptivesDTO.setDidRemoveJadelle(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/jadelle-removed"));
+                                    contraceptivesDTO.setDidReceiveIUD(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/iud-received"));
+                                    contraceptivesDTO.setDidRemoveIUD(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/iud-removed"));
+                                    contraceptivesDTO.setDidHaveTubalLigation(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/tubal-ligation"));
+                                    contraceptivesDTO.setDidHaveVasectomy(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/vasectomy"));
+                                    contraceptivesDTO.setDidReceiveInjection(getNestedExtensionValueBoolean(statement, statementExtensionParentUrl,"http://fhir.moh.go.tz/fhir/StructureDefinition/injection-received"));
+                                    contraceptivesDTO.setNumberOfFemaleCondomsProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/female-condoms-provided"));
+                                    contraceptivesDTO.setNumberOfMaleCondomsProvided(getResourceNestedExtensionQuantityValueAsInteger(statement, statementExtensionParentUrl, "http://fhir.moh.go.tz/fhir/StructureDefinition/male-condoms-provided"));
+                                }
+
+                                templateData.setContraceptives(contraceptivesDTO);
+
+                                // EYE DETAILS
+                                EyeClinicDetailsDTO eyeClinicDetailsDTO = new EyeClinicDetailsDTO();
+                                List<Observation> eyeObservations = getObservationsByCategoryAndCode(fhirClient, fhirContext, encounter, "procedure", "eye-clinic-exam");
+
+                                if(!eyeObservations.isEmpty()){
+                                    Observation observation = eyeObservations.get(0);
+
+                                    eyeClinicDetailsDTO.setRefracted(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-refracted"));
+                                    eyeClinicDetailsDTO.setSpectaclesPrescribed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-spectaclesPrescribed"));
+                                    eyeClinicDetailsDTO.setSpectaclesDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-spectacleDispensed"));
+                                    eyeClinicDetailsDTO.setContactLensDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-contactLenseDispensed"));
+                                    eyeClinicDetailsDTO.setPrescribedWithLowVision(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-prescribedWithLowVision"));
+                                    eyeClinicDetailsDTO.setIsDispensedWithLowVisionDevice(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-isDispensedWithLowVisionDevice"));
+                                }
+
+                                templateData.setEyeClinicDetails(eyeClinicDetailsDTO);
 
                                 // laborAndDeliveryDetails
                                 LaborAndDeliveryDetailsDTO laborAndDeliveryDetailsDTO = new LaborAndDeliveryDetailsDTO();
@@ -3825,6 +3874,105 @@ public class SharedHealthRecordsService {
                                                     getComponentValueBoolean(
                                                             postnatalDetailObservation,
                                                             0));
+                                    List<Observation.ObservationComponentComponent> hivStatusDetailsComponents = getComponentsByCode(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/CodeSystem/maternal-child-health-codes", "hivStatusAsSeenFromAncCard");
+
+                                    if(!hivStatusDetailsComponents.isEmpty()){
+                                        Observation.ObservationComponentComponent component  = hivStatusDetailsComponents.get(0);
+                                        postnatalDetailsDTO.setHivStatusAsSeenFromAncCard(
+                                                STATUS.fromString(component.hasValue() && component.hasValueStringType() ? component.getValueStringType().getValue() : null)
+                                        );
+                                    }
+
+                                    hivStatusDetailsComponents = getComponentsByCode(postnatalDetailObservation, "http://loinc.org", "55277-8");
+
+                                    if(!hivStatusDetailsComponents.isEmpty()){
+                                        PNCHivDetailsDTO pncHivDetailsDTO = new PNCHivDetailsDTO();
+                                        Observation.ObservationComponentComponent component  = hivStatusDetailsComponents.get(0);
+                                        pncHivDetailsDTO.setStatus(
+                                                STATUS.fromString(
+                                                        component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && !component.getValueCodeableConcept().getCoding().isEmpty() && component.getValueCodeableConcept().getCoding().get(0).hasDisplay() ? component.getValueCodeableConcept().getCoding().get(0).getDisplay() : null
+                                                )
+                                        );
+
+                                        pncHivDetailsDTO.setCode(
+                                                        component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && component.getValueCodeableConcept().getCoding().get(0).hasCode() ? component.getValueCodeableConcept().getCoding().get(0).getCode() : null
+                                        );
+
+                                        pncHivDetailsDTO.setHivTestNumber(getExtensionValueInt(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-hivDetails-hivTestNumber"));
+
+                                        postnatalDetailsDTO.setHivDetails(pncHivDetailsDTO);
+                                    }
+
+                                    postnatalDetailsDTO.setMotherAndChildOrigin(PlaceOfOrigin.fromString(getExtensionValueString(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-motherAndChildOrigin")));
+
+                                    postnatalDetailsDTO.setPlaceOfBirth(BirthPlace.fromString(getExtensionValueString(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-placeOfBirth")));
+
+                                    PNCProphylaxisDTO pncProphylaxisDTO = new PNCProphylaxisDTO();
+                                    pncProphylaxisDTO.setProvideWithVitaminA(getExtensionValueBoolean(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-prophylaxis-provideWithVitaminA"));
+                                    pncProphylaxisDTO.setProvidedWithAntenatalCorticosteroids(getExtensionValueBoolean(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-prophylaxis-providedWithAntenatalCorticosteroids"));
+                                    pncProphylaxisDTO.setProvidedWithFEFO(getExtensionValueBoolean(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-prophylaxis-providedWithFEFO"));
+
+                                    postnatalDetailsDTO.setProphylaxis(pncProphylaxisDTO);
+
+                                    List<CounsellingDTO> pncCounselling = new ArrayList<>();
+
+                                    List<Observation.ObservationComponentComponent> pncCounsellingComponents = getComponentsByCode(postnatalDetailObservation, "http://fhir.moh.go.tz/fhir/CodeSystem/pnc-prophylaxis-codes", "counselling");
+
+                                    for(Observation.ObservationComponentComponent component: pncCounsellingComponents){
+                                        CounsellingDTO counselling = new CounsellingDTO();
+                                        counselling.setName(component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && !component.getValueCodeableConcept().getCoding().isEmpty() && component.getValueCodeableConcept().getCoding().get(0).hasDisplay()
+                                         ? component.getValueCodeableConcept().getCoding().get(0).getDisplay() : null);
+
+                                        counselling.setCode(component.hasValueCodeableConcept() && component.getValueCodeableConcept().hasCoding() && !component.getValueCodeableConcept().getCoding().isEmpty() && component.getValueCodeableConcept().getCoding().get(0).hasCode()
+                                                ? component.getValueCodeableConcept().getCoding().get(0).getCode() : null);
+
+                                        pncCounselling.add(counselling);
+                                    }
+
+                                    postnatalDetailsDTO.setCounselling(pncCounselling);
+
+                                    postnatalDetailsDTO.setDaysSinceDelivery(
+                                            getExtensionValueInt(postnatalDetailObservation, "url: 'http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-daysSinceDelivery")
+                                    );
+
+                                    List<BirthDetailsDTO> birthDetailsDTOList = new ArrayList<>();
+
+                                    List<Observation> pncBirthDetailsComponents = getObservationsByCategory(fhirClient, "postnatal-birth-details", encounter, false, true);
+
+                                    for(Observation observation: pncBirthDetailsComponents){
+                                        BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
+                                        birthDetailsDTO.setInfantFeeding(InfantFeeding.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infantFeeding")));
+                                        birthDetailsDTO.setGender(GENDER.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-gender")));
+                                        birthDetailsDTO.setProvidedWithKmc(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-providedWithKmc"));
+                                        birthDetailsDTO.setHb(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-hb"));
+                                        birthDetailsDTO.setHbigTested(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-hbigTested"));
+                                        birthDetailsDTO.setHivDnaPCRTested(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-hivDnaPCRTested"));
+                                        birthDetailsDTO.setChildHivStatus(STATUS.fromString(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-childHivStatus")));
+
+                                        InfectionsDTO infectionsDTO = new InfectionsDTO();
+                                        infectionsDTO.setHasSepticaemia(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasSepticaemia"));
+                                        infectionsDTO.setHasOmphalitis(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasOmphalitis"));
+                                        infectionsDTO.setHasSkinInfection(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasSkinInfection"));
+                                        infectionsDTO.setHasOcularInfection(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasOcularInfection"));
+                                        infectionsDTO.setHasJaundice(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-infections-hasJaundice"));
+
+                                        birthDetailsDTO.setInfections(infectionsDTO);
+
+                                        PNCBirthOutcomeDetailsDTO outcomeDetailsDTO = new PNCBirthOutcomeDetailsDTO();
+                                        outcomeDetailsDTO.setDischargedHome(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-dischargedHome"));
+                                        outcomeDetailsDTO.setReferredToNCU(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToNCU"));
+                                        outcomeDetailsDTO.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHospital"));
+                                        outcomeDetailsDTO.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHealthFacility"));
+
+                                        birthDetailsDTO.setOutcomeDetails(outcomeDetailsDTO);
+
+                                        birthDetailsDTOList.add(birthDetailsDTO);
+
+                                    }
+
+                                    postnatalDetailsDTO.setBirthDetails(birthDetailsDTOList);
+
+
                                     postnatalDetailsDTO
                                             .setReferredToCTC(
                                                     getComponentValueBoolean(
@@ -4033,7 +4181,7 @@ public class SharedHealthRecordsService {
                                                     .hasValue()
                                                     ? admissionDetail
                                                     .getEffectiveDateTimeType()
-                                                    .getValue()
+                                                    .getValue().toString()
                                                     : null);
                                     admissionDetailsDTO.setAdmissionDiagnosis(
                                             getComponentValueCodeableConceptCode(
@@ -4042,7 +4190,7 @@ public class SharedHealthRecordsService {
                                     admissionDetailsDTO.setDischargedOn(
                                             getComponentValueDateTime(
                                                     admissionDetail,
-                                                    2));
+                                                    2).toString());
                                     admissionDetailsDTO.setDischargeStatus(
                                             getComponentValueString(
                                                     admissionDetail,

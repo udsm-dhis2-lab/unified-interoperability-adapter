@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class FPHivStatusDTO {
     private STATUS status;
-    private boolean referredToCTC;
+    private Boolean referredToCTC;
 }

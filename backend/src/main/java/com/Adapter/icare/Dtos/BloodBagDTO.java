@@ -10,7 +10,7 @@ import java.util.Map;
 @Setter
 public class BloodBagDTO {
     private String bloodType;
-    private int quantity;
+    private Integer quantity;
 
     Map<String, Object> toMap() {
         Map<String, Object> bloodBag = new HashMap<>();

@@ -6,6 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BreatheAssistanceDTO {
-    private boolean provided;
+    private Boolean provided;
     private String code;
 }

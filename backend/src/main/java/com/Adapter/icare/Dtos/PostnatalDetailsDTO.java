@@ -20,14 +20,14 @@ public class PostnatalDetailsDTO {
     private Date date;
     private Boolean positiveHivStatusBeforeService;
     private STATUS hivStatusAsSeenFromAncCard;
-    private LDHivDetailsDTO hivDetails;
+    private PNCHivDetailsDTO hivDetails;
     private PlaceOfOrigin motherAndChildOrigin;
     private Boolean referredToCTC;
     private BirthPlace placeOfBirth;
     private PNCProphylaxisDTO prophylaxis;
     private List<CounsellingDTO> counselling;
     private Boolean referredToClinicForFurtherServices;
-    private int daysSinceDelivery;
+    private Integer daysSinceDelivery;
     private String outCome;
     private Integer APGARScore;
     private Map<String,Object> breastFeedingDetails;

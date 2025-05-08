@@ -22,6 +22,8 @@ public class ContraceptivesDTO {
     private Boolean didUseLAM;
     private Boolean didOptToUseEmergencyMethods;
     private Boolean didRemoveIUD;
+    private Boolean didRemoveImplanon;
+    private Boolean didRemoveJadelle;
     private Boolean didHaveVasectomy;
 
 }
