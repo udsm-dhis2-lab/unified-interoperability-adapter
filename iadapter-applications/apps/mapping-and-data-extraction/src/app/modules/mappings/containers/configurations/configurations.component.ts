@@ -25,6 +25,8 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
     { key: 'gender', name: 'Gender' },
     { key: 'ageType', name: 'Age type' },
     { key: 'weightGroup', name: 'Weight Group' },
+    { key: 'hivStatus', name: 'Hiv Status' },
+    { key: 'serviceLocation', name: 'Service Location' },
   ];
 
   selectedConfigurationType: string = '';
