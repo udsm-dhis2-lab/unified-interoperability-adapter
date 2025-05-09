@@ -1843,6 +1843,7 @@ public class SharedHealthRecordsService {
                                             }
                                             referralDetailsDTO.setReason(
                                                     reasons);
+                                            referralDetailsDTO.setReferredToOtherCountry(getExtensionValueBoolean(serviceRequest, "http://fhir.moh.go.tz/fhir/StructureDefinition/extension-referred-to-other-country"));
 
                                             String facilityToCode = new String();
                                             List<Reference> performers = serviceRequest
