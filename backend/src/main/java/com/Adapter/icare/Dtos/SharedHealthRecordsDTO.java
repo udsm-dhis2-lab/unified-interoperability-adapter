@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +70,7 @@ public class SharedHealthRecordsDTO {
 
     private PostnatalDetailsDTO postnatalDetails;
 
-    private List<ProphylAxisDetailsDTO> prophylAxisDetails;
+    private List<ProphylaxisDetailsDTO> prophylAxisDetails;
 
     private List<VaccinationDetailsDTO> vaccinationDetails;
 

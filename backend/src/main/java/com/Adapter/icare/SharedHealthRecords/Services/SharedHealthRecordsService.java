@@ -34,6 +34,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -2505,24 +2507,24 @@ public class SharedHealthRecordsService {
 
                                     ANCProphylaxisDetailsDTO ancProphylaxisDetailsDTO = new ANCProphylaxisDetailsDTO();
 
-                                    List<Observation.ObservationComponentComponent> proxylaxisWithLLINComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-llin");
+                                    List<Observation.ObservationComponentComponent> prophylaxisWithLLINComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-llin");
 
-                                    List<Observation.ObservationComponentComponent> proxylaxisWithIPT2Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt2");
+                                    List<Observation.ObservationComponentComponent> prophylaxisWithIPT2Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt2");
 
-                                    List<Observation.ObservationComponentComponent> proxylaxisWithIPT3Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt3");
+                                    List<Observation.ObservationComponentComponent> prophylaxisWithIPT3Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt3");
 
-                                    List<Observation.ObservationComponentComponent> proxylaxisWithIPT4Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt4");
+                                    List<Observation.ObservationComponentComponent> prophylaxisWithIPT4Components = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-ipt4");
 
                                     List<Observation.ObservationComponentComponent> providedWithIFFolic60TabletsComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-if-folic");
 
                                     List<Observation.ObservationComponentComponent> providedWithMebendazoleOrAlbendazoleComponents = getComponentsByCode(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/anc-prophylaxis-codes", "prophylaxis-mebendazole");
 
                                     ancProphylaxisDetailsDTO.setProvidedWithLLIN(
-                                            !proxylaxisWithLLINComponents.isEmpty() && proxylaxisWithLLINComponents.get(0).hasValueBooleanType() ? proxylaxisWithLLINComponents.get(0).getValueBooleanType().getValue() : null
+                                            !prophylaxisWithLLINComponents.isEmpty() && prophylaxisWithLLINComponents.get(0).hasValueBooleanType() ? prophylaxisWithLLINComponents.get(0).getValueBooleanType().getValue() : null
                                     );
 
                                     ancProphylaxisDetailsDTO.setProvidedWithIPT2(
-                                            !proxylaxisWithIPT2Components.isEmpty() && proxylaxisWithIPT2Components.get(0).hasValueBooleanType() ? proxylaxisWithIPT2Components.get(0).getValueBooleanType().getValue() : null
+                                            !prophylaxisWithIPT2Components.isEmpty() && prophylaxisWithIPT2Components.get(0).hasValueBooleanType() ? prophylaxisWithIPT2Components.get(0).getValueBooleanType().getValue() : null
                                     );
 
                                     ancProphylaxisDetailsDTO.setProvidedWithIFFolic60Tablets(
@@ -2534,11 +2536,11 @@ public class SharedHealthRecordsService {
                                     );
 
                                     ancProphylaxisDetailsDTO.setProvidedWithIPT3(
-                                            !proxylaxisWithIPT3Components.isEmpty() && proxylaxisWithIPT3Components.get(0).hasValueBooleanType() ? proxylaxisWithIPT3Components.get(0).getValueBooleanType().getValue() : null
+                                            !prophylaxisWithIPT3Components.isEmpty() && prophylaxisWithIPT3Components.get(0).hasValueBooleanType() ? prophylaxisWithIPT3Components.get(0).getValueBooleanType().getValue() : null
                                     );
 
                                     ancProphylaxisDetailsDTO.setProvidedWithIPT4(
-                                            !proxylaxisWithIPT4Components.isEmpty() && proxylaxisWithIPT4Components.get(0).hasValueBooleanType() ? proxylaxisWithIPT4Components.get(0).getValueBooleanType().getValue() : null
+                                            !prophylaxisWithIPT4Components.isEmpty() && prophylaxisWithIPT4Components.get(0).hasValueBooleanType() ? prophylaxisWithIPT4Components.get(0).getValueBooleanType().getValue() : null
                                     );
 
                                     antenatalCareDetailsDTO.setProphylaxis(ancProphylaxisDetailsDTO);
@@ -2645,19 +2647,20 @@ public class SharedHealthRecordsService {
                                             antenatalCareDetailsDTO);
                                 }
 
-                                // prophylAxisDetails
-                                List<ProphylAxisDetailsDTO> prophylAxisDetailsDTOS = new ArrayList<>();
-                                List<Procedure> prophylAxisProcedures = getProceduresByCategoryAndObservationReference(
+                                // ProphylaxisDetails
+                                List<ProphylaxisDetailsDTO> prophylaxisDetailsDTOS = new ArrayList<>();
+                                List<Procedure> prophylaxisProcedures = getProceduresByCategoryAndObservationReference(
                                         fhirClient,
                                         encounter.getIdElement().getIdPart(),
                                         "prophyl-axis-details", null);
-                                if (!prophylAxisProcedures.isEmpty()) {
-                                    for (Procedure procedure : prophylAxisProcedures) {
-                                        ProphylAxisDetailsDTO prophylAxisDetailsDTO = new ProphylAxisDetailsDTO();
+                                if (!prophylaxisProcedures.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                                    for (Procedure procedure : prophylaxisProcedures) {
+                                        ProphylaxisDetailsDTO prophylAxisDetailsDTO = new ProphylaxisDetailsDTO();
                                         prophylAxisDetailsDTO.setDate(procedure
                                                 .hasPerformedDateTimeType()
                                                 ? procedure.getPerformedDateTimeType()
-                                                .getValue()
+                                                .getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                                 : null);
                                         if (procedure.hasCode() && !procedure
                                                 .getCode().getCoding()
@@ -2708,34 +2711,34 @@ public class SharedHealthRecordsService {
                                                         .get(0)
                                                         .getText()
                                                         : null);
-                                        ReactionDTO prophylAxisReaction = new ReactionDTO();
+                                        ReactionDTO prophylaxisReaction = new ReactionDTO();
                                         if (procedure.hasExtension()
-                                                && procedure.getExtension()
+                                                && !procedure.getExtension()
                                                 .isEmpty()) {
-                                            prophylAxisReaction
+                                            prophylaxisReaction
                                                     .setReactionDate(
                                                             getNestedExtensionValueDateTime(
                                                                     procedure,
                                                                     "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
                                                                     "reactionDate"));
-                                            prophylAxisReaction.setReported(
+                                            prophylaxisReaction.setReported(
                                                     getNestedExtensionValueBoolean(
                                                             procedure,
                                                             "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
                                                             "reported"));
-                                            prophylAxisReaction.setNotes(
+                                            prophylaxisReaction.setNotes(
                                                     getNestedExtensionValueString(
                                                             procedure,
                                                             "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
                                                             "reactionNotes"));
                                         }
                                         prophylAxisDetailsDTO.setReaction(
-                                                prophylAxisReaction);
-                                        prophylAxisDetailsDTOS.add(
+                                                prophylaxisReaction);
+                                        prophylaxisDetailsDTOS.add(
                                                 prophylAxisDetailsDTO);
                                     }
                                     templateData.setProphylAxisDetails(
-                                            prophylAxisDetailsDTOS);
+                                            prophylaxisDetailsDTOS);
                                 }
 
                                 // Treatment details
@@ -3065,6 +3068,7 @@ public class SharedHealthRecordsService {
                                 List<ChargeItem> chargedItems = getChargeItemsByEncounterId(
                                         encounter.getIdElement().getIdPart());
                                 if (!chargedItems.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     for (ChargeItem chargeItem : chargedItems) {
                                         // TODO: Add billingID
                                         // TODO: Add insuranceCode
@@ -3101,7 +3105,7 @@ public class SharedHealthRecordsService {
                                         billingsDetailsDTO.setBillDate(
                                                 chargeItem.hasOccurrenceDateTimeType()
                                                         ? chargeItem.getOccurrenceDateTimeType()
-                                                        .getValue()
+                                                        .getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                                         : null);
                                         billingsDetailsDTO.setExemptionType(
                                                 getNestedExtensionValueString(
@@ -4172,6 +4176,7 @@ public class SharedHealthRecordsService {
                                         "admission-details", encounter, false,
                                         true);
                                 if (!admissionDetailObservations.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     Observation admissionDetail = admissionDetailObservations
                                             .get(0);
                                     admissionDetailsDTO.setAdmissionDate(
@@ -4181,7 +4186,7 @@ public class SharedHealthRecordsService {
                                                     .hasValue()
                                                     ? admissionDetail
                                                     .getEffectiveDateTimeType()
-                                                    .getValue()
+                                                    .getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                                     : null);
                                     admissionDetailsDTO.setAdmissionDiagnosis(
                                             getComponentValueCodeableConceptCode(
@@ -4190,7 +4195,7 @@ public class SharedHealthRecordsService {
                                     admissionDetailsDTO.setDischargedOn(
                                             getComponentValueDateTime(
                                                     admissionDetail,
-                                                    2));
+                                                    2).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
                                     admissionDetailsDTO.setDischargeStatus(
                                             getComponentValueString(
                                                     admissionDetail,
