@@ -2711,29 +2711,29 @@ public class SharedHealthRecordsService {
                                                         .get(0)
                                                         .getText()
                                                         : null);
-                                        ReactionDTO prophylAxisReaction = new ReactionDTO();
+                                        ReactionDTO prophylaxisReaction = new ReactionDTO();
                                         if (procedure.hasExtension()
-                                                && procedure.getExtension()
+                                                && !procedure.getExtension()
                                                 .isEmpty()) {
-                                            prophylAxisReaction
+                                            prophylaxisReaction
                                                     .setReactionDate(
                                                             getNestedExtensionValueDateTime(
                                                                     procedure,
                                                                     "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
                                                                     "reactionDate"));
-                                            prophylAxisReaction.setReported(
+                                            prophylaxisReaction.setReported(
                                                     getNestedExtensionValueBoolean(
                                                             procedure,
                                                             "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
                                                             "reported"));
-                                            prophylAxisReaction.setNotes(
+                                            prophylaxisReaction.setNotes(
                                                     getNestedExtensionValueString(
                                                             procedure,
                                                             "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
                                                             "reactionNotes"));
                                         }
                                         prophylAxisDetailsDTO.setReaction(
-                                                prophylAxisReaction);
+                                                prophylaxisReaction);
                                         prophylaxisDetailsDTOS.add(
                                                 prophylAxisDetailsDTO);
                                     }
@@ -3068,6 +3068,7 @@ public class SharedHealthRecordsService {
                                 List<ChargeItem> chargedItems = getChargeItemsByEncounterId(
                                         encounter.getIdElement().getIdPart());
                                 if (!chargedItems.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     for (ChargeItem chargeItem : chargedItems) {
                                         // TODO: Add billingID
                                         // TODO: Add insuranceCode
@@ -3104,7 +3105,7 @@ public class SharedHealthRecordsService {
                                         billingsDetailsDTO.setBillDate(
                                                 chargeItem.hasOccurrenceDateTimeType()
                                                         ? chargeItem.getOccurrenceDateTimeType()
-                                                        .getValue()
+                                                        .getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                                         : null);
                                         billingsDetailsDTO.setExemptionType(
                                                 getNestedExtensionValueString(
