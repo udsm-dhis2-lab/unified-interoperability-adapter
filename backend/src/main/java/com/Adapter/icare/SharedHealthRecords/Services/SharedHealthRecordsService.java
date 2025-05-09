@@ -3432,7 +3432,7 @@ public class SharedHealthRecordsService {
                                 if(!cecapObservations.isEmpty()){
                                     Observation observation =  cecapObservations.get(0);
                                     BreastCancerDTO breastCancerDTO = new BreastCancerDTO();
-                                    breastCancerDTO.setScreened(getComponentValueBoolean(observation,"http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
+                                    breastCancerDTO.setScreened(getComponentValueBoolean(observation,"http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-screened"));
                                     breastCancerDTO.setFoundWithBreastCancerSymptoms(getComponentValueBoolean(observation, "http://fhir.moh.go.tz/fhir/CodeSystem/cecap-codes", "breast-cancer-symptoms"));
 
                                     cancerScreeningDetailsDTO.setBreastCancer(breastCancerDTO);
@@ -3553,6 +3553,9 @@ public class SharedHealthRecordsService {
                                                 .setDeliveryMethod(
                                                         deliveryMethod);
                                     }
+
+                                    laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(getExtensionValueInt(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs"));
+
                                     if (deliveryProcedure.hasExtension()
                                             && !deliveryProcedure
                                             .getExtension()
@@ -3572,20 +3575,7 @@ public class SharedHealthRecordsService {
                                                                         .getValue())
                                                                         : null);
                                             }
-                                            if (extension.hasUrl()
-                                                    && extension.getUrl()
-                                                    .equals(
-                                                            "http://fhir.moh.go.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs")) {
-                                                laborAndDeliveryDetailsDTO
-                                                        .setTimeBetweenLaborPainAndDeliveryInHrs(
-                                                                extension.hasValue()
-                                                                        && extension.getValue() instanceof DecimalType
-                                                                        ? ((DecimalType) extension
-                                                                        .getValue())
-                                                                        .getValue()
-                                                                        .intValue()
-                                                                        : null);
-                                            }
+
                                             if (extension.hasUrl()
                                                     && extension.getUrl()
                                                     .equals(
@@ -3604,33 +3594,18 @@ public class SharedHealthRecordsService {
                                 }
 
                                 // Infant and family planning counseling
-                                List<Observation> infantFeedingCounselings = getObservationsByCategory(
-                                        fhirClient,
-                                        "infant-feeding-counseling", encounter,
-                                        false, true);
+
                                 List<Observation> familyPlanningCounselings = getObservationsByCategory(
                                         fhirClient,
                                         "family-planning-counseling", encounter,
                                         false, true);
-                                if (!infantFeedingCounselings.isEmpty()) {
-                                    Observation infantFeedingCounseling = infantFeedingCounselings
-                                            .get(0);
-                                    if (infantFeedingCounseling != null
-                                            && infantFeedingCounseling
-                                            .hasValueBooleanType()
-                                            && infantFeedingCounseling
-                                            .getValueBooleanType()
-                                            .hasValue()) {
-                                        laborAndDeliveryDetailsDTO
-                                                .setProvidedWithInfantFeedingCounseling(
-                                                        infantFeedingCounseling
-                                                                .getValueBooleanType()
-                                                                .getValue());
-                                    }
-                                }
+
                                 if (!familyPlanningCounselings.isEmpty()) {
                                     Observation familyPlanningCounseling = familyPlanningCounselings
                                             .get(0);
+
+                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/infant-feeding-counseling"));
+
                                     if (familyPlanningCounseling != null
                                             && familyPlanningCounseling
                                             .hasValueBooleanType()
