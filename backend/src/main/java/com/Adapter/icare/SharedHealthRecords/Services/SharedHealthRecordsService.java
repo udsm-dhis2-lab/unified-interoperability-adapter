@@ -4770,6 +4770,10 @@ public class SharedHealthRecordsService {
                                 ? immunization.getDoseQuantity().getValue().intValue()
                                 : null);
 
+                vaccinationDetailsDTO.setType(immunization.hasVaccineCode()
+                        ? immunization.getVaccineCode().getText()
+                        : null);
+
                 if (immunization.hasNote() && !immunization.getNote().isEmpty()) {
                     vaccinationDetailsDTO.setNotes(immunization.getNote().get(0).getText());
                 }
@@ -4791,10 +4795,10 @@ public class SharedHealthRecordsService {
                                     : null);
 
                     // TODO: Map notes from reaction details if required
-                    // if (reactionComponent.hasDetail() &&
-                    // reactionComponent.getDetail().hasDisplay()) {
-                    // reaction.setNotes(reactionComponent.getDetail().getDisplay());
-                    // }
+                     if (reactionComponent.hasDetail() &&
+                     reactionComponent.getDetail().hasDisplay()) {
+                      reaction.setNotes(reactionComponent.getDetail().getDisplay());
+                    }
 
                     reaction.setReported(
                             reactionComponent.hasReported()
