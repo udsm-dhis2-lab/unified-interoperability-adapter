@@ -31,7 +31,7 @@ for zip_file in "$BUILD_DIR"/*.zip; do
         app_name=$(basename "$zip_file" .zip)
 
         # Create a target directory for each app based on the zip file name
-        target_dir="$EXTRACT_DIR"
+        target_dir="$EXTRACT_DIR"/"$app_name"
         mkdir -p "$target_dir"
 
         # Unzip the file into the target directory, overwriting existing files if necessary

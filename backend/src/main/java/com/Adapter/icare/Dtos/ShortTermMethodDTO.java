@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 @Getter
 @Setter
 public class ShortTermMethodDTO {
-    private boolean provided;
+    private Boolean provided;
     private String type;
     @NotNull
     private String code;

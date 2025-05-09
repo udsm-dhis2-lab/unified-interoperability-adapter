@@ -94,3 +94,7 @@ backend/.mvn
 backup
 
 deploy.sh
+
+files
+
+ui-apps

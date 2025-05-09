@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +30,8 @@ public class SharedHealthRecordsDTO {
     @NotNull(message = "value cannot be null")
     private VisitDetailsDTO visitDetails;
 
+    private SelfMonitoringClinicalInformationDTO selfMonitoringClinicalInformation;
+
     private List<AppointmentDetailsDTO> appointment;
 
     private ClinicalInformationDTO clinicalInformation;
@@ -51,6 +52,8 @@ public class SharedHealthRecordsDTO {
 
     private TreatmentDetailsDTO treatmentDetails;
 
+    private EyeClinicDetailsDTO eyeClinicDetails;
+
     private List<RadiologyDetailsDTO> radiologyDetails;
 
     private AdmissionDetailsDTO admissionDetails;
@@ -67,11 +70,19 @@ public class SharedHealthRecordsDTO {
 
     private PostnatalDetailsDTO postnatalDetails;
 
-    private List<ProphylAxisDetailsDTO> prophylAxisDetails;
+    private List<ProphylaxisDetailsDTO> prophylAxisDetails;
 
     private List<VaccinationDetailsDTO> vaccinationDetails;
 
     private FamilyPlanningDetailsDTO familyPlanningDetails;
+
+    private ChildHealthDetailsDTO childHealthDetails;
+
+    private CpacDetailsDTO cpacDetails;
+
+    private CecapDTO cecap;
+
+    private ContraceptivesDTO contraceptives;
 
     private List<BillingsDetailsDTO> billingsDetails;
 
@@ -96,7 +107,9 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("labInvestigationDetails", this.getLabInvestigationDetails());
         sharedRecordMap.put("diagnosisDetails", this.getDiagnosisDetails());
         sharedRecordMap.put("medicationDetails", this.getMedicationDetails());
+        sharedRecordMap.put("eyeClinicDetails", this.getEyeClinicDetails());
         sharedRecordMap.put("treatmentDetails", this.getTreatmentDetails());
+        sharedRecordMap.put("childHealthDetails", this.getChildHealthDetails());
         sharedRecordMap.put("radiologyDetails", this.getRadiologyDetails());
         sharedRecordMap.put("admissionDetails", this.getAdmissionDetails());
         sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
@@ -106,9 +119,13 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("vaccinationDetails", this.getVaccinationDetails());
         sharedRecordMap.put("familyPlanningDetails", this.getFamilyPlanningDetails());
         sharedRecordMap.put("laborAndDeliveryDetails", this.getLaborAndDeliveryDetails());
+        sharedRecordMap.put("cpacDetails", this.getCpacDetails());
+        sharedRecordMap.put("cecapDetails", this.getCecap());
         sharedRecordMap.put("postnatalDetails", this.getPostnatalDetails());
+        sharedRecordMap.put("contraceptives", this.getContraceptives());
         sharedRecordMap.put("billingsDetails", this.getBillingsDetails());
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
+        sharedRecordMap.put("selfMonitoringClinicalInformation", this.getSelfMonitoringClinicalInformation());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());
         sharedRecordMap.put("otherInformation", this.getOtherInformation());
         sharedRecordMap.put("appointment", this.getAppointment().stream().map(AppointmentDetailsDTO::toMap));

@@ -23,6 +23,8 @@ public class MedicationDetailsDTO {
     // TODO: Change this to accommodate dosage parameters
     private Map<String,Object> dosage;
     private String refillStatus;
+    private Integer currentRefill;
+    private Integer maxRefill;
     private MedicationDetailPaymentDetailsDTO paymentDetails;
 
     public Map<String,Object> toMap() {
@@ -35,6 +37,8 @@ public class MedicationDetailsDTO {
         medicationDetailsMap.put("treatmentType", this.getTreatmentType());
         medicationDetailsMap.put("dosage", this.getDosage());
         medicationDetailsMap.put("refillStatus", this.getRefillStatus());
+        medicationDetailsMap.put("currentRefill", this.getCurrentRefill());
+        medicationDetailsMap.put("maxRefill", this.getMaxRefill());
         medicationDetailsMap.put("paymentDetails", this.getPaymentDetails());
         return medicationDetailsMap;
     }

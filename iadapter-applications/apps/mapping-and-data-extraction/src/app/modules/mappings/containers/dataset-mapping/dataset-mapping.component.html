@@ -22,8 +22,7 @@
           </div>
 
           <nz-card>
-            <div nz-row [nzGutter]="8" style="margin-bottom: 16px;" *ngIf="rightColumnSpan === 16">
-
+            <div nz-row [nzGutter]="8" style="margin-bottom: 16px" *ngIf="rightColumnSpan === 16">
               <div nz-col nzSpan="12">
                 <label nz-checkbox [(ngModel)]="useSum">Use sum to aggregate</label>
                 <label nz-checkbox [(ngModel)]="freeTextQuery">Use free text query</label>
@@ -31,11 +30,12 @@
             </div>
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="6">
-                <nz-tree-select style="width: 100%" [nzNodes]="nodes" nzShowSearch nzPlaceHolder="LHS Query"
-                  [(ngModel)]="lhsQueryValue"></nz-tree-select>
+                <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
+                  nzCheckStrictly="true" nzShowExpand="true" nzVirtualHeight="450px" [nzNodes]="nodes" nzShowSearch
+                  nzPlaceHolder="LHS Query" [(ngModel)]="lhsQueryValue"></nz-tree-select>
               </div>
 
-              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16  && !freeTextQuery">
+              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16 && !freeTextQuery">
                 <nz-select style="width: 100%" [ngModel]="selectedQueryOperator"
                   (ngModelChange)="onQueryOperatorSelect($event)">
                   <ng-container *ngFor="let option of queryOperators">
@@ -48,8 +48,9 @@
               <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="12">
                 <div nz-row [nzGutter]="8">
                   <div nz-col nzSpan="12">
-                    <nz-tree-select style="width: 100%" [nzNodes]="nodes" nzShowSearch nzPlaceHolder="RHS Query"
-                      [(ngModel)]="rhsQueryValue"></nz-tree-select>
+                    <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
+                      nzCheckStrictly="true" nzShowExpand="true" nzVirtualHeight="450px" [nzNodes]="nodes" nzShowSearch
+                      nzPlaceHolder="RHS Query" [(ngModel)]="rhsQueryValue"></nz-tree-select>
                   </div>
                   <div nz-col nzSpan="8">
                     <input nz-input placeholder="other value" [(ngModel)]="rhsInputValue" />
@@ -70,8 +71,8 @@
             <!-- list of queries -->
             <nz-card *ngIf="queries.length > 0" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
               <p>Queries</p>
-              <textarea nz-input placeholder="Controlled autosize" [value]="queriesAsString"
-                [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
+              <textarea nz-input placeholder="Controlled autosize" (input)="onQueryChange($event)"
+                [value]="queriesAsString" [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
             </nz-card>
 
             <nz-card *ngIf="freeTextQuery" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
@@ -83,10 +84,10 @@
             <!-- selecting configurations options -->
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
-                <custom-select [placeHolder]="placeHolderForConfigurationSelect" [isMultiple]="false"
+                <app-custom-select [placeHolder]="placeHolderForConfigurationSelect" [isMultiple]="false"
                   [isLoading]="isLoadingConfigurations" [optionList]="configurationOptionList"
-                  (onSearchChange)="onSearchConfiguration($event)"
-                  (onSelectChange)="onConfigurationSelect($event)"></custom-select>
+                  (searchChange)="onSearchConfiguration($event)"
+                  (selectChange)="onConfigurationSelect($event)"></app-custom-select>
               </div>
               <div nz-col nzSpan="12">
                 <div nz-row [nzGutter]="16">
@@ -102,16 +103,16 @@
 
             <div nzGutter="16" nz-row style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
-                <custom-select [placeHolder]="placeHolderForLoincCodeSelectObs" [isMultiple]="false"
+                <app-custom-select [placeHolder]="placeHolderForLoincCodeSelectObs" [isMultiple]="false"
                   [isLoading]="isLoadingLoincCodesObs" [optionList]="loincCodeOptionListObs"
-                  (onSearchChange)="onSearchLoincCodeObs($event)"
-                  (onSelectChange)="onLoincCodeSelectObs($event)"></custom-select>
+                  (searchChange)="onSearchLoincCodeObs($event)"
+                  (selectChange)="onLoincCodeSelectObs($event)"></app-custom-select>
               </div>
               <div nz-col nzSpan="12">
-                <custom-select [placeHolder]="placeHolderForLoincCodeSelect" [isMultiple]="false"
+                <app-custom-select [placeHolder]="placeHolderForLoincCodeSelect" [isMultiple]="false"
                   [isLoading]="isLoadingLoincCodes" [optionList]="loincCodeOptionList"
-                  (onSearchChange)="onSearchLoincCode($event)"
-                  (onSelectChange)="onLoincCodeSelect($event)"></custom-select>
+                  (searchChange)="onSearchLoincCode($event)"
+                  (selectChange)="onLoincCodeSelect($event)"></app-custom-select>
               </div>
             </div>
 
@@ -142,14 +143,14 @@
 
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
               <div nz-col nzSpan="12">
-                <custom-select [placeHolder]="placeHolderForMsdCodes" [isMultiple]="false"
+                <app-custom-select [placeHolder]="placeHolderForMsdCodes" [isMultiple]="false"
                   [isLoading]="isLoadingMsdCodes" [optionList]="msdCodesOptionList"
-                  (onSearchChange)="onSearchMsdCode($event)" (onSelectChange)="onMsdCodeSelect($event)"></custom-select>
+                  (searchChange)="onSearchMsdCode($event)" (selectChange)="onMsdCodeSelect($event)"></app-custom-select>
               </div>
               <div nz-col nzSpan="12">
-                <custom-select [placeHolder]="placeHolderForIcdCodeSelect" [isMultiple]="false"
+                <app-custom-select [placeHolder]="placeHolderForIcdCodeSelect" [isMultiple]="true"
                   [isLoading]="isLoadingIcdCodes" [optionList]="icdCodeOptionList"
-                  (onSearchChange)="onSearchIcdCode($event)" (onSelectChange)="onIcdCodeSelect($event)"></custom-select>
+                  (searchChange)="onSearchIcdCode($event)" (selectChange)="onIcdCodeSelect($event)"></app-custom-select>
               </div>
             </div>
 
@@ -159,8 +160,8 @@
               <div *ngIf="selectedICdCodes.length > 0" nz-col nzSpan="12">
                 <nz-card style="width: 100%">
                   <p>ICD Codes</p>
-                  @for (icdCode of selectedICdCodes; track icdCode.code) {
-                  <nz-tag nzMode="closeable" (nzOnClose)="onRemoveIcdCode(icdCode)">{{ icdCode.name }}</nz-tag>
+                  @for (icdCode of selectedICdCodes; track $index) {
+                  <nz-tag nzMode="closeable" (nzOnClose)="onRemoveIcdCode(icdCode)">{{ getCodeName(icdCode) }}</nz-tag>
                   }
                 </nz-card>
               </div>

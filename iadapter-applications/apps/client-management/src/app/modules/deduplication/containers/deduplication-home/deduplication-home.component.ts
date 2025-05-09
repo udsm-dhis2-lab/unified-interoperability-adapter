@@ -5,14 +5,13 @@ import { SharedModule } from 'apps/client-management/src/app/shared/shared.modul
 import { NzModalService } from 'ng-zorro-antd/modal';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { Subscription } from 'rxjs';
-import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 import { Deduplication } from '../../models/deduplication.model';
 import { DeduplicationManagementService } from '../../services/deduplication-management.service';
 import { DeduplicationDetailsComponent } from '../deduplication-details/deduplication-details.component';
 @Component({
   selector: 'app-deduplication-home',
   standalone: true,
-  imports: [SharedModule, SearchBarComponent],
+  imports: [SharedModule],
   providers: [DeduplicationManagementService],
   templateUrl: './deduplication-home.component.html',
   styleUrl: './deduplication-home.component.css',

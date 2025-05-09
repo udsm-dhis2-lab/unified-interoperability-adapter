@@ -1,25 +1,33 @@
-import { filter } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { ActivatedRoute, Router } from '@angular/router';
-import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
-import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
-// import { ClientManagementService } from '../../services/client-management.service';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzUploadChangeParam, NzUploadModule } from 'ng-zorro-antd/upload';
 import { ClientManagementService } from '../../services/client-management.service';
+import { SharedModule } from '../../../../shared/shared.module';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { DicomViewerComponent } from '../dicom-viewer/dicom-viewer.component';
+import { NzModalService } from 'ng-zorro-antd/modal';
 
 @Component({
   selector: 'app-client-details',
   standalone: true,
-  imports: [SharedModule, NzTabsModule, NzCollapseModule, NzEmptyModule],
+  imports: [
+    SharedModule,
+    NzTabsModule,
+    NzCollapseModule,
+    NzEmptyModule,
+    NzUploadModule,
+    NzIconModule,
+  ],
   providers: [ClientManagementService],
   templateUrl: './client-details.component.html',
   styleUrl: './client-details.component.css',
 })
 export class ClientDetailsComponent implements OnInit {
-  loading: boolean = false;
+  loading = false;
 
   parentRoute?: string;
 
@@ -33,10 +41,16 @@ export class ClientDetailsComponent implements OnInit {
 
   extraInfo: any;
 
+  hcrCode!: string;
+
+  files: { name: string; url: string }[] = [];
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private clientManagementService: ClientManagementService
+    private clientManagementService: ClientManagementService,
+    private messageService: NzMessageService,
+    private modal: NzModalService
   ) {}
   backToList() {
     this.router.navigate([this.parentRoute]);
@@ -47,26 +61,21 @@ export class ClientDetailsComponent implements OnInit {
       this.loading = true;
       if (params) {
         const client = params['client'] ?? '';
-        console.log(client, 'client');
-        console.log(params['client']?.startsWith('HCR'), 'client');
         const clientID = client?.startsWith('HCR')
           ? client
           : JSON.parse(client);
 
         this.parentRoute = params['parentRoute'];
+        this.hcrCode = clientID;
 
         this.clientManagementService
           .getClientById(clientID)
           .subscribe((client: any) => {
             this.client = client?.listOfClients[0] || {};
-
-            console.log(this?.client, 'clients');
-
+            this.files = this.client?.demographicDetails?.files ?? [];
             this.basicInfo = this.formatApiResponse(this.client)[
               'Demographic Details'
             ];
-
-            console.log(this.basicInfo, 'basic info');
 
             this.appointmentDetails = this.formatApiResponse(this.client)[
               'Appointments'
@@ -86,6 +95,23 @@ export class ClientDetailsComponent implements OnInit {
     return Object?.keys(obj) || [];
   }
 
+  showDeleteConfirm(
+    nzContent: string,
+    file: { name: string; url: string }
+  ): void {
+    console.log(file);
+    this.modal.create({
+      nzTitle: 'Delete Confirmation',
+      nzContent,
+      nzOkText: 'Delete',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzCancelText: 'Cancel',
+      nzCentered: true,
+      nzClassName: 'custom-confirm-modal',
+    });
+  }
+
   // Utility function to format keys and values
   formatApiResponse(result: any): { [key: string]: any } {
     if (!result) {
@@ -93,7 +119,6 @@ export class ClientDetailsComponent implements OnInit {
     }
 
     const formattedResponse: { [key: string]: any } = {};
-    console.log(result?.demographicDetails?.addresses, 'hulk');
 
     return {
       // {`${id.type}: ${id.id}`}
@@ -119,7 +144,7 @@ export class ClientDetailsComponent implements OnInit {
         'Phone Numbers':
           result.demographicDetails.phoneNumbers?.join(', ') || '-',
         Emails: result.demographicDetails.emails?.join(', ') || '-',
-        "NIDA": result.demographicDetails.nida || '-',
+        NIDA: result.demographicDetails.nida || '-',
         Occupation: result.demographicDetails.occupation || '-',
         Nationality: result.demographicDetails.nationality || '-',
         'Related Clients':
@@ -151,5 +176,37 @@ export class ClientDetailsComponent implements OnInit {
     };
 
     return formattedResponse;
+  }
+
+  handleChange(info: NzUploadChangeParam): void {
+    if (info.file.status === 'done') {
+      this.messageService.success(
+        `${info.file.name} file uploaded successfully`
+      );
+      console.log(info.file.response);
+      this.files.push({
+        name: info.file.name,
+        url: info.file.response?.fileName,
+      });
+    } else if (info.file.status === 'error') {
+      this.messageService.error(`${info.file.name} file upload failed.`);
+    }
+  }
+
+  getAddress() {
+    return `../../../../../api/v1/files/${this.hcrCode}/uploads`;
+  }
+
+  viewFile(file: { name: string; url: string }) {
+    this.modal.create({
+      nzTitle: file.name,
+      nzContent: DicomViewerComponent,
+      nzWidth: '40%',
+      nzMaskClosable: false,
+      nzData: {
+        data: `../../../../../api/v1/files/${file.url}/downloads?id=${this.hcrCode}`,
+      },
+      nzFooter: null,
+    });
   }
 }

@@ -1,16 +1,22 @@
 package com.Adapter.icare.Dtos;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.hl7.fhir.r4.model.*;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
-
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.validation.constraints.NotNull;
+
+import org.hl7.fhir.r4.model.Identifier;
+import org.hl7.fhir.r4.model.Organization;
+import org.hl7.fhir.r4.model.Patient;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -29,21 +35,23 @@ public class PatientDTO {
     private List<ContactPeopleDTO> contactPeople;
     private String maritalStatus;
     private List<PaymentDetailsDTO> paymentDetails;
-    private List<Map<String,Object>> relatedClients;
+    private List<Map<String, Object>> relatedClients;
     private List<AppointmentDetailsDTO> appointment;
+    private List<FileDTO> files;
 
     public PatientDTO(String id,
-                      String status,
-                      List<Identifier> identifiers,
-                      List<HumanNameDTO> name,
-                      String gender,
-                      Date birthDate,
-                      List<AddressDTO> address,
-                      List<ContactDTO> telecom,
-                      Organization organization,
-                      List<ContactPeopleDTO> contactPeople,
-                      String maritalStatus,
-                      List<Map<String,Object>> relatedClients
+            String status,
+            List<Identifier> identifiers,
+            List<HumanNameDTO> name,
+            String gender,
+            Date birthDate,
+            List<AddressDTO> address,
+            List<ContactDTO> telecom,
+            Organization organization,
+            List<ContactPeopleDTO> contactPeople,
+            String maritalStatus,
+            List<Map<String, Object>> relatedClients,
+            List<FileDTO> files
 
     ) {
         this.id = id;
@@ -58,6 +66,7 @@ public class PatientDTO {
         this.contactPeople = contactPeople;
         this.maritalStatus = maritalStatus;
         this.relatedClients = relatedClients;
+        this.files = files;
     }
 
     public DemographicDetailsDTO toMap() {
@@ -83,16 +92,19 @@ public class PatientDTO {
                 }
                 lastName = this.getName().get(0).getFamily();
             }
-            // TODO: Add support to retrieve identifier relevant to requesting health facility
+            // TODO: Add support to retrieve identifier relevant to requesting health
+            // facility
             mappedPatient.setId(this.getId());
             List<IdentifierDTO> idsList = new ArrayList<>();
             if (this.getIdentifiers() != null && !this.getIdentifiers().isEmpty()) {
-                for(Identifier identifier: this.getIdentifiers()) {
-                    IdentifierDTO identifierDTO =  new IdentifierDTO();
-                    identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): this.getId());
-                    identifierDTO.setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode(): null);
-                    identifierDTO.setPreferred(identifier.hasUse() && (identifier.getUse().getDisplay().equals("official")));
-                    identifierDTO.setSystem(identifier.hasSystem() ? identifier.getSystem(): null);
+                for (Identifier identifier : this.getIdentifiers()) {
+                    IdentifierDTO identifierDTO = new IdentifierDTO();
+                    identifierDTO.setId(identifier.hasValue() ? identifier.getValue() : this.getId());
+                    identifierDTO
+                            .setType(identifier.hasType() ? identifier.getType().getCoding().get(0).getCode() : null);
+                    identifierDTO
+                            .setPreferred(identifier.hasUse() && (identifier.getUse().getDisplay().equals("official")));
+                    identifierDTO.setSystem(identifier.hasSystem() ? identifier.getSystem() : null);
                     idsList.add(identifierDTO);
                 }
             }
@@ -107,13 +119,13 @@ public class PatientDTO {
                 mappedPatient.setDateOfBirth(localDate.toString());
             }
             List<String> phones = new ArrayList<>();
-            for (ContactDTO contactDTO: getTelecom()) {
+            for (ContactDTO contactDTO : getTelecom()) {
                 if (contactDTO.getSystem().equalsIgnoreCase("phone")) {
                     phones.add(contactDTO.getValue());
                 }
             }
             List<String> emails = new ArrayList<>();
-            for (ContactDTO contactDTO: getTelecom()) {
+            for (ContactDTO contactDTO : getTelecom()) {
                 if (contactDTO.getSystem().equalsIgnoreCase("email")) {
                     emails.add(contactDTO.getValue());
                 }
@@ -126,23 +138,25 @@ public class PatientDTO {
             mappedPatient.setAddresses(address);
             mappedPatient.setContactPeople(this.getContactPeople());
             mappedPatient.setPaymentDetails(this.getPaymentDetails());
-            List<Map<String,Object>> relatedClientsList = new ArrayList<>();
+            List<Map<String, Object>> relatedClientsList = new ArrayList<>();
             mappedPatient.setAppointment(this.getAppointment());
+            mappedPatient.setFiles(this.getFiles());
+
             if (this.relatedClients != null && !this.relatedClients.isEmpty()) {
-                for (Map<String,Object> clientDetails: this.relatedClients) {
+                for (Map<String, Object> clientDetails : this.relatedClients) {
                     Map<String, Object> clientData = new HashMap<>();
-                    clientData.put("type",clientDetails.get("type"));
+                    clientData.put("type", clientDetails.get("type"));
                     clientData.put("display", clientData.get("patientDisplay"));
-                    Map<String,Object> clientRelated = new HashMap<>();
+                    Map<String, Object> clientRelated = new HashMap<>();
                     if (clientDetails.get("patient") != null && clientDetails.get("patient") instanceof Patient) {
                         Patient patientData = (Patient) clientDetails.get("patient");
                         // TODO: return client registry identifier
-                        List<String> identifiersListForRelatedClient  = new ArrayList<>();
+                        List<String> identifiersListForRelatedClient = new ArrayList<>();
                         clientRelated.put("id", patientData.getIdElement().getIdPart());
-                        for(Identifier identifier: patientData.getIdentifier()) {
+                        for (Identifier identifier : patientData.getIdentifier()) {
                             identifiersListForRelatedClient.add(identifier.getValue());
                         }
-                        clientRelated.put("identifiers",identifiersListForRelatedClient);
+                        clientRelated.put("identifiers", identifiersListForRelatedClient);
                     }
                     clientData.put("client", clientRelated);
                     relatedClientsList.add(clientData);
@@ -157,17 +171,19 @@ public class PatientDTO {
 
     public String getMRN(String orgCode) {
         List<String> identifiers = orgCode != null ? this.getIdentifiers().stream()
-                .filter(identifier -> identifier.hasAssigner() && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType() && identifier.getType().hasCoding() &&
+                .filter(identifier -> identifier.hasAssigner()
+                        && identifier.getAssigner().getReference().contains(orgCode) && identifier.hasType()
+                        && identifier.getType().hasCoding() &&
                         identifier.getType().getCoding().get(0).getCode().equals("MRN"))
                 .map(Identifier::getValue)
-                .collect(Collectors.toList()): null;
-        return identifiers != null && !identifiers.isEmpty() ? identifiers.get(0): null;
+                .collect(Collectors.toList()) : null;
+        return identifiers != null && !identifiers.isEmpty() ? identifiers.get(0) : null;
     }
 
     public @NotNull List<Map<String, Object>> getIdentifierMaps() {
         List<Map<String, Object>> identifiers = new ArrayList<>();
         if (!this.getIdentifiers().isEmpty()) {
-            for (Identifier identifier: this.getIdentifiers()) {
+            for (Identifier identifier : this.getIdentifiers()) {
                 Map<String, Object> id = new HashMap<>();
                 id.put("id", identifier.getValue());
                 id.put("system", identifier.getSystem());
@@ -180,7 +196,7 @@ public class PatientDTO {
                         throw new RuntimeException(e);
                     }
                 }
-                id.put("type",type);
+                id.put("type", type);
                 identifiers.add(id);
             }
         }
@@ -190,9 +206,12 @@ public class PatientDTO {
     public List<IdentifierDTO> getIdentifiersDTO(List<Identifier> identifiersList) {
         List<IdentifierDTO> identifiers = new ArrayList<>();
         if (identifiersList != null && !identifiersList.isEmpty()) {
-            for (Identifier identifier: this.getIdentifiers()) {
+            for (Identifier identifier : this.getIdentifiers()) {
                 IdentifierDTO identifierDTO = new IdentifierDTO();
-                identifierDTO.setId(identifier.hasValue() ? identifier.getValue(): identifier.getType().hasCoding() && identifier.getType().getCoding().get(0).getCode().equals("HCRCODE") ? this.getId(): null);
+                identifierDTO.setId(identifier.hasValue() ? identifier.getValue()
+                        : identifier.getType().hasCoding()
+                                && identifier.getType().getCoding().get(0).getCode().equals("HCRCODE") ? this.getId()
+                                        : null);
                 String type = null;
                 if (identifier.getType() != null && !identifier.getType().getCoding().isEmpty()) {
                     try {
@@ -240,13 +259,13 @@ public class PatientDTO {
             name = this.getOrganization().getName();
         }
         if (this.getOrganization().getType() != null && !this.getOrganization().getType().isEmpty()) {
-            orgType =  this.getOrganization().getType().get(0).getText();
+            orgType = this.getOrganization().getType().get(0).getText();
         }
-        org.put("name",name);
+        org.put("name", name);
         org.put("type", orgType);
         List<Map<String, Object>> identifiers = new ArrayList<>();
         if (!this.getOrganization().getIdentifier().isEmpty()) {
-            for (Identifier identifier: this.getOrganization().getIdentifier()) {
+            for (Identifier identifier : this.getOrganization().getIdentifier()) {
                 Map<String, Object> idObject = new HashMap<>();
                 String id = null;
                 String type = null;
@@ -274,7 +293,7 @@ public class PatientDTO {
                 identifiers.add(idObject);
             }
         }
-        org.put("identifiers",identifiers);
+        org.put("identifiers", identifiers);
         return org;
     }
 }

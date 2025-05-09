@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { SharedModule } from '../../shared.module';
 
 @Component({
-  selector: 'custom-select',
+  selector: 'app-custom-select',
   standalone: true,
   imports: [SharedModule],
   templateUrl: './select.component.html',
@@ -12,17 +12,17 @@ export class SelectComponent {
   @Input({
     required: true,
   })
-  placeHolder: string = '';
+  placeHolder = '';
 
   selectedItem?: any;
 
-  @Output() onSearchChange: EventEmitter<string> = new EventEmitter<string>();
-  @Output() onSelectChange = new EventEmitter<any>();
+  @Output() searchChange: EventEmitter<string> = new EventEmitter<string>();
+  @Output() selectChange = new EventEmitter<any>();
 
   @Input({
     required: true,
   })
-  isLoading: boolean = false;
+  isLoading = false;
 
   @Input({
     required: true,
@@ -30,18 +30,18 @@ export class SelectComponent {
   optionList: any[] = [];
 
   @Input()
-  isMultiple: boolean = true;
+  isMultiple = true;
 
   onSearch(value: string) {
-    this.onSearchChange.emit(value);
+    this.searchChange.emit(value);
   }
 
   onSelect(value: any): void {
     if (!this.isMultiple) {
-      this.onSelectChange.emit(value);
+      this.selectChange.emit(value);
       return;
     }
     const filteredValue = value.filter((item: any) => item !== '');
-    this.onSelectChange.emit(filteredValue);
+    this.selectChange.emit(filteredValue);
   }
 }

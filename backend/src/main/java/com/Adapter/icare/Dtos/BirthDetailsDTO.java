@@ -1,6 +1,12 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.GENDER;
+import com.Adapter.icare.Enums.InfantFeeding;
+import com.Adapter.icare.Enums.MethodOfResuscitation;
+import com.Adapter.icare.Enums.STATUS;
+import com.Adapter.icare.Utils.OutcomeDetailsDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,13 +25,28 @@ public class BirthDetailsDTO {
     private Boolean multipleBirth;
     private Boolean exclusiveBreastFed;
     private Boolean marcerated;
-    private boolean fresh;
+    private Boolean fresh;
     private Integer motherAgeInYears;
     private Integer birthOrder;
+    private InfantFeeding infantFeeding;
+    private GENDER gender;
+    private Boolean providedWithKmc;
+    private Integer hb;
+    private Boolean hbigTested;
+    private STATUS childHivStatus;
+    private InfectionsDTO infections;
+
+    @JsonDeserialize(using = OutcomeDetailsDeserializer.class)
+    private ParentOutcomeDetailsDTO outcomeDetails;
     private CodeAndNameDTO motherHivStatus;
     private Boolean providedWithARV;
-    private boolean referred;
+    private Boolean referred;
     private List<VaccinationDetailsDTO> vaccinationDetails;
-    private BreatheAssistanceDTO breatheAssistance;
     private List<Map<String,Object>> otherServices;
+    private Boolean bornWithDisabilities;
+    private ApgaScoreDTO apgaScore;
+    private Boolean wasBreastFedWithinOneHourAfterDelivery;
+    private MethodOfResuscitation methodOfResuscitation;
+    private Boolean hivDnaPCRTested;
+
 }

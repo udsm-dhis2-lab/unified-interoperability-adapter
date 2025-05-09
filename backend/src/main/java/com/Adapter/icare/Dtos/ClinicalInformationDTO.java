@@ -9,7 +9,6 @@ import java.util.Map;
 @Getter
 @Setter
 public class ClinicalInformationDTO {
-    // TODO: Improve by adding DTOs for specific area
-    private List<Map<String,Object>> vitalSigns;
-    private List<Map<String,Object>> visitNotes;
+    private List<VitalSignDTO> vitalSigns;
+    private List<VisitNotesDTO> visitNotes;
 }

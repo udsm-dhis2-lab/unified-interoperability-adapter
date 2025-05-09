@@ -21,5 +21,5 @@ public class BillingsDetailsDTO {
     private String standardCode;
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date billDate;
+    private String billDate;
 }
