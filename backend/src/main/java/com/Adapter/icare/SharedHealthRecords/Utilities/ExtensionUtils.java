@@ -41,6 +41,23 @@ public class ExtensionUtils {
         return null;
     }
 
+    public static Integer getNestedExtensionValueDecimal(DomainResource resource, String parentUrl, String childUrl) {
+        if (resource != null && resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(parentUrl) && parentExtension.hasExtension()) {
+                    for (Extension childExtension : parentExtension.getExtension()) {
+                        if (childExtension.getUrl().equals(childUrl)
+                                && childExtension.hasValue()
+                                && childExtension.getValue() instanceof DecimalType) {
+                            return ((DecimalType) childExtension.getValue()).getValue().intValue();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public static Date getNestedExtensionValueDateTime(DomainResource resource, String parentUrl, String childUrl) {
         if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {

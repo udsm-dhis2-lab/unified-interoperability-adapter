@@ -40,6 +40,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemNestedExtensionValue;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemsByEncounterId;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
@@ -3066,6 +3068,7 @@ public class SharedHealthRecordsService {
                                 // Billing details
                                 List<BillingsDetailsDTO> billingsDetailsDTOS = new ArrayList<>();
                                 List<ChargeItem> chargedItems = getChargeItemsByEncounterId(
+                                        fhirClient,
                                         encounter.getIdElement().getIdPart());
                                 if (!chargedItems.isEmpty()) {
                                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -3073,8 +3076,10 @@ public class SharedHealthRecordsService {
                                         // TODO: Add billingID
                                         // TODO: Add insuranceCode
                                         // TODO: Add insuranceName
-                                        // TODO: Add wavedAmount
+
                                         BillingsDetailsDTO billingsDetailsDTO = new BillingsDetailsDTO();
+                                        billingsDetailsDTO.setWavedAmount(getNestedExtensionValueDecimal(chargeItem, "http://fhir.moh.go.tz/fhir/StructureDefinition/billing-details", "wavedAmount").toString()
+                                        );
                                         billingsDetailsDTO
                                                 .setBillType(chargeItem
                                                         .hasReason()
@@ -3856,6 +3861,11 @@ public class SharedHealthRecordsService {
                                 }
                                 templateData.setLaborAndDeliveryDetails(
                                         laborAndDeliveryDetailsDTO);
+
+                                // Reporting Details
+                                ReportDetailsDTO reportDetailsDTO = new ReportDetailsDTO();
+                                reportDetailsDTO.setReportingDate(getExtensionValueString(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/reportingDate"));
+                                templateData.setReportDetails(reportDetailsDTO);
 
                                 // Postnatal details
                                 PostnatalDetailsDTO postnatalDetailsDTO = new PostnatalDetailsDTO();
@@ -4713,22 +4723,6 @@ public class SharedHealthRecordsService {
         }
 
         return immunizations;
-    }
-
-    public List<ChargeItem> getChargeItemsByEncounterId(String encounterId) throws Exception {
-        List<ChargeItem> chargeItems = new ArrayList<>();
-        var chargeItemsSearch = fhirClient.search().forResource(ChargeItem.class)
-                .where(ChargeItem.CONTEXT.hasAnyOfIds(encounterId));
-
-        Bundle chargeItemsBundle;
-        chargeItemsBundle = chargeItemsSearch.returnBundle(Bundle.class).execute();
-        if (chargeItemsBundle.hasEntry()) {
-            for (Bundle.BundleEntryComponent entryComponent : chargeItemsBundle.getEntry()) {
-                ChargeItem chargeItem = (ChargeItem) entryComponent.getResource();
-                chargeItems.add(chargeItem);
-            }
-        }
-        return chargeItems;
     }
 
     public DocumentReference getDocumentReferenceById(String id) throws Exception {
