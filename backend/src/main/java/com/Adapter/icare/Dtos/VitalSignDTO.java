@@ -5,8 +5,6 @@ import lombok.Setter;
 
 import java.util.Map;
 
-
-//TODO: We should standardize the vitals to use this DTO
 @Getter
 @Setter
 public class VitalSignDTO {

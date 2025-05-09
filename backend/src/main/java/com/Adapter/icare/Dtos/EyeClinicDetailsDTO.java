@@ -9,8 +9,8 @@ import lombok.Setter;
 public class EyeClinicDetailsDTO {
     private Boolean refracted;
     private Boolean spectaclesPrescribed;
-    private Boolean spectaclesDispensed;
-    private Boolean contactLensDispensed;
+    private Boolean spectacleDispensed;
+    private Boolean contactLenseDispensed;
     private Boolean prescribedWithLowVision;
     private Boolean isDispensedWithLowVisionDevice;
 }

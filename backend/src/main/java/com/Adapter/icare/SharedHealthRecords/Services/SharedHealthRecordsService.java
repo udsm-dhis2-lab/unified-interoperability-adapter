@@ -40,7 +40,9 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.Adapter.icare.SharedHealthRecords.Utilities.AllergyIntoleranceUtils.getAllergyTolerances;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemsByEncounterId;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.ChronicConditionsUtils.getConditionsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
@@ -48,6 +50,7 @@ import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatemen
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.medicationDispenseUtils.getMedicationDispensesById;
 import static com.Adapter.icare.Utils.CarePlanUtils.getCarePlansByCategory;
 import static com.Adapter.icare.Utils.DateUtils.stringToDateOrNull;
 
@@ -787,8 +790,7 @@ public class SharedHealthRecordsService {
                                                 encounter,
                                                 observationGroup.getIdElement()
                                                         .getIdPart());
-                                        if (!reviewOfOtherSystemsData
-                                                .isEmpty()) {
+                                        if (!reviewOfOtherSystemsData.isEmpty()) {
                                             for (Observation observation : reviewOfOtherSystemsData) {
                                                 ReviewOfOtherSystemsDTO data = new ReviewOfOtherSystemsDTO();
                                                 data.setCode(observation.hasCode()
@@ -1093,6 +1095,7 @@ public class SharedHealthRecordsService {
 
                                 // Allergies
                                 List<AllergyIntolerance> allergyIntolerances = getAllergyTolerances(
+                                        fhirClient,
                                         patient.getIdElement().getIdPart());
                                 List<AllergiesDTO> allergiesDTOS = new ArrayList<>();
                                 if (!allergyIntolerances.isEmpty()) {
@@ -1114,7 +1117,6 @@ public class SharedHealthRecordsService {
                                                             .getCoding()
                                                             .get(0)
                                                             .getCode()
-                                                            .toString()
                                                             : null);
                                             allergiesDTO.setCategory(
                                                     allergyIntolerance
@@ -1173,6 +1175,7 @@ public class SharedHealthRecordsService {
                                 // Chronic conditions
                                 List<ChronicConditionsDTO> chronicConditionsDTOS = new ArrayList<>();
                                 List<Condition> conditions = getConditionsByCategory(
+                                        fhirClient,
                                         encounter.getIdElement().getIdPart(),
                                         "chronic-condition");
                                 if (!conditions.isEmpty()) {
@@ -1343,6 +1346,7 @@ public class SharedHealthRecordsService {
                                 List<DiagnosisDetailsDTO> diagnosisDetailsDTOS = new ArrayList<>();
 
                                 List<Condition> conditionsList = getConditionsByCategory(
+                                        fhirClient,
                                         encounter.getIdElement().getIdPart(),
                                         "encounter-diagnosis");
                                 if (!conditionsList.isEmpty()) {
@@ -1424,12 +1428,20 @@ public class SharedHealthRecordsService {
                                                                 .getValue()
                                                                 : null);
 
-                                        List<Observation> daysSinceSymptomsData = getObservationsByObservationGroupId(
+//                                        List<Observation> daysSinceSymptomsData = getObservationsByObservationGroupId(
+//                                                fhirClient,
+//                                                "days-since-symptoms",
+//                                                encounter,
+//                                                observationGroup.getIdElement()
+//                                                        .getIdPart());
+
+                                        List<Observation> daysSinceSymptomsData = getObservationsByCategoryAndCode(
                                                 fhirClient,
-                                                "days-since-symptoms",
+                                                fhirContext,
                                                 encounter,
-                                                observationGroup.getIdElement()
-                                                        .getIdPart());
+                                                "days-since-symptoms",
+                                                null);
+
                                         if (!daysSinceSymptomsData.isEmpty()) {
                                             for (Observation observation : daysSinceSymptomsData) {
                                                 if (observation.hasValueQuantity()) {
@@ -1916,6 +1928,7 @@ public class SharedHealthRecordsService {
                                 // Medication details
                                 List<MedicationDetailsDTO> medicationDetailsDTOS = new ArrayList<>();
                                 List<MedicationDispense> medicationDispensesList = getMedicationDispensesById(
+                                        fhirClient,
                                         encounter.getIdElement().getIdPart());
 
                                 if (!medicationDispensesList.isEmpty()) {
@@ -2709,6 +2722,17 @@ public class SharedHealthRecordsService {
                                                         ? procedure.getCode()
                                                         .getText()
                                                         : null);
+
+                                        prophylAxisDetailsDTO.setType(
+                                                procedure
+                                                        .hasCode()
+                                                        && procedure.getCode()
+                                                        .hasText()
+                                                        ? procedure.getCode()
+                                                        .getText()
+                                                        : null
+                                        );
+
                                         prophylAxisDetailsDTO
                                                 .setName(procedure
                                                         .hasCode()
@@ -3089,6 +3113,7 @@ public class SharedHealthRecordsService {
                                 List<VaccinationDetailsDTO> vaccinationDetailsDTOS = getVaccinationDetails(
                                         encounter.getIdElement().getIdPart(),
                                         patient, null);
+
                                 templateData.setVaccinationDetails(
                                         vaccinationDetailsDTOS);
 
@@ -3478,8 +3503,8 @@ public class SharedHealthRecordsService {
 
                                     eyeClinicDetailsDTO.setRefracted(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-refracted"));
                                     eyeClinicDetailsDTO.setSpectaclesPrescribed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-spectaclesPrescribed"));
-                                    eyeClinicDetailsDTO.setSpectaclesDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-spectacleDispensed"));
-                                    eyeClinicDetailsDTO.setContactLensDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-contactLenseDispensed"));
+                                    eyeClinicDetailsDTO.setSpectacleDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-spectacleDispensed"));
+                                    eyeClinicDetailsDTO.setContactLenseDispensed(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-contactLenseDispensed"));
                                     eyeClinicDetailsDTO.setPrescribedWithLowVision(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-prescribedWithLowVision"));
                                     eyeClinicDetailsDTO.setIsDispensedWithLowVisionDevice(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/eye-isDispensedWithLowVisionDevice"));
                                 }
@@ -3675,6 +3700,7 @@ public class SharedHealthRecordsService {
                                 // Before birth complications
                                 List<CodeAndNameDTO> beforeBirthComplications = new ArrayList<>();
                                 List<Condition> beforeBirthComplicationConditions = getConditionsByCategory(
+                                        fhirClient,
                                         encounter.getIdElement().getIdPart(),
                                         "before-birth-complication");
                                 if (!beforeBirthComplicationConditions.isEmpty()) {
@@ -3717,6 +3743,7 @@ public class SharedHealthRecordsService {
                                 // Birth complications
                                 List<CodeAndNameDTO> birthComplications = new ArrayList<>();
                                 List<Condition> birthComplicationConditions = getConditionsByCategory(
+                                        fhirClient,
                                         encounter.getIdElement().getIdPart(),
                                         "birth-complication");
                                 if (!birthComplicationConditions.isEmpty()) {
@@ -4479,57 +4506,6 @@ public class SharedHealthRecordsService {
             e.printStackTrace();
         }
         return List.of();
-    }
-
-    public List<AllergyIntolerance> getAllergyTolerances(String patientId) throws Exception {
-        List<AllergyIntolerance> allergyIntolerances = new ArrayList<>();
-        var allergySearch = fhirClient.search().forResource(AllergyIntolerance.class)
-                .where(AllergyIntolerance.PATIENT.hasAnyOfIds(patientId));
-
-        Bundle observationBundle = new Bundle();
-        observationBundle = allergySearch.returnBundle(Bundle.class).execute();
-        if (observationBundle.hasEntry()) {
-            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
-                AllergyIntolerance allergyIntolerance = (AllergyIntolerance) entryComponent
-                        .getResource();
-                allergyIntolerances.add(allergyIntolerance);
-            }
-        }
-        return allergyIntolerances;
-    }
-
-    public List<Condition> getConditionsByCategory(String encounterId, String category) throws Exception {
-        List<Condition> conditions = new ArrayList<>();
-        var conditionSearch = fhirClient.search().forResource(Condition.class)
-                .where(Condition.ENCOUNTER.hasAnyOfIds(encounterId))
-                .where(Condition.CATEGORY.exactly().code(category));
-
-        Bundle observationBundle = new Bundle();
-        observationBundle = conditionSearch.returnBundle(Bundle.class).execute();
-        if (observationBundle.hasEntry()) {
-            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
-                Condition condition = (Condition) entryComponent.getResource();
-                conditions.add(condition);
-            }
-        }
-        return conditions;
-    }
-
-    public List<MedicationDispense> getMedicationDispensesById(String encounterId) throws Exception {
-        List<MedicationDispense> medicationDispenses = new ArrayList<>();
-        var medicationDispenseSearch = fhirClient.search().forResource(MedicationDispense.class)
-                .where(MedicationDispense.CONTEXT.hasAnyOfIds(encounterId));
-
-        Bundle observationBundle;
-        observationBundle = medicationDispenseSearch.returnBundle(Bundle.class).execute();
-        if (observationBundle.hasEntry()) {
-            for (Bundle.BundleEntryComponent entryComponent : observationBundle.getEntry()) {
-                MedicationDispense medicationDispense = (MedicationDispense) entryComponent
-                        .getResource();
-                medicationDispenses.add(medicationDispense);
-            }
-        }
-        return medicationDispenses;
     }
 
     public List<BiologicallyDerivedProduct> getBiologicallyDerivedProductByOrganizationId(String organizationId) {
