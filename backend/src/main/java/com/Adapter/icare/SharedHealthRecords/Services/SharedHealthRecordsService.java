@@ -40,7 +40,6 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemNestedExtensionValue;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemsByEncounterId;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
@@ -271,8 +270,8 @@ public class SharedHealthRecordsService {
                                 PatientDTO patientDTO = this.clientRegistryService
                                         .mapToPatientDTO(patient);
                                 List<Coverage> coverages = this.clientRegistryService
-                                        .getCoverages(patient.getIdElement()
-                                                .getIdPart());
+                                        .getCoveragesByPatientIdAndOrDependent(patient.getIdElement()
+                                                .getIdPart(), null);
                                 // TODO: Add payment details for patient
                                 // List<PaymentDetailsDTO> paymentDetailsDTOs = new
                                 // ArrayList<>();
@@ -310,6 +309,34 @@ public class SharedHealthRecordsService {
                                         ? organization.getIdElement()
                                         .getIdPart()
                                         : null;
+
+                                List<PaymentDetailsDTO> paymentDetailsDTOList = new ArrayList<>();
+                                var paymentDetailsCoverages = this.clientRegistryService
+                                        .getCoveragesByPatientIdAndOrDependent(patient.getIdElement()
+                                                .getIdPart(), "demographicPayment");
+
+                                for(Coverage coverage: paymentDetailsCoverages){
+                                    PaymentDetailsDTO paymentDetailsDTO = new PaymentDetailsDTO();
+
+                                    paymentDetailsDTO.setName(coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasName() ? coverage.getClass_().get(0).getName() : null);
+
+                                    paymentDetailsDTO.setType(coverage.hasType() && coverage.getType().hasCoding() && !coverage.getType().getCoding().isEmpty() ? coverage.getType().getCoding().get(0).getCode() : null);
+
+                                    paymentDetailsDTO.setShortName(
+                                            coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasValue() ? coverage.getClass_().get(0).getValue() : null
+                                    );
+                                    paymentDetailsDTO.setInsuranceId(coverage.hasSubscriberId() ? coverage.getSubscriberId() : null);
+
+                                    paymentDetailsDTO.setInsuranceCode(coverage.hasPayor() && !coverage.getPayor().isEmpty() && coverage.getPayor().get(0).hasIdentifier() && coverage.getPayor().get(0).getIdentifier().hasValue() ? coverage.getPayor().get(0).getIdentifier().getValue() : null);
+
+                                    paymentDetailsDTO.setPolicyNumber(getNestedExtensionValueString(coverage, "http://fhir.moh.go.tz/fhir/StructureDefinition/coverage-extension", "policyNumber"));
+                                    paymentDetailsDTO.setGroupNumber(getNestedExtensionValueString(coverage, "http://fhir.moh.go.tz/fhir/StructureDefinition/coverage-extension", "groupNumber"));
+
+                                    paymentDetailsDTOList.add(paymentDetailsDTO);
+                                }
+
+                                patientDTO.setPaymentDetails(paymentDetailsDTOList);
+
                                 templateData.setDemographicDetails(patientDTO.toMap());
                                 templateData.setPaymentDetails(this
                                         .getPaymentDetailsViaCoverage(patient));
@@ -3074,8 +3101,6 @@ public class SharedHealthRecordsService {
                                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     for (ChargeItem chargeItem : chargedItems) {
                                         // TODO: Add billingID
-                                        // TODO: Add insuranceCode
-                                        // TODO: Add insuranceName
 
                                         BillingsDetailsDTO billingsDetailsDTO = new BillingsDetailsDTO();
                                         billingsDetailsDTO.setWavedAmount(getNestedExtensionValueDecimal(chargeItem, "http://fhir.moh.go.tz/fhir/StructureDefinition/billing-details", "wavedAmount").toString()

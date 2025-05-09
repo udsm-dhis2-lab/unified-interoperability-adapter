@@ -201,7 +201,7 @@ public class ClientRegistryService {
                         PatientDTO patientDTO = mapToPatientDTO(patientData);
 
                         // Get coverages
-                        List<Coverage> coverages = getCoverages(patientData.getIdElement().getIdPart());
+                        List<Coverage> coverages = getCoveragesByPatientIdAndOrDependent(patientData.getIdElement().getIdPart(), null);
                         List<PaymentDetailsDTO> paymentDetailsDTOs = new ArrayList<>();
                         if (coverages.size() > 0) {
                             paymentDetailsDTOs = coverages.stream().map(this::mapToPaymentDetails)
@@ -721,11 +721,14 @@ public class ClientRegistryService {
         return visitMainPaymentDetailsDTO;
     }
 
-    public List<Coverage> getCoverages(String patientId) throws Exception {
+    public List<Coverage> getCoveragesByPatientIdAndOrDependent(String patientId, String dependent) throws Exception {
         try {
             List<Coverage> coverages = new ArrayList<>();
             var coveragesSearch = fhirClient.search().forResource(Coverage.class)
                     .where(Coverage.BENEFICIARY.hasId(patientId));
+            if(dependent != null && !dependent.isBlank()){
+                    coveragesSearch.and(Coverage.DEPENDENT.matchesExactly().value(dependent));
+            }
             Bundle coverageBundle = coveragesSearch.sort().descending("_lastUpdated").returnBundle(Bundle.class)
                     .execute();
             if (coverageBundle.hasEntry()) {
