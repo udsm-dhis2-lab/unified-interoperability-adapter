@@ -38,7 +38,7 @@ public class VisitDetailsDTO {
         visitDetails.put("closedDate", this.getClosedDate());
         visitDetails.put("visitType", this.getVisitType());
         visitDetails.put("newThisYear", this.newThisYear);
-        visitDetails.put("isNew", this.isNew);
+        visitDetails.put("isNew", this.getIsNew());
         visitDetails.put("careServices", this.getCareServices().stream().map(careService -> careService.toMap()));
         visitDetails.put("attendedSpecialists", this.getAttendedSpecialist().stream().map(attendedSpecialist -> attendedSpecialist.toMap()));
         visitDetails.put("serviceComplaints", this.getServiceComplaints().toMap());

@@ -99,8 +99,11 @@ public class ObservationsUtils {
             var searchBuilder = fhirClient.search()
                     .forResource(Observation.class)
                     .where(Observation.ENCOUNTER.hasId(encounter.getIdElement().getIdPart()))
-                    .and(Observation.CATEGORY.exactly().code(categoryCode))
-                    .and(Observation.CODE.exactly().code(observationCode));
+                    .and(Observation.CATEGORY.exactly().code(categoryCode));
+            if(observationCode != null && !observationCode.isBlank()){
+                    searchBuilder.and(Observation.CODE.exactly().code(observationCode));
+            }
+
 
             searchBuilder = searchBuilder.sort(new SortSpec(Observation.DATE.getParamName())
                     .setOrder(SortOrderEnum.DESC));
