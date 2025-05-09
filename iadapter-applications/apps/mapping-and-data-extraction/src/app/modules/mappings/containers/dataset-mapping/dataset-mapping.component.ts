@@ -739,7 +739,7 @@ export class DatasetMappingComponent implements OnInit {
   getFlatTablesFromDatastore() {
     const msdList$ = this.dataSetManagementService.getFlatViewsTables(
       1,
-      20,
+      100,
       []
     );
     msdList$.subscribe({
