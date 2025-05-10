@@ -2772,12 +2772,13 @@ public class SharedHealthRecordsService {
                                         if (procedure.hasExtension()
                                                 && !procedure.getExtension()
                                                 .isEmpty()) {
+                                            Date reactionDate = getNestedExtensionValueDateTime(
+                                                    procedure,
+                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
+                                                    "reactionDate");
                                             prophylaxisReaction
-                                                    .setReactionDate(
-                                                            getNestedExtensionValueDateTime(
-                                                                    procedure,
-                                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/event-date",
-                                                                    "reactionDate"));
+                                                    .setReactionDate( reactionDate != null ?
+                                                            reactionDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter) : null);
                                             prophylaxisReaction.setReported(
                                                     getNestedExtensionValueBoolean(
                                                             procedure,
@@ -3767,13 +3768,16 @@ public class SharedHealthRecordsService {
                                         encounter, false, false);
                                 List<BirthDetailsDTO> birthDetailsDTOS = new ArrayList<>();
                                 if (!birthDetailsObservations.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     for (Observation observation : birthDetailsObservations) {
                                         BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
+                                        Date dateOfBith = getNestedExtensionValueDateTime(
+                                                observation,
+                                                "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details",
+                                                "dateOfBirth");
                                         birthDetailsDTO.setDateOfBirth(
-                                                getNestedExtensionValueDateTime(
-                                                        observation,
-                                                        "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details",
-                                                        "dateOfBirth"));
+                                                dateOfBith != null ? dateOfBith.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter) : null
+                                                );
                                         birthDetailsDTO.setExclusiveBreastFed(
                                                 getNestedExtensionValueBoolean(
                                                         observation,
@@ -4115,13 +4119,14 @@ public class SharedHealthRecordsService {
                                     List<BirthDetailsDTO> birthDetailsPostnatalDTOS = new ArrayList<>();
                                     if (!birthDetailsPostnatalObservations
                                             .isEmpty()) {
+                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                         for (Observation observation : birthDetailsPostnatalObservations) {
                                             BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
-                                            birthDetailsDTO.setDateOfBirth(
-                                                    getNestedExtensionValueDateTime(
-                                                            observation,
-                                                            "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details",
-                                                            "dateOfBirth"));
+                                            Date dateOfBith = getNestedExtensionValueDateTime(
+                                                    observation,
+                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/newborn-birth-details",
+                                                    "dateOfBirth");
+                                            birthDetailsDTO.setDateOfBirth(dateOfBith != null ? dateOfBith.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter) : null);
                                             birthDetailsDTO.setExclusiveBreastFed(
                                                     getNestedExtensionValueBoolean(
                                                             observation,
@@ -4764,13 +4769,14 @@ public class SharedHealthRecordsService {
 
                 // Handle Reactions
                 if (immunization.hasReaction() && !immunization.getReaction().isEmpty()) {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     Immunization.ImmunizationReactionComponent reactionComponent = immunization
                             .getReaction().get(0);
                     ReactionDTO reaction = new ReactionDTO();
 
                     reaction.setReactionDate(
                             reactionComponent.hasDate()
-                                    ? reactionComponent.getDate()
+                                    ? reactionComponent.getDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                     : null);
 
                     // TODO: Map notes from reaction details if required

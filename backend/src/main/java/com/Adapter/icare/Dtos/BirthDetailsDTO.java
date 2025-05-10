@@ -20,7 +20,7 @@ import java.util.Map;
 public class BirthDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date dateOfBirth;
+    private String dateOfBirth;
     private Float weightInKgs;
     private Boolean multipleBirth;
     private Boolean exclusiveBreastFed;
