@@ -12,7 +12,7 @@ import java.util.Date;
 public class RadiologyDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date testDate;
+    private String testDate;
     private String testTypeName;
     private String testTypeCode;
     private String testReport;

@@ -12,7 +12,7 @@ import java.util.Date;
 public class CausesOfDeathDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date dateOfDeath;
+    private String dateOfDeath;
     private String lineA;
     private String lineB;
     private String lineC;

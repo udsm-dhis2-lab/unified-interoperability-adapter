@@ -2187,12 +2187,13 @@ public class SharedHealthRecordsService {
                                         encounter.getIdElement().getIdPart(),
                                         "radiology-category");
                                 if (!diagnosticReportsList.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     for (DiagnosticReport diagnosticReport : diagnosticReportsList) {
                                         RadiologyDetailsDTO radiologyDetailsDTO = new RadiologyDetailsDTO();
                                         radiologyDetailsDTO.setTestDate(
                                                 diagnosticReport.hasIssued()
                                                         ? diagnosticReport
-                                                        .getIssued()
+                                                        .getIssued().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                                         : null);
                                         radiologyDetailsDTO.setTestTypeName(
                                                 diagnosticReport.hasCode()
@@ -2305,13 +2306,14 @@ public class SharedHealthRecordsService {
                                         "cause-of-death",
                                         encounter, false, true);
                                 if (!causeOfDeathObservations.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     Observation observation = causeOfDeathObservations
                                             .get(0);
                                     CausesOfDeathDetailsDTO causesOfDeathDetailsDTO = new CausesOfDeathDetailsDTO();
                                     causesOfDeathDetailsDTO.setDateOfDeath(
                                             observation.hasEffectiveDateTimeType()
                                                     ? observation.getEffectiveDateTimeType()
-                                                    .getValue()
+                                                    .getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                                     : null);
                                     causesOfDeathDetailsDTO.setLineA(
                                             observation.hasComponent()
