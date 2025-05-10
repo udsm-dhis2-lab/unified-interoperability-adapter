@@ -3190,92 +3190,10 @@ public class SharedHealthRecordsService {
                                         "family-planning");
                                 if (!carePlans.isEmpty()) {
                                     // TODO: Decide on what item should be used last
-                                    CarePlan carePlan = Iterables
-                                            .getLast(carePlans);
+                                    CarePlan carePlan = carePlans.get(0);
                                     familyPlanningDetailsDTO
                                             .setDate(carePlan
                                                     .hasPeriod() ? carePlan.getPeriod().getStart() : null);
-                                    List<LongTermMethodDTO> longTermMethodDTOS = new ArrayList<>();
-                                    List<ShortTermMethodDTO> shortTermMethodDTOS = new ArrayList<>();
-                                    if (carePlan.hasActivity() && !carePlan
-                                            .getActivity().isEmpty()) {
-                                        for (CarePlan.CarePlanActivityComponent activity : carePlan
-                                                .getActivity()) {
-                                            if (activity.hasDetail()
-                                                    && activity.getDetail()
-                                                    .hasCode()
-                                                    && activity.getDetail()
-                                                    .getCode()
-                                                    .hasCoding()
-                                                    && activity.getDetail()
-                                                    .getCode()
-                                                    .getCoding()
-                                                    .size() > 1) {
-                                                if (activity.getDetail()
-                                                        .getCode()
-                                                        .getCoding()
-                                                        .get(1)
-                                                        .getCode()
-                                                        .equals("long-term-method")) {
-                                                    LongTermMethodDTO longTermMethodDTO = new LongTermMethodDTO();
-                                                    longTermMethodDTO
-                                                            .setProvided(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .hasCode());
-                                                    longTermMethodDTO
-                                                            .setCode(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getCode());
-                                                    longTermMethodDTO
-                                                            .setType(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getDisplay());
-                                                    longTermMethodDTOS
-                                                            .add(longTermMethodDTO);
-                                                }
-                                                if (activity.getDetail()
-                                                        .getCode()
-                                                        .getCoding()
-                                                        .get(1)
-                                                        .getCode()
-                                                        .equals("short-term-method")) {
-                                                    ShortTermMethodDTO shortTermMethodDTO = new ShortTermMethodDTO();
-                                                    shortTermMethodDTO
-                                                            .setProvided(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .hasCode());
-                                                    shortTermMethodDTO
-                                                            .setCode(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getCode());
-                                                    shortTermMethodDTO
-                                                            .setType(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getDisplay());
-                                                    shortTermMethodDTOS
-                                                            .add(shortTermMethodDTO);
-                                                }
-                                            }
-                                        }
-                                    }
 
                                     familyPlanningDetailsDTO.setPositiveHivStatusBeforeService(getExtensionValueBoolean(carePlan, "http://fhir.moh.go.tz/fhir/StructureDefinition/fp-positiveHivStatusBeforeService"));
                                     familyPlanningDetailsDTO.setWasCounselled(getExtensionValueBoolean(carePlan, "http://fhir.moh.go.tz/fhir/StructureDefinition/fp-wasCounselled"));
@@ -3521,8 +3439,7 @@ public class SharedHealthRecordsService {
                                         "obstetrics", null);
                                 if (!deliveryProcedures.isEmpty()) {
                                     // TODO: Decide on what resource to be used here
-                                    Procedure deliveryProcedure = Iterables
-                                            .getLast(deliveryProcedures);
+                                    Procedure deliveryProcedure = deliveryProcedures.get(0);
                                     laborAndDeliveryDetailsDTO
                                             .setDate(deliveryProcedure
                                                     .hasPerformedDateTimeType()
@@ -3530,6 +3447,7 @@ public class SharedHealthRecordsService {
                                                     .getPerformedDateTimeType()
                                                     .getValue()
                                                     : null);
+
                                     Map<String, Object> deliveryMethod = new HashMap<>();
                                     if (deliveryProcedure.hasCode()
                                             && deliveryProcedure.getCode()
@@ -3553,44 +3471,13 @@ public class SharedHealthRecordsService {
                                                 .setDeliveryMethod(
                                                         deliveryMethod);
                                     }
+                                    var timeBetweenLaborPainAndDeliveryInHrs =  getExtensionValueDecimal(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs");
 
-                                    laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(getExtensionValueInt(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs"));
+                                    laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(timeBetweenLaborPainAndDeliveryInHrs != null ? timeBetweenLaborPainAndDeliveryInHrs.getValueAsInteger() : null);
 
-                                    if (deliveryProcedure.hasExtension()
-                                            && !deliveryProcedure
-                                            .getExtension()
-                                            .isEmpty()) {
-                                        for (Extension extension : deliveryProcedure
-                                                .getExtension()) {
-                                            if (extension.hasUrl()
-                                                    && extension.getUrl()
-                                                    .equals(
-                                                            "http://fhir.moh.go.tz/fhir/StructureDefinition/placeOfBirth")) {
-                                                laborAndDeliveryDetailsDTO
-                                                        .setPlaceOfBirth(
-                                                                extension.hasValue()
-                                                                        && extension.getValue() instanceof StringType
-                                                                        ? BirthPlace.fromString(((StringType) extension
-                                                                        .getValue())
-                                                                        .getValue())
-                                                                        : null);
-                                            }
+                                    laborAndDeliveryDetailsDTO.setPlaceOfBirth(BirthPlace.fromString(getExtensionValueString(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/placeOfBirth")));
 
-                                            if (extension.hasUrl()
-                                                    && extension.getUrl()
-                                                    .equals(
-                                                            "http://fhir.moh.go.tz/fhir/StructureDefinition/isAttendantSkilled")) {
-                                                laborAndDeliveryDetailsDTO
-                                                        .setIsAttendantSkilled(
-                                                                extension.hasValue()
-                                                                        && extension.getValue() instanceof BooleanType
-                                                                        ? ((BooleanType) extension
-                                                                        .getValue())
-                                                                        .getValue()
-                                                                        : null);
-                                            }
-                                        }
-                                    }
+                                    laborAndDeliveryDetailsDTO.setIsAttendantSkilled(getExtensionValueBoolean(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/isAttendantSkilled"));
                                 }
 
                                 // Infant and family planning counseling
@@ -3603,8 +3490,6 @@ public class SharedHealthRecordsService {
                                 if (!familyPlanningCounselings.isEmpty()) {
                                     Observation familyPlanningCounseling = familyPlanningCounselings
                                             .get(0);
-
-                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/infant-feeding-counseling"));
 
                                     if (familyPlanningCounseling != null
                                             && familyPlanningCounseling
@@ -3623,6 +3508,8 @@ public class SharedHealthRecordsService {
                                         laborAndDeliveryDetailsDTO.setMotherOrigin(PlaceOfOrigin.fromString(
                                                 getExtensionValueString(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-mother-origin")
                                         ));
+
+                                        laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/infant-feeding-counseling"));
 
                                         laborAndDeliveryDetailsDTO.setHasComeWithSpouse(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-spouse-accompaniment"));
 
@@ -3701,7 +3588,9 @@ public class SharedHealthRecordsService {
                                                         .hasCoding()
                                                         && !condition.getCode()
                                                         .getCoding()
-                                                        .isEmpty()
+                                                        .isEmpty() && condition.getCode()
+                                                        .getCoding()
+                                                        .get(0).hasDisplay()
                                                         ? condition.getCode()
                                                         .getCoding()
                                                         .get(0)
@@ -3722,7 +3611,7 @@ public class SharedHealthRecordsService {
                                         encounter.getIdElement().getIdPart(),
                                         "birth-complication");
                                 if (!birthComplicationConditions.isEmpty()) {
-                                    for (Condition condition : beforeBirthComplicationConditions) {
+                                    for (Condition condition : birthComplicationConditions) {
                                         CodeAndNameDTO birthComplication = new CodeAndNameDTO();
                                         birthComplication.setCode(condition
                                                 .hasCode()
