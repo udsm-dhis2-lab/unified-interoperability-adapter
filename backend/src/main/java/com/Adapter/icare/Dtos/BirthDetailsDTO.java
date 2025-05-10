@@ -20,7 +20,7 @@ import java.util.Map;
 public class BirthDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date dateOfBirth;
+    private String dateOfBirth;
     private Float weightInKgs;
     private Boolean multipleBirth;
     private Boolean exclusiveBreastFed;
@@ -37,7 +37,8 @@ public class BirthDetailsDTO {
     private InfectionsDTO infections;
 
     @JsonDeserialize(using = OutcomeDetailsDeserializer.class)
-    private ParentOutcomeDetailsDTO outcomeDetails;
+    private ParentBDOutcomeDetailsDTO outcomeDetails;
+
     private CodeAndNameDTO motherHivStatus;
     private Boolean providedWithARV;
     private Boolean referred;

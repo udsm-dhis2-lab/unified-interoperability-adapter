@@ -11,5 +11,5 @@ import java.util.Date;
 @Setter
 public class ReportDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date reportingDate;
+    private String reportingDate;
 }

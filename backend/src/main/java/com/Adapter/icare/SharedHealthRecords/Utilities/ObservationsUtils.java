@@ -90,7 +90,7 @@ public class ObservationsUtils {
             String categoryCode,
             String observationCode) {
 
-        if (fhirClient == null || ctx == null || categoryCode == null || categoryCode.isBlank() || observationCode == null || observationCode.isBlank()) {
+        if (fhirClient == null || ctx == null || categoryCode == null || categoryCode.isBlank()) {
             System.err.println("FHIR client, context, category code, and observation code must be provided.");
             return List.of();
         }
@@ -99,8 +99,12 @@ public class ObservationsUtils {
             var searchBuilder = fhirClient.search()
                     .forResource(Observation.class)
                     .where(Observation.ENCOUNTER.hasId(encounter.getIdElement().getIdPart()))
-                    .and(Observation.CATEGORY.exactly().code(categoryCode))
-                    .and(Observation.CODE.exactly().code(observationCode));
+                    .and(Observation.CATEGORY.exactly().code(categoryCode));
+
+            if(observationCode != null && !observationCode.isBlank()){
+                    searchBuilder.and(Observation.CODE.exactly().code(observationCode));
+            }
+
 
             searchBuilder = searchBuilder.sort(new SortSpec(Observation.DATE.getParamName())
                     .setOrder(SortOrderEnum.DESC));

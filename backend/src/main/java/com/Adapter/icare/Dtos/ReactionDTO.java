@@ -15,7 +15,7 @@ import java.util.Map;
 public class ReactionDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date reactionDate;
+    private String reactionDate;
     private String notes;
     private Boolean reported;
 

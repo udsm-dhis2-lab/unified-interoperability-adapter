@@ -14,12 +14,12 @@ import java.util.Map;
 public class AntenatalCareDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date date;
+    private String date;
     private Integer pregnancyAgeInWeeks;
     private Boolean positiveHivStatusBeforeService;
     private Boolean referredToCTC;
     private Integer gravidity;
-    private Map<String,Object> hivDetails;
+    private HivDiseaseStatusDTO hivDetails;
     private DiseaseStatusDTO syphilisDetails;
     private SpouseDetailsDTO spouseDetails;
     private List<Map<String,Object>> otherSpouseDetails;
