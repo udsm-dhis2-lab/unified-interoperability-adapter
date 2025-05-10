@@ -6,8 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ParentOutcomeDetailsDTO {
-    private Boolean referredToHospital;
-    private Boolean referredToHealthFacility;
+public class LDBDOutcomeDetailsDTO extends ParentBDOutcomeDetailsDTO {
+    private Boolean isAlive;
     private Boolean referredToPNC;
 }

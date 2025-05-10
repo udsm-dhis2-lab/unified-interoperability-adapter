@@ -5,7 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PNCBirthOutcomeDetailsDTO extends ParentOutcomeDetailsDTO {
+public class PNCBirthBDOutcomeDetailsDTO extends ParentBDOutcomeDetailsDTO {
     private Boolean dischargedHome;
     private Boolean referredToNCU;
+
 }

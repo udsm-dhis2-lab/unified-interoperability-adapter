@@ -37,7 +37,8 @@ public class BirthDetailsDTO {
     private InfectionsDTO infections;
 
     @JsonDeserialize(using = OutcomeDetailsDeserializer.class)
-    private ParentOutcomeDetailsDTO outcomeDetails;
+    private ParentBDOutcomeDetailsDTO outcomeDetails;
+
     private CodeAndNameDTO motherHivStatus;
     private Boolean providedWithARV;
     private Boolean referred;

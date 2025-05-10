@@ -23,9 +23,6 @@ public class OutcomeDetailsDTO {
     private Boolean investigationConducted;
     private Boolean quarantined;
     private Boolean referred;
-    private Boolean referredToPNC;
-    private Boolean referredToHospital;
-    private Boolean referredTohealthFacility;
 
     private DischargedLocation dischargedLocation;
 }
