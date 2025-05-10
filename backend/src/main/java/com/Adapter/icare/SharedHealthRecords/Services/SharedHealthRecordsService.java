@@ -3127,7 +3127,8 @@ public class SharedHealthRecordsService {
                                         // TODO: Add billingID
 
                                         BillingsDetailsDTO billingsDetailsDTO = new BillingsDetailsDTO();
-                                        billingsDetailsDTO.setWavedAmount(getNestedExtensionValueDecimal(chargeItem, "http://fhir.moh.go.tz/fhir/StructureDefinition/billing-details", "wavedAmount").toString()
+                                        Integer wavedAmount = getNestedExtensionValueDecimal(chargeItem, "http://fhir.moh.go.tz/fhir/StructureDefinition/billing-details", "wavedAmount");
+                                        billingsDetailsDTO.setWavedAmount( wavedAmount != null ? wavedAmount.toString() : null
                                         );
                                         billingsDetailsDTO.setInsuranceCode(getNestedExtensionValueString(chargeItem, "http://fhir.moh.go.tz/fhir/StructureDefinition/billing-details", "insuranceCode"));
 

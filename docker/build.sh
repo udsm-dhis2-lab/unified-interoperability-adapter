@@ -10,7 +10,6 @@ BUILD_DIR=".github/apps-builds"
 # Directory where you want to extract the builds
 EXTRACT_DIR="ui-apps"
 
-# Check if the build directory exists
 if [ ! -d "$BUILD_DIR" ]; then
     echo "Build directory $BUILD_DIR not found. Please ensure that the zipped files are present."
     exit 1
