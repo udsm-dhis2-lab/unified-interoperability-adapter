@@ -2480,13 +2480,14 @@ public class SharedHealthRecordsService {
                                         "anc-details",
                                         encounter, false, true);
                                 if (!antenatalCareObservations.isEmpty()) {
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     Observation observation = antenatalCareObservations
                                             .get(0);
                                     AntenatalCareDetailsDTO antenatalCareDetailsDTO = new AntenatalCareDetailsDTO();
                                     antenatalCareDetailsDTO.setDate(observation
                                             .hasEffectiveDateTimeType()
                                             ? observation.getEffectiveDateTimeType()
-                                            .getValue()
+                                            .getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                             : null);
                                     antenatalCareDetailsDTO
                                             .setPregnancyAgeInWeeks(
@@ -2592,16 +2593,14 @@ public class SharedHealthRecordsService {
 
                                     antenatalCareDetailsDTO.setProphylaxis(ancProphylaxisDetailsDTO);
 
-                                    Map<String, Object> hivDetails = new HashMap<>();
-                                    hivDetails.put("status",
-                                            getComponentValueCodeableConceptDisplay(
+                                    HivDiseaseStatusDTO hivDetails = new HivDiseaseStatusDTO();
+                                    hivDetails.setStatus(STATUS.fromString(getComponentValueCodeableConceptDisplay(
+                                                    observation,
+                                                    9)));
+                                    hivDetails.setCode(getComponentValueCodeableConceptCode(
                                                     observation,
                                                     9));
-                                    hivDetails.put("code",
-                                            getComponentValueCodeableConceptCode(
-                                                    observation,
-                                                    9));
-                                    hivDetails.put("hivTestNumber", getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-hivDetails-hivTestNumber"));
+                                    hivDetails.setHivTestNumber(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/anc-hivDetails-hivTestNumber"));
                                     antenatalCareDetailsDTO
                                             .setHivDetails(hivDetails);
 
@@ -2633,7 +2632,7 @@ public class SharedHealthRecordsService {
 
                                     SpouseDetailsDTO spouseDetails = new SpouseDetailsDTO();
 
-                                    DiseaseStatusDTO spouseHivDetails = new DiseaseStatusDTO();
+                                    HivDiseaseStatusDTO spouseHivDetails = new HivDiseaseStatusDTO();
                                     spouseHivDetails.setCode(
                                             getComponentValueCodeableConceptCode(
                                                     observation,

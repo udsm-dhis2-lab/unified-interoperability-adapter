@@ -6,8 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class DiseaseStatusDTO {
+public class HivDiseaseStatusDTO{
     private STATUS status;
     private String code;
-    private Boolean providedWithTreatment;
+    private Integer hivTestNumber;
 }
