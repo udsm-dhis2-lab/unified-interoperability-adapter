@@ -1,6 +1,7 @@
 package com.Adapter.icare.SharedHealthRecords.Services;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
 import ca.uhn.fhir.rest.api.SortSpec;
@@ -44,6 +45,7 @@ import static com.Adapter.icare.SharedHealthRecords.Utilities.AllergyIntolerance
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemsByEncounterId;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ChronicConditionsUtils.getConditionsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.getComponentValueDateTime;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
@@ -2217,9 +2219,9 @@ public class SharedHealthRecordsService {
                                                         .getConclusion()
                                                         : null);
 
-                                        radiologyDetailsDTO.setBodySite(
-                                                getExtensionValueString(diagnosticReport, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiology-bodySites")
-                                        );
+                                       radiologyDetailsDTO.setBodySite(
+                                               getExtensionValueString(diagnosticReport, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiology-bodySites")
+                                       );
                                         String mediaReferenceId = diagnosticReport
                                                 .hasMedia()
                                                 ? diagnosticReport
@@ -4128,10 +4130,9 @@ public class SharedHealthRecordsService {
                                             getComponentValueCodeableConceptCode(
                                                     admissionDetail,
                                                     1));
+                                    Date date = getComponentValueDateTime(admissionDetail, 2);
                                     admissionDetailsDTO.setDischargedOn(
-                                            getComponentValueDateTime(
-                                                    admissionDetail,
-                                                    2).toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
+                                                    date != null ? date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter) : null);
                                     admissionDetailsDTO.setDischargeStatus(
                                             getComponentValueString(
                                                     admissionDetail,
@@ -4558,6 +4559,8 @@ public class SharedHealthRecordsService {
                     .search()
                     .forResource(Immunization.class)
                     .where(Immunization.PATIENT.hasId(patient.getIdElement().getIdPart()))
+                    .sort(new SortSpec(Constants.PARAM_LASTUPDATED)
+                    .setOrder(SortOrderEnum.DESC))
                     .returnBundle(Bundle.class)
                     .execute();
 
@@ -4631,8 +4634,14 @@ public class SharedHealthRecordsService {
                                 : null);
                 vaccinationDetailsDTO.setCode(
                         immunization.hasVaccineCode()
-                                ? immunization.getVaccineCode().getText()
-                                : null);
+                                && immunization.getVaccineCode().hasCoding() && !immunization.getVaccineCode().getCoding().isEmpty() && immunization.getVaccineCode().getCoding().get(0).hasCode() ?
+                                immunization.getVaccineCode().getCoding().get(0).getCode() : null);
+
+                vaccinationDetailsDTO.setName(
+                        immunization.hasVaccineCode()
+                                && immunization.getVaccineCode().hasCoding() && !immunization.getVaccineCode().getCoding().isEmpty() && immunization.getVaccineCode().getCoding().get(0).hasDisplay() ?
+                                immunization.getVaccineCode().getCoding().get(0).getDisplay() : null);
+
                 vaccinationDetailsDTO.setStatus(
                         immunization.hasStatus()
                                 ? immunization.getStatus().getDisplay()
@@ -4642,9 +4651,10 @@ public class SharedHealthRecordsService {
                                 ? immunization.getDoseQuantity().getValue().intValue()
                                 : null);
 
-                vaccinationDetailsDTO.setType(immunization.hasVaccineCode()
-                        ? immunization.getVaccineCode().getText()
-                        : null);
+                vaccinationDetailsDTO.setType(
+                        immunization.hasVaccineCode() && immunization.getVaccineCode().hasText()
+                                 ?
+                                immunization.getVaccineCode().getText() : null);
 
                 if (immunization.hasNote() && !immunization.getNote().isEmpty()) {
                     vaccinationDetailsDTO.setNotes(immunization.getNote().get(0).getText());
