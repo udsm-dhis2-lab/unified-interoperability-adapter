@@ -4733,13 +4733,14 @@ public class SharedHealthRecordsService {
                 patient, observationReference);
 
         if (!vaccinationDetails.isEmpty()) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             for (Immunization immunization : vaccinationDetails) {
                 VaccinationDetailsDTO vaccinationDetailsDTO = new VaccinationDetailsDTO();
 
                 // Map Immunization data to DTO
                 vaccinationDetailsDTO.setDate(
                         immunization.hasOccurrenceDateTimeType()
-                                ? immunization.getOccurrenceDateTimeType().getValue()
+                                ? immunization.getOccurrenceDateTimeType().getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
                                 : null);
                 vaccinationDetailsDTO.setCode(
                         immunization.hasVaccineCode()
@@ -4769,7 +4770,6 @@ public class SharedHealthRecordsService {
 
                 // Handle Reactions
                 if (immunization.hasReaction() && !immunization.getReaction().isEmpty()) {
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                     Immunization.ImmunizationReactionComponent reactionComponent = immunization
                             .getReaction().get(0);
                     ReactionDTO reaction = new ReactionDTO();

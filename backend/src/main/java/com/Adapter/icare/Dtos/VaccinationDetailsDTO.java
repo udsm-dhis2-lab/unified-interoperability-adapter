@@ -12,7 +12,7 @@ import java.util.Date;
 public class VaccinationDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date date;
+    private String date;
     private String code;
     private String type;
     private String name;
@@ -20,6 +20,5 @@ public class VaccinationDetailsDTO {
     private String status;
     private String notes;
     private Integer dosage;
-    private Integer dose;
     private ReactionDTO reaction;
 }
