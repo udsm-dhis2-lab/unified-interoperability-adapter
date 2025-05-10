@@ -1134,16 +1134,10 @@ public class SharedHealthRecordsService {
                                                             .hasCode()
                                                             && allergyIntolerance
                                                             .getCode()
-                                                            .hasCoding()
-                                                            && !allergyIntolerance
-                                                            .getCode()
-                                                            .getCoding()
-                                                            .isEmpty()
+                                                            .hasText()
                                                             ? allergyIntolerance
                                                             .getCode()
-                                                            .getCoding()
-                                                            .get(0)
-                                                            .getDisplay()
+                                                            .getText()
                                                             : null);
                                             allergiesDTO.setCriticality(
                                                     allergyIntolerance
@@ -4770,11 +4764,7 @@ public class SharedHealthRecordsService {
                                     ? reactionComponent.getDate()
                                     : null);
 
-                    // TODO: Map notes from reaction details if required
-                     if (reactionComponent.hasDetail() &&
-                     reactionComponent.getDetail().hasDisplay()) {
-                      reaction.setNotes(reactionComponent.getDetail().getDisplay());
-                    }
+                     reaction.setNotes(immunization.hasNote() && !immunization.getNote().isEmpty() ? immunization.getNote().get(0).getText() : null);
 
                     reaction.setReported(
                             reactionComponent.hasReported()
