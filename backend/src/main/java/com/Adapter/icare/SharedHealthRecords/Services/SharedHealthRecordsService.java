@@ -1192,7 +1192,7 @@ public class SharedHealthRecordsService {
                                                         .get(0)
                                                         .getCode()
                                                         : null);
-                                        chronicConditionsDTO.setName(condition
+                                        chronicConditionsDTO.setCategory(condition
                                                 .hasCategory()
                                                 && !condition.getCategory()
                                                 .isEmpty()
@@ -1438,12 +1438,12 @@ public class SharedHealthRecordsService {
 
                                         if (!daysSinceSymptomsData.isEmpty()) {
                                             for (Observation observation : daysSinceSymptomsData) {
-                                                if (observation.hasValueQuantity()) {
+                                                if (observation.hasValueStringType()) {
                                                     investigationDetailsDTO
                                                             .setDaysSinceSymptoms(
-                                                                    observation.getValueQuantity()
-                                                                            .getValue()
-                                                                            .intValueExact());
+                                                                    Integer.valueOf(observation.getValueStringType()
+                                                                            .getValue())
+                                                                            );
                                                     break;
                                                 }
                                             }
@@ -2216,7 +2216,10 @@ public class SharedHealthRecordsService {
                                                         ? diagnosticReport
                                                         .getConclusion()
                                                         : null);
-                                        // TODO: Add testReport and bodySite
+
+                                        radiologyDetailsDTO.setBodySite(
+                                                getExtensionValueString(diagnosticReport, "http://fhir.moh.go.tz/fhir/StructureDefinition/radiology-bodySites")
+                                        );
                                         String mediaReferenceId = diagnosticReport
                                                 .hasMedia()
                                                 ? diagnosticReport
