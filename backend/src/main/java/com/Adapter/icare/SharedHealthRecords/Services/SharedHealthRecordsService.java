@@ -3189,92 +3189,10 @@ public class SharedHealthRecordsService {
                                         "family-planning");
                                 if (!carePlans.isEmpty()) {
                                     // TODO: Decide on what item should be used last
-                                    CarePlan carePlan = Iterables
-                                            .getLast(carePlans);
+                                    CarePlan carePlan = carePlans.get(0);
                                     familyPlanningDetailsDTO
                                             .setDate(carePlan
                                                     .hasPeriod() ? carePlan.getPeriod().getStart() : null);
-                                    List<LongTermMethodDTO> longTermMethodDTOS = new ArrayList<>();
-                                    List<ShortTermMethodDTO> shortTermMethodDTOS = new ArrayList<>();
-                                    if (carePlan.hasActivity() && !carePlan
-                                            .getActivity().isEmpty()) {
-                                        for (CarePlan.CarePlanActivityComponent activity : carePlan
-                                                .getActivity()) {
-                                            if (activity.hasDetail()
-                                                    && activity.getDetail()
-                                                    .hasCode()
-                                                    && activity.getDetail()
-                                                    .getCode()
-                                                    .hasCoding()
-                                                    && activity.getDetail()
-                                                    .getCode()
-                                                    .getCoding()
-                                                    .size() > 1) {
-                                                if (activity.getDetail()
-                                                        .getCode()
-                                                        .getCoding()
-                                                        .get(1)
-                                                        .getCode()
-                                                        .equals("long-term-method")) {
-                                                    LongTermMethodDTO longTermMethodDTO = new LongTermMethodDTO();
-                                                    longTermMethodDTO
-                                                            .setProvided(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .hasCode());
-                                                    longTermMethodDTO
-                                                            .setCode(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getCode());
-                                                    longTermMethodDTO
-                                                            .setType(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getDisplay());
-                                                    longTermMethodDTOS
-                                                            .add(longTermMethodDTO);
-                                                }
-                                                if (activity.getDetail()
-                                                        .getCode()
-                                                        .getCoding()
-                                                        .get(1)
-                                                        .getCode()
-                                                        .equals("short-term-method")) {
-                                                    ShortTermMethodDTO shortTermMethodDTO = new ShortTermMethodDTO();
-                                                    shortTermMethodDTO
-                                                            .setProvided(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .hasCode());
-                                                    shortTermMethodDTO
-                                                            .setCode(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getCode());
-                                                    shortTermMethodDTO
-                                                            .setType(activity
-                                                                    .getDetail()
-                                                                    .getCode()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getDisplay());
-                                                    shortTermMethodDTOS
-                                                            .add(shortTermMethodDTO);
-                                                }
-                                            }
-                                        }
-                                    }
 
                                     familyPlanningDetailsDTO.setPositiveHivStatusBeforeService(getExtensionValueBoolean(carePlan, "http://fhir.moh.go.tz/fhir/StructureDefinition/fp-positiveHivStatusBeforeService"));
                                     familyPlanningDetailsDTO.setWasCounselled(getExtensionValueBoolean(carePlan, "http://fhir.moh.go.tz/fhir/StructureDefinition/fp-wasCounselled"));
@@ -3669,7 +3587,9 @@ public class SharedHealthRecordsService {
                                                         .hasCoding()
                                                         && !condition.getCode()
                                                         .getCoding()
-                                                        .isEmpty()
+                                                        .isEmpty() && condition.getCode()
+                                                        .getCoding()
+                                                        .get(0).hasDisplay()
                                                         ? condition.getCode()
                                                         .getCoding()
                                                         .get(0)
@@ -3690,7 +3610,7 @@ public class SharedHealthRecordsService {
                                         encounter.getIdElement().getIdPart(),
                                         "birth-complication");
                                 if (!birthComplicationConditions.isEmpty()) {
-                                    for (Condition condition : beforeBirthComplicationConditions) {
+                                    for (Condition condition : birthComplicationConditions) {
                                         CodeAndNameDTO birthComplication = new CodeAndNameDTO();
                                         birthComplication.setCode(condition
                                                 .hasCode()
