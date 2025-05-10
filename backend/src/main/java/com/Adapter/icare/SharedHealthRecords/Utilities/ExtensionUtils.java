@@ -128,6 +128,18 @@ public class ExtensionUtils {
         return 0;
     }
 
+    public static DecimalType getExtensionValueDecimal(DomainResource resource, String url) {
+        if (resource != null && resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof DecimalType) {
+                    return ((DecimalType) parentExtension.getValue());
+                }
+            }
+        }
+        return null;
+    }
+
     public static BigDecimal getResourceNestedExtensionQuantityValue(Procedure procedure, String parentUrl,
                                                                      String childUrl) {
         if (procedure != null && procedure.hasExtension()) {

@@ -3520,8 +3520,7 @@ public class SharedHealthRecordsService {
                                         "obstetrics", null);
                                 if (!deliveryProcedures.isEmpty()) {
                                     // TODO: Decide on what resource to be used here
-                                    Procedure deliveryProcedure = Iterables
-                                            .getLast(deliveryProcedures);
+                                    Procedure deliveryProcedure = deliveryProcedures.get(0);
                                     laborAndDeliveryDetailsDTO
                                             .setDate(deliveryProcedure
                                                     .hasPerformedDateTimeType()
@@ -3529,6 +3528,7 @@ public class SharedHealthRecordsService {
                                                     .getPerformedDateTimeType()
                                                     .getValue()
                                                     : null);
+
                                     Map<String, Object> deliveryMethod = new HashMap<>();
                                     if (deliveryProcedure.hasCode()
                                             && deliveryProcedure.getCode()
@@ -3552,44 +3552,13 @@ public class SharedHealthRecordsService {
                                                 .setDeliveryMethod(
                                                         deliveryMethod);
                                     }
+                                    var timeBetweenLaborPainAndDeliveryInHrs =  getExtensionValueDecimal(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs");
 
-                                    laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(getExtensionValueInt(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/timeBetweenLaborPainAndDeliveryInHrs"));
+                                    laborAndDeliveryDetailsDTO.setTimeBetweenLaborPainAndDeliveryInHrs(timeBetweenLaborPainAndDeliveryInHrs != null ? timeBetweenLaborPainAndDeliveryInHrs.getValueAsInteger() : null);
 
-                                    if (deliveryProcedure.hasExtension()
-                                            && !deliveryProcedure
-                                            .getExtension()
-                                            .isEmpty()) {
-                                        for (Extension extension : deliveryProcedure
-                                                .getExtension()) {
-                                            if (extension.hasUrl()
-                                                    && extension.getUrl()
-                                                    .equals(
-                                                            "http://fhir.moh.go.tz/fhir/StructureDefinition/placeOfBirth")) {
-                                                laborAndDeliveryDetailsDTO
-                                                        .setPlaceOfBirth(
-                                                                extension.hasValue()
-                                                                        && extension.getValue() instanceof StringType
-                                                                        ? BirthPlace.fromString(((StringType) extension
-                                                                        .getValue())
-                                                                        .getValue())
-                                                                        : null);
-                                            }
+                                    laborAndDeliveryDetailsDTO.setPlaceOfBirth(BirthPlace.fromString(getExtensionValueString(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/placeOfBirth")));
 
-                                            if (extension.hasUrl()
-                                                    && extension.getUrl()
-                                                    .equals(
-                                                            "http://fhir.moh.go.tz/fhir/StructureDefinition/isAttendantSkilled")) {
-                                                laborAndDeliveryDetailsDTO
-                                                        .setIsAttendantSkilled(
-                                                                extension.hasValue()
-                                                                        && extension.getValue() instanceof BooleanType
-                                                                        ? ((BooleanType) extension
-                                                                        .getValue())
-                                                                        .getValue()
-                                                                        : null);
-                                            }
-                                        }
-                                    }
+                                    laborAndDeliveryDetailsDTO.setIsAttendantSkilled(getExtensionValueBoolean(deliveryProcedure, "http://fhir.moh.go.tz/fhir/StructureDefinition/isAttendantSkilled"));
                                 }
 
                                 // Infant and family planning counseling
@@ -3602,8 +3571,6 @@ public class SharedHealthRecordsService {
                                 if (!familyPlanningCounselings.isEmpty()) {
                                     Observation familyPlanningCounseling = familyPlanningCounselings
                                             .get(0);
-
-                                    laborAndDeliveryDetailsDTO.setProvidedWithFamilyPlanningCounseling(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/infant-feeding-counseling"));
 
                                     if (familyPlanningCounseling != null
                                             && familyPlanningCounseling
@@ -3622,6 +3589,8 @@ public class SharedHealthRecordsService {
                                         laborAndDeliveryDetailsDTO.setMotherOrigin(PlaceOfOrigin.fromString(
                                                 getExtensionValueString(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-mother-origin")
                                         ));
+
+                                        laborAndDeliveryDetailsDTO.setProvidedWithInfantFeedingCounseling(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/infant-feeding-counseling"));
 
                                         laborAndDeliveryDetailsDTO.setHasComeWithSpouse(getExtensionValueBoolean(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-spouse-accompaniment"));
 
