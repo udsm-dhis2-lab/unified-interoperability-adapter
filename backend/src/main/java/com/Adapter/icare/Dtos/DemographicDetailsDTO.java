@@ -21,7 +21,6 @@ public class DemographicDetailsDTO {
     private String id;
     @NotBlank(message = "firstName cannot be blank")
     private String firstName;
-    @NotBlank(message = "middleName cannot be blank")
     private String middleName;
     @NotBlank(message = "lastName cannot be blank")
     private String lastName;
