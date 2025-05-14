@@ -3,7 +3,6 @@
 # cd iadapter-applications
 # docker run -w="/app" -v "$(pwd)"/iadapter-applications:/app node:20.18.0 npm i --legacy-peer-deps
 # docker run -w="/app" -v "$(pwd)"/iadapter-applications:/app node:20.18.0 npx nx build client-management
-# docker run -w="/app" -v "$(pwd)"/:/app node:20.18.0 bash -c "rm -rf /app/backend/src/main/resources/static && cp -r /app/iadapter-applications/dist/apps/client-management/browser /app/backend/src/main/resources/static/ClientManagementService"
 
 # Directory where the zipped build files are stored
 BUILD_DIR=".github/apps-builds"
