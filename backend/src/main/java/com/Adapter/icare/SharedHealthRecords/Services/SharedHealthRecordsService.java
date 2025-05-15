@@ -1052,7 +1052,7 @@ public class SharedHealthRecordsService {
                                                     .get(0)
                                                     .getCode()
                                                     .equals("8867-4")) {
-                                                vitalSign.setPulseRate(observation.hasValueQuantity()
+                                                vitalSign.setPulseRate(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
                                                                 .getValue().intValue()
                                                                 : null);
