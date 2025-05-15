@@ -138,6 +138,10 @@ public class ClientRegistryService {
             Bundle response = new Bundle();
             // TODO: You might consider enumerating the gender codes
             var searchClient = fhirClient.search().forResource(Patient.class);
+            
+            // Add sorting by newest first (_lastUpdated in descending order)
+            searchClient.sort().descending(Patient.LAST_UPDATED);
+
             if (identifier != null) {
                 searchClient.where(Patient.IDENTIFIER.exactly().identifier(identifier));
             }
