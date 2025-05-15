@@ -117,7 +117,7 @@ public class SharedHealthRecordsService {
         List<Encounter> encounters = new ArrayList<>();
         var searchRecords = fhirClient.search().forResource(Patient.class);
 
-        searchRecords.sort().descending(Patient.LAST_UPDATED);
+        searchRecords.sort().descending("_lastUpdated");
 
         try {
             if (referralNumber == null) {
