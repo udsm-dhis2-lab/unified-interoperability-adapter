@@ -1,1 +1,50 @@
-<p>general-codes works!</p>
+<div class="home-container">
+    <form nz-form [formGroup]="generalCodeForm" (ngSubmit)="submitForm()" class="general-code-form">
+        <!-- General Code Type Select -->
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="generalCodeType">General Code Type</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="generalCodeTypeErrorTpl">
+                <nz-select id="generalCodeType" formControlName="generalCodeType" nzPlaceHolder="Select a type"
+                    style="width: 100%;">
+                    <ng-container *ngFor="let option of generalCodeCategory">
+                        <nz-option [nzValue]="option.key" [nzLabel]="option.name"></nz-option>
+                    </ng-container>
+                </nz-select>
+                <ng-template #generalCodeTypeErrorTpl let-control>
+                    <ng-container *ngIf="control.hasError('required')">Please select a General Code Type!</ng-container>
+                </ng-template>
+            </nz-form-control>
+        </nz-form-item>
+
+        <!-- Code Input -->
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="code">Code</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="codeErrorTpl">
+                <input nz-input id="code" formControlName="code" placeholder="Enter code" />
+            </nz-form-control>
+            <ng-template #codeErrorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">Please input the Code!</ng-container>
+                <ng-container *ngIf="control.hasError('maxlength')">Code cannot exceed 50 characters!</ng-container>
+            </ng-template>
+        </nz-form-item>
+
+        <!-- Name Input -->
+        <nz-form-item>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="name">Name</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="nameErrorTpl">
+                <input nz-input id="name" formControlName="name" placeholder="Enter name" />
+            </nz-form-control>
+            <ng-template #nameErrorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">Please input the Name!</ng-container>
+                <ng-container *ngIf="control.hasError('maxlength')">Name cannot exceed 100 characters!</ng-container>
+            </ng-template>
+        </nz-form-item>
+
+        <!-- Submit Button -->
+        <nz-form-item>
+            <nz-form-control [nzXs]="{ span: 24, offset: 0 }" [nzSm]="{ span: 14, offset: 6 }">
+                <button nz-button nzType="primary" [disabled]="generalCodeForm.invalid">Submit</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>
