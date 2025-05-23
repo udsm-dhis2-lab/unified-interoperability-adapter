@@ -18,6 +18,7 @@ import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzResultModule } from 'ng-zorro-antd/result';
 
 
 export const antDesignModules = [
@@ -41,4 +42,5 @@ export const antDesignModules = [
   NzDividerModule,
   NzTreeSelectModule,
   NzTabsModule,
+  NzResultModule
 ];
