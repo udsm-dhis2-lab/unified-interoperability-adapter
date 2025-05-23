@@ -21,6 +21,14 @@ const routes: Routes = [
             './../modules/instance-management/instance-management.module'
           ).then((m) => m.InstanceManagementModule),
       },
+
+      {
+        path: 'termminology-services',
+        loadChildren: () =>
+          import(
+            './../modules/service-terminology/service-terminology.module'
+          ).then((m) => m.TerminologyServicesModule),
+      },
     ],
   },
 ];
@@ -29,4 +37,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class MappingAndDataExtractionRoutingModule {}
+export class MappingAndDataExtractionRoutingModule { }
