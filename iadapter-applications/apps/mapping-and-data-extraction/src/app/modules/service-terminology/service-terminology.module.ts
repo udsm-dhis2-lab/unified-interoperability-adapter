@@ -6,7 +6,7 @@ import { GeneralCodesComponent } from './containers/general-codes/general-codes.
 import { ServiceTerminologyRoutingModule } from './service-terminology-routing.module';
 
 @NgModule({
-  declarations: [HomeComponent, StandardCodesComponent, GeneralCodesComponent],
-  imports: [CommonModule, ServiceTerminologyRoutingModule],
+    declarations: [StandardCodesComponent, GeneralCodesComponent],
+    imports: [CommonModule, ServiceTerminologyRoutingModule],
 })
-export class TerminologyServicesModule {}
+export class TerminologyServicesModule { }
