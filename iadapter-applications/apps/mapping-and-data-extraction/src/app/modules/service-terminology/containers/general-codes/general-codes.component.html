@@ -2,7 +2,7 @@
     <form nz-form [formGroup]="generalCodeForm" (ngSubmit)="submitForm()" class="general-code-form">
         <!-- General Code Type Select -->
         <nz-form-item>
-            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="generalCodeType">General Code Type</nz-form-label>
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="generalCodeType">General Code Type </nz-form-label>
             <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="generalCodeTypeErrorTpl">
                 <nz-select id="generalCodeType" formControlName="generalCodeType" nzPlaceHolder="Select a type"
                     style="width: 100%;">
