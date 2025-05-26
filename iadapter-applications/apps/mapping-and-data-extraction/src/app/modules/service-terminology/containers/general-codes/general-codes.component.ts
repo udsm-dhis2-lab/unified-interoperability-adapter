@@ -18,8 +18,7 @@ export class GeneralCodesComponent implements OnInit {
 
   generalCodeCategory: { key: string; name: string }[] = [
     { key: 'billings', name: 'Billings' },
-    { key: 'insurances', name: 'Insurances' },
-    { key: 'departments', name: 'Departments' },
+    { key: 'insurances', name: 'Insurances' }
   ];
 
 
