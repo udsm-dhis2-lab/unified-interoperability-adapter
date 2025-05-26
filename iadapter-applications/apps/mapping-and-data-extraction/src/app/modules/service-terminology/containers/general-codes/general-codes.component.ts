@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
-import { group } from 'console';
 import { ServiceTerminologyConstants } from '../../models/constants/service-terminology-constants';
+import { ServicesTerminologyServiceService } from '../../services/services-terminology-service.service';
 
 
 @Component({
@@ -17,6 +17,13 @@ import { ServiceTerminologyConstants } from '../../models/constants/service-term
 })
 export class GeneralCodesComponent implements OnInit {
   generalCodeForm!: FormGroup;
+  isSubmitting: boolean = false;
+
+  alert = {
+    show: false,
+    type: '',
+    message: '',
+  };
 
   generalCodeCategory: { key: string; name: string }[] = [
     { key: 'billings', name: 'Billings' },
@@ -24,7 +31,7 @@ export class GeneralCodesComponent implements OnInit {
   ];
 
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private serviceTerminologyService: ServicesTerminologyServiceService) { }
 
   ngOnInit(): void {
     this.generalCodeForm = this.fb.group({
@@ -49,7 +56,8 @@ export class GeneralCodesComponent implements OnInit {
     return this.generalCodeForm.get('key');
   }
 
-  submitForm(): void {
+  submitForm() {
+    this.isSubmitting = true;
     if (this.generalCodeForm.valid) {
       console.log('Form is valid');
       var generalCode = {
@@ -62,15 +70,56 @@ export class GeneralCodesComponent implements OnInit {
         datastoreGroup: ServiceTerminologyConstants.GENERAL_CODE_GROUP
       };
 
-      console.log(this.generalCodeForm.value);
+      try {
+        const response = this.serviceTerminologyService.saveGeneralCodes(generalCode).subscribe({
+          next: (response: any) => {
+            this.isSubmitting = false;
+            this.clearForm();
+            this.alert = {
+              show: true,
+              type: 'success',
+              message: 'General code was added successfully',
+            };
+          },
+          error: (error: any) => {
+            this.isSubmitting = false;
+            this.clearForm();
+            this.alert = {
+              show: true,
+              type: 'error',
+              message: error,
+            };
+          }
+        });
+      } catch (error) {
+        this.isSubmitting = false;
+        this.clearForm();
+        this.alert = {
+          show: true,
+          type: 'error',
+          message: error as string,
+        };
+      }
     } else {
+      this.isSubmitting = false;
       Object.values(this.generalCodeForm.controls).forEach(control => {
         if (control.invalid) {
           control.markAsDirty();
           control.updateValueAndValidity({ onlySelf: true });
         }
       });
-      console.log('Form is invalid');
     }
+  }
+
+  onCloseAlert() {
+    this.alert = {
+      show: false,
+      type: '',
+      message: '',
+    };
+  }
+
+  clearForm() {
+    this.generalCodeForm.reset();
   }
 }

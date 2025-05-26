@@ -42,11 +42,11 @@
 
         <!-- Key Input -->
         <nz-form-item>
-            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="name">Key</nz-form-label>
-            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="nameErrorTpl">
-                <input nz-input id="name" formControlName="name" placeholder="Enter name" />
+            <nz-form-label [nzSm]="6" [nzXs]="24" nzRequired nzFor="key">Key</nz-form-label>
+            <nz-form-control [nzSm]="14" [nzXs]="24" [nzErrorTip]="keyErrorTpl">
+                <input nz-input id="key" formControlName="key" placeholder="Enter key" />
             </nz-form-control>
-            <ng-template #nameErrorTpl let-control>
+            <ng-template #keyErrorTpl let-control>
                 <ng-container *ngIf="control.hasError('required')">Please input the Key!</ng-container>
                 <ng-container *ngIf="control.hasError('maxlength')">Key cannot exceed 50 characters!</ng-container>
             </ng-template>
@@ -55,8 +55,20 @@
         <!-- Submit Button -->
         <nz-form-item>
             <nz-form-control [nzXs]="{ span: 24, offset: 0 }" [nzSm]="{ span: 14, offset: 6 }">
-                <button nz-button nzType="primary" [disabled]="generalCodeForm.invalid">Submit</button>
+                <nz-spin [nzSpinning]="isSubmitting">
+                    <button nz-button nzType="primary" [disabled]="generalCodeForm.invalid">Submit</button>
+                </nz-spin>
             </nz-form-control>
         </nz-form-item>
     </form>
+
+    <div class="alert-container">
+        <nz-alert nzCloseable *ngIf="alert.show" [nzType]="
+                      alert.type === 'success'
+                        ? 'success'
+                        : alert.type === 'info'
+                        ? 'info'
+                        : 'error'
+                    " [nzMessage]="alert.message" (nzOnClose)="onCloseAlert()" nzShowIcon></nz-alert>
+    </div>
 </div>

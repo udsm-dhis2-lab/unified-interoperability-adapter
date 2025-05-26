@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
 import { ServiceTerminologyConstants } from '../models/constants/service-terminology-constants';
 import { catchError, map, Observable, throwError } from 'rxjs';
+import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
 
 @Injectable({
   providedIn: 'root'
