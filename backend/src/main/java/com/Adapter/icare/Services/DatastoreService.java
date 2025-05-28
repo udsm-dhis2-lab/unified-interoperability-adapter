@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -102,7 +103,7 @@ public class DatastoreService {
 
     public Page<Datastore> getDatastoreNamespaceDetailsUsingPagination(String namespace, Integer page, Integer pageSize,
             String key) throws Exception {
-        Pageable pageable = createPageable(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize, false);
         return datastoreRepository.getDatastoreByNamespaceByPagination(namespace, pageable, key);
     }
 
@@ -115,14 +116,14 @@ public class DatastoreService {
             Integer page,
             Integer pageSize,
             boolean paging) throws Exception {
-        Pageable pageable = createPageable(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize, true);
         return datastoreRepository.getDatastoreByNamespaceWithPagination(namespace, category, department, q, code,
                 group, paging ? pageable : null);
     }
 
     public Page<Datastore> getDatastoreMatchingNamespaceFilterByPagination(String namespaceFilter, String key, String q,
             String code, Integer page, Integer pageSize) throws Exception {
-        Pageable pageable = createPageable(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize, false);
         return datastoreRepository.getDatastoreMatchingNamespaceFilterByPagination(namespaceFilter, key, q, code,
                 pageable);
     }
@@ -226,7 +227,7 @@ public class DatastoreService {
 
     public Page<Datastore> getDatastoreMatchingParams(String namespace, String key, String version,
             String releaseYear, String code, String q, Integer page, Integer pageSize, String group) throws Exception {
-        Pageable pageable = createPageable(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize, false);
         return datastoreRepository.findDatastoreDataBySpecifiedParams(namespace, key, version, releaseYear, code, q,
                 pageable, group);
     }
@@ -234,7 +235,7 @@ public class DatastoreService {
     public Page<Datastore> getDatastoreICDDataByParams(String namespace, String key, String version,
             String releaseYear, String chapter, String block, String category, String code,
             String q, Integer page, Integer pageSize) throws Exception {
-        Pageable pageable = createPageable(page, pageSize);
+        Pageable pageable = createPageable(page, pageSize, false);
         return datastoreRepository.getDatastoreICDDataByParams(namespace, key, version, releaseYear, chapter, block,
                 category, code, q, pageable);
     }
@@ -254,11 +255,14 @@ public class DatastoreService {
         return datastoreRepository.getICDDataByCategory(namespace, category, release, version);
     }
 
-    private Pageable createPageable(Integer page, Integer pageSize) throws Exception {
-        if (page < 1) {
-            throw new Exception("Page can not be less than zero");
-        } else {
-            return PageRequest.of(page - 1, pageSize);
+    private Pageable createPageable(Integer page, Integer pageSize, boolean sortByLastUpdatedOnDesc) throws Exception {
+        int pageNumber = (page != null && page > 0) ? page - 1 : 0;
+        int size = (pageSize != null && pageSize > 0) ? pageSize : 10;
+
+        Sort sort = Sort.unsorted();
+        if (sortByLastUpdatedOnDesc) {
+            sort = Sort.by(Sort.Direction.DESC, "last_updated_on");
         }
+        return PageRequest.of(pageNumber, size, sort);
     }
 }
