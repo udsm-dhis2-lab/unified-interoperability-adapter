@@ -1,11 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; 
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzButtonModule } from 'ng-zorro-antd/button';
-import { CommonModule } from '@angular/common'; 
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-standard-codes',
@@ -13,19 +8,14 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./standard-codes.component.css'],
   standalone: true,
   imports: [
-    CommonModule,
     SharedModule,
-    ReactiveFormsModule, 
-    NzFormModule,
-    NzInputModule,
-    NzSelectModule,
-    NzButtonModule
+    ReactiveFormsModule,
   ],
 })
 export class StandardCodesComponent implements OnInit {
   standardCodeForm!: FormGroup;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.standardCodeForm = this.fb.group({

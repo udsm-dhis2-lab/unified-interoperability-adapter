@@ -1,34 +1,33 @@
 <div style="padding: 20px;">
-  <h2>Add Standard Code</h2>
-  <form nz-form [formGroup]="standardCodeForm" (ngSubmit)="submitForm()" nzLayout="vertical">
-    <nz-form-item>
-      <nz-form-label nzRequired nzFor="codeType">Code Type</nz-form-label>
-      <nz-form-control nzErrorTip="Please select a code type!">
-        <nz-select id="codeType" formControlName="codeType" nzPlaceHolder="Select code type">
-          <nz-option nzValue="LOINC" nzLabel="LOINC"></nz-option>
-          <nz-option nzValue="ICD" nzLabel="ICD"></nz-option>
-        </nz-select>
-      </nz-form-control>
-    </nz-form-item>
+    <form nz-form [formGroup]="standardCodeForm" (ngSubmit)="submitForm()" nzLayout="vertical">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="codeType">Code Type</nz-form-label>
+            <nz-form-control nzErrorTip="Please select a code type!">
+                <nz-select id="codeType" formControlName="codeType" nzPlaceHolder="Select code type">
+                    <nz-option nzValue="LOINC" nzLabel="LOINC"></nz-option>
+                    <nz-option nzValue="ICD" nzLabel="ICD"></nz-option>
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
 
-    <nz-form-item>
-      <nz-form-label nzRequired nzFor="code">Code</nz-form-label>
-      <nz-form-control nzErrorTip="Please input the code!">
-        <input nz-input id="code" formControlName="code" placeholder="Enter code" />
-      </nz-form-control>
-    </nz-form-item>
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="code">Code</nz-form-label>
+            <nz-form-control nzErrorTip="Please input the code!">
+                <input nz-input id="code" formControlName="code" placeholder="Enter code" />
+            </nz-form-control>
+        </nz-form-item>
 
-    <nz-form-item>
-      <nz-form-label nzFor="displayName">Display Name</nz-form-label> 
-      <nz-form-control nzErrorTip="Please input the display name!">
-        <input nz-input id="displayName" formControlName="displayName" placeholder="Enter display name" />
-      </nz-form-control>
-    </nz-form-item>
+        <nz-form-item>
+            <nz-form-label nzFor="displayName">Display Name</nz-form-label>
+            <nz-form-control nzErrorTip="Please input the display name!">
+                <input nz-input id="displayName" formControlName="displayName" placeholder="Enter display name" />
+            </nz-form-control>
+        </nz-form-item>
 
-    <nz-form-item>
-      <nz-form-control>
-        <button nz-button nzType="primary" [disabled]="!standardCodeForm.valid">Submit</button>
-      </nz-form-control>
-    </nz-form-item>
-  </form>
+        <nz-form-item>
+            <nz-form-control>
+                <button nz-button nzType="primary" [disabled]="!standardCodeForm.valid">Submit</button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
 </div>
