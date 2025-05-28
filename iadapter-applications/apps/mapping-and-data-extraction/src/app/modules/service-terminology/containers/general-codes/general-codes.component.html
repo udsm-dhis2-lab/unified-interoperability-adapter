@@ -1,0 +1,72 @@
+<div style="padding: 20px;">
+    <form nz-form [formGroup]="generalCodeForm" (ngSubmit)="submitForm()" class="general-code-form" nzLayout="vertical">
+        <!-- General Code Type Select -->
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="generalCodeType">General Code Type </nz-form-label>
+            <nz-form-control [nzErrorTip]="generalCodeTypeErrorTpl">
+                <nz-select id="generalCodeType" formControlName="generalCodeType" nzPlaceHolder="Select a type"
+                    style="width: 100%;">
+                    <ng-container *ngFor="let option of generalCodeCategory">
+                        <nz-option [nzValue]="option.key" [nzLabel]="option.name"></nz-option>
+                    </ng-container>
+                </nz-select>
+                <ng-template #generalCodeTypeErrorTpl let-control>
+                    <ng-container *ngIf="control.hasError('required')">Please select a General Code Type!</ng-container>
+                </ng-template>
+            </nz-form-control>
+        </nz-form-item>
+
+        <!-- Code Input -->
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="code">Code</nz-form-label>
+            <nz-form-control [nzErrorTip]="codeErrorTpl">
+                <input nz-input id="code" formControlName="code" placeholder="Enter code" />
+            </nz-form-control>
+            <ng-template #codeErrorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">Please input the Code!</ng-container>
+                <ng-container *ngIf="control.hasError('maxlength')">Code cannot exceed 50 characters!</ng-container>
+            </ng-template>
+        </nz-form-item>
+
+        <!-- Name Input -->
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="name">Name</nz-form-label>
+            <nz-form-control [nzErrorTip]="nameErrorTpl">
+                <input nz-input id="name" formControlName="name" placeholder="Enter name" />
+            </nz-form-control>
+            <ng-template #nameErrorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">Please input the Name!</ng-container>
+                <ng-container *ngIf="control.hasError('maxlength')">Name cannot exceed 100 characters!</ng-container>
+            </ng-template>
+        </nz-form-item>
+
+        <!-- Key Input -->
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="key">Key</nz-form-label>
+            <nz-form-control [nzErrorTip]="keyErrorTpl">
+                <input nz-input id="key" formControlName="key" placeholder="Enter key" />
+            </nz-form-control>
+            <ng-template #keyErrorTpl let-control>
+                <ng-container *ngIf="control.hasError('required')">Please input the Key!</ng-container>
+                <ng-container *ngIf="control.hasError('maxlength')">Key cannot exceed 50 characters!</ng-container>
+            </ng-template>
+        </nz-form-item>
+
+        <!-- Submit Button -->
+        <nz-form-item>
+            <nz-form-control>
+                <nz-spin [nzSpinning]=" isSubmitting">
+                    <button nz-button nzType="primary" [disabled]="generalCodeForm.invalid">Submit</button>
+                </nz-spin>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>
+
+<nz-alert nzCloseable *ngIf="alert.show" [nzType]="
+                      alert.type === 'success'
+                        ? 'success'
+                        : alert.type === 'info'
+                        ? 'info'
+                        : 'error'
+                    " [nzMessage]="alert.message" (nzOnClose)="onCloseAlert()" nzShowIcon></nz-alert>

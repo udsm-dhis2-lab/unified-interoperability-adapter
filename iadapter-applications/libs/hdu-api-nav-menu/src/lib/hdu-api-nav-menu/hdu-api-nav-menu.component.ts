@@ -75,7 +75,7 @@ export class HduApiNavMenuComponent implements OnInit {
     {
       name: 'Appointment Management',
       id: 'appointment-management',
-      routeUrl: '/appointment-management',  
+      routeUrl: '/appointment-management',
       icon: 'user',
       category: 'main',
       subMenus: [
@@ -139,6 +139,13 @@ export class HduApiNavMenuComponent implements OnInit {
           icon: 'interaction',
           subMenus: [],
         },
+        {
+          name: 'Terminology services',
+          id: 'termminology-services',
+          routeUrl: '/mapping-and-data-extraction/termminology-services',
+          icon: 'edit',
+          subMenus: [],
+        }
       ],
     },
     {
@@ -175,7 +182,7 @@ export class HduApiNavMenuComponent implements OnInit {
       : this.activeMainMenuId;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   onRouteTo(event: Event, menu: Menu): void {
     event.stopPropagation();

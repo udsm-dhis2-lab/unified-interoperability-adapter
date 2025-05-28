@@ -1,0 +1,51 @@
+<div style="padding: 20px;">
+    <form nz-form [formGroup]="standardCodeForm" (ngSubmit)="submitForm()" nzLayout="vertical">
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="codeType">Code Type</nz-form-label>
+            <nz-form-control nzErrorTip="Please select a code type!">
+                <nz-select id="codeType" formControlName="codeType" nzPlaceHolder="Select code type">
+                    <ng-container *ngFor="let option of standardCodeCategory">
+                        <nz-option [nzValue]="option.key" [nzLabel]="option.name"></nz-option>
+                    </ng-container>
+                </nz-select>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired nzFor="code">Code</nz-form-label>
+            <nz-form-control nzErrorTip="Please input the code!">
+                <input nz-input id="code" formControlName="code" placeholder="Enter code" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzFor="displayName">Display Name</nz-form-label>
+            <nz-form-control nzErrorTip="Please input the display name!">
+                <input nz-input id="displayName" formControlName="displayName" placeholder="Enter display name" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzFor="key">Key</nz-form-label>
+            <nz-form-control nzErrorTip="Please input the key!">
+                <input nz-input id="key" formControlName="key" placeholder="Enter key" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-control>
+                <nz-spin [nzSpinning]=" isSubmitting">
+                    <button nz-button nzType="primary" [disabled]="!standardCodeForm.valid">Submit</button>
+                </nz-spin>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</div>
+
+<nz-alert nzCloseable *ngIf="alert.show" [nzType]="
+                      alert.type === 'success'
+                        ? 'success'
+                        : alert.type === 'info'
+                        ? 'info'
+                        : 'error'
+                    " [nzMessage]="alert.message" (nzOnClose)="onCloseAlert()" nzShowIcon></nz-alert>

@@ -17,6 +17,10 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { NzResultModule } from 'ng-zorro-antd/result';
+import { NzFormModule } from 'ng-zorro-antd/form';
+
 
 export const antDesignModules = [
   NzLayoutModule,
@@ -38,4 +42,7 @@ export const antDesignModules = [
   NzModalModule,
   NzDividerModule,
   NzTreeSelectModule,
+  NzTabsModule,
+  NzResultModule,
+  NzFormModule
 ];
