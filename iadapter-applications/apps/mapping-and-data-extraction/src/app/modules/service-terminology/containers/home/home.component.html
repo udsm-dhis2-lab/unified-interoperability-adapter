@@ -1,10 +1,51 @@
-<div class="home-container">
-    <nz-tabset nzCentered>
-        <nz-tab nzTitle="General Codes">
-            <app-general-codes></app-general-codes>
-        </nz-tab>
-        <nz-tab nzTitle="Standard Codes">
-            <app-standard-codes></app-standard-codes>
-        </nz-tab>
-    </nz-tabset>
+<div class="page-container" style="padding: 20px;">
+    <div style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+        <nz-select [(ngModel)]="selectedNamespace" (ngModelChange)="loadCodes(true)" nzPlaceHolder="Filter by Type"
+            style="width: 200px;">
+            <nz-option nzValue="ICD-CODES" nzLabel="ICD Codes"></nz-option>
+            <nz-option nzValue="LOINC" nzLabel="LOINC Codes"></nz-option>
+            <nz-option nzValue="insurances" nzLabel="Insurance Codes"></nz-option>
+            <nz-option nzValue="billings" nzLabel="Billing Codes"></nz-option>
+        </nz-select>
+        <button nz-button nzType="primary" (click)="openDrawer()">
+            <span nz-icon nzType="plus"></span>Add Code
+        </button>
+    </div>
+
+    <nz-table #codeTable [nzData]="codes" [nzFrontPagination]="false" [nzLoading]="loading" [nzTotal]="totalRecords"
+        [(nzPageIndex)]="pageIndex" [(nzPageSize)]="pageSize" (nzPageIndexChange)="onPageIndexChange($event)"
+        (nzPageSizeChange)="onPageSizeChange($event)" nzShowSizeChanger [nzPageSizeOptions]="[10, 20, 50]">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Code</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let data of codeTable.data">
+                <td>{{ data.value?.name || "" }}</td>
+                <td>{{ data.value?.code || "" }}</td>
+            </tr>
+        </tbody>
+    </nz-table>
+</div>
+
+<nz-drawer [nzClosable]="true" [nzVisible]="drawerVisible" nzPlacement="right" nzTitle="Add New Terminology Code"
+    (nzOnClose)="closeDrawer()" [nzWidth]="'50%'">
+    <ng-container *nzDrawerContent>
+        <nz-tabset nzCentered>
+            <nz-tab nzTitle="General Codes">
+                <app-general-codes></app-general-codes>
+            </nz-tab>
+            <nz-tab nzTitle="Standard Codes">
+                <app-standard-codes></app-standard-codes>
+            </nz-tab>
+        </nz-tabset>
+    </ng-container>
+</nz-drawer>
+
+<div class="alert-container"
+    style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 1050;">
+    <nz-alert nzCloseable *ngIf="alert.show" [nzType]="alert.type" [nzMessage]="alert.message"
+        (nzOnClose)="onCloseAlert()" nzShowIcon></nz-alert>
 </div>

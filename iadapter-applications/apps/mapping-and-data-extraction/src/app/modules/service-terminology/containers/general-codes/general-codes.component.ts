@@ -21,7 +21,7 @@ export class GeneralCodesComponent implements OnInit {
 
   alert = {
     show: false,
-    type: '',
+    type: 'success' as 'success' | 'info' | 'error' | 'warning',
     message: '',
   };
 
@@ -59,46 +59,33 @@ export class GeneralCodesComponent implements OnInit {
   submitForm() {
     this.isSubmitting = true;
     if (this.generalCodeForm.valid) {
-      console.log('Form is valid');
       var generalCode = {
-        namespace: this.generalCodeForm.get('generalCodeType')?.value,
+        namespace: this.generalCodeType?.value,
         value: {
-          code: this.generalCodeForm.get('code')?.value,
-          name: this.generalCodeForm.get('name')?.value
+          code: this.code?.value,
+          name: this.name?.value,
         },
-        dataKey: this.generalCodeForm.get('key')?.value,
+        dataKey: this.key?.value,
         datastoreGroup: ServiceTerminologyConstants.GENERAL_CODE_GROUP
       };
 
       try {
-        const response = this.serviceTerminologyService.saveGeneralCodes(generalCode).subscribe({
+        const response = this.serviceTerminologyService.saveServiceCode(generalCode).subscribe({
           next: (response: any) => {
             this.isSubmitting = false;
             this.clearForm();
-            this.alert = {
-              show: true,
-              type: 'success',
-              message: 'General code was added successfully',
-            };
+            this.showAlert('success', 'General code was added successfully');
           },
           error: (error: any) => {
             this.isSubmitting = false;
             this.clearForm();
-            this.alert = {
-              show: true,
-              type: 'error',
-              message: error,
-            };
+            this.showAlert('error', error);
           }
         });
       } catch (error) {
         this.isSubmitting = false;
         this.clearForm();
-        this.alert = {
-          show: true,
-          type: 'error',
-          message: error as string,
-        };
+        this.showAlert('error', error as string);
       }
     } else {
       this.isSubmitting = false;
@@ -111,12 +98,13 @@ export class GeneralCodesComponent implements OnInit {
     }
   }
 
-  onCloseAlert() {
-    this.alert = {
-      show: false,
-      type: '',
-      message: '',
-    };
+  onCloseAlert(): void {
+    this.alert.show = false;
+  }
+
+  showAlert(type: 'success' | 'info' | 'error' | 'warning', message: string): void {
+    this.alert = { show: true, type, message };
+    setTimeout(() => this.onCloseAlert(), 5000);
   }
 
   clearForm() {

@@ -11,13 +11,22 @@ export class ServicesTerminologyServiceService {
 
   constructor(private httpClient: HduHttpService) { }
 
-  saveGeneralCodes(data: any): Observable<any> {
+  saveServiceCode(data: any): Observable<any> {
     return this.httpClient.post(this.dataStoreUrl, data).pipe(
       map((response: any) => response),
       catchError((error: any) => {
-        console.error('Error saving general codes:', error);
         return throwError(error);
       })
     );
+  }
+
+  getServiceCodes(namespace: string, pageIndex: number, pageSize: number): Observable<any> {
+    const url = `${this.dataStoreUrl}/${namespace}?page=${pageIndex}&pageSize=${pageSize}`;
+    return this.httpClient.get(url).pipe(
+      map((response: any) => response),
+      catchError((error: any) => {
+        return throwError(error);
+      })
+    )
   }
 }

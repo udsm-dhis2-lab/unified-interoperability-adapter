@@ -63,13 +63,10 @@
     </form>
 </div>
 
-
-<div class="alert-container">
-    <nz-alert nzCloseable *ngIf="alert.show" [nzType]="
+<nz-alert nzCloseable *ngIf="alert.show" [nzType]="
                       alert.type === 'success'
                         ? 'success'
                         : alert.type === 'info'
                         ? 'info'
                         : 'error'
                     " [nzMessage]="alert.message" (nzOnClose)="onCloseAlert()" nzShowIcon></nz-alert>
-</div>
