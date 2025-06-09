@@ -80,6 +80,12 @@ export class HomeComponent implements OnInit {
     this.drawerVisible = false;
   }
 
+  handleCodeAdded(): void {
+    this.showAlert('success', 'Code added successfully. Refreshing list.');
+    this.loadCodes(true); 
+    this.closeDrawer();
+  }
+
   showAlert(type: 'success' | 'info' | 'error' | 'warning', message: string): void {
     this.alert = { show: true, type, message };
     setTimeout(() => this.onCloseAlert(), 5000);

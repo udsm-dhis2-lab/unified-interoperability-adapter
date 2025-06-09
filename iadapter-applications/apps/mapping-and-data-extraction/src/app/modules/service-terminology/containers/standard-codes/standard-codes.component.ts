@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ServicesTerminologyServiceService } from '../../services/services-terminology-service.service';
@@ -14,6 +14,7 @@ import { ServicesTerminologyServiceService } from '../../services/services-termi
   ],
 })
 export class StandardCodesComponent implements OnInit {
+  @Output() codeAdded = new EventEmitter<void>();
   standardCodeForm!: FormGroup;
 
   isSubmitting: boolean = false;
@@ -72,6 +73,7 @@ export class StandardCodesComponent implements OnInit {
             this.isSubmitting = false;
             this.clearForm();
             this.showAlert('success', 'Standard code saved successfully');
+            this.codeAdded.emit(); 
           },
           error: (error: any) => {
             this.isSubmitting = false;

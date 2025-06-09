@@ -35,10 +35,10 @@
     <ng-container *nzDrawerContent>
         <nz-tabset nzCentered>
             <nz-tab nzTitle="General Codes">
-                <app-general-codes></app-general-codes>
+                <app-general-codes (codeAdded)="handleCodeAdded()"></app-general-codes>
             </nz-tab>
             <nz-tab nzTitle="Standard Codes">
-                <app-standard-codes></app-standard-codes>
+                <app-standard-codes (codeAdded)="handleCodeAdded()"></app-standard-codes>
             </nz-tab>
         </nz-tabset>
     </ng-container>

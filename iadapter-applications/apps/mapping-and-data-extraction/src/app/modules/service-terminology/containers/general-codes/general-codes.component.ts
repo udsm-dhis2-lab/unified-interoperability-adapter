@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { ServiceTerminologyConstants } from '../../models/constants/service-terminology-constants';
@@ -16,6 +16,7 @@ import { ServicesTerminologyServiceService } from '../../services/services-termi
   ],
 })
 export class GeneralCodesComponent implements OnInit {
+  @Output() codeAdded = new EventEmitter<void>();
   generalCodeForm!: FormGroup;
   isSubmitting: boolean = false;
 
@@ -75,6 +76,7 @@ export class GeneralCodesComponent implements OnInit {
             this.isSubmitting = false;
             this.clearForm();
             this.showAlert('success', 'General code was added successfully');
+            this.codeAdded.emit();
           },
           error: (error: any) => {
             this.isSubmitting = false;

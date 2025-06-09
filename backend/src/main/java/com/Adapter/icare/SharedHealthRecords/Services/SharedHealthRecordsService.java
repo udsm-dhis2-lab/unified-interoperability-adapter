@@ -1483,15 +1483,14 @@ public class SharedHealthRecordsService {
                                                 if (observation.hasValueStringType()) {
                                                     investigationDetailsDTO
                                                             .setLabSpecimenTaken(
-                                                                    observation.getValueStringType()
-                                                                            .toString());
+                                                                    observation.hasValueBooleanType() && observation.getValueBooleanType().hasValue() ? observation.getValueBooleanType().getValue() : null);
                                                     break;
                                                 }
                                             }
                                         }
                                         List<Observation> specimenSentToData = getObservationsByObservationGroupId(
                                                 fhirClient,
-                                                "specimen-sent-to",
+                                                "specimen-sent-to-lab",
                                                 encounter,
                                                 observationGroup.getIdElement()
                                                         .getIdPart());
@@ -1499,9 +1498,9 @@ public class SharedHealthRecordsService {
                                             for (Observation observation : specimenSentToData) {
                                                 if (observation.hasValueStringType()) {
                                                     investigationDetailsDTO
-                                                            .setSpecimenSentTo(
-                                                                    observation.getValueStringType()
-                                                                            .toString());
+                                                            .setSpecimenSentToLab(
+                                                                 observation.hasValueBooleanType() && observation.getValueBooleanType().hasValue() ? observation.getValueBooleanType().getValue() : null
+                                                                            );
                                                     break;
                                                 }
                                             }
@@ -1516,9 +1515,9 @@ public class SharedHealthRecordsService {
                                             for (Observation observation : vaccinatedData) {
                                                 if (observation.hasValueStringType()) {
                                                     investigationDetailsDTO
-                                                            .setVaccinated(observation
-                                                                    .getValueStringType()
-                                                                    .toString());
+                                                            .setVaccinated(
+                                                                    observation.hasValueBooleanType() && observation.getValueBooleanType().hasValue() ? observation.getValueBooleanType().getValue() : null
+                                                            );
                                                     break;
                                                 }
                                             }
