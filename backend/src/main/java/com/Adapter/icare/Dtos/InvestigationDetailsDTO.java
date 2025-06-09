@@ -17,7 +17,7 @@ public class InvestigationDetailsDTO {
     private Integer daysSinceSymptoms;
     @NotNull
     private String diseaseCode;
-    private String labSpecimenTaken;
-    private String specimenSentTo;
+    private Boolean labSpecimenTaken;
+    private Boolean specimenSentToLab;
     private String vaccinated;
 }
