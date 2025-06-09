@@ -1515,9 +1515,9 @@ public class SharedHealthRecordsService {
                                             for (Observation observation : vaccinatedData) {
                                                 if (observation.hasValueStringType()) {
                                                     investigationDetailsDTO
-                                                            .setVaccinated(observation
-                                                                    .getValueStringType()
-                                                                    .toString());
+                                                            .setVaccinated(
+                                                                    observation.hasValueBooleanType() && observation.getValueBooleanType().hasValue() ? observation.getValueBooleanType().getValue() : null
+                                                            );
                                                     break;
                                                 }
                                             }
