@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.SpecimenAcceptanceStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,4 +21,17 @@ public class InvestigationDetailsDTO {
     private Boolean labSpecimenTaken;
     private Boolean specimenSentToLab;
     private String vaccinated;
+    private Boolean specimenCollected;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date dateSpecimenCollected;
+    private String specimenCollectedFrom;
+    private String specimenID;
+    private String typeOfSpecimen;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date dateSpecimenSentToLab;
+    private String laboratoryName;
+    private String typeOfTest;
+    private SpecimenAcceptanceStatus specimenAcceptanceStatus;
+    private String specimenCollectorName;
+    private String specimenCollectorContactNumber;
 }
