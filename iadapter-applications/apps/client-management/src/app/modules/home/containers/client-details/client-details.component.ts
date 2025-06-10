@@ -1,15 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { NzUploadChangeParam, NzUploadModule } from 'ng-zorro-antd/upload';
-import { ClientManagementService } from '../../services/client-management.service';
-import { SharedModule } from '../../../../shared/shared.module';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzMessageService } from 'ng-zorro-antd/message';
-import { DicomViewerComponent } from '../dicom-viewer/dicom-viewer.component';
-import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { SharedModule } from '../../../../shared/shared.module';
+import { ClientManagementService } from '../../services/client-management.service';
 
 @Component({
   selector: 'app-client-details',
@@ -19,7 +15,6 @@ import { NzModalService } from 'ng-zorro-antd/modal';
     NzTabsModule,
     NzCollapseModule,
     NzEmptyModule,
-    NzUploadModule,
     NzIconModule,
   ],
   providers: [ClientManagementService],
@@ -48,9 +43,7 @@ export class ClientDetailsComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private clientManagementService: ClientManagementService,
-    private messageService: NzMessageService,
-    private modal: NzModalService
+    private clientManagementService: ClientManagementService
   ) {}
   backToList() {
     this.router.navigate([this.parentRoute]);
@@ -93,23 +86,6 @@ export class ClientDetailsComponent implements OnInit {
 
   objectKeys(obj: any): string[] {
     return Object?.keys(obj) || [];
-  }
-
-  showDeleteConfirm(
-    nzContent: string,
-    file: { name: string; url: string }
-  ): void {
-    console.log(file);
-    this.modal.create({
-      nzTitle: 'Delete Confirmation',
-      nzContent,
-      nzOkText: 'Delete',
-      nzOkType: 'primary',
-      nzOkDanger: true,
-      nzCancelText: 'Cancel',
-      nzCentered: true,
-      nzClassName: 'custom-confirm-modal',
-    });
   }
 
   // Utility function to format keys and values
@@ -176,37 +152,5 @@ export class ClientDetailsComponent implements OnInit {
     };
 
     return formattedResponse;
-  }
-
-  handleChange(info: NzUploadChangeParam): void {
-    if (info.file.status === 'done') {
-      this.messageService.success(
-        `${info.file.name} file uploaded successfully`
-      );
-      console.log(info.file.response);
-      this.files.push({
-        name: info.file.name,
-        url: info.file.response?.fileName,
-      });
-    } else if (info.file.status === 'error') {
-      this.messageService.error(`${info.file.name} file upload failed.`);
-    }
-  }
-
-  getAddress() {
-    return `../../../../../api/v1/files/${this.hcrCode}/uploads`;
-  }
-
-  viewFile(file: { name: string; url: string }) {
-    this.modal.create({
-      nzTitle: file.name,
-      nzContent: DicomViewerComponent,
-      nzWidth: '40%',
-      nzMaskClosable: false,
-      nzData: {
-        data: `../../../../../api/v1/files/${file.url}/downloads?id=${this.hcrCode}`,
-      },
-      nzFooter: null,
-    });
   }
 }

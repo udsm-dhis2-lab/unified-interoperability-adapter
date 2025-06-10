@@ -1,15 +1,17 @@
-import { map, filter } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { ActivatedRoute, Router } from '@angular/router';
-import { calculateAge } from 'apps/client-management/src/app/shared/helpers/helpers';
-import { HduHttpService } from 'libs/hdu-api-http-client/src/lib/services/hdu-http.service';
-import { ClientManagementService } from '../../services/client-management.service';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
-import { DynamicListComponent } from '../dynamic-list/dynamic-list.component';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import { SharedModule } from '../../../../shared/shared.module';
+import { ClientManagementService } from '../../services/client-management.service';
+import { DicomViewerComponent } from '../dicom-viewer/dicom-viewer.component';
+import { DynamicListComponent } from '../dynamic-list/dynamic-list.component';
 
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { NzUploadChangeParam, NzUploadModule } from 'ng-zorro-antd/upload';
 
 @Component({
   selector: 'app-client-details',
@@ -20,6 +22,10 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
     NzCollapseModule,
     DynamicListComponent,
     NzEmptyModule,
+    NzTabsModule,
+    NzCollapseModule,
+    NzUploadModule,
+    NzIconModule,
   ],
   providers: [ClientManagementService],
   templateUrl: './health-r-details.component.html',
@@ -41,10 +47,16 @@ export class HealthRecordsDetailsComponent implements OnInit {
   extraInfo: any;
   identifiers: any;
 
+  hcrCode!: string;
+
+  files: { name: string; url: string }[] = [];
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private clientManagementService: ClientManagementService
+    private clientManagementService: ClientManagementService,
+    private modal: NzModalService,
+    private messageService: NzMessageService
   ) {}
   backToList() {
     this.router.navigate([this.parentRoute]);
@@ -64,14 +76,15 @@ export class HealthRecordsDetailsComponent implements OnInit {
       if (params) {
         const clientID = JSON.parse(params['client']);
 
+        this.hcrCode = clientID;
+
         this.parentRoute = params['parentRoute'];
 
         this.clientManagementService
           .getClientById(clientID)
           .subscribe((client: any) => {
             this.client = client.listOfClients[0];
-
-            // this.visits = client?.listOfClients || [];
+            this.files = this.client.demographicDetails?.files ?? [];
 
             this.visits = client.listOfClients.map((visit: any) => ({
               extraInfo: [
@@ -85,63 +98,79 @@ export class HealthRecordsDetailsComponent implements OnInit {
                 {
                   sectionTitle: 'Clinical Information',
                   info: {
-                    'Vital Signs':
-                      visit?.clinicalInformation?.vitalSigns?.length
-                        ? visit.clinicalInformation.vitalSigns
-                            .filter((vitalSign: any) =>
-                              Object.values(vitalSign).some((value) => value !== null)
+                    'Vital Signs': visit?.clinicalInformation?.vitalSigns
+                      ?.length
+                      ? visit.clinicalInformation.vitalSigns
+                          .filter((vitalSign: any) =>
+                            Object.values(vitalSign).some(
+                              (value) => value !== null
                             )
-                            .map((vitalSign: any) => ({
-                              'Blood Pressure': vitalSign.bloodPressure || '-',
-                              Weight: vitalSign.weight || '-',
-                              Temperature: vitalSign.temperature || '-',
-                              Height: vitalSign.height || '-',
-                              Respiration: vitalSign.respiration || '-',
-                              'Pulse Rate': vitalSign.pulseRate || '-',
-                              'Recorded At': vitalSign.dateTime || '-',
-                            }))
-                        : 'No vital signs recorded',
-                    'Visit Notes':
-                      visit?.clinicalInformation?.visitNotes?.length
-                        ? visit.clinicalInformation.visitNotes.map((note: any) => ({
+                          )
+                          .map((vitalSign: any) => ({
+                            'Blood Pressure': vitalSign.bloodPressure || '-',
+                            Weight: vitalSign.weight || '-',
+                            Temperature: vitalSign.temperature || '-',
+                            Height: vitalSign.height || '-',
+                            Respiration: vitalSign.respiration || '-',
+                            'Pulse Rate': vitalSign.pulseRate || '-',
+                            'Recorded At': vitalSign.dateTime || '-',
+                          }))
+                      : 'No vital signs recorded',
+                    'Visit Notes': visit?.clinicalInformation?.visitNotes
+                      ?.length
+                      ? visit.clinicalInformation.visitNotes.map(
+                          (note: any) => ({
                             'Visit Date': note.date || 'Unknown Date',
-                            'Provider Specialty': note.providerSpeciality || '-',
+                            'Provider Specialty':
+                              note.providerSpeciality || '-',
                             'Chief Complaints': note.chiefComplaints?.length
                               ? note.chiefComplaints.join(', ')
                               : 'None',
-                            'History of Present Illness': note.historyOfPresentIllness?.length
+                            'History of Present Illness': note
+                              .historyOfPresentIllness?.length
                               ? note.historyOfPresentIllness.join(', ')
                               : 'None',
-                            'Review of Other Systems': note.reviewOfOtherSystems?.length
-                              ? note.reviewOfOtherSystems.map((ros: any) => ros.name).join(', ')
+                            'Review of Other Systems': note.reviewOfOtherSystems
+                              ?.length
+                              ? note.reviewOfOtherSystems
+                                  .map((ros: any) => ros.name)
+                                  .join(', ')
                               : 'None',
-                            'Past Medical History': note.pastMedicalHistory?.length
+                            'Past Medical History': note.pastMedicalHistory
+                              ?.length
                               ? note.pastMedicalHistory.join(', ')
                               : 'None',
-                            'Family and Social History': note.familyAndSocialHistory?.length
+                            'Family and Social History': note
+                              .familyAndSocialHistory?.length
                               ? note.familyAndSocialHistory.join(', ')
                               : 'None',
-                            'General Examination': note.generalExaminationObservation?.length
+                            'General Examination': note
+                              .generalExaminationObservation?.length
                               ? note.generalExaminationObservation.join(', ')
                               : 'None',
                             'Local Examination': note.localExamination?.length
                               ? note.localExamination.join(', ')
                               : 'None',
-                            'Systemic Examination': note.systemicExaminationObservation?.length
+                            'Systemic Examination': note
+                              .systemicExaminationObservation?.length
                               ? note.systemicExaminationObservation.join(', ')
                               : 'None',
-                            'Doctor’s Plan/Suggestion': note.doctorPlanOrSuggestion?.length
+                            'Doctor’s Plan/Suggestion': note
+                              .doctorPlanOrSuggestion?.length
                               ? note.doctorPlanOrSuggestion.join(', ')
                               : 'None',
-                          }))
-                        : 'No visit notes available',
+                          })
+                        )
+                      : 'No visit notes available',
                   },
                 },
                 {
                   sectionTitle: 'Allergies',
                   info: {
                     Allergies: visit?.allergies?.length
-                      ? visit.allergies.map((allergy: any) => allergy.name || allergy).join(', ')
+                      ? visit.allergies
+                          .map((allergy: any) => allergy.name || allergy)
+                          .join(', ')
                       : 'No allergies recorded',
                   },
                 },
@@ -151,7 +180,9 @@ export class HealthRecordsDetailsComponent implements OnInit {
                     Conditions: visit?.chronicConditions?.length
                       ? visit.chronicConditions
                           .map((condition: any) =>
-                            condition && typeof condition === 'object' && condition.name
+                            condition &&
+                            typeof condition === 'object' &&
+                            condition.name
                               ? condition.name
                               : ''
                           )
@@ -162,9 +193,15 @@ export class HealthRecordsDetailsComponent implements OnInit {
                 {
                   sectionTitle: 'Lifestyle Information',
                   info: {
-                    Smoking: visit?.lifeStyleInformation?.smoking?.use ? 'Yes' : 'No',
-                    'Alcohol Use': visit?.lifeStyleInformation?.alcoholUse?.use ? 'Yes' : 'No',
-                    'Drug Use': visit?.lifeStyleInformation?.drugUse?.use ? 'Yes' : 'No',
+                    Smoking: visit?.lifeStyleInformation?.smoking?.use
+                      ? 'Yes'
+                      : 'No',
+                    'Alcohol Use': visit?.lifeStyleInformation?.alcoholUse?.use
+                      ? 'Yes'
+                      : 'No',
+                    'Drug Use': visit?.lifeStyleInformation?.drugUse?.use
+                      ? 'Yes'
+                      : 'No',
                   },
                 },
                 {
@@ -222,14 +259,23 @@ export class HealthRecordsDetailsComponent implements OnInit {
                   info: {
                     Treatments: visit?.treatmentDetails
                       ? {
-                          Chemotherapy: visit.treatmentDetails.chemoTherapy || 'None',
-                          Radiotherapy: visit.treatmentDetails.radioTherapy || 'None',
-                          'Palliative Care': visit.treatmentDetails.palliativeCare || 'None',
+                          Chemotherapy:
+                            visit.treatmentDetails.chemoTherapy || 'None',
+                          Radiotherapy:
+                            visit.treatmentDetails.radioTherapy || 'None',
+                          'Palliative Care':
+                            visit.treatmentDetails.palliativeCare || 'None',
                           Surgery: visit.treatmentDetails.surgery || 'None',
-                          'Hormone Therapy': visit.treatmentDetails.hormoneTherapy || 'None',
-                          Symptomatic: visit.treatmentDetails.symptomatic || 'None',
-                          'Alternative Treatment': visit.treatmentDetails.alternativeTreatment || 'None',
-                          'Medical Procedure': visit.treatmentDetails.medicalProcedureDetails || 'None',
+                          'Hormone Therapy':
+                            visit.treatmentDetails.hormoneTherapy || 'None',
+                          Symptomatic:
+                            visit.treatmentDetails.symptomatic || 'None',
+                          'Alternative Treatment':
+                            visit.treatmentDetails.alternativeTreatment ||
+                            'None',
+                          'Medical Procedure':
+                            visit.treatmentDetails.medicalProcedureDetails ||
+                            'None',
                         }
                       : 'No treatment details available',
                   },
@@ -250,7 +296,8 @@ export class HealthRecordsDetailsComponent implements OnInit {
                   sectionTitle: 'Outcome Details',
                   info: {
                     'Is Alive': visit?.outcomeDetails?.isAlive ? 'Yes' : 'No',
-                    'Death Location': visit?.outcomeDetails?.deathLocation || '-',
+                    'Death Location':
+                      visit?.outcomeDetails?.deathLocation || '-',
                     'Death Date': visit?.outcomeDetails?.deathDate || '-',
                     Referred: visit?.outcomeDetails?.referred ? 'Yes' : 'No',
                   },
@@ -258,9 +305,13 @@ export class HealthRecordsDetailsComponent implements OnInit {
                 {
                   sectionTitle: 'Causes of Death Details',
                   info: {
-                    'Cause of Death': visit?.causesOfDeathDetails?.primaryCause || '-',
-                    'Contributing Factors': visit?.causesOfDeathDetails?.contributingFactors?.length
-                      ? visit.causesOfDeathDetails.contributingFactors.join(', ')
+                    'Cause of Death':
+                      visit?.causesOfDeathDetails?.primaryCause || '-',
+                    'Contributing Factors': visit?.causesOfDeathDetails
+                      ?.contributingFactors?.length
+                      ? visit.causesOfDeathDetails.contributingFactors.join(
+                          ', '
+                        )
                       : 'None',
                   },
                 },
@@ -303,31 +354,33 @@ export class HealthRecordsDetailsComponent implements OnInit {
                 },
                 {
                   sectionTitle: 'Contact People',
-                  info:
-                    visit?.demographicDetails?.contactPeople?.length
-                      ? visit.demographicDetails.contactPeople
-                          .filter((contact: any) => contact.relationShip !== null)
-                          .map((contact: any) => ({
-                            'First Name': contact.firstName || '-',
-                            'Last Name': contact.lastName || '-',
-                            'Phone Numbers':
-                              contact.phoneNumbers?.filter((num: any) => num).join(', ') ||
-                              'No contact number',
-                            Relationship: contact.relationShip || '-',
-                          }))[0] || { 'No emergency contacts available': '' }
-                      : { 'No emergency contacts available': '' },
+                  info: visit?.demographicDetails?.contactPeople?.length
+                    ? visit.demographicDetails.contactPeople
+                        .filter((contact: any) => contact.relationShip !== null)
+                        .map((contact: any) => ({
+                          'First Name': contact.firstName || '-',
+                          'Last Name': contact.lastName || '-',
+                          'Phone Numbers':
+                            contact.phoneNumbers
+                              ?.filter((num: any) => num)
+                              .join(', ') || 'No contact number',
+                          Relationship: contact.relationShip || '-',
+                        }))[0] || { 'No emergency contacts available': '' }
+                    : { 'No emergency contacts available': '' },
                 },
                 {
                   sectionTitle: 'Prescription',
                   info: {
-                    Prescription: visit?.prescription?.prescription || 'No prescription',
+                    Prescription:
+                      visit?.prescription?.prescription || 'No prescription',
                   },
                 },
               ].filter(
                 (section) =>
                   section.info !== null &&
                   section.info !== undefined &&
-                  (typeof section.info !== 'object' || Object.keys(section.info).length > 0)
+                  (typeof section.info !== 'object' ||
+                    Object.keys(section.info).length > 0)
               ),
             }));
 
@@ -338,25 +391,35 @@ export class HealthRecordsDetailsComponent implements OnInit {
               'Client ID': this.client?.demographicDetails?.clientID,
               Gender: this.client?.demographicDetails?.gender,
               'Date of Birth': this.client?.demographicDetails?.dateOfBirth,
-              "NIDA": this.client?.demographicDetails.nida || '-',
+              NIDA: this.client?.demographicDetails.nida || '-',
               'Phone Numbers': this.client?.demographicDetails?.phoneNumbers,
               Emails: this.client?.demographicDetails?.emails,
               Occupation: this.client?.demographicDetails?.occupation,
               Nationality: this.client?.demographicDetails?.nationality,
               'Marital Status': this.client?.demographicDetails?.maritalStatus,
-              Address: this.client?.demographicDetails?.addresses?.map((address: any) => {
-                const addressParts = [
-                  address?.village,
-                  address?.ward,
-                  address?.district,
-                  address?.region,
-                  address?.city,
-                  address?.state,
-                  address?.country
-                ].filter(part => part && part.trim() !== '' && part.trim() !== 'undefined');  // Filter out null, undefined, and empty strings
+              Address:
+                this.client?.demographicDetails?.addresses?.map(
+                  (address: any) => {
+                    const addressParts = [
+                      address?.village,
+                      address?.ward,
+                      address?.district,
+                      address?.region,
+                      address?.city,
+                      address?.state,
+                      address?.country,
+                    ].filter(
+                      (part) =>
+                        part &&
+                        part.trim() !== '' &&
+                        part.trim() !== 'undefined'
+                    ); // Filter out null, undefined, and empty strings
 
-                return addressParts.length > 0 ? addressParts.join(', ') : '-';
-              }) || '-'
+                    return addressParts.length > 0
+                      ? addressParts.join(', ')
+                      : '-';
+                  }
+                ) || '-',
             };
 
             // console.log(JSON.parse(this.client?.demographicDetails?.addresses))
@@ -373,5 +436,54 @@ export class HealthRecordsDetailsComponent implements OnInit {
           });
       }
     });
+  }
+
+  showDeleteConfirm(
+    nzContent: string,
+    file: { name: string; url: string }
+  ): void {
+    console.log(file);
+    this.modal.create({
+      nzTitle: 'Delete Confirmation',
+      nzContent,
+      nzOkText: 'Delete',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzCancelText: 'Cancel',
+      nzCentered: true,
+      nzClassName: 'custom-confirm-modal',
+    });
+  }
+
+  viewFile(file: { name: string; url: string }) {
+    this.modal.create({
+      nzTitle: file.name,
+      nzContent: DicomViewerComponent,
+      nzWidth: '40%',
+      nzMaskClosable: false,
+      nzData: {
+        data: `../../../../../api/v1/files/${file.url}/downloads?id=${this.hcrCode}`,
+      },
+      nzFooter: null,
+    });
+  }
+
+  handleChange(info: NzUploadChangeParam): void {
+    if (info.file.status === 'done') {
+      this.messageService.success(
+        `${info.file.name} file uploaded successfully`
+      );
+      console.log(info.file.response);
+      this.files.push({
+        name: info.file.name,
+        url: info.file.response?.fileName,
+      });
+    } else if (info.file.status === 'error') {
+      this.messageService.error(`${info.file.name} file upload failed.`);
+    }
+  }
+
+  getAddress() {
+    return `../../../../../api/v1/files/${this.hcrCode}/uploads`;
   }
 }

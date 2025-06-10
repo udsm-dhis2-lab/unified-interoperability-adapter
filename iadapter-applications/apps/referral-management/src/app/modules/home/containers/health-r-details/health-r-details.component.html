@@ -58,40 +58,108 @@
               <h2>Visits</h2>
               @for (visit of visits; track visit; let i = $index) {
               <nz-collapse style="margin-bottom: 24px">
-                  <nz-collapse-panel nzHeader="Visit #{{ i + 1 }} - {{visit.extraInfo[0].info.Name}} - {{visit.extraInfo[1].info['Visit Date']}}">
-                    <p style="margin:0;">
-                      <!-- {{visit.extraInfo[1].info['Visit Date'] | json}} -->
-
-                    </p>
-                    <nz-tabset>
-                      <!-- <h2>{{visit | json}}</h2> -->
-                      <div *ngFor="let section of visit.extraInfo">
-                        <nz-tab nzTitle="{{ section.sectionTitle }}">
-                          <ul class="no-bullets">
-                            <li *ngFor="let key of objectKeys(section.info)">
-                              <div
-                                nz-row
-                                nzJustify="space-between"
-                                style="padding: 8px 0"
-                              >
-                                <div nz-col nzSpan="6">
-                                  <strong>{{ key }}</strong>
-                                </div>
-                                <div nz-col nzSpan="12" style="text-align: right">
-                                  <app-dynamic-list
-                                    [value]="section.info[key]"
-                                  ></app-dynamic-list>
-                                </div>
+                <nz-collapse-panel
+                  nzHeader="Visit #{{ i + 1 }} - {{
+                    visit.extraInfo[0].info.Name
+                  }} - {{ visit.extraInfo[1].info['Visit Date'] }}"
+                >
+                  <p style="margin: 0">
+                    <!-- {{visit.extraInfo[1].info['Visit Date'] | json}} -->
+                  </p>
+                  <nz-tabset>
+                    <!-- <h2>{{visit | json}}</h2> -->
+                    <div *ngFor="let section of visit.extraInfo">
+                      <nz-tab nzTitle="{{ section.sectionTitle }}">
+                        <ul class="no-bullets">
+                          <li *ngFor="let key of objectKeys(section.info)">
+                            <div
+                              nz-row
+                              nzJustify="space-between"
+                              style="padding: 8px 0"
+                            >
+                              <div nz-col nzSpan="6">
+                                <strong>{{ key }}</strong>
                               </div>
-                            </li>
-                          </ul>
-                        </nz-tab>
-                      </div>
-                    </nz-tabset>
-                  </nz-collapse-panel>
-                </nz-collapse>
+                              <div nz-col nzSpan="12" style="text-align: right">
+                                <app-dynamic-list
+                                  [value]="section.info[key]"
+                                ></app-dynamic-list>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </nz-tab>
+                    </div>
+                  </nz-tabset>
+                </nz-collapse-panel>
+              </nz-collapse>
               }
             </div>
+          </nz-card>
+        </div>
+        <div nz-col nzSpan="8">
+          <nz-card style="min-height: 60vh">
+            <div nz-row nzJustify="space-between" nzAlign="middle">
+              <div nz-col nzSpan="12">
+                <h2>Files</h2>
+              </div>
+              <div nz-col nzSpan="12">
+                <nz-upload
+                  [nzAction]="getAddress()"
+                  (nzChange)="handleChange($event)"
+                >
+                  <button nz-button>
+                    <span nz-icon nzType="upload" nzTheme="outline"></span>
+                    Add
+                  </button>
+                </nz-upload>
+              </div>
+            </div>
+            <nz-table #basicTable [nzData]="files" *ngIf="files.length">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th></th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let file of files">
+                  <td>{{ file.name }}</td>
+                  <td>
+                    <a
+                      (click)="viewFile(file)"
+                      (keyup.enter)="viewFile(file)"
+                      tabindex="0"
+                      >View</a
+                    >
+                  </td>
+                  <td>
+                    <button
+                      nz-button
+                      nzType="text"
+                      (click)="
+                        showDeleteConfirm(
+                          'Are you sure you want to delete ' +
+                            ' ' +
+                            file.name +
+                            '? This action cannot be undone.',
+                          file
+                        )
+                      "
+                      style="padding: 0; border: none; height: auto"
+                    >
+                      <i
+                        nz-icon
+                        nzType="delete"
+                        nzTheme="outline"
+                        style="color: #ff4d4f"
+                      ></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </nz-table>
           </nz-card>
         </div>
       </div>
