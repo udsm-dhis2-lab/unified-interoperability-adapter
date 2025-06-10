@@ -48,6 +48,7 @@ import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.getComponentValueDateTime;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.InvestigationDetailsUtils.getInvestigationDetailsFromObservationGroup;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
@@ -1397,132 +1398,10 @@ public class SharedHealthRecordsService {
                                         fhirClient,
                                         "investigation-details", encounter,
                                         true, false);
-                                // Visit notes
+
                                 if (!investigationDetailsGroup.isEmpty()) {
                                     for (Observation observationGroup : investigationDetailsGroup) {
-                                        InvestigationDetailsDTO investigationDetailsDTO = new InvestigationDetailsDTO();
-                                        List<Observation> caseClassificationData = getObservationsByObservationGroupId(
-                                                fhirClient,
-                                                "case-classification",
-                                                encounter,
-                                                observationGroup.getIdElement()
-                                                        .getIdPart());
-                                        if (!caseClassificationData.isEmpty()) {
-                                            for (Observation observation : caseClassificationData) {
-                                                if (observation.hasValueStringType()) {
-                                                    investigationDetailsDTO
-                                                            .setCaseClassification(
-                                                                    observation.getValueStringType()
-                                                                            .toString());
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        investigationDetailsDTO
-                                                .setDateOccurred(
-                                                        observationGroup.hasEffectiveDateTimeType()
-                                                                ? observationGroup
-                                                                .getEffectiveDateTimeType()
-                                                                .getValue()
-                                                                : null);
-
-//                                        List<Observation> daysSinceSymptomsData = getObservationsByObservationGroupId(
-//                                                fhirClient,
-//                                                "days-since-symptoms",
-//                                                encounter,
-//                                                observationGroup.getIdElement()
-//                                                        .getIdPart());
-
-                                        List<Observation> daysSinceSymptomsData = getObservationsByCategoryAndCode(
-                                                fhirClient,
-                                                fhirContext,
-                                                encounter,
-                                                "days-since-symptoms",
-                                                null);
-
-                                        if (!daysSinceSymptomsData.isEmpty()) {
-                                            for (Observation observation : daysSinceSymptomsData) {
-                                                if (observation.hasValueStringType()) {
-                                                    investigationDetailsDTO
-                                                            .setDaysSinceSymptoms(
-                                                                    Integer.valueOf(observation.getValueStringType()
-                                                                            .getValue())
-                                                                            );
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        List<Observation> diseaseCodeData = getObservationsByObservationGroupId(
-                                                fhirClient,
-                                                "disease-code",
-                                                encounter,
-                                                observationGroup.getIdElement()
-                                                        .getIdPart());
-                                        if (!diseaseCodeData.isEmpty()) {
-                                            for (Observation observation : diseaseCodeData) {
-                                                if (observation.hasValueCodeableConcept()) {
-                                                    investigationDetailsDTO
-                                                            .setDiseaseCode(observation
-                                                                    .getValueCodeableConcept()
-                                                                    .getCoding()
-                                                                    .get(0)
-                                                                    .getCode());
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        List<Observation> labSpecimenTakenData = getObservationsByObservationGroupId(
-                                                fhirClient,
-                                                "lab-specimen-taken",
-                                                encounter,
-                                                observationGroup.getIdElement()
-                                                        .getIdPart());
-                                        if (!labSpecimenTakenData.isEmpty()) {
-                                            for (Observation observation : labSpecimenTakenData) {
-                                                if (observation.hasValueStringType()) {
-                                                    investigationDetailsDTO
-                                                            .setLabSpecimenTaken(
-                                                                    observation.getValueStringType()
-                                                                            .toString());
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        List<Observation> specimenSentToData = getObservationsByObservationGroupId(
-                                                fhirClient,
-                                                "specimen-sent-to",
-                                                encounter,
-                                                observationGroup.getIdElement()
-                                                        .getIdPart());
-                                        if (!specimenSentToData.isEmpty()) {
-                                            for (Observation observation : specimenSentToData) {
-                                                if (observation.hasValueStringType()) {
-                                                    investigationDetailsDTO
-                                                            .setSpecimenSentTo(
-                                                                    observation.getValueStringType()
-                                                                            .toString());
-                                                    break;
-                                                }
-                                            }
-                                        }
-
-                                        List<Observation> vaccinatedData = getObservationsByObservationGroupId(
-                                                fhirClient,
-                                                "vaccinated", encounter,
-                                                observationGroup.getIdElement()
-                                                        .getIdPart());
-                                        if (!vaccinatedData.isEmpty()) {
-                                            for (Observation observation : vaccinatedData) {
-                                                if (observation.hasValueStringType()) {
-                                                    investigationDetailsDTO
-                                                            .setVaccinated(observation
-                                                                    .getValueStringType()
-                                                                    .toString());
-                                                    break;
-                                                }
-                                            }
-                                        }
+                                       InvestigationDetailsDTO investigationDetailsDTO =  getInvestigationDetailsFromObservationGroup(fhirClient, encounter, observationGroup, fhirContext);
                                         investigationDetailsDTOList.add(
                                                 investigationDetailsDTO);
                                     }
