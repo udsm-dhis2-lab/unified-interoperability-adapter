@@ -81,7 +81,7 @@ export class HomeComponent implements OnDestroy, OnInit {
       .getHduClients(pageIndex, pageSize, filter)
       .subscribe({
         next: (data: any) => {
-          console.log(data);
+          console.log(data.listOfClients);
           this.loading = false;
           this.total = data.total;
           this.pageIndex = data.pageIndex;
