@@ -11,8 +11,8 @@ export class ClientPage {
     clientPage.pageIndex = data?.pager?.page ?? 0;
     clientPage.pageSize = data?.pager?.pageSize ?? 0;
     clientPage.total = data?.pager?.total ?? 0;
-    clientPage.listOfClients = (data?.results ?? []).map((item: any) =>
-      HDUAPIClientDetails.fromJson(item)
+    clientPage.listOfClients = (data?.results ?? []).map(
+      HDUAPIClientDetails.fromJson
     );
     return clientPage;
   }

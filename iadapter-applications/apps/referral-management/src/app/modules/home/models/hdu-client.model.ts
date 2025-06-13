@@ -37,7 +37,9 @@ export class HduClient {
     hduClient.surname = json['lastName'] || '';
     hduClient.gender = json['gender'] || '';
     hduClient.dateOfBirth = json['dateOfBirth'] || '';
-    hduClient.phoneNumbers = json['phoneNumbers'] ? json['phoneNumbers'].join(', ') : '';
+    hduClient.phoneNumbers = json['phoneNumbers']
+      ? json['phoneNumbers'].join(', ')
+      : '';
     hduClient.emails = json['emails'] ? json['emails'].join(', ') : '';
     hduClient.addresses = json['addresses'] ? json['addresses'] : '';
     hduClient.occupation = json['occupation'] || '';
@@ -49,8 +51,14 @@ export class HduClient {
     hduClient.relatedClients = json['relatedClients'] || [];
 
     // Handle identifiers for idNumber and idType
-    hduClient.idNumber = json['identifiers'] && json['identifiers'][0] ? json['identifiers'][0]['id'] : '';
-    hduClient.idType = json['identifiers'] && json['identifiers'][0] ? json['identifiers'][0]['type'] : '';
+    hduClient.idNumber =
+      json['identifiers'] && json['identifiers'][0]
+        ? json['identifiers'][0]['id']
+        : '';
+    hduClient.idType =
+      json['identifiers'] && json['identifiers'][0]
+        ? json['identifiers'][0]['type']
+        : '';
 
     return hduClient;
   }
@@ -201,7 +209,9 @@ export class HDUAPIClientDetails {
 
   static fromJson(json: any): HDUAPIClientDetails {
     const hduClient = new HDUAPIClientDetails();
-    hduClient.demographicDetails = HduClient.fromJson(json['demographicDetails'] || {});
+    hduClient.demographicDetails = HduClient.fromJson(
+      json['demographicDetails'] || {}
+    );
     hduClient.facilityDetails = {
       code: json['facilityDetails']?.['code'] || '',
       name: json['facilityDetails']?.['name'] || '',
@@ -233,6 +243,6 @@ export class HDUAPIClientDetails {
     hduClient.referralDetails = json['referralDetails'] || {};
     hduClient.otherInformation = json['otherInformation'];
 
-    return hduClient;
+    return { ...json, ...hduClient };
   }
 }

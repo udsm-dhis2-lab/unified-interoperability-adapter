@@ -51,6 +51,7 @@ export class DeduplicationHomeComponent implements OnDestroy, OnInit {
       .subscribe({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         next: (data: any) => {
+          console.log(data.data);
           this.loading = false;
           this.total = data.total;
           this.pageIndex = data.pageIndex;
