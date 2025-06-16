@@ -1,0 +1,97 @@
+<div style="padding: 16px">
+  <button nz-button nzType="default" (click)="backToList()">
+    Back to List
+  </button>
+  <div
+    *ngIf="loading"
+    style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 999;
+    "
+  >
+    <div
+      style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      "
+    >
+      <nz-spin nzSimple nzSize="large"></nz-spin>
+    </div>
+  </div>
+  <div *ngIf="!loading && !client">
+    <nz-empty nzNotFoundImage="simple"></nz-empty>
+  </div>
+  <div *ngIf="client">
+    <nz-card style="width: 100%; margin-top: 16px; min-height: 60vh">
+      <div nz-row [nzGutter]="16">
+        <div nz-col nzSpan="8">
+          <nz-card style="min-height: 60vh">
+            <h2>Basic Information</h2>
+            <ul class="no-bullets">
+              <li *ngFor="let key of objectKeys(basicInfo)">
+                <strong> {{ key }} </strong>:{{ basicInfo[key] }}
+              </li>
+            </ul>
+
+            <br />
+
+            <!-- <h2>Other Informations</h2>
+            <ul class="no-bullets">
+              <div *ngFor="let id of identifiers">
+                <li *ngFor="let key of objectKeys(id)">
+                  <strong>{{ key }} </strong>:{{ id[key] }}
+                </li>
+              </div>
+            </ul> -->
+          </nz-card>
+        </div>
+        <div nz-col nzSpan="16">
+          <nz-card style="min-height: 60vh">
+            <div>
+              <nz-tabset>
+                  <nz-tab nzTitle="Referral">
+
+                    <nz-table [nzData]="referrals" [nzFrontPagination]="false" [nzShowPagination]="false">
+                      <thead>
+                        <tr>
+                          <th>SN</th>
+                          <th>Referral Date</th>
+                          <th>Referral No</th>
+                          <th>Referring Facility</th>
+                          <th>Referred Facility</th>
+                          <th>Referred Abroad</th>
+                        </tr>
+                      </thead>
+                      <tbody cdkDropList (cdkDropListDropped)="drop($event)">
+                        @for (data of referrals; track data; let i = $index) {
+                          <tr cdkDrag>
+                            <td>
+                              {{
+                                 i + 1
+                              }}
+                            </td>
+                            <td>{{ data.referral_date | date:'dd MMM yyyy'}}</td>
+                            <td>{{ data.referral_number }}</td>
+                            <td>{{ data.referring_facility || "Buguruni Health Center"}}</td>
+                            <td>{{ data.referred_to_facility || "Amana Hospital" }}</td>
+                            <td>{{ data.referred_to_other_country === false ? "No" : "Yes"  }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </nz-table>
+                  </nz-tab>
+              </nz-tabset>
+            </div>
+          </nz-card>
+        </div>
+      </div>
+    </nz-card>
+  </div>
+</div>

@@ -148,6 +148,22 @@ export class HduApiNavMenuComponent implements OnInit {
         }
       ],
     },
+    // add user management
+    {
+      name: 'User Management',
+      id: 'user-management',
+      routeUrl: '/user-management',
+      icon: 'user',
+      category: 'main',
+      subMenus: [
+        {
+          name: 'Users',
+          id: 'users',
+          routeUrl: '/user-management',
+          icon: 'unordered-list',
+          subMenus: [],
+        }
+      ]},
     {
       name: 'Settings',
       id: 'settings',

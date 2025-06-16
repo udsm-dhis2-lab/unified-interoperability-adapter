@@ -1,0 +1,180 @@
+<nz-layout>
+  <nz-content>
+    <nz-breadcrumb class="breadcrumb">
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/home']">User Management</a>
+      </nz-breadcrumb-item>
+      <nz-breadcrumb-item>
+        <a [routerLink]="['/workflows']">Users</a>
+      </nz-breadcrumb-item>
+    </nz-breadcrumb>
+
+    <div class="inner-content">
+      <!-- Filter Row -->
+      <!-- Filter Row -->
+      <div nz-row [nzGutter]="16" style="padding: 16px">
+        <!-- First Name Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="First Name"
+            [(ngModel)]="firstName"
+            class="sexy-input"
+            (ngModelChange)="filterData($event, 'firstName')"
+          />
+        </div>
+
+        <!-- Facility Search Inputs -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Facility"
+            [(ngModel)]="facilityFrom"
+            (ngModelChange)="filterData($event, 'referringFacility')"
+            class="sexy-input"
+          />
+        </div>
+
+        <!-- Client ID Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Referral Number"
+            [(ngModel)]="referralNumber"
+            (ngModelChange)="filterData($event, 'referralNumber')"
+            class="sexy-input"
+          />
+        </div>
+
+        <!-- Client ID Input -->
+        <div nz-col [nzSpan]="4">
+          <input
+            nz-input
+            placeholder="Client ID"
+            [(ngModel)]="clientId"
+            (ngModelChange)="filterData($event, 'clientId')"
+            class="sexy-input"
+          />
+        </div>
+
+        <!-- Date Filters -->
+        <div nz-col [nzSpan]="4">
+          <nz-date-picker
+            style="width: 100%; width: 100% !important"
+            nzPlaceHolder="Start Date"
+            [(ngModel)]="startDate"
+            (ngModelChange)="filterData($event, 'startDate')"
+            class="sexy-input"
+          ></nz-date-picker>
+        </div>
+        <div nz-col [nzSpan]="4">
+          <nz-date-picker
+            style="width: 100%; width: 100% !important"
+            nzPlaceHolder="End Date"
+            [(ngModel)]="endDate"
+            (ngModelChange)="filterData($event, 'endDate')"
+            class="sexy-input"
+          ></nz-date-picker>
+        </div>
+
+        <div nz-col [nzSpan]="4">
+          <br />
+
+          <nz-select
+            ngModel="gender"
+            style="width: 100%"
+            nzAllowClear
+            nzPlaceHolder="Select a gender"
+            (ngModelChange)="filterData($event, 'gender')"
+          >
+            <nz-option nzValue="male" nzLabel="Male"></nz-option>
+            <nz-option nzValue="female" nzLabel="Female"></nz-option>
+          </nz-select>
+        </div>
+
+        <!-- Apply Filters Button -->
+        <div nz-col [nzSpan]="1.5">
+          <br />
+          <button
+            nz-button
+            nzType="primary"
+            (click)="applyFilters()"
+            class="apply-button"
+          >
+            Search
+          </button>
+        </div>
+
+        <div nz-col [nzSpan]="1">
+          <br />
+          <button
+            nz-button
+            nzType="default"
+            (click)="resetFilters()"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div nz-row>
+        <div style="padding: 0 16px 16px; width: 100%">
+          <nz-table
+            nzShowSizeChanger
+            [nzData]="referrals"
+            [nzFrontPagination]="false"
+            [nzLoading]="loading"
+            [nzTotal]="total"
+            [nzPageSize]="pageSize"
+            [nzPageIndex]="pageIndex"
+            (nzQueryParams)="onQueryParamsChange($event)"
+          >
+            <thead>
+              <tr>
+                <th>SN</th>
+                <th>Client ID</th>
+                <th>First name</th>
+                <th>Middle name</th>
+                <th>Last name</th>
+                <th>Gender</th>
+                <th>National ID</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (referral of referrals; track referral.client_id; let i =
+              $index) {
+              <tr>
+                <td>
+                  {{
+                    pageIndex === 1 ? i + 1 : (pageIndex - 1) * pageSize + i + 1
+                  }}
+                </td>
+                <td>
+                  <span style="color: #1890ff">{{ referral.client_id }}</span>
+                </td>
+                <td>{{ referral.first_name }}</td>
+                <td> {{ referral.mname }}</td>
+                <td>{{ referral.surname }}</td>
+                <td>{{ referral.gender | titlecase }}</td>
+                <td>{{ referral.nida | titlecase }}</td>
+                <td>
+                  <button
+                    nz-button
+                    nzType="text"
+                    class="view-button"
+                    (click)="viewClientDetails(referral.client_id)"
+                  >
+                    View
+                  </button>
+                </td>
+              </tr>
+              }
+            </tbody>
+          </nz-table>
+        </div>
+      </div>
+    </div>
+  </nz-content>
+</nz-layout>
