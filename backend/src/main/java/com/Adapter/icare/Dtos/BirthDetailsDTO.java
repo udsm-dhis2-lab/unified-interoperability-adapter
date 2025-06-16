@@ -39,7 +39,7 @@ public class BirthDetailsDTO {
     @JsonDeserialize(using = OutcomeDetailsDeserializer.class)
     private ParentBDOutcomeDetailsDTO outcomeDetails;
 
-    private CodeAndNameDTO motherHivStatus;
+    private Boolean motherHivStatus;
     private Boolean providedWithARV;
     private Boolean referred;
     private List<VaccinationDetailsDTO> vaccinationDetails;
