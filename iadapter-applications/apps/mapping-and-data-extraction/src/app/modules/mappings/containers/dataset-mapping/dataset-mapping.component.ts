@@ -475,12 +475,21 @@ export class DatasetMappingComponent implements OnInit {
               } else if (
                 key === 'endAge' ||
                 key === 'co' ||
-                key === 'higherWeight'
+                key === 'higherWeight' ||
+                key === 'motherEndAge'
               ) {
                 return;
               } else if (key === 'lowerWeight') {
                 const configuration = this.configurationOptionList.find(
                   (item: any) => item.value.keyToUseInMappings === 'weightGroup'
+                );
+                this.assignConfigurationToSelectedDisaggregation(
+                  configuration.value
+                );
+              } else if (key === 'motherStartAge') {
+                const configuration = this.configurationOptionList.find(
+                  (item: any) =>
+                    item.value.keyToUseInMappings === 'motherAgeGroup'
                 );
                 this.assignConfigurationToSelectedDisaggregation(
                   configuration.value
@@ -502,7 +511,8 @@ export class DatasetMappingComponent implements OnInit {
                 if (
                   key === 'endAge' ||
                   key === 'co' ||
-                  key === 'higherWeight'
+                  key === 'higherWeight' ||
+                  key === 'motherEndAge'
                 ) {
                   return;
                 } else if (key === 'startAge') {
@@ -523,7 +533,27 @@ export class DatasetMappingComponent implements OnInit {
                         configuration.value.keyToUseInMappings,
                     });
                   }
-                } else if (key === 'lowerWeight') {
+                } else if (key === 'motherStartAge') {
+                  const configuration = this.configurationOptionList.find(
+                    (item: any) =>
+                      item.value.keyToUseInMappings === 'motherAgeGroup'
+                  );
+                  const selectedOption = configuration.value.options.find(
+                    (item: any) =>
+                      item.motherStartAge === param.motherStartAge &&
+                      item.motherEndAge === param.motherEndAge
+                  );
+                  if (selectedOption) {
+                    this.onSelectMappingSetting({
+                      value: selectedOption,
+                      categoryOptionComboId: param.co,
+                      settingName: configuration.label,
+                      keyToUseInMappings:
+                        configuration.value.keyToUseInMappings,
+                    });
+                  }
+                }
+                else if (key === 'lowerWeight') {
                   const configuration = this.configurationOptionList.find(
                     (item: any) =>
                       item.value.keyToUseInMappings === 'weightGroup'
@@ -779,7 +809,13 @@ export class DatasetMappingComponent implements OnInit {
                 startAge: event.value.startAge,
                 endAge: event.value.endAge,
               };
-            } else {
+            } else if (event.keyToUseInMappings === 'motherAgeGroup') {
+              config.payLoad = {
+                motherStartAge: event.value.motherStartAge,
+                motherEndAge: event.value.motherEndAge,
+              };
+            }
+            else {
               config.payLoad = {
                 [event.keyToUseInMappings]: event.value.code,
               };
