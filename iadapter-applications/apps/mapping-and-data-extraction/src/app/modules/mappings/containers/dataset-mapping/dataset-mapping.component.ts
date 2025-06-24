@@ -817,14 +817,14 @@ export class DatasetMappingComponent implements OnInit {
             }
             else {
               config.payLoad = {
-                [event.keyToUseInMappings]: event.value.code,
+                [event.keyToUseInMappings]: (event.value && event.value.code) ? event.value.code : '',
               };
             }
           }
         });
       }
     });
-  }
+  }   
 
   createMappingsPayload() {
     const payLoad = {
