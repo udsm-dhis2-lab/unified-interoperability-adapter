@@ -25,7 +25,7 @@
             <div nz-row [nzGutter]="8" style="margin-bottom: 16px" *ngIf="rightColumnSpan === 16">
               <div nz-col nzSpan="12">
                 <label nz-checkbox [(ngModel)]="useSum">Use sum to aggregate</label>
-                <label nz-checkbox (ngModelChange)="generateCustomQuery($event)" [(ngModel)]="freeTextQuery">Use free
+                <label nz-checkbox (ngModelChange)="onFreeTextQueryChange($event)" [(ngModel)]="freeTextQuery">Use free
                   text query</label>
               </div>
             </div>

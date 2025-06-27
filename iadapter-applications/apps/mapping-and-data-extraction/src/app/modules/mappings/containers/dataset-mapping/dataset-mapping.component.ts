@@ -18,7 +18,7 @@ import {
 } from '../../models';
 import { SelectComponent } from '../../../../shared';
 import { SharedModule } from '../../../../shared/shared.module';
-import generateQueryFromMapping  from '../../utils/generate-query-from-mapping';
+import generateQueryFromMapping from '../../utils/generate-query-from-mapping';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -386,11 +386,7 @@ export class DatasetMappingComponent implements OnInit {
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
-          this.alert = {
-            show: true,
-            type: 'error',
-            message: error.message,
-          };
+          this.showAlert('error', error.message);
           // TODO: Handle error
         },
       });
@@ -827,12 +823,21 @@ export class DatasetMappingComponent implements OnInit {
     });
   }
 
-  generateCustomQuery(event: Event) {
-    console.log('Generating custom query');
-    console.log("================= event", event);
-    let customQuery = '';
-    customQuery = generateQueryFromMapping(this.createMappingsPayload());
-    console.log('Custom Query:', customQuery);
+  onFreeTextQueryChange(checked: boolean): void {
+    if (checked) {
+      if (!this.selectedInputId) {
+        this.showAlert(
+          'error',
+          'Please select an input field to generate a custom query.'
+        );
+        setTimeout(() => (this.freeTextQuery = false));
+        return;
+      }
+      this.customQuery = generateQueryFromMapping(this.createMappingsPayload());
+
+    } else {
+      this.customQuery = '';
+    }
   }
 
   createMappingsPayload() {
@@ -925,20 +930,12 @@ export class DatasetMappingComponent implements OnInit {
     action$.subscribe({
       next: (data: any) => {
         this.isSubmittingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'success',
-          message: 'Mapping added successfully',
-        };
+        this.showAlert('success', 'Mapping saved successfully');
         // TODO: Handle response
       },
       error: (error: any) => {
         this.isSubmittingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'error',
-          message: error.message,
-        };
+        this.showAlert('error', error.message);
         // TODO: Handle error
       },
     });
@@ -949,19 +946,11 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetManagementService.deleteMapping(this.mappingUuid!).subscribe({
       next: (data: any) => {
         this.isDeletingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'success',
-          message: 'Mapping deleted successfully',
-        };
+        this.showAlert('success', 'Mapping deleted successfully');
       },
       error: (error: any) => {
         this.isDeletingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'error',
-          message: error.message,
-        };
+        this.showAlert('error', error.message);
         // TODO: Handle error
       },
     });
@@ -973,6 +962,11 @@ export class DatasetMappingComponent implements OnInit {
       type: '',
       message: '',
     };
+  }
+
+  showAlert(type: 'success' | 'info' | 'error' | 'warning', message: string): void {
+    this.alert = { show: true, type, message };
+    setTimeout(() => this.onCloseAlert(), 5000);
   }
 
   goBackToDatasetList() {
