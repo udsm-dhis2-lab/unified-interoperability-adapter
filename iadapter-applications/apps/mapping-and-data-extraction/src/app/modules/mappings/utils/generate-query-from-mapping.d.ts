@@ -1,0 +1,1 @@
+export default function generateQueryFromMapping(mapping: any): string;

@@ -18,6 +18,7 @@ import {
 } from '../../models';
 import { SelectComponent } from '../../../../shared';
 import { SharedModule } from '../../../../shared/shared.module';
+import generateQueryFromMapping  from '../../utils/generate-query-from-mapping';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -824,7 +825,15 @@ export class DatasetMappingComponent implements OnInit {
         });
       }
     });
-  }   
+  }
+
+  generateCustomQuery(event: Event) {
+    console.log('Generating custom query');
+    console.log("================= event", event);
+    let customQuery = '';
+    customQuery = generateQueryFromMapping(this.createMappingsPayload());
+    console.log('Custom Query:', customQuery);
+  }
 
   createMappingsPayload() {
     const payLoad = {
@@ -979,3 +988,5 @@ export class DatasetMappingComponent implements OnInit {
     return icdCode.name;
   }
 }
+
+
