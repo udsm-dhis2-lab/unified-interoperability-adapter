@@ -18,10 +18,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,6 +60,7 @@ public class SharedHealthRecordValidator {
     }
 
     public List<String> dynamicValidate(SharedHealthRecordsDTO record){
+        List<String> errors = new ArrayList<>();
         if (record == null) {
             return List.of("SharedHealthRecordsDTO record cannot be null.");
         }
@@ -85,44 +83,34 @@ public class SharedHealthRecordValidator {
                         String keyInsideVariable = matcher.group(1);
                         String variableToReplace = matcher.group(0);
 
-                        AtomicReference<Object> valueRef = new AtomicReference<>();
-
-                        Optional<Object> valueOptional = DTONavigator.getValueByPath(record, keyInsideVariable);
-
-                        valueOptional.ifPresent(valueRef::set);
-
-                        var value = valueRef.get();
-
                         ruleExpression = ruleExpression.replace(variableToReplace, keyInsideVariable);
 
                     }
 
                     Expression ruleExpressionParsed = expressionParser.parseExpression(ruleExpression);
-                    System.out.println("Rule expression answer: " + ruleExpressionParsed.getValue(record));
-
-                    System.out.println("Rule Expression: " + validator.getRuleExpression());
+                    var expressionValue = (Boolean) ruleExpressionParsed.getValue(record);
+                    if(expressionValue != null && !expressionValue){
+                        errors.add(validator.getMessage());
+                    }
                 }
             }
 
+            for(String error: errors){
+                System.out.println(error);
+            }
+            return errors;
+
         } catch (DatabindException e) {
-            throw new RuntimeException(e);
+            errors.add("Data Bind error occurred: "+ e);
+            System.out.println("DATABIND EXCEPTION " + e);
         } catch (IOException e) {
             System.err.println("Error reading or mapping JSON file: " + e.getMessage());
-            System.out.println(e);
+            errors.add("Error reading json file: "+ e);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            System.err.println("Unknown error occurred: " + e.getMessage());
+            errors.add("Unknown error occurred: "+ e);
         }
 
-        // Map to String
-        // Rule definition reader
-//        - Regex to get variables in our rule
-//         - EG -> "#{}"
-        // Get values based on variables from the String (1)
-        // replace variables with values
-        // Execute the expression to get boolean value
-        // From boolean accumulate errors
-        // Extract message based on the rule
-//        return errors
-        return List.of("");
+        return errors;
     }
 }
