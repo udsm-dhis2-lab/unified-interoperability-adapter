@@ -78,8 +78,8 @@
 
             <nz-card *ngIf="freeTextQuery" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
               <p>Free Text Query</p>
-              <textarea nz-input placeholder="Controlled autosize" [(ngModel)]="customQuery"
-                [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
+              <nz-code-editor style="height: 250px" [nzEditorOption]="editorOptions" [(ngModel)]="customQuery"
+                (nzEditorInitialized)="onEditorInit($event)"></nz-code-editor>
             </nz-card>
 
             <!-- selecting configurations options -->

@@ -7,14 +7,20 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Component
 public class SharedHealthRecordValidator {
 
-    private final Validator validator; // JSR-380 Validator
+    private final Validator validator;
 
     // Initialize the validator instance (thread-safe)
     public SharedHealthRecordValidator() {
@@ -43,4 +49,4 @@ public class SharedHealthRecordValidator {
                         violation.getMessage()))     // e.g., "firstName can not be null"
                 .collect(Collectors.toList());
     }
-}
+

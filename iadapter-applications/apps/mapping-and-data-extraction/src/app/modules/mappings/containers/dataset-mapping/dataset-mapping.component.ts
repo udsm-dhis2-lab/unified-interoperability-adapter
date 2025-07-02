@@ -9,6 +9,8 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
+import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
+
 import {
   ConfigurationPage,
   Field,
@@ -53,11 +55,24 @@ class Disaggregation {
 @Component({
   selector: 'app-dataset-mapping',
   standalone: true,
-  imports: [SharedModule, SelectComponent],
+  imports: [
+    SharedModule,
+    SelectComponent,
+    NzCodeEditorModule,
+  ],
   templateUrl: './dataset-mapping.component.html',
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  editorOptions = { theme: 'vs-dark', language: 'sql' };
+  databaseSchema = {
+    encounter_flat: ['organization_id', 'patient_id', 'period_start', 'new_visit', 'new_this_year', 'identifier_value'],
+    patient_flat: ['identifier_value', 'gender', 'birth_date'],
+    child_health_flat: ['encounter_id', 'mother_start_age', 'mother_end_age'],
+    diagnostic_report_flat: ['code', 'effective_datetime', 'encounter_id'],
+    condition_flat: ['code', 'onset_datetime', 'encounter_id']
+  };
+
   newThisYear?: boolean = false;
   newVisit?: boolean = false;
 
@@ -838,6 +853,51 @@ export class DatasetMappingComponent implements OnInit {
     } else {
       this.customQuery = '';
     }
+  }
+
+  onEditorInit(editor: any) {
+    const monaco = (window as any).monaco;
+
+    if ((window as any).sqlCompletionProvider) {
+      (window as any).sqlCompletionProvider.dispose();
+    }
+
+    (window as any).sqlCompletionProvider = monaco.languages.registerCompletionItemProvider('sql', {
+      provideCompletionItems: (model: { getWordUntilPosition: (arg0: any) => any; }, position: { lineNumber: any; }) => {
+        const word = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: word.startColumn,
+          endColumn: word.endColumn,
+        };
+
+        const tableSuggestions = Object.keys(this.databaseSchema).map(tableName => ({
+          label: tableName,
+          kind: monaco.languages.CompletionItemKind.Module,
+          documentation: `Table: ${tableName}`,
+          insertText: tableName,
+          range: range,
+        }));
+
+        let columnSuggestions: { label: string; kind: any; documentation: string; insertText: any; range: { startLineNumber: any; endLineNumber: any; startColumn: any; endColumn: any; }; }[] = [];
+        for (const table of Object.keys(this.databaseSchema) as Array<keyof typeof this.databaseSchema>) {
+          this.databaseSchema[table].forEach((column: any) => {
+            columnSuggestions.push({
+              label: `${table}.${column}`,
+              kind: monaco.languages.CompletionItemKind.Field,
+              documentation: `Column: ${column} in ${table}`,
+              insertText: column,
+              range: range,
+            });
+          });
+        }
+
+        return {
+          suggestions: [...tableSuggestions, ...columnSuggestions],
+        };
+      },
+    });
   }
 
   createMappingsPayload() {
