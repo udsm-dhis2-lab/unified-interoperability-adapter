@@ -1,9 +1,9 @@
 <div style="padding: 20px;">
     <form nz-form [formGroup]="standardCodeForm" (ngSubmit)="submitForm()" nzLayout="vertical">
         <nz-form-item>
-            <nz-form-label nzRequired nzFor="codeType">Code Type</nz-form-label>
-            <nz-form-control nzErrorTip="Please select a code type!">
-                <nz-select id="codeType" formControlName="codeType" nzPlaceHolder="Select code type">
+            <nz-form-label nzRequired nzFor="codeType">Standard Code Type</nz-form-label>
+            <nz-form-control nzErrorTip="Please select a standard code type!">
+                <nz-select id="codeType" formControlName="codeType" nzPlaceHolder="Select a standard code type">
                     <ng-container *ngFor="let option of standardCodeCategory">
                         <nz-option [nzValue]="option.key" [nzLabel]="option.name"></nz-option>
                     </ng-container>

@@ -21,6 +21,15 @@
 
   <nz-dropdown-menu #menu="nzDropdownMenu">
     <ul nz-menu>
+      <li nz-menu-item>
+        <span
+          nz-icon
+          nzType="user"
+          nzTheme="outline"
+          class="logout-icon"
+        ></span>
+        Account
+      </li>
       <li nz-menu-item (click)="logOut()">
         <span
           nz-icon
