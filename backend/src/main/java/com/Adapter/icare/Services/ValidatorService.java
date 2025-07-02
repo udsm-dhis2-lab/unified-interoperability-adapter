@@ -67,16 +67,17 @@ public class ValidatorService {
         if (authenticatedUser != null) {
             validator.setLastUpdatedBy(authenticatedUser);
         }
-        if (validator.getUuid() != null) {
-            String uuid = validator.getUuid();
-            Validator validatorToUpdate = validatorRepository.findByUuid(uuid);
-            if (validatorToUpdate != null) {
-                return validatorRepository.save(validator);
-            } else {
-                throw new IllegalStateException("Validator with uuid " + uuid + " does not exists");
-            }
+        Validator validatorToUpdate = validatorRepository.findByUuid(validator.getUuid());
+        if (validatorToUpdate != null) {
+            validatorToUpdate.setName(validator.getName() == null ? validatorToUpdate.getName() : validator.getName());
+            validatorToUpdate.setCode(validator.getCode() == null ? validatorToUpdate.getCode() : validator.getCode());
+            validatorToUpdate.setRuleExpression(validator.getRuleExpression() == null ? validatorToUpdate.getRuleExpression() : validator.getRuleExpression());
+            validatorToUpdate.setErrorMessage(validator.getErrorMessage() == null ? validatorToUpdate.getErrorMessage() : validator.getErrorMessage());
+            validatorToUpdate.setDescription(validator.getDescription() == null ? validatorToUpdate.getDescription() : validator.getDescription());
+
+            return validatorRepository.save(validatorToUpdate);
         } else {
-            throw new IllegalStateException("Validator uuid is not set");
+            throw new IllegalStateException("Validator with uuid " + validator.getUuid() + " does not exists");
         }
     }
 
