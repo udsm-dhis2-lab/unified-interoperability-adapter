@@ -259,6 +259,8 @@ public class HDUAPIController {
                 Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
                 List<SharedHealthRecordsDTO> validatedListGrid = Collections.synchronizedList(new ArrayList<>());
 
+                // TODO: Process clients in chunks in case exceed a certain amount (e.g 20)
+
                 IntStream.range(0, listGrid.size()).parallel().forEach(index -> {
                     SharedHealthRecordsDTO currentRecord = listGrid.get(index);
                     List<String> errors = new ArrayList<String>();
@@ -272,6 +274,9 @@ public class HDUAPIController {
                         validationErrorsMap.put(index, errors);
                     }
                 });
+
+                // TODO: Do not reject the whole request if one record fails
+                // TODO: To softcode the validation by using program rules knowledge to enhance flexibility
 
                 List<Map<String, Object>> recordsWithIssues = validationErrorsMap.entrySet().stream()
                         .map(entry -> {
