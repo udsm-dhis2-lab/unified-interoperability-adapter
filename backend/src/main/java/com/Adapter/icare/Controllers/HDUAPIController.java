@@ -263,6 +263,7 @@ public class HDUAPIController {
                     SharedHealthRecordsDTO currentRecord = listGrid.get(index);
                     List<String> errors = new ArrayList<String>();
                     if (performValidation) {
+                        sharedHealthRecordValidator.dynamicValidate(currentRecord);
                         errors = sharedHealthRecordValidator.validate(currentRecord);
                     }
                     if (errors.isEmpty()) {
