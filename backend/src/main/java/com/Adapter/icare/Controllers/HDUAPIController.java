@@ -323,7 +323,7 @@ public class HDUAPIController {
                     Map<String, Object> testResponse = new HashMap<>();
                     testResponse.put("statusDetails", "Completed testing data");
                     testResponse.put("message", "Congratulations your data passed through all data validation rules.");
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(testResponse);
+                    return ResponseEntity.status(HttpStatus.OK).body(testResponse);
                 }
 
                 DataTemplateDataDTO validatedDataTemplatePayload = new DataTemplateDataDTO();
