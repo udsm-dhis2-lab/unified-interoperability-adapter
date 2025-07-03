@@ -1,0 +1,56 @@
+<nz-layout>
+  <nz-content>
+    <div class="inner-content">
+      <nz-breadcrumb class="breadcrumb">
+        <nz-breadcrumb-item>
+          <a [routerLink]="['/validations']">Validations</a>
+        </nz-breadcrumb-item>
+        <nz-breadcrumb-item>Add New Validation</nz-breadcrumb-item>
+      </nz-breadcrumb>
+
+      <form nz-form [formGroup]="validationForm" (ngSubmit)="saveForm()" class="validation-form">
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="name" nzRequired>Name</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please enter the validation name">
+            <input nz-input id="name" formControlName="name" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="description" nzRequired>Description</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please enter a description">
+            <textarea nz-input id="description" formControlName="description" [nzAutosize]="{ minRows: 2 }"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="message" nzRequired>Message</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please enter the error message">
+            <textarea nz-input id="message" formControlName="message" [nzAutosize]="{ minRows: 2 }"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="code" nzRequired>Code</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="Please enter the code">
+            <input nz-input id="code" formControlName="code" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="ruleExpression" nzRequired>Rule Expression</nz-form-label>
+          <nz-form-control [nzSm]="14" [nzXs]="24" nzErrorTip="The expression is required">
+            <textarea nz-input id="ruleExpression" formControlName="ruleExpression" [nzAutosize]="{ minRows: 4, maxRows: 10 }"></textarea>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control [nzXs]="{ span: 24, offset: 0 }" [nzSm]="{ span: 14, offset: 6 }">
+            <button nz-button nzType="primary" [disabled]="!validationForm.valid">Save</button>
+            <button nz-button type="button" (click)="cancel()" class="cancel-button">Cancel</button>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </nz-content>
+</nz-layout>
