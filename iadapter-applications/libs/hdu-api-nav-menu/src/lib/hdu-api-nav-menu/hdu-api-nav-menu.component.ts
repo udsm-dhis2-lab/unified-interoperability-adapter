@@ -145,6 +145,13 @@ export class HduApiNavMenuComponent implements OnInit {
           routeUrl: '/mapping-and-data-extraction/termminology-services',
           icon: 'edit',
           subMenus: [],
+        },
+        {
+          name: 'Validation',
+          id: 'validation',
+          routeUrl: '/validations',
+          icon: 'unordered-list',
+          subMenus: [],
         }
       ],
     },
@@ -164,6 +171,21 @@ export class HduApiNavMenuComponent implements OnInit {
           subMenus: [],
         }
       ]},
+    // {
+    //   name: 'Validation Management',
+    //   id: 'validation',
+    //   routeUrl: '/validation',
+    //   icon: 'user',
+    //   category: 'main',
+    //   subMenus: [
+    //     {
+    //       name: 'Validation',
+    //       id: 'users',
+    //       routeUrl: '/validation',
+    //       icon: 'unordered-list',
+    //       subMenus: [],
+    //     }
+    //   ]},
     {
       name: 'Settings',
       id: 'settings',
@@ -185,7 +207,7 @@ export class HduApiNavMenuComponent implements OnInit {
           routeUrl: '/settings/instances',
           icon: 'interaction',
           subMenus: [],
-        },
+        }
       ],
     },
   ];
