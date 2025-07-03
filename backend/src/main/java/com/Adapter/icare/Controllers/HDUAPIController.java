@@ -234,7 +234,9 @@ public class HDUAPIController {
 
     @PostMapping(value = "dataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> passDataToMediator(@Valid @RequestBody DataTemplateDTO dataTemplate,
-            @RequestParam(name = "validation", required = false, defaultValue = "true") boolean performValidation) {
+            @RequestParam(name = "validation", required = false, defaultValue = "true") boolean performValidation,
+            @RequestParam(name = "testDataValidity", required = false, defaultValue = "false") boolean testDataValidity
+    ) {
         Map<String, Object> baseResponse = new HashMap<>();
 
         try {
@@ -259,11 +261,14 @@ public class HDUAPIController {
                 Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
                 List<SharedHealthRecordsDTO> validatedListGrid = Collections.synchronizedList(new ArrayList<>());
 
+                // TODO: Process clients in chunks in case exceed a certain amount (e.g 20)
+
                 IntStream.range(0, listGrid.size()).parallel().forEach(index -> {
                     SharedHealthRecordsDTO currentRecord = listGrid.get(index);
                     List<String> errors = new ArrayList<String>();
                     if (performValidation) {
-                        errors = sharedHealthRecordValidator.validate(currentRecord);
+                        errors = sharedHealthRecordValidator.dynamicValidate(currentRecord);
+//                        errors = sharedHealthRecordValidator.validate(currentRecord);
                     }
                     if (errors.isEmpty()) {
                         validatedListGrid.add(currentRecord);
@@ -271,6 +276,9 @@ public class HDUAPIController {
                         validationErrorsMap.put(index, errors);
                     }
                 });
+
+                // TODO: Do not reject the whole request if one record fails
+                // TODO: To softcode the validation by using program rules knowledge to enhance flexibility
 
                 List<Map<String, Object>> recordsWithIssues = validationErrorsMap.entrySet().stream()
                         .map(entry -> {
@@ -309,6 +317,13 @@ public class HDUAPIController {
                     workflowResponse.put("validationSkippedRecordsCount", recordsWithIssues.size());
                     workflowResponse.put("validationFailures", recordsWithIssues);
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(workflowResponse);
+                }
+
+                if(testDataValidity){
+                    Map<String, Object> testResponse = new HashMap<>();
+                    testResponse.put("statusDetails", "Completed testing data");
+                    testResponse.put("message", "Congratulations your data passed through all data validation rules.");
+                    return ResponseEntity.status(HttpStatus.OK).body(testResponse);
                 }
 
                 DataTemplateDataDTO validatedDataTemplatePayload = new DataTemplateDataDTO();

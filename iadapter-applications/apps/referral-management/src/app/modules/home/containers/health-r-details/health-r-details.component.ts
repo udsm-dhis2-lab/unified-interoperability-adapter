@@ -83,7 +83,7 @@ export class HealthRecordsDetailsComponent implements OnInit {
           .getClientById(clientID)
           .subscribe((client: any) => {
             this.client = client.listOfClients[0];
-            this.files = this.client.demographicDetails?.files ?? [];
+            this.files = this.client?.demographicDetails?.files ?? [];
 
             this.visits = client.listOfClients.map((visit: any) => ({
               extraInfo: [
@@ -208,7 +208,7 @@ export class HealthRecordsDetailsComponent implements OnInit {
                                 )
                               : 'No visit notes available',
                           })
-                        )
+                        )[0]
                       : 'No visit notes available',
                   },
                 },

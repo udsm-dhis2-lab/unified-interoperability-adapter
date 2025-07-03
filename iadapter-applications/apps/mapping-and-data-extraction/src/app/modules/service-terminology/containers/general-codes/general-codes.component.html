@@ -4,7 +4,7 @@
         <nz-form-item>
             <nz-form-label nzRequired nzFor="generalCodeType">General Code Type </nz-form-label>
             <nz-form-control [nzErrorTip]="generalCodeTypeErrorTpl">
-                <nz-select id="generalCodeType" formControlName="generalCodeType" nzPlaceHolder="Select a type"
+                <nz-select id="generalCodeType" formControlName="generalCodeType" nzPlaceHolder="Select a general code type"
                     style="width: 100%;">
                     <ng-container *ngFor="let option of generalCodeCategory">
                         <nz-option [nzValue]="option.key" [nzLabel]="option.name"></nz-option>
@@ -30,9 +30,9 @@
 
         <!-- Name Input -->
         <nz-form-item>
-            <nz-form-label nzRequired nzFor="name">Name</nz-form-label>
+            <nz-form-label nzRequired nzFor="name">Display Name</nz-form-label>
             <nz-form-control [nzErrorTip]="nameErrorTpl">
-                <input nz-input id="name" formControlName="name" placeholder="Enter name" />
+                <input nz-input id="name" formControlName="name" placeholder="Enter display name" />
             </nz-form-control>
             <ng-template #nameErrorTpl let-control>
                 <ng-container *ngIf="control.hasError('required')">Please input the Name!</ng-container>
