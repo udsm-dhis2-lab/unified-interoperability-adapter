@@ -1,20 +1,48 @@
+/* --- Overall Page Layout --- */
+
+/* Target the nz-content to give a background color for our "card" to sit on */
+nz-content {
+  padding: 24px; /* Give some space around the main content card */
+  /* background-color: #f0f2f5; /* Optional: A light gray background makes the white form pop */
+}
+
+/* This is the main container for your breadcrumb and form */
 .inner-content {
-  margin: 16px;
-  background: #fff;
-  border: 1px solid #e8e8e8;
-  border-radius: 4px;
-  padding: 24px;
+  max-width: 960px; /* Set a maximum width for readability on large screens */
+  margin: 0 auto; /* Horizontally center the container */
+  padding: 24px; /* Add padding inside the container */
+  background: #fff; /* Give it a solid white background */
+  border-radius: 8px; /* Optional: Softer corners */
+  border: 1px solid #e8e8e8; /* Optional: A subtle border */
 }
 
-.breadcrumb {
-  margin-bottom: 24px;
-}
 
+/* --- Form Specific Tweaks --- */
+
+/* Add some vertical space between the breadcrumb and the form */
 .validation-form {
-  max-width: 800px;
-  margin: auto;
+  margin-top: 24px;
 }
 
+/* Add a margin to the left of the cancel button to separate it from the save button */
 .cancel-button {
   margin-left: 8px;
+}
+
+
+/* --- SpEL Preview Styling (from previous steps) --- */
+
+.spel-preview {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: #f7f7f7;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.spel-preview code {
+  word-break: break-all; /* Ensure long SpEL strings wrap */
 }

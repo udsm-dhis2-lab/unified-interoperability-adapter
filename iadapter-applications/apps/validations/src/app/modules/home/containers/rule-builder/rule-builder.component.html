@@ -1,0 +1,69 @@
+<div class="rule-builder-container">
+  <!-- Loop through each group of conditions -->
+  <ng-container *ngFor="let group of groups; let i = index; let isFirstGroup = first">
+
+    <!-- The 'OR' divider between groups -->
+    <div *ngIf="!isFirstGroup" class="group-separator">
+      <nz-divider nzText="OR" nzOrientation="center"></nz-divider>
+    </div>
+
+    <nz-card class="rule-group" nzSize="small">
+      <!-- Loop through conditions within a group -->
+      <div *ngFor="let condition of group.conditions; let j = index" class="condition-row">
+
+        <!-- 'AND' text for subsequent conditions -->
+        <span *ngIf="j > 0" class="condition-joiner">AND</span>
+
+        <!-- Left Operand (Field) -->
+        <nz-select
+          class="operand"
+          [(ngModel)]="condition.leftOperandPath"
+          (ngModelChange)="updateRule()"
+          nzPlaceHolder="Select a field"
+          nzShowSearch>
+          <nz-option *ngFor="let field of fields" [nzLabel]="field.label" [nzValue]="field.path"></nz-option>
+        </nz-select>
+
+        <!-- Operator -->
+        <nz-select
+          class="operator"
+          [(ngModel)]="condition.operator"
+          (ngModelChange)="updateRule()"
+          nzPlaceHolder="Operator">
+          <nz-option *ngFor="let op of operators" [nzLabel]="op.label" [nzValue]="op.value"></nz-option>
+        </nz-select>
+
+        <!-- Right Operand (Value) -->
+        <nz-select
+          class="operand"
+          [(ngModel)]="condition.rightOperandPath"
+          (ngModelChange)="updateRule()"
+          nzPlaceHolder="Select a value"
+          nzShowSearch>
+          <!-- We cleverly use the same field list for both sides -->
+          <nz-option *ngFor="let field of fields" [nzLabel]="field.label" [nzValue]="field.path"></nz-option>
+        </nz-select>
+
+        <!-- Remove Condition Button -->
+        <button nz-button nzType="text" nzShape="circle" (click)="removeCondition(group, j)" [disabled]="group.conditions.length === 1 && groups.length === 1">
+            <i nz-icon nzType="minus-circle" nzTheme="outline" class="remove-icon"></i>
+        </button>
+      </div>
+
+      <!-- Add/Remove buttons for the group -->
+      <div class="group-actions">
+        <button nz-button nzType="dashed" (click)="addCondition(group)" class="action-button">
+            <i nz-icon nzType="plus"></i>Add Condition
+        </button>
+        <button nz-button nzType="text" nzDanger (click)="removeGroup(i)" *ngIf="groups.length > 1" class="action-button">
+            Remove Group
+        </button>
+      </div>
+    </nz-card>
+  </ng-container>
+
+  <!-- Add new top-level 'OR' group -->
+  <button nz-button (click)="addGroup()" class="add-group-button">
+      <i nz-icon nzType="plus-circle" nzTheme="outline"></i>Add OR Group
+  </button>
+</div>
