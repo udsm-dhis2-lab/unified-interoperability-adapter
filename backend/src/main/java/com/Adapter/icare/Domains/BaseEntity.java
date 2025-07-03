@@ -19,7 +19,7 @@ public class BaseEntity implements Serializable {
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name = "uuid", updatable = false, nullable = false)
+    @Column(name = "uuid", updatable = false, nullable = false, unique = true)
     private String uuid;
 
     @ManyToOne
