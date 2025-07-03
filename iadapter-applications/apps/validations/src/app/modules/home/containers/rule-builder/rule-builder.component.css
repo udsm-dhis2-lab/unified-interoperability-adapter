@@ -1,0 +1,56 @@
+.rule-builder-container {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+.rule-group {
+  margin-bottom: 16px;
+}
+
+.condition-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.condition-joiner {
+  width: 50px;
+  font-weight: bold;
+  color: #888;
+  text-align: right;
+  margin-right: 10px;
+}
+
+.operand {
+  flex: 1;
+}
+
+.operator {
+  width: 150px;
+}
+
+.remove-icon {
+    color: #ff4d4f;
+}
+
+.group-actions {
+  margin-top: 12px;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 12px;
+}
+
+.action-button {
+    margin-right: 8px;
+}
+
+.add-group-button {
+  width: 100%;
+  border-style: dashed;
+}
+
+.group-separator {
+  margin: 16px 0;
+}
