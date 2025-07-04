@@ -646,7 +646,7 @@ public class SharedHealthRecordsService {
                                                     .equals("29463-7")) {
                                                 vitalSign.setWeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue().intValue()
+                                                                .getValue().floatValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -656,7 +656,7 @@ public class SharedHealthRecordsService {
                                                     .equals("8310-5")) {
                                                 vitalSign.setTemperature(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue().intValue()
+                                                                .getValue().floatValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -666,7 +666,7 @@ public class SharedHealthRecordsService {
                                                     .equals("8302-2")) {
                                                 vitalSign.setHeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue().intValue()
+                                                                .getValue().floatValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -1017,7 +1017,7 @@ public class SharedHealthRecordsService {
                                                     .getCode()
                                                     .equals("29463-7")) {
                                                 vitalSign.setWeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
-                                                                ? observation.getValueQuantity().getValue().intValue()
+                                                                ? observation.getValueQuantity().getValue().floatValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -1027,7 +1027,7 @@ public class SharedHealthRecordsService {
                                                     .equals("8310-5")) {
                                                 vitalSign.setTemperature(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue().intValue()
+                                                                .getValue().floatValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()
@@ -1037,7 +1037,7 @@ public class SharedHealthRecordsService {
                                                     .equals("8302-2")) {
                                                 vitalSign.setHeight(observation.hasValueQuantity() && observation.getValueQuantity().hasValue()
                                                                 ? observation.getValueQuantity()
-                                                                .getValue().intValue()
+                                                                .getValue().floatValue()
                                                                 : null);
                                             }
                                             if (observation.getCode()

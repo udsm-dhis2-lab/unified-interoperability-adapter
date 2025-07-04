@@ -41,7 +41,7 @@ public class ValidatorService {
         return validatorRepository.getValidatorsListByPagination(code, name, pageable);
     }
 
-    public Validator getValidatorsByUuid(String uuid) {
+    public Validator getValidatorByUuid(String uuid) {
         return validatorRepository.findByUuid(uuid);
     }
 
