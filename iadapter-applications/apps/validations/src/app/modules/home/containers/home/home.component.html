@@ -56,12 +56,13 @@
             [nzData]="listOfData"
             nzBordered
             [nzPaginationPosition]="'bottom'"
+            [nzLoading]="isLoading"
           >
             <thead>
               <tr>
                 <th >Name</th>
                 <th >Description</th>
-                <th >Message</th>
+                <th >Error Message</th>
                 <th >Code</th>
                 <!--
           Change: This is now an ordinary column.
@@ -78,14 +79,18 @@
               <tr *ngFor="let data of ruleTable.data">
                 <td>{{ data.name }}</td>
                 <td>{{ data.description }}</td>
-                <td>{{ data.message }}</td>
+                <td>{{ data.errorMessage }}</td>
                 <td>{{ data.code }}</td>
                 <td>
                   <!-- <div class="code-block"> -->
                     {{ data.ruleExpression }}
                   <!-- </div> -->
                 </td>
-                <td nzRight><a>Edit</a></td>
+                  <td>
+              <a (click)="editValidation(data.uuid)">Edit</a>
+              <nz-divider nzType="vertical"></nz-divider>
+              <a (click)="deleteValidation(data)" class="delete-link">Delete</a>
+            </td>
               </tr>
             </tbody>
           </nz-table>

@@ -15,14 +15,14 @@
         <span *ngIf="j > 0" class="condition-joiner">AND</span>
 
         <!-- Left Operand (Field) -->
-        <nz-select
+        <!-- <nz-select
           class="operand"
           [(ngModel)]="condition.leftOperandPath"
           (ngModelChange)="updateRule()"
           nzPlaceHolder="Select a field"
           nzShowSearch>
           <nz-option *ngFor="let field of fields" [nzLabel]="field.label" [nzValue]="field.path"></nz-option>
-        </nz-select>
+        </nz-select> -->
 
         <!-- Operator -->
         <nz-select
@@ -40,9 +40,11 @@
           (ngModelChange)="updateRule()"
           nzPlaceHolder="Select a value"
           nzShowSearch>
-          <!-- We cleverly use the same field list for both sides -->
+
           <nz-option *ngFor="let field of fields" [nzLabel]="field.label" [nzValue]="field.path"></nz-option>
         </nz-select>
+
+
 
         <!-- Remove Condition Button -->
         <button nz-button nzType="text" nzShape="circle" (click)="removeCondition(group, j)" [disabled]="group.conditions.length === 1 && groups.length === 1">

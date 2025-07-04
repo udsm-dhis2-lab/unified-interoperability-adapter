@@ -1,13 +1,8 @@
 package com.Adapter.icare.Controllers;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Domains.Validator;
-import com.Adapter.icare.Dtos.MediatorDTO;
-import com.Adapter.icare.Dtos.ValidatorDTO;
-import com.Adapter.icare.Services.DatastoreService;
-import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.Adapter.icare.Services.ValidatorService;
 import org.springframework.data.domain.Page;
@@ -81,9 +76,16 @@ public class ValidatorsController {
             @PathVariable("uuid") String uuid) throws Exception {
         try {
             Validator validator = validatorService.getValidatorByUuid(uuid);
-            return ResponseEntity.ok(validator.toMap());
+            if (validator != null) {
+                return ResponseEntity.ok(validator.toMap());
+            } else {
+                throw new Exception("Validator with uuid " + uuid + " does not exists");
+            }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e);
+            error.put("message", "Failed to get validator");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -114,22 +116,31 @@ public class ValidatorsController {
             }
             return ResponseEntity.ok(validatorService.updateValidator(validator).toMap());
         } catch (Exception e) {
-            System.out.println("UPDATE VALIDATORl "+ e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            System.out.println("UPDATE VALIDATOR: "+ e);
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e);
+            error.put("message", "Failed to update validator");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @DeleteMapping("validators/{uuid}")
-    public void deleteValidators(@PathVariable("uuid") String uuid) throws Exception {
+    public ResponseEntity<Map<String, Object>> deleteValidators(@PathVariable("uuid") String uuid) throws Exception {
         try {
             Validator validator = validatorService.getValidatorByUuid(uuid);
             if (validator != null) {
                 validatorService.deleteValidator(validator.getId());
+                Map<String, Object> responseMap = new HashMap<>();
+                responseMap.put("message", "Validator deleted successfully.");
+                return ResponseEntity.status(HttpStatus.OK).body(responseMap);
             } else {
                 throw new Exception("Validator with uuid " + uuid + " does not exists");
             }
         } catch (Exception e) {
-            throw e;
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e);
+            error.put("message", "Failed to delete validator");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }
