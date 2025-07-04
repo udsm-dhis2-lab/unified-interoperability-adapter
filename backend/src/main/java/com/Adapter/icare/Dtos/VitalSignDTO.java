@@ -9,9 +9,9 @@ import java.util.Map;
 @Setter
 public class VitalSignDTO {
     private String bloodPressure;
-    private Integer weight;
-    private Integer temperature;
-    private Integer height;
+    private Float weight;
+    private Float temperature;
+    private Float height;
     private Integer respiration;
     private Integer pulseRate;
     private String dateTime;

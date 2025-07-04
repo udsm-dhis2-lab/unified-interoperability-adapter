@@ -76,6 +76,17 @@ public class ValidatorsController {
         }
     }
 
+    @GetMapping("validators/{uuid}")
+    public ResponseEntity<Map<String, Object>> getValidator(
+            @PathVariable("uuid") String uuid) throws Exception {
+        try {
+            Validator validator = validatorService.getValidatorByUuid(uuid);
+            return ResponseEntity.ok(validator.toMap());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
     @PostMapping("validators")
     public ResponseEntity<Map<String, Object>> addValidator(@Valid @RequestBody Map<String, Object> validatorDTO) {
         try {
@@ -111,7 +122,7 @@ public class ValidatorsController {
     @DeleteMapping("validators/{uuid}")
     public void deleteValidators(@PathVariable("uuid") String uuid) throws Exception {
         try {
-            Validator validator = validatorService.getValidatorsByUuid(uuid);
+            Validator validator = validatorService.getValidatorByUuid(uuid);
             if (validator != null) {
                 validatorService.deleteValidator(validator.getId());
             } else {
