@@ -20,10 +20,10 @@ export const ValidationUrls = {
  * The structure should match the fields in your form.
  */
 export interface Validation {
-  id?: string; // The ID is optional, as it won't exist for a new rule
+  uuid?: string; // The ID is optional, as it won't exist for a new rule
   name: string;
   description: string;
-  message: string;
+  errorMessage: string;
   code: string;
   ruleExpression: string;
 }
@@ -33,7 +33,7 @@ export interface Validation {
  * The structure (e.g., 'content', 'totalElements') should match your backend's pagination response.
  */
 export interface ValidationPage {
-  content: Validation[];
+  results: Validation[];
   totalElements: number;
   totalPages: number;
   size: number;
@@ -59,9 +59,7 @@ export class ValidationService {
     pageSize: number,
     filters: Array<{ key: string; value: string[] }>
   ): Observable<ValidationPage> {
-    let params = new HttpParams()
-      .append('page', pageIndex.toString())
-      .append('size', pageSize.toString());
+    let params = new HttpParams();
 
     filters.forEach((filter) => {
       filter.value.forEach((value) => {

@@ -1,4 +1,10 @@
-import { Component, forwardRef, OnInit } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  forwardRef,
+  OnInit,
+  Output,
+} from '@angular/core';
 // You MUST import NG_VALUE_ACCESSOR and ControlValueAccessor from @angular/forms
 import {
   ControlValueAccessor,
@@ -19,6 +25,9 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { CommonModule } from '@angular/common';
+import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select'; // <-- IMPORT THIS
+import { NzTreeNodeOptions } from 'ng-zorro-antd/tree'; // <-- IMPORT THIS
+import { transformFieldsToTreeNodes } from '../../models/data-model.transformer';
 // import { DATA_MODEL_DEFINITION, ModelField, OPERATORS } from '../data-model';
 
 export interface RuleCondition {
@@ -39,43 +48,43 @@ export interface RuleGroup {
   imports: [
     CommonModule,
 
-    // Import Angular's form modules
     FormsModule, // <-- FIXES: "Can't bind to 'ngModel'"
     ReactiveFormsModule,
 
-    // Import the specific NG-ZORRO modules your component's template uses
     NzButtonModule, // <-- FIXES: <button nz-button>
     NzCardModule, // <-- FIXES: <nz-card>
     NzDividerModule, // <-- FIXES: <nz-divider>
     NzIconModule, // <-- FIXES: <i nz-icon>
     NzSelectModule,
+
+    NzTreeSelectModule, // <-- ADD THIS TO IMPORTS
   ],
-  // ----------------- THIS IS THE CRITICAL FIX -----------------
-  // This provider registers the component as a custom form control.
-  // providers: [
-  //   {
-  //     provide: NG_VALUE_ACCESSOR,
-  //     useExisting: forwardRef(() => RuleBuilderComponent),
-  //     multi: true,
-  //   },
-  // ],
-  // -----------------------------------------------------------
 })
 export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   // UI State
   groups: RuleGroup[] = [];
 
   // Expose our data model and operators to the template
-  fields: ModelField[] = DATA_MODEL_DEFINITION;
+  fields: any = DATA_MODEL_DEFINITION;
   operators = OPERATORS;
+  treeData: any = {
+      title: "key",
+      expanded: true,
+      children: [],
+      isLeaf: false
+    };;
+
 
   // ControlValueAccessor methods
-  onChange: (value: string) => void = () => {};
+  @Output() valueChange = new EventEmitter<string>();
+
   onTouched: () => void = () => {};
 
   constructor() {}
 
   ngOnInit(): void {
+        this.treeData = transformFieldsToTreeNodes(DATA_MODEL_DEFINITION);
+
     // Start with one empty group
     if (this.groups.length === 0) {
       this.addGroup();
@@ -134,7 +143,7 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
       .filter((g) => g !== null);
 
     const finalExpression = groupStrings.join(' || ');
-    this.onChange(finalExpression);
+    this.valueChange.emit(finalExpression);
     this.onTouched(); // Also a good idea to call onTouched when the value changes
   }
 
@@ -148,7 +157,7 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   }
 
   registerOnChange(fn: any): void {
-    this.onChange = fn;
+    this.valueChange = fn;
   }
 
   registerOnTouched(fn: any): void {
