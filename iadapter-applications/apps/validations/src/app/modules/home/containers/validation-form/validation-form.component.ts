@@ -40,6 +40,7 @@ import { ValidationService } from '../../services/client-management.service';
     NzMessageModule,
     NzSpinModule,
     RuleBuilderComponent,
+
   ],
   templateUrl: './validation-form.component.html',
   styleUrls: ['./validation-form.component.scss'],

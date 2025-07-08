@@ -8,6 +8,17 @@
     </div>
 
     <nz-card class="rule-group" nzSize="small">
+      <app-tree-select
+        [nodes]="categoryNodes"
+        [expandedKeys]="defaultExpandedKeys"
+        [selectedValues]="currentSelection"
+        (selectionChange)="handleSelectionChange($event)"
+      ></app-tree-select>
+    </nz-card>
+
+
+    <nz-card class="rule-group" nzSize="small">
+
       <!-- Loop through conditions within a group -->
       <div *ngFor="let condition of group.conditions; let j = index" class="condition-row">
 
@@ -15,14 +26,14 @@
         <span *ngIf="j > 0" class="condition-joiner">AND</span>
 
         <!-- Left Operand (Field) -->
-        <!-- <nz-select
+        <nz-select
           class="operand"
           [(ngModel)]="condition.leftOperandPath"
           (ngModelChange)="updateRule()"
           nzPlaceHolder="Select a field"
           nzShowSearch>
           <nz-option *ngFor="let field of fields" [nzLabel]="field.label" [nzValue]="field.path"></nz-option>
-        </nz-select> -->
+        </nz-select>
 
         <!-- Operator -->
         <nz-select

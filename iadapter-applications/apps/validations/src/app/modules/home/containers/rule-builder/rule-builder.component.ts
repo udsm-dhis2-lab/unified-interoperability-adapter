@@ -28,6 +28,7 @@ import { CommonModule } from '@angular/common';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select'; // <-- IMPORT THIS
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree'; // <-- IMPORT THIS
 import { transformFieldsToTreeNodes } from '../../models/data-model.transformer';
+import { TreeSelectComponent } from '../app-selection/app-selection';
 // import { DATA_MODEL_DEFINITION, ModelField, OPERATORS } from '../data-model';
 
 export interface RuleCondition {
@@ -50,7 +51,7 @@ export interface RuleGroup {
 
     FormsModule, // <-- FIXES: "Can't bind to 'ngModel'"
     ReactiveFormsModule,
-
+    TreeSelectComponent,
     NzButtonModule, // <-- FIXES: <button nz-button>
     NzCardModule, // <-- FIXES: <nz-card>
     NzDividerModule, // <-- FIXES: <nz-divider>
@@ -64,16 +65,40 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   // UI State
   groups: RuleGroup[] = [];
 
+  currentSelection: string[] | null = null;
+  defaultExpandedKeys = ['cat-1', 'cat-1-0'];
+
+  readonly categoryNodes: NzTreeNodeOptions[] = [
+    {
+      title: 'Electronics',
+      key: 'cat-1',
+      children: [
+        {
+          title: 'Phones',
+          key: 'cat-1-0',
+          children: [
+            { title: 'iPhone 15', key: 'prod-101', isLeaf: true },
+            { title: 'Galaxy S24', key: 'prod-102', isLeaf: true },
+          ],
+        },
+        {
+          title: 'Laptops',
+          key: 'cat-1-1',
+          children: [{ title: 'MacBook Pro', key: 'prod-201', isLeaf: true }],
+        },
+      ],
+    },
+  ];
+
   // Expose our data model and operators to the template
   fields: any = DATA_MODEL_DEFINITION;
   operators = OPERATORS;
   treeData: any = {
-      title: "key",
-      expanded: true,
-      children: [],
-      isLeaf: false
-    };;
-
+    title: 'key',
+    expanded: true,
+    children: [],
+    isLeaf: false,
+  };
 
   // ControlValueAccessor methods
   @Output() valueChange = new EventEmitter<string>();
@@ -83,7 +108,7 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   constructor() {}
 
   ngOnInit(): void {
-        this.treeData = transformFieldsToTreeNodes(DATA_MODEL_DEFINITION);
+    // this.treeData = transformFieldsToTreeNodes(DATA_MODEL_DEFINITION);
 
     // Start with one empty group
     if (this.groups.length === 0) {
@@ -162,5 +187,10 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
 
   registerOnTouched(fn: any): void {
     this.onTouched = fn;
+  }
+
+  handleSelectionChange(selectedKeys: string[] | null): void {
+    console.log('Event received from child component:', selectedKeys);
+    this.currentSelection = selectedKeys;
   }
 }
