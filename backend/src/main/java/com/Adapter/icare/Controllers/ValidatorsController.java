@@ -13,10 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.zip.DataFormatException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -79,8 +77,13 @@ public class ValidatorsController {
             if (validator != null) {
                 return ResponseEntity.ok(validator.toMap());
             } else {
-                throw new Exception("Validator with uuid " + uuid + " does not exists");
+                throw new NoSuchElementException("Validator with uuid " + uuid + " does not exists");
             }
+        } catch (NoSuchElementException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to get validator");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
             error.put("error", e);
@@ -97,9 +100,20 @@ public class ValidatorsController {
                 validator.setCreatedBy(this.authenticatedUser);
             }
             return ResponseEntity.ok(validatorService.addNewValidator(validator).toMap());
-        } catch (Exception e) {
+        } catch (DataFormatException e) {
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("message", e.getMessage());
+            errorMap.put("error", "Failed to add validator");
+
             System.out.println("ERROR CREATING VALIDATOR: "+ e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+        } catch (Exception e) {
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("message", e.getMessage());
+            errorMap.put("error", "Failed to add validator");
+
+            System.out.println("ERROR CREATING VALIDATOR: "+ e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
         }
     }
 
@@ -115,11 +129,17 @@ public class ValidatorsController {
                 }
             }
             return ResponseEntity.ok(validatorService.updateValidator(validator).toMap());
+        } catch (DataFormatException e){
+            System.out.println("UPDATE VALIDATOR: "+ e);
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to update validator");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
             System.out.println("UPDATE VALIDATOR: "+ e);
             Map<String, Object> error = new HashMap<>();
-            error.put("error", e);
-            error.put("message", "Failed to update validator");
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to update validator");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
@@ -134,12 +154,17 @@ public class ValidatorsController {
                 responseMap.put("message", "Validator deleted successfully.");
                 return ResponseEntity.status(HttpStatus.OK).body(responseMap);
             } else {
-                throw new Exception("Validator with uuid " + uuid + " does not exists");
+                throw new NoSuchElementException("Validator with uuid " + uuid + " does not exists");
             }
+        } catch (NoSuchElementException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to delete validator");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
             Map<String, Object> error = new HashMap<>();
-            error.put("error", e);
-            error.put("message", "Failed to delete validator");
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to delete validator");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
