@@ -33,5 +33,6 @@ validators.json
 ### VS Code ###
 *.vscode
 *.env
+*.log
 
 src/main/resources/static
