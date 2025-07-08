@@ -8,6 +8,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,27 +38,24 @@ public class Validator extends BaseEntity{
     private String errorMessage;
 
 
-    public Validator fromMap(Map<String, Object> validatorMap){
+    public Validator fromMap(Map<String, Object> validatorMap) throws DataFormatException {
+
+        if(validatorMap.get("name") == null || validatorMap.get("ruleExpression") == null || validatorMap.get("errorMessage") == null){
+            throw new DataFormatException("Validator must have name, rule expression and error message!");
+        }
+
         Validator validator = new Validator();
 
         if(validatorMap.get("uuid") != null){
             validator.setUuid(validatorMap.get("uuid").toString());
         }
 
-        if(validatorMap.get("name") != null){
-            validator.setName(validatorMap.get("name").toString());
-        }
-
-        if(validatorMap.get("ruleExpression") != null){
-            validator.setRuleExpression(validatorMap.get("ruleExpression").toString());
-        }
+        validator.setName(validatorMap.get("name").toString());
+        validator.setErrorMessage(validatorMap.get("errorMessage").toString());
+        validator.setRuleExpression(validatorMap.get("ruleExpression").toString());
 
         if(validatorMap.get("code") != null){
             validator.setCode(validatorMap.get("code").toString());
-        }
-
-        if(validatorMap.get("errorMessage") != null){
-            validator.setErrorMessage(validatorMap.get("errorMessage").toString());
         }
 
         if(validatorMap.get("description") != null){

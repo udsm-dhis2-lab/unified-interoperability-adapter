@@ -1,13 +1,8 @@
 package com.Adapter.icare.Controllers;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Domains.Validator;
-import com.Adapter.icare.Dtos.MediatorDTO;
-import com.Adapter.icare.Dtos.ValidatorDTO;
-import com.Adapter.icare.Services.DatastoreService;
-import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.Adapter.icare.Services.ValidatorService;
 import org.springframework.data.domain.Page;
@@ -18,10 +13,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.zip.DataFormatException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -81,9 +74,21 @@ public class ValidatorsController {
             @PathVariable("uuid") String uuid) throws Exception {
         try {
             Validator validator = validatorService.getValidatorByUuid(uuid);
-            return ResponseEntity.ok(validator.toMap());
+            if (validator != null) {
+                return ResponseEntity.ok(validator.toMap());
+            } else {
+                throw new NoSuchElementException("Validator with uuid " + uuid + " does not exists");
+            }
+        } catch (NoSuchElementException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to get validator");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e);
+            error.put("message", "Failed to get validator");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
@@ -95,9 +100,20 @@ public class ValidatorsController {
                 validator.setCreatedBy(this.authenticatedUser);
             }
             return ResponseEntity.ok(validatorService.addNewValidator(validator).toMap());
-        } catch (Exception e) {
+        } catch (DataFormatException e) {
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("message", e.getMessage());
+            errorMap.put("error", "Failed to add validator");
+
             System.out.println("ERROR CREATING VALIDATOR: "+ e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+        } catch (Exception e) {
+            Map<String, Object> errorMap = new HashMap<>();
+            errorMap.put("message", e.getMessage());
+            errorMap.put("error", "Failed to add validator");
+
+            System.out.println("ERROR CREATING VALIDATOR: "+ e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
         }
     }
 
@@ -113,23 +129,43 @@ public class ValidatorsController {
                 }
             }
             return ResponseEntity.ok(validatorService.updateValidator(validator).toMap());
+        } catch (DataFormatException e){
+            System.out.println("UPDATE VALIDATOR: "+ e);
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to update validator");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
-            System.out.println("UPDATE VALIDATORl "+ e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            System.out.println("UPDATE VALIDATOR: "+ e);
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to update validator");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 
     @DeleteMapping("validators/{uuid}")
-    public void deleteValidators(@PathVariable("uuid") String uuid) throws Exception {
+    public ResponseEntity<Map<String, Object>> deleteValidators(@PathVariable("uuid") String uuid) throws Exception {
         try {
             Validator validator = validatorService.getValidatorByUuid(uuid);
             if (validator != null) {
                 validatorService.deleteValidator(validator.getId());
+                Map<String, Object> responseMap = new HashMap<>();
+                responseMap.put("message", "Validator deleted successfully.");
+                return ResponseEntity.status(HttpStatus.OK).body(responseMap);
             } else {
-                throw new Exception("Validator with uuid " + uuid + " does not exists");
+                throw new NoSuchElementException("Validator with uuid " + uuid + " does not exists");
             }
+        } catch (NoSuchElementException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to delete validator");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
         } catch (Exception e) {
-            throw e;
+            Map<String, Object> error = new HashMap<>();
+            error.put("message", e.getMessage());
+            error.put("error", "Failed to delete validator");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }
 }
