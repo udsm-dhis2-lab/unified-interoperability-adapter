@@ -2,6 +2,7 @@ package com.Adapter.icare.validators;
 
 import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
 import com.Adapter.icare.Services.ValidatorService;
+import com.Adapter.icare.Utils.DtoSchemaGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
@@ -13,6 +14,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
