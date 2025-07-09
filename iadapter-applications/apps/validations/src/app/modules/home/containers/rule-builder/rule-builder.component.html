@@ -7,14 +7,14 @@
       <nz-divider nzText="OR" nzOrientation="center"></nz-divider>
     </div>
 
-    <nz-card class="rule-group" nzSize="small">
+    <!-- <nz-card class="rule-group" nzSize="small">
       <app-tree-select
         [nodes]="categoryNodes"
         [expandedKeys]="defaultExpandedKeys"
         [selectedValues]="currentSelection"
         (selectionChange)="handleSelectionChange($event)"
       ></app-tree-select>
-    </nz-card>
+    </nz-card> -->
 
 
     <nz-card class="rule-group" nzSize="small">
@@ -58,7 +58,7 @@
           <app-tree-select
             [nodes]="categoryNodes"
             [expandedKeys]="defaultExpandedKeys"
-            [selectedValues]="currentSelection"
+            [selectedValues]="leftCurrentSelection"
             (selectionChange)="updateRule()"
           ></app-tree-select>
         </div>
@@ -82,7 +82,7 @@
           <app-tree-select
             [nodes]="categoryNodes"
             [expandedKeys]="defaultExpandedKeys"
-            [selectedValues]="currentSelection"
+            [selectedValues]="rightCurrentSelection"
             (selectionChange)="updateRule()"
           ></app-tree-select>
         </div>

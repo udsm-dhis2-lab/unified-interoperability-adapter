@@ -70,6 +70,8 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   groups: RuleGroup[] = [];
 
   currentSelection: string[] | null = null;
+  leftCurrentSelection: string[] | null = null;
+  rightCurrentSelection: string[] | null = null;
   defaultExpandedKeys = ['cat-1', 'cat-1-0'];
 
   readonly categoryNodes: NzTreeNodeOptions[] = [
@@ -4336,7 +4338,7 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
         isLeaf: true,
       };
     }
-  
+
     if (visited.has(value)) {
       return {
         title: `${title}: [Circular Reference]`,
@@ -4344,11 +4346,11 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
         isLeaf: true,
       };
     }
-  
+
     visited.add(value);
-  
+
     let children: TreeNode[];
-  
+
     if (Array.isArray(value)) {
       children = [];
       for(let item of value){
@@ -4362,23 +4364,23 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
         return this.buildNode(val, key, `${path}.${key}`, visited);
       });
     }
-  
+
     visited.delete(value);
-  
+
     return {
       title,
       key: path,
       children: children?.length > 0 ? children : undefined,
     };
   }
-  
-  
+
+
 
   formatDataTemplate(){
     let dataTemplate = "";
 
     dataTemplate = JSON.parse(dataTemplate);
-    
+
     if (typeof dataTemplate !== 'object' || dataTemplate === null || Array.isArray(dataTemplate)) {
       console.error("Invalid input: The function expects a non-array object.");
       return [];
