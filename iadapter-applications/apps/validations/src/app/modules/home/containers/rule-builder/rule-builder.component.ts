@@ -27,7 +27,6 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { CommonModule } from '@angular/common';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select'; // <-- IMPORT THIS
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree'; // <-- IMPORT THIS
-import { transformFieldsToTreeNodes } from '../../models/data-model.transformer';
 import { TreeSelectComponent } from '../app-selection/app-selection';
 // import { DATA_MODEL_DEFINITION, ModelField, OPERATORS } from '../data-model';
 
@@ -39,6 +38,13 @@ export interface RuleCondition {
 
 export interface RuleGroup {
   conditions: RuleCondition[];
+}
+
+interface TreeNode {
+  title: string;
+  key: string;
+  isLeaf?: boolean;
+  children?: TreeNode[];
 }
 
 @Component({
@@ -192,5 +198,71 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   handleSelectionChange(selectedKeys: string[] | null): void {
     console.log('Event received from child component:', selectedKeys);
     this.currentSelection = selectedKeys;
+  }
+
+  buildNode(
+    value: any,
+    title: string,
+    path: string,
+    visited: WeakSet<object>
+  ): TreeNode {
+    if (typeof value !== 'object' || value === null) {
+      return {
+        title: `${title}`,
+        key: path,
+        isLeaf: true,
+      };
+    }
+  
+    if (visited.has(value)) {
+      return {
+        title: `${title}: [Circular Reference]`,
+        key: path,
+        isLeaf: true,
+      };
+    }
+  
+    visited.add(value);
+  
+    let children: TreeNode[];
+  
+    if (Array.isArray(value)) {
+      children = [];
+      for(let item of value){
+        children = Object.entries(item).map(([key, val]) => {
+          return this.buildNode(val, key, `${path}.${key}`, visited);
+        });
+        break;
+      }
+    } else {
+      children = Object.entries(value).map(([key, val]) => {
+        return this.buildNode(val, key, `${path}.${key}`, visited);
+      });
+    }
+  
+    visited.delete(value);
+  
+    return {
+      title,
+      key: path,
+      children: children?.length > 0 ? children : undefined,
+    };
+  }
+  
+  
+
+  formatDataTemplate(){
+    let dataTemplate = "";
+
+    dataTemplate = JSON.parse(dataTemplate);
+    
+    if (typeof dataTemplate !== 'object' || dataTemplate === null || Array.isArray(dataTemplate)) {
+      console.error("Invalid input: The function expects a non-array object.");
+      return [];
+    }
+    const visited = new WeakSet<object>();
+    return Object.entries(dataTemplate).map(([key, value]) => {
+      return this.buildNode(value, key, key, visited);
+    });
   }
 }
