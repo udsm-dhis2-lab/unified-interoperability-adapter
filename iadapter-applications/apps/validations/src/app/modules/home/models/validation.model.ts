@@ -31,8 +31,8 @@ export const OPERATORS = [
   { label: 'is less than', value: '<' },
 ];
 
-export const DATA_MODEL_DEFINITION: ModelField[] = [
-  {
+export const DATA_MODEL_DEFINITION: any = {
+  "postnatalDetails.hivDetails.status": {
     label: "Mother's Overall HIV Status",
     path: '#{postnatalDetails.hivDetails.status}',
     type: 'enum',
@@ -41,28 +41,41 @@ export const DATA_MODEL_DEFINITION: ModelField[] = [
       { label: 'Negative', value: 'T(com.Adapter.icare.Enums.STATUS).NEGATIVE' },
       { label: 'Unknown', value: "null" }
     ]
-  },
-  {
-    label: 'Total Number of Births',
-    path: '#{postnatalDetails.birthDetails.size()}',
-    type: 'collection_size'
-  },
-  {
-    label: 'Number of Births with Mother HIV Positive',
-    path: '#{postnatalDetails.birthDetails.?[motherHivStatus == true].size()}',
-    type: 'computed_field'
-  },
-  {
-    label: 'Number of Births with Mother HIV Negative',
-    path: '#{postnatalDetails.birthDetails.?[motherHivStatus == false].size()}',
-    type: 'computed_field'
-  },
-  {
-    label: 'Number of Births with Mother HIV Unknown',
-    path: '#{postnatalDetails.birthDetails.?[motherHivStatus == null].size()}',
-    type: 'computed_field'
   }
-];
+}
+
+// [
+//   {
+//     label: "Mother's Overall HIV Status",
+//     path: '#{postnatalDetails.hivDetails.status}',
+//     type: 'enum',
+//     options: [
+//       { label: 'Positive', value: 'T(com.Adapter.icare.Enums.STATUS).POSITIVE' },
+//       { label: 'Negative', value: 'T(com.Adapter.icare.Enums.STATUS).NEGATIVE' },
+//       { label: 'Unknown', value: "null" }
+//     ]
+//   },
+//   {
+//     label: 'Total Number of Births',
+//     path: '#{postnatalDetails.birthDetails.size()}',
+//     type: 'collection_size'
+//   },
+//   {
+//     label: 'Number of Births with Mother HIV Positive',
+//     path: '#{postnatalDetails.birthDetails.?[motherHivStatus == true].size()}',
+//     type: 'computed_field'
+//   },
+//   {
+//     label: 'Number of Births with Mother HIV Negative',
+//     path: '#{postnatalDetails.birthDetails.?[motherHivStatus == false].size()}',
+//     type: 'computed_field'
+//   },
+//   {
+//     label: 'Number of Births with Mother HIV Unknown',
+//     path: '#{postnatalDetails.birthDetails.?[motherHivStatus == null].size()}',
+//     type: 'computed_field'
+//   }
+// ];
 
 
 // This constant is now an array of groups, directly matching the desired UI structure.
