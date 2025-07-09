@@ -15,7 +15,6 @@ import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
       style="width: 100%"
       [nzNodes]="nodes"
       [nzExpandedKeys]="expandedKeys"
-      [nzCheckable]="isCheckable"
       [nzAllowClear]="allowClear"
       [nzShowSearch]="showSearch"
       [nzPlaceHolder]="placeholder"

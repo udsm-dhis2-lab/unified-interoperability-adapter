@@ -39,7 +39,7 @@ export const DATA_MODEL_DEFINITION: ModelField[] = [
     options: [
       { label: 'Positive', value: 'T(com.Adapter.icare.Enums.STATUS).POSITIVE' },
       { label: 'Negative', value: 'T(com.Adapter.icare.Enums.STATUS).NEGATIVE' },
-      { label: 'Unknown', value: "Naeck" }
+      { label: 'Unknown', value: "null" }
     ]
   },
   {

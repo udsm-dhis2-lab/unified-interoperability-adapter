@@ -26,7 +26,7 @@
         <span *ngIf="j > 0" class="condition-joiner">AND</span>
 
         <!-- Left Operand (Field) -->
-        <nz-select
+        <!-- <nz-select
           class="operand"
           [(ngModel)]="condition.leftOperandPath"
           (ngModelChange)="updateRule()"
@@ -35,7 +35,6 @@
           <nz-option *ngFor="let field of fields" [nzLabel]="field.label" [nzValue]="field.path"></nz-option>
         </nz-select>
 
-        <!-- Operator -->
         <nz-select
           class="operator"
           [(ngModel)]="condition.operator"
@@ -44,7 +43,6 @@
           <nz-option *ngFor="let op of operators" [nzLabel]="op.label" [nzValue]="op.value"></nz-option>
         </nz-select>
 
-        <!-- Right Operand (Value) -->
         <nz-select
           class="operand"
           [(ngModel)]="condition.rightOperandPath"
@@ -53,9 +51,41 @@
           nzShowSearch>
 
           <nz-option *ngFor="let field of fields" [nzLabel]="field.label" [nzValue]="field.path"></nz-option>
+        </nz-select> -->
+
+         <!-- Left Operand (Field) -->
+       <div class="condition-operand">
+          <app-tree-select
+            [nodes]="categoryNodes"
+            [expandedKeys]="defaultExpandedKeys"
+            [selectedValues]="currentSelection"
+            (selectionChange)="updateRule()"
+          ></app-tree-select>
+        </div>
+
+        <!-- Operator -->
+        <nz-select
+          class="operator"
+          [(ngModel)]="condition.operator"
+          (ngModelChange)="updateRule()"
+          nzPlaceHolder="Operator"
+        >
+          <nz-option
+            *ngFor="let op of operators"
+            [nzLabel]="op.label"
+            [nzValue]="op.value"
+          ></nz-option>
         </nz-select>
 
-
+        <!-- Right Operand (Value) -->
+       <div class="condition-operand">
+          <app-tree-select
+            [nodes]="categoryNodes"
+            [expandedKeys]="defaultExpandedKeys"
+            [selectedValues]="currentSelection"
+            (selectionChange)="updateRule()"
+          ></app-tree-select>
+        </div>
 
         <!-- Remove Condition Button -->
         <button nz-button nzType="text" nzShape="circle" (click)="removeCondition(group, j)" [disabled]="group.conditions.length === 1 && groups.length === 1">
