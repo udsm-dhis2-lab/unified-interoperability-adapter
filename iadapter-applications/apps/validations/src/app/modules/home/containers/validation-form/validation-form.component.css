@@ -30,6 +30,18 @@ nz-content {
 }
 
 
+.rule-expression-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Ensure it takes full width to push toggle to the right */
+}
+
+/* Optional: Add some margin below the preview */
+.spel-preview-container {
+  margin-top: 12px;
+}
+
 /* --- SpEL Preview Styling (from previous steps) --- */
 
 .spel-preview {

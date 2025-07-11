@@ -1,3 +1,2381 @@
+export const DATA_MODEL_DEFINITION_CONST = {
+    "mrn": {
+        "label": "Mrn",
+        "type": "STRING",
+        "path": "#{mrn}"
+    },
+    "facilityDetails.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{facilityDetails.code}"
+    },
+    "facilityDetails.name": {
+        "label": "Name",
+        "type": "STRING",
+        "path": "#{facilityDetails.name}"
+    },
+    "reportDetails.reportingDate": {
+        "label": "Reporting Date",
+        "type": "DATE",
+        "path": "#{reportDetails.reportingDate}"
+    },
+    "demographicDetails.id": {
+        "label": "Id",
+        "type": "STRING",
+        "path": "#{demographicDetails.id}"
+    },
+    "demographicDetails.firstName": {
+        "label": "First Name",
+        "type": "STRING",
+        "path": "#{demographicDetails.firstName}"
+    },
+    "demographicDetails.middleName": {
+        "label": "Middle Name",
+        "type": "STRING",
+        "path": "#{demographicDetails.middleName}"
+    },
+    "demographicDetails.lastName": {
+        "label": "Last Name",
+        "type": "STRING",
+        "path": "#{demographicDetails.lastName}"
+    },
+    "demographicDetails.dateOfBirth": {
+        "label": "Date Of Birth",
+        "type": "DATE",
+        "path": "#{demographicDetails.dateOfBirth}"
+    },
+    "demographicDetails.gender": {
+        "label": "Gender",
+        "type": "STRING",
+        "path": "#{demographicDetails.gender}"
+    },
+    "demographicDetails.phoneNumbers[]": {
+        "label": "Phone Numbers (Item)",
+        "type": "STRING",
+        "path": "#{demographicDetails.phoneNumbers[]}"
+    },
+    "demographicDetails.emails[]": {
+        "label": "Emails (Item)",
+        "type": "STRING",
+        "path": "#{demographicDetails.emails[]}"
+    },
+    "demographicDetails.occupation": {
+        "label": "Occupation",
+        "type": "STRING",
+        "path": "#{demographicDetails.occupation}"
+    },
+    "demographicDetails.maritalStatus": {
+        "label": "Marital Status",
+        "type": "STRING",
+        "path": "#{demographicDetails.maritalStatus}"
+    },
+    "demographicDetails.nationality": {
+        "label": "Nationality",
+        "type": "STRING",
+        "path": "#{demographicDetails.nationality}"
+    },
+    "demographicDetails.relatedClients[]": {
+        "label": "Related Clients (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{demographicDetails.relatedClients[]}"
+    },
+    "visitDetails.id": {
+        "label": "Id",
+        "type": "STRING",
+        "path": "#{visitDetails.id}"
+    },
+    "visitDetails.visitDate": {
+        "label": "Visit Date",
+        "type": "DATE",
+        "path": "#{visitDetails.visitDate}"
+    },
+    "visitDetails.newThisYear": {
+        "label": "New This Year",
+        "type": "BOOLEAN",
+        "path": "#{visitDetails.newThisYear}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "visitDetails.isNew": {
+        "label": "Is New",
+        "type": "BOOLEAN",
+        "path": "#{visitDetails.isNew}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "visitDetails.closedDate": {
+        "label": "Closed Date",
+        "type": "DATE",
+        "path": "#{visitDetails.closedDate}"
+    },
+    "visitDetails.visitType": {
+        "label": "Visit Type",
+        "type": "STRING",
+        "path": "#{visitDetails.visitType}"
+    },
+    "visitDetails.serviceComplaints.providedComplaints": {
+        "label": "Provided Complaints",
+        "type": "BOOLEAN",
+        "path": "#{visitDetails.serviceComplaints.providedComplaints}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "visitDetails.serviceComplaints.complaints": {
+        "label": "Complaints",
+        "type": "STRING",
+        "path": "#{visitDetails.serviceComplaints.complaints}"
+    },
+    "visitDetails.referredIn": {
+        "label": "Referred In",
+        "type": "BOOLEAN",
+        "path": "#{visitDetails.referredIn}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "visitDetails.disabled": {
+        "label": "Disabled",
+        "type": "BOOLEAN",
+        "path": "#{visitDetails.disabled}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "lifeStyleInformation.smoking": {
+        "label": "Smoking",
+        "type": "MAP_OBJECT",
+        "path": "#{lifeStyleInformation.smoking}"
+    },
+    "lifeStyleInformation.alcoholUse": {
+        "label": "Alcohol Use",
+        "type": "MAP_OBJECT",
+        "path": "#{lifeStyleInformation.alcoholUse}"
+    },
+    "lifeStyleInformation.drugUse": {
+        "label": "Drug Use",
+        "type": "MAP_OBJECT",
+        "path": "#{lifeStyleInformation.drugUse}"
+    },
+    "treatmentDetails.chemoTherapy[]": {
+        "label": "Chemo Therapy (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{treatmentDetails.chemoTherapy[]}"
+    },
+    "treatmentDetails.radioTherapy[]": {
+        "label": "Radio Therapy (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{treatmentDetails.radioTherapy[]}"
+    },
+    "treatmentDetails.palliativeCare[]": {
+        "label": "Palliative Care (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{treatmentDetails.palliativeCare[]}"
+    },
+    "treatmentDetails.surgery[]": {
+        "label": "Surgery (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{treatmentDetails.surgery[]}"
+    },
+    "treatmentDetails.hormoneTherapy[]": {
+        "label": "Hormone Therapy (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{treatmentDetails.hormoneTherapy[]}"
+    },
+    "treatmentDetails.symptomatic": {
+        "label": "Symptomatic",
+        "type": "STRING",
+        "path": "#{treatmentDetails.symptomatic}"
+    },
+    "treatmentDetails.alternativeTreatment": {
+        "label": "Alternative Treatment",
+        "type": "STRING",
+        "path": "#{treatmentDetails.alternativeTreatment}"
+    },
+    "eyeClinicDetails.refracted": {
+        "label": "Refracted",
+        "type": "BOOLEAN",
+        "path": "#{eyeClinicDetails.refracted}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "eyeClinicDetails.spectaclesPrescribed": {
+        "label": "Spectacles Prescribed",
+        "type": "BOOLEAN",
+        "path": "#{eyeClinicDetails.spectaclesPrescribed}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "eyeClinicDetails.spectacleDispensed": {
+        "label": "Spectacle Dispensed",
+        "type": "BOOLEAN",
+        "path": "#{eyeClinicDetails.spectacleDispensed}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "eyeClinicDetails.contactLenseDispensed": {
+        "label": "Contact Lense Dispensed",
+        "type": "BOOLEAN",
+        "path": "#{eyeClinicDetails.contactLenseDispensed}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "eyeClinicDetails.prescribedWithLowVision": {
+        "label": "Prescribed With Low Vision",
+        "type": "BOOLEAN",
+        "path": "#{eyeClinicDetails.prescribedWithLowVision}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "eyeClinicDetails.isDispensedWithLowVisionDevice": {
+        "label": "Is Dispensed With Low Vision Device",
+        "type": "BOOLEAN",
+        "path": "#{eyeClinicDetails.isDispensedWithLowVisionDevice}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "admissionDetails.admissionDate": {
+        "label": "Admission Date",
+        "type": "DATE",
+        "path": "#{admissionDetails.admissionDate}"
+    },
+    "admissionDetails.admissionDiagnosis": {
+        "label": "Admission Diagnosis",
+        "type": "STRING",
+        "path": "#{admissionDetails.admissionDiagnosis}"
+    },
+    "admissionDetails.dischargedOn": {
+        "label": "Discharged On",
+        "type": "STRING",
+        "path": "#{admissionDetails.dischargedOn}"
+    },
+    "admissionDetails.dischargeStatus": {
+        "label": "Discharge Status",
+        "type": "STRING",
+        "path": "#{admissionDetails.dischargeStatus}"
+    },
+    "outcomeDetails.isAlive": {
+        "label": "Is Alive",
+        "type": "BOOLEAN",
+        "path": "#{outcomeDetails.isAlive}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "outcomeDetails.deathLocation": {
+        "label": "Death Location",
+        "type": "STRING",
+        "path": "#{outcomeDetails.deathLocation}"
+    },
+    "outcomeDetails.deathDate": {
+        "label": "Death Date",
+        "type": "DATE",
+        "path": "#{outcomeDetails.deathDate}"
+    },
+    "outcomeDetails.contactTracing": {
+        "label": "Contact Tracing",
+        "type": "BOOLEAN",
+        "path": "#{outcomeDetails.contactTracing}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "outcomeDetails.investigationConducted": {
+        "label": "Investigation Conducted",
+        "type": "BOOLEAN",
+        "path": "#{outcomeDetails.investigationConducted}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "outcomeDetails.quarantined": {
+        "label": "Quarantined",
+        "type": "BOOLEAN",
+        "path": "#{outcomeDetails.quarantined}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "outcomeDetails.referred": {
+        "label": "Referred",
+        "type": "BOOLEAN",
+        "path": "#{outcomeDetails.referred}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "causesOfDeathDetails.dateOfDeath": {
+        "label": "Date Of Death",
+        "type": "DATE",
+        "path": "#{causesOfDeathDetails.dateOfDeath}"
+    },
+    "causesOfDeathDetails.lineA": {
+        "label": "Line A",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.lineA}"
+    },
+    "causesOfDeathDetails.lineB": {
+        "label": "Line B",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.lineB}"
+    },
+    "causesOfDeathDetails.lineC": {
+        "label": "Line C",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.lineC}"
+    },
+    "causesOfDeathDetails.lineD": {
+        "label": "Line D",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.lineD}"
+    },
+    "causesOfDeathDetails.causeOfDeathOther": {
+        "label": "Cause Of Death Other",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.causeOfDeathOther}"
+    },
+    "causesOfDeathDetails.mannerOfDeath": {
+        "label": "Manner Of Death",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.mannerOfDeath}"
+    },
+    "causesOfDeathDetails.placeOfDeath": {
+        "label": "Place Of Death",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.placeOfDeath}"
+    },
+    "causesOfDeathDetails.otherDeathDetails.postmortemDetails": {
+        "label": "Postmortem Details",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.otherDeathDetails.postmortemDetails}"
+    },
+    "causesOfDeathDetails.otherDeathDetails.marcerated": {
+        "label": "Marcerated",
+        "type": "BOOLEAN",
+        "path": "#{causesOfDeathDetails.otherDeathDetails.marcerated}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "causesOfDeathDetails.otherDeathDetails.fresh": {
+        "label": "Fresh",
+        "type": "BOOLEAN",
+        "path": "#{causesOfDeathDetails.otherDeathDetails.fresh}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "causesOfDeathDetails.otherDeathDetails.motherCondition": {
+        "label": "Mother Condition",
+        "type": "STRING",
+        "path": "#{causesOfDeathDetails.otherDeathDetails.motherCondition}"
+    },
+    "antenatalCareDetails.date": {
+        "label": "Date",
+        "type": "DATE",
+        "path": "#{antenatalCareDetails.date}"
+    },
+    "antenatalCareDetails.pregnancyAgeInWeeks": {
+        "label": "Pregnancy Age In Weeks",
+        "type": "NUMBER",
+        "path": "#{antenatalCareDetails.pregnancyAgeInWeeks}"
+    },
+    "antenatalCareDetails.positiveHivStatusBeforeService": {
+        "label": "Positive Hiv Status Before Service",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.positiveHivStatusBeforeService}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.referredToCTC": {
+        "label": "Referred To CTC",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.referredToCTC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.gravidity": {
+        "label": "Gravidity",
+        "type": "NUMBER",
+        "path": "#{antenatalCareDetails.gravidity}"
+    },
+    "antenatalCareDetails.hivDetails.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{antenatalCareDetails.hivDetails.code}"
+    },
+    "antenatalCareDetails.hivDetails.hivTestNumber": {
+        "label": "Hiv Test Number",
+        "type": "NUMBER",
+        "path": "#{antenatalCareDetails.hivDetails.hivTestNumber}"
+    },
+    "antenatalCareDetails.syphilisDetails.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{antenatalCareDetails.syphilisDetails.code}"
+    },
+    "antenatalCareDetails.syphilisDetails.providedWithTreatment": {
+        "label": "Provided With Treatment",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.syphilisDetails.providedWithTreatment}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.spouseDetails.hivDetails.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{antenatalCareDetails.spouseDetails.hivDetails.code}"
+    },
+    "antenatalCareDetails.spouseDetails.hivDetails.hivTestNumber": {
+        "label": "Hiv Test Number",
+        "type": "NUMBER",
+        "path": "#{antenatalCareDetails.spouseDetails.hivDetails.hivTestNumber}"
+    },
+    "antenatalCareDetails.spouseDetails.syphilisDetails.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{antenatalCareDetails.spouseDetails.syphilisDetails.code}"
+    },
+    "antenatalCareDetails.spouseDetails.syphilisDetails.providedWithTreatment": {
+        "label": "Provided With Treatment",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.spouseDetails.syphilisDetails.providedWithTreatment}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.spouseDetails.hepatitisB.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{antenatalCareDetails.spouseDetails.hepatitisB.code}"
+    },
+    "antenatalCareDetails.spouseDetails.hepatitisB.providedWithTreatment": {
+        "label": "Provided With Treatment",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.spouseDetails.hepatitisB.providedWithTreatment}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.spouseDetails.diagnosedWithOtherSTDs": {
+        "label": "Diagnosed With Other STDs",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.spouseDetails.diagnosedWithOtherSTDs}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.spouseDetails.providedWithTreatmentForOtherSTDs": {
+        "label": "Provided With Treatment For Other STDs",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.spouseDetails.providedWithTreatmentForOtherSTDs}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.spouseDetails.otherSpouseDetails[]": {
+        "label": "Other Spouse Details (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{antenatalCareDetails.spouseDetails.otherSpouseDetails[]}"
+    },
+    "antenatalCareDetails.otherSpouseDetails[]": {
+        "label": "Other Spouse Details (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{antenatalCareDetails.otherSpouseDetails[]}"
+    },
+    "antenatalCareDetails.lastAncVisitDate": {
+        "label": "Last Anc Visit Date",
+        "type": "DATE",
+        "path": "#{antenatalCareDetails.lastAncVisitDate}"
+    },
+    "antenatalCareDetails.referredIn": {
+        "label": "Referred In",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.referredIn}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.referredOut": {
+        "label": "Referred Out",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.referredOut}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.providedWithHivCounsellingBeforeLabTest": {
+        "label": "Provided With Hiv Counselling Before Lab Test",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.providedWithHivCounsellingBeforeLabTest}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.providedWithHivCounsellingAfterLabTest": {
+        "label": "Provided With Hiv Counselling After Lab Test",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.providedWithHivCounsellingAfterLabTest}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.prophylaxis.providedWithLLIN": {
+        "label": "Provided With LLIN",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.prophylaxis.providedWithLLIN}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.prophylaxis.providedWithIPT2": {
+        "label": "Provided With IPT2",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.prophylaxis.providedWithIPT2}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.prophylaxis.providedWithIPT3": {
+        "label": "Provided With IPT3",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.prophylaxis.providedWithIPT3}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.prophylaxis.providedWithIPT4": {
+        "label": "Provided With IPT4",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.prophylaxis.providedWithIPT4}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.prophylaxis.providedWithMebendazoleOrAlbendazole": {
+        "label": "Provided With Mebendazole Or Albendazole",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.prophylaxis.providedWithMebendazoleOrAlbendazole}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.prophylaxis.providedWithIFFolic60Tablets": {
+        "label": "Provided With IFFolic60Tablets",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.prophylaxis.providedWithIFFolic60Tablets}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.diagnosedWithOtherSTDs": {
+        "label": "Diagnosed With Other STDs",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.diagnosedWithOtherSTDs}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "antenatalCareDetails.providedWithTreatmentForOtherSTDs": {
+        "label": "Provided With Treatment For Other STDs",
+        "type": "BOOLEAN",
+        "path": "#{antenatalCareDetails.providedWithTreatmentForOtherSTDs}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.date": {
+        "label": "Date",
+        "type": "DATE",
+        "path": "#{laborAndDeliveryDetails.date}"
+    },
+    "laborAndDeliveryDetails.deliveryMethod": {
+        "label": "Delivery Method",
+        "type": "MAP_OBJECT",
+        "path": "#{laborAndDeliveryDetails.deliveryMethod}"
+    },
+    "laborAndDeliveryDetails.timeBetweenLaborPainAndDeliveryInHrs": {
+        "label": "Time Between Labor Pain And Delivery In Hrs",
+        "type": "NUMBER",
+        "path": "#{laborAndDeliveryDetails.timeBetweenLaborPainAndDeliveryInHrs}"
+    },
+    "laborAndDeliveryDetails.isAttendantSkilled": {
+        "label": "Is Attendant Skilled",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.isAttendantSkilled}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.providedWithFamilyPlanningCounseling": {
+        "label": "Provided With Family Planning Counseling",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.providedWithFamilyPlanningCounseling}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.providedWithInfantFeedingCounseling": {
+        "label": "Provided With Infant Feeding Counseling",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.providedWithInfantFeedingCounseling}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.emoc.providedAntibiotic": {
+        "label": "Provided Antibiotic",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.emoc.providedAntibiotic}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.emoc.providedUterotonic": {
+        "label": "Provided Uterotonic",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.emoc.providedUterotonic}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.emoc.providedMagnesiumSulphate": {
+        "label": "Provided Magnesium Sulphate",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.emoc.providedMagnesiumSulphate}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.emoc.removedPlacenta": {
+        "label": "Removed Placenta",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.emoc.removedPlacenta}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.emoc.performedMvaOrDc": {
+        "label": "Performed Mva Or Dc",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.emoc.performedMvaOrDc}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.emoc.administeredBlood": {
+        "label": "Administered Blood",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.emoc.administeredBlood}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.amstl.cordTractionUsed": {
+        "label": "Cord Traction Used",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.amstl.cordTractionUsed}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.amstl.uterineMassageDone": {
+        "label": "Uterine Massage Done",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.amstl.uterineMassageDone}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.amstl.administeredOxytocin": {
+        "label": "Administered Oxytocin",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.amstl.administeredOxytocin}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.amstl.administeredEgometrine": {
+        "label": "Administered Egometrine",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.amstl.administeredEgometrine}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.amstl.administeredMisoprostol": {
+        "label": "Administered Misoprostol",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.others.amstl.administeredMisoprostol}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.others.familyPlanning[]": {
+        "label": "Family Planning (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{laborAndDeliveryDetails.others.familyPlanning[]}"
+    },
+    "laborAndDeliveryDetails.hasComeWithSpouse": {
+        "label": "Has Come With Spouse",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.hasComeWithSpouse}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.hasComeWithCompanion": {
+        "label": "Has Come With Companion",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.hasComeWithCompanion}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.pregnancyAgeInWeeks": {
+        "label": "Pregnancy Age In Weeks",
+        "type": "NUMBER",
+        "path": "#{laborAndDeliveryDetails.pregnancyAgeInWeeks}"
+    },
+    "laborAndDeliveryDetails.wasProvidedWithAntenatalCorticosteroid": {
+        "label": "Was Provided With Antenatal Corticosteroid",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.wasProvidedWithAntenatalCorticosteroid}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.hasHistoryOfFGM": {
+        "label": "Has History Of FGM",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.hasHistoryOfFGM}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.hivDetails.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{laborAndDeliveryDetails.hivDetails.code}"
+    },
+    "laborAndDeliveryDetails.hivDetails.hivTestNumber": {
+        "label": "Hiv Test Number",
+        "type": "NUMBER",
+        "path": "#{laborAndDeliveryDetails.hivDetails.hivTestNumber}"
+    },
+    "laborAndDeliveryDetails.hivDetails.referredToCTC": {
+        "label": "Referred To CTC",
+        "type": "BOOLEAN",
+        "path": "#{laborAndDeliveryDetails.hivDetails.referredToCTC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "laborAndDeliveryDetails.hivDetails.ancHivStatus.numberOfTestTaken": {
+        "label": "Number Of Test Taken",
+        "type": "NUMBER",
+        "path": "#{laborAndDeliveryDetails.hivDetails.ancHivStatus.numberOfTestTaken}"
+    },
+    "postnatalDetails.date": {
+        "label": "Date",
+        "type": "DATE",
+        "path": "#{postnatalDetails.date}"
+    },
+    "postnatalDetails.positiveHivStatusBeforeService": {
+        "label": "Positive Hiv Status Before Service",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.positiveHivStatusBeforeService}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.hivDetails.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{postnatalDetails.hivDetails.code}"
+    },
+    "postnatalDetails.hivDetails.hivTestNumber": {
+        "label": "Hiv Test Number",
+        "type": "NUMBER",
+        "path": "#{postnatalDetails.hivDetails.hivTestNumber}"
+    },
+    "postnatalDetails.referredToCTC": {
+        "label": "Referred To CTC",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.referredToCTC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.prophylaxis.providedWithAntenatalCorticosteroids": {
+        "label": "Provided With Antenatal Corticosteroids",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.prophylaxis.providedWithAntenatalCorticosteroids}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.prophylaxis.provideWithVitaminA": {
+        "label": "Provide With Vitamin A",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.prophylaxis.provideWithVitaminA}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.prophylaxis.providedWithFEFO": {
+        "label": "Provided With FEFO",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.prophylaxis.providedWithFEFO}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.referredToClinicForFurtherServices": {
+        "label": "Referred To Clinic For Further Services",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.referredToClinicForFurtherServices}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.daysSinceDelivery": {
+        "label": "Days Since Delivery",
+        "type": "NUMBER",
+        "path": "#{postnatalDetails.daysSinceDelivery}"
+    },
+    "postnatalDetails.outCome": {
+        "label": "Out Come",
+        "type": "STRING",
+        "path": "#{postnatalDetails.outCome}"
+    },
+    "postnatalDetails.APGARScore": {
+        "label": "APGARScore",
+        "type": "NUMBER",
+        "path": "#{postnatalDetails.APGARScore}"
+    },
+    "postnatalDetails.breastFeedingDetails": {
+        "label": "Breast Feeding Details",
+        "type": "MAP_OBJECT",
+        "path": "#{postnatalDetails.breastFeedingDetails}"
+    },
+    "postnatalDetails.demagedNipples.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{postnatalDetails.demagedNipples.code}"
+    },
+    "postnatalDetails.demagedNipples.name": {
+        "label": "Name",
+        "type": "STRING",
+        "path": "#{postnatalDetails.demagedNipples.name}"
+    },
+    "postnatalDetails.demagedNipples.provided": {
+        "label": "Provided",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.demagedNipples.provided}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.mastitis.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{postnatalDetails.mastitis.code}"
+    },
+    "postnatalDetails.mastitis.name": {
+        "label": "Name",
+        "type": "STRING",
+        "path": "#{postnatalDetails.mastitis.name}"
+    },
+    "postnatalDetails.mastitis.provided": {
+        "label": "Provided",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.mastitis.provided}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.breastAbscess.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{postnatalDetails.breastAbscess.code}"
+    },
+    "postnatalDetails.breastAbscess.name": {
+        "label": "Name",
+        "type": "STRING",
+        "path": "#{postnatalDetails.breastAbscess.name}"
+    },
+    "postnatalDetails.breastAbscess.provided": {
+        "label": "Provided",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.breastAbscess.provided}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.fistula.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{postnatalDetails.fistula.code}"
+    },
+    "postnatalDetails.fistula.name": {
+        "label": "Name",
+        "type": "STRING",
+        "path": "#{postnatalDetails.fistula.name}"
+    },
+    "postnatalDetails.fistula.provided": {
+        "label": "Provided",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.fistula.provided}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.puerperalPsychosis.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{postnatalDetails.puerperalPsychosis.code}"
+    },
+    "postnatalDetails.puerperalPsychosis.name": {
+        "label": "Name",
+        "type": "STRING",
+        "path": "#{postnatalDetails.puerperalPsychosis.name}"
+    },
+    "postnatalDetails.puerperalPsychosis.provided": {
+        "label": "Provided",
+        "type": "BOOLEAN",
+        "path": "#{postnatalDetails.puerperalPsychosis.provided}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "postnatalDetails.otherServices[]": {
+        "label": "Other Services (Item)",
+        "type": "GENERIC_OBJECT",
+        "path": "#{postnatalDetails.otherServices[]}"
+    },
+    "familyPlanningDetails.date": {
+        "label": "Date",
+        "type": "DATE",
+        "path": "#{familyPlanningDetails.date}"
+    },
+    "familyPlanningDetails.positiveHivStatusBeforeService": {
+        "label": "Positive Hiv Status Before Service",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.positiveHivStatusBeforeService}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.wasCounselled": {
+        "label": "Was Counselled",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.wasCounselled}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.hasComeWithSpouse": {
+        "label": "Has Come With Spouse",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.hasComeWithSpouse}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.referred": {
+        "label": "Referred",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.referred}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.cancerScreeningDetails.breastCancer.foundWithBreastCancerSymptoms": {
+        "label": "Found With Breast Cancer Symptoms",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.cancerScreeningDetails.breastCancer.foundWithBreastCancerSymptoms}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.cancerScreeningDetails.breastCancer.screened": {
+        "label": "Screened",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.cancerScreeningDetails.breastCancer.screened}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.hivStatus.referredToCTC": {
+        "label": "Referred To CTC",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.hivStatus.referredToCTC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.spouseHivStatus.referredToCTC": {
+        "label": "Referred To CTC",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.spouseHivStatus.referredToCTC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.breastFeeding": {
+        "label": "Breast Feeding",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.breastFeeding}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.sideEffects.bleeding": {
+        "label": "Bleeding",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.sideEffects.bleeding}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.sideEffects.headache": {
+        "label": "Headache",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.sideEffects.headache}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "familyPlanningDetails.sideEffects.gotPregnancy": {
+        "label": "Got Pregnancy",
+        "type": "BOOLEAN",
+        "path": "#{familyPlanningDetails.sideEffects.gotPregnancy}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "childHealthDetails.motherAge": {
+        "label": "Mother Age",
+        "type": "NUMBER",
+        "path": "#{childHealthDetails.motherAge}"
+    },
+    "childHealthDetails.prophylaxis.albendazole.administered": {
+        "label": "Administered",
+        "type": "BOOLEAN",
+        "path": "#{childHealthDetails.prophylaxis.albendazole.administered}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "childHealthDetails.prophylaxis.vitaminA.administered": {
+        "label": "Administered",
+        "type": "BOOLEAN",
+        "path": "#{childHealthDetails.prophylaxis.vitaminA.administered}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "childHealthDetails.prophylaxis.providedWithLLIN": {
+        "label": "Provided With LLIN",
+        "type": "BOOLEAN",
+        "path": "#{childHealthDetails.prophylaxis.providedWithLLIN}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "childHealthDetails.providedWithInfantFeedingCounselling": {
+        "label": "Provided With Infant Feeding Counselling",
+        "type": "BOOLEAN",
+        "path": "#{childHealthDetails.providedWithInfantFeedingCounselling}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "childHealthDetails.hasBeenBreastFedFor24Month": {
+        "label": "Has Been Breast Fed For24Month",
+        "type": "BOOLEAN",
+        "path": "#{childHealthDetails.hasBeenBreastFedFor24Month}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "childHealthDetails.motherHivStatus.testingDate": {
+        "label": "Testing Date",
+        "type": "DATE",
+        "path": "#{childHealthDetails.motherHivStatus.testingDate}"
+    },
+    "childHealthDetails.referredToCTC": {
+        "label": "Referred To CTC",
+        "type": "BOOLEAN",
+        "path": "#{childHealthDetails.referredToCTC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.pregnancyAgeInWeeks": {
+        "label": "Pregnancy Age In Weeks",
+        "type": "NUMBER",
+        "path": "#{cpacDetails.pregnancyAgeInWeeks}"
+    },
+    "cpacDetails.positiveHIVStatusBeforeAbortion": {
+        "label": "Positive HIVStatus Before Abortion",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.positiveHIVStatusBeforeAbortion}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionsMedications.providedWithAntibiotics": {
+        "label": "Provided With Antibiotics",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionsMedications.providedWithAntibiotics}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionsMedications.providedWithPainKillers": {
+        "label": "Provided With Pain Killers",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionsMedications.providedWithPainKillers}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionsMedications.providedWithOxytocin": {
+        "label": "Provided With Oxytocin",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionsMedications.providedWithOxytocin}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionsMedications.providedWithMisoprostol": {
+        "label": "Provided With Misoprostol",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionsMedications.providedWithMisoprostol}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionsMedications.providedWithIvInfusion": {
+        "label": "Provided With Iv Infusion",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionsMedications.providedWithIvInfusion}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionCounselling.providedWithSTDsPreventionCounselling": {
+        "label": "Provided With STDs Prevention Counselling",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionCounselling.providedWithSTDsPreventionCounselling}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionCounselling.providedWithHIVCounselling": {
+        "label": "Provided With HIVCounselling",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionCounselling.providedWithHIVCounselling}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.postAbortionCounselling.providedWithFamilyPlanningCounselling": {
+        "label": "Provided With Family Planning Counselling",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.postAbortionCounselling.providedWithFamilyPlanningCounselling}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.didReceiveOralPillsPOP": {
+        "label": "Did Receive Oral Pills POP",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.didReceiveOralPillsPOP}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.popCyclesProvided": {
+        "label": "Pop Cycles Provided",
+        "type": "NUMBER",
+        "path": "#{cpacDetails.contraceptives.popCyclesProvided}"
+    },
+    "cpacDetails.contraceptives.didReceiveOralPillsCOC": {
+        "label": "Did Receive Oral Pills COC",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.didReceiveOralPillsCOC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.cocCyclesProvided": {
+        "label": "Coc Cycles Provided",
+        "type": "NUMBER",
+        "path": "#{cpacDetails.contraceptives.cocCyclesProvided}"
+    },
+    "cpacDetails.contraceptives.didReceivePillCycles": {
+        "label": "Did Receive Pill Cycles",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.didReceivePillCycles}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.wasInsertedWithImplanon": {
+        "label": "Was Inserted With Implanon",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.wasInsertedWithImplanon}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.wasInsertedWithJadelle": {
+        "label": "Was Inserted With Jadelle",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.wasInsertedWithJadelle}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.didReceiveIUD": {
+        "label": "Did Receive IUD",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.didReceiveIUD}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.didHaveTubalLigation": {
+        "label": "Did Have Tubal Ligation",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.didHaveTubalLigation}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.didReceiveInjection": {
+        "label": "Did Receive Injection",
+        "type": "BOOLEAN",
+        "path": "#{cpacDetails.contraceptives.didReceiveInjection}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cpacDetails.contraceptives.numberOfFemaleCondomsProvided": {
+        "label": "Number Of Female Condoms Provided",
+        "type": "NUMBER",
+        "path": "#{cpacDetails.contraceptives.numberOfFemaleCondomsProvided}"
+    },
+    "cpacDetails.contraceptives.numberOfMaleCondomsProvided": {
+        "label": "Number Of Male Condoms Provided",
+        "type": "NUMBER",
+        "path": "#{cpacDetails.contraceptives.numberOfMaleCondomsProvided}"
+    },
+    "cecap.cancerScreeningDetails.breastCancer.foundWithBreastCancerSymptoms": {
+        "label": "Found With Breast Cancer Symptoms",
+        "type": "BOOLEAN",
+        "path": "#{cecap.cancerScreeningDetails.breastCancer.foundWithBreastCancerSymptoms}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "cecap.cancerScreeningDetails.breastCancer.screened": {
+        "label": "Screened",
+        "type": "BOOLEAN",
+        "path": "#{cecap.cancerScreeningDetails.breastCancer.screened}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didReceiveOralPillsPOP": {
+        "label": "Did Receive Oral Pills POP",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didReceiveOralPillsPOP}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.popCyclesProvided": {
+        "label": "Pop Cycles Provided",
+        "type": "NUMBER",
+        "path": "#{contraceptives.popCyclesProvided}"
+    },
+    "contraceptives.didReceiveOralPillsCOC": {
+        "label": "Did Receive Oral Pills COC",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didReceiveOralPillsCOC}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.cocCyclesProvided": {
+        "label": "Coc Cycles Provided",
+        "type": "NUMBER",
+        "path": "#{contraceptives.cocCyclesProvided}"
+    },
+    "contraceptives.didReceivePillCycles": {
+        "label": "Did Receive Pill Cycles",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didReceivePillCycles}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.wasInsertedWithImplanon": {
+        "label": "Was Inserted With Implanon",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.wasInsertedWithImplanon}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.wasInsertedWithJadelle": {
+        "label": "Was Inserted With Jadelle",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.wasInsertedWithJadelle}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didReceiveIUD": {
+        "label": "Did Receive IUD",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didReceiveIUD}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didHaveTubalLigation": {
+        "label": "Did Have Tubal Ligation",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didHaveTubalLigation}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didReceiveInjection": {
+        "label": "Did Receive Injection",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didReceiveInjection}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.numberOfFemaleCondomsProvided": {
+        "label": "Number Of Female Condoms Provided",
+        "type": "NUMBER",
+        "path": "#{contraceptives.numberOfFemaleCondomsProvided}"
+    },
+    "contraceptives.numberOfMaleCondomsProvided": {
+        "label": "Number Of Male Condoms Provided",
+        "type": "NUMBER",
+        "path": "#{contraceptives.numberOfMaleCondomsProvided}"
+    },
+    "contraceptives.didReceiveSDM": {
+        "label": "Did Receive SDM",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didReceiveSDM}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didUseLAM": {
+        "label": "Did Use LAM",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didUseLAM}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didOptToUseEmergencyMethods": {
+        "label": "Did Opt To Use Emergency Methods",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didOptToUseEmergencyMethods}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didRemoveIUD": {
+        "label": "Did Remove IUD",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didRemoveIUD}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didRemoveImplanon": {
+        "label": "Did Remove Implanon",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didRemoveImplanon}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didRemoveJadelle": {
+        "label": "Did Remove Jadelle",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didRemoveJadelle}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "contraceptives.didHaveVasectomy": {
+        "label": "Did Have Vasectomy",
+        "type": "BOOLEAN",
+        "path": "#{contraceptives.didHaveVasectomy}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "visitMainPaymentDetails.shortName": {
+        "label": "Short Name",
+        "type": "STRING",
+        "path": "#{visitMainPaymentDetails.shortName}"
+    },
+    "visitMainPaymentDetails.type": {
+        "label": "Type",
+        "type": "STRING",
+        "path": "#{visitMainPaymentDetails.type}"
+    },
+    "visitMainPaymentDetails.insuranceCode": {
+        "label": "Insurance Code",
+        "type": "STRING",
+        "path": "#{visitMainPaymentDetails.insuranceCode}"
+    },
+    "visitMainPaymentDetails.name": {
+        "label": "Name",
+        "type": "STRING",
+        "path": "#{visitMainPaymentDetails.name}"
+    },
+    "visitMainPaymentDetails.insuranceId": {
+        "label": "Insurance Id",
+        "type": "STRING",
+        "path": "#{visitMainPaymentDetails.insuranceId}"
+    },
+    "referralDetails.referralDate": {
+        "label": "Referral Date",
+        "type": "DATE",
+        "path": "#{referralDetails.referralDate}"
+    },
+    "referralDetails.hfrCode": {
+        "label": "Hfr Code",
+        "type": "STRING",
+        "path": "#{referralDetails.hfrCode}"
+    },
+    "referralDetails.facility": {
+        "label": "Facility",
+        "type": "STRING",
+        "path": "#{referralDetails.facility}"
+    },
+    "referralDetails.reason[]": {
+        "label": "Reason (Item)",
+        "type": "STRING",
+        "path": "#{referralDetails.reason[]}"
+    },
+    "referralDetails.referralNumber": {
+        "label": "Referral Number",
+        "type": "STRING",
+        "path": "#{referralDetails.referralNumber}"
+    },
+    "referralDetails.referringClinician": {
+        "label": "Referring Clinician",
+        "type": "MAP_OBJECT",
+        "path": "#{referralDetails.referringClinician}"
+    },
+    "referralDetails.referredToOtherCountry": {
+        "label": "Referred To Other Country",
+        "type": "BOOLEAN",
+        "path": "#{referralDetails.referredToOtherCountry}",
+        "options": [
+            {
+                "label": "True",
+                "value": true
+            },
+            {
+                "label": "False",
+                "value": false
+            }
+        ]
+    },
+    "otherInformation.cancerScreening.date": {
+        "label": "Date",
+        "type": "DATE",
+        "path": "#{otherInformation.cancerScreening.date}"
+    },
+    "otherInformation.cancerScreening.method": {
+        "label": "Method",
+        "type": "STRING",
+        "path": "#{otherInformation.cancerScreening.method}"
+    },
+    "otherInformation.cancerScreening.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{otherInformation.cancerScreening.code}"
+    },
+    "otherInformation.cancerScreening.results.date": {
+        "label": "Date",
+        "type": "DATE",
+        "path": "#{otherInformation.cancerScreening.results.date}"
+    },
+    "otherInformation.cancerScreening.results.value": {
+        "label": "Value",
+        "type": "STRING",
+        "path": "#{otherInformation.cancerScreening.results.value}"
+    },
+    "otherInformation.cancerScreening.results.code": {
+        "label": "Code",
+        "type": "STRING",
+        "path": "#{otherInformation.cancerScreening.results.code}"
+    }
+}
+
 export const DISPLAY_DATA_TEMPLATE = [
     {
       title: 'demographicDetails',

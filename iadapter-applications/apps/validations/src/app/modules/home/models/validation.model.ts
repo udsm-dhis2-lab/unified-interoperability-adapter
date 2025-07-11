@@ -1,3 +1,6 @@
+import { DATA_MODEL_DEFINITION_CONST } from './../../../shared/validators.constants';
+
+
 export interface ModelField {
   label: string; // Human-readable name for the UI
   path: string; // The SpEL expression path
@@ -31,18 +34,7 @@ export const OPERATORS = [
   { label: 'is less than', value: '<' },
 ];
 
-export const DATA_MODEL_DEFINITION: any = {
-  "postnatalDetails.hivDetails.status": {
-    label: "Mother's Overall HIV Status",
-    path: '#{postnatalDetails.hivDetails.status}',
-    type: 'enum',
-    options: [
-      { label: 'Positive', value: 'T(com.Adapter.icare.Enums.STATUS).POSITIVE' },
-      { label: 'Negative', value: 'T(com.Adapter.icare.Enums.STATUS).NEGATIVE' },
-      { label: 'Unknown', value: "null" }
-    ]
-  }
-}
+export const DATA_MODEL_DEFINITION: any = DATA_MODEL_DEFINITION_CONST;
 
 // [
 //   {
