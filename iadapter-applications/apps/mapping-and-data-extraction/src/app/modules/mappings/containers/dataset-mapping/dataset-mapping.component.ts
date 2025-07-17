@@ -64,13 +64,7 @@ class Disaggregation {
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
-  databaseSchema = {
-    encounter_flat: ['organization_id', 'patient_id', 'period_start', 'new_visit', 'new_this_year', 'identifier_value'],
-    patient_flat: ['identifier_value', 'gender', 'birth_date'],
-    child_health_flat: ['encounter_id', 'mother_start_age', 'mother_end_age'],
-    diagnostic_report_flat: ['code', 'effective_datetime', 'encounter_id'],
-    condition_flat: ['code', 'onset_datetime', 'encounter_id']
-  };
+  // Database schema is now defined in the SqlEditorComponent with comprehensive FHIR views
 
   newThisYear?: boolean = false;
   newVisit?: boolean = false;

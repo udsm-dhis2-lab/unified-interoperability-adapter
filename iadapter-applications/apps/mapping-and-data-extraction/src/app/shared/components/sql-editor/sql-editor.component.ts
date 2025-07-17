@@ -5,40 +5,73 @@ import { sql } from '@codemirror/lang-sql';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { autocompletion, CompletionContext } from '@codemirror/autocomplete';
 import { basicSetup } from 'codemirror';
+import { CommonModule } from '@angular/common';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { FHIR_TABLE_SCHEMAS, TableSchema } from './table-schemas';
 
 @Component({
     selector: 'app-sql-editor',
     standalone: true,
-    template: `
-    <div #editor class="sql-editor" [style.height]="height"></div>
-  `,
-    styles: [`
-    .sql-editor {
-      border: 1px solid #d9d9d9;
-      border-radius: 4px;
-    }
-    .sql-editor .cm-editor {
-      height: 100%;
-    }
-  `]
+    imports: [CommonModule, NzIconModule, NzButtonModule, NzToolTipModule],
+    templateUrl: './sql-editor.component.html',
+    styleUrls: ['./sql-editor.component.css']
 })
 export class SqlEditorComponent implements OnInit, OnDestroy {
     @Input() value: string = '';
     @Input() height: string = '250px';
     @Input() theme: 'light' | 'dark' = 'dark';
-    @Input() tableSchema: { [tableName: string]: string[] } = {};
+    @Input() tableSchema: { [tableName: string]: string[] } = FHIR_TABLE_SCHEMAS;
     @Output() valueChange = new EventEmitter<string>();
 
     @ViewChild('editor', { static: true }) editorElement!: ElementRef;
 
     private editorView?: EditorView;
+    public isFullScreen: boolean = false;
+
+    get editorHeight(): string {
+        return this.isFullScreen ? 'calc(100vh - 41px)' : this.height;
+    }
 
     ngOnInit() {
         this.initializeEditor();
+        this.addKeyboardShortcuts();
     }
 
     ngOnDestroy() {
         this.editorView?.destroy();
+        this.removeKeyboardShortcuts();
+    }
+
+    toggleFullScreen(): void {
+        this.isFullScreen = !this.isFullScreen;
+
+        setTimeout(() => {
+            this.editorView?.requestMeasure();
+        }, 100);
+    }
+
+    private addKeyboardShortcuts(): void {
+        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+    }
+
+    private removeKeyboardShortcuts(): void {
+        document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+    }
+
+    private handleKeyDown(event: KeyboardEvent): void {
+        // ESC key to exit full screen
+        if (event.key === 'Escape' && this.isFullScreen) {
+            this.toggleFullScreen();
+        }
+
+        // F11 or Ctrl+Enter to toggle full screen (when editor has focus)
+        if ((event.key === 'F11' || (event.ctrlKey && event.key === 'Enter')) &&
+            this.editorElement.nativeElement.contains(document.activeElement)) {
+            event.preventDefault();
+            this.toggleFullScreen();
+        }
     }
 
     private initializeEditor() {

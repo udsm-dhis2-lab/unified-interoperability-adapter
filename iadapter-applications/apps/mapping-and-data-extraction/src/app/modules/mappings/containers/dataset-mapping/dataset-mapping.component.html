@@ -77,7 +77,7 @@
 
             <nz-card *ngIf="freeTextQuery" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
               <p>Free Text Query</p>
-              <app-sql-editor [value]="customQuery" [height]="'250px'" [theme]="'dark'" [tableSchema]="databaseSchema"
+              <app-sql-editor [value]="customQuery" [height]="'250px'" [theme]="'dark'"
                 (valueChange)="onCustomQueryChange($event)"></app-sql-editor>
             </nz-card>
 
