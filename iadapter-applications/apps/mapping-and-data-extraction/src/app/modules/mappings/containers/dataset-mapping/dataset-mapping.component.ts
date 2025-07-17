@@ -9,7 +9,7 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { NzCodeEditorModule } from 'ng-zorro-antd/code-editor';
+import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
 
 import {
   ConfigurationPage,
@@ -58,13 +58,12 @@ class Disaggregation {
   imports: [
     SharedModule,
     SelectComponent,
-    NzCodeEditorModule,
+    SqlEditorComponent,
   ],
   templateUrl: './dataset-mapping.component.html',
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
-  editorOptions = { theme: 'vs-dark', language: 'sql' };
   databaseSchema = {
     encounter_flat: ['organization_id', 'patient_id', 'period_start', 'new_visit', 'new_this_year', 'identifier_value'],
     patient_flat: ['identifier_value', 'gender', 'birth_date'],
@@ -75,9 +74,8 @@ export class DatasetMappingComponent implements OnInit {
 
   newThisYear?: boolean = false;
   newVisit?: boolean = false;
-
-  useSum?: boolean = false;
-  freeTextQuery?: boolean = false;
+  freeTextQuery: boolean = false; 
+  customQuery: string = '';
 
   lhsQueryValue?: any;
   rhsQueryValue?: any;
@@ -85,7 +83,6 @@ export class DatasetMappingComponent implements OnInit {
   nodes = [];
 
   queries: any[] = [];
-  customQuery?: string = '';
 
   get queriesAsString(): string {
     return JSON.stringify(this.queries, null, 2);
@@ -366,7 +363,6 @@ export class DatasetMappingComponent implements OnInit {
     this.mappingUuid = undefined;
     this.freeTextQuery = false;
     this.customQuery = '';
-    this.useSum = false;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
 
@@ -437,10 +433,6 @@ export class DatasetMappingComponent implements OnInit {
 
           if (data?.mapping?.customQuery) {
             this.customQuery = data?.mapping?.customQuery ?? '';
-          }
-
-          if (data?.mapping?.useSum) {
-            this.useSum = data?.mapping?.useSum;
           }
 
           if (data?.mapping?.newThisYear) {
@@ -855,58 +847,12 @@ export class DatasetMappingComponent implements OnInit {
     }
   }
 
-  onEditorInit(editor: any) {
-    const monaco = (window as any).monaco;
-
-    if ((window as any).sqlCompletionProvider) {
-      (window as any).sqlCompletionProvider.dispose();
-    }
-
-    (window as any).sqlCompletionProvider = monaco.languages.registerCompletionItemProvider('sql', {
-      provideCompletionItems: (model: { getWordUntilPosition: (arg0: any) => any; }, position: { lineNumber: any; }) => {
-        const word = model.getWordUntilPosition(position);
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: word.startColumn,
-          endColumn: word.endColumn,
-        };
-
-        const tableSuggestions = Object.keys(this.databaseSchema).map(tableName => ({
-          label: tableName,
-          kind: monaco.languages.CompletionItemKind.Module,
-          documentation: `Table: ${tableName}`,
-          insertText: tableName,
-          range: range,
-        }));
-
-        let columnSuggestions: { label: string; kind: any; documentation: string; insertText: any; range: { startLineNumber: any; endLineNumber: any; startColumn: any; endColumn: any; }; }[] = [];
-        for (const table of Object.keys(this.databaseSchema) as Array<keyof typeof this.databaseSchema>) {
-          this.databaseSchema[table].forEach((column: any) => {
-            columnSuggestions.push({
-              label: `${table}.${column}`,
-              kind: monaco.languages.CompletionItemKind.Field,
-              documentation: `Column: ${column} in ${table}`,
-              insertText: column,
-              range: range,
-            });
-          });
-        }
-
-        return {
-          suggestions: [...tableSuggestions, ...columnSuggestions],
-        };
-      },
-    });
-  }
-
   createMappingsPayload() {
     const payLoad = {
       mapping: {
         queries: this.queries,
         newThisYear: this.newThisYear,
         newVisit: this.newVisit,
-        useSum: this.useSum,
         freeTextQuery: this.freeTextQuery,
         customQuery: this.customQuery,
 
@@ -1040,6 +986,11 @@ export class DatasetMappingComponent implements OnInit {
       return icdCode[0].name;
     }
     return icdCode.name;
+  }
+
+  // Add the missing method
+  onCustomQueryChange(value: string): void {
+    this.customQuery = value;
   }
 }
 

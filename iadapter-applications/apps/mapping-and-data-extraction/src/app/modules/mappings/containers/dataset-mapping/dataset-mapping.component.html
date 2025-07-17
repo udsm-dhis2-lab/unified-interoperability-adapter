@@ -24,19 +24,18 @@
           <nz-card>
             <div nz-row [nzGutter]="8" style="margin-bottom: 16px" *ngIf="rightColumnSpan === 16">
               <div nz-col nzSpan="12">
-                <label nz-checkbox [(ngModel)]="useSum">Use sum to aggregate</label>
                 <label nz-checkbox (ngModelChange)="onFreeTextQueryChange($event)" [(ngModel)]="freeTextQuery">Use free
                   text query</label>
               </div>
             </div>
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
-              <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="6">
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="6">
                 <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
                   nzCheckStrictly="true" nzShowExpand="true" nzVirtualHeight="450px" [nzNodes]="nodes" nzShowSearch
                   nzPlaceHolder="LHS Query" [(ngModel)]="lhsQueryValue"></nz-tree-select>
               </div>
 
-              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16 && !freeTextQuery">
+              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16">
                 <nz-select style="width: 100%" [ngModel]="selectedQueryOperator"
                   (ngModelChange)="onQueryOperatorSelect($event)">
                   <ng-container *ngFor="let option of queryOperators">
@@ -46,7 +45,7 @@
                 </nz-select>
               </div>
 
-              <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="12">
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="12">
                 <div nz-row [nzGutter]="8">
                   <div nz-col nzSpan="12">
                     <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
@@ -78,8 +77,8 @@
 
             <nz-card *ngIf="freeTextQuery" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
               <p>Free Text Query</p>
-              <nz-code-editor style="height: 250px" [nzEditorOption]="editorOptions" [(ngModel)]="customQuery"
-                (nzEditorInitialized)="onEditorInit($event)"></nz-code-editor>
+              <app-sql-editor [value]="customQuery" [height]="'250px'" [theme]="'dark'" [tableSchema]="databaseSchema"
+                (valueChange)="onCustomQueryChange($event)"></app-sql-editor>
             </nz-card>
 
             <!-- selecting configurations options -->
