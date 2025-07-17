@@ -6,7 +6,6 @@ import { oneDark } from '@codemirror/theme-one-dark';
 import { autocompletion, CompletionContext } from '@codemirror/autocomplete';
 import { basicSetup } from 'codemirror';
 import { CommonModule } from '@angular/common';
-import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { FHIR_TABLE_SCHEMAS, TableSchema } from './table-schemas';
@@ -14,7 +13,7 @@ import { FHIR_TABLE_SCHEMAS, TableSchema } from './table-schemas';
 @Component({
     selector: 'app-sql-editor',
     standalone: true,
-    imports: [CommonModule, NzIconModule, NzButtonModule, NzToolTipModule],
+    imports: [CommonModule, NzButtonModule, NzToolTipModule],
     templateUrl: './sql-editor.component.html',
     styleUrls: ['./sql-editor.component.css']
 })
@@ -31,7 +30,7 @@ export class SqlEditorComponent implements OnInit, OnDestroy {
     public isFullScreen: boolean = false;
 
     get editorHeight(): string {
-        return this.isFullScreen ? 'calc(100vh - 41px)' : this.height;
+        return this.isFullScreen ? 'calc(100vh - 35px)' : this.height;
     }
 
     ngOnInit() {

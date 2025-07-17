@@ -39,10 +39,20 @@
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+    color: #595959 !important;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    min-width: 24px;
+    min-height: 24px;
+    background-color: transparent;
+    font-size: 16px;
+    line-height: 1;
 }
 
 .fullscreen-toggle:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0 !important;
+    color: #1890ff !important;
+    border-color: #d9d9d9;
 }
 
 .fullscreen-toggle:active {
