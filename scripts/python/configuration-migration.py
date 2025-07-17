@@ -13,8 +13,7 @@ headers = {
     'Content-Type': 'application/json; charset=utf8'
 }
 
-source_url ="http://hdu-api-dev.moh.go.tz/api/v1/hduApi/configurations"
-
+source_url ="https://iadapter.dhis2.udsm.ac.tz/api/v1/hduApi/configurations"
 async def get_conigurations():
     path =source_url + "?page=1&pageSize=100"
     print(path)

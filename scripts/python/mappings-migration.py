@@ -14,7 +14,7 @@ headers = {
     'Content-Type': 'application/json; charset=utf8'
 }
 
-source_url ="http://hdu-api-dev.moh.go.tz/api/v1/datastore"
+source_url ="https://iadapter.dhis2.udsm.ac.tz/api/v1/datastore"
 
 async def get_mappings(namespace):
     path =source_url + "/" + namespace + "?pageSize=1000"
@@ -25,7 +25,7 @@ async def get_mappings(namespace):
     else:
         return "none"
 async def save_mappings_by_key(key_payload):
-    response = requests.post("https://iadapter.dhis2.udsm.ac.tz/api/v1/datastore?update=true", 
+    response = requests.post("http://hdu-api.moh.go.tz/api/v1/datastore?update=true", 
                                     json=key_payload, auth=(username,password), 
                                     headers=headers)
     return response
@@ -36,7 +36,7 @@ async def main():
         # "MAPPINGS-v6wdME3ouXu",
         # "MAPPINGS-qpcwPcj8D6u",
         # "MAPPINGS-Pw3c2BcqbQ5",
-        # "MAPPINGS-cBPkl0M6T9I",
+        "MAPPINGS-cBPkl0M6T9I",
         # "MAPPINGS-V8bbSX0sFf2",
         # "MAPPINGS-RpeHQ2saIRg",
         # "MAPPINGS-cap79mdf6Co",
@@ -45,7 +45,7 @@ async def main():
         # "MAPPINGS-kSaoJVXNxZE",
         # "MAPPINGS-QntdhuQfgvT",
         # "MAPPINGS-YV5hjD0QuQG",
-        "MAPPINGS-Dy0caSoFk1Z",
+        # "MAPPINGS-Dy0caSoFk1Z",
         # "MAPPINGS-ExX34Bpv0qN",
         # "MAPPINGS-mU6qzGINdKw",
         # "MAPPINGS-xewWZMYbqYc",
