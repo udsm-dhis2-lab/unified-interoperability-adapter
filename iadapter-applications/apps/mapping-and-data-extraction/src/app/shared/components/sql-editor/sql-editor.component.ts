@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, ElementRef, ViewChild } from '@angular/core';
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { sql } from '@codemirror/lang-sql';
@@ -17,7 +17,7 @@ import { FHIR_TABLE_SCHEMAS, TableSchema } from './table-schemas';
     templateUrl: './sql-editor.component.html',
     styleUrls: ['./sql-editor.component.css']
 })
-export class SqlEditorComponent implements OnInit, OnDestroy {
+export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
     @Input() value: string = '';
     @Input() height: string = '250px';
     @Input() theme: 'light' | 'dark' = 'dark';
@@ -30,12 +30,29 @@ export class SqlEditorComponent implements OnInit, OnDestroy {
     public isFullScreen: boolean = false;
 
     get editorHeight(): string {
-        return this.isFullScreen ? 'calc(100vh - 35px)' : this.height;
+        return this.isFullScreen ? '100%' : this.height;
     }
 
     ngOnInit() {
         this.initializeEditor();
         this.addKeyboardShortcuts();
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['value'] && this.editorView && !changes['value'].firstChange) {
+            const newValue = changes['value'].currentValue || '';
+            const currentValue = this.editorView.state.doc.toString();
+            
+            if (newValue !== currentValue) {
+                this.editorView.dispatch({
+                    changes: {
+                        from: 0,
+                        to: this.editorView.state.doc.length,
+                        insert: newValue
+                    }
+                });
+            }
+        }
     }
 
     ngOnDestroy() {

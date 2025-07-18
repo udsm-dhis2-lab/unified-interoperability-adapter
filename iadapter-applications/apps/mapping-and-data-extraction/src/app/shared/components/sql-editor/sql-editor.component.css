@@ -15,6 +15,8 @@
     background: white;
     border-radius: 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
 }
 
 .editor-header {
@@ -62,6 +64,8 @@
 .sql-editor {
     border: none;
     background: white;
+    flex: 1;
+    overflow: hidden;
 }
 
 .sql-editor .cm-editor {
@@ -69,6 +73,15 @@
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
     font-size: 13px;
     line-height: 1.5;
+}
+
+.sql-editor-container.fullscreen .sql-editor {
+    flex: 1;
+    height: auto;
+}
+
+.sql-editor-container.fullscreen .sql-editor .cm-editor {
+    height: 100%;
 }
 
 .sql-editor .cm-editor.cm-focused {

@@ -68,8 +68,9 @@ export class DatasetMappingComponent implements OnInit {
 
   newThisYear?: boolean = false;
   newVisit?: boolean = false;
-  freeTextQuery: boolean = false; 
+  freeTextQuery: boolean = false;
   customQuery: string = '';
+  isFreeTextQueryInfoVisible: boolean = false;
 
   lhsQueryValue?: any;
   rhsQueryValue?: any;
@@ -985,6 +986,22 @@ export class DatasetMappingComponent implements OnInit {
   // Add the missing method
   onCustomQueryChange(value: string): void {
     this.customQuery = value;
+  }
+
+  // Refresh custom query based on current configurations
+  refreshCustomQuery(): void {
+    const baseQuery = generateQueryFromMapping(this.createMappingsPayload());
+    console.log('=============== Base Query:', baseQuery);
+    this.customQuery = baseQuery;
+  }
+
+  // Modal methods for Free Text Query information
+  showFreeTextQueryInfo(): void {
+    this.isFreeTextQueryInfoVisible = true;
+  }
+
+  closeFreeTextQueryInfo(): void {
+    this.isFreeTextQueryInfoVisible = false;
   }
 }
 
