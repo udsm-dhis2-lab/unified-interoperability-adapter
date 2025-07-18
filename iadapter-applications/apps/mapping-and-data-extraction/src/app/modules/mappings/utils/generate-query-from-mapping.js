@@ -16,7 +16,15 @@ const buildQuery = (mapping, useSum) => {
     query += `LEFT JOIN patient_flat pt ON pt.identifier_value = en.patient_id \n `;
 
     if (mapping?.mapping?.params && (!!mapping.mapping.params.find((param) => param.motherStartAge) || !!mapping.mapping.params.find((param) => param.serviceLocation))) {
-        query += `LEFT JOIN child_health_flat ch ON ch.encounter_id = en.identifier_value \n`;
+        query += `LEFT JOIN child_health_flat ch ON ch.encounter_id = en.encounter_id \n`;
+    }
+
+    if (mapping?.mapping?.params && !!mapping.mapping.params.find((param) => param.childGender)) {
+        query += `LEFT JOIN postnatal_birth_details_flat pbd ON pbd.encounter_id = en.encounter_id \n`;
+    }
+
+    if (mapping?.mapping?.params && !!mapping.mapping.params.find((param) => param.isAlive)) {
+        query += `LEFT JOIN outcome_details_flat ot ON ot.encounter_id = en.encounter_id \n`;
     }
 
     if (joins.size > 0) {
@@ -25,8 +33,8 @@ const buildQuery = (mapping, useSum) => {
 
     conditions.push(
         loincOrderCodes.length > 0
-            ? `drep.effective_datetime BETWEEN '#{startDate}' AND '#{endDate}'`
-            : `en.period_start BETWEEN '#{startDate}' AND '#{endDate}'`,
+            ? `drep.effective_datetime BETWEEN '#{startDate} 00:00:00' AND '#{endDate} 23:59:59'`
+            : `en.period_start BETWEEN '#{startDate} 00:00:00' AND '#{endDate} 23:59:59'`,
     );
 
     if (conditions.length > 0) {
@@ -39,12 +47,33 @@ const buildQuery = (mapping, useSum) => {
 };
 
 const buildSelectPart = (query, mapping, useSum) => {
+    const hasGender = !!mapping.mapping.params.find((param) => param.gender);
+    const hasAgeGroup = !!mapping.mapping.params.find(
+        (param) => param.ageType && param.startAge && param.endAge,
+    );
+
+    // If no params or empty params, handle the case differently
     if (!mapping.mapping.params || mapping.mapping.params.length === 0) {
-        query += ` ${useSum ? 'SUM' : 'COUNT'}(*) AS \"total\" \n`;
+        query += ` ${useSum ? 'SUM' : 'COUNT'}(DISTINCT en.encounter_id) AS \"total\" \n`;
         return query;
     }
 
-    mapping.mapping.params.forEach((param, index) => {
+    const filteredParams = mapping.mapping.params.filter(param => {
+        const hasParamGender = !!param.gender;
+        const hasParamAgeGroup =
+            param.ageType && param.startAge !== undefined && param.startAge !== null && param.endAge;
+        const hasMotherAgeGroup =
+            param.motherStartAge !== undefined &&
+            param.motherStartAge !== null &&
+            param.motherEndAge !== undefined &&
+            param.motherEndAge !== null;
+        const hasServiceLocation = !!param.serviceLocation;
+        const hasIsAliveStatus = !!param.isAlive;
+        const hasChildGender = !!param.childGender;
+        return hasParamGender || hasParamAgeGroup || hasMotherAgeGroup || hasServiceLocation || hasIsAliveStatus || hasChildGender;
+    });
+
+    filteredParams.forEach((param, index) => {
         const gender = param.gender;
         const co = param.co;
         const ageType = param.ageType;
@@ -53,7 +82,6 @@ const buildSelectPart = (query, mapping, useSum) => {
         const hasParamGender = !!gender;
         const hasParamAgeGroup =
             ageType && startAge !== undefined && startAge !== null && endAge;
-
         const motherStartAge = param.motherStartAge;
         const motherEndAge = param.motherEndAge;
 
@@ -64,10 +92,15 @@ const buildSelectPart = (query, mapping, useSum) => {
             motherEndAge !== null;
 
         const hasServiceLocation = !!param.serviceLocation;
+        const hasIsAliveStatus = !!param.isAlive;
+        const hasChildGender = !!param.childGender;
 
-        query += ` ${useSum ? 'SUM' : 'COUNT'}(*) `;
+        // Use SUM or COUNT based on useSum flag
+        const countExpression = hasChildGender ? 'COUNT(*)' : 'COUNT(DISTINCT en.encounter_id)';
+        query += ` ${useSum ? 'SUM' : countExpression} `;
 
-        if (hasParamGender || hasParamAgeGroup || hasMotherAgeGroup || hasServiceLocation) {
+        // Add filter conditions if needed
+        if (hasParamGender || hasParamAgeGroup || hasMotherAgeGroup || hasServiceLocation || hasChildGender) {
             query += ` FILTER ( WHERE `;
             const filterConditions = [];
 
@@ -83,6 +116,14 @@ const buildSelectPart = (query, mapping, useSum) => {
                 filterConditions.push(`ch.service_location = '${param.serviceLocation}'`);
             }
 
+            if (hasIsAliveStatus) {
+                filterConditions.push(`ot.is_alive = ${param.isAlive === 'isNotALive' ? 'FALSE' : 'TRUE'}`);
+            }
+
+            if (hasChildGender) {
+                filterConditions.push(`pbd.ext_gender = '${param.childGender === 'M' ? 'Male' : 'Female'}'`);
+            }
+
             if (hasParamAgeGroup) {
                 const ageInterval =
                     ageType.toLowerCase() === 'years'
@@ -92,11 +133,12 @@ const buildSelectPart = (query, mapping, useSum) => {
                             : 'DAY';
 
                 if (endAge === startAge) {
-                    filterConditions.push(`pt.birth_date BETWEEN ('#{endDate}'::date - INTERVAL '${startAge} ${ageInterval}') AND '#{endDate}'::date`);
+                    // This handles cases like "age is 5 years"
+                    filterConditions.push(`pt.birth_date > (CURRENT_DATE - INTERVAL '${Number(startAge) + 1} ${ageInterval}') AND pt.birth_date <= (CURRENT_DATE - INTERVAL '${startAge} ${ageInterval}')`);
                 } else {
+                    // This handles age ranges like "10-14 years"
                     filterConditions.push(
-                        `pt.birth_date BETWEEN ('#{endDate}'::date - INTERVAL '${endAge} ${ageInterval}') ` +
-                        `AND ('#{endDate}'::date - INTERVAL '${startAge} ${ageInterval}')`
+                        `pt.birth_date > (CURRENT_DATE - INTERVAL '${Number(endAge) + 1} ${ageInterval}') AND pt.birth_date <= (CURRENT_DATE - INTERVAL '${startAge} ${ageInterval}')`
                     );
                 }
             }
@@ -104,7 +146,7 @@ const buildSelectPart = (query, mapping, useSum) => {
             query += `)`;
         }
 
-        query += ` AS \"${co}\"${index < mapping.mapping.params.length - 1 ? ',' : ''} \n`;
+        query += ` AS \"${co}\"${index < filteredParams.length - 1 ? ',' : ''} \n`;
     });
 
     return query;
@@ -142,12 +184,12 @@ const extractCodeMappings = (mapping) => {
 
 const buildJoins = (query, icdCodes, loincOrderCodes) => {
     if (icdCodes && icdCodes.length > 0) {
-        query += `RIGHT JOIN condition_flat cond ON en.id = cond.encounter_id \n`;
+        query += `RIGHT JOIN condition_flat cond ON en.encounter_id = cond.encounter_id \n`;
         query += `AND cond.code IN ('${icdCodes.join("\',\'")}') \n`;
     }
 
     if (loincOrderCodes.length > 0) {
-        query += `RIGHT JOIN diagnosticreport_flat drep ON en.id = drep.encounter_id \n`;
+        query += `RIGHT JOIN diagnosticreport_flat drep ON en.encounter_id = drep.encounter_id \n`;
         query += `AND drep.code IN ('${loincOrderCodes.join("\',\'")}') \n`;
     }
 
@@ -155,7 +197,7 @@ const buildJoins = (query, icdCodes, loincOrderCodes) => {
 };
 
 const getValue = (query) => {
-    if (!query?.value) return null;
+    if (!query?.value == null) return null;
     return Array.isArray(query.value) ? query.value[0] : query.value;
 };
 
@@ -163,56 +205,119 @@ const buildAdditionalConditions = (mapping) => {
     let joins = new Set();
     let conditions = [];
 
+    // Process additional query conditions
     if (mapping.mapping.queries && mapping.mapping.queries.length > 0) {
-        const hasMotherAgeGroup = !!mapping.mapping.params.find((param) => param.motherStartAge);
-        const hasServiceLocation = !!mapping.mapping.params.find((param) => param.serviceLocation);
+        const hasMotherAgeGroup = !!mapping.mapping.params.find(
+            (param) => param.motherStartAge,
+        );
+        const hasServiceLocation = !!mapping.mapping.params.find(
+            (param) => param.serviceLocation,
+        );
+        const hasIsAliveStatus = !!mapping.mapping.params.find(
+            (param) => param.isAlive,
+        );
+        const hasChildGender = !!mapping.mapping.params.find(
+            (param) => param.childGender,
+        );
+
         mapping.mapping.queries.forEach((queryItem) => {
             const leftSide = getValue(queryItem.leftSideQuery);
             const operator = queryItem.operator;
             const rightSide = getValue(queryItem.rightSideQuery);
 
             if (leftSide && operator) {
+                // Handle left side of the condition
                 let leftField;
                 if (leftSide.table && leftSide.code) {
-                    leftField =
-                        leftSide.table === 'encounter_flat'
-                            ? `en.${leftSide.code}` : (hasMotherAgeGroup || hasServiceLocation) ? `ch.${leftSide.code}`
-                                : `${leftSide.table}.${leftSide.code}`;
+                    // Use the correct alias if the join is already handled by a parameter
+                    if (leftSide.table === 'encounter_flat') {
+                        leftField = `en.${leftSide.code}`;
+                    } else if (
+                        (hasMotherAgeGroup || hasServiceLocation) &&
+                        leftSide.table === 'child_health_flat'
+                    ) {
+                        leftField = `ch.${leftSide.code}`;
+                    } else if (
+                        hasIsAliveStatus &&
+                        leftSide.table === 'outcome_details_flat'
+                    ) {
+                        leftField = `ot.${leftSide.code}`;
+                    } else if (
+                        hasChildGender &&
+                        leftSide.table === 'postnatal_birth_details_flat'
+                    ) {
+                        leftField = `pbd.${leftSide.code}`;
+                    } else {
+                        leftField = `${leftSide.table}.${leftSide.code}`;
+                    }
                 } else {
                     leftField = leftSide.code;
                 }
 
-                if (leftSide.table && leftSide.table !== 'encounter_flat' && !(hasMotherAgeGroup || hasServiceLocation)) {
+                // Only add join if table is not encounter_flat and not already handled by a param
+                if (
+                    leftSide.table &&
+                    leftSide.table !== 'encounter_flat' &&
+                    !((hasMotherAgeGroup || hasServiceLocation) && leftSide.table === 'child_health_flat') &&
+                    !(hasIsAliveStatus && leftSide.table === 'outcome_details_flat') &&
+                    !(hasChildGender && leftSide.table === 'postnatal_birth_details_flat')
+                ) {
                     joins.add(
-                        `LEFT JOIN ${leftSide.table} ON ${leftSide.table}.encounter_id = en.identifier_value`,
+                        `LEFT JOIN ${leftSide.table} ON ${leftSide.table}.encounter_id = en.encounter_id`,
                     );
                 }
 
+                // Handle right side of the condition
                 let rightValue;
                 if (queryItem.rightSideQuery?.type === 'tableField' && rightSide) {
                     if (rightSide.table && rightSide.code) {
-                        rightValue =
-                            rightSide.table === 'encounter_flat'
-                                ? `en.${rightSide.code}` : (hasMotherAgeGroup || hasServiceLocation) ? `ch.${rightSide.code}`
-                                    : `${rightSide.table}.${rightSide.code}`;
+                        // Use the correct alias if the join is already handled by a parameter
+                        if (rightSide.table === 'encounter_flat') {
+                            rightValue = `en.${rightSide.code}`;
+                        } else if (
+                            (hasMotherAgeGroup || hasServiceLocation) &&
+                            rightSide.table === 'child_health_flat'
+                        ) {
+                            rightValue = `ch.${rightSide.code}`;
+                        } else if (
+                            hasIsAliveStatus &&
+                            rightSide.table === 'outcome_details_flat'
+                        ) {
+                            rightValue = `ot.${rightSide.code}`;
+                        } else if (
+                            hasChildGender &&
+                            rightSide.table === 'postnatal_birth_details_flat'
+                        ) {
+                            rightValue = `pbd.${rightSide.code}`;
+                        } else {
+                            rightValue = `${rightSide.table}.${rightSide.code}`;
+                        }
                     } else {
                         rightValue = rightSide.code;
                     }
 
+                    // Only add join if table is not encounter_flat and not already added
                     if (
                         rightSide.table &&
-                        rightSide.table !== 'encounter_flat' && !(hasMotherAgeGroup || hasServiceLocation) &&
+                        rightSide.table !== 'encounter_flat' &&
+                        !((hasMotherAgeGroup || hasServiceLocation) && rightSide.table === 'child_health_flat') &&
+                        !(hasIsAliveStatus && rightSide.table === 'outcome_details_flat') &&
+                        !(hasChildGender && rightSide.table === 'postnatal_birth_details_flat') &&
                         !joins.has(
-                            `LEFT JOIN ${rightSide.table} ON ${rightSide.table}.encounter_id = en.identifier_value`,
+                            `LEFT JOIN ${rightSide.table} ON ${rightSide.table}.encounter_id = en.encounter_id`,
                         )
                     ) {
                         joins.add(
-                            `LEFT JOIN ${rightSide.table} ON ${rightSide.table}.encounter_id = en.identifier_value`,
+                            `LEFT JOIN ${rightSide.table} ON ${rightSide.table}.encounter_id = en.encounter_id`,
                         );
                     }
                 } else if (queryItem.rightSideQuery?.type === 'primitiveValue') {
                     if (typeof rightSide === 'string') {
-                        rightValue = `'${rightSide}'`;
+                        if (operator === 'IN' || operator === 'NOT IN') {
+                            rightValue = rightSide;
+                        } else {
+                            rightValue = `'${rightSide}'`;
+                        }
                     } else if (typeof rightSide === 'number') {
                         rightValue = rightSide;
                     } else if (typeof rightSide === 'boolean') {
@@ -220,6 +325,7 @@ const buildAdditionalConditions = (mapping) => {
                     }
                 }
 
+                // Add condition based on available values
                 if (leftField && operator && rightValue !== undefined) {
                     conditions.push(`${leftField} ${operator} ${rightValue}`);
                 } else if (leftField && operator) {
@@ -229,6 +335,7 @@ const buildAdditionalConditions = (mapping) => {
         });
     }
 
+    // Add visit conditions
     if (mapping.mapping.newVisit) {
         conditions.push(`en.new_visit = TRUE`);
     }
@@ -249,11 +356,7 @@ const buildGroupByClause = (query, icdCodes, mapping) => {
         groupByClauses.push(`cond.code`);
     }
 
-    const hasGender = !!mapping.mapping.params.find((param) => param.gender);
-    if (hasGender) {
-        groupByClauses.push(`pt.gender`);
-    }
-
+    // Always group by organization_id
     groupByClauses.push(`en.organization_id`);
 
     query += groupByClauses.join(', ') + `;`;
@@ -268,7 +371,7 @@ const buildGroupByClause = (query, icdCodes, mapping) => {
  * @returns {string} The generated SQL query.
  */
 const generateQueryFromMapping = (mapping) => {
-    
+
     const useSum = mapping?.mapping?.useSum ?? false;
 
     const query = buildQuery(mapping, useSum);
