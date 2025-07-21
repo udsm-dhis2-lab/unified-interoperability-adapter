@@ -1,5 +1,6 @@
 package com.Adapter.icare.validators;
 
+import com.Adapter.icare.Domains.DynamicValidator;
 import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
 import com.Adapter.icare.Services.ValidatorService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +57,7 @@ public class SharedHealthRecordValidator {
                 .collect(Collectors.toList());
     }
 
-    public List<String> dynamicValidate(SharedHealthRecordsDTO record){
+    public List<String> dynamicValidate(SharedHealthRecordsDTO record, List<DynamicValidator> dynamicValidators){
         List<String> errors = new ArrayList<>();
         if (record == null) {
             return List.of("SharedHealthRecordsDTO record cannot be null.");
@@ -65,13 +66,12 @@ public class SharedHealthRecordValidator {
         ObjectMapper mapper = new ObjectMapper();
 
         try {
-            var validators = this.validatorService.getValidators();
             File jsonFile = new File("src/main/resources/validators.json");
 
 //            List<CustomValidator> customValidators = mapper.readValue(jsonFile, new TypeReference<List<CustomValidator>>() {});
 
-            if(!validators.isEmpty()){
-                for(var validator: validators){
+            if(!dynamicValidators.isEmpty()){
+                for(var validator: dynamicValidators){
                     Matcher matcher = TEMPLATE_PATTERN.matcher(validator.getRuleExpression());
 
                     String ruleExpression = validator.getRuleExpression();

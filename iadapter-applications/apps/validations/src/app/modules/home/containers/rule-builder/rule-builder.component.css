@@ -54,3 +54,52 @@
 .group-separator {
   margin: 16px 0;
 }
+
+/* --- Rule Builder Styles --- */
+
+/* 1. Use Flexbox for the main row layout */
+.condition-row {
+  display: flex;
+  align-items: center; /* Vertically align all items in the middle */
+  gap: 8px; /* Creates consistent spacing between all items */
+  margin-bottom: 16px; /* Space between each condition row */
+}
+
+/* 2. Make the main inputs (operands) flexible */
+/* This is the most important rule to prevent shrinking */
+.condition-operand {
+  flex: 1; /* Allows this element to grow and shrink to fill available space */
+  min-width: 150px; /* Prevents the select from becoming too small to be usable */
+}
+
+/* 3. Give the operator a sensible, fixed width */
+.condition-operator {
+  /* Let the ng-zorro select define its own width,
+     or set a specific one if needed, e.g., width: 130px; */
+}
+
+/* 4. Style the joiner text */
+.condition-joiner {
+  font-weight: 500;
+  color: #888;
+}
+
+/* --- General Spacing & Actions --- */
+
+.group-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.add-group-button {
+  margin-top: 20px;
+}
+
+.group-separator {
+  margin: 24px 0;
+}
+
+.remove-icon {
+  color: #ff4d4f; /* Make the remove icon red */
+}

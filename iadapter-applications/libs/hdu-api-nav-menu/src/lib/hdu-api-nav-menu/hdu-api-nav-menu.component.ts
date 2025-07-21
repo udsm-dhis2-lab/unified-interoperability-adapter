@@ -145,14 +145,14 @@ export class HduApiNavMenuComponent implements OnInit {
           routeUrl: '/mapping-and-data-extraction/termminology-services',
           icon: 'edit',
           subMenus: [],
+        },
+        {
+          name: 'Validation',
+          id: 'validation',
+          routeUrl: '/validations',
+          icon: 'unordered-list',
+          subMenus: [],
         }
-        // {
-        //   name: 'Validation',
-        //   id: 'validation',
-        //   routeUrl: '/validations',
-        //   icon: 'unordered-list',
-        //   subMenus: [],
-        // }
       ],
     },
     // add user management

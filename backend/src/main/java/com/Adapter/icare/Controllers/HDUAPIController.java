@@ -12,7 +12,9 @@ import java.util.stream.Stream;
 
 import javax.validation.Valid;
 
+import com.Adapter.icare.Domains.DynamicValidator;
 import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Services.ValidatorService;
 import com.Adapter.icare.validators.SharedHealthRecordValidator;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,6 +67,7 @@ public class HDUAPIController {
 
     private final DatastoreService datastoreService;
     private final MediatorsService mediatorsService;
+    private final ValidatorService validatorService;
     private boolean shouldUseWorkflowEngine;
     private String defaultWorkflowEngineCode;
     private Mediator workflowEngine;
@@ -88,12 +91,14 @@ public class HDUAPIController {
             UserService userService,
             ClientRegistryService clientRegistryService,
             ClientRegistryConstants clientRegistryConstants,
+            ValidatorService validatorService,
             FHIRConstants fhirConstants) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryService = clientRegistryService;
         this.userService = userService;
+        this.validatorService = validatorService;
         this.clientRegistryConstants = clientRegistryConstants;
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirConstants = fhirConstants;
@@ -260,6 +265,7 @@ public class HDUAPIController {
 
                 Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
                 List<SharedHealthRecordsDTO> validatedListGrid = Collections.synchronizedList(new ArrayList<>());
+                List<DynamicValidator> dynamicValidators = this.validatorService.getValidators();
 
                 // TODO: Process clients in chunks in case exceed a certain amount (e.g 20)
 
@@ -267,8 +273,11 @@ public class HDUAPIController {
                     SharedHealthRecordsDTO currentRecord = listGrid.get(index);
                     List<String> errors = new ArrayList<String>();
                     if (performValidation) {
-//                        errors = sharedHealthRecordValidator.dynamicValidate(currentRecord);
-                        errors = sharedHealthRecordValidator.validate(currentRecord);
+                        if(dynamicValidators.isEmpty()){
+                            errors = sharedHealthRecordValidator.validate(currentRecord);
+                        } else {
+                            errors = sharedHealthRecordValidator.dynamicValidate(currentRecord, dynamicValidators);
+                        }
                     }
                     if (errors.isEmpty()) {
                         validatedListGrid.add(currentRecord);

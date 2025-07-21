@@ -98,3 +98,4 @@ deploy.sh
 files
 
 ui-apps
+*data-template.helper.ts

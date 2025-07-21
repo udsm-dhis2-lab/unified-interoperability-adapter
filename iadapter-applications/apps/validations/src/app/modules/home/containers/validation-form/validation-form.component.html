@@ -25,9 +25,7 @@
         </nz-form-item>
 
         <nz-form-item>
-          <nz-form-label nzFor="description" nzRequired
-            >Description</nz-form-label
-          >
+          <nz-form-label nzFor="description">Description</nz-form-label>
           <nz-form-control nzErrorTip="Please enter a description">
             <textarea
               nz-input
@@ -53,22 +51,40 @@
         <nz-form-item>
           <nz-form-label nzFor="code" nzRequired>Code</nz-form-label>
           <nz-form-control nzErrorTip="Please enter the code">
-            <input nz-input id="code" formControlName="code" />
+            <input nz-input id="code" formControlName="code"/>
           </nz-form-control>
         </nz-form-item>
 
         <nz-form-item>
+          <nz-radio-group
+            [ngModelOptions]="{ standalone: true }"
+          [(ngModel)]="ruleInputMode" nzButtonStyle="solid">
+         <label nz-radio-button nzValue="builder">Simple</label>
+              <label nz-radio-button nzValue="editor">Advanced</label>
+          </nz-radio-group>
+        </nz-form-item>
+
+        <nz-form-item>
           <nz-form-label nzFor="ruleExpression" nzRequired
-            >Rule Expression</nz-form-label
-          >
+            >Rule Expression</nz-form-label>
           <nz-form-control
             nzErrorTip="The expression is required and must be valid."
           >
             <!-- This custom component must implement ControlValueAccessor to work with formControlName -->
             <app-rule-builder
+            *ngIf="ruleInputMode === 'builder'"
               formControlName="ruleExpression"
               (valueChange)="onRuleExpressionChange($event)"
             ></app-rule-builder>
+
+            <textarea
+              *ngIf="ruleInputMode === 'editor'"
+              nz-input
+              formControlName="ruleExpression"
+              placeholder="Enter the Rule Expression manually (e.g., #entity.field == 'value')"
+              [nzAutosize]="{ minRows: 5 }"
+            ></textarea>
+
             <div
               *ngIf="validationForm.get('ruleExpression')?.value"
               class="spel-preview-container"
