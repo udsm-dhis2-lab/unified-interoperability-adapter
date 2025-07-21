@@ -29,6 +29,7 @@ import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select'; // <-- IMPORT TH
 import { NzTreeNodeOptions } from 'ng-zorro-antd/tree'; // <-- IMPORT THIS
 import { TreeSelectComponent } from '../app-selection/app-selection';
 import { DISPLAY_DATA_TEMPLATE } from '../../../../shared/validators.constants';
+import { transformToDataModel } from '../../../../shared/helpers/helpers';
 // import { DATA_MODEL_DEFINITION, ModelField, OPERATORS } from '../data-model';
 
 export interface RuleCondition {
@@ -101,6 +102,8 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
     if (this.groups.length === 0) {
       this.addGroup();
     }
+
+    console.log(transformToDataModel());
   }
 
   addGroup(): void {

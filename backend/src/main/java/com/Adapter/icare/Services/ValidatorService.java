@@ -1,9 +1,8 @@
 package com.Adapter.icare.Services;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Mediator;
+import com.Adapter.icare.Domains.DynamicValidator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Domains.Validator;
 import com.Adapter.icare.Repository.ValidatorRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,26 +31,26 @@ public class ValidatorService {
         }
     }
 
-    public List<Validator> getValidators(){
+    public List<DynamicValidator> getValidators(){
         return validatorRepository.findAll();
     }
 
-    public Page<Validator> getValidatorsByPagination(Integer page, Integer pageSize, boolean paging, String code, String name) throws Exception {
+    public Page<DynamicValidator> getValidatorsByPagination(Integer page, Integer pageSize, boolean paging, String code, String name) throws Exception {
         Pageable pageable = paging ? createPageable(page, pageSize): null;
         return validatorRepository.getValidatorsListByPagination(code, name, pageable);
     }
 
-    public Validator getValidatorByUuid(String uuid) {
+    public DynamicValidator getValidatorByUuid(String uuid) {
         return validatorRepository.findByUuid(uuid);
     }
 
-    public Validator addNewValidator(Validator validator) {
+    public DynamicValidator addNewValidator(DynamicValidator dynamicValidator) {
         UUID uuid = UUID.randomUUID();
-        validator.setUuid(uuid.toString());
+        dynamicValidator.setUuid(uuid.toString());
         if (authenticatedUser != null) {
-            validator.setCreatedBy(authenticatedUser);
+            dynamicValidator.setCreatedBy(authenticatedUser);
         }
-        return validatorRepository.save(validator);
+        return validatorRepository.save(dynamicValidator);
     }
 
     public void deleteValidator(Long validatorId) {
@@ -63,21 +62,21 @@ public class ValidatorService {
         validatorRepository.deleteById(validatorId);
     }
 
-    public Validator updateValidator(Validator validator) {
+    public DynamicValidator updateValidator(DynamicValidator dynamicValidator) {
         if (authenticatedUser != null) {
-            validator.setLastUpdatedBy(authenticatedUser);
+            dynamicValidator.setLastUpdatedBy(authenticatedUser);
         }
-        Validator validatorToUpdate = validatorRepository.findByUuid(validator.getUuid());
-        if (validatorToUpdate != null) {
-            validatorToUpdate.setName(validator.getName() == null ? validatorToUpdate.getName() : validator.getName());
-            validatorToUpdate.setCode(validator.getCode() == null ? validatorToUpdate.getCode() : validator.getCode());
-            validatorToUpdate.setRuleExpression(validator.getRuleExpression() == null ? validatorToUpdate.getRuleExpression() : validator.getRuleExpression());
-            validatorToUpdate.setErrorMessage(validator.getErrorMessage() == null ? validatorToUpdate.getErrorMessage() : validator.getErrorMessage());
-            validatorToUpdate.setDescription(validator.getDescription() == null ? validatorToUpdate.getDescription() : validator.getDescription());
+        DynamicValidator dynamicValidatorToUpdate = validatorRepository.findByUuid(dynamicValidator.getUuid());
+        if (dynamicValidatorToUpdate != null) {
+            dynamicValidatorToUpdate.setName(dynamicValidator.getName() == null ? dynamicValidatorToUpdate.getName() : dynamicValidator.getName());
+            dynamicValidatorToUpdate.setCode(dynamicValidator.getCode() == null ? dynamicValidatorToUpdate.getCode() : dynamicValidator.getCode());
+            dynamicValidatorToUpdate.setRuleExpression(dynamicValidator.getRuleExpression() == null ? dynamicValidatorToUpdate.getRuleExpression() : dynamicValidator.getRuleExpression());
+            dynamicValidatorToUpdate.setErrorMessage(dynamicValidator.getErrorMessage() == null ? dynamicValidatorToUpdate.getErrorMessage() : dynamicValidator.getErrorMessage());
+            dynamicValidatorToUpdate.setDescription(dynamicValidator.getDescription() == null ? dynamicValidatorToUpdate.getDescription() : dynamicValidator.getDescription());
 
-            return validatorRepository.save(validatorToUpdate);
+            return validatorRepository.save(dynamicValidatorToUpdate);
         } else {
-            throw new IllegalStateException("Validator with uuid " + validator.getUuid() + " does not exists");
+            throw new IllegalStateException("Validator with uuid " + dynamicValidator.getUuid() + " does not exists");
         }
     }
 

@@ -16,7 +16,7 @@ import java.util.zip.DataFormatException;
 @Setter
 @Entity
 @Table(name = "validators")
-public class Validator extends BaseEntity{
+public class DynamicValidator extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name="validator_id")
@@ -38,31 +38,31 @@ public class Validator extends BaseEntity{
     private String errorMessage;
 
 
-    public Validator fromMap(Map<String, Object> validatorMap) throws DataFormatException {
+    public DynamicValidator fromMap(Map<String, Object> validatorMap) throws DataFormatException {
 
         if(validatorMap.get("name") == null || validatorMap.get("ruleExpression") == null || validatorMap.get("errorMessage") == null){
             throw new DataFormatException("Validator must have name, rule expression and error message!");
         }
 
-        Validator validator = new Validator();
+        DynamicValidator dynamicValidator = new DynamicValidator();
 
         if(validatorMap.get("uuid") != null){
-            validator.setUuid(validatorMap.get("uuid").toString());
+            dynamicValidator.setUuid(validatorMap.get("uuid").toString());
         }
 
-        validator.setName(validatorMap.get("name").toString());
-        validator.setErrorMessage(validatorMap.get("errorMessage").toString());
-        validator.setRuleExpression(validatorMap.get("ruleExpression").toString());
+        dynamicValidator.setName(validatorMap.get("name").toString());
+        dynamicValidator.setErrorMessage(validatorMap.get("errorMessage").toString());
+        dynamicValidator.setRuleExpression(validatorMap.get("ruleExpression").toString());
 
         if(validatorMap.get("code") != null){
-            validator.setCode(validatorMap.get("code").toString());
+            dynamicValidator.setCode(validatorMap.get("code").toString());
         }
 
         if(validatorMap.get("description") != null){
-            validator.setDescription(validatorMap.get("description").toString());
+            dynamicValidator.setDescription(validatorMap.get("description").toString());
         }
 
-        return validator;
+        return dynamicValidator;
     }
 
     public Map<String, Object> toMap(){
