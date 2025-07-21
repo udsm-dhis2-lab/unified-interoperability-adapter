@@ -30,7 +30,7 @@ export class TreeSelectComponent {
   @Input() nodes: NzTreeNodeOptions[] = [];
 
   /** The initial selected values. Note: nzCheckable makes this an array. */
-  @Input() selectedValues: string[] | null = null;
+  @Input() selectedValues: string | null = null;
 
   /** Keys of nodes that should be expanded by default */
   @Input() expandedKeys: string[] = [];

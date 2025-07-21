@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
+  FormsModule,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
@@ -17,6 +18,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+import { NzRadioModule } from 'ng-zorro-antd/radio'; // <-- ADD THIS
 
 // Import your custom components and services
 import { RuleBuilderComponent } from '../rule-builder/rule-builder.component';
@@ -40,7 +42,8 @@ import { ValidationService } from '../../services/client-management.service';
     NzMessageModule,
     NzSpinModule,
     RuleBuilderComponent,
-
+    NzRadioModule,
+    FormsModule
   ],
   templateUrl: './validation-form.component.html',
   styleUrls: ['./validation-form.component.scss'],
@@ -50,6 +53,9 @@ export class ValidationFormComponent implements OnInit {
   isEditMode = false;
   isLoading = false;
   private validationId?: string;
+
+
+  public ruleInputMode: 'builder' | 'editor' = 'editor';
 
   constructor(
     private fb: FormBuilder,
@@ -67,7 +73,7 @@ export class ValidationFormComponent implements OnInit {
   private initForm(): void {
     this.validationForm = this.fb.group({
       name: ['', [Validators.required]],
-      description: ['', [Validators.required]],
+      description: [''],
       message: ['', [Validators.required]], // Corresponds to `errorMessage` in the API
       code: ['', [Validators.required]],
       ruleExpression: [null, [Validators.required]], // `null` is often a better default for custom controls

@@ -17,8 +17,9 @@ import {
   ModelField,
   OPERATORS,
 } from '../../models/validation.model';
+// format date
+import { formatDate } from '@angular/common';
 
-// --- REQUIRED NG-ZORRO MODULES ---
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
@@ -31,11 +32,17 @@ import { TreeSelectComponent } from '../app-selection/app-selection';
 import { DISPLAY_DATA_TEMPLATE } from '../../../../shared/validators.constants';
 import { transformToDataModel } from '../../../../shared/helpers/helpers';
 // import { DATA_MODEL_DEFINITION, ModelField, OPERATORS } from '../data-model';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzInputNumberModule } from 'ng-zorro-antd/input-number'; // <-- IMPORT
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 
 export interface RuleCondition {
   leftOperandPath?: string;
+  leftOperandType: 'value' | 'text';
   operator?: string;
   rightOperandPath?: string;
+  rightOperandType: 'value' | 'text';
 }
 
 export interface RuleGroup {
@@ -47,6 +54,12 @@ interface TreeNode {
   key: string;
   isLeaf?: boolean;
   children?: TreeNode[];
+}
+
+export interface SelectedField {
+  label: string;
+  type: 'STRING' | 'NUMBER' | 'BOOLEAN'; // Define the possible types
+  path: string;
 }
 
 @Component({
@@ -64,16 +77,22 @@ interface TreeNode {
     NzDividerModule,
     NzIconModule,
     NzSelectModule,
-    NzTreeSelectModule
+    NzTreeSelectModule,
+    NzInputModule, // <-- ADD
+    NzInputNumberModule, // <-- ADD
+    NzToolTipModule,
+    NzDatePickerModule,
   ],
 })
 export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   // UI State
   groups: RuleGroup[] = [];
 
-  currentSelection: string[] | null = null;
-  leftCurrentSelection: string[] | null = null;
-  rightCurrentSelection: string[] | null = null;
+  date = null;
+
+  currentSelection: string | null = null;
+  leftCurrentSelection: string | null = null;
+  rightCurrentSelection: string | null = null;
   defaultExpandedKeys = ['cat-1', 'cat-1-0'];
 
   readonly categoryNodes: NzTreeNodeOptions[] = DISPLAY_DATA_TEMPLATE;
@@ -88,10 +107,14 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
     isLeaf: false,
   };
 
+  booleanFields: any = ['true', 'false'];
+
   // ControlValueAccessor methods
   @Output() valueChange = new EventEmitter<string>();
 
   onTouched: () => void = () => {};
+  secondFieldType!: string;
+  fieldValue!: string;
 
   constructor() {}
 
@@ -108,7 +131,12 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
 
   addGroup(): void {
     this.groups.push({
-      conditions: [{}], // Start with one empty condition
+      conditions: [
+        {
+          rightOperandType: 'text',
+          leftOperandType: 'text',
+        },
+      ], // Start with one empty condition
     });
     this.updateRule();
   }
@@ -119,7 +147,22 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   }
 
   addCondition(group: RuleGroup): void {
-    group.conditions.push({});
+    group.conditions.push({
+      rightOperandType: 'text',
+      leftOperandType: 'text',
+    });
+    this.updateRule();
+  }
+
+  onChange(result: Date): void {
+    this.groups = this.groups.map((group) => {
+      group.conditions = group.conditions.map((condition) => {
+        condition.rightOperandPath = `#{${formatDate(result, 'yyyy-MM-dd', 'en-US')}}`;
+
+        return condition;
+      });
+      return group;
+    });
     this.updateRule();
   }
 
@@ -132,8 +175,79 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
     this.updateRule();
   }
 
+  updateField(event: any) {
+    this.fieldValue = event;
+  }
+
+  updateLeftValue(event: any): void {
+    this.groups = this.groups.map((group) => {
+      group.conditions = group.conditions.map((condition) => {
+        if (event != null && this.fields[event] !== undefined) {
+          condition.leftOperandPath = this.fields[event].path;
+          this.processField(this.fields[event]);
+        } else {
+          condition.leftOperandPath = `#{${event}}`;
+        }
+
+        return condition;
+      });
+      return group;
+    });
+    this.updateRule();
+  }
+
+  updateRightValue(event: any): void {
+    console.log('event', event);
+    this.groups = this.groups.map((group) => {
+      group.conditions = group.conditions.map((condition) => {
+        if (event != null && this.fields[event] !== undefined) {
+          condition.rightOperandPath = this.fields[event].path;
+          this.processField(this.fields[event]);
+        } else {
+          condition.rightOperandPath = `#{${event}}`;
+        }
+        return condition;
+      });
+      return group;
+    });
+    this.updateRule();
+  }
+
+  processField(input: any): void {
+    console.log('input', input);
+
+    if (input.type === 'BOOLEAN') {
+      this.secondFieldType = 'BOOLEAN';
+    } else if (input.type === 'STRING') {
+      this.secondFieldType = 'STRING';
+    } else if (input.type === 'NUMBER') {
+      this.secondFieldType = 'NUMBER';
+    } else if (input.type === 'DATE') {
+      this.secondFieldType = 'DATE';
+    }
+  }
+
+  onRightOperandFieldChange(
+    condition: RuleCondition,
+    selectedValue: SelectedField | null
+  ): void {
+    // When selecting a field, the value is its path
+    condition.rightOperandPath = selectedValue ? selectedValue.path : undefined;
+    this.updateRule();
+  }
+
+  toggleRightOperandType(condition: RuleCondition): void {
+    console.log('toggleRightOperandType', condition);
+    condition.rightOperandPath =
+      condition.rightOperandType === 'text' ? 'value' : 'text';
+    // Reset value when toggling to avoid mismatches
+    condition.rightOperandPath = undefined;
+    this.updateRule();
+  }
+
   // --- Core Logic ---
-  updateRule(): void {
+  updateRule(event?: any): void {
+    // console.log('updateRule', this.fields[event]);
     const groupStrings = this.groups
       .map((group) => {
         const conditionStrings = group.conditions
@@ -179,7 +293,10 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
   }
 
   handleSelectionChange(selectedKeys: any | null): void {
-    console.log('Event received from child component:', this.fields[selectedKeys!]);
+    console.log(
+      'Event received from child component:',
+      this.fields[selectedKeys!]
+    );
     this.currentSelection = selectedKeys;
   }
 
@@ -211,7 +328,7 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
 
     if (Array.isArray(value)) {
       children = [];
-      for(let item of value){
+      for (let item of value) {
         children = Object.entries(item).map(([key, val]) => {
           return this.buildNode(val, key, `${path}.${key}`, visited);
         });
@@ -232,15 +349,17 @@ export class RuleBuilderComponent implements OnInit, ControlValueAccessor {
     };
   }
 
-
-
-  formatDataTemplate(){
-    let dataTemplate = "";
+  formatDataTemplate() {
+    let dataTemplate = '';
 
     dataTemplate = JSON.parse(dataTemplate);
 
-    if (typeof dataTemplate !== 'object' || dataTemplate === null || Array.isArray(dataTemplate)) {
-      console.error("Invalid input: The function expects a non-array object.");
+    if (
+      typeof dataTemplate !== 'object' ||
+      dataTemplate === null ||
+      Array.isArray(dataTemplate)
+    ) {
+      console.error('Invalid input: The function expects a non-array object.');
       return [];
     }
     const visited = new WeakSet<object>();
