@@ -33,8 +33,8 @@ const buildQuery = (mapping, useSum) => {
 
     conditions.push(
         loincOrderCodes.length > 0
-            ? `drep.effective_datetime BETWEEN '#{startDate} 00:00:00' AND '#{endDate} 23:59:59'`
-            : `en.period_start BETWEEN '#{startDate} 00:00:00' AND '#{endDate} 23:59:59'`,
+            ? `drep.effective_datetime BETWEEN '#{startDate}' AND '#{endDate}'`
+            : `en.period_start BETWEEN '#{startDate}' AND '#{endDate}'`,
     );
 
     if (conditions.length > 0) {
@@ -70,7 +70,8 @@ const buildSelectPart = (query, mapping, useSum) => {
         const hasServiceLocation = !!param.serviceLocation;
         const hasIsAliveStatus = !!param.isAlive;
         const hasChildGender = !!param.childGender;
-        return hasParamGender || hasParamAgeGroup || hasMotherAgeGroup || hasServiceLocation || hasIsAliveStatus || hasChildGender;
+        const hasVisitType = !!param.visitType;
+        return hasParamGender || hasParamAgeGroup || hasMotherAgeGroup || hasServiceLocation || hasIsAliveStatus || hasChildGender || hasVisitType;
     });
 
     filteredParams.forEach((param, index) => {
@@ -94,13 +95,14 @@ const buildSelectPart = (query, mapping, useSum) => {
         const hasServiceLocation = !!param.serviceLocation;
         const hasIsAliveStatus = !!param.isAlive;
         const hasChildGender = !!param.childGender;
+        const hasVisitType = !!param.visitType;
 
         // Use SUM or COUNT based on useSum flag
         const countExpression = hasChildGender ? 'COUNT(*)' : 'COUNT(DISTINCT en.encounter_id)';
         query += ` ${useSum ? 'SUM' : countExpression} `;
 
         // Add filter conditions if needed
-        if (hasParamGender || hasParamAgeGroup || hasMotherAgeGroup || hasServiceLocation || hasChildGender) {
+        if (hasParamGender || hasParamAgeGroup || hasMotherAgeGroup || hasServiceLocation || hasChildGender || hasVisitType) {
             query += ` FILTER ( WHERE `;
             const filterConditions = [];
 
@@ -121,7 +123,15 @@ const buildSelectPart = (query, mapping, useSum) => {
             }
 
             if (hasChildGender) {
-                filterConditions.push(`pbd.ext_gender = '${param.childGender === 'M' ? 'Male' : 'Female'}'`);
+                filterConditions.push(`pbd.ext_gender = '${param.childGender === 'ME' ? 'male' : 'female'}'`);
+            }
+
+            if (hasVisitType) {
+                if (param.visitType === 'newVisit') {
+                    filterConditions.push(`en.new_visit = TRUE`);
+                } else if (param.visitType === 'repeatingVisit') {
+                    filterConditions.push(`en.new_visit = FALSE`);
+                }
             }
 
             if (hasParamAgeGroup) {

@@ -82,7 +82,7 @@ export const FHIR_TABLE_SCHEMAS: TableSchema = {
         'id', 'encounter_id', 'patient_id', 'screening_date', 'screening_result',
         'screening_method'
     ],
-    contraceptives_flat: [
+    contraceptive_med_statement_flat: [
         'id', 'encounter_id', 'patient_id', 'contraceptive_type', 'start_date',
         'end_date', 'effectiveness'
     ],
