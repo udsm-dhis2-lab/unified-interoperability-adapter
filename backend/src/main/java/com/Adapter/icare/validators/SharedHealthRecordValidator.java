@@ -15,6 +15,12 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.io.File;
 import java.util.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -63,10 +69,10 @@ public class SharedHealthRecordValidator {
             return List.of("SharedHealthRecordsDTO record cannot be null.");
         }
 
-        ObjectMapper mapper = new ObjectMapper();
+        // ObjectMapper mapper = new ObjectMapper();
 
         try {
-            File jsonFile = new File("src/main/resources/validators.json");
+            // File jsonFile = new File("src/main/resources/validators.json");
 
 //            List<CustomValidator> customValidators = mapper.readValue(jsonFile, new TypeReference<List<CustomValidator>>() {});
 

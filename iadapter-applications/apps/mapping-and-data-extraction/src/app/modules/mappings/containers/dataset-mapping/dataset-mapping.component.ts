@@ -9,6 +9,8 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
+import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
+
 import {
   ConfigurationPage,
   Field,
@@ -18,6 +20,7 @@ import {
 } from '../../models';
 import { SelectComponent } from '../../../../shared';
 import { SharedModule } from '../../../../shared/shared.module';
+import generateQueryFromMapping from '../../utils/generate-query-from-mapping';
 
 export interface MappingsData {
   disagregations: Disaggregation[];
@@ -52,16 +55,22 @@ class Disaggregation {
 @Component({
   selector: 'app-dataset-mapping',
   standalone: true,
-  imports: [SharedModule, SelectComponent],
+  imports: [
+    SharedModule,
+    SelectComponent,
+    SqlEditorComponent,
+  ],
   templateUrl: './dataset-mapping.component.html',
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
+  // Database schema is now defined in the SqlEditorComponent with comprehensive FHIR views
+
   newThisYear?: boolean = false;
   newVisit?: boolean = false;
-
-  useSum?: boolean = false;
-  freeTextQuery?: boolean = false;
+  freeTextQuery: boolean = false;
+  customQuery: string = '';
+  isFreeTextQueryInfoVisible: boolean = false;
 
   lhsQueryValue?: any;
   rhsQueryValue?: any;
@@ -69,7 +78,6 @@ export class DatasetMappingComponent implements OnInit {
   nodes = [];
 
   queries: any[] = [];
-  customQuery?: string = '';
 
   get queriesAsString(): string {
     return JSON.stringify(this.queries, null, 2);
@@ -350,7 +358,6 @@ export class DatasetMappingComponent implements OnInit {
     this.mappingUuid = undefined;
     this.freeTextQuery = false;
     this.customQuery = '';
-    this.useSum = false;
     this.getCategoryOptionCombos(this.selectedInputId);
   }
 
@@ -385,11 +392,7 @@ export class DatasetMappingComponent implements OnInit {
         },
         error: (error: any) => {
           this.isLoadingDisaggregation = false;
-          this.alert = {
-            show: true,
-            type: 'error',
-            message: error.message,
-          };
+          this.showAlert('error', error.message);
           // TODO: Handle error
         },
       });
@@ -425,10 +428,6 @@ export class DatasetMappingComponent implements OnInit {
 
           if (data?.mapping?.customQuery) {
             this.customQuery = data?.mapping?.customQuery ?? '';
-          }
-
-          if (data?.mapping?.useSum) {
-            this.useSum = data?.mapping?.useSum;
           }
 
           if (data?.mapping?.newThisYear) {
@@ -824,7 +823,24 @@ export class DatasetMappingComponent implements OnInit {
         });
       }
     });
-  }   
+  }
+
+  onFreeTextQueryChange(checked: boolean): void {
+    if (checked) {
+      if (!this.selectedInputId) {
+        this.showAlert(
+          'error',
+          'Please select an input field to generate a custom query.'
+        );
+        setTimeout(() => (this.freeTextQuery = false));
+        return;
+      }
+      this.customQuery = generateQueryFromMapping(this.createMappingsPayload());
+
+    } else {
+      this.customQuery = '';
+    }
+  }
 
   createMappingsPayload() {
     const payLoad = {
@@ -832,7 +848,6 @@ export class DatasetMappingComponent implements OnInit {
         queries: this.queries,
         newThisYear: this.newThisYear,
         newVisit: this.newVisit,
-        useSum: this.useSum,
         freeTextQuery: this.freeTextQuery,
         customQuery: this.customQuery,
 
@@ -916,20 +931,12 @@ export class DatasetMappingComponent implements OnInit {
     action$.subscribe({
       next: (data: any) => {
         this.isSubmittingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'success',
-          message: 'Mapping added successfully',
-        };
+        this.showAlert('success', 'Mapping saved successfully');
         // TODO: Handle response
       },
       error: (error: any) => {
         this.isSubmittingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'error',
-          message: error.message,
-        };
+        this.showAlert('error', error.message);
         // TODO: Handle error
       },
     });
@@ -940,19 +947,11 @@ export class DatasetMappingComponent implements OnInit {
     this.dataSetManagementService.deleteMapping(this.mappingUuid!).subscribe({
       next: (data: any) => {
         this.isDeletingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'success',
-          message: 'Mapping deleted successfully',
-        };
+        this.showAlert('success', 'Mapping deleted successfully');
       },
       error: (error: any) => {
         this.isDeletingMapping = false;
-        this.alert = {
-          show: true,
-          type: 'error',
-          message: error.message,
-        };
+        this.showAlert('error', error.message);
         // TODO: Handle error
       },
     });
@@ -964,6 +963,11 @@ export class DatasetMappingComponent implements OnInit {
       type: '',
       message: '',
     };
+  }
+
+  showAlert(type: 'success' | 'info' | 'error' | 'warning', message: string): void {
+    this.alert = { show: true, type, message };
+    setTimeout(() => this.onCloseAlert(), 5000);
   }
 
   goBackToDatasetList() {
@@ -978,4 +982,27 @@ export class DatasetMappingComponent implements OnInit {
     }
     return icdCode.name;
   }
+
+  // Add the missing method
+  onCustomQueryChange(value: string): void {
+    this.customQuery = value;
+  }
+
+  // Refresh custom query based on current configurations
+  refreshCustomQuery(): void {
+    const baseQuery = generateQueryFromMapping(this.createMappingsPayload());
+    console.log('=============== Base Query:', baseQuery);
+    this.customQuery = baseQuery;
+  }
+
+  // Modal methods for Free Text Query information
+  showFreeTextQueryInfo(): void {
+    this.isFreeTextQueryInfoVisible = true;
+  }
+
+  closeFreeTextQueryInfo(): void {
+    this.isFreeTextQueryInfoVisible = false;
+  }
 }
+
+
