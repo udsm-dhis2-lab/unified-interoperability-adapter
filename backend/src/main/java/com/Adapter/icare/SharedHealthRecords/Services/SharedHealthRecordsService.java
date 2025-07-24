@@ -35,7 +35,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -49,6 +51,7 @@ import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.get
 import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.InvestigationDetailsUtils.getInvestigationDetailsFromObservationGroup;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.LabInvestigationDetailsUtils.getLabInvestigationDetailsFromDiagnosticReport;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
@@ -1411,242 +1414,21 @@ public class SharedHealthRecordsService {
                                         investigationDetailsDTOList);
 
                                 // Lab investigation details using DiagnosticReport
-                                List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
-                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(
-                                        fhirClient,
-                                        encounter.getIdElement().getIdPart(),
-                                        "laboratory");
-                                if (!diagnosticReports.isEmpty()) {
-                                    for (DiagnosticReport diagnosticReport : diagnosticReports) {
-                                        LabInvestigationDetailsDTO labInvestigationDetailsDTO = new LabInvestigationDetailsDTO();
-                                        labInvestigationDetailsDTO.setTestCode(
-                                                diagnosticReport.hasCode()
-                                                        &&
-                                                        diagnosticReport.getCode()
-                                                                .hasCoding()
-                                                        &&
-                                                        !diagnosticReport
-                                                                .getCode()
-                                                                .getCoding()
-                                                                .isEmpty()
-                                                        ? diagnosticReport
-                                                        .getCode()
-                                                        .getCoding()
-                                                        .get(0)
-                                                        .getCode()
-                                                        : null);
-
-                                        labInvestigationDetailsDTO
-                                                .setTestResultDate(
-                                                        diagnosticReport.hasEffectiveDateTimeType()
-                                                                && diagnosticReport
-                                                                .getEffectiveDateTimeType()
-                                                                .hasValue()
-                                                                ? diagnosticReport
-                                                                .getEffectiveDateTimeType()
-                                                                .getValue()
-                                                                : null);
-                                        labInvestigationDetailsDTO
-                                                .setTestStatus(getNestedExtensionValueString(
-                                                        diagnosticReport,
-                                                        "http://fhir.moh.go.tz/fhir/StructureDefinition/diagonostic-report-results",
-                                                        "testStatus"));
-
-                                        List<Identifier> identifiers = diagnosticReport
-                                                .getIdentifier();
-                                        for (Identifier reportIdentifier : identifiers) {
-                                            if (reportIdentifier.hasValue()
-                                                    && reportIdentifier
-                                                    .hasType()
-                                                    && reportIdentifier
-                                                    .getType()
-                                                    .hasCoding()
-                                                    && !reportIdentifier
-                                                    .getType()
-                                                    .getCoding()
-                                                    .isEmpty()) {
-                                                if (reportIdentifier
-                                                        .getType()
-                                                        .getCoding()
-                                                        .get(0)
-                                                        .getCode()
-                                                        .equals("TEST-ORDER")) {
-                                                    labInvestigationDetailsDTO
-                                                            .setTestOrderId(reportIdentifier
-                                                                    .getValue());
-                                                } else if (reportIdentifier
-                                                        .getType()
-                                                        .getCoding()
-                                                        .get(0)
-                                                        .getCode()
-                                                        .equals("SAMPLE-ID")) {
-                                                    labInvestigationDetailsDTO
-                                                            .setTestSampleId(
-                                                                    reportIdentifier.getValue());
-                                                }
-                                            }
-                                        }
-                                        labInvestigationDetailsDTO
-                                                .setTestOrderDate(
-                                                        diagnosticReport.hasEffectiveDateTimeType()
-                                                                ? diagnosticReport
-                                                                .getEffectiveDateTimeType()
-                                                                .getValue()
-                                                                : null);
-
-                                        labInvestigationDetailsDTO.setTestType(
-                                                diagnosticReport.hasCode()
-                                                        &&
-                                                        diagnosticReport.getCode()
-                                                                .hasCoding()
-                                                        &&
-                                                        !diagnosticReport
-                                                                .getCode()
-                                                                .getCoding()
-                                                                .isEmpty()
-                                                        ? diagnosticReport
-                                                        .getCode()
-                                                        .getCoding()
-                                                        .get(0)
-                                                        .getDisplay()
-                                                        : null);
-
-                                        labInvestigationDetailsDTO
-                                                .setStandardCode(
-                                                        getNestedExtensionValueBoolean(
-                                                                diagnosticReport,
-                                                                "http://fhir.moh.go.tz/fhir/StructureDefinition/diagonostic-report-results",
-                                                                "standardCode"));
-                                        labInvestigationDetailsDTO.setCodeType(
-                                                diagnosticReport.hasCode()
-                                                        &&
-                                                        diagnosticReport.getCode()
-                                                                .hasCoding()
-                                                        &&
-                                                        !diagnosticReport
-                                                                .getCode()
-                                                                .getCoding()
-                                                                .isEmpty()
-                                                        && diagnosticReport
-                                                        .getCode()
-                                                        .getCoding()
-                                                        .get(0)
-                                                        .getSystem()
-                                                        .contains("loinc")
-                                                        ? "LOINC"
-                                                        : null);
-
-                                        List<LabTestResultsDTO> labTestResultsDTOS = new ArrayList<>();
-                                        if (diagnosticReport.hasResult()) {
-                                            for (Reference reference : diagnosticReport
-                                                    .getResult()) {
-                                                LabTestResultsDTO labTestResultsDTO = new LabTestResultsDTO();
-                                                IIdType obsReference = reference
-                                                        .getReferenceElement();
-                                                if (obsReference.getResourceType()
-                                                        .equals("Observation")) {
-                                                    Observation observation = fhirClient
-                                                            .read()
-                                                            .resource(Observation.class)
-                                                            .withId(obsReference
-                                                                    .getIdPart())
-                                                            .execute();
-                                                    labTestResultsDTO
-                                                            .setStandardCode(
-                                                                    getNestedExtensionValueBoolean(
-                                                                            observation,
-                                                                            "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results",
-                                                                            "standardCode"));
-                                                    labTestResultsDTO
-                                                            .setReleaseDate(observation
-                                                                    .hasEffectiveDateTimeType()
-                                                                    ? observation.getEffectiveDateTimeType()
-                                                                    .getValue()
-                                                                    : null);
-                                                    labTestResultsDTO
-                                                            .setValueType(observation
-                                                                    .hasValueStringType()
-                                                                    ? "TEXT"
-                                                                    : observation.hasValueQuantity()
-                                                                    ? "NUMERIC"
-                                                                    : observation.hasValueCodeableConcept()
-                                                                    ? "CODED"
-                                                                    : null);
-
-                                                    labTestResultsDTO
-                                                            .setResult(
-                                                                    observation.hasInterpretation()
-                                                                            && !observation.getInterpretation()
-                                                                            .isEmpty()
-                                                                            ? observation.getInterpretationFirstRep()
-                                                                            .getText()
-                                                                            : observation.hasValueStringType()
-                                                                            ? observation.getValueStringType()
-                                                                            .getValue()
-                                                                            : observation.hasValueQuantity()
-                                                                            ? String.valueOf(
-                                                                            observation
-                                                                                    .getValueQuantity()
-                                                                                    .getValue())
-                                                                            : observation
-                                                                            .hasValueCodeableConcept()
-                                                                            ? observation
-                                                                            .getValueCodeableConcept()
-                                                                            .getText()
-                                                                            : null);
-
-                                                    labTestResultsDTO
-                                                            .setCodedValue(
-                                                                    observation.hasCode()
-                                                                            && observation.getCode()
-                                                                            .hasText()
-                                                                            ? observation.getCode()
-                                                                            .getText()
-                                                                            : null);
-                                                    labTestResultsDTO
-                                                            .setHighRange(getNestedExtensionValueString(
-                                                                    observation,
-                                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results",
-                                                                    "highRange"));
-                                                    labTestResultsDTO
-                                                            .setLowRange(getNestedExtensionValueString(
-                                                                    observation,
-                                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results",
-                                                                    "lowRange"));
-                                                    labTestResultsDTO
-                                                            .setRemarks(getNestedExtensionValueString(
-                                                                    observation,
-                                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results",
-                                                                    "remarks"));
-                                                    labTestResultsDTO
-                                                            .setCodeType(getNestedExtensionValueString(
-                                                                    observation,
-                                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results",
-                                                                    "codeType"));
-                                                    labTestResultsDTO
-                                                            .setParameter(getNestedExtensionValueString(
-                                                                    observation,
-                                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results",
-                                                                    "parameter"));
-                                                    labTestResultsDTO
-                                                            .setUnit(getNestedExtensionValueString(
-                                                                    observation,
-                                                                    "http://fhir.moh.go.tz/fhir/StructureDefinition/laboratory-results",
-                                                                    "unit"));
-                                                }
-                                                labTestResultsDTOS.add(
-                                                        labTestResultsDTO);
-                                            }
-                                        }
-                                        labInvestigationDetailsDTO
-                                                .setTestResults(labTestResultsDTOS);
-                                        labInvestigationDetailsDTOS.add(
-                                                labInvestigationDetailsDTO);
-                                    }
-                                }
-
-                                templateData.setLabInvestigationDetails(
-                                        labInvestigationDetailsDTOS);
+//                                List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
+//                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(
+//                                        fhirClient,
+//                                        encounter.getIdElement().getIdPart(),
+//                                        "laboratory");
+//                                if (!diagnosticReports.isEmpty()) {
+//                                    for (DiagnosticReport diagnosticReport : diagnosticReports) {
+//                                        LabInvestigationDetailsDTO labInvestigationDetailsDTO = getLabInvestigationDetailsFromDiagnosticReport(fhirClient, diagnosticReport);
+//                                        labInvestigationDetailsDTOS.add(
+//                                                labInvestigationDetailsDTO);
+//                                    }
+//                                }
+//
+//                                templateData.setLabInvestigationDetails(
+//                                        labInvestigationDetailsDTOS);
 
                                 ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
                                 // 1. get service request
@@ -3672,7 +3454,14 @@ public class SharedHealthRecordsService {
 
                                 // Reporting Details
                                 ReportDetailsDTO reportDetailsDTO = new ReportDetailsDTO();
-                                reportDetailsDTO.setReportingDate(getExtensionValueString(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/reportingDate"));
+
+                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                                var dateString = getExtensionValueString(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/reportingDate");
+                                if(!dateString.isEmpty()) {
+                                    LocalDateTime localDateTime = LocalDateTime.parse(dateString, formatter);
+                                    reportDetailsDTO.setReportingDateTime(localDateTime.toInstant(ZoneOffset.UTC));
+                                }
                                 templateData.setReportDetails(reportDetailsDTO);
 
                                 // Postnatal details
@@ -3889,7 +3678,6 @@ public class SharedHealthRecordsService {
                                     List<BirthDetailsDTO> birthDetailsPostnatalDTOS = new ArrayList<>();
                                     if (!birthDetailsPostnatalObservations
                                             .isEmpty()) {
-                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                         for (Observation observation : birthDetailsPostnatalObservations) {
                                             BirthDetailsDTO birthDetailsDTO = new BirthDetailsDTO();
                                             Date dateOfBith = getNestedExtensionValueDateTime(
@@ -3995,7 +3783,6 @@ public class SharedHealthRecordsService {
                                         "admission-details", encounter, false,
                                         true);
                                 if (!admissionDetailObservations.isEmpty()) {
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                                     Observation admissionDetail = admissionDetailObservations
                                             .get(0);
                                     admissionDetailsDTO.setAdmissionDate(

@@ -44,7 +44,9 @@ public class SharedHealthRecordsDTO {
 
     private List<InvestigationDetailsDTO> investigationDetails;
 
-    private List<LabInvestigationDetailsDTO> labInvestigationDetails;
+//    private List<LabInvestigationDetailsDTO> labInvestigationDetails;
+
+    private List<LabRequestDetailsDTO> labRequestDetails;
 
     private List<DiagnosisDetailsDTO> diagnosisDetails;
 
@@ -104,7 +106,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("chronicConditions", this.getChronicConditions());
         sharedRecordMap.put("lifeStyleInformation", this.getLifeStyleInformation());
         sharedRecordMap.put("investigationDetails", this.getInvestigationDetails());
-        sharedRecordMap.put("labInvestigationDetails", this.getLabInvestigationDetails());
+//        sharedRecordMap.put("labInvestigationDetails", this.getLabInvestigationDetails());
         sharedRecordMap.put("diagnosisDetails", this.getDiagnosisDetails());
         sharedRecordMap.put("medicationDetails", this.getMedicationDetails());
         sharedRecordMap.put("eyeClinicDetails", this.getEyeClinicDetails());
@@ -115,7 +117,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
         sharedRecordMap.put("causesOfDeathDetails", this.getCausesOfDeathDetails());
         sharedRecordMap.put("antenatalCareDetails", this.getAntenatalCareDetails());
-        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails());
+        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails().stream().map(ProphylaxisDetailsDTO::toMap));
         sharedRecordMap.put("vaccinationDetails", this.getVaccinationDetails());
         sharedRecordMap.put("familyPlanningDetails", this.getFamilyPlanningDetails());
         sharedRecordMap.put("laborAndDeliveryDetails", this.getLaborAndDeliveryDetails());
