@@ -28,6 +28,9 @@ export class ConfigurationsComponent implements OnDestroy, OnInit {
     { key: 'weightGroup', name: 'Weight Group' },
     { key: 'hivStatus', name: 'Hiv Status' },
     { key: 'serviceLocation', name: 'Service Location' },
+    { key: 'isAlive', name: 'Is Alive' },
+    { key: 'childGender', name: 'Child Gender' },
+    { key: 'visitType', name: 'Visit Type' }
   ];
 
   selectedConfigurationType: string = '';

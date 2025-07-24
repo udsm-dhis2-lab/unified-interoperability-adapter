@@ -1,0 +1,179 @@
+.sql-editor-container {
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+}
+
+.sql-editor-container.fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999;
+    background: white;
+    border-radius: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #fafafa;
+    border-bottom: 1px solid #d9d9d9;
+    user-select: none;
+}
+
+.editor-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666;
+    margin: 0;
+}
+
+.fullscreen-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: #595959 !important;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    min-width: 24px;
+    min-height: 24px;
+    background-color: transparent;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.fullscreen-toggle:hover {
+    background-color: #f0f0f0 !important;
+    color: #1890ff !important;
+    border-color: #d9d9d9;
+}
+
+.fullscreen-toggle:active {
+    transform: scale(0.95);
+}
+
+.sql-editor {
+    border: none;
+    background: white;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sql-editor .cm-editor {
+    height: 100%;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.sql-editor-container.fullscreen .sql-editor {
+    flex: 1;
+    height: auto;
+}
+
+.sql-editor-container.fullscreen .sql-editor .cm-editor {
+    height: 100%;
+}
+
+.sql-editor .cm-editor.cm-focused {
+    outline: none;
+}
+
+.sql-editor .cm-scroller {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+}
+
+/* Custom scrollbar styling */
+.sql-editor .cm-scroller::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.sql-editor .cm-scroller::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.sql-editor .cm-scroller::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.sql-editor .cm-scroller::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+/* Completion popup styling */
+.sql-editor .cm-tooltip-autocomplete {
+    background: white;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+    font-size: 12px;
+}
+
+.sql-editor .cm-tooltip-autocomplete ul {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.sql-editor .cm-tooltip-autocomplete li {
+    padding: 4px 8px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sql-editor .cm-tooltip-autocomplete li:last-child {
+    border-bottom: none;
+}
+
+.sql-editor .cm-tooltip-autocomplete li[aria-selected] {
+    background: #e6f7ff;
+    color: #1890ff;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .sql-editor-container.fullscreen {
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .editor-header {
+        padding: 12px 16px;
+    }
+
+    .editor-title {
+        font-size: 14px;
+    }
+
+    .sql-editor .cm-editor {
+        font-size: 14px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .sql-editor-container {
+        border: 1px solid #ccc;
+        background: white;
+    }
+
+    .editor-header {
+        display: none;
+    }
+
+    .sql-editor .cm-editor {
+        background: white;
+        color: black;
+    }
+}
