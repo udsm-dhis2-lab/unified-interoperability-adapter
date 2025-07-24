@@ -24,18 +24,18 @@
           <nz-card>
             <div nz-row [nzGutter]="8" style="margin-bottom: 16px" *ngIf="rightColumnSpan === 16">
               <div nz-col nzSpan="12">
-                <label nz-checkbox [(ngModel)]="useSum">Use sum to aggregate</label>
-                <label nz-checkbox [(ngModel)]="freeTextQuery">Use free text query</label>
+                <label nz-checkbox (ngModelChange)="onFreeTextQueryChange($event)" [(ngModel)]="freeTextQuery">Use free
+                  text query</label>
               </div>
             </div>
             <div nz-row [nzGutter]="16" style="margin-bottom: 16px">
-              <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="6">
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="6">
                 <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
                   nzCheckStrictly="true" nzShowExpand="true" nzVirtualHeight="450px" [nzNodes]="nodes" nzShowSearch
                   nzPlaceHolder="LHS Query" [(ngModel)]="lhsQueryValue"></nz-tree-select>
               </div>
 
-              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16 && !freeTextQuery">
+              <div nz-col [nzSpan]="6" *ngIf="rightColumnSpan === 16">
                 <nz-select style="width: 100%" [ngModel]="selectedQueryOperator"
                   (ngModelChange)="onQueryOperatorSelect($event)">
                   <ng-container *ngFor="let option of queryOperators">
@@ -45,7 +45,7 @@
                 </nz-select>
               </div>
 
-              <div *ngIf="rightColumnSpan === 16 && !freeTextQuery" nz-col nzSpan="12">
+              <div *ngIf="rightColumnSpan === 16" nz-col nzSpan="12">
                 <div nz-row [nzGutter]="8">
                   <div nz-col nzSpan="12">
                     <nz-tree-select style="width: 100%" nzShowIcon="true" nzHideUnMatched="true" nzCheckable="true"
@@ -76,9 +76,21 @@
             </nz-card>
 
             <nz-card *ngIf="freeTextQuery" style="width: 100%; margin-top: 16px; margin-bottom: 16px">
-              <p>Free Text Query</p>
-              <textarea nz-input placeholder="Controlled autosize" [(ngModel)]="customQuery"
-                [nzAutosize]="{ minRows: 3, maxRows: 8 }"></textarea>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <p style="margin: 0; font-weight: 500;">Free Text Query</p>
+                <div style="display: flex; gap: 8px;">
+                  <button nz-button nzType="text" nzSize="small" (click)="refreshCustomQuery()" nz-tooltip
+                    nzTooltipTitle="Refresh query based on current configurations (will overwrite manual changes)">
+                    <span style="color: #52c41a;">🔄 Refresh</span>
+                  </button>
+                  <button nz-button nzType="text" nzSize="small" (click)="showFreeTextQueryInfo()" nz-tooltip
+                    nzTooltipTitle="Click for detailed information about the SQL editor">
+                    <span style="color: #1890ff;">ℹ️ Info</span>
+                  </button>
+                </div>
+              </div>
+              <app-sql-editor [value]="customQuery" [height]="'250px'" [theme]="'dark'"
+                (valueChange)="onCustomQueryChange($event)"></app-sql-editor>
             </nz-card>
 
             <!-- selecting configurations options -->
@@ -243,3 +255,53 @@
     </nz-card>
   </div>
 </nz-spin>
+
+<!-- Free Text Query Information Modal -->
+<nz-modal [(nzVisible)]="isFreeTextQueryInfoVisible" nzTitle="Free Text Query - SQL Editor Guide"
+  (nzOnCancel)="closeFreeTextQueryInfo()" (nzOnOk)="closeFreeTextQueryInfo()" nzOkText="Got it" nzWidth="800px"
+  nzCancelText="">
+  <ng-container *nzModalContent>
+    <div style="line-height: 1.6;">
+      <h4 style="color: #1890ff; margin-top: 0;">🚀 What is the Free Text Query Editor for?</h4>
+      <p>The Free Text Query editor allows you to write custom SQL queries directly against the FHIR database views.
+        This gives you maximum flexibility to create complex data mappings beyond the standard configuration options,
+        for precise control over data extraction and filtering.</p>
+
+      <h4 style="color: #1890ff;">✨ Key Features and Quick Navigation</h4>
+      <ul>
+        <li><strong>Smart Query Generation:</strong> Select codes, gender, and configurations first to auto-generate
+          base queries</li>
+        <li><strong>SQL Syntax Highlighting:</strong> Code highlighting for better readability</li>
+        <li><strong>Auto-completion:</strong> Intelligent suggestions for 30+ Flat tables, table names and column names
+        </li>
+        <li><strong>Full-screen Mode:</strong> Press F11 or click the expand button (⤢) for distraction-free editing
+        </li>
+      </ul>
+
+      <h4 style="color: #52c41a;">💡 Quick Tips & Workflow</h4>
+      <ul>
+        <li><strong>Configuration First:</strong> Select ICD codes, LOINC codes, gender, and other configurations before
+          enabling free text query</li>
+        <li><strong>Auto-generation:</strong> The system will pre-populate a base query based on your selections</li>
+        <li><strong>Refresh Button:</strong> Use the refresh button to regenerate the query when you add new
+          configurations</li>
+        <li><strong>Manual Override:</strong> Modify the generated query as needed for complex scenarios</li>
+        <li>Start typing table names to see available options (e.g., "patient_flat", "encounter_flat")</li>
+        <li>Use dot notation for columns (e.g., "patient_flat.gender")</li>
+        <li>Press <code style="background: #f0f0f0; padding: 2px 4px;">Ctrl+Space</code> to trigger auto-completion</li>
+        <li>Use <code style="background: #f0f0f0; padding: 2px 4px;">ESC</code> to exit full-screen mode</li>
+      </ul>
+
+      <h4 style="color: #ff9500;">⚠️ Important Considerations</h4>
+      <div style="background: #fff7e6; padding: 12px; border-radius: 6px; border-left: 4px solid #ff9500;">
+        <ul style="margin: 0;">
+          <li><strong>Configuration Changes:</strong> Adding new configurations will regenerate the query and erase
+            manual progress</li>
+          <li><strong>Performance:</strong> Complex queries may impact system performance</li>
+          <li><strong>Testing:</strong> Always test your queries with small datasets first</li>
+          <li><strong>Validation:</strong> Ensure your query returns the expected data structure</li>
+        </ul>
+      </div>
+    </div>
+  </ng-container>
+</nz-modal>

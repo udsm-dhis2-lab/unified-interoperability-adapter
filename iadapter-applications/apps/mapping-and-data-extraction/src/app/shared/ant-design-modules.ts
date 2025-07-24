@@ -15,6 +15,7 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
@@ -40,6 +41,7 @@ export const antDesignModules = [
   NzCollapseModule,
   NzAlertModule,
   NzModalModule,
+  NzToolTipModule,
   NzDividerModule,
   NzTreeSelectModule,
   NzTabsModule,
