@@ -133,6 +133,7 @@ public class DatastoreController {
                 Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
                 if (existingDatastore != null) {
                     existingDatastore.setValue(datastore.getValue());
+                    existingDatastore.setDatastoreGroup(datastore.getDatastoreGroup() != null ? datastore.getDatastoreGroup() : existingDatastore.getDatastoreGroup());
                     if (this.authentication != null && this.authenticatedUser != null) {
                         existingDatastore.setLastUpdatedBy(this.authenticatedUser);
                     }
