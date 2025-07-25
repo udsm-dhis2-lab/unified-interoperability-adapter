@@ -75,6 +75,14 @@ public class DatastoreService {
 
     }
 
+    public Integer deleteDatastoreByNamespace(String namespace) throws Exception {
+        return datastoreRepository.deleteDatastoreByNamespace(namespace);
+    }
+
+    public Integer updateDatastoreNamespace(String oldNamespace, String newNamespace) {
+        return datastoreRepository.updateNamespace(oldNamespace, newNamespace);
+    }
+
     public void deleteDatastore(String uuid) throws NotFoundException {
         if (uuid == null) {
             throw new IllegalStateException("uuid is missing");

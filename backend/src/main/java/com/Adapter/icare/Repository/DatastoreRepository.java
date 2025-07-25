@@ -4,9 +4,12 @@ import com.Adapter.icare.Domains.Datastore;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +23,17 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
 
     @Query(value = "SELECT * FROM datastore WHERE namespace=:namespace",nativeQuery = true)
     List<Datastore> getDatastoreByNamespace(String namespace);
+
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM datastore WHERE namespace=:namespace", nativeQuery = true)
+    Integer deleteDatastoreByNamespace(String namespace);
+
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE datastore SET namespace=:newNamespace WHERE namespace=:oldNamespace", nativeQuery = true)
+    Integer updateNamespace(@Param("oldNamespace") String oldNamespace, @Param("newNamespace") String newNamespace);
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             " (:key IS NULL OR data_key = :key )",
