@@ -20,8 +20,11 @@ import {
   DataSetInstance,
   DatasetPage,
   MappingsUrls,
+  Program,
+  ProgramPage,
 } from '../../models';
 import { DatasetManagementService } from '../../services/dataset-management.service';
+import { ProgramManagementService } from '../../services/program-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { SharedModule } from 'apps/mapping-and-data-extraction/src/app/shared/shared.module';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -31,11 +34,12 @@ import {
   InstancePage,
 } from 'apps/mapping-and-data-extraction/src/app/shared/models';
 import { InstanceManagementService } from 'apps/mapping-and-data-extraction/src/app/shared';
+import { NzTabsModule } from 'ng-zorro-antd/tabs';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [SearchBarComponent, SharedModule],
+  imports: [SearchBarComponent, SharedModule, NzTabsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css',
 })
@@ -46,12 +50,17 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     message: '',
   };
 
+  // Tab management
+  selectedDataType: 'aggregate' | 'individual' = 'aggregate';
+  selectedTabIndex: number = 0;
+
   selectedInstanceFetchingMechanism: string = 'remoteDatasets';
   showMapAsDataSetAction = false;
 
   @ViewChild('additionalContent') additionalContent!: TemplateRef<any>;
   @ViewChild(SearchBarComponent) searchBarComponent!: SearchBarComponent;
 
+  // Dataset-related properties
   total = 1;
   listOfDatasets: Dataset[] = [];
   loading = true;
@@ -59,6 +68,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   pageIndex = 1;
   filterKey = [{}];
   dataSetSeachQuery: string = '';
+
+  // Program-related properties
+  listOfPrograms: Program[] = [];
+  programSearchQuery: string = '';
 
   isFirstLoad = true;
 
@@ -69,18 +82,69 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
 
   constructor(
     private dataSetManagementService: DatasetManagementService,
+    private programManagementService: ProgramManagementService,
     private instanceManagementService: InstanceManagementService,
     private router: Router,
     private modal: NzModalService,
     private route: ActivatedRoute
-  ) {}
+  ) { }
 
   onInstanceSearch(value: string): void {
     this.isInstanceFetchingLoading = true;
     this.searchInstanceChange$.next(value);
   }
 
-  setDataSetUrl(fetchMechanism: string): string {
+  onDataTypeChange(dataType: 'aggregate' | 'individual'): void {
+    this.selectedDataType = dataType;
+    this.selectedTabIndex = dataType === 'aggregate' ? 0 : 1;
+    this.loading = true;
+    this.pageIndex = 1;
+
+    this.dataSetSeachQuery = '';
+    this.programSearchQuery = '';
+
+    if (dataType === 'individual') {
+      this.selectedInstanceFetchingMechanism = 'remoteDatasets';
+      this.showMapAsDataSetAction = false;
+    }
+
+    if (this.selectedInstance) {
+      this.loadAppropriateData();
+    }
+  }
+
+  onTabChange(index: number): void {
+    const dataType: 'aggregate' | 'individual' = index === 0 ? 'aggregate' : 'individual';
+    this.onDataTypeChange(dataType);
+  }
+
+  get searchLabel(): string {
+    return this.selectedDataType === 'aggregate' ? 'Search Dataset:' : 'Search Program:';
+  }
+
+  private loadAppropriateData(): void {
+    if (this.selectedDataType === 'aggregate') {
+      this.loadDatasetsFromServer(
+        this.pageIndex,
+        this.pageSize,
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        [{ key: 'instance', value: [this.selectedInstance!] }]
+      );
+    } else {
+      this.loadProgramsFromServer(
+        this.pageIndex,
+        this.pageSize,
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        [{ key: 'instance', value: [this.selectedInstance!] }]
+      );
+    }
+  }
+
+  setDataUrl(fetchMechanism: string, dataType: 'aggregate' | 'individual'): string {
+    if (dataType === 'individual') {
+      return MappingsUrls.GET_PROGRAMS_REMOTE;
+    }
+
     switch (fetchMechanism) {
       case 'remoteDatasets':
         return MappingsUrls.GET_DATASETS_REMOTE;
@@ -97,6 +161,9 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   ngOnDestroy(): void {
     if (this.loadDatasetsSubscription) {
       this.loadDatasetsSubscription.unsubscribe();
+    }
+    if (this.loadProgramsSubscription) {
+      this.loadProgramsSubscription.unsubscribe();
     }
   }
 
@@ -129,6 +196,32 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       });
   }
 
+  loadProgramsSubscription!: Subscription;
+
+  loadProgramsFromServer(
+    pageIndex: number,
+    pageSize: number,
+    programsUrl: string,
+    filter: Array<{ key: string; value: string[] }>
+  ): void {
+    this.loading = true;
+    this.loadProgramsSubscription = this.programManagementService
+      .getPrograms(pageIndex, pageSize, programsUrl, filter)
+      .subscribe({
+        next: (data: ProgramPage) => {
+          this.loading = false;
+          this.total = data.total;
+          this.pageIndex = data.pageIndex;
+          this.pageSize = data.pageSize;
+          this.listOfPrograms = data.listOfPrograms;
+        },
+        error: (error) => {
+          this.loading = false;
+          //TODO: Implement error handling
+        },
+      });
+  }
+
   onQueryParamsChange(params: NzTableQueryParams): void {
     if (this.isFirstLoad) {
       this.isFirstLoad = false;
@@ -138,16 +231,28 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     const queryFilter = [
       ...filter,
       { key: 'instance', value: [this.selectedInstance!] },
-      this.dataSetSeachQuery !== ''
+      this.selectedDataType === 'aggregate' && this.dataSetSeachQuery !== ''
         ? { key: 'q', value: [this.dataSetSeachQuery] }
-        : { key: 'q', value: [] },
+        : this.selectedDataType === 'individual' && this.programSearchQuery !== ''
+          ? { key: 'q', value: [this.programSearchQuery] }
+          : { key: 'q', value: [] },
     ];
-    this.loadDatasetsFromServer(
-      pageIndex,
-      pageSize,
-      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
-      queryFilter
-    );
+
+    if (this.selectedDataType === 'aggregate') {
+      this.loadDatasetsFromServer(
+        pageIndex,
+        pageSize,
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        queryFilter
+      );
+    } else {
+      this.loadProgramsFromServer(
+        pageIndex,
+        pageSize,
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        queryFilter
+      );
+    }
   }
 
   ngOnInit(): void {
@@ -159,12 +264,6 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     this.searchInstances();
   }
 
-  /**
-   * Search for instances based on the input in the search bar.
-   * Debounce for 500ms and fetch the first page of instances.
-   * Set the selectedInstance to the first instance in the list :- This is done on first load.
-   * Load the datasets for the selected instance.
-   */
   searchInstances() {
     const optionList$: Observable<InstancePage> = this.searchInstanceChange$
       .asObservable()
@@ -189,50 +288,59 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     optionList$.pipe(take(1)).subscribe((data: any) => {
       if (this.instancesOptionList.length > 0) {
         this.selectedInstance = this.instancesOptionList[0].uuid;
-        this.loadDatasetsFromServer(
-          this.pageIndex,
-          this.pageSize,
-          this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
-          [{ key: 'instance', value: [this.selectedInstance!] }]
-        );
+        this.loadAppropriateData();
         this.isInstanceFetchingLoading = false;
       }
     });
   }
 
-  /**
-   * Load datasets from server when user clicks the search button in the search bar.
-   * The filter parameter is set to the selected instance uuid and fetch mechanism that can be
-   * either "remoteDatasets" or "selectedDatasets".
-   */
   onDatasetsSearch() {
-    this.loadDatasetsFromServer(
-      1,
-      10,
-      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
-      [{ key: 'instance', value: [this.selectedInstance!] }]
-    );
-  }
-
-  /**
-   * This function is a callback function for the search input typing event in the
-   * search bar. It reloads the datasets table with the search query in the
-   * input box.
-   *
-   * @param value The search query in the input box.
-   */
-  onDatasetsSearchInputTyping(value: string) {
-    this.dataSetSeachQuery = value;
-    if (value.length >= 3 || value === '') {
+    if (this.selectedDataType === 'aggregate') {
       this.loadDatasetsFromServer(
         1,
         10,
-        this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
-        [
-          { key: 'instance', value: [this.selectedInstance!] },
-          value !== '' ? { key: 'q', value: [value] } : { key: 'q', value: [] },
-        ]
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        [{ key: 'instance', value: [this.selectedInstance!] }]
       );
+    } else {
+      this.loadProgramsFromServer(
+        1,
+        10,
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        [{ key: 'instance', value: [this.selectedInstance!] }]
+      );
+    }
+  }
+
+  onDatasetsSearchInputTyping(value: string) {
+    if (this.selectedDataType === 'aggregate') {
+      this.dataSetSeachQuery = value;
+    } else {
+      this.programSearchQuery = value;
+    }
+
+    if (value.length >= 3 || value === '') {
+      if (this.selectedDataType === 'aggregate') {
+        this.loadDatasetsFromServer(
+          1,
+          10,
+          this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+          [
+            { key: 'instance', value: [this.selectedInstance!] },
+            value !== '' ? { key: 'q', value: [value] } : { key: 'q', value: [] },
+          ]
+        );
+      } else {
+        this.loadProgramsFromServer(
+          1,
+          10,
+          this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+          [
+            { key: 'instance', value: [this.selectedInstance!] },
+            value !== '' ? { key: 'q', value: [value] } : { key: 'q', value: [] },
+          ]
+        );
+      }
     }
   }
 
@@ -248,6 +356,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     } else {
       this.selectDatasetForMapping(event.dataSetId, this.selectedInstance!);
     }
+  }
+
+  programAction(event: { programId: string }) {
+    this.goToProgramMapping({ id: event.programId });
   }
 
   selectDatasetForMapping(datasetUuid: string, instanceUuid: string) {
@@ -304,22 +416,42 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
   }
 
   reLoadDataSets() {
-    this.loadDatasetsFromServer(
-      this.pageIndex,
-      this.pageSize,
-      this.setDataSetUrl(this.selectedInstanceFetchingMechanism),
-      [
-        { key: 'instance', value: [this.selectedInstance!] },
-        this.dataSetSeachQuery !== ''
-          ? { key: 'q', value: [this.dataSetSeachQuery] }
-          : { key: 'q', value: [] },
-      ]
-    );
+    if (this.selectedDataType === 'aggregate') {
+      this.loadDatasetsFromServer(
+        this.pageIndex,
+        this.pageSize,
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        [
+          { key: 'instance', value: [this.selectedInstance!] },
+          this.dataSetSeachQuery !== ''
+            ? { key: 'q', value: [this.dataSetSeachQuery] }
+            : { key: 'q', value: [] },
+        ]
+      );
+    } else {
+      this.loadProgramsFromServer(
+        this.pageIndex,
+        this.pageSize,
+        this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+        [
+          { key: 'instance', value: [this.selectedInstance!] },
+          this.programSearchQuery !== ''
+            ? { key: 'q', value: [this.programSearchQuery] }
+            : { key: 'q', value: [] },
+        ]
+      );
+    }
   }
 
   goToDataSetMapping(dataSetIds: { uuid: string; id: string }) {
     this.router.navigate(['mapping-and-data-extraction/dataset-mapping'], {
       queryParams: dataSetIds,
+    });
+  }
+
+  goToProgramMapping(programIds: { id: string }) {
+    this.router.navigate(['mapping-and-data-extraction/program-mapping'], {
+      queryParams: programIds,
     });
   }
 

@@ -1,5 +1,7 @@
 export * from './dataset.model';
+export * from './program.model';
 export * from './responses/dataset-page';
+export * from './responses/program-page';
 export * from './constants/mappings-urls';
 export * from './options.model';
 export * from './configuration.model';
