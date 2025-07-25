@@ -261,6 +261,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
         this.selectedInstanceFetchingMechanism = 'selectedDatasets';
       } else if (params['from'] === 'program-mapping') {
         this.selectedDataType = 'individual';
+        this.selectedTabIndex = 1; // Set tab index to Individual tab
         if (params['instance']) {
           this.selectedInstance = params['instance'];
           setTimeout(() => {
@@ -277,6 +278,7 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
       // Set data type if provided
       if (params['dataType']) {
         this.selectedDataType = params['dataType'];
+        this.selectedTabIndex = params['dataType'] === 'individual' ? 1 : 0;
       }
     });
     this.searchInstances();
