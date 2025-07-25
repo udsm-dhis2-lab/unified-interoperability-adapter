@@ -21,6 +21,7 @@ import { NzTreeSelectModule } from 'ng-zorro-antd/tree-select';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzFormModule } from 'ng-zorro-antd/form';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
 
 
 export const antDesignModules = [
@@ -46,5 +47,6 @@ export const antDesignModules = [
   NzTreeSelectModule,
   NzTabsModule,
   NzResultModule,
-  NzFormModule
+  NzFormModule,
+  NzEmptyModule
 ];

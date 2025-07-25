@@ -35,6 +35,17 @@ export class ProgramManagementService {
             );
     }
 
+    getProgramById(programId: string, programUrl: string, instance: string): Observable<any> {
+        const params = new HttpParams()
+            .set('programId', programId)
+            .set('instance', instance);
+        return this.httpClient
+            .get<any>(programUrl, { params })
+            .pipe(
+                catchError((error: any) => this.handleError(error))
+            );
+    }
+
     private buildHttpParams(
         pageIndex: number,
         pageSize: number,

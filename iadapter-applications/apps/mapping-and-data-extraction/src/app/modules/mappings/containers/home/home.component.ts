@@ -259,6 +259,24 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
     this.route.queryParams.subscribe((params) => {
       if (params['from'] === 'mapping') {
         this.selectedInstanceFetchingMechanism = 'selectedDatasets';
+      } else if (params['from'] === 'program-mapping') {
+        this.selectedDataType = 'individual';
+        if (params['instance']) {
+          this.selectedInstance = params['instance'];
+          setTimeout(() => {
+            this.loadProgramsFromServer(
+              1,
+              10,
+              this.setDataUrl(this.selectedInstanceFetchingMechanism, this.selectedDataType),
+              [{ key: 'instance', value: [this.selectedInstance!] }]
+            );
+          }, 100);
+        }
+      }
+
+      // Set data type if provided
+      if (params['dataType']) {
+        this.selectedDataType = params['dataType'];
       }
     });
     this.searchInstances();
@@ -451,7 +469,10 @@ export class HomeComponent implements AfterViewInit, OnDestroy, OnInit {
 
   goToProgramMapping(programIds: { id: string }) {
     this.router.navigate(['mapping-and-data-extraction/program-mapping'], {
-      queryParams: programIds,
+      queryParams: {
+        id: programIds.id,
+        instance: this.selectedInstance
+      },
     });
   }
 

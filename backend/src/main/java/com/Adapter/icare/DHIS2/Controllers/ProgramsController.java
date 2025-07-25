@@ -28,7 +28,8 @@ public class ProgramsController {
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "q", required = false) String q,
-            @RequestParam(value = "programType", required = false) String programType
+            @RequestParam(value = "programType", required = false) String programType,
+            @RequestParam(value = "programId", required = false) String programId
     ) {
         try {
             Instance instanceDetails = instanceService.getInstanceByUuid(instance);
@@ -39,7 +40,9 @@ public class ProgramsController {
                         page,
                         pageSize,
                         q,
-                        programType);
+                        programType,
+                        programId
+                        );
                 response.put("results", remoteProgramsPayload.get("programs"));
                 response.put("pager", remoteProgramsPayload.get("pager"));
                 return ResponseEntity.ok(response);

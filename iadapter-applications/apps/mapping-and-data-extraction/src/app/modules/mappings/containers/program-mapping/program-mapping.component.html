@@ -1,0 +1,215 @@
+<nz-spin [nzSpinning]="isLoading">
+    <div class="inner-content">
+        <button nz-button nzType="default" style="margin-bottom: 16px" (click)="goBackToProgramList()">
+            Go back
+        </button>
+
+        <nz-card style="width: 100%">
+            <div nz-row [nzGutter]="16">
+                <!-- Left Column - Program Form Representation -->
+                <div nz-col [nzSpan]="leftColumnSpan">
+                    <nz-card class="card">
+                        <div class="left-column">
+                            <div class="program-header" *ngIf="programData">
+                                <h2>{{ programData.displayName }}</h2>
+                                <p class="program-description">{{ programData.description }}</p>
+                                <div class="program-meta">
+                                    <nz-tag [nzColor]="'blue'">{{ programData.programType }}</nz-tag>
+                                    <span class="program-short-name">{{ programData.displayShortName }}</span>
+                                </div>
+                            </div>
+
+                            <div class="scrollable-content">
+                                <!-- Program Stage Form -->
+                                <div class="program-stage" *ngIf="firstProgramStage">
+                                    <div class="stage-header">
+                                        <h3>{{ firstProgramStage.displayName }}</h3>
+                                        <p class="stage-description">{{ firstProgramStage.description }}</p>
+                                    </div>
+
+                                    <!-- Program Stage Sections -->
+                                    <div class="program-sections">
+                                        <div class="section"
+                                            *ngFor="let section of firstProgramStage.programStageSections; trackBy: trackBySection">
+                                            <div class="section-header">
+                                                <h4>{{ section.displayName }}</h4>
+                                            </div>
+
+                                            <!-- Data Elements in Section -->
+                                            <div class="data-elements">
+                                                <div class="data-element-field"
+                                                    *ngFor="let dataElement of section.dataElements; trackBy: trackByDataElement"
+                                                    [class.selected]="dataElement.selected"
+                                                    [class.disabled]="selectedDataElement && selectedDataElement.id !== dataElement.id && selectedDataElement.selected"
+                                                    (click)="onDataElementSelect(dataElement)">
+                                                    <label class="field-label">
+                                                        {{ dataElement.formName || dataElement.displayName }}
+                                                    </label>
+                                                    <input nz-input [placeholder]="dataElement.displayName" readonly
+                                                        class="field-input"
+                                                        [disabled]="selectedDataElement && selectedDataElement.id !== dataElement.id && selectedDataElement.selected" />
+                                                    <div class="field-info">
+                                                        <small class="field-id">ID: {{ dataElement.id }}</small>
+                                                        <small class="field-name"
+                                                            *ngIf="dataElement.name !== dataElement.displayName">
+                                                            Name: {{ dataElement.name }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- No data message -->
+                                <div class="no-data" *ngIf="!programData && !isLoading && !hasError">
+                                    <nz-empty nzNotFoundImage="simple"
+                                        nzNotFoundContent="No program data available"></nz-empty>
+                                </div>
+
+                                <!-- Error message -->
+                                <div class="error-data" *ngIf="hasError && !isLoading">
+                                    <nz-alert nzType="error" 
+                                              [nzMessage]="errorMessage" 
+                                              nzShowIcon 
+                                              [nzAction]="retryTemplate"
+                                              style="margin: 16px 0;">
+                                    </nz-alert>
+                                    <ng-template #retryTemplate>
+                                        <button nz-button nzType="primary" nzSize="small" (click)="loadProgramData()">
+                                            Retry
+                                        </button>
+                                    </ng-template>
+                                </div>
+                            </div>
+                        </div>
+                    </nz-card>
+                </div>
+
+                <!-- Right Column - Mapping Configuration -->
+                <div nz-col [nzSpan]="rightColumnSpan">
+                    <div nz-row nzJustify="space-between">
+                        <div nz-col nzSpan="12">
+                            <!-- Collapse button -->
+                            <button nz-button nzType="default" (click)="onCollapse()" class="collapse-button">
+                                <span nz-icon [nzType]="leftColumnSpan === 8 ? 'right' : 'left'"
+                                    nzTheme="outline"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <nz-card>
+                        <!-- Selected Field Info -->
+                        <div class="selected-field-info" *ngIf="selectedDataElement">
+                            <h4>Selected Field</h4>
+                            <div class="field-details">
+                                <p><strong>Display Name:</strong> {{ selectedDataElement.displayName }}</p>
+                                <p><strong>Form Name:</strong> {{ selectedDataElement.formName || 'N/A' }}</p>
+                                <p><strong>Internal Name:</strong> {{ selectedDataElement.name }}</p>
+                                <p><strong>ID:</strong> {{ selectedDataElement.id }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Mapping Configuration Placeholder -->
+                        <div class="mapping-configuration" *ngIf="selectedDataElement">
+                            <nz-divider></nz-divider>
+                            <h4>Mapping Configuration</h4>
+
+                            <!-- Data Source Mapping -->
+                            <div class="mapping-section">
+                                <h5>Data Source Mapping</h5>
+                                <nz-form-item>
+                                    <nz-form-label>Source Table</nz-form-label>
+                                    <nz-form-control>
+                                        <nz-select nzPlaceHolder="Select source table" style="width: 100%">
+                                            <nz-option nzValue="encounter_flat" nzLabel="encounter_flat"></nz-option>
+                                            <nz-option nzValue="patient_flat" nzLabel="patient_flat"></nz-option>
+                                            <nz-option nzValue="observation_flat"
+                                                nzLabel="observation_flat"></nz-option>
+                                        </nz-select>
+                                    </nz-form-control>
+                                </nz-form-item>
+
+                                <nz-form-item>
+                                    <nz-form-label>Source Field</nz-form-label>
+                                    <nz-form-control>
+                                        <nz-select nzPlaceHolder="Select source field" style="width: 100%">
+                                            <nz-option nzValue="patient_id" nzLabel="patient_id"></nz-option>
+                                            <nz-option nzValue="encounter_id" nzLabel="encounter_id"></nz-option>
+                                            <nz-option nzValue="obs_value" nzLabel="obs_value"></nz-option>
+                                        </nz-select>
+                                    </nz-form-control>
+                                </nz-form-item>
+                            </div>
+
+                            <!-- Transformation Rules -->
+                            <div class="mapping-section">
+                                <h5>Transformation Rules</h5>
+                                <nz-form-item>
+                                    <nz-form-label>Data Type</nz-form-label>
+                                    <nz-form-control>
+                                        <nz-select nzPlaceHolder="Select data type" style="width: 100%">
+                                            <nz-option nzValue="TEXT" nzLabel="Text"></nz-option>
+                                            <nz-option nzValue="NUMBER" nzLabel="Number"></nz-option>
+                                            <nz-option nzValue="DATE" nzLabel="Date"></nz-option>
+                                            <nz-option nzValue="BOOLEAN" nzLabel="Boolean"></nz-option>
+                                        </nz-select>
+                                    </nz-form-control>
+                                </nz-form-item>
+
+                                <nz-form-item>
+                                    <nz-form-label>Default Value</nz-form-label>
+                                    <nz-form-control>
+                                        <input nz-input placeholder="Enter default value (optional)" />
+                                    </nz-form-control>
+                                </nz-form-item>
+                            </div>
+
+                            <!-- Validation Rules -->
+                            <div class="mapping-section">
+                                <h5>Validation Rules</h5>
+                                <nz-form-item>
+                                    <nz-form-control>
+                                        <label nz-checkbox>Required Field</label>
+                                    </nz-form-control>
+                                </nz-form-item>
+
+                                <nz-form-item>
+                                    <nz-form-control>
+                                        <label nz-checkbox>Apply Data Validation</label>
+                                    </nz-form-control>
+                                </nz-form-item>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mapping-actions">
+                                <button nz-button nzType="primary" style="margin-right: 8px;">
+                                    Save Mapping
+                                </button>
+                                <button nz-button nzType="default" (click)="clearSelection()">
+                                    Clear Selection
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- No selection message -->
+                        <div class="no-selection" *ngIf="!selectedDataElement">
+                            <nz-empty nzNotFoundImage="simple"
+                                nzNotFoundContent="Select a field from the form to configure mapping"></nz-empty>
+                        </div>
+
+                        <!-- Collapsed state message -->
+                        <div *ngIf="rightColumnSpan !== 16 && leftColumnSpan !== 8"
+                            style="margin-top: 16px; font-size: 14px; color: #888; text-align: center;">
+                            Expand the right column to configure mapping.
+                        </div>
+                    </nz-card>
+                </div>
+            </div>
+        </nz-card>
+
+        <!-- Alert for user feedback -->
+        <nz-alert *ngIf="false" nzType="success" nzMessage="Mapping saved successfully!" nzShowIcon nzCloseable
+            style="margin-top: 16px;"></nz-alert>
+    </div>
+</nz-spin>

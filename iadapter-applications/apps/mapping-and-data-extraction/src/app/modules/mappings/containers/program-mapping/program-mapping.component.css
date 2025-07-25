@@ -1,0 +1,259 @@
+.inner-content {
+    padding: 20px;
+    background-color: #f5f5f5;
+    min-height: calc(100vh - 100px);
+}
+
+.card {
+    height: 100%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.left-column {
+    padding: 16px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.program-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    background: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
+}
+
+.scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.program-header h2 {
+    margin: 0 0 8px 0;
+    color: #1890ff;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.program-description {
+    margin: 0 0 12px 0;
+    color: #666;
+    font-size: 14px;
+}
+
+.program-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.program-short-name {
+    font-size: 12px;
+    color: #999;
+}
+
+.program-stage {
+    margin-bottom: 24px;
+}
+
+.stage-header {
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.stage-header h3 {
+    margin: 0 0 8px 0;
+    color: #52c41a;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.stage-description {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.program-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.section {
+    background: #fafafa;
+    border: 1px solid #f0f0f0;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.section-header {
+    margin-bottom: 16px;
+}
+
+.section-header h4 {
+    margin: 0;
+    color: #1890ff;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.data-elements {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+.data-element-field {
+    background: white;
+    border: 2px solid #d9d9d9;
+    border-radius: 6px;
+    padding: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.data-element-field:hover {
+    border-color: #40a9ff;
+    box-shadow: 0 2px 4px rgba(64, 169, 255, 0.2);
+}
+
+.data-element-field.selected {
+    border-color: #1890ff;
+    background-color: #e6f7ff;
+    box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+}
+
+.data-element-field.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f5f5f5;
+}
+
+.data-element-field.disabled:hover {
+    border-color: #d9d9d9;
+    box-shadow: none;
+}
+
+.field-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #262626;
+    font-size: 14px;
+}
+
+.field-input {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.field-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.field-id,
+.field-name {
+    font-size: 11px;
+    color: #8c8c8c;
+}
+
+.collapse-button {
+    margin-bottom: 16px;
+}
+
+.no-data,
+.no-selection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+.selected-field-info {
+    background: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.selected-field-info h4 {
+    margin: 0 0 12px 0;
+    color: #52c41a;
+}
+
+.field-details p {
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+.mapping-configuration {
+    padding-top: 16px;
+}
+
+.mapping-configuration h4 {
+    margin: 0 0 16px 0;
+    color: #1890ff;
+}
+
+.mapping-section {
+    background: #fafafa;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.mapping-section h5 {
+    margin: 0 0 12px 0;
+    color: #595959;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.mapping-actions {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .data-elements {
+        grid-template-columns: 1fr;
+    }
+
+    .program-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+/* Custom scrollbar for left column */
+.left-column::-webkit-scrollbar {
+    width: 6px;
+}
+
+.left-column::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.left-column::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.left-column::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
