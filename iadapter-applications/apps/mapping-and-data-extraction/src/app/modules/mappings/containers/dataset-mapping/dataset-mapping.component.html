@@ -89,8 +89,8 @@
                   </button>
                 </div>
               </div>
-              <app-sql-editor [value]="customQuery" [height]="'250px'" [theme]="'dark'"
-                (valueChange)="onCustomQueryChange($event)"></app-sql-editor>
+              <app-code-editor [value]="customQuery" [height]="'250px'" [theme]="'dark'" [language]="'sql'"
+                (valueChange)="onCustomQueryChange($event)"></app-code-editor>
             </nz-card>
 
             <!-- selecting configurations options -->

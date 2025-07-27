@@ -1,12 +1,12 @@
 <div class="sql-editor-container" [class.fullscreen]="isFullScreen">
     <div class="editor-header">
-        <span class="editor-title">Free Text Query Editor</span>
-        <button nz-button nzType="text" nzSize="small" class="fullscreen-toggle" (click)="toggleFullScreen()" nz-tooltip
-            [nzTooltipTitle]="isFullScreen ? 'Exit Full Screen (ESC)' : 'Enter Full Screen (F11)'">
-            {{ isFullScreen ? '⤵' : '⤢' }}
+        <span class="editor-title">{{ editorTitle }}</span>
+        <button nz-button nzType="text" nzSize="small" (click)="toggleFullScreen()"
+            nz-tooltip="Toggle Full Screen (F11 or Ctrl+Enter)" class="expand-btn">
+            <span class="expand-icon">{{ isFullScreen ? '⊡' : '⊞' }}</span>
         </button>
     </div>
-
-    <div #editor class="sql-editor" [style.height]="editorHeight" [attr.aria-label]="'SQL Query Editor'">
+    <div class="editor-wrapper" [style.height]="editorHeight">
+        <div #editor class="editor"></div>
     </div>
 </div>

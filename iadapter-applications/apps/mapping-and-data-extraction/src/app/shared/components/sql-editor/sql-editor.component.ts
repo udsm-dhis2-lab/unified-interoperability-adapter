@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, S
 import { EditorView } from '@codemirror/view';
 import { EditorState } from '@codemirror/state';
 import { sql } from '@codemirror/lang-sql';
+import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { autocompletion, CompletionContext } from '@codemirror/autocomplete';
 import { basicSetup } from 'codemirror';
@@ -11,16 +12,17 @@ import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { FHIR_TABLE_SCHEMAS, TableSchema } from './table-schemas';
 
 @Component({
-    selector: 'app-sql-editor',
+    selector: 'app-code-editor',
     standalone: true,
     imports: [CommonModule, NzButtonModule, NzToolTipModule],
     templateUrl: './sql-editor.component.html',
     styleUrls: ['./sql-editor.component.css']
 })
-export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
+export class CodeEditorComponent implements OnInit, OnDestroy, OnChanges {
     @Input() value: string = '';
     @Input() height: string = '250px';
     @Input() theme: 'light' | 'dark' = 'dark';
+    @Input() language: 'sql' | 'javascript' = 'sql';
     @Input() tableSchema: { [tableName: string]: string[] } = FHIR_TABLE_SCHEMAS;
     @Output() valueChange = new EventEmitter<string>();
 
@@ -28,6 +30,10 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
 
     private editorView?: EditorView;
     public isFullScreen: boolean = false;
+
+    get editorTitle(): string {
+        return this.language === 'sql' ? 'SQL Query Editor' : 'JavaScript Function Editor';
+    }
 
     get editorHeight(): string {
         return this.isFullScreen ? '100%' : this.height;
@@ -42,7 +48,7 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
         if (changes['value'] && this.editorView && !changes['value'].firstChange) {
             const newValue = changes['value'].currentValue || '';
             const currentValue = this.editorView.state.doc.toString();
-            
+
             if (newValue !== currentValue) {
                 this.editorView.dispatch({
                     changes: {
@@ -93,14 +99,14 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
     private initializeEditor() {
         const extensions = [
             basicSetup,
-            sql(),
+            this.language === 'sql' ? sql() : javascript(),
             EditorView.updateListener.of((update) => {
                 if (update.docChanged) {
                     this.valueChange.emit(update.state.doc.toString());
                 }
             }),
             autocompletion({
-                override: [this.sqlCompletions.bind(this)]
+                override: [this.language === 'sql' ? this.sqlCompletions.bind(this) : this.jsCompletions.bind(this)]
             })
         ];
 
@@ -144,6 +150,62 @@ export class SqlEditorComponent implements OnInit, OnDestroy, OnChanges {
                 });
             }
         }
+
+        return {
+            from: word.from,
+            options
+        };
+    }
+
+    private jsCompletions(context: CompletionContext) {
+        const word = context.matchBefore(/\w*/);
+        if (!word) return null;
+
+        const options = [
+            // JavaScript keywords
+            { label: 'function', type: 'keyword', info: 'Function declaration' },
+            { label: 'return', type: 'keyword', info: 'Return statement' },
+            { label: 'if', type: 'keyword', info: 'Conditional statement' },
+            { label: 'else', type: 'keyword', info: 'Else clause' },
+            { label: 'for', type: 'keyword', info: 'For loop' },
+            { label: 'while', type: 'keyword', info: 'While loop' },
+            { label: 'const', type: 'keyword', info: 'Constant declaration' },
+            { label: 'let', type: 'keyword', info: 'Variable declaration' },
+            { label: 'var', type: 'keyword', info: 'Variable declaration' },
+
+            // Common data transformation methods
+            { label: '$dataParams', type: 'variable', info: 'Array of input parameters from selected fields' },
+            { label: 'join', type: 'method', info: 'Array.join() - Join array elements into string' },
+            { label: 'split', type: 'method', info: 'String.split() - Split string into array' },
+            { label: 'toUpperCase', type: 'method', info: 'Convert string to uppercase' },
+            { label: 'toLowerCase', type: 'method', info: 'Convert string to lowercase' },
+            { label: 'trim', type: 'method', info: 'Remove whitespace from string' },
+            { label: 'replace', type: 'method', info: 'Replace text in string' },
+            { label: 'substring', type: 'method', info: 'Extract substring' },
+            { label: 'indexOf', type: 'method', info: 'Find index of substring' },
+            { label: 'includes', type: 'method', info: 'Check if string contains substring' },
+
+            // Array methods
+            { label: 'map', type: 'method', info: 'Array.map() - Transform array elements' },
+            { label: 'filter', type: 'method', info: 'Array.filter() - Filter array elements' },
+            { label: 'find', type: 'method', info: 'Array.find() - Find first matching element' },
+            { label: 'forEach', type: 'method', info: 'Array.forEach() - Iterate over elements' },
+            { label: 'length', type: 'property', info: 'Array/String length property' },
+
+            // Date methods (useful for healthcare data)
+            { label: 'Date', type: 'class', info: 'Date constructor' },
+            { label: 'new Date()', type: 'constructor', info: 'Create new Date object' },
+            { label: 'getFullYear', type: 'method', info: 'Get year from date' },
+            { label: 'getMonth', type: 'method', info: 'Get month from date (0-11)' },
+            { label: 'getDate', type: 'method', info: 'Get day of month from date' },
+
+            // Common patterns for healthcare data
+            { label: 'parseInt', type: 'function', info: 'Parse string to integer' },
+            { label: 'parseFloat', type: 'function', info: 'Parse string to float' },
+            { label: 'isNaN', type: 'function', info: 'Check if value is NaN' },
+            { label: 'JSON.stringify', type: 'method', info: 'Convert object to JSON string' },
+            { label: 'JSON.parse', type: 'method', info: 'Parse JSON string to object' }
+        ];
 
         return {
             from: word.from,

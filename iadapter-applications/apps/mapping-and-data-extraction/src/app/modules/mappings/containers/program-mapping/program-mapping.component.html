@@ -69,11 +69,8 @@
 
                                 <!-- Error message -->
                                 <div class="error-data" *ngIf="hasError && !isLoading">
-                                    <nz-alert nzType="error" 
-                                              [nzMessage]="errorMessage" 
-                                              nzShowIcon 
-                                              [nzAction]="retryTemplate"
-                                              style="margin: 16px 0;">
+                                    <nz-alert nzType="error" [nzMessage]="errorMessage" nzShowIcon
+                                        [nzAction]="retryTemplate" style="margin: 16px 0;">
                                     </nz-alert>
                                     <ng-template #retryTemplate>
                                         <button nz-button nzType="primary" nzSize="small" (click)="loadProgramData()">
@@ -101,92 +98,113 @@
                     <nz-card>
                         <!-- Selected Field Info -->
                         <div class="selected-field-info" *ngIf="selectedDataElement">
-                            <h4>Selected Field</h4>
+                            <h4>Selected Field: {{ selectedDataElement.displayName }}</h4>
                             <div class="field-details">
-                                <p><strong>Display Name:</strong> {{ selectedDataElement.displayName }}</p>
                                 <p><strong>Form Name:</strong> {{ selectedDataElement.formName || 'N/A' }}</p>
                                 <p><strong>Internal Name:</strong> {{ selectedDataElement.name }}</p>
                                 <p><strong>ID:</strong> {{ selectedDataElement.id }}</p>
+                                <p *ngIf="selectedDataElement.type"><strong>Type:</strong> {{ selectedDataElement.type
+                                    }}</p>
+                                <div *ngIf="selectedDataElement.optionSet" class="option-set-info">
+                                    <p><strong>Option Set:</strong> {{ selectedDataElement.optionSet.name }}</p>
+                                    <div class="options-list">
+                                        <nz-tag *ngFor="let option of selectedDataElement.optionSet.options"
+                                            [nzColor]="'blue'">
+                                            {{ option.name }} ({{ option.code }})
+                                        </nz-tag>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Mapping Configuration Placeholder -->
-                        <div class="mapping-configuration" *ngIf="selectedDataElement">
+                        <!-- Mapping Configuration -->
+                        <!-- Mapping Configuration -->
+                        <div class="mapping-configuration"
+                            *ngIf="selectedDataElement && currentMapping && rightColumnSpan === 16">
                             <nz-divider></nz-divider>
                             <h4>Mapping Configuration</h4>
 
-                            <!-- Data Source Mapping -->
-                            <div class="mapping-section">
-                                <h5>Data Source Mapping</h5>
-                                <nz-form-item>
-                                    <nz-form-label>Source Table</nz-form-label>
-                                    <nz-form-control>
-                                        <nz-select nzPlaceHolder="Select source table" style="width: 100%">
-                                            <nz-option nzValue="encounter_flat" nzLabel="encounter_flat"></nz-option>
-                                            <nz-option nzValue="patient_flat" nzLabel="patient_flat"></nz-option>
-                                            <nz-option nzValue="observation_flat"
-                                                nzLabel="observation_flat"></nz-option>
-                                        </nz-select>
-                                    </nz-form-control>
-                                </nz-form-item>
+                            <!-- Junction Operator (when multiple fields) -->
+                            <div class="mapping-section" *ngIf="selectedDataParams.length > 1">
+                                <h5>Junction Operator</h5>
+                                <nz-select [(ngModel)]="junctionOperator"
+                                    (ngModelChange)="updateJunctionOperator($event)" style="width: 100%">
+                                    <nz-option nzValue="SPACE" nzLabel="Space"></nz-option>
+                                    <nz-option nzValue="COMMA" nzLabel="Comma (,)"></nz-option>
+                                    <nz-option nzValue="HYPHEN" nzLabel="Hyphen (-)"></nz-option>
+                                    <nz-option nzValue="UNDERSCORE" nzLabel="Underscore (_)"></nz-option>
+                                    <nz-option nzValue="PIPE" nzLabel="Pipe (|)"></nz-option>
+                                </nz-select>
+                            </div>
 
+                            <!-- Custom Script Section -->
+                            <div class="mapping-section">
+                                <div class="section-header-with-action">
+                                    <h5>Data Source Fields</h5>
+                                    <button nz-button nzType="dashed" nzSize="small" (click)="addDataParam()">
+                                        <span nz-icon nzType="plus"></span>
+                                        Add Field
+                                    </button>
+                                </div>
+
+                                <!-- Data Parameters -->
+                                <div class="data-params-list">
+                                    <div class="data-param-item"
+                                        *ngFor="let param of selectedDataParams; let i = index">
+                                        <div class="param-header">
+                                            <h6>Parameter {{ i + 1 }} ($dataParams[{{ i }}])</h6>
+                                            <button nz-button nzType="text" nzDanger nzSize="small"
+                                                (click)="removeDataParam(i)">
+                                                <span nz-icon nzType="delete"></span>
+                                            </button>
+                                        </div>
+
+                                        <nz-form-item>
+                                            <nz-form-label>Source Field</nz-form-label>
+                                            <nz-form-control>
+                                                <nz-select [ngModel]="param.value.code"
+                                                    (ngModelChange)="onDataParamFieldChange(i, $event)"
+                                                    nzPlaceHolder="Select source field" style="width: 100%">
+                                                    <nz-option *ngFor="let field of dataTemplateFields"
+                                                        [nzValue]="field.code"
+                                                        [nzLabel]="field.label + ' (' + field.block + ')'">
+                                                    </nz-option>
+                                                </nz-select>
+                                            </nz-form-control>
+                                        </nz-form-item>
+                                    </div>
+                                </div>
+
+                                <!-- Custom JavaScript Function Editor -->
                                 <nz-form-item>
-                                    <nz-form-label>Source Field</nz-form-label>
+                                    <nz-form-label>Custom JavaScript Function</nz-form-label>
                                     <nz-form-control>
-                                        <nz-select nzPlaceHolder="Select source field" style="width: 100%">
-                                            <nz-option nzValue="patient_id" nzLabel="patient_id"></nz-option>
-                                            <nz-option nzValue="encounter_id" nzLabel="encounter_id"></nz-option>
-                                            <nz-option nzValue="obs_value" nzLabel="obs_value"></nz-option>
-                                        </nz-select>
+                                        <app-code-editor [value]="customScript"
+                                            (valueChange)="updateCustomScript($event)" [height]="'200px'"
+                                            [theme]="'dark'" [language]="'javascript'">
+                                        </app-code-editor>
                                     </nz-form-control>
                                 </nz-form-item>
                             </div>
 
-                            <!-- Transformation Rules -->
-                            <div class="mapping-section">
-                                <h5>Transformation Rules</h5>
-                                <nz-form-item>
-                                    <nz-form-label>Data Type</nz-form-label>
-                                    <nz-form-control>
-                                        <nz-select nzPlaceHolder="Select data type" style="width: 100%">
-                                            <nz-option nzValue="TEXT" nzLabel="Text"></nz-option>
-                                            <nz-option nzValue="NUMBER" nzLabel="Number"></nz-option>
-                                            <nz-option nzValue="DATE" nzLabel="Date"></nz-option>
-                                            <nz-option nzValue="BOOLEAN" nzLabel="Boolean"></nz-option>
-                                        </nz-select>
-                                    </nz-form-control>
-                                </nz-form-item>
-
-                                <nz-form-item>
-                                    <nz-form-label>Default Value</nz-form-label>
-                                    <nz-form-control>
-                                        <input nz-input placeholder="Enter default value (optional)" />
-                                    </nz-form-control>
-                                </nz-form-item>
-                            </div>
-
-                            <!-- Validation Rules -->
-                            <div class="mapping-section">
-                                <h5>Validation Rules</h5>
-                                <nz-form-item>
-                                    <nz-form-control>
-                                        <label nz-checkbox>Required Field</label>
-                                    </nz-form-control>
-                                </nz-form-item>
-
-                                <nz-form-item>
-                                    <nz-form-control>
-                                        <label nz-checkbox>Apply Data Validation</label>
-                                    </nz-form-control>
-                                </nz-form-item>
+                            <!-- Mapping Preview -->
+                            <div class="mapping-section" *ngIf="currentMapping">
+                                <h5>Mapping Preview</h5>
+                                <div class="mapping-preview">
+                                    <pre>{{ currentMapping | json }}</pre>
+                                </div>
                             </div>
 
                             <!-- Action Buttons -->
                             <div class="mapping-actions">
-                                <button nz-button nzType="primary" style="margin-right: 8px;">
+                                <button nz-button nzType="primary" (click)="saveMapping()"
+                                    [disabled]="!currentMapping || selectedDataParams.length === 0"
+                                    style="margin-right: 8px;">
+                                    <span nz-icon nzType="save"></span>
                                     Save Mapping
                                 </button>
                                 <button nz-button nzType="default" (click)="clearSelection()">
+                                    <span nz-icon nzType="clear"></span>
                                     Clear Selection
                                 </button>
                             </div>
