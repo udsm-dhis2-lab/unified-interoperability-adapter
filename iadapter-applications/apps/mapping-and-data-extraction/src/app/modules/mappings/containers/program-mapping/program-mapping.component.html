@@ -105,15 +105,8 @@
                                 <p><strong>ID:</strong> {{ selectedDataElement.id }}</p>
                                 <p *ngIf="selectedDataElement.type"><strong>Type:</strong> {{ selectedDataElement.type
                                     }}</p>
-                                <div *ngIf="selectedDataElement.optionSet" class="option-set-info">
-                                    <p><strong>Option Set:</strong> {{ selectedDataElement.optionSet.name }}</p>
-                                    <div class="options-list">
-                                        <nz-tag *ngFor="let option of selectedDataElement.optionSet.options"
-                                            [nzColor]="'blue'">
-                                            {{ option.name }} ({{ option.code }})
-                                        </nz-tag>
-                                    </div>
-                                </div>
+                                <p *ngIf="selectedDataElement.optionSet"><strong>Option Set:</strong> {{
+                                    selectedDataElement.optionSet.name }}</p>
                             </div>
                         </div>
 
@@ -172,6 +165,55 @@
                                                 </nz-select>
                                             </nz-form-control>
                                         </nz-form-item>
+
+                                        <!-- Option Set Mappings for selected data element with option set -->
+                                        <div *ngIf="selectedDataElement?.optionSet" class="code-mappings">
+                                            <div class="section-header-with-action">
+                                                <h6>Option Set Mappings</h6>
+                                                <button nz-button nzType="text" nzSize="small"
+                                                    (click)="toggleOptionMappings(i)"
+                                                    nz-tooltip="Toggle option mappings visibility">
+                                                    <span nz-icon
+                                                        [nzType]="param.showOptionMappings ? 'eye-invisible' : 'eye'"
+                                                        nzTheme="outline"></span>
+                                                    {{ param.showOptionMappings ? 'Hide' : 'Show' }} Mappings
+                                                    <nz-tag
+                                                        *ngIf="!param.showOptionMappings && (param.mappings?.length || 0) > 0"
+                                                        nzSize="small" [nzColor]="'blue'">
+                                                        {{ param.mappings?.length || 0 }} mapped
+                                                    </nz-tag>
+                                                </button>
+                                            </div>
+                                            <p class="mapping-description" *ngIf="param.showOptionMappings">
+                                                Map source field values to option set codes:
+                                            </p>
+
+                                            <div class="option-set-mappings" *ngIf="param.showOptionMappings">
+                                                <div class="mapping-item"
+                                                    *ngFor="let option of selectedDataElement.optionSet.options; let optionIndex = index">
+                                                    <div class="mapping-header">
+                                                        <h6>{{ option.name }} ({{ option.code }})</h6>
+                                                        <button nz-button nzType="text" nzDanger nzSize="small"
+                                                            (click)="removeOptionMapping(i, optionIndex)"
+                                                            *ngIf="getOptionMapping(i, option.code)">
+                                                            <span nz-icon nzType="delete"></span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="mapping-target">
+                                                        Target: {{ option.code }}
+                                                    </div>
+                                                    <nz-form-item>
+                                                        <nz-form-label>Input Values (comma-separated)</nz-form-label>
+                                                        <nz-form-control>
+                                                            <textarea rows="3" nz-input
+                                                                [ngModel]="getOptionMappingInputCodes(i, option.code)"
+                                                                (ngModelChange)="updateOptionMapping(i, option.code, $event)"
+                                                                placeholder="Enter comma-separated input values that should map to {{ option.code }}&#10;Example: Yes, true, 1, positive"></textarea>
+                                                        </nz-form-control>
+                                                    </nz-form-item>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

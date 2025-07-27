@@ -49,6 +49,7 @@ export interface DataParam {
         block: string;
     };
     mappings?: CodeMapping[];
+    showOptionMappings?: boolean;
 }
 
 export interface CodeMapping {
@@ -266,7 +267,8 @@ export class ProgramMappingComponent implements OnInit {
                 code: '',
                 type: '',
                 block: ''
-            }
+            },
+            showOptionMappings: true
         };
 
         this.selectedDataParams.push(newParam);
@@ -327,6 +329,72 @@ export class ProgramMappingComponent implements OnInit {
     updateCustomScript(script: string): void {
         this.customScript = script;
         this.updateMappingStructure();
+    }
+
+    getOptionMapping(paramIndex: number, optionCode: string): CodeMapping | undefined {
+        if (!this.selectedDataParams[paramIndex]?.mappings) {
+            return undefined;
+        }
+        return this.selectedDataParams[paramIndex].mappings!.find(mapping => mapping.outputCode === optionCode);
+    }
+
+    getOptionMappingInputCodes(paramIndex: number, optionCode: string): string {
+        const mapping = this.getOptionMapping(paramIndex, optionCode);
+        return mapping ? mapping.inputCodes.join(', ') : '';
+    }
+
+    updateOptionMapping(paramIndex: number, optionCode: string, inputText: string): void {
+        if (!this.selectedDataParams[paramIndex]) return;
+
+        // Initialize mappings array if it doesn't exist
+        if (!this.selectedDataParams[paramIndex].mappings) {
+            this.selectedDataParams[paramIndex].mappings = [];
+        }
+
+        const mappings = this.selectedDataParams[paramIndex].mappings!;
+        let mapping = mappings.find(m => m.outputCode === optionCode);
+
+        if (!mapping) {
+            // Create new mapping if it doesn't exist
+            mapping = {
+                inputCodes: [],
+                operator: 'IN',
+                outputCode: optionCode
+            };
+            mappings.push(mapping);
+        }
+
+        // Update input codes
+        mapping.inputCodes = inputText.split(',').map(s => s.trim()).filter(s => s);
+
+        // Remove mapping if no input codes
+        if (mapping.inputCodes.length === 0) {
+            const index = mappings.indexOf(mapping);
+            if (index > -1) {
+                mappings.splice(index, 1);
+            }
+        }
+
+        this.updateMappingStructure();
+    }
+
+    removeOptionMapping(paramIndex: number, optionIndex: number): void {
+        if (!this.selectedDataElement?.optionSet?.options || !this.selectedDataParams[paramIndex]?.mappings) return;
+
+        const optionCode = this.selectedDataElement.optionSet.options[optionIndex].code;
+        const mappings = this.selectedDataParams[paramIndex].mappings!;
+        const mappingIndex = mappings.findIndex(m => m.outputCode === optionCode);
+
+        if (mappingIndex > -1) {
+            mappings.splice(mappingIndex, 1);
+            this.updateMappingStructure();
+        }
+    }
+
+    toggleOptionMappings(paramIndex: number): void {
+        if (this.selectedDataParams[paramIndex]) {
+            this.selectedDataParams[paramIndex].showOptionMappings = !this.selectedDataParams[paramIndex].showOptionMappings;
+        }
     }
 
     saveMapping(): void {

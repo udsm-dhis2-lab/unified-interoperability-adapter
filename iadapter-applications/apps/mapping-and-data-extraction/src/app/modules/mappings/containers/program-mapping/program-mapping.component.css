@@ -282,9 +282,20 @@
     border-top: 1px solid #e8e8e8;
 }
 
+.mapping-description {
+    margin-bottom: 16px;
+    color: #666;
+    font-size: 13px;
+    font-style: italic;
+}
+
 .option-set-mappings,
 .custom-code-mappings {
     margin-top: 12px;
+}
+
+.option-set-mappings {
+    transition: all 0.3s ease;
 }
 
 .mapping-item {

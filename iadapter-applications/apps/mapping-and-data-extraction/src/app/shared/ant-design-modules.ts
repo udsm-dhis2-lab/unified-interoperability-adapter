@@ -23,7 +23,6 @@ import { NzResultModule } from 'ng-zorro-antd/result';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 
-
 export const antDesignModules = [
   NzLayoutModule,
   NzMenuModule,
