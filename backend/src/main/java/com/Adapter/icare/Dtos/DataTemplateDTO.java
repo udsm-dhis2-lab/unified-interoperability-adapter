@@ -11,7 +11,7 @@ import java.util.Map;
 @Setter
 public class DataTemplateDTO {
     @NotNull(message = "templateDetails field is required")
-    private Map<String,Object> templateDetails;
+    private TemplateDetailsDTO templateDetails;
     @NotNull(message = "data field is required")
     private DataTemplateDataDTO data;
 

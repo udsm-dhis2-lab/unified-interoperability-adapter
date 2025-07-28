@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -29,6 +30,8 @@ import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.UserService;
+
+import javax.xml.crypto.Data;
 
 @RestController
 @RequestMapping("/api/v1/datastore")
@@ -194,6 +197,80 @@ public class DatastoreController {
             return ResponseEntity.ok(datastoreService.updateDatastore(datastoreData).toMap());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
+    @PutMapping(value = "namespace", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> updateDatastoreNamespace(
+            @RequestBody Map<String, Object> namespacesObject
+    ) throws Exception {
+        try {
+            String oldNamespace = null;
+            String newNamespace = null;
+
+            if (namespacesObject.containsKey("oldNamespace") && namespacesObject.get("oldNamespace") instanceof String) {
+                oldNamespace = (String) namespacesObject.get("oldNamespace");
+            }
+
+            if (namespacesObject.containsKey("newNamespace") && namespacesObject.get("newNamespace") instanceof String) {
+                newNamespace = (String) namespacesObject.get("newNamespace");
+            }
+
+            if(oldNamespace == null || newNamespace == null || oldNamespace.isEmpty() || newNamespace.isEmpty()){
+                throw new DataFormatException("Old Namespace and New Namespace should be specified in your request body!");
+            }
+
+            List<Datastore> existingNamespace = datastoreService.getDatastoreNamespaceDetails(newNamespace);
+
+            if(!existingNamespace.isEmpty()){
+                throw new DataFormatException("New namespace is already existing!");
+            }
+
+
+            Integer updatedRecords = datastoreService.updateDatastoreNamespace(oldNamespace, newNamespace);
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "Namespace updated successfully!");
+            responseMap.put("value", updatedRecords + " number of records using this namespace where updated!");
+            return ResponseEntity.ok().body(responseMap);
+        } catch (DataFormatException e) {
+            Map<String, Object> errorMap = new HashMap<String, Object>();
+            System.out.println("UPDATE_DATA_STORE_NAMESPACE_ERROR " + e);
+            errorMap.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+        }
+        catch (Exception e) {
+            Map<String, Object> errorMap = new HashMap<String, Object>();
+            System.out.println("UPDATE_DATA_STORE_NAMESPACE_ERROR " + e);
+            errorMap.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
+        }
+    }
+
+    @DeleteMapping(value = "namespace/{namespace}")
+    public ResponseEntity<Map<String, Object>> updateDatastoreNamespace(
+            @PathVariable("namespace") String namespace
+    ) throws Exception {
+        try {
+            if(namespace == null || namespace.isEmpty()){
+                throw new DataFormatException("Namespace should be specified!");
+            }
+            Integer updatedRecords = datastoreService.deleteDatastoreByNamespace(namespace);
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "Namespace deleted successfully!");
+            responseMap.put("value", updatedRecords + " number of records using this namespace where updated!");
+            return ResponseEntity.ok(responseMap);
+        } catch (DataFormatException e) {
+            Map<String, Object> errorMap = new HashMap<String, Object>();
+            System.out.println("DELETE_DATA_STORE_NAMESPACE_ERROR " + e);
+            errorMap.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMap);
+        }
+        catch (Exception e) {
+            Map<String, Object> errorMap = new HashMap<String, Object>();
+            System.out.println("DELETE_DATA_STORE_NAMESPACE_ERROR " + e);
+            errorMap.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMap);
         }
     }
 
