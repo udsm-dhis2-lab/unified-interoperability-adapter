@@ -8,12 +8,18 @@ import {
     UnknownException,
     InternalServerException,
 } from '../../../../../../../libs/models';
+import { MappingsUrls } from '../models/constants/mappings-urls';
+import { BaseMappingService } from './base-mapping.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class ProgramManagementService {
-    constructor(private httpClient: HduHttpService) { }
+
+    constructor(
+        private httpClient: HduHttpService,
+        private baseMappingService: BaseMappingService
+    ) { }
 
     getPrograms(
         pageIndex: number,
@@ -44,6 +50,24 @@ export class ProgramManagementService {
             .pipe(
                 catchError((error: any) => this.handleError(error))
             );
+    }
+
+    // Program Mapping Methods
+    addProgramMapping(payLoad: any): Observable<any> {
+        return this.baseMappingService.addMapping(payLoad, MappingsUrls.HDU_PROGRAM_MAPPINGS);
+    }
+
+    getExistingProgramMapping(dataElementUuid: string, programId: string, instanceId: string): Observable<any> {
+        const namespace = `PROGRAM-${programId}`;
+        return this.baseMappingService.getExistingMapping(dataElementUuid, namespace, MappingsUrls.HDU_PROGRAM_MAPPINGS);
+    }
+
+    updateProgramMapping(payLoad: any, mappingUuid: string): Observable<any> {
+        return this.baseMappingService.updateMapping(payLoad, mappingUuid, MappingsUrls.HDU_PROGRAM_MAPPINGS);
+    }
+
+    deleteProgramMapping(mappingUuid: string): Observable<any> {
+        return this.baseMappingService.deleteMapping(mappingUuid, MappingsUrls.HDU_PROGRAM_MAPPINGS);
     }
 
     private buildHttpParams(

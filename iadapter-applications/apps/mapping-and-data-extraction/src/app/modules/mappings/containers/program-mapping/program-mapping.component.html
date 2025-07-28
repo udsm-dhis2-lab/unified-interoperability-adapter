@@ -98,7 +98,13 @@
                     <nz-card>
                         <!-- Selected Field Info -->
                         <div class="selected-field-info" *ngIf="selectedDataElement">
-                            <h4>Selected Field: {{ selectedDataElement.displayName }}</h4>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Selected Field: {{ selectedDataElement.displayName }}</h4>
+                                <nz-tag *ngIf="mappingUuid" [nzColor]="'green'">
+                                    <span nz-icon nzType="check-circle"></span>
+                                    Mapped
+                                </nz-tag>
+                            </div>
                             <div class="field-details">
                                 <p><strong>Form Name:</strong> {{ selectedDataElement.formName || 'N/A' }}</p>
                                 <p><strong>Internal Name:</strong> {{ selectedDataElement.name }}</p>
@@ -190,7 +196,7 @@
 
                                             <div class="option-set-mappings" *ngIf="param.showOptionMappings">
                                                 <div class="mapping-item"
-                                                    *ngFor="let option of selectedDataElement.optionSet.options; let optionIndex = index">
+                                                    *ngFor="let option of selectedDataElement?.optionSet?.options; let optionIndex = index">
                                                     <div class="mapping-header">
                                                         <h6>{{ option.name }} ({{ option.code }})</h6>
                                                         <button nz-button nzType="text" nzDanger nzSize="small"
@@ -241,9 +247,17 @@
                             <div class="mapping-actions">
                                 <button nz-button nzType="primary" (click)="saveMapping()"
                                     [disabled]="!currentMapping || selectedDataParams.length === 0"
+                                    [nzLoading]="isSubmittingMapping"
                                     style="margin-right: 8px;">
-                                    <span nz-icon nzType="save"></span>
-                                    Save Mapping
+                                    <span nz-icon nzType="save" *ngIf="!isSubmittingMapping"></span>
+                                    {{ mappingUuid ? 'Update' : 'Save' }} Mapping
+                                </button>
+                                <button nz-button nzType="default" nzDanger (click)="deleteMapping()"
+                                    *ngIf="mappingUuid"
+                                    [nzLoading]="isDeletingMapping"
+                                    style="margin-right: 8px;">
+                                    <span nz-icon nzType="delete" *ngIf="!isDeletingMapping"></span>
+                                    Delete Mapping
                                 </button>
                                 <button nz-button nzType="default" (click)="clearSelection()">
                                     <span nz-icon nzType="clear"></span>
@@ -269,7 +283,13 @@
         </nz-card>
 
         <!-- Alert for user feedback -->
-        <nz-alert *ngIf="false" nzType="success" nzMessage="Mapping saved successfully!" nzShowIcon nzCloseable
-            style="margin-top: 16px;"></nz-alert>
+        <nz-alert *ngIf="alert.show" 
+            [nzType]="alert.type === 'success' ? 'success' : alert.type === 'error' ? 'error' : alert.type === 'warning' ? 'warning' : 'info'"
+            [nzMessage]="alert.message" 
+            (nzOnClose)="onCloseAlert()" 
+            nzShowIcon 
+            nzCloseable
+            style="margin-top: 16px;">
+        </nz-alert>
     </div>
 </nz-spin>

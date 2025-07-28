@@ -19,6 +19,7 @@ import {
 import { CategoryOptionCombo } from '../models/category-option-combo.model';
 import { Endpoints } from '../../../shared';
 import { MsdCodePage } from '../models/responses/msd-code-page';
+import { BaseMappingService } from './base-mapping.service';
 
 @Injectable({
   providedIn: 'root',
@@ -27,13 +28,12 @@ export class DatasetManagementService {
   instanceUrl: string = Endpoints.INSTANCES;
   dataSetByIdUrl: string = MappingsUrls.GET_DATASET_BY_ID;
   configurationUrl: string = MappingsUrls.CONFIGURATIONS;
-  addMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
-  getMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
-  updateMappingsUrl: string = MappingsUrls.HDU_MAPPINGS;
-  deleteMappingUrl: string = MappingsUrls.HDU_MAPPINGS;
   getFlatViewsTablesUrl: string = MappingsUrls.GET_FLAT_VIEWS_TABLES;
 
-  constructor(private httpClient: HduHttpService) { }
+  constructor(
+    private httpClient: HduHttpService,
+    private baseMappingService: BaseMappingService
+  ) { }
 
   getDatasets(
     pageIndex: number,
@@ -224,44 +224,20 @@ export class DatasetManagementService {
   }
 
   addMappings(payLoad: any): Observable<any> {
-    return this.httpClient.post<any>(this.addMappingsUrl, payLoad).pipe(
-      // TODO: return response
-      map((response: any) => console.log(response)),
-      catchError((error: any) => this.handleError(error))
-    );
+    return this.baseMappingService.addMapping(payLoad, MappingsUrls.HDU_MAPPINGS);
   }
 
-  getExistingMappings(dataElementUud: string, datasetUuid: string) {
-    return this.httpClient
-      .get<any>(
-        `${MappingsUrls.HDU_MAPPINGS}/MAPPINGS-${datasetUuid}/${dataElementUud}`
-      )
-      .pipe(
-        map((response: any) => {
-          return response;
-        }),
-        catchError((error: any) => this.handleError(error))
-      );
+  getExistingMappings(dataElementUud: string, datasetUuid: string): Observable<any> {
+    const namespace = `MAPPINGS-${datasetUuid}`;
+    return this.baseMappingService.getExistingMapping(dataElementUud, namespace, MappingsUrls.HDU_MAPPINGS);
   }
 
   updateMappings(payLoad: any, mappingUuid: string): Observable<any> {
-    return this.httpClient
-      .put<any>(`${this.updateMappingsUrl}/${mappingUuid}`, payLoad)
-      .pipe(
-        // TODO: return response
-        map((response: any) => console.log(response)),
-        catchError((error: any) => this.handleError(error))
-      );
+    return this.baseMappingService.updateMapping(payLoad, mappingUuid, MappingsUrls.HDU_MAPPINGS);
   }
 
   deleteMapping(mappingUuid: string): Observable<any> {
-    return this.httpClient
-      .delete<any>(`${this.deleteMappingUrl}/${mappingUuid}`, {})
-      .pipe(
-        // TODO: return response
-        map((response: any) => console.log(response)),
-        catchError((error: any) => this.handleError(error))
-      );
+    return this.baseMappingService.deleteMapping(mappingUuid, MappingsUrls.HDU_MAPPINGS);
   }
 
   private buildHttpParams(

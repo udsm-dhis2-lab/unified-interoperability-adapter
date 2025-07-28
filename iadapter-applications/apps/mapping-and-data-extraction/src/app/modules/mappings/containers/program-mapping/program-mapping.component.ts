@@ -137,6 +137,16 @@ export class ProgramMappingComponent implements OnInit {
     showCodedMappings: boolean = false;
     showCustomScript: boolean = false;
 
+    // Mapping management properties
+    isSubmittingMapping = false;
+    isDeletingMapping = false;
+    mappingUuid?: string;
+    alert = {
+        show: false,
+        type: '',
+        message: '',
+    };
+
     // Mock data template fields (in real app, this would come from API)
     dataTemplateFields = [
         { code: 'reportingDateTime', type: 'DATETIME', block: 'reportingDetails', label: 'Reporting Date Time' },
@@ -212,8 +222,10 @@ export class ProgramMappingComponent implements OnInit {
         // Initialize mapping when element is selected
         if (this.selectedDataElement) {
             this.initializeMapping();
+            this.loadExistingMapping();
         } else {
             this.currentMapping = null;
+            this.mappingUuid = undefined;
         }
     }
 
@@ -227,14 +239,14 @@ export class ProgramMappingComponent implements OnInit {
                     id: this.selectedDataElement.id,
                     name: this.selectedDataElement.displayName,
                     programStage: this.firstProgramStage?.id || '',
-                    program: this.programData?.programStages?.[0]?.id || '',
+                    program: this.programId,
                     code: this.selectedDataElement.code || '',
-                    type: this.selectedDataElement.type || 'TEXT'
+                    type: this.selectedDataElement.type || ''
                 },
                 dataParams: [],
                 junctionOperator: this.junctionOperator
             },
-            namespace: `MAPPINGS-${this.programId}`,
+            namespace: `PROGRAM-${this.programId}`,
             description: '',
             group: null
         };
@@ -280,6 +292,18 @@ export class ProgramMappingComponent implements OnInit {
         this.updateMappingStructure();
     }
 
+    addDataParamField(index: number): void {
+        if (!this.selectedDataParams[index]) return;
+
+        const newField = this.dataTemplateFields[0]; // Default to first field for simplicity
+        this.selectedDataParams[index].value = {
+            code: newField.code,
+            type: newField.type,
+            block: newField.block
+        };
+        this.updateMappingStructure();
+    }
+
     updateDataParam(index: number, field: any): void {
         if (this.selectedDataParams[index]) {
             this.selectedDataParams[index].value = {
@@ -295,29 +319,6 @@ export class ProgramMappingComponent implements OnInit {
         const field = this.dataTemplateFields.find(f => f.code === fieldCode);
         if (field) {
             this.updateDataParam(index, field);
-        }
-    }
-
-    updateInputCodes(mapping: CodeMapping, inputText: string): void {
-        mapping.inputCodes = inputText.split(',').map(s => s.trim()).filter(s => s);
-        this.updateMappingStructure();
-    }
-
-    isFieldAlreadySelected(fieldCode: string, currentIndex: number): boolean {
-        return this.selectedDataParams.some((p, idx) => idx !== currentIndex && p.value.code === fieldCode);
-    }
-
-    addCodeMapping(paramIndex: number): void {
-        if (this.selectedDataParams[paramIndex]) {
-            if (!this.selectedDataParams[paramIndex].mappings) {
-                this.selectedDataParams[paramIndex].mappings = [];
-            }
-            this.selectedDataParams[paramIndex].mappings!.push({
-                inputCodes: [],
-                operator: 'IN',
-                outputCode: ''
-            });
-            this.updateMappingStructure();
         }
     }
 
@@ -391,6 +392,62 @@ export class ProgramMappingComponent implements OnInit {
         }
     }
 
+    loadExistingMapping(): void {
+        if (!this.selectedDataElement || !this.programId || !this.instanceId) return;
+
+        this.programManagementService
+            .getExistingProgramMapping(this.selectedDataElement.id, this.programId, this.instanceId)
+            .subscribe({
+                next: (data: any) => {
+                    if (!data || data.uuid === null) return;
+
+                    this.mappingUuid = data.uuid;
+
+                    const mappingData = data.value || data.mapping || data;
+
+                    if (mappingData) {
+                        if (mappingData.dataParams?.length > 0) {
+                            this.selectedDataParams = mappingData.dataParams;
+                        }
+
+                        if (mappingData.junctionOperator) {
+                            this.junctionOperator = mappingData.junctionOperator;
+                        }
+
+                        if (mappingData.customScript) {
+                            this.customScript = mappingData.customScript;
+                        }
+
+                        this.updateMappingStructure();
+                    }
+                },
+                error: (error: any) => {
+                    this.mappingUuid = undefined;
+                }
+            });
+    }
+
+    createMappingPayload(): any {
+        if (!this.currentMapping) return null;
+
+        const payload = {
+            uuid: this.mappingUuid,
+            dataKey: this.currentMapping.dataKey,
+            mapping: {
+                dataElement: this.currentMapping.mapping.dataElement,
+                dataParams: this.selectedDataParams,
+                junctionOperator: this.junctionOperator,
+                customScript: this.customScript && this.customScript.trim() ? this.customScript : undefined
+            },
+            namespace: this.currentMapping.namespace,
+            description: this.currentMapping.description || `Mapping for ${this.selectedDataElement?.displayName}`,
+            group: this.currentMapping.group,
+            programId: this.programId,
+            instanceId: this.instanceId
+        };
+        return payload;
+    }
+
     toggleOptionMappings(paramIndex: number): void {
         if (this.selectedDataParams[paramIndex]) {
             this.selectedDataParams[paramIndex].showOptionMappings = !this.selectedDataParams[paramIndex].showOptionMappings;
@@ -400,20 +457,71 @@ export class ProgramMappingComponent implements OnInit {
     saveMapping(): void {
         if (!this.currentMapping) return;
 
-        if (!this.currentMapping.uuid) {
-            this.currentMapping.uuid = this.generateUUID();
+        this.isSubmittingMapping = true;
+        const payLoad = this.createMappingPayload();
+
+        if (!payLoad) {
+            this.isSubmittingMapping = false;
+            this.showAlert('error', 'Failed to create mapping payload');
+            return;
         }
 
-        console.log('Saving mapping:', JSON.stringify(this.currentMapping, null, 2));
-        // TODO: Implement actual save logic
+        let action$;
+        if (this.mappingUuid) {
+            action$ = this.programManagementService.updateProgramMapping(payLoad, this.mappingUuid);
+        } else {
+            action$ = this.programManagementService.addProgramMapping(payLoad);
+        }
+
+        action$.subscribe({
+            next: (data: any) => {
+                this.isSubmittingMapping = false;
+                this.mappingUuid = data.uuid || this.mappingUuid;
+                this.showAlert('success', 'Program mapping saved successfully!');
+            },
+            error: (error: any) => {
+                this.isSubmittingMapping = false;
+                this.showAlert('error', error?.message || 'Failed to save mapping');
+                console.error('Error saving mapping:', error);
+            }
+        });
     }
 
-    generateUUID(): string {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            const r = Math.random() * 16 | 0;
-            const v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
+    deleteMapping(): void {
+        if (!this.mappingUuid) return;
+
+        this.isDeletingMapping = true;
+        this.programManagementService.deleteProgramMapping(this.mappingUuid).subscribe({
+            next: (data: any) => {
+                this.isDeletingMapping = false;
+                this.mappingUuid = undefined;
+                this.showAlert('success', 'Program mapping deleted successfully!');
+
+                // Clear the mapping data
+                this.selectedDataParams = [];
+                this.customScript = '';
+                this.junctionOperator = '';
+                this.updateMappingStructure();
+            },
+            error: (error: any) => {
+                this.isDeletingMapping = false;
+                this.showAlert('error', error?.message || 'Failed to delete mapping');
+                console.error('Error deleting mapping:', error);
+            }
         });
+    }
+
+    showAlert(type: 'success' | 'info' | 'error' | 'warning', message: string): void {
+        this.alert = { show: true, type, message };
+        setTimeout(() => this.onCloseAlert(), 5000);
+    }
+
+    onCloseAlert(): void {
+        this.alert = {
+            show: false,
+            type: '',
+            message: '',
+        };
     }
 
     clearSelection(): void {
@@ -426,6 +534,8 @@ export class ProgramMappingComponent implements OnInit {
         this.customScript = '';
         this.showCodedMappings = false;
         this.showCustomScript = false;
+        this.mappingUuid = undefined;
+        this.junctionOperator = '';
     }
 
     onCollapse(): void {
