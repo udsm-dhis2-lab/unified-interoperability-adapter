@@ -1,6 +1,7 @@
 package com.Adapter.icare.Dtos;
 
-import com.Adapter.icare.Enums.SpecimenAcceptanceStatus;
+import com.Adapter.icare.Enums.RequestTypeCode;
+import com.Adapter.icare.Enums.SpecimentCollectedFrom;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,14 +20,13 @@ public class LabRequestDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date dateOccurred;
     private String specimenID;
-    private String typeOfSpecimen;
-    private String specimenSiteCode;
-    private String specimenCollectedFrom;
+    private CodeDTO typeOfSpecimen;
+    private CodeDTO specimenSite;
+    private SpecimentCollectedFrom specimenCollectedFrom;
     private Integer specimenCollectionVolumeInMl;
-    private SpecimenAcceptanceStatus specimenAcceptanceStatus;
-    private List<String> specimenRejectionCodes;
     private String specimenCollectorName;
     private String specimenCollectorContactNumber;
+    private List<String> specimenRejectionCodes;
     private Instant dateTimeSpecimenCollected;
     private Boolean specimenSentToLab;
     private Instant dateTimeSpecimenSentToLab;
@@ -34,10 +34,12 @@ public class LabRequestDetailsDTO {
     private String specimenRegisteredBy;
     private Instant dateTimeSpecimenRegistered;
     private RequestingFacilityDTO requestingFacility;
-    private String requestTypeCode;
+    private RequestTypeCode requestTypeCode;
     private String referringRequestId;
-    private String therapy;
-    private List<LabTestsDTO> labTests;
+    private List<String> clinicalCodes;
+    private String clinicalNotes;
+    private ReceivingFacilityDTO receivingFacility;
+    private List<LabTestsDTO> requestedLabTests;
     private List<LabTestResultsFinalDTO> labTestResults;
 
 
@@ -45,11 +47,10 @@ public class LabRequestDetailsDTO {
         Map<String, Object> labRequestMap = new HashMap<String, Object>();
         labRequestMap.put("dateOccurred", this.getDateOccurred());
         labRequestMap.put("specimenID", this.getSpecimenID());
-        labRequestMap.put("typeOfSpecimen", this.getTypeOfSpecimen());
-        labRequestMap.put("specimenSiteCode", this.getSpecimenSiteCode());
+        labRequestMap.put("typeOfSpecimen", this.getTypeOfSpecimen().toMap());
+        labRequestMap.put("specimenSiteCode", this.getSpecimenSite().toMap());
         labRequestMap.put("specimenCollectedFrom", this.getSpecimenCollectedFrom());
         labRequestMap.put("specimenCollectionVolumeInMl", this.getSpecimenCollectionVolumeInMl());
-        labRequestMap.put("specimenAcceptanceStatus", this.getSpecimenAcceptanceStatus());
         labRequestMap.put("specimenRejectionCodes", this.getSpecimenRejectionCodes());
         labRequestMap.put("specimenCollectorName", this.getSpecimenCollectorName());
         labRequestMap.put("specimenCollectorContactNumber", this.getSpecimenCollectorContactNumber());
@@ -61,8 +62,7 @@ public class LabRequestDetailsDTO {
         labRequestMap.put("requestingFacility", this.requestingFacility.toMap());
         labRequestMap.put("requestTypeCode", this.getRequestTypeCode());
         labRequestMap.put("referringRequestId", this.getReferringRequestId());
-        labRequestMap.put("therapy", this.getTherapy());
-        labRequestMap.put("labTests", this.getLabTests());
+        labRequestMap.put("labTests", this.getRequestedLabTests());
         labRequestMap.put("labTestResults", this.getLabTestResults());
         return labRequestMap;
     }

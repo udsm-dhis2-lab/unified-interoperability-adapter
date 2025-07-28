@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.CareType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,12 +11,12 @@ import java.util.Map;
 @Setter
 public class RequestingFacilityDTO {
     private String code;
-    private String pointOfCare;
+    private CareType careType;
 
     public Map<String, Object> toMap(){
         Map<String, Object> requestingFacilityMap = new HashMap<>();
         requestingFacilityMap.put("code", this.getCode());
-        requestingFacilityMap.put("pointOfCare", this.getPointOfCare());
+        requestingFacilityMap.put("careType", this.getCareType());
         return requestingFacilityMap;
     }
 }

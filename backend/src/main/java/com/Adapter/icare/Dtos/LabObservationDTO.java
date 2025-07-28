@@ -1,6 +1,5 @@
 package com.Adapter.icare.Dtos;
 
-import com.Adapter.icare.Enums.LabTrackingStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,13 +12,14 @@ import java.util.Map;
 public class LabObservationDTO {
     private String parameter;
     private Instant releaseDate;
-    private LabTrackingStatus resultStatusCode;
+    private CodeDTO resultStatus;
     private Integer obrSetId;
     private Integer obxSetId;
     private Integer obxSubId;
     private String result;
     private String codedValue;
     private ObservationDTO observation;
+    private CodeDTO confirmedDiagnosis;
     private String abnormalFlagCode;
     private Instant dateTimeValue;
     private String resultSemiquantitive;
@@ -37,7 +37,7 @@ public class LabObservationDTO {
         Map<String, Object> labObservationMap = new HashMap<>();
         labObservationMap.put("parameter", this.getParameter());
         labObservationMap.put("releaseDate", this.getReleaseDate());
-        labObservationMap.put("resultStatusCode", this.getResultStatusCode());
+        labObservationMap.put("resultStatus", this.getResultStatus());
         labObservationMap.put("obrSetId", this.getObrSetId());
         labObservationMap.put("obxSetId", this.getObxSetId());
         labObservationMap.put("obxSubId", this.getObxSubId());

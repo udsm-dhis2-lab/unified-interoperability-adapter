@@ -24,6 +24,7 @@ public class DemographicDetailsDTO {
     private String middleName;
     @NotBlank(message = "lastName cannot be blank")
     private String lastName;
+    private String ethnicGroup;
     @NotNull(message = "Date of birth can not be null")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String dateOfBirth;

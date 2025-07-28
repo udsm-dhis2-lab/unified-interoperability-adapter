@@ -15,7 +15,7 @@ public enum SpecimenAcceptanceStatus {
     public static final String INVALID_SPECIMEN_ACCETANCE_STATUS_PREFIX = "Invalid specimen acceptance status:";
     private static final String ALLOWED_VALUES_MESSAGE =
             "Allowed values are: " +
-                    Arrays.stream(ServiceModality.values())
+                    Arrays.stream(SpecimenAcceptanceStatus.values())
                             .map(Enum::name)
                             .collect(Collectors.joining(", "));
 

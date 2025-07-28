@@ -20,7 +20,7 @@ public enum Priority {
     public static final String INVALID_PRIORITY_PREFIX = "Invalid priority:";
     private static final String ALLOWED_VALUES_MESSAGE =
             "Allowed values are: " +
-                    Arrays.stream(ServiceModality.values())
+                    Arrays.stream(Priority.values())
                             .map(Enum::name)
                             .collect(Collectors.joining(", "));
 

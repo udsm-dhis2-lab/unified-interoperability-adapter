@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,9 +43,13 @@ public class SharedHealthRecordsDTO {
 
     private LifeStyleInformationDTO lifeStyleInformation;
 
+
+    @Schema(description = "This field is deprecated. It wont work starting v1.0.9", deprecated = true)
     private List<InvestigationDetailsDTO> investigationDetails;
 
-//    private List<LabInvestigationDetailsDTO> labInvestigationDetails;
+
+    private List<LabInvestigationDetailsDTO> labInvestigationDetails;
+
 
     private List<LabRequestDetailsDTO> labRequestDetails;
 

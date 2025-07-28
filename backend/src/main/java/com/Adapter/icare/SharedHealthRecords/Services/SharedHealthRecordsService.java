@@ -1414,21 +1414,21 @@ public class SharedHealthRecordsService {
                                         investigationDetailsDTOList);
 
                                 // Lab investigation details using DiagnosticReport
-//                                List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
-//                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(
-//                                        fhirClient,
-//                                        encounter.getIdElement().getIdPart(),
-//                                        "laboratory");
-//                                if (!diagnosticReports.isEmpty()) {
-//                                    for (DiagnosticReport diagnosticReport : diagnosticReports) {
-//                                        LabInvestigationDetailsDTO labInvestigationDetailsDTO = getLabInvestigationDetailsFromDiagnosticReport(fhirClient, diagnosticReport);
-//                                        labInvestigationDetailsDTOS.add(
-//                                                labInvestigationDetailsDTO);
-//                                    }
-//                                }
-//
-//                                templateData.setLabInvestigationDetails(
-//                                        labInvestigationDetailsDTOS);
+                                List<LabInvestigationDetailsDTO> labInvestigationDetailsDTOS = new ArrayList<>();
+                                List<DiagnosticReport> diagnosticReports = getDiagnosticReportsByCategory(
+                                        fhirClient,
+                                        encounter.getIdElement().getIdPart(),
+                                        "laboratory");
+                                if (!diagnosticReports.isEmpty()) {
+                                    for (DiagnosticReport diagnosticReport : diagnosticReports) {
+                                        LabInvestigationDetailsDTO labInvestigationDetailsDTO = getLabInvestigationDetailsFromDiagnosticReport(fhirClient, diagnosticReport);
+                                        labInvestigationDetailsDTOS.add(
+                                                labInvestigationDetailsDTO);
+                                    }
+                                }
+
+                                templateData.setLabInvestigationDetails(
+                                        labInvestigationDetailsDTOS);
 
                                 ReferralDetailsDTO referralDetailsDTO = new ReferralDetailsDTO();
                                 // 1. get service request
@@ -3459,8 +3459,7 @@ public class SharedHealthRecordsService {
 
                                 var dateString = getExtensionValueString(encounter, "http://fhir.moh.go.tz/fhir/StructureDefinition/reportingDate");
                                 if(!dateString.isEmpty()) {
-                                    LocalDateTime localDateTime = LocalDateTime.parse(dateString, formatter);
-                                    reportDetailsDTO.setReportingDateTime(localDateTime.toInstant(ZoneOffset.UTC));
+                                    reportDetailsDTO.setReportingDate(dateString);
                                 }
                                 templateData.setReportDetails(reportDetailsDTO);
 

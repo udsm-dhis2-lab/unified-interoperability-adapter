@@ -18,4 +18,6 @@ public class DiagnosisDetailsDTO {
     @NotNull
     private String diagnosisCode;
     private String diagnosisDescription;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date dateOfSymptomsOnset;
 }
