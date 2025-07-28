@@ -20,6 +20,40 @@
                             </div>
 
                             <div class="scrollable-content">
+                                <!-- Enrollment Details for Tracker Programs -->
+                                <div class="enrollment-section" *ngIf="isTrackerProgram && hasEnrollmentAttributes">
+                                    <div class="enrollment-header">
+                                        <h3>Enrollment Details</h3>
+                                        <p class="enrollment-description">Registration attributes for this program</p>
+                                    </div>
+
+                                    <!-- Tracked Entity Attributes -->
+                                    <div class="tracked-entity-attributes">
+                                        <div class="attribute-field"
+                                            *ngFor="let programAttribute of programData?.programTrackedEntityAttributes; trackBy: trackByTrackedEntityAttribute"
+                                            [class.selected]="programAttribute.trackedEntityAttribute.selected"
+                                            [class.disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected"
+                                            (click)="onTrackedEntityAttributeSelect(programAttribute.trackedEntityAttribute)">
+                                            <label class="field-label">
+                                                {{ programAttribute.trackedEntityAttribute.formName ||
+                                                programAttribute.trackedEntityAttribute.displayName }}
+                                            </label>
+                                            <input nz-input
+                                                [placeholder]="programAttribute.trackedEntityAttribute.displayName"
+                                                readonly class="field-input"
+                                                [disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected" />
+                                            <div class="field-info">
+                                                <small class="field-id">ID: {{
+                                                    programAttribute.trackedEntityAttribute.id }}</small>
+                                                <small class="field-name"
+                                                    *ngIf="programAttribute.trackedEntityAttribute.name !== programAttribute.trackedEntityAttribute.displayName">
+                                                    Name: {{ programAttribute.trackedEntityAttribute.name }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Program Stage Form -->
                                 <div class="program-stage" *ngIf="firstProgramStage">
                                     <div class="stage-header">
@@ -96,17 +130,16 @@
                     </div>
 
                     <nz-card>
-                        <!-- Selected Field Info -->
+                        <!-- Selected Data Element Info -->
                         <div class="selected-field-info" *ngIf="selectedDataElement">
                             <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <h4>Selected Field: {{ selectedDataElement.displayName }}</h4>
+                                <h4>Selected Data Element: {{ selectedDataElement.displayName }}</h4>
                                 <nz-tag *ngIf="mappingUuid" [nzColor]="'green'">
                                     <span nz-icon nzType="check-circle"></span>
                                     Mapped
                                 </nz-tag>
                             </div>
                             <div class="field-details">
-                                <p><strong>Form Name:</strong> {{ selectedDataElement.formName || 'N/A' }}</p>
                                 <p><strong>Internal Name:</strong> {{ selectedDataElement.name }}</p>
                                 <p><strong>ID:</strong> {{ selectedDataElement.id }}</p>
                                 <p *ngIf="selectedDataElement.type"><strong>Type:</strong> {{ selectedDataElement.type
@@ -116,9 +149,28 @@
                             </div>
                         </div>
 
+                        <!-- Selected Tracked Entity Attribute Info -->
+                        <div class="selected-field-info" *ngIf="selectedTrackedEntityAttribute">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Selected Enrollment Attribute: {{ selectedTrackedEntityAttribute.displayName }}</h4>
+                                <nz-tag *ngIf="mappingUuid" [nzColor]="'green'">
+                                    <span nz-icon nzType="check-circle"></span>
+                                    Mapped
+                                </nz-tag>
+                            </div>
+                            <div class="field-details">
+                                <p><strong>Internal Name:</strong> {{ selectedTrackedEntityAttribute.name }}</p>
+                                <p><strong>ID:</strong> {{ selectedTrackedEntityAttribute.id }}</p>
+                                <p *ngIf="selectedTrackedEntityAttribute.type"><strong>Type:</strong> {{
+                                    selectedTrackedEntityAttribute.type }}</p>
+                                <p *ngIf="selectedTrackedEntityAttribute.optionSet"><strong>Option Set:</strong> {{
+                                    selectedTrackedEntityAttribute.optionSet.name }}</p>
+                            </div>
+                        </div>
+
                         <!-- Mapping Configuration -->
                         <div class="mapping-configuration"
-                            *ngIf="selectedDataElement && currentMapping && rightColumnSpan === 16">
+                            *ngIf="(selectedDataElement || selectedTrackedEntityAttribute) && currentMapping && rightColumnSpan === 16">
                             <nz-divider></nz-divider>
                             <h4>Mapping Configuration</h4>
 
@@ -229,7 +281,8 @@
                                         </nz-form-item>
 
                                         <!-- Option Set Mappings for selected data element with option set -->
-                                        <div *ngIf="selectedDataElement?.optionSet" class="code-mappings">
+                                        <div *ngIf="(selectedDataElement?.optionSet || selectedTrackedEntityAttribute?.optionSet)"
+                                            class="code-mappings">
                                             <div class="section-header-with-action">
                                                 <h6>Option Set Mappings</h6>
                                                 <button nz-button nzType="text" nzSize="small"
@@ -252,7 +305,7 @@
 
                                             <div class="option-set-mappings" *ngIf="param.showOptionMappings">
                                                 <div class="mapping-item"
-                                                    *ngFor="let option of selectedDataElement?.optionSet?.options; let optionIndex = index">
+                                                    *ngFor="let option of (selectedDataElement?.optionSet?.options || selectedTrackedEntityAttribute?.optionSet?.options); let optionIndex = index">
                                                     <div class="mapping-header">
                                                         <h6>{{ option.name }} ({{ option.code }})</h6>
                                                         <button nz-button nzType="text" nzDanger nzSize="small"

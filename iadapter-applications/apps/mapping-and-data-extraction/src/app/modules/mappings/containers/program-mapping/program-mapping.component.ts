@@ -130,6 +130,22 @@ export interface ProgramData {
     displayShortName: string;
     selectIncidentDatesInFuture: boolean;
     programStages: ProgramStage[];
+    programTrackedEntityAttributes?: ProgramTrackedEntityAttribute[];
+}
+
+export interface ProgramTrackedEntityAttribute {
+    trackedEntityAttribute: TrackedEntityAttribute;
+}
+
+export interface TrackedEntityAttribute {
+    displayName: string;
+    formName?: string;
+    name?: string;
+    id: string;
+    selected?: boolean;
+    optionSet?: OptionSet;
+    type?: string;
+    code?: string;
 }
 
 @Component({
@@ -153,6 +169,7 @@ export class ProgramMappingComponent implements OnInit {
     programId: string = '';
     instanceId: string = '';
     selectedDataElement: DataElement | null = null;
+    selectedTrackedEntityAttribute: TrackedEntityAttribute | null = null;
 
     // Mapping data
     currentMapping: MappingData | null = null;
@@ -419,6 +436,14 @@ export class ProgramMappingComponent implements OnInit {
         });
     }
 
+    // Tree node selection for updating data params
+    onTreeNodeClick(event: any, paramIndex: number): void {
+        const node = event.node?.origin as TreeNode;
+        if (node && node.selectable && node.isLeaf) {
+            this.selectNodeForDataParam(paramIndex, node);
+        }
+    }
+
     private createFieldLabel(key: string): string {
         return key
             .replace(/([A-Z])/g, ' $1')
@@ -443,6 +468,12 @@ export class ProgramMappingComponent implements OnInit {
     }
 
     onDataElementSelect(dataElement: DataElement): void {
+        // Clear any selected tracked entity attribute
+        if (this.selectedTrackedEntityAttribute) {
+            this.selectedTrackedEntityAttribute.selected = false;
+            this.selectedTrackedEntityAttribute = null;
+        }
+
         // Deselect previously selected element
         if (this.selectedDataElement && this.selectedDataElement.id !== dataElement.id) {
             this.selectedDataElement.selected = false;
@@ -462,12 +493,41 @@ export class ProgramMappingComponent implements OnInit {
         }
     }
 
-    initializeMapping(): void {
-        if (!this.selectedDataElement) return;
+    onTrackedEntityAttributeSelect(attribute: TrackedEntityAttribute): void {
+        // Clear any selected data element
+        if (this.selectedDataElement) {
+            this.selectedDataElement.selected = false;
+            this.selectedDataElement = null;
+        }
 
-        this.currentMapping = {
-            dataKey: this.selectedDataElement.id,
-            mapping: {
+        // Deselect previously selected attribute
+        if (this.selectedTrackedEntityAttribute && this.selectedTrackedEntityAttribute.id !== attribute.id) {
+            this.selectedTrackedEntityAttribute.selected = false;
+        }
+
+        // Toggle selection
+        attribute.selected = !attribute.selected;
+        this.selectedTrackedEntityAttribute = attribute.selected ? attribute : null;
+
+        // Initialize mapping when attribute is selected
+        if (this.selectedTrackedEntityAttribute) {
+            this.initializeMapping();
+            this.loadExistingMapping();
+        } else {
+            this.currentMapping = null;
+            this.mappingUuid = undefined;
+        }
+    }
+
+    initializeMapping(): void {
+        if (!this.selectedDataElement && !this.selectedTrackedEntityAttribute) return;
+
+        let mappingContent: any;
+        let dataKey: string;
+
+        if (this.selectedDataElement) {
+            dataKey = this.selectedDataElement.id;
+            mappingContent = {
                 dataElement: {
                     id: this.selectedDataElement.id,
                     name: this.selectedDataElement.displayName,
@@ -478,7 +538,27 @@ export class ProgramMappingComponent implements OnInit {
                 },
                 dataParams: [],
                 junctionOperator: this.junctionOperator
-            },
+            };
+        } else if (this.selectedTrackedEntityAttribute) {
+            dataKey = this.selectedTrackedEntityAttribute.id;
+            mappingContent = {
+                trackedEntityAttribute: {
+                    id: this.selectedTrackedEntityAttribute.id,
+                    name: this.selectedTrackedEntityAttribute.displayName,
+                    program: this.programId,
+                    code: this.selectedTrackedEntityAttribute.code || '',
+                    type: '' //TODO: Add data type
+                },
+                dataParams: [],
+                junctionOperator: this.junctionOperator
+            };
+        } else {
+            return;
+        }
+
+        this.currentMapping = {
+            dataKey: dataKey,
+            mapping: mappingContent,
             namespace: `PROGRAM-${this.programId}`,
             description: '',
             group: null
@@ -613,9 +693,10 @@ export class ProgramMappingComponent implements OnInit {
     }
 
     removeOptionMapping(paramIndex: number, optionIndex: number): void {
-        if (!this.selectedDataElement?.optionSet?.options || !this.selectedDataParams[paramIndex]?.mappings) return;
+        const optionSet = this.selectedDataElement?.optionSet || this.selectedTrackedEntityAttribute?.optionSet;
+        if (!optionSet?.options || !this.selectedDataParams[paramIndex]?.mappings) return;
 
-        const optionCode = this.selectedDataElement.optionSet.options[optionIndex].code;
+        const optionCode = optionSet.options[optionIndex].code;
         const mappings = this.selectedDataParams[paramIndex].mappings!;
         const mappingIndex = mappings.findIndex(m => m.outputCode === optionCode);
 
@@ -626,10 +707,11 @@ export class ProgramMappingComponent implements OnInit {
     }
 
     loadExistingMapping(): void {
-        if (!this.selectedDataElement || !this.programId || !this.instanceId) return;
+        const elementId = this.selectedDataElement?.id || this.selectedTrackedEntityAttribute?.id;
+        if (!elementId || !this.programId || !this.instanceId) return;
 
         this.programManagementService
-            .getExistingProgramMapping(this.selectedDataElement.id, this.programId, this.instanceId)
+            .getExistingProgramMapping(elementId, this.programId, this.instanceId)
             .subscribe({
                 next: (data: any) => {
                     if (!data || data.uuid === null) return;
@@ -663,17 +745,43 @@ export class ProgramMappingComponent implements OnInit {
     createMappingPayload(): any {
         if (!this.currentMapping) return null;
 
-        const payload = {
-            uuid: this.mappingUuid,
-            dataKey: this.currentMapping.dataKey,
-            mapping: {
+        let mappingContent: any;
+        let description: string;
+
+        if (this.selectedDataElement) {
+            // For data elements
+            mappingContent = {
                 dataElement: this.currentMapping.mapping.dataElement,
                 dataParams: this.selectedDataParams,
                 junctionOperator: this.junctionOperator,
                 customScript: this.customScript && this.customScript.trim() ? this.customScript : undefined
-            },
+            };
+            description = this.currentMapping.description || `Mapping for ${this.selectedDataElement?.displayName}`;
+        } else if (this.selectedTrackedEntityAttribute) {
+            // For tracked entity attributes
+            mappingContent = {
+                trackedEntityAttribute: {
+                    id: this.selectedTrackedEntityAttribute.id,
+                    displayName: this.selectedTrackedEntityAttribute.displayName,
+                    program: this.programId,
+                    formName: this.selectedTrackedEntityAttribute.formName,
+                    type: '' //TODO: Add data type
+                },
+                dataParams: this.selectedDataParams,
+                junctionOperator: this.junctionOperator,
+                customScript: this.customScript && this.customScript.trim() ? this.customScript : undefined
+            };
+            description = this.currentMapping.description || `Mapping for ${this.selectedTrackedEntityAttribute?.displayName}`;
+        } else {
+            return null;
+        }
+
+        const payload = {
+            uuid: this.mappingUuid,
+            dataKey: this.currentMapping.dataKey,
+            mapping: mappingContent,
             namespace: this.currentMapping.namespace,
-            description: this.currentMapping.description || `Mapping for ${this.selectedDataElement?.displayName}`,
+            description: description,
             group: this.currentMapping.group,
             programId: this.programId,
             instanceId: this.instanceId
@@ -762,6 +870,10 @@ export class ProgramMappingComponent implements OnInit {
             this.selectedDataElement.selected = false;
             this.selectedDataElement = null;
         }
+        if (this.selectedTrackedEntityAttribute) {
+            this.selectedTrackedEntityAttribute.selected = false;
+            this.selectedTrackedEntityAttribute = null;
+        }
         this.currentMapping = null;
         this.selectedDataParams = [];
         this.customScript = '';
@@ -797,6 +909,16 @@ export class ProgramMappingComponent implements OnInit {
         return this.programData?.programStages?.[0] || null;
     }
 
+    get isTrackerProgram(): boolean {
+        return this.programData?.programType === 'WITH_REGISTRATION';
+    }
+
+    get hasEnrollmentAttributes(): boolean {
+        return this.isTrackerProgram &&
+            !!this.programData?.programTrackedEntityAttributes &&
+            this.programData.programTrackedEntityAttributes.length > 0;
+    }
+
     get isDataTemplateLoaded(): boolean {
         return this.dataTemplateTree.length > 0;
     }
@@ -826,6 +948,7 @@ export class ProgramMappingComponent implements OnInit {
         return count;
     }
 
+    // Helper method to get the display text for a selected data param
     getDataParamDisplayText(dataParam: DataParam): string {
         if (!dataParam.value.label && dataParam.value.path) {
             const node = this.findTreeNodeByPath(dataParam.value.path);
@@ -840,5 +963,9 @@ export class ProgramMappingComponent implements OnInit {
 
     trackByDataElement(index: number, dataElement: DataElement): string {
         return dataElement.id;
+    }
+
+    trackByTrackedEntityAttribute(index: number, programAttribute: ProgramTrackedEntityAttribute): string {
+        return programAttribute.trackedEntityAttribute.id;
     }
 }
