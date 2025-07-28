@@ -7,13 +7,20 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular-devkit/build-angular:application",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@angular-builders/custom-webpack:application",
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
+        "customWebpackConfig": {
+          "path": "apps/mapping-and-data-extraction/webpack.partial.js"
+        },
         "outputPath": "dist/apps/mapping-and-data-extraction",
         "index": "apps/mapping-and-data-extraction/src/index.html",
         "browser": "apps/mapping-and-data-extraction/src/main.ts",
-        "polyfills": ["zone.js"],
+        "polyfills": [
+          "zone.js"
+        ],
         "tsConfig": "apps/mapping-and-data-extraction/tsconfig.app.json",
         "inlineStyleLanguage": "less",
         "assets": [
@@ -58,7 +65,7 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "executor": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular-builders/custom-webpack:dev-server",
       "configurations": {
         "production": {
           "buildTarget": "mapping-and-data-extraction:build:production"
@@ -81,7 +88,9 @@
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "outputs": [
+        "{workspaceRoot}/coverage/{projectRoot}"
+      ],
       "options": {
         "jestConfig": "apps/mapping-and-data-extraction/jest.config.ts"
       }

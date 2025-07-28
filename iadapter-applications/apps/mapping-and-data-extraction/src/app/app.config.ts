@@ -14,9 +14,15 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
 import { registerLocaleData } from '@angular/common';
+import { NZ_CONFIG, NzConfig } from 'ng-zorro-antd/core/config';
 
 const icons: IconDefinition[] = [...antDesignIcons];
 registerLocaleData(en);
+
+const ngZorroConfig: NzConfig = {
+  codeEditor: { useStaticLoading: true },
+};
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),
@@ -26,5 +32,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes),
     { provide: NZ_ICONS, useValue: icons },
     { provide: NZ_I18N, useValue: en_US },
+    { provide: NZ_CONFIG, useValue: ngZorroConfig },
   ],
 };

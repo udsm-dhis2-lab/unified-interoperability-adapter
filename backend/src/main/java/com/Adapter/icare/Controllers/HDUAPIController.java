@@ -1461,6 +1461,7 @@ public class HDUAPIController {
                 Datastore existingDatastore = datastoreService.getDatastoreByNamespaceAndKey(namespace, dataKey);
                 if (existingDatastore != null) {
                     existingDatastore.setValue(datastore.getValue());
+                    existingDatastore.setDatastoreGroup(datastore.getDatastoreGroup() != null ? datastore.getDatastoreGroup() : existingDatastore.getDatastoreGroup());
                     return ResponseEntity.ok(datastoreService.updateDatastore(existingDatastore).toMap());
                 } else {
                     return ResponseEntity.ok(datastoreService.saveDatastore(datastore).toMap());
