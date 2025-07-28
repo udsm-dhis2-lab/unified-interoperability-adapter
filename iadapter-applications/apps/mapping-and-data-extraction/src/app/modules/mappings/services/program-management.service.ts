@@ -70,6 +70,17 @@ export class ProgramManagementService {
         return this.baseMappingService.deleteMapping(mappingUuid, MappingsUrls.HDU_PROGRAM_MAPPINGS);
     }
 
+    getDataTemplate(): Observable<any> {
+        return this.httpClient
+            .get<any>(MappingsUrls.GET_DATA_TEMPLATE)
+            .pipe(
+                map((response: any) => {
+                    return response.value || response.dataTemplate || response;
+                }),
+                catchError((error: any) => this.handleError(error))
+            );
+    }
+
     private buildHttpParams(
         pageIndex: number,
         pageSize: number,

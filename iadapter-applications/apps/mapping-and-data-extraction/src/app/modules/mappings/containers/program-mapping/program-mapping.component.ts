@@ -11,6 +11,29 @@ import { MappingsUrls } from '../../models/constants/mappings-urls';
 import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
 
+export interface DataTemplateField {
+    code: string;
+    type: string;
+    block: string;
+    label: string;
+    path: string;
+}
+
+export interface TreeNode {
+    key: string;
+    title: string;
+    label: string;
+    value?: any;
+    children?: TreeNode[];
+    path: string;
+    type: string;
+    isLeaf: boolean;
+    selectable: boolean;
+    expanded?: boolean;
+    selected?: boolean;
+    icon?: string;
+}
+
 export interface ProgramStageSection {
     displayName: string;
     sortOrder: number;
@@ -44,9 +67,9 @@ export interface Option {
 export interface DataParam {
     type: string;
     value: {
-        code: string;
+        path: string;
         type: string;
-        block: string;
+        label: string;
     };
     mappings?: CodeMapping[];
     showOptionMappings?: boolean;
@@ -117,7 +140,9 @@ export interface ProgramData {
     styleUrl: './program-mapping.component.css',
 })
 export class ProgramMappingComponent implements OnInit {
+    // Component state
     isLoading = false;
+    isLoadingDataTemplate = false;
     leftColumnSpan = 12;
     rightColumnSpan = 12;
     hasError = false;
@@ -147,17 +172,14 @@ export class ProgramMappingComponent implements OnInit {
         message: '',
     };
 
-    // Mock data template fields (in real app, this would come from API)
-    dataTemplateFields = [
-        { code: 'reportingDateTime', type: 'DATETIME', block: 'reportingDetails', label: 'Reporting Date Time' },
-        { code: 'firstName', type: 'TEXT', block: 'demographicDetails', label: 'First Name' },
-        { code: 'surname', type: 'TEXT', block: 'demographicDetails', label: 'Surname' },
-        { code: 'sex', type: 'TEXT', block: 'demographicDetails', label: 'Sex' },
-        { code: 'dateOfBirth', type: 'DATE', block: 'demographicDetails', label: 'Date of Birth' },
-        { code: 'placeOfBirth', type: 'TEXT', block: 'demographicDetails', label: 'Place of Birth' },
-        { code: 'address', type: 'TEXT', block: 'addressDetails', label: 'Address' },
-        { code: 'phoneNumber', type: 'TEXT', block: 'contactDetails', label: 'Phone Number' },
-    ];
+    // Data template tree for tree selector
+    dataTemplateTree: TreeNode[] = [];
+    dataTemplateRaw: any = null;
+
+    // Tree selector state
+    selectedTreeNodes: TreeNode[] = [];
+    expandedKeys: string[] = [];
+    searchValue: string = '';
 
     constructor(
         private route: ActivatedRoute,
@@ -173,6 +195,7 @@ export class ProgramMappingComponent implements OnInit {
 
             if (this.programId && this.instanceId) {
                 this.loadProgramData();
+                this.loadDataTemplateFields();
             } else {
                 this.hasError = true;
                 if (!this.programId && !this.instanceId) {
@@ -208,6 +231,216 @@ export class ProgramMappingComponent implements OnInit {
             });
     }
 
+    loadDataTemplateFields(): void {
+        this.isLoadingDataTemplate = true;
+
+        this.programManagementService.getDataTemplate()
+            .subscribe({
+                next: (data) => {
+                    console.log('Data template response:', data);
+
+                    this.dataTemplateRaw = data;
+
+                    this.dataTemplateTree = this.createTreeFromTemplate(data);
+
+                    this.isLoadingDataTemplate = false;
+                    console.log('Loaded data template tree:', this.dataTemplateTree);
+                },
+                error: (error) => {
+                    console.error('Error loading data template fields:', error);
+                    this.isLoadingDataTemplate = false;
+
+                    this.showAlert('warning', 'Using default data template fields due to loading error');
+                }
+            });
+    }
+
+    private createTreeFromTemplate(template: any): TreeNode[] {
+        if (!template) return [];
+
+        return this.createTreeNodes(template, '', 'root');
+    }
+
+    private createTreeNodes(obj: any, currentPath: string, parentKey: string): TreeNode[] {
+        const nodes: TreeNode[] = [];
+
+        if (obj === null || obj === undefined) {
+            return nodes;
+        }
+
+        if (Array.isArray(obj)) {
+            const arrayLabel = `${this.createFieldLabel(parentKey)} (Array)`;
+            nodes.push({
+                key: `${parentKey}[]`,
+                title: arrayLabel,
+                label: arrayLabel,
+                value: obj,
+                path: currentPath,
+                type: 'ARRAY',
+                isLeaf: false,
+                selectable: true,
+                children: obj.length > 0 ? this.createTreeNodes(obj[0], `${currentPath}[0]`, `${parentKey}[0]`) : [],
+                icon: this.getNodeIcon('ARRAY', false)
+            });
+
+            return nodes;
+        }
+
+        if (typeof obj === 'object') {
+            Object.keys(obj).forEach(key => {
+                const value = obj[key];
+                const newPath = currentPath ? `${currentPath}.${key}` : key;
+                const nodeKey = currentPath ? `${currentPath}.${key}` : key;
+
+                let nodeType = 'OBJECT';
+                let isLeaf = false;
+                let children: TreeNode[] = [];
+
+                if (value === null || value === undefined) {
+                    nodeType = 'NULL';
+                    isLeaf = true;
+                } else if (typeof value === 'string') {
+                    nodeType = this.determineStringType(key, value);
+                    isLeaf = true;
+                } else if (typeof value === 'number') {
+                    nodeType = 'NUMBER';
+                    isLeaf = true;
+                } else if (typeof value === 'boolean') {
+                    nodeType = 'BOOLEAN';
+                    isLeaf = true;
+                } else if (Array.isArray(value)) {
+                    nodeType = 'ARRAY';
+                    isLeaf = false;
+                    children = this.createTreeNodes(value, newPath, key);
+                } else if (typeof value === 'object') {
+                    nodeType = 'OBJECT';
+                    isLeaf = false;
+                    children = this.createTreeNodes(value, newPath, key);
+                }
+
+                const fieldLabel = this.createFieldLabel(key);
+                nodes.push({
+                    key: nodeKey,
+                    title: fieldLabel,
+                    label: fieldLabel,
+                    value: value,
+                    path: newPath,
+                    type: nodeType,
+                    isLeaf: isLeaf,
+                    selectable: true,
+                    children: children,
+                    icon: this.getNodeIcon(nodeType, isLeaf)
+                });
+            });
+        }
+
+        return nodes;
+    }
+
+    private determineStringType(key: string, value: string): string {
+        const keyLower = key.toLowerCase();
+
+        if (keyLower.includes('date')) {
+            if (keyLower.includes('time') || /T\d{2}:\d{2}:\d{2}/.test(value)) {
+                return 'DATETIME';
+            }
+            return 'DATE';
+        }
+
+        if (keyLower.includes('time')) {
+            return 'DATETIME';
+        }
+
+        // Check if value looks like a date
+        if (/^\d{4}-\d{2}-\d{2}/.test(value)) {
+            return /T\d{2}:\d{2}:\d{2}/.test(value) ? 'DATETIME' : 'DATE';
+        }
+
+        return 'TEXT';
+    }
+
+    onTreeClick(event: any, paramIndex: number): void {
+        const node = event.node?.origin as TreeNode;
+        if (node && node.selectable) {
+            console.log('Tree node clicked for param:', { paramIndex, node });
+            this.selectNodeForDataParam(paramIndex, node);
+        }
+    }
+
+    onTreeExpandChange(event: any): void {
+        const node = event.node?.origin as TreeNode;
+        if (node) {
+            if (event.isExpanded) {
+                if (!this.expandedKeys.includes(node.key)) {
+                    this.expandedKeys.push(node.key);
+                }
+            } else {
+                const index = this.expandedKeys.indexOf(node.key);
+                if (index > -1) {
+                    this.expandedKeys.splice(index, 1);
+                }
+            }
+        }
+    }
+
+    selectNodeForDataParam(index: number, selectedNode: TreeNode): void {
+        if (!selectedNode || !selectedNode.selectable || !this.selectedDataParams[index]) {
+            console.log('Node not selectable or invalid index:', { selectedNode, index });
+            return;
+        }
+
+        console.log('Selecting node for data param:', { index, selectedNode });
+
+        this.selectedDataParams[index].value = {
+            path: selectedNode.path,
+            type: selectedNode.type,
+            label: selectedNode.label
+        };
+        this.updateMappingStructure();
+    }
+
+    onTreeSearchValueChange(searchValue: string): void {
+        this.searchValue = searchValue;
+        if (searchValue) {
+            this.expandNodesWithSearchTerm(this.dataTemplateTree, searchValue.toLowerCase());
+        }
+    }
+
+    private expandNodesWithSearchTerm(nodes: TreeNode[], searchTerm: string): void {
+        nodes.forEach(node => {
+            if (node.label.toLowerCase().includes(searchTerm)) {
+                if (!this.expandedKeys.includes(node.key)) {
+                    this.expandedKeys.push(node.key);
+                }
+            }
+            if (node.children) {
+                this.expandNodesWithSearchTerm(node.children, searchTerm);
+            }
+        });
+    }
+
+    private createFieldLabel(key: string): string {
+        return key
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase())
+            .trim();
+    }
+
+    getNodeIcon(nodeType: string, isLeaf: boolean): string {
+        if (!isLeaf) {
+            return nodeType === 'ARRAY' ? 'unordered-list' : 'folder';
+        }
+
+        switch (nodeType) {
+            case 'TEXT': return 'font-colors';
+            case 'NUMBER': return 'field-number';
+            case 'BOOLEAN': return 'check-square';
+            case 'DATE': return 'calendar';
+            case 'DATETIME': return 'clock-circle';
+            case 'NULL': return 'minus-circle';
+            default: return 'file-text';
+        }
+    }
 
     onDataElementSelect(dataElement: DataElement): void {
         // Deselect previously selected element
@@ -276,9 +509,9 @@ export class ProgramMappingComponent implements OnInit {
         const newParam: DataParam = {
             type: 'dataTemplateField',
             value: {
-                code: '',
-                type: '',
-                block: ''
+                path: '',
+                type: 'TEXT',
+                label: ''
             },
             showOptionMappings: true
         };
@@ -292,34 +525,38 @@ export class ProgramMappingComponent implements OnInit {
         this.updateMappingStructure();
     }
 
-    addDataParamField(index: number): void {
-        if (!this.selectedDataParams[index]) return;
-
-        const newField = this.dataTemplateFields[0]; // Default to first field for simplicity
-        this.selectedDataParams[index].value = {
-            code: newField.code,
-            type: newField.type,
-            block: newField.block
-        };
-        this.updateMappingStructure();
-    }
-
-    updateDataParam(index: number, field: any): void {
+    updateDataParam(index: number, selectedNode: TreeNode): void {
         if (this.selectedDataParams[index]) {
             this.selectedDataParams[index].value = {
-                code: field.code,
-                type: field.type,
-                block: field.block
+                path: selectedNode.path,
+                type: selectedNode.type,
+                label: selectedNode.label
             };
             this.updateMappingStructure();
         }
     }
 
-    onDataParamFieldChange(index: number, fieldCode: string): void {
-        const field = this.dataTemplateFields.find(f => f.code === fieldCode);
-        if (field) {
-            this.updateDataParam(index, field);
+    onDataParamFieldChange(index: number, selectedNode: TreeNode): void {
+        if (selectedNode && selectedNode.selectable) {
+            this.updateDataParam(index, selectedNode);
         }
+    }
+
+    findTreeNodeByPath(path: string): TreeNode | null {
+        const findInNodes = (nodes: TreeNode[]): TreeNode | null => {
+            for (const node of nodes) {
+                if (node.path === path) {
+                    return node;
+                }
+                if (node.children) {
+                    const found = findInNodes(node.children);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        return findInNodes(this.dataTemplateTree);
     }
 
     updateJunctionOperator(operator: string): void {
@@ -347,7 +584,6 @@ export class ProgramMappingComponent implements OnInit {
     updateOptionMapping(paramIndex: number, optionCode: string, inputText: string): void {
         if (!this.selectedDataParams[paramIndex]) return;
 
-        // Initialize mappings array if it doesn't exist
         if (!this.selectedDataParams[paramIndex].mappings) {
             this.selectedDataParams[paramIndex].mappings = [];
         }
@@ -356,7 +592,6 @@ export class ProgramMappingComponent implements OnInit {
         let mapping = mappings.find(m => m.outputCode === optionCode);
 
         if (!mapping) {
-            // Create new mapping if it doesn't exist
             mapping = {
                 inputCodes: [],
                 operator: 'IN',
@@ -365,10 +600,8 @@ export class ProgramMappingComponent implements OnInit {
             mappings.push(mapping);
         }
 
-        // Update input codes
         mapping.inputCodes = inputText.split(',').map(s => s.trim()).filter(s => s);
 
-        // Remove mapping if no input codes
         if (mapping.inputCodes.length === 0) {
             const index = mappings.indexOf(mapping);
             if (index > -1) {
@@ -562,6 +795,43 @@ export class ProgramMappingComponent implements OnInit {
 
     get firstProgramStage(): ProgramStage | null {
         return this.programData?.programStages?.[0] || null;
+    }
+
+    get isDataTemplateLoaded(): boolean {
+        return this.dataTemplateTree.length > 0;
+    }
+
+    get dataTemplateLoadingStatus(): string {
+        if (this.isLoadingDataTemplate) {
+            return 'Loading data template...';
+        }
+        if (this.dataTemplateTree.length === 0) {
+            return 'No data template available';
+        }
+
+        const selectableCount = this.countSelectableNodes(this.dataTemplateTree);
+        return `Data template loaded with ${selectableCount} selectable fields`;
+    }
+
+    private countSelectableNodes(nodes: TreeNode[]): number {
+        let count = 0;
+        for (const node of nodes) {
+            if (node.isLeaf && node.selectable) {
+                count++;
+            }
+            if (node.children) {
+                count += this.countSelectableNodes(node.children);
+            }
+        }
+        return count;
+    }
+
+    getDataParamDisplayText(dataParam: DataParam): string {
+        if (!dataParam.value.label && dataParam.value.path) {
+            const node = this.findTreeNodeByPath(dataParam.value.path);
+            return node ? node.label : dataParam.value.path;
+        }
+        return dataParam.value.label || dataParam.value.path || 'No selection';
     }
 
     trackBySection(index: number, section: ProgramStageSection): string {

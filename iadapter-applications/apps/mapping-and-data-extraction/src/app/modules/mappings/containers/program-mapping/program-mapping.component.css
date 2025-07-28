@@ -430,3 +430,94 @@ nz-radio-group label.ant-radio-wrapper-checked {
 .left-column::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+/* Tree selector styles */
+.tree-selector-container {
+    margin-bottom: 16px;
+}
+
+.current-selection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+}
+
+.current-selection nz-tag {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tree-selector {
+    margin-top: 8px;
+}
+
+.tree-container {
+    background: #fafafa;
+    border-radius: 4px;
+}
+
+.tree-node-content {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.tree-node-content .node-label {
+    flex: 1;
+    font-size: 13px;
+}
+
+.tree-node-content nz-tag {
+    font-size: 11px;
+    padding: 0 4px;
+    height: 18px;
+    line-height: 18px;
+}
+
+.template-status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-style: italic;
+}
+
+/* Tree node hover effects */
+:host ::ng-deep .ant-tree-node-content-wrapper:hover {
+    background-color: #e6f7ff !important;
+}
+
+:host ::ng-deep .ant-tree-node-content-wrapper.ant-tree-node-selected {
+    background-color: #bae7ff !important;
+}
+
+/* Tree icons */
+:host ::ng-deep .ant-tree-iconEle {
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+    width: 16px;
+    height: 16px;
+}
+
+/* Custom tree node spacing */
+:host ::ng-deep .ant-tree-node-content-wrapper {
+    line-height: 24px;
+    height: 24px;
+    margin: 2px 0;
+    border-radius: 4px;
+}
+
+/* Tree search highlighting */
+:host ::ng-deep .ant-tree-node-content-wrapper .font-highlight {
+    background-color: #ffe58f;
+    padding: 1px 2px;
+    border-radius: 2px;
+}

@@ -117,7 +117,6 @@
                         </div>
 
                         <!-- Mapping Configuration -->
-                        <!-- Mapping Configuration -->
                         <div class="mapping-configuration"
                             *ngIf="selectedDataElement && currentMapping && rightColumnSpan === 16">
                             <nz-divider></nz-divider>
@@ -161,14 +160,71 @@
                                         <nz-form-item>
                                             <nz-form-label>Source Field</nz-form-label>
                                             <nz-form-control>
-                                                <nz-select [ngModel]="param.value.code"
-                                                    (ngModelChange)="onDataParamFieldChange(i, $event)"
-                                                    nzPlaceHolder="Select source field" style="width: 100%">
-                                                    <nz-option *ngFor="let field of dataTemplateFields"
-                                                        [nzValue]="field.code"
-                                                        [nzLabel]="field.label + ' (' + field.block + ')'">
-                                                    </nz-option>
-                                                </nz-select>
+                                                <div class="tree-selector-container">
+                                                    <!-- Current selection display -->
+                                                    <div class="current-selection" *ngIf="param.value.path">
+                                                        <nz-tag [nzColor]="'blue'">
+                                                            <span nz-icon
+                                                                [nzType]="getNodeIcon(param.value.type, true)"></span>
+                                                            {{ getDataParamDisplayText(param) }}
+                                                        </nz-tag>
+                                                        <button nz-button nzType="text" nzSize="small"
+                                                            (click)="param.value = { path: '', type: 'TEXT', label: '' }; updateMappingStructure()">
+                                                            <span nz-icon nzType="close"></span>
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- Tree selector -->
+                                                    <div class="tree-selector">
+                                                        <nz-input-group nzCompact>
+                                                            <input nz-input [ngModel]="searchValue"
+                                                                (ngModelChange)="onTreeSearchValueChange($event)"
+                                                                placeholder="Search data template fields..."
+                                                                style="width: 70%;" />
+                                                            <button nz-button nzType="default" style="width: 30%;"
+                                                                (click)="expandedKeys = []; searchValue = ''">
+                                                                <span nz-icon nzType="reload"></span>
+                                                                Reset
+                                                            </button>
+                                                        </nz-input-group>
+
+                                                        <div class="tree-container"
+                                                            style="max-height: 300px; overflow-y: auto; border: 1px solid #d9d9d9; margin-top: 8px; padding: 8px;">
+                                                            <div *ngIf="isLoadingDataTemplate" class="loading-state"
+                                                                style="text-align: center; padding: 20px;">
+                                                                <nz-spin nzSimple></nz-spin>
+                                                                <p style="margin-top: 8px; color: #666;">Loading data
+                                                                    template...</p>
+                                                            </div>
+
+                                                            <div *ngIf="!isLoadingDataTemplate && dataTemplateTree.length === 0"
+                                                                class="empty-state"
+                                                                style="text-align: center; padding: 20px;">
+                                                                <nz-empty nzNotFoundImage="simple"
+                                                                    nzNotFoundContent="No data template available"></nz-empty>
+                                                            </div>
+
+                                                            <nz-tree
+                                                                *ngIf="!isLoadingDataTemplate && dataTemplateTree.length > 0"
+                                                                [nzData]="dataTemplateTree"
+                                                                [nzExpandedKeys]="expandedKeys"
+                                                                [nzSearchValue]="searchValue" [nzHideUnMatched]="false"
+                                                                [nzCheckable]="false" [nzShowIcon]="true"
+                                                                (nzClick)="onTreeClick($event, i)"
+                                                                (nzExpandChange)="onTreeExpandChange($event)">
+                                                            </nz-tree>
+                                                        </div>
+
+                                                        <!-- Data template loading status -->
+                                                        <div class="template-status"
+                                                            style="margin-top: 8px; font-size: 12px; color: #666;">
+                                                            <span nz-icon
+                                                                [nzType]="isLoadingDataTemplate ? 'loading' : 'info-circle'"
+                                                                [nzSpin]="isLoadingDataTemplate"></span>
+                                                            {{ dataTemplateLoadingStatus }}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </nz-form-control>
                                         </nz-form-item>
 
@@ -247,15 +303,12 @@
                             <div class="mapping-actions">
                                 <button nz-button nzType="primary" (click)="saveMapping()"
                                     [disabled]="!currentMapping || selectedDataParams.length === 0"
-                                    [nzLoading]="isSubmittingMapping"
-                                    style="margin-right: 8px;">
+                                    [nzLoading]="isSubmittingMapping" style="margin-right: 8px;">
                                     <span nz-icon nzType="save" *ngIf="!isSubmittingMapping"></span>
                                     {{ mappingUuid ? 'Update' : 'Save' }} Mapping
                                 </button>
                                 <button nz-button nzType="default" nzDanger (click)="deleteMapping()"
-                                    *ngIf="mappingUuid"
-                                    [nzLoading]="isDeletingMapping"
-                                    style="margin-right: 8px;">
+                                    *ngIf="mappingUuid" [nzLoading]="isDeletingMapping" style="margin-right: 8px;">
                                     <span nz-icon nzType="delete" *ngIf="!isDeletingMapping"></span>
                                     Delete Mapping
                                 </button>
@@ -283,13 +336,9 @@
         </nz-card>
 
         <!-- Alert for user feedback -->
-        <nz-alert *ngIf="alert.show" 
+        <nz-alert *ngIf="alert.show"
             [nzType]="alert.type === 'success' ? 'success' : alert.type === 'error' ? 'error' : alert.type === 'warning' ? 'warning' : 'info'"
-            [nzMessage]="alert.message" 
-            (nzOnClose)="onCloseAlert()" 
-            nzShowIcon 
-            nzCloseable
-            style="margin-top: 16px;">
+            [nzMessage]="alert.message" (nzOnClose)="onCloseAlert()" nzShowIcon nzCloseable style="margin-top: 16px;">
         </nz-alert>
     </div>
 </nz-spin>

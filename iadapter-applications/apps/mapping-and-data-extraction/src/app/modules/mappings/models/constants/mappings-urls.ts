@@ -13,4 +13,5 @@ export enum MappingsUrls {
   HDU_MAPPINGS = 'hduApi/mappings',
   HDU_PROGRAM_MAPPINGS = 'hduApi/mappings',
   GET_FLAT_VIEWS_TABLES = 'datastore/FLAT-VIEWS-TABLES',
+  GET_DATA_TEMPLATE = 'datastore/TEMPLATE/dataTemplate',
 }
