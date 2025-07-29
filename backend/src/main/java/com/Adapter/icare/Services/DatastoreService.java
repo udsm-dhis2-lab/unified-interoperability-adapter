@@ -64,22 +64,23 @@ public class DatastoreService {
     }
 
     public Datastore updateDatastore(Datastore datastore) throws Exception {
-        if (datastore.getUuid() != null) {
-            String uuid = datastore.getUuid();
-            Datastore datastoreToUpdate = datastoreRepository.getDatastoreByUuid(uuid);
-            if (datastoreToUpdate != null) {
-                datastore.setId(datastoreToUpdate.getId());
-                if (authenticatedUser != null) {
-                    datastore.setLastUpdatedBy(authenticatedUser);
-                }
-                return datastoreRepository.save(datastore);
-            } else {
-                throw new IllegalStateException("Datastore with uuid " + uuid + " does not exists");
+        if (datastore.getId() != null) {
+            if (authenticatedUser != null) {
+                datastore.setLastUpdatedBy(authenticatedUser);
             }
+            return datastoreRepository.save(datastore);
         } else {
-            throw new IllegalStateException("Datastore uuid is not set");
+            throw new IllegalStateException("Datastore doesn't exist");
         }
 
+    }
+
+    public Integer deleteDatastoreByNamespace(String namespace) throws Exception {
+        return datastoreRepository.deleteDatastoreByNamespace(namespace);
+    }
+
+    public Integer updateDatastoreNamespace(String oldNamespace, String newNamespace) {
+        return datastoreRepository.updateNamespace(oldNamespace, newNamespace);
     }
 
     public void deleteDatastore(String uuid) throws NotFoundException {
