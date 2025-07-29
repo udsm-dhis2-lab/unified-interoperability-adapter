@@ -9,7 +9,7 @@ import { DatasetManagementService } from '../../services/dataset-management.serv
 import { ActivatedRoute, Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { BehaviorSubject, debounceTime, Observable, switchMap } from 'rxjs';
-import { SqlEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
+import { CodeEditorComponent } from '../../../../shared/components/sql-editor/sql-editor.component';
 
 import {
   ConfigurationPage,
@@ -58,13 +58,13 @@ class Disaggregation {
   imports: [
     SharedModule,
     SelectComponent,
-    SqlEditorComponent,
+    CodeEditorComponent,
   ],
   templateUrl: './dataset-mapping.component.html',
   styleUrl: './dataset-mapping.component.css',
 })
 export class DatasetMappingComponent implements OnInit {
-  // Database schema is now defined in the SqlEditorComponent with comprehensive FHIR views
+  // Database schema is now defined in the CodeEditorComponent with comprehensive FHIR views
 
   newThisYear?: boolean = false;
   newVisit?: boolean = false;

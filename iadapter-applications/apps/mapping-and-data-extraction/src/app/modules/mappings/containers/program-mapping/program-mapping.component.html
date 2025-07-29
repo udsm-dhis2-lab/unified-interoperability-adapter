@@ -1,0 +1,407 @@
+<nz-spin [nzSpinning]="isLoading">
+    <div class="inner-content">
+        <button nz-button nzType="default" style="margin-bottom: 16px" (click)="goBackToProgramList()">
+            Go back
+        </button>
+
+        <nz-card style="width: 100%">
+            <div nz-row [nzGutter]="16">
+                <!-- Left Column - Program Form Representation -->
+                <div nz-col [nzSpan]="leftColumnSpan">
+                    <nz-card class="card">
+                        <div class="left-column">
+                            <div class="program-header" *ngIf="programData">
+                                <h2>{{ programData.displayName }}</h2>
+                                <p class="program-description">{{ programData.description }}</p>
+                                <div class="program-meta">
+                                    <nz-tag [nzColor]="'blue'">{{ programData.programType }}</nz-tag>
+                                    <span class="program-short-name">{{ programData.displayShortName }}</span>
+                                </div>
+                            </div>
+
+                            <div class="scrollable-content">
+                                <!-- Enrollment Details for Tracker Programs -->
+                                <div class="enrollment-section" *ngIf="isTrackerProgram && hasEnrollmentAttributes">
+                                    <div class="stage-header">
+                                        <h3>Enrollment Details</h3>
+                                        <p class="stage-description">Registration attributes for this program</p>
+                                    </div>
+
+                                    <!-- Tracked Entity Attributes Section -->
+                                    <div class="program-sections">
+                                        <div class="section">
+                                            <div class="section-header">
+                                                <h4>Registration Attributes</h4>
+                                            </div>
+
+                                            <!-- Tracked Entity Attributes -->
+                                            <div class="data-elements">
+                                                <div class="data-element-field"
+                                                    *ngFor="let programAttribute of programData?.programTrackedEntityAttributes; trackBy: trackByTrackedEntityAttribute"
+                                                    [class.selected]="programAttribute.trackedEntityAttribute.selected"
+                                                    [class.disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected"
+                                                    (click)="onTrackedEntityAttributeSelect(programAttribute.trackedEntityAttribute)">
+                                                    <label class="field-label">
+                                                        {{ programAttribute.trackedEntityAttribute.formName ||
+                                                        programAttribute.trackedEntityAttribute.displayName }}
+                                                    </label>
+                                                    <input nz-input
+                                                        [placeholder]="programAttribute.trackedEntityAttribute.displayName"
+                                                        readonly class="field-input"
+                                                        [disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected" />
+                                                    <div class="field-info">
+                                                        <small class="field-id">ID: {{
+                                                            programAttribute.trackedEntityAttribute.id }}</small>
+                                                        <small class="field-name"
+                                                            *ngIf="programAttribute.trackedEntityAttribute.name !== programAttribute.trackedEntityAttribute.displayName">
+                                                            Name: {{ programAttribute.trackedEntityAttribute.name }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Program Stages - Loop through all stages -->
+                                <div class="program-stage"
+                                    *ngFor="let programStage of programData?.programStages; trackBy: trackByProgramStage">
+                                    <div class="stage-header">
+                                        <h3>{{ programStage.displayName }}</h3>
+                                        <p class="stage-description">{{ programStage.description }}</p>
+                                    </div>
+
+                                    <!-- Program Stage Sections -->
+                                    <div class="program-sections">
+                                        <div class="section"
+                                            *ngFor="let section of programStage.programStageSections; trackBy: trackBySection">
+                                            <div class="section-header">
+                                                <h4>{{ section.displayName }}</h4>
+                                            </div>
+
+                                            <!-- Data Elements in Section -->
+                                            <div class="data-elements">
+                                                <div class="data-element-field"
+                                                    *ngFor="let dataElement of section.dataElements; trackBy: trackByDataElement"
+                                                    [class.selected]="dataElement.selected"
+                                                    [class.disabled]="selectedDataElement && selectedDataElement.id !== dataElement.id && selectedDataElement.selected"
+                                                    (click)="onDataElementSelect(dataElement)">
+                                                    <label class="field-label">
+                                                        {{ dataElement.formName || dataElement.displayName }}
+                                                    </label>
+                                                    <input nz-input [placeholder]="dataElement.displayName" readonly
+                                                        class="field-input"
+                                                        [disabled]="selectedDataElement && selectedDataElement.id !== dataElement.id && selectedDataElement.selected" />
+                                                    <div class="field-info">
+                                                        <small class="field-id">ID: {{ dataElement.id }}</small>
+                                                        <small class="field-name"
+                                                            *ngIf="dataElement.name !== dataElement.displayName">
+                                                            Name: {{ dataElement.name }}
+                                                        </small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- No data message -->
+                                <div class="no-data" *ngIf="!programData && !isLoading && !hasError">
+                                    <nz-empty nzNotFoundImage="simple"
+                                        nzNotFoundContent="No program data available"></nz-empty>
+                                </div>
+
+                                <!-- Error message -->
+                                <div class="error-data" *ngIf="hasError && !isLoading">
+                                    <nz-alert nzType="error" [nzMessage]="errorMessage" nzShowIcon
+                                        [nzAction]="retryTemplate" style="margin: 16px 0;">
+                                    </nz-alert>
+                                    <ng-template #retryTemplate>
+                                        <button nz-button nzType="primary" nzSize="small" (click)="loadProgramData()">
+                                            Retry
+                                        </button>
+                                    </ng-template>
+                                </div>
+                            </div>
+                        </div>
+                    </nz-card>
+                </div>
+
+                <!-- Right Column - Mapping Configuration -->
+                <div nz-col [nzSpan]="rightColumnSpan">
+                    <div nz-row nzJustify="space-between">
+                        <div nz-col nzSpan="12">
+                            <!-- Collapse button -->
+                            <button nz-button nzType="default" (click)="onCollapse()" class="collapse-button">
+                                <span nz-icon [nzType]="leftColumnSpan === 8 ? 'right' : 'left'"
+                                    nzTheme="outline"></span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <nz-card>
+                        <!-- Selected Data Element Info -->
+                        <div class="selected-field-info" *ngIf="selectedDataElement">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Selected Data Element: {{ selectedDataElement.displayName }}</h4>
+                                <nz-tag *ngIf="mappingUuid" [nzColor]="'green'">
+                                    <span nz-icon nzType="check-circle"></span>
+                                    Mapped
+                                </nz-tag>
+                            </div>
+                            <div class="field-details">
+                                <p><strong>Internal Name:</strong> {{ selectedDataElement.name }}</p>
+                                <p><strong>ID:</strong> {{ selectedDataElement.id }}</p>
+                                <p *ngIf="selectedDataElement.type"><strong>Type:</strong> {{ selectedDataElement.type
+                                    }}</p>
+                                <p *ngIf="selectedDataElement.optionSet"><strong>Option Set:</strong> {{
+                                    selectedDataElement.optionSet.name }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Selected Tracked Entity Attribute Info -->
+                        <div class="selected-field-info" *ngIf="selectedTrackedEntityAttribute">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <h4>Selected Enrollment Attribute: {{ selectedTrackedEntityAttribute.displayName }}</h4>
+                                <nz-tag *ngIf="mappingUuid" [nzColor]="'green'">
+                                    <span nz-icon nzType="check-circle"></span>
+                                    Mapped
+                                </nz-tag>
+                            </div>
+                            <div class="field-details">
+                                <!-- <p><strong>Internal Name:</strong> {{ selectedTrackedEntityAttribute.name }}</p> -->
+                                <p><strong>ID:</strong> {{ selectedTrackedEntityAttribute.id }}</p>
+                                <p *ngIf="selectedTrackedEntityAttribute.type"><strong>Type:</strong> {{
+                                    selectedTrackedEntityAttribute.type }}</p>
+                                <p *ngIf="selectedTrackedEntityAttribute.optionSet"><strong>Option Set:</strong> {{
+                                    selectedTrackedEntityAttribute.optionSet.name }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Mapping Configuration -->
+                        <div class="mapping-configuration"
+                            *ngIf="(selectedDataElement || selectedTrackedEntityAttribute) && currentMapping && rightColumnSpan === 16">
+                            <nz-divider></nz-divider>
+                            <h4>Mapping Configuration</h4>
+
+                            <!-- Junction Operator (when multiple fields) -->
+                            <div class="mapping-section" *ngIf="selectedDataParams.length > 1">
+                                <h5>Junction Operator</h5>
+                                <nz-select [(ngModel)]="junctionOperator"
+                                    (ngModelChange)="updateJunctionOperator($event)" style="width: 100%">
+                                    <nz-option nzValue="SPACE" nzLabel="Space"></nz-option>
+                                    <nz-option nzValue="COMMA" nzLabel="Comma (,)"></nz-option>
+                                    <nz-option nzValue="HYPHEN" nzLabel="Hyphen (-)"></nz-option>
+                                    <nz-option nzValue="UNDERSCORE" nzLabel="Underscore (_)"></nz-option>
+                                    <nz-option nzValue="PIPE" nzLabel="Pipe (|)"></nz-option>
+                                </nz-select>
+                            </div>
+
+                            <!-- Custom Script Section -->
+                            <div class="mapping-section">
+                                <div class="section-header-with-action">
+                                    <h5>Data Source Fields</h5>
+                                    <button nz-button nzType="dashed" nzSize="small" (click)="addDataParam()">
+                                        <span nz-icon nzType="plus"></span>
+                                        Add Field
+                                    </button>
+                                </div>
+
+                                <!-- Data Parameters -->
+                                <div class="data-params-list">
+                                    <div class="data-param-item"
+                                        *ngFor="let param of selectedDataParams; let i = index">
+                                        <div class="param-header">
+                                            <h6>Parameter {{ i + 1 }} ($dataParams[{{ i }}])</h6>
+                                            <button nz-button nzType="text" nzDanger nzSize="small"
+                                                (click)="removeDataParam(i)">
+                                                <span nz-icon nzType="delete"></span>
+                                            </button>
+                                        </div>
+
+                                        <nz-form-item>
+                                            <nz-form-label>Source Field</nz-form-label>
+                                            <nz-form-control>
+                                                <div class="tree-selector-container">
+                                                    <!-- Current selection display -->
+                                                    <div class="current-selection" *ngIf="param.value.path">
+                                                        <nz-tag [nzColor]="'blue'">
+                                                            <span nz-icon
+                                                                [nzType]="getNodeIcon(param.value.type, true)"></span>
+                                                            {{ getDataParamDisplayText(param) }}
+                                                        </nz-tag>
+                                                        <button nz-button nzType="text" nzSize="small"
+                                                            (click)="param.value = { path: '', type: 'TEXT', label: '' }; updateMappingStructure()">
+                                                            <span nz-icon nzType="close"></span>
+                                                        </button>
+                                                    </div>
+
+                                                    <!-- Tree selector -->
+                                                    <div class="tree-selector">
+                                                        <nz-input-group nzCompact>
+                                                            <input nz-input [ngModel]="searchValue"
+                                                                (ngModelChange)="onTreeSearchValueChange($event)"
+                                                                placeholder="Search data template fields..."
+                                                                style="width: 70%;" />
+                                                            <button nz-button nzType="default" style="width: 30%;"
+                                                                (click)="expandedKeys = []; searchValue = ''">
+                                                                <span nz-icon nzType="reload"></span>
+                                                                Reset
+                                                            </button>
+                                                        </nz-input-group>
+
+                                                        <div class="tree-container"
+                                                            style="max-height: 300px; overflow-y: auto; border: 1px solid #d9d9d9; margin-top: 8px; padding: 8px;">
+                                                            <div *ngIf="isLoadingDataTemplate" class="loading-state"
+                                                                style="text-align: center; padding: 20px;">
+                                                                <nz-spin nzSimple></nz-spin>
+                                                                <p style="margin-top: 8px; color: #666;">Loading data
+                                                                    template...</p>
+                                                            </div>
+
+                                                            <div *ngIf="!isLoadingDataTemplate && dataTemplateTree.length === 0"
+                                                                class="empty-state"
+                                                                style="text-align: center; padding: 20px;">
+                                                                <nz-empty nzNotFoundImage="simple"
+                                                                    nzNotFoundContent="No data template available"></nz-empty>
+                                                            </div>
+
+                                                            <nz-tree
+                                                                *ngIf="!isLoadingDataTemplate && dataTemplateTree.length > 0"
+                                                                [nzData]="dataTemplateTree"
+                                                                [nzExpandedKeys]="expandedKeys"
+                                                                [nzSearchValue]="searchValue" [nzHideUnMatched]="false"
+                                                                [nzCheckable]="false" [nzShowIcon]="true"
+                                                                (nzClick)="onTreeClick($event, i)"
+                                                                (nzExpandChange)="onTreeExpandChange($event)">
+                                                            </nz-tree>
+                                                        </div>
+
+                                                        <!-- Data template loading status -->
+                                                        <div class="template-status"
+                                                            style="margin-top: 8px; font-size: 12px; color: #666;">
+                                                            <span nz-icon
+                                                                [nzType]="isLoadingDataTemplate ? 'loading' : 'info-circle'"
+                                                                [nzSpin]="isLoadingDataTemplate"></span>
+                                                            {{ dataTemplateLoadingStatus }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </nz-form-control>
+                                        </nz-form-item>
+
+                                        <!-- Option Set Mappings for selected data element with option set -->
+                                        <div *ngIf="(selectedDataElement?.optionSet || selectedTrackedEntityAttribute?.optionSet)"
+                                            class="code-mappings">
+                                            <div class="section-header-with-action">
+                                                <h6>Option Set Mappings</h6>
+                                                <button nz-button nzType="text" nzSize="small"
+                                                    (click)="toggleOptionMappings(i)"
+                                                    nz-tooltip="Toggle option mappings visibility">
+                                                    <span nz-icon
+                                                        [nzType]="param.showOptionMappings ? 'eye-invisible' : 'eye'"
+                                                        nzTheme="outline"></span>
+                                                    {{ param.showOptionMappings ? 'Hide' : 'Show' }} Mappings
+                                                    <nz-tag
+                                                        *ngIf="!param.showOptionMappings && (param.mappings?.length || 0) > 0"
+                                                        nzSize="small" [nzColor]="'blue'">
+                                                        {{ param.mappings?.length || 0 }} mapped
+                                                    </nz-tag>
+                                                </button>
+                                            </div>
+                                            <p class="mapping-description" *ngIf="param.showOptionMappings">
+                                                Map source field values to option set codes:
+                                            </p>
+
+                                            <div class="option-set-mappings" *ngIf="param.showOptionMappings">
+                                                <div class="mapping-item"
+                                                    *ngFor="let option of (selectedDataElement?.optionSet?.options || selectedTrackedEntityAttribute?.optionSet?.options); let optionIndex = index">
+                                                    <div class="mapping-header">
+                                                        <h6>{{ option.name }} ({{ option.code }})</h6>
+                                                        <button nz-button nzType="text" nzDanger nzSize="small"
+                                                            (click)="removeOptionMapping(i, optionIndex)"
+                                                            *ngIf="getOptionMapping(i, option.code)">
+                                                            <span nz-icon nzType="delete"></span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="mapping-target">
+                                                        Target: {{ option.code }}
+                                                    </div>
+                                                    <nz-form-item>
+                                                        <nz-form-label>Input Values (comma-separated)</nz-form-label>
+                                                        <nz-form-control>
+                                                            <textarea rows="3" nz-input
+                                                                [ngModel]="getOptionMappingInputCodes(i, option.code)"
+                                                                (ngModelChange)="updateOptionMapping(i, option.code, $event)"
+                                                                placeholder="Enter comma-separated input values that should map to {{ option.code }}&#10;Example: Yes, true, 1, positive"></textarea>
+                                                        </nz-form-control>
+                                                    </nz-form-item>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Custom JavaScript Function Editor -->
+                                <nz-form-item>
+                                    <nz-form-label>Custom JavaScript Function</nz-form-label>
+                                    <nz-form-control>
+                                        <app-code-editor [value]="customScript"
+                                            (valueChange)="updateCustomScript($event)" [height]="'200px'"
+                                            [theme]="'dark'" [language]="'javascript'">
+                                        </app-code-editor>
+                                    </nz-form-control>
+                                </nz-form-item>
+                            </div>
+
+                            <!-- Mapping Preview -->
+                            <div class="mapping-section" *ngIf="currentMapping">
+                                <h5>Mapping Preview</h5>
+                                <div class="mapping-preview">
+                                    <pre>{{ currentMapping | json }}</pre>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="mapping-actions">
+                                <button nz-button nzType="primary" (click)="saveMapping()"
+                                    [disabled]="!currentMapping || selectedDataParams.length === 0"
+                                    [nzLoading]="isSubmittingMapping" style="margin-right: 8px;">
+                                    <span nz-icon nzType="save" *ngIf="!isSubmittingMapping"></span>
+                                    {{ mappingUuid ? 'Update' : 'Save' }} Mapping
+                                </button>
+                                <button nz-button nzType="default" nzDanger (click)="deleteMapping()"
+                                    *ngIf="mappingUuid" [nzLoading]="isDeletingMapping" style="margin-right: 8px;">
+                                    <span nz-icon nzType="delete" *ngIf="!isDeletingMapping"></span>
+                                    Delete Mapping
+                                </button>
+                                <button nz-button nzType="default" (click)="clearSelection()">
+                                    <span nz-icon nzType="clear"></span>
+                                    Clear Selection
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- No selection message -->
+                        <div class="no-selection" *ngIf="!selectedDataElement && !selectedTrackedEntityAttribute">
+                            <nz-empty nzNotFoundImage="simple"
+                                nzNotFoundContent="Select a field from the form to configure mapping"></nz-empty>
+                        </div>
+
+                        <!-- Collapsed state message -->
+                        <div *ngIf="rightColumnSpan !== 16 && leftColumnSpan !== 8"
+                            style="margin-top: 16px; font-size: 14px; color: #888; text-align: center;">
+                            Expand the right column to configure mapping.
+                        </div>
+                    </nz-card>
+                </div>
+            </div>
+        </nz-card>
+
+        <!-- Alert for user feedback -->
+        <nz-alert *ngIf="alert.show"
+            [nzType]="alert.type === 'success' ? 'success' : alert.type === 'error' ? 'error' : alert.type === 'warning' ? 'warning' : 'info'"
+            [nzMessage]="alert.message" (nzOnClose)="onCloseAlert()" nzShowIcon nzCloseable style="margin-top: 16px;">
+        </nz-alert>
+    </div>
+</nz-spin>

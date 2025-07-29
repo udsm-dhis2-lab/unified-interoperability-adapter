@@ -2,6 +2,7 @@ export enum MappingsUrls {
   GET_DATASETS_REMOTE = 'dataSets/remote',
   GET_DATASETS_SELECTED = 'dataSets',
   GET_DATASET_BY_ID = 'dataSets',
+  GET_PROGRAMS_REMOTE = 'programs/remote',
   CONFIGURATIONS = 'hduApi/configurations',
   GET_ICD_CODES = 'hduApi/codeSystems/icd/codes',
   GET_LOINC_CODES = 'hduApi/codeSystems/loinc',
@@ -10,5 +11,7 @@ export enum MappingsUrls {
   REMOVE_DATASET_FROM_MAPPING = 'dataSets',
   GET_CATEGORY_OPTION_COMBO = 'dataElements',
   HDU_MAPPINGS = 'hduApi/mappings',
+  HDU_PROGRAM_MAPPINGS = 'hduApi/mappings',
   GET_FLAT_VIEWS_TABLES = 'datastore/FLAT-VIEWS-TABLES',
+  GET_DATA_TEMPLATE = 'datastore/TEMPLATE/dataTemplate',
 }
