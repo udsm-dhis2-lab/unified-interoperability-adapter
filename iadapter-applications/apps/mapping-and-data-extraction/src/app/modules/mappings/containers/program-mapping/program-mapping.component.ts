@@ -90,6 +90,7 @@ export interface MappingData {
             name: string;
             programStage?: string;
             program?: string;
+            isProgramStageRepeatable: boolean;
             code: string;
             type: string;
         };
@@ -536,6 +537,7 @@ export class ProgramMappingComponent implements OnInit {
                     name: this.selectedDataElement.displayName,
                     programStage: programStage?.id || '',
                     program: this.programId,
+                    isProgramStageRepeatable: programStage?.repeatable || false,
                     code: this.selectedDataElement.code || '',
                     type: this.selectedDataElement.type || ''
                 },
@@ -766,9 +768,15 @@ export class ProgramMappingComponent implements OnInit {
         let description: string;
 
         if (this.selectedDataElement) {
+            // Find the program stage that contains this data element to get repeatable property
+            const programStage = this.findProgramStageForDataElement(this.selectedDataElement.id);
+
             // For data elements
             mappingContent = {
-                dataElement: this.currentMapping.mapping.dataElement,
+                dataElement: {
+                    ...this.currentMapping.mapping.dataElement,
+                    isProgramStageRepeatable: programStage?.repeatable || false
+                },
                 dataParams: this.selectedDataParams,
                 junctionOperator: this.junctionOperator,
                 customScript: this.customScript && this.customScript.trim() ? this.customScript : undefined
