@@ -526,12 +526,15 @@ export class ProgramMappingComponent implements OnInit {
         let dataKey: string;
 
         if (this.selectedDataElement) {
+            // Find the program stage that contains this data element
+            const programStage = this.findProgramStageForDataElement(this.selectedDataElement.id);
+
             dataKey = this.selectedDataElement.id;
             mappingContent = {
                 dataElement: {
                     id: this.selectedDataElement.id,
                     name: this.selectedDataElement.displayName,
-                    programStage: this.firstProgramStage?.id || '',
+                    programStage: programStage?.id || '',
                     program: this.programId,
                     code: this.selectedDataElement.code || '',
                     type: this.selectedDataElement.type || ''
@@ -569,6 +572,20 @@ export class ProgramMappingComponent implements OnInit {
         this.customScript = '';
         this.showCodedMappings = false;
         this.showCustomScript = false;
+    }
+
+    // Helper method to find the program stage that contains a specific data element
+    private findProgramStageForDataElement(dataElementId: string): ProgramStage | null {
+        if (!this.programData?.programStages) return null;
+
+        for (const stage of this.programData.programStages) {
+            for (const section of stage.programStageSections || []) {
+                if (section.dataElements?.some(de => de.id === dataElementId)) {
+                    return stage;
+                }
+            }
+        }
+        return null;
     }
 
     updateMappingStructure(): void {
@@ -967,5 +984,9 @@ export class ProgramMappingComponent implements OnInit {
 
     trackByTrackedEntityAttribute(index: number, programAttribute: ProgramTrackedEntityAttribute): string {
         return programAttribute.trackedEntityAttribute.id;
+    }
+
+    trackByProgramStage(index: number, programStage: ProgramStage): string {
+        return programStage.id;
     }
 }

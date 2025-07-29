@@ -22,49 +22,59 @@
                             <div class="scrollable-content">
                                 <!-- Enrollment Details for Tracker Programs -->
                                 <div class="enrollment-section" *ngIf="isTrackerProgram && hasEnrollmentAttributes">
-                                    <div class="enrollment-header">
+                                    <div class="stage-header">
                                         <h3>Enrollment Details</h3>
-                                        <p class="enrollment-description">Registration attributes for this program</p>
+                                        <p class="stage-description">Registration attributes for this program</p>
                                     </div>
 
-                                    <!-- Tracked Entity Attributes -->
-                                    <div class="tracked-entity-attributes">
-                                        <div class="attribute-field"
-                                            *ngFor="let programAttribute of programData?.programTrackedEntityAttributes; trackBy: trackByTrackedEntityAttribute"
-                                            [class.selected]="programAttribute.trackedEntityAttribute.selected"
-                                            [class.disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected"
-                                            (click)="onTrackedEntityAttributeSelect(programAttribute.trackedEntityAttribute)">
-                                            <label class="field-label">
-                                                {{ programAttribute.trackedEntityAttribute.formName ||
-                                                programAttribute.trackedEntityAttribute.displayName }}
-                                            </label>
-                                            <input nz-input
-                                                [placeholder]="programAttribute.trackedEntityAttribute.displayName"
-                                                readonly class="field-input"
-                                                [disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected" />
-                                            <div class="field-info">
-                                                <small class="field-id">ID: {{
-                                                    programAttribute.trackedEntityAttribute.id }}</small>
-                                                <small class="field-name"
-                                                    *ngIf="programAttribute.trackedEntityAttribute.name !== programAttribute.trackedEntityAttribute.displayName">
-                                                    Name: {{ programAttribute.trackedEntityAttribute.name }}
-                                                </small>
+                                    <!-- Tracked Entity Attributes Section -->
+                                    <div class="program-sections">
+                                        <div class="section">
+                                            <div class="section-header">
+                                                <h4>Registration Attributes</h4>
+                                            </div>
+
+                                            <!-- Tracked Entity Attributes -->
+                                            <div class="data-elements">
+                                                <div class="data-element-field"
+                                                    *ngFor="let programAttribute of programData?.programTrackedEntityAttributes; trackBy: trackByTrackedEntityAttribute"
+                                                    [class.selected]="programAttribute.trackedEntityAttribute.selected"
+                                                    [class.disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected"
+                                                    (click)="onTrackedEntityAttributeSelect(programAttribute.trackedEntityAttribute)">
+                                                    <label class="field-label">
+                                                        {{ programAttribute.trackedEntityAttribute.formName ||
+                                                        programAttribute.trackedEntityAttribute.displayName }}
+                                                    </label>
+                                                    <input nz-input
+                                                        [placeholder]="programAttribute.trackedEntityAttribute.displayName"
+                                                        readonly class="field-input"
+                                                        [disabled]="selectedTrackedEntityAttribute && selectedTrackedEntityAttribute.id !== programAttribute.trackedEntityAttribute.id && selectedTrackedEntityAttribute.selected" />
+                                                    <div class="field-info">
+                                                        <small class="field-id">ID: {{
+                                                            programAttribute.trackedEntityAttribute.id }}</small>
+                                                        <small class="field-name"
+                                                            *ngIf="programAttribute.trackedEntityAttribute.name !== programAttribute.trackedEntityAttribute.displayName">
+                                                            Name: {{ programAttribute.trackedEntityAttribute.name }}
+                                                        </small>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <!-- Program Stage Form -->
-                                <div class="program-stage" *ngIf="firstProgramStage">
+                                <!-- Program Stages - Loop through all stages -->
+                                <div class="program-stage"
+                                    *ngFor="let programStage of programData?.programStages; trackBy: trackByProgramStage">
                                     <div class="stage-header">
-                                        <h3>{{ firstProgramStage.displayName }}</h3>
-                                        <p class="stage-description">{{ firstProgramStage.description }}</p>
+                                        <h3>{{ programStage.displayName }}</h3>
+                                        <p class="stage-description">{{ programStage.description }}</p>
                                     </div>
 
                                     <!-- Program Stage Sections -->
                                     <div class="program-sections">
                                         <div class="section"
-                                            *ngFor="let section of firstProgramStage.programStageSections; trackBy: trackBySection">
+                                            *ngFor="let section of programStage.programStageSections; trackBy: trackBySection">
                                             <div class="section-header">
                                                 <h4>{{ section.displayName }}</h4>
                                             </div>
@@ -159,7 +169,7 @@
                                 </nz-tag>
                             </div>
                             <div class="field-details">
-                                <p><strong>Internal Name:</strong> {{ selectedTrackedEntityAttribute.name }}</p>
+                                <!-- <p><strong>Internal Name:</strong> {{ selectedTrackedEntityAttribute.name }}</p> -->
                                 <p><strong>ID:</strong> {{ selectedTrackedEntityAttribute.id }}</p>
                                 <p *ngIf="selectedTrackedEntityAttribute.type"><strong>Type:</strong> {{
                                     selectedTrackedEntityAttribute.type }}</p>
@@ -373,7 +383,7 @@
                         </div>
 
                         <!-- No selection message -->
-                        <div class="no-selection" *ngIf="!selectedDataElement">
+                        <div class="no-selection" *ngIf="!selectedDataElement && !selectedTrackedEntityAttribute">
                             <nz-empty nzNotFoundImage="simple"
                                 nzNotFoundContent="Select a field from the form to configure mapping"></nz-empty>
                         </div>
