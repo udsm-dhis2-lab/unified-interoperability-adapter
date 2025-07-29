@@ -545,6 +545,83 @@ public class HDUAPIController {
         }
     }
 
+
+    @GetMapping("standardCodes")
+    public ResponseEntity<Map<String, Object>> getStandardCodes(
+            @RequestParam(value = "namespace", required = false) String namespace,
+            @RequestParam(value = "key", required = false) String key,
+            @RequestParam(value = "code", required = false) String code,
+            @RequestParam(value = "version", required = false) String version,
+            @RequestParam(value = "q", required = false) String q,
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+
+            var testingDatastore = datastoreService.getDatastoreNamespaceUsingPagination(namespace, page, pageSize, key,"STANDARD-CODES");
+            System.out.println("==> Getting standard codes: " + testingDatastore.getTotalElements());
+
+
+            Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreMatchingParams(namespace, key, version,
+                    null, q, code, page, pageSize, "STANDARD-CODES");
+            for (Datastore datastore : pagedDatastoreData.getContent()) {
+                Map<String, Object> standardCodeDetails = datastore.getValue();
+                standardCodeDetails.put("namespace", datastore.getNamespace());
+                standardCodeDetails.put("key", datastore.getDataKey());
+                namespaceDetails.add(standardCodeDetails);
+            }
+            Map<String, Object> returnObject = new HashMap<>();
+            Map<String, Object> pager = new HashMap<>();
+            pager.put("page", page);
+            pager.put("pageSize", pageSize);
+            pager.put("totalPages", pagedDatastoreData.getTotalPages());
+            pager.put("total", pagedDatastoreData.getTotalElements());
+            returnObject.put("pager", pager);
+            returnObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(returnObject);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+    @GetMapping("standardCodes/{namespace}")
+    public ResponseEntity<Map<String, Object>> getSpecificStandardCodedItems(@PathVariable("namespace") String namespace,
+                                                                     @RequestParam(value = "code", required = false) String code,
+                                                                     @RequestParam(value = "q", required = false) String q,
+                                                                     @RequestParam(value = "page", required = false, defaultValue = "1") Integer page,
+                                                                     @RequestParam(value = "pageSize", required = false, defaultValue = "10") Integer pageSize,
+                                                                     @RequestParam(value = "paging", required = false, defaultValue = "true") boolean paging) throws Exception {
+        List<Map<String, Object>> namespaceDetails = new ArrayList<>();
+        try {
+           Page<Datastore> pagedDatastoreData = datastoreService.getDatastoreNamespaceDetailsByPagination(
+                    namespace, null, null, q, code, "STANDARD-CODES", page,
+                    pageSize, paging);
+            for (Datastore datastore : pagedDatastoreData.getContent()) {
+                namespaceDetails.add(datastore.getValue());
+            }
+            Map<String, Object> returnObject = new HashMap<>();
+            if (paging) {
+                Map<String, Object> pager = new HashMap<>();
+                pager.put("page", page);
+                pager.put("pageSize", pageSize);
+                pager.put("totalPages", pagedDatastoreData.getTotalPages());
+                pager.put("total", pagedDatastoreData.getTotalElements());
+                returnObject.put("pager", pager);
+            }
+            returnObject.put("results", namespaceDetails);
+            return ResponseEntity.ok(returnObject);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Map<String, Object> response = new HashMap<>();
+            response.put("status", HttpStatus.NOT_FOUND.getReasonPhrase());
+            response.put("statusCode", HttpStatus.NOT_FOUND.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+
     @PostMapping(value = "configurations", consumes = APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, Object>> addConfigurations(
             @Valid @RequestBody DatastoreConfigurationsDTO configurations) {

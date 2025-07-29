@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-username =  os.getenv('HDU_USERNAME')
+username = os.getenv('HDU_USERNAME')
 password = os.getenv('HDU_PASSWORD')
 
 def set_nested_value(d, key_path, value):
@@ -78,6 +78,7 @@ def read_and_convert_to_json(file_path):
         elif file_extension == '.xlsx':
             xls = pd.ExcelFile(file_path)
             emptyConsecutiveRows = 0
+            # print(xls.sheet_names)
             for sheet_name in xls.sheet_names:
                 df = xls.parse(sheet_name)
                 namespace_value = sheet_name
@@ -144,11 +145,12 @@ def is_row_effectively_empty(row_series):
 
 
 def sendToDataStore(json_data):
-    url = "http://41.59.228.177/api/v1/datastore?update=true"
+    url = "http://hdu-api-dev.moh.go.tz/api/v1/datastore?update=true"
+    # url = "http://localhost:8091/api/v1/datastore?update=true"
     headers = {
         'Content-type': 'application/json',
     }
-    response = requests.post(f"{url}", json=json_data, auth=HTTPBasicAuth(username,password), headers=headers)
+    response = requests.post(f"{url}", json=json_data, headers=headers, auth=HTTPBasicAuth(username, password))
 
     return response
 
@@ -172,18 +174,20 @@ def create_json_from_row(row_data, namespace_value):
             
             set_nested_value(dynamic_attributes, attribute_key_path, attribute_value)
 
+    orgName = get_val("value.organisation", "MOH")
+
     json_object = {
         "namespace": namespace_value,
         "dataKey": get_val("dataKey"),
         "description": get_val("description"),
-        "datastoreGroup": "GENERAL-CODES" if  namespace_value.lower().find('loinc') == -1 and namespace_value.lower().find('snomed') == -1 else get_val("datastoreGroup"),
+        "datastoreGroup": "GENERAL-CODES" if  orgName == "MOH" else get_val("datastoreGroup"),
         "value": {
             "code": get_val("value.code"),
             "name": get_val("value.name"),
             "version": get_val("value.version", "1.0.0"),
             "release": get_val("value.release"),
             "url": get_val("value.url"),
-            "organisation": get_val("value.organisation", "MOH"),
+            "organisation": orgName,
             "attributes": dynamic_attributes
         }
     }
@@ -191,6 +195,8 @@ def create_json_from_row(row_data, namespace_value):
 
 
 
-filePath = "references/codes_import.xlsx"
+filePath = "codes_import.xlsx"
 
 read_and_convert_to_json(filePath)
+
+# ['OBSERVATIONGENERALCODES', 'ANALYZERCODEGUDID', 'TESTS OBERVATIONSLOINC', 'REJECTION_CODES', 'UCUM_CODES', 'MAPPED_LAB_TEST', 'MAPPED OBSERVARIONLOINC OBSERVA', 'LAB_RESULTSLOINC', 'ABNORMALFLAGS', 'RESULT_TYPE', 'ETHNIC GROUPGENERAL CODES', 'PATIENT_CLASS', 'RESULT_STATUS', 'LABRESULT_SNOMED', 'REQUESTTYPE_GENERAL CODE', 'PRIORITY_CODE', 'RACE', 'SPECIMEN_SITEGENERAL CODES', 'OBSERVATIONSLOINC']
