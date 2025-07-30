@@ -137,6 +137,7 @@ public class DatastoreController {
                 if (existingDatastore != null) {
                     existingDatastore.setValue(datastore.getValue());
                     existingDatastore.setDatastoreGroup(datastore.getDatastoreGroup() != null ? datastore.getDatastoreGroup() : existingDatastore.getDatastoreGroup());
+                    existingDatastore.setDescription(datastore.getDescription() != null ? datastore.getDescription() : existingDatastore.getDescription());
                     if (this.authentication != null && this.authenticatedUser != null) {
                         existingDatastore.setLastUpdatedBy(this.authenticatedUser);
                     }
