@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 
 @Slf4j
 public enum GENDER {
-    male,
-    female;
+    MALE,
+    FEMALE;
 
     public static final String INVALID_GENDER_PREFIX = "Invalid gender:";
     private static final String ALLOWED_VALUES_MESSAGE =
