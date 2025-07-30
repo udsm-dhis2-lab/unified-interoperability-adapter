@@ -47,7 +47,7 @@ public class SharedHealthRecordsDTO {
     @Schema(description = "This field is deprecated. It wont work starting v1.0.9", deprecated = true)
     private List<InvestigationDetailsDTO> investigationDetails;
 
-
+    @Schema(description = "This field is deprecated. It wont work starting v1.0.9", deprecated = true)
     private List<LabInvestigationDetailsDTO> labInvestigationDetails;
 
 

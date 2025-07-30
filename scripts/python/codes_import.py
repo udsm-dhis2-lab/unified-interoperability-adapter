@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import re
 import os
 import requests
 from requests.auth import HTTPBasicAuth
@@ -7,7 +8,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-username =  os.getenv('HDU_USERNAME')
+username = os.getenv('HDU_USERNAME')
 password = os.getenv('HDU_PASSWORD')
 
 def set_nested_value(d, key_path, value):
@@ -26,6 +27,61 @@ def set_nested_value(d, key_path, value):
             elif not isinstance(current[key], dict):
                 current[key] = {}
             current = current[key]
+
+def build_relationships_array(row_data):
+    """
+    Parses columns with bracket notation (e.g., 'value.relationships[0].type')
+    to build a proper list of relationship objects.
+    """
+    relationships_data = {}
+    REL_PREFIX = 'value.relationships['
+    
+    for col_name, value in row_data.items():
+        if col_name.startswith(REL_PREFIX) and pd.notna(value):
+            path = col_name[len(REL_PREFIX):]
+            match = re.match(r'(\d+)\]\.(.*)', path)
+            if match:
+                index = int(match.group(1))
+                key_path = match.group(2)
+                
+                if index not in relationships_data:
+                    relationships_data[index] = {}
+                relationships_data[index][key_path] = value
+
+    final_relationships = []
+    for index in sorted(relationships_data.keys()):
+        rel_cols = relationships_data[index]
+        
+        relationship_obj = {
+            "type": rel_cols.get("type", ""),
+            "codes": []
+        }
+        
+        codes_data = {}
+        CODES_PREFIX = 'codes['
+        for key, val in rel_cols.items():
+            if key.startswith(CODES_PREFIX):
+                code_path = key[len(CODES_PREFIX):]
+                code_match = re.match(r'(\d+)\]\.(.*)', code_path)
+                if code_match:
+                    code_index = int(code_match.group(1))
+                    code_key = code_match.group(2)
+                    
+                    if code_index not in codes_data:
+                        codes_data[code_index] = {}
+                    codes_data[code_index][code_key] = val
+                    
+        for code_index in sorted(codes_data.keys()):
+            code_obj = {
+                "code": codes_data[code_index].get("code", ""),
+                "name": codes_data[code_index].get("name", ""),
+                "codeType": codes_data[code_index].get("codeType", "")
+            }
+            relationship_obj["codes"].append(code_obj)
+            
+        final_relationships.append(relationship_obj)
+        
+    return final_relationships
 
 def read_and_convert_to_json(file_path):
     """
@@ -78,6 +134,7 @@ def read_and_convert_to_json(file_path):
         elif file_extension == '.xlsx':
             xls = pd.ExcelFile(file_path)
             emptyConsecutiveRows = 0
+            # print(xls.sheet_names)
             for sheet_name in xls.sheet_names:
                 df = xls.parse(sheet_name)
                 namespace_value = sheet_name
@@ -144,11 +201,12 @@ def is_row_effectively_empty(row_series):
 
 
 def sendToDataStore(json_data):
-    url = "http://41.59.228.177/api/v1/datastore?update=true"
+    url = "http://hdu-api-dev.moh.go.tz/api/v1/datastore?update=true"
+    # url = "http://localhost:8091/api/v1/datastore?update=true"
     headers = {
         'Content-type': 'application/json',
     }
-    response = requests.post(f"{url}", json=json_data, auth=HTTPBasicAuth(username,password), headers=headers)
+    response = requests.post(f"{url}", json=json_data, headers=headers, auth=HTTPBasicAuth(username, password))
 
     return response
 
@@ -172,18 +230,25 @@ def create_json_from_row(row_data, namespace_value):
             
             set_nested_value(dynamic_attributes, attribute_key_path, attribute_value)
 
+    relationships_array = build_relationships_array(row_data)
+
+    orgName = get_val("value.organisation", "MOH")
+
     json_object = {
         "namespace": namespace_value,
         "dataKey": get_val("dataKey"),
         "description": get_val("description"),
-        "datastoreGroup": "GENERAL-CODES" if  namespace_value.lower().find('loinc') == -1 and namespace_value.lower().find('snomed') == -1 else get_val("datastoreGroup"),
+        "datastoreGroup": "GENERAL-CODES" if  orgName == "MOH" else "STANDARD-CODES",
         "value": {
+            "codeType": namespace_value,
             "code": get_val("value.code"),
             "name": get_val("value.name"),
-            "version": get_val("value.version", "1.0.0"),
+            "shortName": get_val("value.shortName"),
+            "version": get_val("value.version"),
             "release": get_val("value.release"),
             "url": get_val("value.url"),
-            "organisation": get_val("value.organisation", "MOH"),
+            "organisation": orgName,
+            "relationships": relationships_array,
             "attributes": dynamic_attributes
         }
     }
@@ -191,6 +256,8 @@ def create_json_from_row(row_data, namespace_value):
 
 
 
-filePath = "references/codes_import.xlsx"
+filePath = "references/sample-new-format.xlsx"
 
 read_and_convert_to_json(filePath)
+
+# ['OBSERVATIONGENERALCODES', 'ANALYZERCODEGUDID', 'TESTS OBERVATIONSLOINC', 'REJECTION_CODES', 'UCUM_CODES', 'MAPPED_LAB_TEST', 'MAPPED OBSERVARIONLOINC OBSERVA', 'LAB_RESULTSLOINC', 'ABNORMALFLAGS', 'RESULT_TYPE', 'ETHNIC GROUPGENERAL CODES', 'PATIENT_CLASS', 'RESULT_STATUS', 'LABRESULT_SNOMED', 'REQUESTTYPE_GENERAL CODE', 'PRIORITY_CODE', 'RACE', 'SPECIMEN_SITEGENERAL CODES', 'OBSERVATIONSLOINC']
