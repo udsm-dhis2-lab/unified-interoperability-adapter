@@ -37,13 +37,25 @@ public interface DatastoreRepository  extends JpaRepository<Datastore, Long> {
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             " (:key IS NULL OR data_key = :key ) AND" +
-            " (:group IS NULL OR datastore_group = :group)",
+            " (:group IS NULL OR datastore_group = :group) AND" +
+            " (:q IS NULL OR (" +
+            "       JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
+            "       description LIKE CONCAT('%',:q,'%') OR" +
+            "       JSON_EXTRACT(value, '$.shortName') LIKE CONCAT('%',:q,'%')" +
+            "       )" +
+            ")",
             countQuery = "SELECT COUNT(*) FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
                     " (:key IS NULL OR data_key = :key ) AND" +
-                    " (:group IS NULL OR datastore_group = :group)",nativeQuery = true)
+                    " (:group IS NULL OR datastore_group = :group) AND" +
+                    " (:q IS NULL OR (" +
+                    "       JSON_EXTRACT(value, '$.name') LIKE CONCAT('%',:q,'%') OR " +
+                    "       description LIKE CONCAT('%',:q,'%') OR" +
+                    "       JSON_EXTRACT(value, '$.shortName') LIKE CONCAT('%',:q,'%')" +
+                    "       )" +
+                    ")", nativeQuery = true)
     Page<Datastore> getDatastoreByNamespaceByPagination(String namespace,
                                                         Pageable pageable,
-                                                        String key, String group);
+                                                        String key, String group, String q);
 
     @Query(value = "SELECT * FROM datastore WHERE (:namespace IS NULL OR namespace = :namespace ) AND " +
             "(:category IS NULL OR JSON_EXTRACT(value, '$.category') = :category ) AND " +
