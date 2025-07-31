@@ -2946,7 +2946,7 @@ public class SharedHealthRecordsService {
                                                     motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().get(0).hasCode() ?
                                                     motherHICStatusComponents.get(0).getValueCodeableConcept().getCoding().get(0).getCode() : null)
                                     );
-                                    motherHivStatusDTO.setTestingDate(stringToDateOrNull(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-motherHivstatus-testingDate"), "yyyy-MM-dd"));
+                                    motherHivStatusDTO.setTestingDate(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ch-motherHivstatus-testingDate"));
 
                                     childHealthDetailsDTO.setMotherHivStatus(motherHivStatusDTO);
 

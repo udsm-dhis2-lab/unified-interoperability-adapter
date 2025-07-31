@@ -12,5 +12,5 @@ import java.util.Date;
 public class MotherHivStatusDTO {
     private STATUS status;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date testingDate;
+    private String testingDate;
 }

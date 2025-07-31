@@ -16,6 +16,7 @@ import com.Adapter.icare.Domains.DynamicValidator;
 import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.ValidatorService;
 import com.Adapter.icare.validators.SharedHealthRecordValidator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hl7.fhir.r4.model.Bundle;
@@ -84,6 +85,9 @@ public class HDUAPIController {
 
     @Autowired
     private SharedHealthRecordValidator sharedHealthRecordValidator;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public HDUAPIController(DatastoreService datastoreService,
             MediatorsService mediatorsService,
@@ -343,7 +347,7 @@ public class HDUAPIController {
                 validatedDataTemplatePayload.setFacilityDetails(dataTemplate.getData().getFacilityDetails());
                 validatedDataTemplatePayload.setReportDetails(dataTemplate.getData().getReportDetails());
                 validatedDataTemplatePayload.setClientIdentifiersPool(clientIds);
-                payload.put("payload", validatedDataTemplatePayload);
+                payload.put("payload", validatedDataTemplatePayload.toMap());
 
                 // --- Call the workflow engine ---
                 log.info("Sending {} valid records to workflow engine.", validatedListGrid.size());
@@ -360,6 +364,149 @@ public class HDUAPIController {
                 Map<String, Object> dataToSend = dataTemplate.toMap(); // TODO Ensure toMap() handles nulls safely
                 log.info("Sending {} records directly.",
                         Optional.ofNullable(dataTemplate.getData()).map(d -> d.getListGrid().size()).orElse(0));
+                return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataToSend));
+
+            } else {
+                log.error("Workflow engine processing requested but engine is not available.");
+                baseResponse.put("message", "Workflow engine configured but not available");
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(baseResponse);
+            }
+        } catch (Exception e) {
+            log.error("Error processing data template: {}", e.getMessage(), e);
+            Map<String, Object> statusResponse = new LinkedHashMap<>();
+            statusResponse.put("status", "ERROR");
+            statusResponse.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            statusResponse.put("message", "An unexpected error occurred during processing: " + e.getMessage());
+            statusResponse.put("validationFailures", new ArrayList<>());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(statusResponse);
+        }
+    }
+
+    @PostMapping(value = "labDataTemplates", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    public ResponseEntity<Map<String, Object>> passLabDataToMediator(@Valid @RequestBody LabDataTemplateDTO labDataTemplate,
+            @RequestParam(name = "validation", required = false, defaultValue = "true") boolean performValidation,
+            @RequestParam(name = "testDataValidity", required = false, defaultValue = "false") boolean testDataValidity
+    ) {
+
+        Map<String, Object> baseResponse = new HashMap<>();
+
+        try {
+            if (shouldUseWorkflowEngine && workflowEngine != null) {
+                Map<String, Object> payload = new HashMap<>();
+                payload.put("code", "labDataTemplates");
+                LabRecordsDataDTO labRecordsData = labDataTemplate.getData();
+
+                if(labRecordsData != null){
+                    List<LabRequestDetailsDTO> labRequestDetailsData = labRecordsData.getLabRequestDetails();
+
+                    if (labRequestDetailsData.isEmpty()) {
+                        log.warn("Received data template with empty lab request details data.");
+                        LabRecordsDataDTO emptyData = this.createEmptyLabDataTemplate(labDataTemplate);
+                        payload.put("payload", emptyData);
+                        return ResponseEntity
+                                .ok(this.mediatorsService.processWorkflowInAWorkflowEngine(workflowEngine, payload,
+                                        "processes/execute?async=true"));
+                    }
+
+                    log.info("Processing {} records from labRequestDetails.", labRequestDetailsData.size());
+
+                    Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
+                    List<LabRequestDetailsDTO> validatedLabRequestDetails = Collections.synchronizedList(new ArrayList<>());
+                    List<DynamicValidator> dynamicValidators = this.validatorService.getValidators();
+
+                    // TODO: Process clients in chunks in case exceed a certain amount (e.g 20)
+
+                    IntStream.range(0, labRequestDetailsData.size()).parallel().forEach(index -> {
+                        LabRequestDetailsDTO currentRecord = labRequestDetailsData.get(index);
+                        List<String> errors = new ArrayList<String>();
+//                    if (performValidation) {
+//                        if(dynamicValidators.isEmpty()){
+//                            errors = sharedHealthRecordValidator.validate(currentRecord);
+//                        } else {
+//                            errors = sharedHealthRecordValidator.dynamicValidate(currentRecord, dynamicValidators);
+//                        }
+//                    }
+                        if (errors.isEmpty()) {
+                            validatedLabRequestDetails.add(currentRecord);
+                        } else {
+                            validationErrorsMap.put(index, errors);
+                        }
+                    });
+
+                    // TODO: Do not reject the whole request if one record fails
+                    // TODO: To softcode the validation by using program rules knowledge to enhance flexibility
+
+                    List<Map<String, Object>> recordsWithIssues = validationErrorsMap.entrySet().stream()
+                            .map(entry -> {
+                                int index = entry.getKey();
+                                List<String> errors = entry.getValue();
+                                LabRequestDetailsDTO originalRecord = labRequestDetailsData.get(index);
+                                Map<String, Object> issueDetail = new HashMap<>();
+                                issueDetail.put("index", index);
+                                issueDetail.put("specimen", originalRecord.getSpecimenID());
+                                issueDetail.put("validationIssues", errors);
+                                return issueDetail;
+                            })
+                            .sorted(Comparator.comparingInt(m -> (int) m.get("index")))
+                            .collect(Collectors.toList());
+
+                    if (!recordsWithIssues.isEmpty()) {
+                        log.warn("Validation finished. {} out of {} records had issues to me rectified.", recordsWithIssues.size(),
+                                labRequestDetailsData.size());
+                    }
+
+                    if (validatedLabRequestDetails.isEmpty() && !labRequestDetailsData.isEmpty()) {
+                        log.error("All {} records failed validation.", labRequestDetailsData.size());
+                        Map<String, Object> errorResponse = new LinkedHashMap<>();
+                        errorResponse.put("status", "VALIDATION_ERROR");
+                        errorResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
+                        errorResponse.put("message",
+                                "All submitted records failed validation. See 'validationFailures' for details.");
+                        errorResponse.put("validationFailures", recordsWithIssues);
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+                    }
+
+                    if (!recordsWithIssues.isEmpty()) {
+                        Map<String, Object> workflowResponse = new HashMap<>();
+                        workflowResponse.put("statusDetails", "Completed with validation issues");
+                        workflowResponse.put("validationSkippedRecordsCount", recordsWithIssues.size());
+                        workflowResponse.put("validationFailures", recordsWithIssues);
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(workflowResponse);
+                    }
+
+                    if(testDataValidity){
+                        Map<String, Object> testResponse = new HashMap<>();
+                        testResponse.put("statusDetails", "Completed testing data");
+                        testResponse.put("message", "Congratulations your data passed through all data validation rules.");
+                        return ResponseEntity.status(HttpStatus.OK).body(testResponse);
+                    }
+
+                    LabRecordsDataDTO validatedLabDataTemplatePayload = new LabRecordsDataDTO();
+                    validatedLabDataTemplatePayload.setLabRequestDetails(validatedLabRequestDetails);
+
+                    validatedLabDataTemplatePayload.setFacilityDetails(labDataTemplate.getData().getFacilityDetails());
+                    validatedLabDataTemplatePayload.setReportDetails(labDataTemplate.getData().getReportDetails());
+                    System.out.println("Data: " + validatedLabDataTemplatePayload.toMap());
+                    payload.put("payload", validatedLabDataTemplatePayload.toMap());
+
+                    // --- Call the workflow engine ---
+                    log.info("Sending {} valid lab records to workflow engine.", validatedLabRequestDetails.size());
+                    Map<String, Object> workflowResponse = this.mediatorsService.processWorkflowInAWorkflowEngine(
+                            workflowEngine, payload,
+                            "processes/execute?async=true");
+                    return ResponseEntity.ok(workflowResponse);
+                }
+
+                return ResponseEntity.badRequest().body(this.createEmptyLabDataTemplate(null).toMap());
+
+            } else if (!shouldUseWorkflowEngine) {
+                log.warn(
+                        "Workflow engine is disabled. Sending data directly to mediator workflow. Validation via annotations might still occur if @Valid is on RequestBody, but parallel processing/composite validator logic is SKIPPED here.");
+                // TODO: Decide if validation (parallel or sequential) is needed here too for
+                // consistency.
+                Map<String, Object> dataToSend = labDataTemplate.toMap(); // TODO Ensure toMap() handles nulls safely
+                log.info("Sending {} records directly to mediator.",
+                        Optional.ofNullable(labDataTemplate.getData()).map(d -> d.getLabRequestDetails().size()).orElse(0));
                 return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataToSend));
 
             } else {
@@ -1734,6 +1881,17 @@ public class HDUAPIController {
             emptyData.setReportDetails(dataTemplate.getData().getReportDetails());
         }
         return emptyData;
+    }
+
+    private LabRecordsDataDTO createEmptyLabDataTemplate(LabDataTemplateDTO labData){
+        LabRecordsDataDTO emptyLabRecordsDTO = new LabRecordsDataDTO();
+        emptyLabRecordsDTO.setLabRequestDetails(new ArrayList<>());
+        if(labData != null && labData.getData() != null){
+            emptyLabRecordsDTO.setFacilityDetails(labData.getData().getFacilityDetails());
+            emptyLabRecordsDTO.setReportDetails(labData.getData().getReportDetails());
+        }
+
+        return emptyLabRecordsDTO;
     }
 
     private String generateUserFriendlyIdentifier(DemographicDetailsDTO details, int index) {

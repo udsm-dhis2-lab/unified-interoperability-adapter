@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
@@ -58,16 +59,16 @@ public class DemographicDetailsDTO {
         demographicDetails.put("occupation", this.getOccupation());
         demographicDetails.put("maritalStatus", this.getMaritalStatus());
         demographicDetails.put("nationality", this.getNationality());
-        demographicDetails.put("addresses", this.getAddresses().stream().map(address -> address.toMap()));
+        demographicDetails.put("addresses", this.getAddresses().isEmpty() ? this.getAddresses() : this.getAddresses().stream().map(AddressDTO::toMap).collect(Collectors.toList()));
         if (this.getIdentifiers() != null) {
-            demographicDetails.put("identifiers", this.getIdentifiers().stream().map(identifier -> identifier.toMap()));
+            demographicDetails.put("identifiers", this.getIdentifiers().stream().map(IdentifierDTO::toMap).collect(Collectors.toList()));
         }
         demographicDetails.put("contactPeople", this.getContactPeople());
         demographicDetails.put("paymentDetails", this.getPaymentDetails());
         demographicDetails.put("relatedClients", this.getRelatedClients());
         demographicDetails.put("appointment", this.getAppointment());
         if (this.getFiles() != null) {
-            demographicDetails.put("files", this.getFiles().stream().map(file -> file.toMap()));
+            demographicDetails.put("files", this.getFiles().stream().map(FileDTO::toMap).collect(Collectors.toList()));
         } else {
             demographicDetails.put("files", new ArrayList<>());
         }
