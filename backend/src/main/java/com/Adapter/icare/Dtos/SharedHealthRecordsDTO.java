@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -122,7 +123,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
         sharedRecordMap.put("causesOfDeathDetails", this.getCausesOfDeathDetails());
         sharedRecordMap.put("antenatalCareDetails", this.getAntenatalCareDetails());
-        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails().stream().map(ProphylaxisDetailsDTO::toMap));
+        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails().stream().map(ProphylaxisDetailsDTO::toMap).collect(Collectors.toList()));
         sharedRecordMap.put("vaccinationDetails", this.getVaccinationDetails());
         sharedRecordMap.put("familyPlanningDetails", this.getFamilyPlanningDetails());
         sharedRecordMap.put("laborAndDeliveryDetails", this.getLaborAndDeliveryDetails());
@@ -135,7 +136,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("selfMonitoringClinicalInformation", this.getSelfMonitoringClinicalInformation());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());
         sharedRecordMap.put("otherInformation", this.getOtherInformation());
-        sharedRecordMap.put("appointment", this.getAppointment().stream().map(AppointmentDetailsDTO::toMap));
+        sharedRecordMap.put("appointment", this.getAppointment().stream().map(AppointmentDetailsDTO::toMap).collect(Collectors.toList()));
         return sharedRecordMap;
     }
 }

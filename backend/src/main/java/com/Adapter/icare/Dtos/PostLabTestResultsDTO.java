@@ -20,8 +20,8 @@ public class PostLabTestResultsDTO {
         Map<String, Object> postLabTestResultsMap = new HashMap<>();
         postLabTestResultsMap.put("obrSetId", this.getObrSetId());
         postLabTestResultsMap.put("typeOfTest", this.getTypeOfTest());
-        postLabTestResultsMap.put("dateTimeResultsReceivedAtFacility", this.getDateTimeResultsReceivedAtFacility());
-        postLabTestResultsMap.put("dateTimeResultsprovidedToClient", this.getDateTimeResultsprovidedToClient());
+        postLabTestResultsMap.put("dateTimeResultsReceivedAtFacility", this.getDateTimeResultsReceivedAtFacility().toString());
+        postLabTestResultsMap.put("dateTimeResultsprovidedToClient", this.getDateTimeResultsprovidedToClient().toString());
         return postLabTestResultsMap;
     }
 }

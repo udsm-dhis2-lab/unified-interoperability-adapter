@@ -20,7 +20,7 @@ public class FacilityDetailsDTO {
         facilityMap.put("code", this.getCode());
         facilityMap.put("name", this.getName());
         facilityMap.put("system", this.getSystem().toMap());
-        facilityMap.put("bloodBags", this.getBloodBags().stream().map(BloodBagDTO::toMap));
+        facilityMap.put("bloodBags", this.getBloodBags());
         return facilityMap;
     }
 }

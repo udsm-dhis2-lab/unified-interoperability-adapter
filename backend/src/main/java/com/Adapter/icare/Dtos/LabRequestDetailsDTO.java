@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -41,6 +42,7 @@ public class LabRequestDetailsDTO {
     private ReceivingFacilityDTO receivingFacility;
     private List<LabTestsDTO> requestedLabTests;
     private List<LabTestResultsFinalDTO> labTestResults;
+    private List<PostLabTestResultsDTO> postLabTestResults;
 
 
     public Map<String, Object> toMap(){
@@ -54,16 +56,17 @@ public class LabRequestDetailsDTO {
         labRequestMap.put("specimenRejectionCodes", this.getSpecimenRejectionCodes());
         labRequestMap.put("specimenCollectorName", this.getSpecimenCollectorName());
         labRequestMap.put("specimenCollectorContactNumber", this.getSpecimenCollectorContactNumber());
-        labRequestMap.put("dateTimeSpecimenCollected", this.getDateTimeSpecimenCollected());
+        labRequestMap.put("dateTimeSpecimenCollected", this.getDateTimeSpecimenCollected().toString());
         labRequestMap.put("specimenSentToLab", this.getSpecimenSentToLab());
-        labRequestMap.put("dateTimeSpecimenReceived", this.getDateTimeSpecimenReceived());
+        labRequestMap.put("dateTimeSpecimenReceived", this.getDateTimeSpecimenReceived().toString());
         labRequestMap.put("specimenRegisteredBy", this.getSpecimenRegisteredBy());
-        labRequestMap.put("dateTimeSpecimenRegistered", this.getDateTimeSpecimenRegistered());
+        labRequestMap.put("dateTimeSpecimenRegistered", this.getDateTimeSpecimenRegistered().toString());
         labRequestMap.put("requestingFacility", this.requestingFacility.toMap());
         labRequestMap.put("requestTypeCode", this.getRequestTypeCode());
         labRequestMap.put("referringRequestId", this.getReferringRequestId());
-        labRequestMap.put("labTests", this.getRequestedLabTests());
-        labRequestMap.put("labTestResults", this.getLabTestResults());
+        labRequestMap.put("labTests", this.getRequestedLabTests().isEmpty() ? this.getRequestedLabTests() : this.getRequestedLabTests().stream().map(LabTestsDTO::toMap).collect(Collectors.toList()));
+        labRequestMap.put("labTestResults", !this.getLabTestResults().isEmpty() ? this.getLabTestResults().stream().map(LabTestResultsFinalDTO::toMap).collect(Collectors.toList()) : this.getLabTestResults());
+        labRequestMap.put("postLabTestResults", this.getPostLabTestResults().isEmpty() ? this.getPostLabTestResults() : this.getPostLabTestResults().stream().map(PostLabTestResultsDTO::toMap).collect(Collectors.toList()));
         return labRequestMap;
     }
 }

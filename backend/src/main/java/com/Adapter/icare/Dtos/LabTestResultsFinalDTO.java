@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -33,22 +34,20 @@ public class LabTestResultsFinalDTO {
     private Integer targetTimeDays;
     private Integer targetTimeMins;
     private List<LabObservationDTO> results;
-    private List<PostLabTestResultsDTO> postLabTestResults;
 
     public Map<String, Object> toMap(){
         Map<String, Object> testResultsMap = new HashMap<>();
-        testResultsMap.put("testOrderDate", this.getTestOrderDate());
+        testResultsMap.put("testOrderDate", this.getTestOrderDate().toString());
         testResultsMap.put("analyzerCode", this.getAnalyzerCode());
-        testResultsMap.put("dateTimeSpecimenAnalyzed", this.getDateTimeSpecimenAnalyzed());
-        testResultsMap.put("testResultDate", this.getTestResultDate());
+        testResultsMap.put("dateTimeSpecimenAnalyzed", this.getDateTimeSpecimenAnalyzed().toString());
+        testResultsMap.put("testResultDate", this.getTestResultDate().toString());
         testResultsMap.put("testingFacilityCode", this.getTestingFacilityCode());
-        testResultsMap.put("dateTimeResultsRegistered", this.getDateTimeResultsRegistered());
+        testResultsMap.put("dateTimeResultsRegistered", this.getDateTimeResultsRegistered().toString());
         testResultsMap.put("resultsAuthorisedBy", this.getResultsAuthorisedBy());
-        testResultsMap.put("dateTimeResultsAuthorized", this.getDateTimeResultsAuthorized());
+        testResultsMap.put("dateTimeResultsAuthorized", this.getDateTimeResultsAuthorized().toString());
         testResultsMap.put("targetTimeDays", this.getTargetTimeDays());
         testResultsMap.put("targetTimeMins", this.getTargetTimeMins());
-        testResultsMap.put("results", this.getResults());
-        testResultsMap.put("postLabTestResults", this.getPostLabTestResults().stream().map(PostLabTestResultsDTO::toMap));
+        testResultsMap.put("results", this.getResults().isEmpty() ? this.getResults() : this.getResults().stream().map(LabObservationDTO::toMap).collect(Collectors.toList()));
         return testResultsMap;
     }
 

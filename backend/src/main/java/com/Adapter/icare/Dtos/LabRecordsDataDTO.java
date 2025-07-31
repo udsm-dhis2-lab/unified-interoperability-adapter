@@ -10,18 +10,16 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class DataTemplateDataDTO {
+public class LabRecordsDataDTO {
     private FacilityDetailsDTO facilityDetails;
-    private List<SharedHealthRecordsDTO> listGrid;
+    private List<LabRequestDetailsDTO> labRequestDetails;
     private ReportDetailsDTO reportDetails;
-    private List<IdentifierDTO> clientIdentifiersPool;
 
     public Map<String,Object> toMap() {
         Map<String, Object> mappedDataTemplateData = new HashMap<>();
         mappedDataTemplateData.put("facilityDetails", this.getFacilityDetails().toMap());
-        mappedDataTemplateData.put("listGrid", this.getListGrid().isEmpty() ? this.getListGrid() : this.getListGrid().stream().map(SharedHealthRecordsDTO::toMap).collect(Collectors.toList()));
+        mappedDataTemplateData.put("labRequestDetails", !this.getLabRequestDetails().isEmpty() ? this.getLabRequestDetails().stream().map(LabRequestDetailsDTO::toMap).collect(Collectors.toList()) : this.getLabRequestDetails());
         mappedDataTemplateData.put("reportDetails", this.getReportDetails().toMap());
-        mappedDataTemplateData.put("clientIdentifiersPool", this.getClientIdentifiersPool());
         return mappedDataTemplateData;
     }
 }
