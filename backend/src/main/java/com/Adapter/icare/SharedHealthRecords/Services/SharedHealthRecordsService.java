@@ -3372,7 +3372,7 @@ public class SharedHealthRecordsService {
                                         ldBdOutcomeDetails.setIsAlive(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-isAlive"));
                                         ldBdOutcomeDetails.setReferredToPNC(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-referredToPNC"));
                                         ldBdOutcomeDetails.setReferredToHospital(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-referredToHospital"));
-                                        ldBdOutcomeDetails.setReferredtohealthfacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-referredTohealthFacility"));
+                                        ldBdOutcomeDetails.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-outcomeDetails-referredTohealthFacility"));
 
                                         birthDetailsDTO.setOutcomeDetails(ldBdOutcomeDetails);
 
@@ -3571,8 +3571,8 @@ public class SharedHealthRecordsService {
                                         PNCBirthBDOutcomeDetailsDTO outcomeDetailsDTO = new PNCBirthBDOutcomeDetailsDTO();
                                         outcomeDetailsDTO.setDischargedHome(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-dischargedHome"));
                                         outcomeDetailsDTO.setReferredToNCU(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToNCU"));
-                                        outcomeDetailsDTO.setReferredtohealthfacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHospital"));
-                                        outcomeDetailsDTO.setReferredtohealthfacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHealthFacility"));
+                                        outcomeDetailsDTO.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHospital"));
+                                        outcomeDetailsDTO.setReferredToHealthFacility(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/pnc-birthdetails-outcomeDetails-referredToHealthFacility"));
 
                                         birthDetailsDTO.setOutcomeDetails(outcomeDetailsDTO);
 
