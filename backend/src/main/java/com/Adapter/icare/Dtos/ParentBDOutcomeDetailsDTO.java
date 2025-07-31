@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class ParentBDOutcomeDetailsDTO {
     private Boolean referredToHospital;
-    private Boolean referredtohealthfacility;
+    private Boolean referredToHealthFacility;
 }
