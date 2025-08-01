@@ -5,7 +5,11 @@ import { ClientManagementRoutingModule } from './client-management-routing.modul
 import { ClientManagementComponent } from './client-management.component';
 
 @NgModule({
-  declarations: [ClientManagementComponent],
-  imports: [CommonModule, ClientManagementRoutingModule],
+  declarations: [],
+  imports: [
+    CommonModule,
+    ClientManagementRoutingModule,
+    ClientManagementComponent,
+  ],
 })
 export class ClientManagementModule {}

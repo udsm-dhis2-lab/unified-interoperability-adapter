@@ -111,8 +111,9 @@ export const appConfig: ApplicationConfig = {
     StoreDevtoolsModule.instrument({
       logOnly: !isDevMode(),
     }),
+    AppComponent,
   ],
-  declarations: [AppComponent],
+  declarations: [],
   providers: [
     { provide: NZ_ICONS, useValue: icons },
     { provide: NZ_I18N, useValue: en_US },

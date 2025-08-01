@@ -19,7 +19,11 @@ import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message'; // Fo
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 // Import your service and models
-import { Validation, ValidationPage, ValidationService } from '../../services/client-management.service';
+import {
+  Validation,
+  ValidationPage,
+  ValidationService,
+} from '../../services/client-management.service';
 
 @Component({
   standalone: true,
@@ -38,10 +42,10 @@ import { Validation, ValidationPage, ValidationService } from '../../services/cl
     NzIconModule,
     NzAlertModule,
     NzModalModule, // Add NzModalModule
-    NzMessageModule // Add NzMessageModule
+    NzMessageModule, // Add NzMessageModule
   ],
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  styleUrls: ['./home.component.css'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
   // Data, loading, and error state
@@ -65,7 +69,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     message: '25%',
     code: '10%',
     expression: '20%',
-    action: '5%'
+    action: '5%',
   };
 
   // --- 2. Inject Modal and Message services ---
@@ -104,26 +108,33 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Assuming your API can filter by a 'name' field with a 'CONTAINS' operation
     const filters = [];
     if (this.searchValue) {
-      filters.push({ key: 'name', value: this.searchValue, operation: 'CONTAINS' });
+      filters.push({
+        key: 'name',
+        value: this.searchValue,
+        operation: 'CONTAINS',
+      });
     }
 
-    this.validationService.getValidations(apiPageIndex, this.pageSize, filters as any).subscribe({
-      next: (response: ValidationPage) => {
-        this.listOfData = response.results;
-        this.totalItems = response.totalElements;
-        this.isLoading = false;
-      },
-      error: (err: any) => {
-        console.error('Failed to load validation rules:', err);
-        this.error = 'Could not retrieve validation rules. Please try again later.';
-        this.isLoading = false;
-      }
-    });
+    this.validationService
+      .getValidations(apiPageIndex, this.pageSize, filters as any)
+      .subscribe({
+        next: (response: ValidationPage) => {
+          this.listOfData = response.results;
+          this.totalItems = response.totalElements;
+          this.isLoading = false;
+        },
+        error: (err: any) => {
+          console.error('Failed to load validation rules:', err);
+          this.error =
+            'Could not retrieve validation rules. Please try again later.';
+          this.isLoading = false;
+        },
+      });
   }
 
   // Trigger search when user types
   onSearch(): void {
-    console.log("search value here>")
+    console.log('search value here>');
     this.searchSubject.next(this.searchValue.trim());
   }
 
@@ -146,7 +157,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   editValidation(id: string | undefined): void {
-    console.log("edit validations");
+    console.log('edit validations');
     if (!id) return;
     // Navigate to the form in edit mode, passing the validation's ID
     this.router.navigate(['/validations/validations/edit', id]);
@@ -166,10 +177,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       nzOnOk: () => {
         // Here you would call the actual delete service method
         // this.validationService.deleteValidation(validation.id).subscribe({ ... });
-        this.message.success(`Validation rule "${validation.name}" deleted successfully.`);
+        this.message.success(
+          `Validation rule "${validation.name}" deleted successfully.`
+        );
         // For demonstration, we'll just remove it from the list and reload
         this.loadValidations();
-      }
+      },
     });
   }
 

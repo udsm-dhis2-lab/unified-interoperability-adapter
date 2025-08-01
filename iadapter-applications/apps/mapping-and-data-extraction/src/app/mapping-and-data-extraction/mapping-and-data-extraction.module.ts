@@ -5,7 +5,11 @@ import { MappingAndDataExtractionRoutingModule } from './mapping-and-data-extrac
 import { MappingAndDataExtractionComponent } from './mapping-and-data-extraction.component';
 
 @NgModule({
-  declarations: [MappingAndDataExtractionComponent],
-  imports: [CommonModule, MappingAndDataExtractionRoutingModule],
+  declarations: [],
+  imports: [
+    CommonModule,
+    MappingAndDataExtractionRoutingModule,
+    MappingAndDataExtractionComponent,
+  ],
 })
 export class MappingAndDataExtractionModule {}

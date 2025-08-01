@@ -1,15 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, NavigationEnd } from '@angular/router';
+import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
 import { Fn } from '@iapps/function-analytics';
 import { Menu } from './shared/menu.model';
 import { NgxDhis2HttpClientService } from '@iapps/ngx-dhis2-http-client';
 import { filter } from 'rxjs/operators';
+import { HduApiTopBarMenuComponent } from '../../../../libs/hdu-api-top-bar-menu/src/lib/hdu-api-top-bar-menu/hdu-api-top-bar-menu.component';
+import { HduApiNavMenuComponent } from '../../../../libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
+import { NzLayoutModule } from 'ng-zorro-antd/layout';
 
 @Component({
   providers: [],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.less',
+  imports: [
+    RouterOutlet,
+    HduApiTopBarMenuComponent,
+    HduApiNavMenuComponent,
+    NzLayoutModule,
+  ],
 })
 export class AppComponent implements OnInit {
   title = 'apps-shell';
@@ -33,11 +42,11 @@ export class AppComponent implements OnInit {
     this.updateAppNameFromRoute(this.router.url);
 
     // Subscribe to router events to update appName when navigation occurs
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
-    ).subscribe((event: any) => {
-      this.updateAppNameFromRoute(event.url);
-    });
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.updateAppNameFromRoute(event.url);
+      });
   }
 
   updateAppNameFromRoute(url: string) {
@@ -45,14 +54,14 @@ export class AppComponent implements OnInit {
     const mainPath = url.split('/')[1] || 'dashboard';
 
     // Map paths to their corresponding display names
-    const pathToNameMap: {[key: string]: string} = {
-      'dashboard': 'Dashboard',
+    const pathToNameMap: { [key: string]: string } = {
+      dashboard: 'Dashboard',
       'client-management': 'Client Management',
       'shr-management': 'SHR Management',
       'appointment-management': 'Appointment Management',
       'workflows-management': 'Workflows Management',
       'mapping-and-data-extraction': 'Mapping and Data Extraction',
-      'settings': 'Settings'
+      settings: 'Settings',
     };
 
     // Update appName based on the current path
