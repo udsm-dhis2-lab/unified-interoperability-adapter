@@ -20,7 +20,7 @@ public class ReportDetailsDTO {
     public Map<String, Object> toMap(){
         Map<String, Object> reportDetailsMap = new HashMap<>();
         reportDetailsMap.put("reportingDate", this.getReportingDate());
-        reportDetailsMap.put("reportingDateTime", this.getReportingDateTime().toString());
+        reportDetailsMap.put("reportingDateTime", this.getReportingDateTime() != null ? this.getReportingDateTime().toString() : null);
         return reportDetailsMap;
     }
 }

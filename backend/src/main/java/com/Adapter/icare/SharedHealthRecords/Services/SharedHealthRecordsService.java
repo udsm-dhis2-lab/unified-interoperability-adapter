@@ -1344,6 +1344,9 @@ public class SharedHealthRecordsService {
                                 templateData.setLifeStyleInformation(
                                         lifeStyleInformationDTO);
 
+//                                Lab Request Details
+
+
                                 // Diagnosis details
                                 List<DiagnosisDetailsDTO> diagnosisDetailsDTOS = new ArrayList<>();
 
