@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 public class AncHivStatusDTO {
     private STATUS status;
-    private Integer numberOfTestTaken;
+    private Integer numberOfTestsTaken;
 }
