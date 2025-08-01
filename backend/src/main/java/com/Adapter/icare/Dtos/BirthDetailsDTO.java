@@ -11,7 +11,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +44,7 @@ public class BirthDetailsDTO {
     private List<VaccinationDetailsDTO> vaccinationDetails;
     private List<Map<String,Object>> otherServices;
     private Boolean bornWithDisabilities;
-    private ApgaScoreDTO apgaScore;
+    private ApgarScore apgarScore;
     private Boolean wasBreastFedWithinOneHourAfterDelivery;
     private MethodOfResuscitation methodOfResuscitation;
     private Boolean hivDnaPCRTested;

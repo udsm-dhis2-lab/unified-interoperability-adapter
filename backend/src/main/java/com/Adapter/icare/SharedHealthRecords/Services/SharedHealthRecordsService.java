@@ -35,9 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -58,7 +56,6 @@ import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.ge
 import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.medicationDispenseUtils.getMedicationDispensesById;
 import static com.Adapter.icare.Utils.CarePlanUtils.getCarePlansByCategory;
-import static com.Adapter.icare.Utils.DateUtils.stringToDateOrNull;
 
 @Service
 public class SharedHealthRecordsService {
@@ -3362,7 +3359,7 @@ public class SharedHealthRecordsService {
                                                 getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-childHivStatus")
                                         ));
 
-                                        ApgaScoreDTO ldBirthDetailsApgaScore = new ApgaScoreDTO();
+                                        ApgarScore ldBirthDetailsApgaScore = new ApgarScore();
                                         ldBirthDetailsApgaScore.setOneMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-oneMinute"));
 
                                         ldBirthDetailsApgaScore.setFiveMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-fiveMinute"));
