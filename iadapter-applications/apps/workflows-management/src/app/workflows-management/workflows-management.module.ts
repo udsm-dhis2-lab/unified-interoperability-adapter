@@ -5,7 +5,11 @@ import { WorkflowsManagementRoutingModule } from './workflows-management-routing
 import { WorkflowsManagementHomeComponent } from './workflows-management-home.component';
 
 @NgModule({
-  declarations: [WorkflowsManagementHomeComponent],
-  imports: [CommonModule, WorkflowsManagementRoutingModule],
+  declarations: [],
+  imports: [
+    CommonModule,
+    WorkflowsManagementRoutingModule,
+    WorkflowsManagementHomeComponent,
+  ],
 })
 export class WorkflowsManagementModule {}

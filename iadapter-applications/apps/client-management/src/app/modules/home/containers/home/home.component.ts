@@ -1,16 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
 import { Router, RouterModule } from '@angular/router';
-import { HDUAPIClientDetails } from '../../models';
-import { ClientManagementService } from '../../services/client-management.service';
+import { SharedModule } from 'apps/client-management/src/app/shared/shared.module';
+import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { debounceTime, Subject, Subscription, switchMap } from 'rxjs';
 import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
-import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
-import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
+import { HDUAPIClientDetails } from '../../models';
+import { ClientManagementService } from '../../services/client-management.service';
 
 import { FormsModule } from '@angular/forms';
 import { ReusableModalComponent } from '../modal/modal.component';
@@ -27,8 +25,8 @@ import { ReusableModalComponent } from '../modal/modal.component';
     NzInputModule,
     FormsModule,
     NzSelectModule,
-   NzDividerModule,
-   ReusableModalComponent
+    NzDividerModule,
+    ReusableModalComponent,
   ],
   providers: [ClientManagementService],
   templateUrl: './home.component.html',
@@ -161,14 +159,14 @@ export class HomeComponent implements OnDestroy, OnInit {
   }
 
   deleteClient(client: HDUAPIClientDetails) {
-
     this.loading = true;
     this.listOfHduClients = [];
-    this.clientManagementService.deleteClient(client.demographicDetails.clientID).subscribe((response) => {
-      this.filterSubject.next();
-      console.log(response);
-
-    });
+    this.clientManagementService
+      .deleteClient(client.demographicDetails.clientID)
+      .subscribe((response) => {
+        this.filterSubject.next();
+        console.log(response);
+      });
   }
 
   resetFilters() {
@@ -244,7 +242,6 @@ export class HomeComponent implements OnDestroy, OnInit {
 
     return filters;
   }
-
 
   showDeleteModal(): void {
     this.isDeleteModalVisible = true;

@@ -3,13 +3,8 @@ import { CommonModule } from '@angular/common';
 import { UserManagementComponent } from './user-management.component';
 import { UserManagementRoutingModule } from './user-management.routing.module';
 
-
-
 @NgModule({
-  declarations: [UserManagementComponent],
-  imports: [
-    CommonModule,
-    UserManagementRoutingModule
-  ]
+  declarations: [],
+  imports: [CommonModule, UserManagementRoutingModule, UserManagementComponent],
 })
-export class UserManagementModule { }
+export class UserManagementModule {}
