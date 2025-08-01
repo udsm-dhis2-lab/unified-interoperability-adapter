@@ -112,7 +112,8 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("chronicConditions", this.getChronicConditions());
         sharedRecordMap.put("lifeStyleInformation", this.getLifeStyleInformation());
         sharedRecordMap.put("investigationDetails", this.getInvestigationDetails());
-//        sharedRecordMap.put("labInvestigationDetails", this.getLabInvestigationDetails());
+        sharedRecordMap.put("labRequestDetails", this.getLabRequestDetails() == null || this.getLabRequestDetails().isEmpty() ? this.getLabRequestDetails() : this.getLabRequestDetails().stream().map(LabRequestDetailsDTO::toMap).collect(Collectors.toList()));
+        sharedRecordMap.put("labInvestigationDetails", this.getLabInvestigationDetails());
         sharedRecordMap.put("diagnosisDetails", this.getDiagnosisDetails());
         sharedRecordMap.put("medicationDetails", this.getMedicationDetails());
         sharedRecordMap.put("eyeClinicDetails", this.getEyeClinicDetails());
@@ -123,7 +124,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("outcomeDetails", this.getOutcomeDetails());
         sharedRecordMap.put("causesOfDeathDetails", this.getCausesOfDeathDetails());
         sharedRecordMap.put("antenatalCareDetails", this.getAntenatalCareDetails());
-        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails().stream().map(ProphylaxisDetailsDTO::toMap).collect(Collectors.toList()));
+        sharedRecordMap.put("prophylAxisDetails", this.getProphylAxisDetails() == null || this.getProphylAxisDetails().isEmpty() ? this.getProphylAxisDetails() : this.getProphylAxisDetails().stream().map(ProphylaxisDetailsDTO::toMap).collect(Collectors.toList()));
         sharedRecordMap.put("vaccinationDetails", this.getVaccinationDetails());
         sharedRecordMap.put("familyPlanningDetails", this.getFamilyPlanningDetails());
         sharedRecordMap.put("laborAndDeliveryDetails", this.getLaborAndDeliveryDetails());
@@ -131,12 +132,12 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("cecapDetails", this.getCecap());
         sharedRecordMap.put("postnatalDetails", this.getPostnatalDetails());
         sharedRecordMap.put("contraceptives", this.getContraceptives());
-        sharedRecordMap.put("billingsDetails", this.getBillingsDetails());
+        sharedRecordMap.put("billingsDetails", this.getBillingsDetails() == null || this.getBillingsDetails().isEmpty() ? this.getBillingsDetails() : this.getBillingsDetails().stream().map(BillingsDetailsDTO::toMap).collect(Collectors.toList()));
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
         sharedRecordMap.put("selfMonitoringClinicalInformation", this.getSelfMonitoringClinicalInformation());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());
         sharedRecordMap.put("otherInformation", this.getOtherInformation());
-        sharedRecordMap.put("appointment", this.getAppointment().stream().map(AppointmentDetailsDTO::toMap).collect(Collectors.toList()));
+        sharedRecordMap.put("appointment", this.getAppointment() == null || this.getAppointment().isEmpty() ? this.getAppointment() : this.getAppointment().stream().map(AppointmentDetailsDTO::toMap).collect(Collectors.toList()));
         return sharedRecordMap;
     }
 }
