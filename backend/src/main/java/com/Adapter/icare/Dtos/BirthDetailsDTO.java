@@ -24,7 +24,7 @@ public class BirthDetailsDTO {
     private Float weightInKgs;
     private Boolean multipleBirth;
     private Boolean exclusiveBreastFed;
-    private Boolean marcerated;
+    private Boolean macerated;
     private Boolean fresh;
     private Integer motherAgeInYears;
     private Integer birthOrder;
