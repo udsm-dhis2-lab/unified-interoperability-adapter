@@ -6,7 +6,12 @@ import { SettingsHomeComponent } from './containers/settings-home/settings-home.
 import { RouterModule } from '@angular/router';
 
 @NgModule({
-  declarations: [SettingsHomeComponent],
-  imports: [CommonModule, RouterModule, SettingsRoutingModule],
+  declarations: [],
+  imports: [
+    CommonModule,
+    RouterModule,
+    SettingsRoutingModule,
+    SettingsHomeComponent,
+  ],
 })
 export class SettingsModule {}

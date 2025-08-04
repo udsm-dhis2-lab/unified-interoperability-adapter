@@ -25,10 +25,7 @@
         "styles": ["apps/settings/src/styles.less"],
         "scripts": [],
         "server": "apps/settings/src/main.server.ts",
-        "prerender": true,
-        "ssr": {
-          "entry": "apps/settings/server.ts"
-        }
+        "prerender": true
       },
       "configurations": {
         "production": {

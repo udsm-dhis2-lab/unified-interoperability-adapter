@@ -1,46 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { NgFlowchartModule } from '@joelwenzel/ng-flowchart';
+import { select, Store } from '@ngrx/store';
+import { getCurrentUrl } from 'apps/workflows-management/src/app/state/router.selector';
 import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzCollapseModule } from 'ng-zorro-antd/collapse';
+import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzTableModule } from 'ng-zorro-antd/table';
 import {
   NzTabChangeEvent,
   NzTabPosition,
   NzTabsModule,
 } from 'ng-zorro-antd/tabs';
-import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzDescriptionsModule } from 'ng-zorro-antd/descriptions';
-import { AddComponent } from '../add/add.component';
-import { ParametersComponent } from '../parameters/parameters.component';
-import { EditorComponent } from '../editor/editor.component';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { NzCollapseModule } from 'ng-zorro-antd/collapse';
-import { FlowchartComponent } from '../../components/flow-chart/flow-chart.component';
-import { WorkflowState } from '../../state/workflow/workflow.state';
-import { select, Store } from '@ngrx/store';
-import {
-  getCurrentSelectedProcessInWorkflow,
-  getCurrentSelectedWorkflow,
-} from '../../state/workflow/workflow.selectors';
-import { Process } from '../../models/process.model';
 import { Observable, of, take } from 'rxjs';
+import { FlowchartComponent } from '../../components/flow-chart/flow-chart.component';
 import { ProcessSummaryComponent } from '../../components/process-summary/process-summary.component';
 import {
   extractIdFromPath,
   getWorkflowUidFromRoute,
 } from '../../helpers/workflow.helper';
-import { WorkflowActions } from '../../state/workflow/workflow.actions';
-import { getCurrentUrl } from 'apps/workflows-management/src/app/state/router.selector';
-import { WorkflowRunLoggingComponent } from '../workflow-run-logging/workflow-run-logging.component';
+import { Process } from '../../models/process.model';
 import { Workflow } from '../../models/workflow.model';
+import { WorkflowActions } from '../../state/workflow/workflow.actions';
+import {
+  getCurrentSelectedProcessInWorkflow,
+  getCurrentSelectedWorkflow,
+} from '../../state/workflow/workflow.selectors';
+import { WorkflowState } from '../../state/workflow/workflow.state';
+import { AddComponent } from '../add/add.component';
 import { EditComponent } from '../edit/edit.component';
+import { EditorComponent } from '../editor/editor.component';
+import { ParametersComponent } from '../parameters/parameters.component';
+import { WorkflowRunLoggingComponent } from '../workflow-run-logging/workflow-run-logging.component';
 
 @Component({
   selector: 'app-workflow-management',

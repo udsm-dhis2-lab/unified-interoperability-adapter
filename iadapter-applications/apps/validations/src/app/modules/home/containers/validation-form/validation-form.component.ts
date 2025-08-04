@@ -43,17 +43,16 @@ import { ValidationService } from '../../services/client-management.service';
     NzSpinModule,
     RuleBuilderComponent,
     NzRadioModule,
-    FormsModule
+    FormsModule,
   ],
   templateUrl: './validation-form.component.html',
-  styleUrls: ['./validation-form.component.scss'],
+  styleUrls: ['./validation-form.component.css'],
 })
 export class ValidationFormComponent implements OnInit {
   validationForm!: FormGroup;
   isEditMode = false;
   isLoading = false;
   private validationId?: string;
-
 
   public ruleInputMode: 'builder' | 'editor' = 'editor';
 

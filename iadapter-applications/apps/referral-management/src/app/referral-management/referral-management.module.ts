@@ -3,13 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ReferralManagementComponent } from './referral-management.component';
 import { ReferralManagementRoutingModule } from './referral-management.routing.module';
 
-
-
 @NgModule({
-  declarations: [ReferralManagementComponent],
+  declarations: [],
   imports: [
     CommonModule,
-    ReferralManagementRoutingModule
-  ]
+    ReferralManagementRoutingModule,
+    ReferralManagementComponent,
+  ],
 })
-export class ReferralManagementModule { }
+export class ReferralManagementModule {}

@@ -3359,7 +3359,7 @@ public class SharedHealthRecordsService {
                                                 getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-childHivStatus")
                                         ));
 
-                                        ApgaScoreDTO ldBirthDetailsApgaScore = new ApgaScoreDTO();
+                                        ApgarScore ldBirthDetailsApgaScore = new ApgarScore();
                                         ldBirthDetailsApgaScore.setOneMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-oneMinute"));
 
                                         ldBirthDetailsApgaScore.setFiveMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-fiveMinute"));

@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { NxWelcomeComponent } from './nx-welcome.component';
 import { antDesignModules } from './shared/config/ant-design.modules';
 import { HduApiTopBarMenuComponent } from 'libs/hdu-api-top-bar-menu/src/lib/hdu-api-top-bar-menu/hdu-api-top-bar-menu.component';
 import { HduApiNavMenuComponent } from 'libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
@@ -10,7 +9,6 @@ import { CommonModule } from '@angular/common';
 @Component({
   standalone: true,
   imports: [
-    NxWelcomeComponent,
     RouterModule,
     CommonModule,
     HduApiTopBarMenuComponent,
