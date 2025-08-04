@@ -525,6 +525,23 @@ public class HDUAPIController {
         }
     }
 
+
+//    @GetMapping(value = "labDataTemplates")
+//    public ResponseEntity<Map<String, Object>> getLabDataFromFhir(
+//            @RequestParam(value = "page", defaultValue = "1") Integer page,
+//            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
+//    ){
+//        try {
+//
+//        } catch (Exception e){
+//            Map<String, Object> exceptionMap = new HashMap<>();
+//            exceptionMap.put("message", "Unknown error occured!");
+//            exceptionMap.put("error", e.getMessage());
+//            log.error("Error: ", e);
+//            return ResponseEntity.internalServerError().body(exceptionMap);
+//        }
+//    }
+
     @DeleteMapping("datastore/{uuid}")
     public Map<String, Object> deleteDatastore(@PathVariable("uuid") String uuid) throws Exception {
         try {

@@ -1,4 +1,4 @@
-package com.Adapter.icare.SharedHealthRecords.Utilities;
+package com.Adapter.icare.Utils;
 
 import ca.uhn.fhir.rest.api.Constants;
 import ca.uhn.fhir.rest.api.SortOrderEnum;
@@ -8,7 +8,6 @@ import ca.uhn.fhir.util.BundleUtil;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Procedure;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 

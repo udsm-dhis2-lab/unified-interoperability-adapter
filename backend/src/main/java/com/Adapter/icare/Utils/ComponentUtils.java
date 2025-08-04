@@ -1,4 +1,4 @@
-package com.Adapter.icare.SharedHealthRecords.Utilities;
+package com.Adapter.icare.Utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.r4.model.BooleanType;

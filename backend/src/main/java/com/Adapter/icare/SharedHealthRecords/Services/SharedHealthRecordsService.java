@@ -41,19 +41,19 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.Adapter.icare.SharedHealthRecords.Utilities.AllergyIntoleranceUtils.getAllergyTolerances;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemsByEncounterId;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ChronicConditionsUtils.getConditionsByCategory;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.getComponentValueDateTime;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
+import static com.Adapter.icare.Utils.AllergyIntoleranceUtils.getAllergyTolerances;
+import static com.Adapter.icare.Utils.ChargeItemsUtils.getChargeItemsByEncounterId;
+import static com.Adapter.icare.Utils.ChronicConditionsUtils.getConditionsByCategory;
+import static com.Adapter.icare.Utils.ComponentUtils.*;
+import static com.Adapter.icare.Utils.ComponentUtils.getComponentValueDateTime;
+import static com.Adapter.icare.Utils.DiagnosticReportUtils.getDiagnosticReportsByCategory;
+import static com.Adapter.icare.Utils.ExtensionUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.InvestigationDetailsUtils.getInvestigationDetailsFromObservationGroup;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.LabInvestigationDetailsUtils.getLabInvestigationDetailsFromDiagnosticReport;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
+import static com.Adapter.icare.Utils.ObservationsUtils.*;
+import static com.Adapter.icare.Utils.ProceduresUtils.getProceduresByCategoryAndObservationReference;
+import static com.Adapter.icare.Utils.ServiceRequestUtils.getServiceRequestsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.medicationDispenseUtils.getMedicationDispensesById;
 import static com.Adapter.icare.Utils.CarePlanUtils.getCarePlansByCategory;
 
@@ -3198,7 +3198,7 @@ public class SharedHealthRecordsService {
 
                                         AncHivStatusDTO ldAncHivStatusDTO = new AncHivStatusDTO();
                                         ldAncHivStatusDTO.setStatus(STATUS.fromString(getExtensionValueString(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-status")));
-                                        ldAncHivStatusDTO.setNumberOfTestTaken(getExtensionValueInt(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-numberOfTestsTaken"));
+                                        ldAncHivStatusDTO.setNumberOfTestsTaken(getExtensionValueInt(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-numberOfTestsTaken"));
 
                                         ldHivDetailsDTO.setAncHivStatus(ldAncHivStatusDTO);
                                         laborAndDeliveryDetailsDTO.setHivDetails(ldHivDetailsDTO);
@@ -3345,7 +3345,7 @@ public class SharedHealthRecordsService {
                                         // "://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details",
                                         // "motherHivStatus"));
 
-                                        birthDetailsDTO.setMarcerated(
+                                        birthDetailsDTO.setMacerated(
                                                 getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-macerated")
                                         );
 
@@ -3364,7 +3364,7 @@ public class SharedHealthRecordsService {
 
                                         ldBirthDetailsApgaScore.setFiveMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-fiveMinute"));
 
-                                        birthDetailsDTO.setApgaScore(ldBirthDetailsApgaScore);
+                                        birthDetailsDTO.setApgarScore(ldBirthDetailsApgaScore);
 
                                         birthDetailsDTO.setWasBreastFedWithinOneHourAfterDelivery(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-wasBreastFedWithinOneHourAfterDelivery"));
 
@@ -3720,7 +3720,7 @@ public class SharedHealthRecordsService {
                                                     getComponentIntValue(
                                                             observation,
                                                             2));
-                                            birthDetailsDTO.setMarcerated(
+                                            birthDetailsDTO.setMacerated(
                                                     getComponentValueBoolean(
                                                             observation,
                                                             3));

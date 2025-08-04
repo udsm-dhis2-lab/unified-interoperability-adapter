@@ -1,4 +1,4 @@
-package com.Adapter.icare.SharedHealthRecords.Utilities;
+package com.Adapter.icare.Utils;
 
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import org.hl7.fhir.r4.model.AllergyIntolerance;

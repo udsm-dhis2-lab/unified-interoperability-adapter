@@ -12,8 +12,8 @@ import org.hl7.fhir.r4.model.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.getNestedExtensionValueBoolean;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.getNestedExtensionValueString;
+import static com.Adapter.icare.Utils.ExtensionUtils.getNestedExtensionValueBoolean;
+import static com.Adapter.icare.Utils.ExtensionUtils.getNestedExtensionValueString;
 
 public class LabInvestigationDetailsUtils {
     public static LabInvestigationDetailsDTO getLabInvestigationDetailsFromDiagnosticReport (IGenericClient fhirClient, DiagnosticReport diagnosticReport){
