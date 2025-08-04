@@ -3198,7 +3198,7 @@ public class SharedHealthRecordsService {
 
                                         AncHivStatusDTO ldAncHivStatusDTO = new AncHivStatusDTO();
                                         ldAncHivStatusDTO.setStatus(STATUS.fromString(getExtensionValueString(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-status")));
-                                        ldAncHivStatusDTO.setNumberOfTestTaken(getExtensionValueInt(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-numberOfTestsTaken"));
+                                        ldAncHivStatusDTO.setNumberOfTestsTaken(getExtensionValueInt(familyPlanningCounseling, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-hiv-details-ancHivStatus-numberOfTestsTaken"));
 
                                         ldHivDetailsDTO.setAncHivStatus(ldAncHivStatusDTO);
                                         laborAndDeliveryDetailsDTO.setHivDetails(ldHivDetailsDTO);
@@ -3345,7 +3345,7 @@ public class SharedHealthRecordsService {
                                         // "://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details",
                                         // "motherHivStatus"));
 
-                                        birthDetailsDTO.setMarcerated(
+                                        birthDetailsDTO.setMacerated(
                                                 getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-macerated")
                                         );
 
@@ -3364,7 +3364,7 @@ public class SharedHealthRecordsService {
 
                                         ldBirthDetailsApgaScore.setFiveMinute(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-apgarScore-fiveMinute"));
 
-                                        birthDetailsDTO.setApgaScore(ldBirthDetailsApgaScore);
+                                        birthDetailsDTO.setApgarScore(ldBirthDetailsApgaScore);
 
                                         birthDetailsDTO.setWasBreastFedWithinOneHourAfterDelivery(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-wasBreastFedWithinOneHourAfterDelivery"));
 
@@ -3720,7 +3720,7 @@ public class SharedHealthRecordsService {
                                                     getComponentIntValue(
                                                             observation,
                                                             2));
-                                            birthDetailsDTO.setMarcerated(
+                                            birthDetailsDTO.setMacerated(
                                                     getComponentValueBoolean(
                                                             observation,
                                                             3));
