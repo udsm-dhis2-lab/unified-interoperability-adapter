@@ -52,6 +52,7 @@ public class DemographicDetailsDTO {
         demographicDetails.put("firstName", this.getFirstName());
         demographicDetails.put("middleName", this.getMiddleName());
         demographicDetails.put("lastName", this.getLastName());
+        demographicDetails.put("ethnicGroup", this.getEthnicGroup());
         demographicDetails.put("dateOfBirth", this.getDateOfBirth());
         demographicDetails.put("gender", this.getGender());
         demographicDetails.put("phoneNumbers", this.getPhoneNumbers());

@@ -35,30 +35,27 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static com.Adapter.icare.SharedHealthRecords.Utilities.AllergyIntoleranceUtils.getAllergyTolerances;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ChargeItemsUtils.getChargeItemsByEncounterId;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ChronicConditionsUtils.getConditionsByCategory;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.*;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ComponentUtils.getComponentValueDateTime;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.DiagnosticReportUtils.getDiagnosticReportsByCategory;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ExtensionUtils.*;
+import static com.Adapter.icare.Utils.AllergyIntoleranceUtils.getAllergyTolerances;
+import static com.Adapter.icare.Utils.ChargeItemsUtils.getChargeItemsByEncounterId;
+import static com.Adapter.icare.Utils.ChronicConditionsUtils.getConditionsByCategory;
+import static com.Adapter.icare.Utils.ComponentUtils.*;
+import static com.Adapter.icare.Utils.ComponentUtils.getComponentValueDateTime;
+import static com.Adapter.icare.Utils.DiagnosticReportUtils.getDiagnosticReportsByCategory;
+import static com.Adapter.icare.Utils.ExtensionUtils.*;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.InvestigationDetailsUtils.getInvestigationDetailsFromObservationGroup;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.LabInvestigationDetailsUtils.getLabInvestigationDetailsFromDiagnosticReport;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.*;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ProceduresUtils.getProceduresByCategoryAndObservationReference;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ServiceRequestUtils.getServiceRequestsByCategory;
+import static com.Adapter.icare.Utils.ObservationsUtils.*;
+import static com.Adapter.icare.Utils.ProceduresUtils.getProceduresByCategoryAndObservationReference;
+import static com.Adapter.icare.Utils.ServiceRequestUtils.getServiceRequestsByCategory;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.medicationDispenseUtils.getMedicationDispensesById;
 import static com.Adapter.icare.Utils.CarePlanUtils.getCarePlansByCategory;
-import static com.Adapter.icare.Utils.DateUtils.stringToDateOrNull;
 
 @Service
 public class SharedHealthRecordsService {

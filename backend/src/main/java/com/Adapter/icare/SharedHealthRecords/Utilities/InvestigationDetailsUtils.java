@@ -9,8 +9,8 @@ import org.hl7.fhir.r4.model.Observation;
 
 import java.util.List;
 
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.getObservationsByCategoryAndCode;
-import static com.Adapter.icare.SharedHealthRecords.Utilities.ObservationsUtils.getObservationsByObservationGroupId;
+import static com.Adapter.icare.Utils.ObservationsUtils.getObservationsByCategoryAndCode;
+import static com.Adapter.icare.Utils.ObservationsUtils.getObservationsByObservationGroupId;
 
 public class InvestigationDetailsUtils {
 
