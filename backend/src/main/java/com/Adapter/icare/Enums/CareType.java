@@ -12,6 +12,7 @@ public enum CareType {
     IPD,
     ANC,
     DENTAL,
+    FP,
     EYE;
 
     public static final String INVALID_CARE_TYPE_PREFIX = "Invalid careType:";
