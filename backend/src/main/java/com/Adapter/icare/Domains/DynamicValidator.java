@@ -37,6 +37,9 @@ public class DynamicValidator extends BaseEntity{
     @Column()
     private String errorMessage;
 
+    @Column()
+    private Boolean published = false;
+
 
     public DynamicValidator fromMap(Map<String, Object> validatorMap) throws DataFormatException {
 
@@ -60,6 +63,12 @@ public class DynamicValidator extends BaseEntity{
 
         if(validatorMap.get("description") != null){
             dynamicValidator.setDescription(validatorMap.get("description").toString());
+        }
+
+        if(validatorMap.get("published") != null){
+            dynamicValidator.setPublished((Boolean) validatorMap.get("published"));
+        } else {
+            dynamicValidator.setPublished(false);
         }
 
         return dynamicValidator;
@@ -110,8 +119,14 @@ public class DynamicValidator extends BaseEntity{
         } else {
             lastUpdatedBy = null;
         }
+
+        if (this.getPublished() != null) {
+            validatorMap.put("published", this.getPublished());
+        } else {
+            validatorMap.put("published", false);
+        }
         validatorMap.put("lastUpdatedOn", this.getLastUpdatedOn());
-        validatorMap.put("lastUpdatedBy",lastUpdatedBy);
+        validatorMap.put("lastUpdatedBy", lastUpdatedBy);
 
         return validatorMap;
     }

@@ -47,11 +47,13 @@ public class ValidatorsController {
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "paging", defaultValue = "true") Boolean paging,
             @RequestParam(value = "code", required = false) String code,
-            @RequestParam(value = "name", required = false) String name) throws Exception {
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "published", required = false, defaultValue = "false") Boolean published
+    ) throws Exception {
         try {
             List<Map<String, Object>> validatorsList = new ArrayList<>();
             Page<DynamicValidator> pagedValidatorData = validatorService.getValidatorsByPagination(page, pageSize, paging, code,
-                    name);
+                    name, published);
             for (DynamicValidator dynamicValidator : pagedValidatorData.getContent()) {
                 validatorsList.add(dynamicValidator.toMap());
             }
@@ -71,9 +73,11 @@ public class ValidatorsController {
 
     @GetMapping("validators/{uuid}")
     public ResponseEntity<Map<String, Object>> getValidator(
-            @PathVariable("uuid") String uuid) throws Exception {
+            @PathVariable("uuid") String uuid,
+            @RequestParam(value = "published", required = false, defaultValue = "false") Boolean published
+            ) throws Exception {
         try {
-            DynamicValidator dynamicValidator = validatorService.getValidatorByUuid(uuid);
+            DynamicValidator dynamicValidator = validatorService.getValidatorByUuid(uuid, published);
             if (dynamicValidator != null) {
                 return ResponseEntity.ok(dynamicValidator.toMap());
             } else {
@@ -147,7 +151,7 @@ public class ValidatorsController {
     @DeleteMapping("validators/{uuid}")
     public ResponseEntity<Map<String, Object>> deleteValidators(@PathVariable("uuid") String uuid) throws Exception {
         try {
-            DynamicValidator dynamicValidator = validatorService.getValidatorByUuid(uuid);
+            DynamicValidator dynamicValidator = validatorService.getValidatorByUuid(uuid, null);
             if (dynamicValidator != null) {
                 validatorService.deleteValidator(dynamicValidator.getId());
                 Map<String, Object> responseMap = new HashMap<>();

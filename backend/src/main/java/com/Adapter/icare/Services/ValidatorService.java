@@ -35,13 +35,17 @@ public class ValidatorService {
         return validatorRepository.findAll();
     }
 
-    public Page<DynamicValidator> getValidatorsByPagination(Integer page, Integer pageSize, boolean paging, String code, String name) throws Exception {
-        Pageable pageable = paging ? createPageable(page, pageSize): null;
-        return validatorRepository.getValidatorsListByPagination(code, name, pageable);
+    public List<DynamicValidator> getValidators(Boolean published){
+        return validatorRepository.findByPublised(published);
     }
 
-    public DynamicValidator getValidatorByUuid(String uuid) {
-        return validatorRepository.findByUuid(uuid);
+    public Page<DynamicValidator> getValidatorsByPagination(Integer page, Integer pageSize, boolean paging, String code, String name, Boolean published) throws Exception {
+        Pageable pageable = paging ? createPageable(page, pageSize): null;
+        return validatorRepository.getValidatorsListByPagination(code, name, published, pageable);
+    }
+
+    public DynamicValidator getValidatorByUuid(String uuid, Boolean published) {
+        return validatorRepository.findByUuid(uuid, published);
     }
 
     public DynamicValidator addNewValidator(DynamicValidator dynamicValidator) {
@@ -66,7 +70,7 @@ public class ValidatorService {
         if (authenticatedUser != null) {
             dynamicValidator.setLastUpdatedBy(authenticatedUser);
         }
-        DynamicValidator dynamicValidatorToUpdate = validatorRepository.findByUuid(dynamicValidator.getUuid());
+        DynamicValidator dynamicValidatorToUpdate = validatorRepository.findByUuid(dynamicValidator.getUuid(), null);
         if (dynamicValidatorToUpdate != null) {
             dynamicValidatorToUpdate.setName(dynamicValidator.getName() == null ? dynamicValidatorToUpdate.getName() : dynamicValidator.getName());
             dynamicValidatorToUpdate.setCode(dynamicValidator.getCode() == null ? dynamicValidatorToUpdate.getCode() : dynamicValidator.getCode());
