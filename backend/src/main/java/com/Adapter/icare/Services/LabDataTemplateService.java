@@ -84,20 +84,30 @@ public class LabDataTemplateService {
     }
 
     public Map<String, Object> getLabRecordsWithPagination(Integer page,
-                                                              Integer pageSize) throws Exception {
+                                                              Integer pageSize, String facilityCode, String specimenId) throws Exception {
 
         List<Map<String, Object>> labRecords = new ArrayList<>();
-        Bundle clientTotalBundle = new Bundle();
-        var searchRecords = fhirClient.search().forResource(ServiceRequest.class);
-        searchRecords.sort().descending("_lastUpdated");
+        Bundle response = new Bundle();
+        Bundle specimensTotalBundle = new Bundle();
+        var specimens = fhirClient.search().forResource(Specimen.class);
+        specimens.sort().descending("_lastUpdated");
 
         try {
+
+
+
+
+            response = specimens.count(pageSize).offset(page - 1).returnBundle(Bundle.class)
+                    .execute();
+            specimensTotalBundle = specimens.summaryMode(SummaryEnum.COUNT)
+                    .returnBundle(Bundle.class).execute();
+
 
 
             Map<String, Object> lanRecordsResponse = new HashMap<>();
             lanRecordsResponse.put("results", labRecords);
             Map<String, Object> pager = new HashMap<>();
-            pager.put("total", clientTotalBundle.getTotal());
+            pager.put("total", specimensTotalBundle.getTotal());
             pager.put("totalPages", null);
             pager.put("page", page);
             pager.put("pageSize", pageSize);
