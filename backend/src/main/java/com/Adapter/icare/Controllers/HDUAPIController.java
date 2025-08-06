@@ -269,7 +269,7 @@ public class HDUAPIController {
 
                 Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
                 List<SharedHealthRecordsDTO> validatedListGrid = Collections.synchronizedList(new ArrayList<>());
-                List<DynamicValidator> dynamicValidators = this.validatorService.getValidators();
+                List<DynamicValidator> dynamicValidators = this.validatorService.getValidators(true);
 
                 // TODO: Process clients in chunks in case exceed a certain amount (e.g 20)
 
@@ -412,7 +412,7 @@ public class HDUAPIController {
 
                     Map<Integer, List<String>> validationErrorsMap = new ConcurrentHashMap<>();
                     List<LabRequestDetailsDTO> validatedLabRequestDetails = Collections.synchronizedList(new ArrayList<>());
-                    List<DynamicValidator> dynamicValidators = this.validatorService.getValidators();
+                    List<DynamicValidator> dynamicValidators = this.validatorService.getValidators(testDataValidity ? null : true);
 
                     // TODO: Process clients in chunks in case exceed a certain amount (e.g 20)
 
