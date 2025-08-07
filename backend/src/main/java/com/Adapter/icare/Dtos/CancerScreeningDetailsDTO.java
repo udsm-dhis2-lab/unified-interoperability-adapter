@@ -13,5 +13,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CancerScreeningDetailsDTO {
     private BreastCancerDTO breastCancer;
-    private CervicalCancerDTO cervicalCancer;
+
+    @JsonDeserialize(using = CervicalCancerDeserializer.class)
+    private ParentCervicalCancerDTO cervicalCancer;
 }
