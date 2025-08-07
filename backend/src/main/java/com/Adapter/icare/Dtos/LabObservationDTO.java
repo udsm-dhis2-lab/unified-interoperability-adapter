@@ -17,7 +17,7 @@ public class LabObservationDTO {
     private Integer obxSetId;
     private Integer obxSubId;
     private String result;
-    private String codedValue;
+    private CodeDTO codedValue;
     private ObservationDTO observation;
     private CodeDTO confirmedDiagnosis;
     private String abnormalFlagCode;

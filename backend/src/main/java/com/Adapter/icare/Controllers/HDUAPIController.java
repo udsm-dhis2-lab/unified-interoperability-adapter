@@ -14,7 +14,7 @@ import javax.validation.Valid;
 
 import com.Adapter.icare.Domains.DynamicValidator;
 import com.Adapter.icare.Dtos.*;
-import com.Adapter.icare.Services.ValidatorService;
+import com.Adapter.icare.Services.*;
 import com.Adapter.icare.validators.SharedHealthRecordValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -51,9 +51,6 @@ import com.Adapter.icare.Constants.FHIRConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Services.DatastoreService;
-import com.Adapter.icare.Services.MediatorsService;
-import com.Adapter.icare.Services.UserService;
 import com.google.common.collect.Maps;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -69,6 +66,7 @@ public class HDUAPIController {
     private final DatastoreService datastoreService;
     private final MediatorsService mediatorsService;
     private final ValidatorService validatorService;
+    private final LabDataTemplateService labDataTemplateService;
     private boolean shouldUseWorkflowEngine;
     private String defaultWorkflowEngineCode;
     private Mediator workflowEngine;
@@ -95,6 +93,7 @@ public class HDUAPIController {
             UserService userService,
             ClientRegistryService clientRegistryService,
             ClientRegistryConstants clientRegistryConstants,
+            LabDataTemplateService labDataTemplateService,
             ValidatorService validatorService,
             FHIRConstants fhirConstants) throws Exception {
         this.datastoreService = datastoreService;
@@ -102,6 +101,7 @@ public class HDUAPIController {
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryService = clientRegistryService;
         this.userService = userService;
+        this.labDataTemplateService = labDataTemplateService;
         this.validatorService = validatorService;
         this.clientRegistryConstants = clientRegistryConstants;
         FhirContext fhirContext = FhirContext.forR4();
@@ -526,21 +526,23 @@ public class HDUAPIController {
     }
 
 
-//    @GetMapping(value = "labDataTemplates")
-//    public ResponseEntity<Map<String, Object>> getLabDataFromFhir(
-//            @RequestParam(value = "page", defaultValue = "1") Integer page,
-//            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize
-//    ){
-//        try {
-//
-//        } catch (Exception e){
-//            Map<String, Object> exceptionMap = new HashMap<>();
-//            exceptionMap.put("message", "Unknown error occured!");
-//            exceptionMap.put("error", e.getMessage());
-//            log.error("Error: ", e);
-//            return ResponseEntity.internalServerError().body(exceptionMap);
-//        }
-//    }
+    @GetMapping(value = "labDataTemplates")
+    public ResponseEntity<Map<String, Object>> getLabDataFromFhir(
+            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(value = "facilityCode", required = false) String facilityCode,
+            @RequestParam(value = "specimenId", required = false) String specimenId
+    ){
+        try {
+            return ResponseEntity.ok().body(this.labDataTemplateService.getLabRecordsWithPagination(page, pageSize, facilityCode, specimenId));
+        } catch (Exception e){
+            Map<String, Object> exceptionMap = new HashMap<>();
+            exceptionMap.put("message", "Unknown error occured!");
+            exceptionMap.put("error", e.getMessage());
+            log.error("Error: ", e);
+            return ResponseEntity.internalServerError().body(exceptionMap);
+        }
+    }
 
     @DeleteMapping("datastore/{uuid}")
     public Map<String, Object> deleteDatastore(@PathVariable("uuid") String uuid) throws Exception {

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class LabRequestDetailsDTO {
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date dateOccurred;
+    private String dateOccurred;
     private String specimenID;
     private CodeDTO typeOfSpecimen;
     private CodeDTO specimenSite;
