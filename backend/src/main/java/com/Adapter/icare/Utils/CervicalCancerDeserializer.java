@@ -31,7 +31,7 @@ public class CervicalCancerDeserializer extends StdDeserializer<ParentCervicalCa
 
         ParentCervicalCancerDTO result = null;
 
-        if (node.has("suspected") || node.has("screenedWithVia") || node.has("viaTestPositive") &&
+        if ((node.has("suspected") || node.has("screenedWithVia") || node.has("viaTestPositive")) &&
                 !(node.has("screenedWithHPVDNA") || node.has("hpvDNAPositive")  ||
                         node.has("diagnosedWithLargeLesion") || node.has("diagnosedWithSmallOrModerateLesion") || node.has("treatedWithCryo") ||
                         node.has("treatedWithThermo") || node.has("treatedWithLEEP") || node.has("firstTimeScreening") || node.has("treatedOnTheSameDay") || node.has("complicationsAfterTreatment") || node.has("foundWithHivAndReferredToCTC"))){
