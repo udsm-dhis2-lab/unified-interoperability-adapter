@@ -32,6 +32,18 @@ public enum Priority {
                 log.error(INVALID_PRIORITY_PREFIX + " Input  priority  value cannot be null. {} ", ALLOWED_VALUES_MESSAGE);
                 return null;
             }
+
+            switch (value) {
+                case "routine":
+                    return Priority.R;
+                case "urgent":
+                    return Priority.U;
+                case "asap":
+                    return Priority.A;
+                case "stat":
+                    return Priority.S;
+            }
+
             return Priority.valueOf(value.toUpperCase());
         } catch (IllegalArgumentException ex) {
             // throw new IllegalArgumentException(INVALID_PRIORITY_PREFIX + " '" + value + "'. " + ALLOWED_VALUES_MESSAGE, ex);

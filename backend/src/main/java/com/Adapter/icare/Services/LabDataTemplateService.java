@@ -24,14 +24,19 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.Adapter.icare.SharedHealthRecords.Utilities.InvestigationDetailsUtils.getInvestigationDetailsFromObservationGroup;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.LabInvestigationDetailsUtils.getLabInvestigationDetailsFromDiagnosticReport;
+import static com.Adapter.icare.SharedHealthRecords.Utilities.LabRequestDetailsUtils.getLabRequestDetailsBySpecimen;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.MedicationStatementUtils.getMedicationStatementsByCategoryAndCodeableConcept;
 import static com.Adapter.icare.SharedHealthRecords.Utilities.medicationDispenseUtils.getMedicationDispensesById;
 import static com.Adapter.icare.Utils.AllergyIntoleranceUtils.getAllergyTolerances;
@@ -104,8 +109,16 @@ public class LabDataTemplateService {
                 .execute();
 
         if(response.hasEntry()){
-            for(Bundle.BundleEntryComponent bundleEntryComponent :  response.getEntry()){
-                labRecords.add((new LabRecordsDataDTO()).toMap());
+            for(Bundle.BundleEntryComponent entry :  response.getEntry()){
+                if (entry.getResource() instanceof Specimen){
+                    Specimen specimen = (Specimen) entry.getResource();
+
+                    LabRequestDetailsDTO labRequestDetailsDTO = getLabRequestDetailsBySpecimen(fhirClient, specimen);
+
+                    if(labRequestDetailsDTO != null){
+                        labRecords.add(labRequestDetailsDTO.toMap());
+                    }
+                }
             }
         }
 
