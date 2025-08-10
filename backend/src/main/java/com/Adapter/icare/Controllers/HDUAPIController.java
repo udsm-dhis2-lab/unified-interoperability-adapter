@@ -248,6 +248,8 @@ public class HDUAPIController {
     ) {
         Map<String, Object> baseResponse = new HashMap<>();
 
+        System.out.println("Data Template: ===================== **********" + dataTemplate.getData().getListGrid().get(0).getDeathRegistry());
+
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 Map<String, Object> payload = new HashMap<>();
