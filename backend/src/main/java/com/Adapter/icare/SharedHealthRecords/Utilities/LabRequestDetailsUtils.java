@@ -162,6 +162,28 @@ public class LabRequestDetailsUtils {
 
                 labRequestDetailsDTO.setLabTestResults(labResults);
 
+
+                Bundle responseTasks = fhirClient.search()
+                        .forResource(Task.class)
+                        .where(Task.FOCUS.hasId(specimen.getIdElement().getIdPart()))
+                        .returnBundle(Bundle.class)
+                        .execute();
+
+                List<PostLabTestResultsDTO> postLabResults = new ArrayList<PostLabTestResultsDTO>();
+                for (Bundle.BundleEntryComponent entry : responseLabResultsObservations.getEntry()) {
+                    if (entry.getResource() instanceof Task) {
+                        Task task = (Task) entry.getResource();
+
+                        PostLabTestResultsDTO postLabTestResultsDTO = getPostLabTestResultsFromTask(task);
+                        if(postLabTestResultsDTO != null){
+                            postLabResults.add(postLabTestResultsDTO);
+                        }
+                    }
+                }
+
+                labRequestDetailsDTO.setPostLabTestResults(postLabResults);
+
+
             }
 
             return labRequestDetailsDTO;
@@ -274,14 +296,217 @@ public class LabRequestDetailsUtils {
                 Date dateSpecimenAnalyzed = observation.getEffectiveDateTimeType().getValue();
                 labTestResultsFinalDTO.setDateTimeSpecimenAnalyzed(dateSpecimenAnalyzed != null ? dateSpecimenAnalyzed.toInstant() : null);
 
+                CodeDTO resultStatusDTO = new CodeDTO();
+                resultStatusDTO.setCode(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result-status/code"));
+                resultStatusDTO.setCodeType(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result-status/codeType"));
 
+                labTestResultsFinalDTO.setResultStatus(resultStatusDTO);
 
+                Date testResultDate = getExtensionValueDatetime(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/testResultDate");
+
+                labTestResultsFinalDTO.setTestResultDate(testResultDate != null ? testResultDate.toInstant() : null);
+                labTestResultsFinalDTO.setTestingFacilityCode(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/performingFacility"));
+                labTestResultsFinalDTO.setReferringSpecimenId(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/referringSpecimenId"));
+
+                Date dateResultsRegistered = getExtensionValueDatetime(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/dateTimeResultsRegistered");
+                labTestResultsFinalDTO.setDateTimeResultsRegistered(dateResultsRegistered != null ? dateResultsRegistered.toInstant() : null);
+
+                labTestResultsFinalDTO.setResultsAuthorisedBy(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/resultsAuthorisedBy"));
+
+                labTestResultsFinalDTO.setDateTimeResultsAuthorized(observation.hasIssued() && observation.getIssued() != null ? observation.getIssued().toInstant() : null);
+
+                labTestResultsFinalDTO.setSpecimenTestedBy(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/specimenTestedBy"));
+
+                labTestResultsFinalDTO.setTargetTimeDays(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/targetTimeDays"));
+                labTestResultsFinalDTO.setTargetTimeMins(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/targetTimeMins"));
+
+                // Time to set results
+
+                Bundle responseResultsObservations = fhirClient.search()
+                        .forResource(Observation.class)
+                        .where(Observation.DERIVED_FROM.hasId(observation.getId()))
+                        .returnBundle(Bundle.class)
+                        .execute();
+                List<LabObservationDTO> results = new ArrayList<LabObservationDTO>();
+
+                for (Bundle.BundleEntryComponent entry : responseResultsObservations.getEntry()) {
+                    if (entry.getResource() instanceof Observation) {
+                        LabObservationDTO result = getChildLabResultObservationFromObservation(fhirClient, observation);
+                        if(result != null){
+                            results.add(result);
+                        }
+                    }
+                }
+
+                labTestResultsFinalDTO.setResults(results);
             }
 
 
 
             return labTestResultsFinalDTO;
         }
+
+        return null;
+    }
+
+    private static LabObservationDTO getChildLabResultObservationFromObservation(IGenericClient fhirClient, Observation observation){
+        LabObservationDTO result = new LabObservationDTO();
+
+        if(observation != null){
+            result.setParameter(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/parameter"));
+            result.setReleaseDate(observation.hasIssued() && observation.getIssued() != null ? observation.getIssued().toInstant() : null);
+
+            CodeDTO resultStatusDTO = new CodeDTO();
+            resultStatusDTO.setCode(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/result-status/code"));
+            resultStatusDTO.setCodeType(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/result-status/codeType"));
+            result.setResultStatus(resultStatusDTO);
+
+            if(observation.hasIdentifier() && !observation.getIdentifier().isEmpty()){
+                for(Identifier identifier: observation.getIdentifier()){
+                    if(identifier.hasSystem() && identifier.getSystem().equals("urn:sys:result:obr-set-id")){
+                        result.setObrSetId(identifier.hasValue() && identifier.getValue() != null ? Integer.parseInt(identifier.getValue()) : null);
+                    }
+
+                    if(identifier.hasSystem() && identifier.getSystem().equals("obx-set-id")){
+                        result.setObxSetId(identifier.hasValue() && identifier.getValue() != null ? Integer.parseInt(identifier.getValue()) : null);
+                    }
+
+                    if(identifier.hasSystem() && identifier.getSystem().equals("sys:obx-sub-id")){
+                        result.setObxSubId(identifier.hasValue() && identifier.getValue() != null ? Integer.parseInt(identifier.getValue()) : null);
+                    }
+                }
+            }
+
+            if(observation.hasValueCodeableConcept() && observation.getValueCodeableConcept() != null){
+                result.setResult(observation.getValueCodeableConcept().hasText() ? observation.getValueCodeableConcept().getText() : null);
+
+                if(observation.getValueCodeableConcept().hasCoding() && !observation.getValueCodeableConcept().getCoding().isEmpty()){
+                    for(Coding coding: observation.getValueCodeableConcept().getCoding()){
+                        if(coding.hasSystem() && coding.getSystem().equals("http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/codedValue")){
+                            CodeDTO codedValue = new CodeDTO();
+
+                            codedValue.setCode(coding.hasCode() ? coding.getCode() : null);
+                            codedValue.setCodeType(coding.hasDisplay() ? coding.getDisplay() : null);
+
+                            result.setCodedValue(codedValue);
+                        }
+
+                        if(coding.hasSystem() && coding.getSystem().equals("http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/observation")){
+                            ObservationDTO observationCode = new ObservationDTO();
+
+                            observationCode.setCode(coding.hasCode() ? coding.getCode() : null);
+                            observationCode.setType(coding.hasDisplay() ? coding.getDisplay() : null);
+
+                            result.setObservation(observationCode);
+                        }
+                    }
+                }
+
+            }
+
+            DiagnosticReport diagnosticReport = fhirClient.read()
+                    .resource(DiagnosticReport.class)
+                    .withId(observation.getId())
+                    .execute();
+
+            if(diagnosticReport != null && diagnosticReport.hasConclusionCode() && !diagnosticReport.getConclusionCode().isEmpty()){
+                CodeDTO confirmedDiagnosis = new CodeDTO();
+                for(CodeableConcept conclusionCode: diagnosticReport.getConclusionCode()){
+                    if(conclusionCode.hasCoding() && !conclusionCode.getCoding().isEmpty()){
+                        for(Coding coding: conclusionCode.getCoding()){
+                            if(coding.hasSystem() && coding.getSystem().equals("http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/confirmed-diagnosis")){
+                                confirmedDiagnosis.setCode(coding.hasCode() && coding.getCode() != null ? coding.getCode() : null);
+                                confirmedDiagnosis.setCodeType(coding.hasDisplay() && coding.getDisplay() != null ? coding.getDisplay() : null);
+                            }
+                        }
+                    }
+                }
+                result.setConfirmedDiagnosis(confirmedDiagnosis);
+            }
+
+
+            if(observation.hasInterpretation() && !observation.getInterpretation().isEmpty()){
+                for(CodeableConcept interpretation: observation.getInterpretation()){
+                    if(interpretation.hasCoding() && !interpretation.getCoding().isEmpty()){
+                        for(Coding coding: interpretation.getCoding()){
+                            if(coding.hasSystem() && coding.getSystem().equals("http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/abnormalFlagCode")){
+                                result.setAbnormalFlagCode(coding.hasCode() && coding.getCode() != null ? coding.getCode() : null);
+                            }
+                        }
+                    }
+                }
+            }
+
+            Date resultDateTimeValue = observation.hasEffectiveDateTimeType() && observation.getEffectiveDateTimeType() != null ? observation.getEffectiveDateTimeType().getValue() : null;
+            result.setDateTimeValue(resultDateTimeValue != null ? resultDateTimeValue.toInstant() : null);
+
+            result.setResultSemiquantitive(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/resultSemiquantitive"));
+
+            result.setNote(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/note"));
+
+            result.setWorkUnitsInMinutes(getExtensionValueInt(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/workUnitsInMinutes"));
+
+            var constUnit = getExtensionValueDecimal(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/costUnits");
+            result.setCostUnits(constUnit != null ? constUnit.getValue().floatValue() : null);
+
+            result.setValueType(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/valueType"));
+
+            result.setStandardCode(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/standardCode"));
+
+            result.setUnit(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/unit"));
+
+            var lowRange = getExtensionValueDecimal(observation,"http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/lowRange");
+            result.setLowRange(lowRange != null ? lowRange.getValue().floatValue() : null);
+
+            var highRange = getExtensionValueDecimal(observation,"http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/highRange");
+            result.setHighRange(highRange != null ? highRange.getValue().floatValue() : null);
+
+            result.setRemarks(getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/lab-request/lab-test-result/result/remarks"));
+
+            return result;
+        }
+
+        return null;
+    }
+
+    private static PostLabTestResultsDTO getPostLabTestResultsFromTask(Task task){
+        PostLabTestResultsDTO postLabResult = new PostLabTestResultsDTO();
+
+        if(task != null){
+            if(task.hasIdentifier() && !task.getIdentifier().isEmpty()){
+                for(Identifier identifier: task.getIdentifier()){
+                    if(identifier.hasSystem() && identifier.getSystem().equals("urn:sys:obr-set-id")){
+                        postLabResult.setObrSetId(identifier.hasValue() && identifier.getValue() != null ? Integer.parseInt(identifier.getValue()) : null);
+                    }
+                }
+            }
+            postLabResult.setTypeOfTest(getExtensionValueString(task, "http://fhir.moh.go.tz/fhir/lab-request/post-lab-test-results/typeOfTest"));
+
+            if(task.hasOutput() && !task.getOutput().isEmpty()){
+                for(Task.TaskOutputComponent output: task.getOutput()){
+                    if(output.hasType() && output.getType().hasCoding() && !output.getType().getCoding().isEmpty()){
+                        for(Coding coding: output.getType().getCoding()){
+                            if(coding.hasSystem() && coding.getSystem().equals("http://fhir.moh.go.tz/fhir/lab-request/post-lab-test-results/dateTimeResultsReceivedAtFacility")){
+                                Date value = output.hasValue() && output.getValue().hasPrimitiveValue() ? output.getValue().dateTimeValue().getValue() : null;
+
+                                postLabResult.setDateTimeResultsReceivedAtFacility(value != null ? value.toInstant() : null);
+
+                            }
+
+                            if(coding.hasSystem() && coding.getSystem().equals("http://fhir.moh.go.tz/fhir/lab-request/post-lab-test-results/dateTimeResultsprovidedToClient")){
+                                Date value = output.hasValue() && output.getValue().hasPrimitiveValue() ? output.getValue().dateTimeValue().getValue() : null;
+
+                                postLabResult.setDateTimeResultsprovidedToClient(value != null ? value.toInstant() : null);
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            return postLabResult;
+        }
+
 
         return null;
     }
