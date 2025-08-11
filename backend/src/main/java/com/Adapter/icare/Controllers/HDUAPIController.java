@@ -247,7 +247,6 @@ public class HDUAPIController {
             @RequestParam(name = "testDataValidity", required = false, defaultValue = "false") boolean testDataValidity
     ) {
         Map<String, Object> baseResponse = new HashMap<>();
-
         try {
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 Map<String, Object> payload = new HashMap<>();
