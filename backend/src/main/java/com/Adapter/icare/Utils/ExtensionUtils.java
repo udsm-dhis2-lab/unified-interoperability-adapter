@@ -92,6 +92,18 @@ public class ExtensionUtils {
         return Boolean.FALSE;
     }
 
+    public static Date getExtensionValueDatetime(DomainResource resource, String url){
+        if (resource != null && resource.hasExtension()) {
+            for (Extension parentExtension : resource.getExtension()) {
+                if (parentExtension.getUrl().equals(url) && parentExtension.hasValue()
+                        && parentExtension.getValue() instanceof DateTimeType) {
+                    return ((DateTimeType) parentExtension.getValue()).getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     public static Boolean getExtensionValueBoolean(DomainResource resource, String url) {
         if (resource != null && resource.hasExtension()) {
             for (Extension parentExtension : resource.getExtension()) {
@@ -137,6 +149,30 @@ public class ExtensionUtils {
                 }
             }
         }
+        return null;
+    }
+
+    /**
+     * Finds an extension by its URL on a given resource and returns its value
+     * if that value is a CodeableConcept.
+     *
+     * @param resource The FHIR resource to search within (e.g., Specimen, Observation).
+     * @param url The unique URL of the extension to find.
+     * @return The CodeableConcept object if found, otherwise null.
+     */
+    public static CodeableConcept getExtensionValueCodeableConcept(DomainResource resource, String url) {
+        if (resource == null || !resource.hasExtension() || url == null || url.isEmpty()) {
+            return null;
+        }
+
+        for (Extension extension : resource.getExtension()) {
+            if (url.equals(extension.getUrl()) && extension.hasValue()) {
+                if (extension.getValue() instanceof CodeableConcept) {
+                    return (CodeableConcept) extension.getValue();
+                }
+            }
+        }
+
         return null;
     }
 

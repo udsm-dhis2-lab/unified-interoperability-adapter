@@ -40,21 +40,21 @@ public class LabTestResultsFinalDTO {
         testResultsMap.put("specimenAcceptanceStatus", this.getSpecimenAcceptanceStatus());
         testResultsMap.put("specimenRejectionCodes", this.getSpecimenRejectionCodes() == null || this.getSpecimenRejectionCodes().isEmpty() ? this.getSpecimenRejectionCodes() : this.getSpecimenRejectionCodes().stream().map(CodeDTO::toMap).collect(Collectors.toList()));
         testResultsMap.put("typeOfTest", this.getTypeOfTest() != null ? this.getTypeOfTest().toMap() : null);
-        testResultsMap.put("testOrderDate", this.getTestOrderDate().toString());
+        testResultsMap.put("testOrderDate", this.getTestOrderDate() != null ? this.getTestOrderDate().toString() : null);
         testResultsMap.put("obrSetId", this.getObrSetId());
         testResultsMap.put("analyzerCode", this.getAnalyzerCode());
-        testResultsMap.put("dateTimeSpecimenAnalyzed", this.getDateTimeSpecimenAnalyzed().toString());
+        testResultsMap.put("dateTimeSpecimenAnalyzed", this.getDateTimeSpecimenAnalyzed() != null ? this.getDateTimeSpecimenAnalyzed().toString() : null);
         testResultsMap.put("resultStatus", this.getResultStatus() != null ? this.getResultStatus().toMap() : null);
-        testResultsMap.put("testResultDate", this.getTestResultDate().toString());
+        testResultsMap.put("testResultDate", this.getTestResultDate() != null ? this.getTestResultDate().toString() : null);
         testResultsMap.put("testingFacilityCode", this.getTestingFacilityCode());
         testResultsMap.put("referringSpecimenId", this.getReferringSpecimenId());
         testResultsMap.put("dateTimeResultsRegistered", this.getDateTimeResultsRegistered() != null ? this.getDateTimeResultsRegistered().toString() : null);
         testResultsMap.put("resultsAuthorisedBy", this.getResultsAuthorisedBy());
-        testResultsMap.put("dateTimeResultsAuthorized", this.getDateTimeResultsAuthorized().toString());
+        testResultsMap.put("dateTimeResultsAuthorized", this.getDateTimeResultsAuthorized() != null ? this.getDateTimeResultsAuthorized().toString() : null);
         testResultsMap.put("specimenTestedBy", this.getSpecimenTestedBy());
         testResultsMap.put("targetTimeDays", this.getTargetTimeDays());
         testResultsMap.put("targetTimeMins", this.getTargetTimeMins());
-        testResultsMap.put("results", this.getResults().isEmpty() ? this.getResults() : this.getResults().stream().map(LabObservationDTO::toMap).collect(Collectors.toList()));
+        testResultsMap.put("results", this.getResults() == null || this.getResults().isEmpty() ? this.getResults() : this.getResults().stream().map(LabObservationDTO::toMap).collect(Collectors.toList()));
         return testResultsMap;
     }
 
