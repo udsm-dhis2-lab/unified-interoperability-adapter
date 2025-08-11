@@ -27,7 +27,6 @@ public class LabRequestDetailsDTO {
     private Integer specimenCollectionVolumeInMl;
     private String specimenCollectorName;
     private String specimenCollectorContactNumber;
-    private List<String> specimenRejectionCodes;
     private Instant dateTimeSpecimenCollected;
     private Boolean specimenSentToLab;
     private Instant dateTimeSpecimenSentToLab;
@@ -53,7 +52,6 @@ public class LabRequestDetailsDTO {
         labRequestMap.put("specimenSite", this.getSpecimenSite() != null ? this.getSpecimenSite().toMap() : null);
         labRequestMap.put("specimenCollectedFrom", this.getSpecimenCollectedFrom());
         labRequestMap.put("specimenCollectionVolumeInMl", this.getSpecimenCollectionVolumeInMl());
-        labRequestMap.put("specimenRejectionCodes", this.getSpecimenRejectionCodes());
         labRequestMap.put("specimenCollectorName", this.getSpecimenCollectorName());
         labRequestMap.put("specimenCollectorContactNumber", this.getSpecimenCollectorContactNumber());
         labRequestMap.put("dateTimeSpecimenCollected", this.getDateTimeSpecimenCollected() != null ? this.getDateTimeSpecimenCollected().toString() : null);
