@@ -64,6 +64,12 @@ public class DatastoreService {
     }
 
     public Datastore updateDatastore(Datastore datastore) throws Exception {
+        if(datastore.getUuid() != null && datastore.getId() == null){
+            var existingDatastore = datastoreRepository.getDatastoreByUuid(datastore.getUuid());
+            if(existingDatastore != null){
+                datastore.setId(existingDatastore.getId());
+            }
+        }
         if (datastore.getId() != null) {
             if (authenticatedUser != null) {
                 datastore.setLastUpdatedBy(authenticatedUser);

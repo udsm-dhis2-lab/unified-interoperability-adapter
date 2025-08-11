@@ -145,10 +145,12 @@ public class LabRequestDetailsUtils {
                 Bundle responseLabResultsObservations = fhirClient.search()
                         .forResource(Observation.class)
                         .where(Observation.SPECIMEN.hasId(specimen.getIdPart()))
+                        .and(Observation.DERIVED_FROM.isMissing(true))
                         .returnBundle(Bundle.class)
                         .execute();
 
                 List<LabTestResultsFinalDTO> labResults = new ArrayList<LabTestResultsFinalDTO>();
+                System.out.println("Results: " + responseLabResultsObservations.getEntry().size());
                 for (Bundle.BundleEntryComponent entry : responseLabResultsObservations.getEntry()) {
                     if (entry.getResource() instanceof Observation) {
                         Observation observation = (Observation) entry.getResource();
