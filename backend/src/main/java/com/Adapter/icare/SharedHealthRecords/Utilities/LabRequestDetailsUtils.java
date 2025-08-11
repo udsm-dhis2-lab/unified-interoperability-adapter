@@ -325,8 +325,7 @@ public class LabRequestDetailsUtils {
                 for (Bundle.BundleEntryComponent entry : responseResultsObservations.getEntry()) {
                     if (entry.getResource() instanceof Observation) {
                         Observation childObservation = (Observation) entry.getResource();
-                        LabObservationDTO result = getChildLabRe
-        System.out.println("FHIR SERVER: " + fhirConstants.FHIRServerUrl);sultObservationFromObservation(fhirClient, childObservation);
+                        LabObservationDTO result = getChildLabResultObservationFromObservation(fhirClient, childObservation);
                         if(result != null){
                             results.add(result);
                         }
