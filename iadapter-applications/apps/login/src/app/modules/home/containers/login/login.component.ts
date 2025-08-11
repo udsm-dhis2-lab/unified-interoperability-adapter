@@ -1,17 +1,23 @@
-import { Component, Inject, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { antDesignModules } from 'apps/login/src/app/shared/ant-design-modules';
+import {
+  Component,
+  NgZone,
+  OnDestroy,
+  AfterViewInit,
+  OnInit,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
   FormsModule,
-  ReactiveFormsModule,
   NonNullableFormBuilder,
+  ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { LoginService } from '../../services/login.service';
-import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { LoginService } from '../../services/login.service';
+import { antDesignModules } from '../../../../shared/ant-design-modules';
 
 @Component({
   selector: 'app-login',
@@ -25,8 +31,8 @@ import { Router } from '@angular/router';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
-export class LoginComponent implements OnDestroy {
-  isLoading: boolean = false;
+export class LoginComponent implements OnDestroy, AfterViewInit, OnInit {
+  isLoading = false;
   alert = {
     show: false,
     type: '',
@@ -42,17 +48,38 @@ export class LoginComponent implements OnDestroy {
   constructor(
     private fb: NonNullableFormBuilder,
     private loginService: LoginService,
-    private router: Router
+    private zone: NgZone
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
       password: ['', [Validators.required]],
     });
   }
+
+  ngOnInit(): void {
+    this.validateForm = this.fb.group({
+      userName: ['', [Validators.required]],
+      password: ['', [Validators.required]],
+    });
+    this.zone.runOutsideAngular(() => {
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 0);
+    });
+  }
+
   ngOnDestroy(): void {
     if (this.loginSubcription) {
       this.loginSubcription.unsubscribe();
     }
+  }
+
+  ngAfterViewInit() {
+    this.zone.runOutsideAngular(() => {
+      setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 0);
+    });
   }
 
   submitForm(): void {

@@ -11,6 +11,12 @@ import { antDesignIcons } from './shared/ant-design-icons.constants';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClient } from '@angular/common/http';
+import { NzConfig, provideNzConfig } from 'ng-zorro-antd/core/config';
+
+const ngZorroConfig: NzConfig = {
+  message: { nzTop: 120 },
+  notification: { nzTop: 240 },
+};
 
 const icons: IconDefinition[] = [...antDesignIcons];
 export const appConfig: ApplicationConfig = {
@@ -21,5 +27,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(appRoutes),
     { provide: NZ_ICONS, useValue: icons },
+    provideNzConfig(ngZorroConfig),
   ],
 };
