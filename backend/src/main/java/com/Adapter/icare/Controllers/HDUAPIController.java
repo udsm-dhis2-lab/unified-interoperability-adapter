@@ -397,7 +397,11 @@ public class HDUAPIController {
 
                 if(labRecordsData != null){
                     List<LabRequestDetailsDTO> labRequestDetailsData = labRecordsData.getLabRequestDetails();
-
+                    if (labRequestDetailsData == null){
+                        payload.put("payload", null);
+                        log.error("lab request data is null and couldn't be processed.");
+                        return ResponseEntity.badRequest().body(payload);
+                    }
                     if (labRequestDetailsData.isEmpty()) {
                         log.warn("Received data template with empty lab request details data.");
                         LabRecordsDataDTO emptyData = this.createEmptyLabDataTemplate(labDataTemplate);
