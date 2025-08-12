@@ -3,6 +3,7 @@ package com.Adapter.icare.Services;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
+import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
@@ -66,8 +67,25 @@ public class LabDataTemplateService {
         var records = fhirClient.search().forResource(Specimen.class);
         records.sort().descending("_lastUpdated");
 
+        String searchedSpecimenId = null;
+
+        if(specimenId != null){
+            searchedSpecimenId = facilityCode != null && specimenId.contains(facilityCode) ? specimenId : facilityCode != null ? facilityCode + "-" + specimenId : specimenId;
+        }
+
         records.where(Specimen.IDENTIFIER.exactly().systemAndCode("urn:sys:lab-request:specimen-id", ""));
         records.and(Specimen.SUBJECT.isMissing(true));
+
+        if(searchedSpecimenId != null){
+            records.and(Specimen.IDENTIFIER.exactly().identifier(searchedSpecimenId));
+        }
+
+        if(facilityCode != null && searchedSpecimenId == null){
+            String hasParameterName = "_has:ServiceRequest:specimen:performer";
+            String organizationReference = "Organization/" + facilityCode;
+
+            records.and(new StringClientParam(hasParameterName).matches().value(organizationReference));
+        }
 
         response = records.count(pageSize).offset(page - 1).returnBundle(Bundle.class)
                 .execute();
