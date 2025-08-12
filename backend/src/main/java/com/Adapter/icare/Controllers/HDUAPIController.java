@@ -397,7 +397,11 @@ public class HDUAPIController {
 
                 if(labRecordsData != null){
                     List<LabRequestDetailsDTO> labRequestDetailsData = labRecordsData.getLabRequestDetails();
-
+                    if (labRequestDetailsData == null){
+                        payload.put("payload", null);
+                        log.error("lab request data is null and couldn't be processed.");
+                        return ResponseEntity.badRequest().body(payload);
+                    }
                     if (labRequestDetailsData.isEmpty()) {
                         log.warn("Received data template with empty lab request details data.");
                         LabRecordsDataDTO emptyData = this.createEmptyLabDataTemplate(labDataTemplate);
@@ -485,7 +489,6 @@ public class HDUAPIController {
 
                     validatedLabDataTemplatePayload.setFacilityDetails(labDataTemplate.getData().getFacilityDetails());
                     validatedLabDataTemplatePayload.setReportDetails(labDataTemplate.getData().getReportDetails());
-                    System.out.println("Data: " + validatedLabDataTemplatePayload.toMap());
                     payload.put("payload", validatedLabDataTemplatePayload.toMap());
 
                     // --- Call the workflow engine ---
@@ -509,7 +512,7 @@ public class HDUAPIController {
                 return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataToSend));
 
             } else {
-                log.error("Workflow engine processing requested but engine is not available.");
+                log.error("Workflow engine processing requested but the engine is not available.");
                 baseResponse.put("message", "Workflow engine configured but not available");
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(baseResponse);
             }
