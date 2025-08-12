@@ -280,7 +280,7 @@ public class DatastoreController {
         try {
             datastoreService.deleteDatastore(uuid);
         } catch (Exception e) {
-            throw new Exception("Issue with deleting user");
+            throw new Exception("Issue with deleting data store");
         }
     }
 }

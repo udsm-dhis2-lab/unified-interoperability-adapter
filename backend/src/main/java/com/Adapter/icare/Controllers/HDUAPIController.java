@@ -489,7 +489,6 @@ public class HDUAPIController {
 
                     validatedLabDataTemplatePayload.setFacilityDetails(labDataTemplate.getData().getFacilityDetails());
                     validatedLabDataTemplatePayload.setReportDetails(labDataTemplate.getData().getReportDetails());
-                    System.out.println("Data: " + validatedLabDataTemplatePayload.toMap());
                     payload.put("payload", validatedLabDataTemplatePayload.toMap());
 
                     // --- Call the workflow engine ---
@@ -513,7 +512,7 @@ public class HDUAPIController {
                 return ResponseEntity.ok(this.mediatorsService.sendDataToMediatorWorkflow(dataToSend));
 
             } else {
-                log.error("Workflow engine processing requested but engine is not available.");
+                log.error("Workflow engine processing requested but the engine is not available.");
                 baseResponse.put("message", "Workflow engine configured but not available");
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(baseResponse);
             }

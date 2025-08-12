@@ -29,7 +29,7 @@ public class Datastore  extends BaseEntity implements Serializable {
     @Column(name = "namespace", nullable = false)
     private String namespace;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "data_key", nullable = false)

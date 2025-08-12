@@ -60,4 +60,7 @@
     <changeSet id="3_privileges" author="josephat-mwakyusa">
         <modifyDataType tableName="privileges" columnName="created_by" newDataType="INT"/>
     </changeSet>
+    <changeSet id="1_datastore" author="jonas-mwambimbi">
+        <modifyDataType tableName="datastore" columnName="description" newDataType="TEXT"/>
+    </changeSet>
 </databaseChangeLog>
