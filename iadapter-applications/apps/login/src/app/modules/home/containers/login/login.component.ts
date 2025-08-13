@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import {
+  AfterViewInit,
   Component,
   NgZone,
   OnDestroy,
-  AfterViewInit,
   OnInit,
 } from '@angular/core';
 import {
@@ -14,10 +14,9 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { LoginService } from '../../services/login.service';
 import { antDesignModules } from '../../../../shared/ant-design-modules';
+import { LoginService } from '../../services/login.service';
 
 @Component({
   selector: 'app-login',
