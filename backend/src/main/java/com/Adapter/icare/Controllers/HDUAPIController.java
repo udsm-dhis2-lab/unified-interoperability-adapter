@@ -353,6 +353,12 @@ public class HDUAPIController {
                 Map<String, Object> workflowResponse = this.mediatorsService.processWorkflowInAWorkflowEngine(
                         workflowEngine, payload,
                         "processes/execute?async=true");
+                if(workflowResponse.containsKey("statusCode")){
+                    Integer responseCode = (Integer) workflowResponse.get("statusCode");
+                    if(responseCode != null){
+                        return ResponseEntity.status(responseCode).body(workflowResponse);
+                    }
+                }
                 return ResponseEntity.ok(workflowResponse);
 
             } else if (!shouldUseWorkflowEngine) {
