@@ -527,8 +527,54 @@ public class HDUAPIController {
         }
     }
 
+    @GetMapping("labDataTemplates")
+    public ResponseEntity<Map<String, Object>> getLabDataTemplatesList(
+            @RequestParam(value = "id", required = false) String id,
+            @RequestParam(value = "uuid", required = false) String uuid) throws Exception {
+        // NB: Since data templates are JSON type metadata stored on datastore, then
+        // dataTemplates namespace has been used to retrieve the configs
+        // System.out.println(this.authentication.isAuthenticated());
+        try {
+            Map<String, Object> dataTemplatesResults = new HashMap<>();
+            if (uuid == null) {
+                List<Datastore> dataTemplateNameSpaceDetails = datastoreService
+                        .getDatastoreNamespaceDetails("labDataTemplates");
+                List<Map<String, Object>> dataTemplates = new ArrayList<>();
+                for (Datastore datastore : dataTemplateNameSpaceDetails) {
+                    Map<String, Object> dataTemplate = datastore.getValue();
+                    if (id != null) {
+                        if (((Map<String, Object>) dataTemplate.get("labDataTemplates")).get("id").equals(id)) {
+                            dataTemplate.put("uuid", datastore.getUuid());
+                            dataTemplates.add(dataTemplate);
+                        }
+                    } else {
+                        dataTemplate.put("uuid", datastore.getUuid());
+                        dataTemplates.add(dataTemplate);
+                    }
+                }
+                if (id != null) {
+                    if (!dataTemplates.isEmpty()) {
+                        dataTemplatesResults = dataTemplates.get(0);
+                    }
+                } else {
+                    dataTemplatesResults.put("results", dataTemplates);
+                }
+            } else {
+                Datastore datastore = datastoreService.getDatastoreByUuid(uuid);
+                Map<String, Object> dataTemplate = datastore.getValue();
+                dataTemplate.put("uuid", datastore.getUuid());
+                dataTemplatesResults = dataTemplate;
+            }
 
-    @GetMapping(value = "labDataTemplates")
+            return ResponseEntity.ok(dataTemplatesResults);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+
+    @GetMapping(value = "labData")
     public ResponseEntity<Map<String, Object>> getLabDataFromFhir(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
