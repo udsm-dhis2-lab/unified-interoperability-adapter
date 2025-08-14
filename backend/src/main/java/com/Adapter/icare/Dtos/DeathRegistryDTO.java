@@ -1,5 +1,6 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.PeriodType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -18,6 +19,8 @@ public class DeathRegistryDTO {
     private String lineC;
     private String lineD;
     private String causeOfDeathOther;
+    private PeriodType periodTypePatientWasSick;
+    private Integer timeInNumbersPatientWasSick;
     private MannerOfDeath mannerOfDeath;
     private PlaceOfDeath placeOfDeath;
     private DROtherDeathDetails otherDeathDetails;
