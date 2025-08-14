@@ -1,5 +1,7 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.Enums.VisitType;
+import com.Adapter.icare.validators.annotations.ValidVisitType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +25,9 @@ public class VisitDetailsDTO {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date closedDate;
-    private String visitType;
+
+    @ValidVisitType(message = "The 'visitType' is mandatory and must be a valid type.")
+    private VisitType visitType;
     private List<CareServiceDTO> careServices;
     private List<AttendedSpecialistDTO> attendedSpecialist;
     private ServiceComplaintsDTO serviceComplaints;
