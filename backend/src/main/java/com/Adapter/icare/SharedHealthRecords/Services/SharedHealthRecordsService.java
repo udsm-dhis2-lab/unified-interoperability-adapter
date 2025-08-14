@@ -41,6 +41,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.Adapter.icare.SharedHealthRecords.Utilities.LabRequestDetailsUtils.getLabRequestDetailsBySpecimen;
 import static com.Adapter.icare.Utils.AllergyIntoleranceUtils.getAllergyTolerances;
 import static com.Adapter.icare.Utils.ChargeItemsUtils.getChargeItemsByEncounterId;
 import static com.Adapter.icare.Utils.ChronicConditionsUtils.getConditionsByCategory;
@@ -1341,7 +1342,27 @@ public class SharedHealthRecordsService {
                                 templateData.setLifeStyleInformation(
                                         lifeStyleInformationDTO);
 
-//                                Lab Request Details
+                                // Lab Request Details
+                                List<LabRequestDetailsDTO> labRequestDetailsList = new ArrayList<LabRequestDetailsDTO>();
+
+                                Bundle specimensResponse = fhirClient.search().forResource(Specimen.class).sort().descending("_lastUpdated").where(Specimen.IDENTIFIER.exactly().systemAndCode("urn:sys:lab-request:specimen-id", null)).and(Specimen.SUBJECT.hasId(patient.getIdPart())).returnBundle(Bundle.class).execute();
+
+                                if(specimensResponse.hasEntry()){
+                                    for(Bundle.BundleEntryComponent specimenEntry :  specimensResponse.getEntry()){
+                                        if (specimenEntry.getResource() instanceof Specimen){
+                                            Specimen specimen = (Specimen) specimenEntry.getResource();
+
+                                            LabRequestDetailsDTO labRequestDetailsDTO = getLabRequestDetailsBySpecimen(fhirClient, specimen);
+
+                                            if(labRequestDetailsDTO != null){
+                                                labRequestDetailsList.add(labRequestDetailsDTO);
+                                            }
+                                        }
+                                    }
+                                }
+
+                                templateData.setLabRequestDetails(labRequestDetailsList);
+
 
 
                                 // Diagnosis details
