@@ -1,5 +1,6 @@
 package com.Adapter.icare.Handlers;
 
+import com.Adapter.icare.CustomExceptions.InvalidDateFormatException;
 import com.Adapter.icare.CustomExceptions.InvalidEnumValueException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,12 @@ public class GlobalApiExceptionHandler {
 
     @ExceptionHandler(InvalidEnumValueException.class)
     public ResponseEntity<Object> handleInvalidEnumValue(InvalidEnumValueException ex, WebRequest request) {
+        Map<String, Object> body = createErrorBody(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidDateFormatException.class)
+    public ResponseEntity<Object> handleInvalidDateValue(InvalidDateFormatException ex, WebRequest request) {
         Map<String, Object> body = createErrorBody(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }

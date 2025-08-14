@@ -1,8 +1,11 @@
 package com.Adapter.icare.Dtos;
 
+import com.Adapter.icare.CustomDeserializers.LenientDateDeserializer;
 import com.Adapter.icare.Enums.VisitType;
+import com.Adapter.icare.validators.annotations.JsonLenientDateFormat;
 import com.Adapter.icare.validators.annotations.ValidVisitType;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,12 +21,12 @@ public class VisitDetailsDTO {
     @NotNull
     private String id;
     @NotNull
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonLenientDateFormat
     private Date visitDate;
     private Boolean newThisYear;
     private Boolean isNew;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonLenientDateFormat
     private Date closedDate;
 
     @ValidVisitType(message = "The 'visitType' is mandatory and must be a valid type.")
