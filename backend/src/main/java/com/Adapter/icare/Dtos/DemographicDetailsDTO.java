@@ -60,7 +60,7 @@ public class DemographicDetailsDTO {
         demographicDetails.put("occupation", this.getOccupation());
         demographicDetails.put("maritalStatus", this.getMaritalStatus());
         demographicDetails.put("nationality", this.getNationality());
-        demographicDetails.put("addresses", this.getAddresses().isEmpty() ? this.getAddresses() : this.getAddresses().stream().map(AddressDTO::toMap).collect(Collectors.toList()));
+        demographicDetails.put("addresses", this.getAddresses() == null || this.getAddresses().isEmpty() ? this.getAddresses() : this.getAddresses().stream().map(AddressDTO::toMap).collect(Collectors.toList()));
         if (this.getIdentifiers() != null) {
             demographicDetails.put("identifiers", this.getIdentifiers().stream().map(IdentifierDTO::toMap).collect(Collectors.toList()));
         }

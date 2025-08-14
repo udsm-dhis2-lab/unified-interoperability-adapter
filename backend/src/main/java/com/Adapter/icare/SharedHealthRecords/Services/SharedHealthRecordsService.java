@@ -399,9 +399,9 @@ public class SharedHealthRecordsService {
                                                 : null);
                                 visitDetails.setVisitType(encounter.hasType()
                                         && !encounter.getType().isEmpty()
-                                        ? encounter.getType()
+                                        ? VisitType.fromString(encounter.getType()
                                         .get(0)
-                                        .getText()
+                                        .getText())
                                         : null);
 
                                 visitDetails.setReferredIn(
