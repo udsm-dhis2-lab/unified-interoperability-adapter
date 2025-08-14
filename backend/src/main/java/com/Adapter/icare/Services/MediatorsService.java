@@ -15,13 +15,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
@@ -537,45 +536,59 @@ public class MediatorsService {
         String dataLine;
         StringBuffer responseContent = new StringBuffer();
         Map<String, Object> responseMap = new HashMap<>();
-        try {
-            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-            String authentication = "";
-            if (authType.toLowerCase().equals("basic")) {
-                authentication = "Basic " + authToken;
-                // System.out.println(authentication);
-                httpURLConnection.setRequestProperty("Authorization", authentication);
-            } else if (authType.toLowerCase().equals("token")) {
-                authentication = "Bearer " + authToken;
-                httpURLConnection.setRequestProperty("Authorization", authentication);
-            }
-            httpURLConnection.setRequestMethod(method);
-            httpURLConnection.setRequestProperty("Content-Type", "application/json");
-            httpURLConnection.setRequestProperty("Accept", "application/json");
-            httpURLConnection.setDoOutput(true);
-
-            ObjectMapper mapper = new ObjectMapper();
-            String jsonString = mapper.writeValueAsString(data);
-
-            try (OutputStream os = httpURLConnection.getOutputStream()) {
-                byte[] input = jsonString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
-
-            // Read the response
-            reader = new BufferedReader(new InputStreamReader(httpURLConnection.getInputStream()));
-            while ((dataLine = reader.readLine()) != null) {
-                responseContent.append(dataLine);
-            }
-            reader.close();
-
-            // Convert the response JSON string to a Map
-            String responseString = responseContent.toString();
-            responseMap = mapper.readValue(responseString, Map.class);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception(e.getMessage());
+        HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
+        String authentication = "";
+        if (authType.toLowerCase().equals("basic")) {
+            authentication = "Basic " + authToken;
+            // System.out.println(authentication);
+            httpURLConnection.setRequestProperty("Authorization", authentication);
+        } else if (authType.toLowerCase().equals("token")) {
+            authentication = "Bearer " + authToken;
+            httpURLConnection.setRequestProperty("Authorization", authentication);
         }
+        httpURLConnection.setRequestMethod(method);
+        httpURLConnection.setRequestProperty("Content-Type", "application/json");
+        httpURLConnection.setRequestProperty("Accept", "application/json");
+        httpURLConnection.setDoOutput(true);
+
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonString = mapper.writeValueAsString(data);
+
+        try (OutputStream os = httpURLConnection.getOutputStream()) {
+            byte[] input = jsonString.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        int responseCode = httpURLConnection.getResponseCode();
+        String responseString;
+
+        //Read the response
+
+        if (responseCode >= 200 && responseCode < 300) {
+            responseString = readStreamToString(httpURLConnection.getInputStream());
+            responseMap = mapper.readValue(responseString, Map.class);
+        } else {
+            String errorBody = readStreamToString(httpURLConnection.getErrorStream());
+            responseMap = mapper.readValue(errorBody, Map.class);
+        }
+
         return responseMap;
+    }
+
+    private String readStreamToString(InputStream stream){
+        if (stream == null) {
+            return "No response body.";
+        }
+        StringBuilder responseContent = new StringBuilder();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                responseContent.append(line);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return responseContent.toString();
     }
 
     public Map<String, Object> deleteResourceFromExternalSystem(Mediator mediator, String apiPath) throws Exception {
