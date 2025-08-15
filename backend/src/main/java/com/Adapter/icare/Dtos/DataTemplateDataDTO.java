@@ -20,7 +20,7 @@ public class DataTemplateDataDTO {
         Map<String, Object> mappedDataTemplateData = new HashMap<>();
         mappedDataTemplateData.put("facilityDetails", this.getFacilityDetails().toMap());
         mappedDataTemplateData.put("listGrid", this.getListGrid().isEmpty() ? this.getListGrid() : this.getListGrid().stream().map(SharedHealthRecordsDTO::toMap).collect(Collectors.toList()));
-        mappedDataTemplateData.put("reportDetails", this.getReportDetails().toMap());
+        mappedDataTemplateData.put("reportDetails", this.getReportDetails() != null ? this.getReportDetails().toMap() : null);
         mappedDataTemplateData.put("clientIdentifiersPool", this.getClientIdentifiersPool());
         return mappedDataTemplateData;
     }
