@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -1098,6 +1099,69 @@ public class SharedHealthRecordsService {
                                 templateData.setSelfMonitoringClinicalInformation(selfMonitoringClinicalInformationDTO);
 
                                 // End Self Monitoring
+
+                                // Death Registry
+                                DeathRegistryDTO deathRegistryDTO = new DeathRegistryDTO();
+                                Observation deathObservation = fhirClient.read()
+                                        .resource(Observation.class)
+                                        .withId("DEATH-"+patient.getIdElement().getIdPart())
+                                        .execute();
+
+                                if(deathObservation != null){
+                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+                                    DateTimeType deathDatetimeType = deathObservation.hasEffectiveDateTimeType() && deathObservation.getEffectiveDateTimeType() != null ? deathObservation.getEffectiveDateTimeType() : null;
+
+                                    deathRegistryDTO.setDateOfDeath(deathDatetimeType.getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
+
+                                    List<Observation.ObservationComponentComponent> lineAComponents = getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineA", "line-a");
+
+                                    if(!lineAComponents.isEmpty()){
+                                        var component = lineAComponents.get(0);
+                                        deathRegistryDTO.setLineA(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                    }
+
+                                    List<Observation.ObservationComponentComponent> lineBComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineB", "line-b");
+
+                                    if(!lineBComponent.isEmpty()){
+                                        var component = lineBComponent.get(0);
+                                        deathRegistryDTO.setLineB(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                    }
+
+                                    List<Observation.ObservationComponentComponent> lineCComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineC", "line-c");
+
+                                    if(!lineCComponent.isEmpty()){
+                                        var component = lineCComponent.get(0);
+                                        deathRegistryDTO.setLineC(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                    }
+
+                                    List<Observation.ObservationComponentComponent> lineDComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineD", "line-d");
+
+                                    if(!lineDComponent.isEmpty()){
+                                        var component = lineDComponent.get(0);
+                                        deathRegistryDTO.setLineD(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                    }
+
+
+                                    List<Observation.ObservationComponentComponent> otherCauseComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause%20of%20death/causeOfDeathOther", "other-cause-of-death");
+
+                                    if(!otherCauseComponent.isEmpty()){
+                                        var component = otherCauseComponent.get(0);
+                                        deathRegistryDTO.setCauseOfDeathOther(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                    }
+
+                                    List<Observation.ObservationComponentComponent> mannerOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "69449-7");
+
+                                    List<Observation.ObservationComponentComponent> placeOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "80931-1");
+
+                                    List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
+
+//                                    List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
+
+                                }
+
+                                templateData.setDeathRegistry(deathRegistryDTO);
+                                // End of Death Registry
 
                                 // Allergies
                                 List<AllergyIntolerance> allergyIntolerances = getAllergyTolerances(
