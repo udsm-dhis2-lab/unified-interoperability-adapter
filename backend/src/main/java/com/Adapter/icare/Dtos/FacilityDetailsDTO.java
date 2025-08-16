@@ -24,4 +24,10 @@ public class FacilityDetailsDTO {
         facilityMap.put("bloodBags", this.getBloodBags() == null || this.getBloodBags().isEmpty() ? this.getBloodBags() : this.getBloodBags().stream().map(BloodBagDTO::toMap).collect(Collectors.toList()));
         return facilityMap;
     }
+    public Map<String,Object> toMap(Boolean excludeBloodBags) {
+        Map<String, Object> facilityMap = new HashMap<>();
+        facilityMap.put("code", this.getCode());
+        facilityMap.put("system", this.getSystem() != null ? this.getSystem().toMap() : null);
+        return facilityMap;
+    }
 }
