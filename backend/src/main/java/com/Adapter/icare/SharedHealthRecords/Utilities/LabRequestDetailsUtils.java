@@ -363,11 +363,11 @@ public class LabRequestDetailsUtils {
                         result.setObrSetId(identifier.hasValue() && identifier.getValue() != null ? Integer.parseInt(identifier.getValue()) : null);
                     }
 
-                    if(identifier.hasSystem() && identifier.getSystem().equals("obx-set-id")){
+                    if(identifier.hasSystem() && identifier.getSystem().equals("urn:sys:obx-set-id")){
                         result.setObxSetId(identifier.hasValue() && identifier.getValue() != null ? Integer.parseInt(identifier.getValue()) : null);
                     }
 
-                    if(identifier.hasSystem() && identifier.getSystem().equals("sys:obx-sub-id")){
+                    if(identifier.hasSystem() && identifier.getSystem().equals("urn:sys:obx-sub-id")){
                         result.setObxSubId(identifier.hasValue() && identifier.getValue() != null ? Integer.parseInt(identifier.getValue()) : null);
                     }
                 }
