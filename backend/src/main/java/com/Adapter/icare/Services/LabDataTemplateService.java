@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 import static com.Adapter.icare.SharedHealthRecords.Utilities.LabRequestDetailsUtils.getLabRequestDetailsBySpecimen;
+import static com.Adapter.icare.Utils.ExtensionUtils.getExtensionValueCodeableConcept;
 
 @Service
 public class LabDataTemplateService {
@@ -95,10 +96,31 @@ public class LabDataTemplateService {
                 if (entry.getResource() instanceof Specimen){
                     Specimen specimen = (Specimen) entry.getResource();
 
-                    LabRequestDetailsDTO labRequestDetailsDTO = getLabRequestDetailsBySpecimen(fhirClient, specimen);
+                    FacilityDetailsDTO facilityDetails = new FacilityDetailsDTO();
 
+                    CodeableConcept specimenSystemCodeableConcept = getExtensionValueCodeableConcept(specimen, "http://fhir.moh.go.tz/fhir/lab-request/facilityDetails");
+                    if(specimenSystemCodeableConcept != null){
+                        facilityDetails.setCode(specimenSystemCodeableConcept.hasText() ? specimenSystemCodeableConcept.getText() : null);
+
+                        FacilitySystemDTO facilitySystemDTO = new FacilitySystemDTO();
+                        if(specimenSystemCodeableConcept.hasCoding() && !specimenSystemCodeableConcept.getCoding().isEmpty()){
+                            for(Coding coding: specimenSystemCodeableConcept.getCoding()){
+                                if(coding.hasSystem() && coding.getSystem().equals("http://fhir.moh.go.tz/fhir/lab-request/facility-details/")){
+
+                                    facilitySystemDTO.setName(coding.hasDisplay() ? coding.getDisplay() : null);
+                                    facilitySystemDTO.setVersion(coding.hasCode() ? coding.getCode() : null);
+                                }
+                            }
+                        }
+                        facilityDetails.setSystem(facilitySystemDTO);
+                    }
+
+
+                    LabRequestDetailsDTO labRequestDetailsDTO = getLabRequestDetailsBySpecimen(fhirClient, specimen);
                     if(labRequestDetailsDTO != null){
-                        labRecords.add(labRequestDetailsDTO.toMap());
+                        Map<String, Object> labRequestMap = labRequestDetailsDTO.toMap();
+                        labRequestMap.put("facilityDetails", facilityDetails.toMap(null));
+                        labRecords.add(labRequestMap);
                     }
                 }
             }
