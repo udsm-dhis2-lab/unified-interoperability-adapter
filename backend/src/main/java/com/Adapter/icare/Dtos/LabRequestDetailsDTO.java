@@ -24,7 +24,7 @@ public class LabRequestDetailsDTO {
     private CodeDTO typeOfSpecimen;
     private CodeDTO specimenSite;
     private SpecimentCollectedFrom specimenCollectedFrom;
-    private Integer specimenCollectionVolumeInMl;
+    private Float specimenCollectionVolumeInMl;
     private String specimenCollectorName;
     private String specimenCollectorContactNumber;
     private Instant dateTimeSpecimenCollected;

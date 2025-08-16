@@ -1152,11 +1152,19 @@ public class SharedHealthRecordsService {
 
                                     List<Observation.ObservationComponentComponent> mannerOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "69449-7");
 
+                                    if(!mannerOfDeathComponents.isEmpty()){
+                                        var component = mannerOfDeathComponents.get(0);
+                                        deathRegistryDTO.setMannerOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? MannerOfDeath.fromString(component.getValueStringType().getValue()) : null);
+                                    }
+
                                     List<Observation.ObservationComponentComponent> placeOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "80931-1");
 
-                                    List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
+                                    if(!placeOfDeathComponents.isEmpty()){
+                                        var component = placeOfDeathComponents.get(0);
+                                        deathRegistryDTO.setPlaceOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? PlaceOfDeath.fromString(component.getValueStringType().getValue()) : null);
+                                    }
 
-//                                    List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
+                                    List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
 
                                 }
 

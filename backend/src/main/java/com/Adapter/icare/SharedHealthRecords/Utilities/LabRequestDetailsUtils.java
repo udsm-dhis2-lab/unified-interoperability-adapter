@@ -43,7 +43,7 @@ public class LabRequestDetailsUtils {
 
             labRequestDetailsDTO.setSpecimenCollectedFrom(SpecimentCollectedFrom.fromString(getExtensionValueString(specimen, "http://fhir.moh.go.tz/fhir/lab-request/specimentCollectedFrom")));
 
-            labRequestDetailsDTO.setSpecimenCollectionVolumeInMl(specimen.hasCollection() && specimen.getCollection().hasQuantity() && specimen.getCollection().getQuantity().hasValue() ? specimen.getCollection().getQuantity().getValue().intValue() : null);
+            labRequestDetailsDTO.setSpecimenCollectionVolumeInMl(specimen.hasCollection() && specimen.getCollection().hasQuantity() && specimen.getCollection().getQuantity().hasValue() ? specimen.getCollection().getQuantity().getValue().floatValue() : null);
 
             if(specimen.hasCollection() && specimen.getCollection().hasCollector() && specimen.getCollection().getCollector().hasReference()){
                 String specimenCollectorReference = specimen.getCollection().getCollector().getReference();
