@@ -135,7 +135,7 @@ public class LabDataTemplateService {
         labRecordsResponse.put("results", labRecords);
         Map<String, Object> pager = new HashMap<>();
         pager.put("total", specimensTotalBundle.getTotal());
-        pager.put("totalPages", null);
+        pager.put("totalPages", specimensTotalBundle.getTotal()%pageSize == 0 ? specimensTotalBundle.getTotal()/pageSize : (specimensTotalBundle.getTotal()/pageSize) + 1);
         pager.put("page", page);
         pager.put("pageSize", pageSize);
         labRecordsResponse.put("pager", pager);
