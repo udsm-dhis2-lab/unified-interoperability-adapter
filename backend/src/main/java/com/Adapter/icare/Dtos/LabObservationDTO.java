@@ -45,7 +45,7 @@ public class LabObservationDTO {
         labObservationMap.put("codedValue", this.getCodedValue());
         labObservationMap.put("observation", this.getObservation().toMap());
         labObservationMap.put("abnormalFlagCode", this.getAbnormalFlagCode());
-        labObservationMap.put("dateTimeValue", this.getDateTimeValue().toString());
+        labObservationMap.put("dateTimeValue", this.getDateTimeValue() != null ? this.getDateTimeValue().toString() : null);
         labObservationMap.put("resultSemiquantitive", this.getResultSemiquantitive());
         labObservationMap.put("note", this.getNote());
         labObservationMap.put("workUnitsInMinutes", this.getWorkUnitsInMinutes());
