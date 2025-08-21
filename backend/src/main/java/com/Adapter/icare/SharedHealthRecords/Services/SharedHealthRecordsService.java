@@ -1265,7 +1265,6 @@ public class SharedHealthRecordsService {
 
                                     templateData.setDeathRegistry(deathRegistryDTO);
                                 } catch (Exception e ) {
-                                    System.out.println("Death observation not found for patient: " + patient.getIdElement().getIdPart());
                                 }
                                 // End of Death Registry
 
