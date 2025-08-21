@@ -182,7 +182,7 @@ public class SharedHealthRecordsController {
             List<IdentifierDTO> clientIds = this.clientRegistryService.getClientRegistryIdentifiers(1);
             dataTemplateDataDTO.setClientIdentifiersPool(clientIds);
             payload.put("code","dataTemplates");
-            payload.put("payload", dataTemplateDataDTO);
+            payload.put("payload", dataTemplateDataDTO.toMap());
             return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true"));
         } catch (Exception e) {
             e.printStackTrace();

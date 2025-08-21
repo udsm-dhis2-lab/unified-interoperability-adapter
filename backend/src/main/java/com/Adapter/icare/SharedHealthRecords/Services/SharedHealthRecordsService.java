@@ -1101,168 +1101,171 @@ public class SharedHealthRecordsService {
                                 // End Self Monitoring
 
                                 // Death Registry
-                                DeathRegistryDTO deathRegistryDTO = new DeathRegistryDTO();
-                                Observation deathObservation = fhirClient.read()
-                                        .resource(Observation.class)
-                                        .withId("DEATH-"+patient.getIdElement().getIdPart())
-                                        .execute();
+                                try {
+                                    DeathRegistryDTO deathRegistryDTO = new DeathRegistryDTO();
+                                    Observation deathObservation = fhirClient.read()
+                                            .resource(Observation.class)
+                                            .withId("DEATH-"+patient.getIdElement().getIdPart())
+                                            .execute();
 
-                                if(deathObservation != null){
-                                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                                    if(deathObservation != null){
+                                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-                                    DateTimeType deathDatetimeType = deathObservation.hasEffectiveDateTimeType() && deathObservation.getEffectiveDateTimeType() != null ? deathObservation.getEffectiveDateTimeType() : null;
+                                        DateTimeType deathDatetimeType = deathObservation.hasEffectiveDateTimeType() && deathObservation.getEffectiveDateTimeType() != null ? deathObservation.getEffectiveDateTimeType() : null;
 
-                                    deathRegistryDTO.setDateOfDeath(deathDatetimeType.getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
+                                        deathRegistryDTO.setDateOfDeath(deathDatetimeType.getValue().toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
 
-                                    List<Observation.ObservationComponentComponent> lineAComponents = getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineA", "line-a");
+                                        List<Observation.ObservationComponentComponent> lineAComponents = getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineA", "line-a");
 
-                                    if(!lineAComponents.isEmpty()){
-                                        var component = lineAComponents.get(0);
-                                        deathRegistryDTO.setLineA(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
-                                    }
-
-                                    List<Observation.ObservationComponentComponent> lineBComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineB", "line-b");
-
-                                    if(!lineBComponent.isEmpty()){
-                                        var component = lineBComponent.get(0);
-                                        deathRegistryDTO.setLineB(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
-                                    }
-
-                                    List<Observation.ObservationComponentComponent> lineCComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineC", "line-c");
-
-                                    if(!lineCComponent.isEmpty()){
-                                        var component = lineCComponent.get(0);
-                                        deathRegistryDTO.setLineC(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
-                                    }
-
-                                    List<Observation.ObservationComponentComponent> lineDComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineD", "line-d");
-
-                                    if(!lineDComponent.isEmpty()){
-                                        var component = lineDComponent.get(0);
-                                        deathRegistryDTO.setLineD(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
-                                    }
-
-
-                                    List<Observation.ObservationComponentComponent> otherCauseComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause%20of%20death/causeOfDeathOther", "other-cause-of-death");
-
-                                    if(!otherCauseComponent.isEmpty()){
-                                        var component = otherCauseComponent.get(0);
-                                        deathRegistryDTO.setCauseOfDeathOther(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
-                                    }
-
-                                    List<Observation.ObservationComponentComponent> mannerOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "69449-7");
-
-                                    if(!mannerOfDeathComponents.isEmpty()){
-                                        var component = mannerOfDeathComponents.get(0);
-                                        deathRegistryDTO.setMannerOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? MannerOfDeath.fromString(component.getValueStringType().getValue()) : null);
-                                    }
-
-                                    List<Observation.ObservationComponentComponent> placeOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "80931-1");
-
-                                    if(!placeOfDeathComponents.isEmpty()){
-                                        var component = placeOfDeathComponents.get(0);
-                                        deathRegistryDTO.setPlaceOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? PlaceOfDeath.fromString(component.getValueStringType().getValue()) : null);
-                                    }
-
-                                    DROtherDeathDetails otherDeathDetails = new DROtherDeathDetails();
-
-                                    otherDeathDetails.setWasSurgeryPerformedInTheLast4Weeks(YesNoUnknown.fromString(getExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-wasSurgeryPerformedInLast4Weeks")));
-
-                                    List<Observation.ObservationComponentComponent> dateOfSurgeryComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "45079-9");
-
-                                    if(!dateOfSurgeryComponents.isEmpty()){
-                                        var component = dateOfSurgeryComponents.get(0);
-                                        Date dateOfSurgeryDateTimeType = component.hasValueDateTimeType() && component.getValueDateTimeType().hasValue() ? component.getValueDateTimeType().dateTimeValue().getValue() : null;
-                                        if(dateOfSurgeryDateTimeType != null){
-                                            otherDeathDetails.setDateOfSurgery(dateOfSurgeryDateTimeType.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
+                                        if(!lineAComponents.isEmpty()){
+                                            var component = lineAComponents.get(0);
+                                            deathRegistryDTO.setLineA(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
                                         }
-                                    }
 
-                                    List<Observation.ObservationComponentComponent> surgeryReasonComponents= getComponentsByCode(deathObservation, "http://snomed.info/sct", "397709008");
-                                    if(!surgeryReasonComponents.isEmpty()){
-                                        var component = surgeryReasonComponents.get(0);
-                                        otherDeathDetails.setSurgeryReason(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
-                                    }
+                                        List<Observation.ObservationComponentComponent> lineBComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineB", "line-b");
 
-                                    PostmortemDetails postmortemDetails = new PostmortemDetails();
-
-                                    List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
-
-                                    if(!autopsyPerformedComponents.isEmpty()){
-                                        var component = autopsyPerformedComponents.get(0);
-                                        postmortemDetails.setWasPostmortemDone(component.hasValueStringType() && component.getValueStringType().hasValue() ? YesNoUnknown.fromString(component.getValueStringType().getValue()) : null);
-                                    }
-
-                                    postmortemDetails.setWasPostmortemResultsUsedToDetermineCauseOfDeath(YesNoUnknown.fromString(getExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-wasPostmortemUsedForCod")));
-
-                                    List<Observation.ObservationComponentComponent> dateOfExternalDeathCauseOccurredComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/date-of-external-cause-of-death", "date-of-external-cause-of-death");
-
-                                    if(!dateOfExternalDeathCauseOccurredComponents.isEmpty()){
-                                        var component = dateOfExternalDeathCauseOccurredComponents.get(0);
-                                        Date dateOfExternalDeathCauseOccurredDateTimeType = component.hasValueDateTimeType() && component.getValueDateTimeType().hasValue() ? component.getValueDateTimeType().dateTimeValue().getValue() : null;
-                                        if(dateOfExternalDeathCauseOccurredDateTimeType != null){
-                                            postmortemDetails.setDateOfExternalDeathCauseOccurred(dateOfExternalDeathCauseOccurredDateTimeType.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
+                                        if(!lineBComponent.isEmpty()){
+                                            var component = lineBComponent.get(0);
+                                            deathRegistryDTO.setLineB(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
                                         }
+
+                                        List<Observation.ObservationComponentComponent> lineCComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineC", "line-c");
+
+                                        if(!lineCComponent.isEmpty()){
+                                            var component = lineCComponent.get(0);
+                                            deathRegistryDTO.setLineC(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                        }
+
+                                        List<Observation.ObservationComponentComponent> lineDComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/lineD", "line-d");
+
+                                        if(!lineDComponent.isEmpty()){
+                                            var component = lineDComponent.get(0);
+                                            deathRegistryDTO.setLineD(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                        }
+
+
+                                        List<Observation.ObservationComponentComponent> otherCauseComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause%20of%20death/causeOfDeathOther", "other-cause-of-death");
+
+                                        if(!otherCauseComponent.isEmpty()){
+                                            var component = otherCauseComponent.get(0);
+                                            deathRegistryDTO.setCauseOfDeathOther(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                        }
+
+                                        List<Observation.ObservationComponentComponent> mannerOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "69449-7");
+
+                                        if(!mannerOfDeathComponents.isEmpty()){
+                                            var component = mannerOfDeathComponents.get(0);
+                                            deathRegistryDTO.setMannerOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? MannerOfDeath.fromString(component.getValueStringType().getValue()) : null);
+                                        }
+
+                                        List<Observation.ObservationComponentComponent> placeOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "80931-1");
+
+                                        if(!placeOfDeathComponents.isEmpty()){
+                                            var component = placeOfDeathComponents.get(0);
+                                            deathRegistryDTO.setPlaceOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? PlaceOfDeath.fromString(component.getValueStringType().getValue()) : null);
+                                        }
+
+                                        DROtherDeathDetails otherDeathDetails = new DROtherDeathDetails();
+
+                                        otherDeathDetails.setWasSurgeryPerformedInTheLast4Weeks(YesNoUnknown.fromString(getExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-wasSurgeryPerformedInLast4Weeks")));
+
+                                        List<Observation.ObservationComponentComponent> dateOfSurgeryComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "45079-9");
+
+                                        if(!dateOfSurgeryComponents.isEmpty()){
+                                            var component = dateOfSurgeryComponents.get(0);
+                                            Date dateOfSurgeryDateTimeType = component.hasValueDateTimeType() && component.getValueDateTimeType().hasValue() ? component.getValueDateTimeType().dateTimeValue().getValue() : null;
+                                            if(dateOfSurgeryDateTimeType != null){
+                                                otherDeathDetails.setDateOfSurgery(dateOfSurgeryDateTimeType.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
+                                            }
+                                        }
+
+                                        List<Observation.ObservationComponentComponent> surgeryReasonComponents= getComponentsByCode(deathObservation, "http://snomed.info/sct", "397709008");
+                                        if(!surgeryReasonComponents.isEmpty()){
+                                            var component = surgeryReasonComponents.get(0);
+                                            otherDeathDetails.setSurgeryReason(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                        }
+
+                                        PostmortemDetails postmortemDetails = new PostmortemDetails();
+
+                                        List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
+
+                                        if(!autopsyPerformedComponents.isEmpty()){
+                                            var component = autopsyPerformedComponents.get(0);
+                                            postmortemDetails.setWasPostmortemDone(component.hasValueStringType() && component.getValueStringType().hasValue() ? YesNoUnknown.fromString(component.getValueStringType().getValue()) : null);
+                                        }
+
+                                        postmortemDetails.setWasPostmortemResultsUsedToDetermineCauseOfDeath(YesNoUnknown.fromString(getExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-wasPostmortemUsedForCod")));
+
+                                        List<Observation.ObservationComponentComponent> dateOfExternalDeathCauseOccurredComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/date-of-external-cause-of-death", "date-of-external-cause-of-death");
+
+                                        if(!dateOfExternalDeathCauseOccurredComponents.isEmpty()){
+                                            var component = dateOfExternalDeathCauseOccurredComponents.get(0);
+                                            Date dateOfExternalDeathCauseOccurredDateTimeType = component.hasValueDateTimeType() && component.getValueDateTimeType().hasValue() ? component.getValueDateTimeType().dateTimeValue().getValue() : null;
+                                            if(dateOfExternalDeathCauseOccurredDateTimeType != null){
+                                                postmortemDetails.setDateOfExternalDeathCauseOccurred(dateOfExternalDeathCauseOccurredDateTimeType.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter));
+                                            }
+                                        }
+
+                                        List<Observation.ObservationComponentComponent> externalCauseOfDeathExplanationComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/external-cause-of-death-explanation", "external-cause-of-death-explanation");
+                                        if(!externalCauseOfDeathExplanationComponents.isEmpty()){
+                                            var component = externalCauseOfDeathExplanationComponents.get(0);
+                                            postmortemDetails.setExternalCauseOfDeathExplanation(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
+                                        }
+
+                                        List<Observation.ObservationComponentComponent> placeExternalCauseOfDeathComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/place-of-external-cause-of-death", "place-of-external-cause-of-death");
+                                        if(!placeExternalCauseOfDeathComponents.isEmpty()){
+                                            var component = placeExternalCauseOfDeathComponents.get(0);
+                                            postmortemDetails.setPlaceExternalCauseOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? PlaceExternalCauseOfDeath.fromString(component.getValueStringType().getValue()) : null);
+                                        }
+
+                                        otherDeathDetails.setPostmortemDetails(postmortemDetails);
+
+                                        NeonatalDetails neonatalDetails = new NeonatalDetails();
+
+                                        neonatalDetails.setWasMultipleBirth(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,
+                                                "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "wasMultipleBirth")));
+
+                                        neonatalDetails.setStillbirth(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,
+                                                "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "stillbirth")));
+
+                                        neonatalDetails.setMacerated(getNestedExtensionValueBoolean(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "macerated"));
+
+                                        neonatalDetails.setFresh(getNestedExtensionValueBoolean(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "fresh"));
+
+                                        neonatalDetails.setMotherAge(getNestedExtensionValueInteger(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "motherAge"));
+
+                                        neonatalDetails.setPregnancyAgeInWeeks(getNestedExtensionValueInteger(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "pregnancyAgeInWeeks"));
+
+                                        Float childWeightAfterBirthInKg = getNestedExtensionValueDecimal(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "birthWeight");
+                                        if(childWeightAfterBirthInKg != null){
+                                            neonatalDetails.setChildWeightAfterBirthInKg(childWeightAfterBirthInKg.doubleValue());
+                                        }
+
+                                        neonatalDetails.setHrsSinceBirthWithin24hrsBeforeDeath(getNestedExtensionValueInteger(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "hrsSinceBirthWithin24hrsBeforeDeath"));
+
+                                        neonatalDetails.setMotherConditionsThatLedToChildDeath(getNestedExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "motherConditions"));
+
+                                        otherDeathDetails.setNeonatalDetails(neonatalDetails);
+
+                                        MaternalDeathDetails maternalDeathDetails = new MaternalDeathDetails();
+
+                                        maternalDeathDetails.setWasPregnant(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "wasPregnant")));
+
+                                        maternalDeathDetails.setWasDeathAfterOrDuringPregnancy(DeathTimingDuringPregnancy.fromString(getNestedExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "timing")));
+
+                                        maternalDeathDetails.setWasPregnancyContributedToDeath(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,"http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "pregnancyContributed")));
+
+                                        maternalDeathDetails.setWasDeathAudited(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,"http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "wasAudited")));
+
+                                        otherDeathDetails.setMaternalDeathDetails(maternalDeathDetails);
+
+                                        deathRegistryDTO.setOtherDeathDetails(otherDeathDetails);
+
                                     }
 
-                                    List<Observation.ObservationComponentComponent> externalCauseOfDeathExplanationComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/external-cause-of-death-explanation", "external-cause-of-death-explanation");
-                                    if(!externalCauseOfDeathExplanationComponents.isEmpty()){
-                                        var component = externalCauseOfDeathExplanationComponents.get(0);
-                                        postmortemDetails.setExternalCauseOfDeathExplanation(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
-                                    }
-
-                                    List<Observation.ObservationComponentComponent> placeExternalCauseOfDeathComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/place-of-external-cause-of-death", "place-of-external-cause-of-death");
-                                    if(!placeExternalCauseOfDeathComponents.isEmpty()){
-                                        var component = placeExternalCauseOfDeathComponents.get(0);
-                                        postmortemDetails.setPlaceExternalCauseOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? PlaceExternalCauseOfDeath.fromString(component.getValueStringType().getValue()) : null);
-                                    }
-
-                                    otherDeathDetails.setPostmortemDetails(postmortemDetails);
-
-                                    NeonatalDetails neonatalDetails = new NeonatalDetails();
-
-                                    neonatalDetails.setWasMultipleBirth(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,
-                                            "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "wasMultipleBirth")));
-
-                                    neonatalDetails.setStillbirth(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,
-                                            "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "stillbirth")));
-
-                                    neonatalDetails.setMacerated(getNestedExtensionValueBoolean(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "macerated"));
-
-                                    neonatalDetails.setFresh(getNestedExtensionValueBoolean(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "fresh"));
-
-                                    neonatalDetails.setMotherAge(getNestedExtensionValueInteger(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "motherAge"));
-
-                                    neonatalDetails.setPregnancyAgeInWeeks(getNestedExtensionValueInteger(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "pregnancyAgeInWeeks"));
-
-                                    Float childWeightAfterBirthInKg = getNestedExtensionValueDecimal(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "birthWeight");
-                                    if(childWeightAfterBirthInKg != null){
-                                        neonatalDetails.setChildWeightAfterBirthInKg(childWeightAfterBirthInKg.doubleValue());
-                                    }
-
-                                    neonatalDetails.setHrsSinceBirthWithin24hrsBeforeDeath(getNestedExtensionValueInteger(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "hrsSinceBirthWithin24hrsBeforeDeath"));
-
-                                    neonatalDetails.setMotherConditionsThatLedToChildDeath(getNestedExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-neonatalDeath", "motherConditions"));
-
-                                    otherDeathDetails.setNeonatalDetails(neonatalDetails);
-
-                                    MaternalDeathDetails maternalDeathDetails = new MaternalDeathDetails();
-
-                                    maternalDeathDetails.setWasPregnant(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "wasPregnant")));
-
-                                    maternalDeathDetails.setWasDeathAfterOrDuringPregnancy(DeathTimingDuringPregnancy.fromString(getNestedExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "timing")));
-
-                                    maternalDeathDetails.setWasPregnancyContributedToDeath(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,"http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "pregnancyContributed")));
-
-                                    maternalDeathDetails.setWasDeathAudited(YesNoUnknown.fromString(getNestedExtensionValueString(deathObservation,"http://fhir.moh.go.tz/StructureDefinition/death-details-maternalDeath", "wasAudited")));
-
-                                    otherDeathDetails.setMaternalDeathDetails(maternalDeathDetails);
-
-                                    deathRegistryDTO.setOtherDeathDetails(otherDeathDetails);
-
+                                    templateData.setDeathRegistry(deathRegistryDTO);
+                                } catch (Exception e ) {
                                 }
-
-                                templateData.setDeathRegistry(deathRegistryDTO);
                                 // End of Death Registry
 
                                 // Allergies
