@@ -8,13 +8,10 @@ import com.Adapter.icare.Constants.SharedRecordsConstants;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.DataTemplateDataDTO;
-import com.Adapter.icare.Dtos.FacilityDetailsDTO;
-import com.Adapter.icare.Dtos.IdentifierDTO;
+import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
-import com.Adapter.icare.Dtos.SharedHealthRecordsDTO;
 import com.Adapter.icare.SharedHealthRecords.Services.SharedHealthRecordsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -168,18 +165,17 @@ public class SharedHealthRecordsController {
     }
 
     @PostMapping(value = "/sharedRecords", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String,Object>> addSharedRecords(@Valid @RequestBody SharedHealthRecordsDTO sharedRecordsPayload) {
+    public ResponseEntity<Map<String,Object>> addSharedRecords(@Valid @RequestBody DataTemplateDTO dataTemplateDTO) {
         try {
             Map <String,Object> payload = new HashMap<>();
             DataTemplateDataDTO dataTemplateDataDTO = new DataTemplateDataDTO();
             dataTemplateDataDTO.setClientIdentifiersPool(null);
-            FacilityDetailsDTO facilityDetailsDTO = sharedRecordsPayload.getFacilityDetails();
-            List<SharedHealthRecordsDTO> listGrid =  new ArrayList<>();
-            listGrid.add(sharedRecordsPayload);
+            FacilityDetailsDTO facilityDetailsDTO = dataTemplateDTO.getData().getFacilityDetails();
+            List<SharedHealthRecordsDTO> listGrid = dataTemplateDTO.getData().getListGrid();
             dataTemplateDataDTO.setListGrid(listGrid);
             dataTemplateDataDTO.setFacilityDetails(facilityDetailsDTO);
-            dataTemplateDataDTO.setReportDetails(sharedRecordsPayload.getReportDetails());
-            List<IdentifierDTO> clientIds = this.clientRegistryService.getClientRegistryIdentifiers(1);
+            dataTemplateDataDTO.setReportDetails(dataTemplateDTO.getData().getReportDetails());
+            List<IdentifierDTO> clientIds = this.clientRegistryService.getClientRegistryIdentifiers(dataTemplateDTO.getData().getListGrid().size());
             dataTemplateDataDTO.setClientIdentifiersPool(clientIds);
             payload.put("code","dataTemplates");
             payload.put("payload", dataTemplateDataDTO.toMap());
