@@ -11,7 +11,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public enum VisitType {
     IPD("IPD"),
+    EMD("EMD"),
     OPD("OPD");
+
 
     public static final String INVALID_VISIT_TYPE_PREFIX = "Invalid visit type:";
     private static final String ALLOWED_VALUES_MESSAGE =

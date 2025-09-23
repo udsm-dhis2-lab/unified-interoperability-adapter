@@ -32,24 +32,24 @@ async def save_mappings_by_key(key_payload):
 
 async def main():
     namespaces = [
-        # "MAPPINGS-NDcgQeGaJC9",
-        # "MAPPINGS-v6wdME3ouXu",
-        # "MAPPINGS-qpcwPcj8D6u",
-        # "MAPPINGS-Pw3c2BcqbQ5",
+        "MAPPINGS-NDcgQeGaJC9",
+        "MAPPINGS-v6wdME3ouXu",
+        "MAPPINGS-qpcwPcj8D6u",
+        "MAPPINGS-Pw3c2BcqbQ5",
         "MAPPINGS-cBPkl0M6T9I",
-        # "MAPPINGS-V8bbSX0sFf2",
-        # "MAPPINGS-RpeHQ2saIRg",
-        # "MAPPINGS-cap79mdf6Co",
-        # "MAPPINGS-GpPH69ru2po",
-        # "MAPPINGS-GfYjZEQV98i",
-        # "MAPPINGS-kSaoJVXNxZE",
-        # "MAPPINGS-QntdhuQfgvT",
-        # "MAPPINGS-YV5hjD0QuQG",
-        # "MAPPINGS-Dy0caSoFk1Z",
-        # "MAPPINGS-ExX34Bpv0qN",
-        # "MAPPINGS-mU6qzGINdKw",
-        # "MAPPINGS-xewWZMYbqYc",
-        # "MAPPINGS-xQWse025yRw"
+        "MAPPINGS-V8bbSX0sFf2",
+        "MAPPINGS-RpeHQ2saIRg",
+        "MAPPINGS-cap79mdf6Co",
+        "MAPPINGS-GpPH69ru2po",
+        "MAPPINGS-GfYjZEQV98i",
+        "MAPPINGS-kSaoJVXNxZE",
+        "MAPPINGS-QntdhuQfgvT",
+        "MAPPINGS-YV5hjD0QuQG",
+        "MAPPINGS-Dy0caSoFk1Z",
+        "MAPPINGS-ExX34Bpv0qN",
+        "MAPPINGS-mU6qzGINdKw",
+        "MAPPINGS-xewWZMYbqYc",
+        "MAPPINGS-xQWse025yRw"
     ]   
     for namespace in namespaces:
         mappings = await get_mappings(namespace)

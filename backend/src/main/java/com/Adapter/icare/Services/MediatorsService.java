@@ -540,7 +540,6 @@ public class MediatorsService {
         String authentication = "";
         if (authType.toLowerCase().equals("basic")) {
             authentication = "Basic " + authToken;
-            // System.out.println(authentication);
             httpURLConnection.setRequestProperty("Authorization", authentication);
         } else if (authType.toLowerCase().equals("token")) {
             authentication = "Bearer " + authToken;

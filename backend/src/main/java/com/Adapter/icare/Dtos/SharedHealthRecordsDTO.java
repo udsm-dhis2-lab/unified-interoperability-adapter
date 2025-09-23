@@ -21,6 +21,8 @@ public class SharedHealthRecordsDTO {
 //    @NotNull(message = "value cannot be null")
     private FacilityDetailsDTO facilityDetails;
 
+    private List<IdentifierDTO> identifiers;
+
 //    @NotNull(message = "value cannot be null")
     private ReportDetailsDTO reportDetails;
 
@@ -105,6 +107,7 @@ public class SharedHealthRecordsDTO {
     public Map<String,Object> toMap() {
         Map<String,Object> sharedRecordMap = new LinkedHashMap<>();
         sharedRecordMap.put("facilityDetails", this.getFacilityDetails());
+        sharedRecordMap.put("identifiers", this.getIdentifiers() == null || this.getIdentifiers().isEmpty() ? null : this.getIdentifiers().stream().map(IdentifierDTO::toMap).collect(Collectors.toList()));
         sharedRecordMap.put("reportingDetails", this.getReportDetails());
         sharedRecordMap.put("mrn", this.getMrn());
         sharedRecordMap.put("demographicDetails", this.getDemographicDetails() != null ? this.getDemographicDetails().toMap() : null);
