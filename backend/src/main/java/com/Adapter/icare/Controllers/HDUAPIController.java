@@ -248,6 +248,7 @@ public class HDUAPIController {
     ) {
         Map<String, Object> baseResponse = new HashMap<>();
         try {
+            Integer responseCode = null;
             if (shouldUseWorkflowEngine && workflowEngine != null) {
                 Map<String, Object> payload = new HashMap<>();
                 payload.put("code", "dataTemplates");
@@ -289,7 +290,6 @@ public class HDUAPIController {
                     }
                 });
 
-                // TODO: Do not reject the whole request if one record fails
                 // TODO: To softcode the validation by using program rules knowledge to enhance flexibility
 
                 List<Map<String, Object>> recordsWithIssues = validationErrorsMap.entrySet().stream()
@@ -314,28 +314,27 @@ public class HDUAPIController {
 
                 if (validatedListGrid.isEmpty() && !listGrid.isEmpty()) {
                     log.error("All {} records failed validation.", listGrid.size());
+                    responseCode = HttpStatus.BAD_REQUEST.value();
                     Map<String, Object> errorResponse = new LinkedHashMap<>();
+                    ArrayList<Object> summary = new ArrayList<>();
                     errorResponse.put("status", "VALIDATION_ERROR");
-                    errorResponse.put("statusCode", HttpStatus.BAD_REQUEST.value());
-                    errorResponse.put("message",
-                            "All submitted records failed validation. See 'validationFailures' for details.");
-                    errorResponse.put("validationFailures", recordsWithIssues);
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-                }
-
-                if (!recordsWithIssues.isEmpty()) {
-                    Map<String, Object> workflowResponse = new HashMap<>();
-                    workflowResponse.put("statusDetails", "Completed with validation issues");
-                    workflowResponse.put("validationSkippedRecordsCount", recordsWithIssues.size());
-                    workflowResponse.put("validationFailures", recordsWithIssues);
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(workflowResponse);
+                    errorResponse.put("statusCode", responseCode);
+                    errorResponse.put("newClients", 0);
+                    errorResponse.put("updatedClients", 0);
+                    errorResponse.put("failedClients", 0);
+                    errorResponse.put("ignoredClients", 0);
+                    errorResponse.put("invalidClients", recordsWithIssues.size());
+                    errorResponse.put("summary", summary);
+                    errorResponse.put("invalidClientsSummary", recordsWithIssues);
+                    return ResponseEntity.status(responseCode).body(errorResponse);
                 }
 
                 if(testDataValidity){
                     Map<String, Object> testResponse = new HashMap<>();
+                    responseCode = HttpStatus.OK.value();
                     testResponse.put("statusDetails", "Completed testing data");
                     testResponse.put("message", "Congratulations your data passed through all data validation rules.");
-                    return ResponseEntity.status(HttpStatus.OK).body(testResponse);
+                    return ResponseEntity.status(responseCode).body(testResponse);
                 }
 
                 DataTemplateDataDTO validatedDataTemplatePayload = new DataTemplateDataDTO();
@@ -354,13 +353,12 @@ public class HDUAPIController {
                         workflowEngine, payload,
                         "processes/execute?async=true");
                 if(workflowResponse.containsKey("statusCode")){
-                    Integer responseCode = (Integer) workflowResponse.get("statusCode");
-                    if(responseCode != null){
-                        return ResponseEntity.status(responseCode).body(workflowResponse);
-                    }
+                    responseCode = (Integer) workflowResponse.get("statusCode");
                 }
-                return ResponseEntity.ok(workflowResponse);
+                workflowResponse.put("invalidClients", recordsWithIssues.size());
+                workflowResponse.put("invalidClientsSummary", recordsWithIssues);
 
+                return ResponseEntity.status(responseCode != null ? responseCode : HttpStatus.OK.value()).body(workflowResponse);
             } else if (!shouldUseWorkflowEngine) {
                 log.warn(
                         "Workflow engine disabled. Sending data directly to mediator workflow. Validation via annotations might still occur if @Valid is on RequestBody, but parallel processing/composite validator logic is SKIPPED here.");
@@ -382,7 +380,6 @@ public class HDUAPIController {
             statusResponse.put("status", "ERROR");
             statusResponse.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
             statusResponse.put("message", "An unexpected error occurred during processing: " + e.getMessage());
-            statusResponse.put("validationFailures", new ArrayList<>());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(statusResponse);
         }
     }
