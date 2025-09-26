@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { User, Role, Privilege, Group } from '../../models';
-import { UserManagementService, CreateUserRequest, UpdateUserRequest } from '../../services/user-management.service';
+import { UserManagementService, CreateUserRequest, UpdateUserRequest, UserPage } from '../../services/user-management.service';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
@@ -19,7 +19,13 @@ import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzAvatarModule } from 'ng-zorro-antd/avatar';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
@@ -28,6 +34,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    FormsModule,
     NzTableModule,
     NzSpinModule,
     NzLayoutModule,
@@ -42,7 +49,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
     NzSwitchModule,
     NzPaginationModule,
     NzTagModule,
-    NzDividerModule
+    NzDividerModule,
+    NzSpaceModule,
+    NzEmptyModule,
+    NzAvatarModule,
+    NzToolTipModule,
+    NzCheckboxModule,
+    NzIconModule
   ],
   providers: [UserManagementService, NzModalService, NzMessageService],
   templateUrl: './home.component.html',
@@ -55,6 +68,14 @@ export class HomeComponent implements OnInit {
   total = 0;
   pageSize = 10;
   pageIndex = 1;
+
+  // Search functionality
+  searchQuery = '';
+  searching = false;
+
+  // Current user
+  currentUser: User | null = null;
+  isProfileModalVisible = false;
 
   // Modal states
   isCreateModalVisible = false;
@@ -86,6 +107,7 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.loadUsers();
     this.loadReferenceData();
+    this.loadCurrentUser();
   }
 
   initializeForms(): void {
@@ -120,14 +142,26 @@ export class HomeComponent implements OnInit {
   loadUsers(): void {
     this.loading = true;
     this.userManagementService.getUsers(this.pageIndex - 1, this.pageSize).subscribe({
-      next: (data: User[]) => {
-        this.users = data;
-        this.total = data.length; // In a real implementation, this would come from the API
+      next: (data: UserPage) => {
+        this.users = data.content || [];
+        this.total = data.totalElements || 0;
         this.loading = false;
       },
       error: (error: any) => {
         console.error('Error loading users:', error);
-        this.messageService.error('Failed to load users');
+        
+        // Handle specific error cases
+        if (error.status === 401) {
+          // JWT interceptor will handle this automatically
+          return;
+        } else if (error.status === 403) {
+          this.messageService.error('You do not have permission to view users');
+        } else if (error.status === 500) {
+          this.messageService.error('Server error. Please try again later.');
+        } else {
+          this.messageService.error('Failed to load users');
+        }
+        
         this.loading = false;
       }
     });
@@ -412,8 +446,153 @@ export class HomeComponent implements OnInit {
     this.isCreateModalVisible = false;
     this.isEditModalVisible = false;
     this.isDetailModalVisible = false;
+    this.isProfileModalVisible = false;
     this.selectedUser = null;
     this.createUserForm.reset();
     this.editUserForm.reset();
+  }
+
+  // Current User Profile Management
+  loadCurrentUser(): void {
+    this.userManagementService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.currentUser = user;
+      },
+      error: (error) => {
+        console.error('Error loading current user:', error);
+        if (error.status !== 401) { // Don't show error for 401 as interceptor handles it
+          this.messageService.error('Failed to load current user profile');
+        }
+      }
+    });
+  }
+
+  showCurrentUserProfile(): void {
+    if (this.currentUser) {
+      this.selectedUser = this.currentUser;
+      this.isProfileModalVisible = true;
+    }
+  }
+
+  // Search Functionality
+  onSearchQueryChange(): void {
+    if (this.searchQuery.trim().length > 2) {
+      this.searchUsers();
+    } else if (this.searchQuery.trim().length === 0) {
+      this.loadUsers();
+    }
+  }
+
+  searchUsers(): void {
+    if (this.searchQuery.trim().length === 0) {
+      this.loadUsers();
+      return;
+    }
+
+    this.searching = true;
+    this.userManagementService.searchUsers(this.searchQuery, this.pageIndex - 1, this.pageSize).subscribe({
+      next: (data: UserPage) => {
+        this.users = data.content || [];
+        this.total = data.totalElements || 0;
+        this.searching = false;
+      },
+      error: (error) => {
+        console.error('Error searching users:', error);
+        if (error.status !== 401) {
+          this.messageService.error('Failed to search users');
+        }
+        this.searching = false;
+      }
+    });
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.loadUsers();
+  }
+
+  // Bulk Operations
+  selectedUserUuids: Set<string> = new Set();
+
+  onUserSelectionChange(uuid: string, selected: boolean): void {
+    if (selected) {
+      this.selectedUserUuids.add(uuid);
+    } else {
+      this.selectedUserUuids.delete(uuid);
+    }
+  }
+
+  onSelectAllUsers(selected: boolean): void {
+    if (selected) {
+      this.users.forEach(user => this.selectedUserUuids.add(user.uuid));
+    } else {
+      this.selectedUserUuids.clear();
+    }
+  }
+
+  bulkDeleteSelected(): void {
+    if (this.selectedUserUuids.size === 0) {
+      this.messageService.warning('Please select users to delete');
+      return;
+    }
+
+    this.modalService.confirm({
+      nzTitle: 'Delete Multiple Users',
+      nzContent: `Are you sure you want to delete ${this.selectedUserUuids.size} selected users? This action cannot be undone.`,
+      nzOkText: 'Yes, Delete All',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzCancelText: 'Cancel',
+      nzOnOk: () => {
+        this.loading = true;
+        this.userManagementService.bulkDeleteUsers(Array.from(this.selectedUserUuids)).subscribe({
+          next: () => {
+            this.messageService.success(`${this.selectedUserUuids.size} users deleted successfully`);
+            this.selectedUserUuids.clear();
+            this.loadUsers();
+            this.loading = false;
+          },
+          error: (error) => {
+            console.error('Error bulk deleting users:', error);
+            this.loading = false;
+            if (error.status !== 401) {
+              this.messageService.error('Failed to delete selected users');
+            }
+          }
+        });
+      }
+    });
+  }
+
+  // User Status Toggle
+  toggleUserStatus(user: User): void {
+    const action = user.disabled ? 'enable' : 'disable';
+    const newStatus = !user.disabled;
+
+    this.modalService.confirm({
+      nzTitle: `${action.charAt(0).toUpperCase() + action.slice(1)} User`,
+      nzContent: `Are you sure you want to ${action} user "${user.username}"?`,
+      nzOkText: `Yes, ${action.charAt(0).toUpperCase() + action.slice(1)}`,
+      nzOkType: 'primary',
+      nzCancelText: 'Cancel',
+      nzOnOk: () => {
+        this.userManagementService.toggleUserStatus(user.uuid, newStatus).subscribe({
+          next: (updatedUser) => {
+            this.messageService.success(`User "${user.username}" ${action}d successfully`);
+            // Update user in the list
+            const index = this.users.findIndex(u => u.uuid === user.uuid);
+            if (index !== -1) {
+              this.users[index] = updatedUser;
+            }
+          },
+          error: (error) => {
+            console.error(`Error ${action}ing user:`, error);
+            if (error.status !== 401) {
+              this.messageService.error(`Failed to ${action} user`);
+            }
+          }
+        });
+      }
+    });
   }
 }
