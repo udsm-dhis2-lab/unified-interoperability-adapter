@@ -1,8 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, throwError, map } from 'rxjs';
 import { User, Role, Privilege, Group } from '../models';
 
+// API Response Interface - matches the actual backend response
+export interface ApiUserPageResponse {
+  users: User[];
+  totalElements: number;
+  totalPages: number;
+  pageSize: number;
+  currentPage: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}
+
+// Frontend Interface - matches the component expectations
 export interface UserPage {
   content: User[];
   totalElements: number;
@@ -76,8 +88,29 @@ export class UserManagementService {
     if (page !== undefined) params = params.set('page', page.toString());
     if (pageSize !== undefined) params = params.set('size', pageSize.toString());
 
-    return this.httpClient.get<UserPage>(`${this.baseUrl}/users`, { params })
-      .pipe(catchError(this.handleError));
+    return this.httpClient.get<ApiUserPageResponse>(`${this.baseUrl}/users`, { params })
+      .pipe(
+        map(apiResponse => {
+          // Map API response to frontend expected format
+          const userPage: UserPage = {
+            content: apiResponse.users || [],
+            totalElements: apiResponse.totalElements || 0,
+            totalPages: apiResponse.totalPages || 1,
+            size: apiResponse.pageSize || 10,
+            number: apiResponse.currentPage || 0,
+            first: !apiResponse.hasPrevious,
+            last: !apiResponse.hasNext,
+            numberOfElements: apiResponse.users?.length || 0,
+            empty: !apiResponse.users || apiResponse.users.length === 0
+          };
+          
+          console.log('UserManagementService - API Response:', apiResponse);
+          console.log('UserManagementService - Mapped UserPage:', userPage);
+          
+          return userPage;
+        }),
+        catchError(this.handleError)
+      );
   }
 
   /**
@@ -240,8 +273,29 @@ export class UserManagementService {
     if (page !== undefined) params = params.set('page', page.toString());
     if (pageSize !== undefined) params = params.set('size', pageSize.toString());
 
-    return this.httpClient.get<UserPage>(`${this.baseUrl}/users/search`, { params })
-      .pipe(catchError(this.handleError));
+    return this.httpClient.get<ApiUserPageResponse>(`${this.baseUrl}/users/search`, { params })
+      .pipe(
+        map(apiResponse => {
+          // Map API response to frontend expected format
+          const userPage: UserPage = {
+            content: apiResponse.users || [],
+            totalElements: apiResponse.totalElements || 0,
+            totalPages: apiResponse.totalPages || 1,
+            size: apiResponse.pageSize || 10,
+            number: apiResponse.currentPage || 0,
+            first: !apiResponse.hasPrevious,
+            last: !apiResponse.hasNext,
+            numberOfElements: apiResponse.users?.length || 0,
+            empty: !apiResponse.users || apiResponse.users.length === 0
+          };
+          
+          console.log('UserManagementService - Search API Response:', apiResponse);
+          console.log('UserManagementService - Search Mapped UserPage:', userPage);
+          
+          return userPage;
+        }),
+        catchError(this.handleError)
+      );
   }
 
   /**
