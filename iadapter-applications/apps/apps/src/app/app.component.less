@@ -5,3 +5,17 @@
 .inner-content {
   margin-top: 55px;
 }
+
+/* Full-screen layout for login and auth pages */
+:host {
+  display: block;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Ensure router-outlet takes full height in full-screen mode */
+router-outlet {
+  display: block;
+  height: 100%;
+  width: 100%;
+}

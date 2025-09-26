@@ -4,10 +4,15 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { User, Role, Privilege, Group } from '../models';
 
 export interface UserPage {
-  users: User[];
-  total: number;
-  page: number;
-  pageSize: number;
+  content: User[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
 }
 
 export interface CreateUserRequest {
@@ -66,12 +71,12 @@ export class UserManagementService {
   /**
    * GET /api/v1/users - Get all users with pagination
    */
-  getUsers(page?: number, pageSize?: number): Observable<User[]> {
+  getUsers(page?: number, pageSize?: number): Observable<UserPage> {
     let params = new HttpParams();
     if (page !== undefined) params = params.set('page', page.toString());
     if (pageSize !== undefined) params = params.set('size', pageSize.toString());
 
-    return this.httpClient.get<User[]>(`${this.baseUrl}/users`, { params })
+    return this.httpClient.get<UserPage>(`${this.baseUrl}/users`, { params })
       .pipe(catchError(this.handleError));
   }
 
@@ -224,6 +229,63 @@ export class UserManagementService {
    */
   getCurrentUser(): Observable<User> {
     return this.httpClient.get<User>(`${this.baseUrl}/me`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Search users by username or email
+   */
+  searchUsers(query: string, page?: number, pageSize?: number): Observable<UserPage> {
+    let params = new HttpParams().set('search', query);
+    if (page !== undefined) params = params.set('page', page.toString());
+    if (pageSize !== undefined) params = params.set('size', pageSize.toString());
+
+    return this.httpClient.get<UserPage>(`${this.baseUrl}/users/search`, { params })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Check if username is available
+   */
+  checkUsernameAvailability(username: string): Observable<{ available: boolean }> {
+    return this.httpClient.get<{ available: boolean }>(`${this.baseUrl}/users/check-username/${username}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Reset user password (admin function)
+   */
+  resetUserPassword(uuid: string, newPassword: string): Observable<void> {
+    return this.httpClient.put<void>(`${this.baseUrl}/users/${uuid}/reset-password`, { password: newPassword })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Disable/Enable user account
+   */
+  toggleUserStatus(uuid: string, disabled: boolean): Observable<User> {
+    return this.httpClient.patch<User>(`${this.baseUrl}/users/${uuid}/status`, { disabled })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Bulk delete users
+   */
+  bulkDeleteUsers(userUuids: string[]): Observable<void> {
+    return this.httpClient.delete<void>(`${this.baseUrl}/users/bulk`, { 
+      body: { userUuids } 
+    }).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get user activity/audit log
+   */
+  getUserActivity(uuid: string, page?: number, pageSize?: number): Observable<any> {
+    let params = new HttpParams();
+    if (page !== undefined) params = params.set('page', page.toString());
+    if (pageSize !== undefined) params = params.set('size', pageSize.toString());
+
+    return this.httpClient.get<any>(`${this.baseUrl}/users/${uuid}/activity`, { params })
       .pipe(catchError(this.handleError));
   }
 }

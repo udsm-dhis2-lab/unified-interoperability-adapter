@@ -40,7 +40,6 @@ import { appRoutes } from './app.routes';
 import { antDesignIcons } from './shared/ant-design-icons.constants';
 import { antDesignModules } from './shared/ant-design-modules';
 import { appEffects, appReducers, metaReducers } from './store/app.state';
-import { AuthInterceptor } from '../../../../libs/models/src/lib/exceptions/exceptions';
 import { JwtInterceptor } from '../../../../libs/shared/interceptors/jwt.interceptor';
 
 const icons: IconDefinition[] = [...antDesignIcons];
@@ -123,11 +122,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     { provide: NZ_ICONS, useValue: icons },
     { provide: NZ_I18N, useValue: en_US },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: AuthInterceptor,
-      multi: true, // Allows multiple interceptors
-    },
   ],
   bootstrap: [AppComponent],
 })

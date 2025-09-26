@@ -12,13 +12,53 @@
     <div class="inner-content">
       <div nz-row style="padding: 16px" nzJustify="space-between" nzAlign="middle">
         <div nz-col>
-          <h2>Users</h2>
+          <h2>Users Management</h2>
+          <p *ngIf="currentUser" style="margin: 0; color: #666;">
+            Welcome, {{ currentUser.firstName }} {{ currentUser.surname }} 
+            <a (click)="showCurrentUserProfile()" style="margin-left: 8px;">(View Profile)</a>
+          </p>
         </div>
         <div nz-col>
-          <button nz-button nzType="primary" (click)="showCreateModal()">
-            <i nz-icon nzType="plus"></i>
-            Create User
-          </button>
+          <nz-space nzSize="small">
+            <button *nzSpaceItem nz-button nzType="primary" (click)="showCreateModal()">
+              <i nz-icon nzType="plus"></i>
+              Create User
+            </button>
+            <button *nzSpaceItem nz-button nzType="default" 
+                    [disabled]="selectedUserUuids.size === 0" 
+                    (click)="bulkDeleteSelected()"
+                    nzDanger>
+              <i nz-icon nzType="delete"></i>
+              Delete Selected ({{ selectedUserUuids.size }})
+            </button>
+          </nz-space>
+        </div>
+      </div>
+
+      <!-- Search and Filters -->
+      <div nz-row style="padding: 0 16px 16px;">
+        <div nz-col [nzSpan]="24">
+          <nz-input-group [nzSuffix]="suffixTemplate" [nzPrefix]="prefixTemplate">
+            <input
+              type="text"
+              nz-input
+              placeholder="Search users by username, email, or name..."
+              [(ngModel)]="searchQuery"
+              (input)="onSearchQueryChange()"
+              [disabled]="loading || searching"
+            />
+          </nz-input-group>
+          <ng-template #prefixTemplate><i nz-icon nzType="search"></i></ng-template>
+          <ng-template #suffixTemplate>
+            <i 
+              *ngIf="searchQuery && !searching" 
+              nz-icon 
+              nzType="close-circle" 
+              class="clear-search-icon" 
+              (click)="clearSearch()"
+            ></i>
+            <i *ngIf="searching" nz-icon nzType="loading" nzSpin></i>
+          </ng-template>
         </div>
       </div>
 
@@ -27,51 +67,101 @@
         <div style="padding: 0 16px 16px; width: 100%">
           <nz-table
             [nzData]="users"
-            [nzLoading]="loading"
+            [nzLoading]="loading || searching"
             [nzFrontPagination]="false"
             [nzShowPagination]="false"
+            [nzScroll]="{ x: '1200px' }"
           >
             <thead>
               <tr>
-                <th>SN</th>
-                <th>Username</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Phone Number</th>
-                <th>Roles</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th [nzWidth]="'50px'">
+                  <label nz-checkbox 
+                         [nzChecked]="selectedUserUuids.size > 0 && selectedUserUuids.size === users.length"
+                         [nzIndeterminate]="selectedUserUuids.size > 0 && selectedUserUuids.size < users.length"
+                         (nzCheckedChange)="onSelectAllUsers($event)">
+                  </label>
+                </th>
+                <th [nzWidth]="'60px'">SN</th>
+                <th [nzWidth]="'120px'" nzSortKey="username">Username</th>
+                <th [nzWidth]="'180px'">Full Name</th>
+                <th [nzWidth]="'150px'">Email</th>
+                <th [nzWidth]="'130px'">Phone</th>
+                <th [nzWidth]="'120px'">Roles</th>
+                <th [nzWidth]="'100px'">Status</th>
+                <th [nzWidth]="'200px'" [nzRight]="true">Actions</th>
               </tr>
             </thead>
             <tbody>
               @for (user of users; track user.uuid; let i = $index) {
-              <tr>
-                <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.firstName }} {{ user.middleName }} {{ user.surname }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.phoneNumber }}</td>
+              <tr [class.selected-row]="selectedUserUuids.has(user.uuid)">
                 <td>
-                  <span *ngFor="let role of user.roles; let isLast = last">
-                    {{ role.roleName }}{{ !isLast ? ', ' : '' }}
-                  </span>
+                  <label nz-checkbox 
+                         [nzChecked]="selectedUserUuids.has(user.uuid)"
+                         (nzCheckedChange)="onUserSelectionChange(user.uuid, $event)">
+                  </label>
+                </td>
+                <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
+                <td>
+                  <strong>{{ user.username }}</strong>
+                </td>
+                <td>{{ user.firstName }} {{ user.middleName || '' }} {{ user.surname }}</td>
+                <td>
+                  <span *ngIf="user.email; else noEmail">{{ user.email }}</span>
+                  <ng-template #noEmail><i style="color: #999;">Not provided</i></ng-template>
                 </td>
                 <td>
-                  <nz-tag [nzColor]="user.disabled ? 'red' : 'green'">
+                  <span *ngIf="user.phoneNumber; else noPhone">{{ user.phoneNumber }}</span>
+                  <ng-template #noPhone><i style="color: #999;">Not provided</i></ng-template>
+                </td>
+                <td>
+                  <div *ngIf="user.roles && user.roles.length > 0; else noRoles" class="roles-container">
+                    <nz-tag *ngFor="let role of user.roles.slice(0, 2)" nzColor="blue" nzSize="small">
+                      {{ role.roleName }}
+                    </nz-tag>
+                    <nz-tag *ngIf="user.roles.length > 2" nzColor="default" nzSize="small">
+                      +{{ user.roles.length - 2 }}
+                    </nz-tag>
+                  </div>
+                  <ng-template #noRoles><i style="color: #999;">No roles</i></ng-template>
+                </td>
+                <td>
+                  <nz-tag [nzColor]="user.disabled ? 'red' : 'green'" 
+                          style="cursor: pointer;"
+                          (click)="toggleUserStatus(user)"
+                          [title]="'Click to ' + (user.disabled ? 'enable' : 'disable')">
+                    <i nz-icon [nzType]="user.disabled ? 'stop' : 'check-circle'"></i>
                     {{ user.disabled ? 'Disabled' : 'Active' }}
                   </nz-tag>
                 </td>
                 <td>
-                  <button nz-button nzType="link" (click)="viewUserDetails(user)" [disabled]="loading">
-                    <i nz-icon nzType="eye"></i> View
-                  </button>
-                  <button nz-button nzType="link" (click)="editUser(user)" [disabled]="loading">
-                    <i nz-icon nzType="edit"></i> Edit
-                  </button>
-                  <button nz-button nzType="link" nzDanger 
-                          (click)="deleteUser(user)" [disabled]="loading">
-                    <i nz-icon nzType="delete"></i> Delete
-                  </button>
+                  <nz-space nzSize="small">
+                    <button *nzSpaceItem nz-button nzSize="small" nzType="text" 
+                            (click)="viewUserDetails(user)" [disabled]="loading"
+                            nz-tooltip="View Details">
+                      <i nz-icon nzType="eye"></i>
+                    </button>
+                    <button *nzSpaceItem nz-button nzSize="small" nzType="text" 
+                            (click)="editUser(user)" [disabled]="loading"
+                            nz-tooltip="Edit User">
+                      <i nz-icon nzType="edit"></i>
+                    </button>
+                    <nz-divider *nzSpaceItem nzType="vertical"></nz-divider>
+                    <button *nzSpaceItem nz-button nzSize="small" nzType="text" nzDanger 
+                            (click)="deleteUser(user)" [disabled]="loading"
+                            nz-tooltip="Delete User">
+                      <i nz-icon nzType="delete"></i>
+                    </button>
+                  </nz-space>
+                </td>
+              </tr>
+              }
+              @empty {
+              <tr>
+                <td colspan="9" class="no-data">
+                  <nz-empty 
+                    [nzNotFoundImage]="searchQuery ? 'simple' : 'default'"
+                    [nzNotFoundContent]="searchQuery ? 'No users found matching your search' : 'No users available'">
+                  </nz-empty>
                 </td>
               </tr>
               }
@@ -355,6 +445,86 @@
             <h4>System Information</h4>
             <p><strong>UUID:</strong> <code>{{ selectedUser.uuid }}</code></p>
             <p *ngIf="selectedUser.externalAuth"><strong>External Auth:</strong> {{ selectedUser.externalAuth ? 'Yes' : 'No' }}</p>
+          </div>
+        </div>
+      </ng-container>
+    </nz-modal>
+
+    <!-- Current User Profile Modal -->
+    <nz-modal
+      [(nzVisible)]="isProfileModalVisible"
+      nzTitle="My Profile"
+      (nzOnCancel)="handleCancel()"
+      [nzFooter]="null"
+      nzWidth="500px">
+      <ng-container *nzModalContent>
+        <div *ngIf="selectedUser" class="user-profile-content">
+          <div class="profile-header" style="text-align: center; padding-bottom: 20px;">
+            <div class="avatar-container" style="margin-bottom: 16px;">
+              <nz-avatar [nzSize]="64" [nzIcon]="'user'" nzSrc=""></nz-avatar>
+            </div>
+            <h3 style="margin-bottom: 4px;">{{ selectedUser.firstName }} {{ selectedUser.surname }}</h3>
+            <p style="color: #666; margin-bottom: 0;">@{{ selectedUser.username }}</p>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div class="profile-details">
+            <div class="detail-row" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span style="font-weight: 500;">Email:</span>
+              <span>{{ selectedUser.email || 'Not provided' }}</span>
+            </div>
+            <div class="detail-row" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span style="font-weight: 500;">Phone:</span>
+              <span>{{ selectedUser.phoneNumber || 'Not provided' }}</span>
+            </div>
+            <div class="detail-row" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <span style="font-weight: 500;">Status:</span>
+              <nz-tag [nzColor]="selectedUser.disabled ? 'red' : 'green'">
+                {{ selectedUser.disabled ? 'Disabled' : 'Active' }}
+              </nz-tag>
+            </div>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div class="profile-roles" *ngIf="selectedUser.roles && selectedUser.roles.length > 0">
+            <h4 style="margin-bottom: 12px;">My Roles</h4>
+            <div class="tags-container">
+              <nz-tag *ngFor="let role of selectedUser.roles" nzColor="blue">
+                {{ role.roleName }}
+              </nz-tag>
+            </div>
+          </div>
+
+          <div class="profile-groups" *ngIf="selectedUser.groups && selectedUser.groups.length > 0">
+            <h4 style="margin-bottom: 12px;">My Groups</h4>
+            <div class="tags-container">
+              <nz-tag *ngFor="let group of selectedUser.groups" nzColor="green">
+                {{ group.name }}
+              </nz-tag>
+            </div>
+          </div>
+
+          <div class="profile-authorities" *ngIf="selectedUser.authorities && selectedUser.authorities.length > 0">
+            <h4 style="margin-bottom: 12px;">My Permissions</h4>
+            <div class="authorities-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;">
+              <nz-tag *ngFor="let authority of selectedUser.authorities.slice(0, 20)" nzColor="orange" nzSize="small">
+                {{ authority }}
+              </nz-tag>
+              <nz-tag *ngIf="selectedUser.authorities.length > 20" nzColor="default">
+                +{{ selectedUser.authorities.length - 20 }} more
+              </nz-tag>
+            </div>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div class="profile-actions" style="text-align: center;">
+            <button nz-button nzType="primary" (click)="editUser(selectedUser)">
+              <i nz-icon nzType="edit"></i>
+              Edit My Profile
+            </button>
           </div>
         </div>
       </ng-container>

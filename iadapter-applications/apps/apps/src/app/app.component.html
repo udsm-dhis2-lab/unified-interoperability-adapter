@@ -1,16 +1,24 @@
-<lib-hdu-api-top-bar-menu [appName]="appName"></lib-hdu-api-top-bar-menu>
+<!-- Navigation layout for authenticated pages -->
+<ng-container *ngIf="showNavigation$ | async">
+  <lib-hdu-api-top-bar-menu [appName]="appName"></lib-hdu-api-top-bar-menu>
+  
+  <nz-layout>
+    <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
+      <lib-hdu-api-nav-menu
+        [activeMainMenuId]="'dashboard'"
+        (selectedMenu)="onGetSelectedMenu($event)"
+      ></lib-hdu-api-nav-menu>
+    </nz-sider>
 
-<nz-layout>
-  <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
-    <lib-hdu-api-nav-menu
-      [activeMainMenuId]="'dashboard'"
-      (selectedMenu)="onGetSelectedMenu($event)"
-    ></lib-hdu-api-nav-menu>
-  </nz-sider>
+    <nz-content class="app-container">
+      <div class="inner-content">
+        <router-outlet />
+      </div>
+    </nz-content>
+  </nz-layout>
+</ng-container>
 
-  <nz-content class="app-container">
-    <div class="inner-content">
-      <router-outlet />
-    </div>
-  </nz-content>
-</nz-layout>
+<!-- Full-screen layout for login and other auth pages -->
+<ng-container *ngIf="!(showNavigation$ | async)">
+  <router-outlet />
+</ng-container>

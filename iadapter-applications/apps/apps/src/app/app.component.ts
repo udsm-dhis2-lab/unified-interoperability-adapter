@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, NavigationEnd, RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 import { Fn } from '@iapps/function-analytics';
 import { Menu } from './shared/menu.model';
 import { NgxDhis2HttpClientService } from '@iapps/ngx-dhis2-http-client';
@@ -7,6 +9,7 @@ import { filter } from 'rxjs/operators';
 import { HduApiTopBarMenuComponent } from '../../../../libs/hdu-api-top-bar-menu/src/lib/hdu-api-top-bar-menu/hdu-api-top-bar-menu.component';
 import { HduApiNavMenuComponent } from '../../../../libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
+import { LayoutService } from '../../../../libs/shared/services/layout.service';
 
 @Component({
   providers: [],
@@ -14,6 +17,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
   templateUrl: './app.component.html',
   styleUrl: './app.component.less',
   imports: [
+    CommonModule,
     RouterOutlet,
     HduApiTopBarMenuComponent,
     HduApiNavMenuComponent,
@@ -23,11 +27,14 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 export class AppComponent implements OnInit {
   title = 'apps-shell';
   appName = 'Dashboard'; // Default value
+  showNavigation$: Observable<boolean>;
 
   constructor(
     private router: Router,
-    private httpClient: NgxDhis2HttpClientService
+    private httpClient: NgxDhis2HttpClientService,
+    private layoutService: LayoutService
   ) {
+    this.showNavigation$ = this.layoutService.showNavigation$;
     this.httpClient.manifest().subscribe((manifest) => {
       if (Fn) {
         Fn.init({

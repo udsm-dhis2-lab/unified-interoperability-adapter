@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject, EMPTY } from 'rxjs';
 import { catchError, filter, take, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { JwtTokenService } from '../services/jwt-token.service';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
-  private isRefreshing = false;
+  private isRedirecting = false;
   private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
   constructor(
@@ -16,8 +16,12 @@ export class JwtInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Skip interceptor for login requests
-    if (request.url.includes('/api/v1/login')) {
+    // Skip interceptor for login requests and static assets
+    if (request.url.includes('/api/v1/login') || 
+        request.url.includes('/assets/') ||
+        request.url.includes('.js') ||
+        request.url.includes('.css') ||
+        request.url.includes('.html')) {
       return next.handle(request);
     }
 
@@ -32,7 +36,7 @@ export class JwtInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError(error => {
         if (error instanceof HttpErrorResponse && error.status === 401) {
-          return this.handle401Error(request, next);
+          return this.handle401Error();
         }
         return throwError(error);
       })
@@ -47,25 +51,33 @@ export class JwtInterceptor implements HttpInterceptor {
     });
   }
 
-  private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!this.isRefreshing) {
-      this.isRefreshing = true;
-      this.refreshTokenSubject.next(null);
-
-      // Clear tokens and redirect to login
-      this.jwtTokenService.clearTokens();
-      this.router.navigate(['/login']);
-      this.isRefreshing = false;
-      
-      return throwError('Authentication required');
-    } else {
-      return this.refreshTokenSubject.pipe(
-        filter(token => token != null),
-        take(1),
-        switchMap(jwt => {
-          return next.handle(this.addTokenHeader(request, jwt, this.jwtTokenService.getTokenType()));
-        })
-      );
+  private handle401Error(): Observable<HttpEvent<any>> {
+    // Prevent multiple simultaneous redirects
+    if (this.isRedirecting) {
+      return EMPTY;
     }
+    
+    this.isRedirecting = true;
+    
+    // Clear tokens immediately
+    this.jwtTokenService.clearTokens();
+    
+    // Clear any cached user data
+    sessionStorage.clear();
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('userPermissions');
+    
+    // Immediate redirect to login - no delays, no retries, no user interaction required
+    console.warn('401 Unauthorized detected - redirecting to login immediately');
+    
+    // Use setTimeout to avoid navigation during HTTP request
+    setTimeout(() => {
+      // Force navigation to login with replace to prevent back navigation
+      window.location.href = '/login';
+      this.isRedirecting = false;
+    }, 0);
+    
+    // Return empty to prevent further processing
+    return EMPTY;
   }
 }
