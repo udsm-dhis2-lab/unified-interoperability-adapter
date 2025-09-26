@@ -140,12 +140,16 @@ export class HomeComponent implements OnInit {
   }
 
   loadUsers(): void {
+    console.log('LoadUsers - Starting to load users...');
     this.loading = true;
     this.userManagementService.getUsers(this.pageIndex - 1, this.pageSize).subscribe({
       next: (data: UserPage) => {
+        console.log('LoadUsers - Received user data:', data);
+        console.log('LoadUsers - Users count:', data.content?.length || 0);
         this.users = data.content || [];
         this.total = data.totalElements || 0;
         this.loading = false;
+        console.log('LoadUsers - Updated local users array, new count:', this.users.length);
       },
       error: (error: any) => {
         console.error('Error loading users:', error);
@@ -384,10 +388,20 @@ export class HomeComponent implements OnInit {
       nzOkDanger: true,
       nzCancelText: 'Cancel',
       nzOnOk: () => {
+        console.log('Deleting user:', user.uuid, user.username);
         this.loading = true;
         this.userManagementService.deleteUser(user.uuid).subscribe({
-          next: () => {
+          next: (response) => {
+            console.log('Delete API response:', response);
+            console.log('User deleted successfully, refreshing list...');
+            
+            // Remove the user from the local list immediately for instant feedback
+            this.users = this.users.filter(u => u.uuid !== user.uuid);
+            this.total = Math.max(0, this.total - 1);
+            
             this.messageService.success(`User "${user.username}" deleted successfully`);
+            
+            // Also refresh from server to ensure consistency
             this.loadUsers();
             this.loading = false;
           },

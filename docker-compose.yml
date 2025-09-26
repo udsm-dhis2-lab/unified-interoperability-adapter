@@ -36,6 +36,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD:-Admin123}
     healthcheck:
       test: "exit 0"
+    ports:
+      - 3308:3306
     volumes:
       - iadapter-data:/var/lib/mysql
       - ./backup:/backup

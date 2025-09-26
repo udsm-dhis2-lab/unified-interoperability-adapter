@@ -76,21 +76,21 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllActiveUsers();
     }
 
     public Page<User> getUsers(int page, int size, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        return userRepository.findAll(pageable);
+        return userRepository.findAllActiveUsers(pageable);
     }
 
     public Page<User> getUsersWithSearch(int page, int size, String search, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         // This would require a custom repository method for search
-        // For now, return all users - implement search later if needed
-        return userRepository.findAll(pageable);
+        // For now, return all active users - implement search later if needed
+        return userRepository.findAllActiveUsers(pageable);
     }
 
     @Transactional

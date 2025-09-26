@@ -159,9 +159,16 @@ export class UserManagementService {
   /**
    * DELETE /api/v1/users/{uuid} - Delete user (This endpoint might need to be added to backend)
    */
-  deleteUser(uuid: string): Observable<void> {
-    return this.httpClient.delete<void>(`${this.baseUrl}/users/${uuid}`)
-      .pipe(catchError(this.handleError));
+  deleteUser(uuid: string): Observable<any> {
+    console.log('UserManagementService - Deleting user:', uuid);
+    return this.httpClient.delete<any>(`${this.baseUrl}/users/${uuid}`)
+      .pipe(
+        map(response => {
+          console.log('UserManagementService - Delete response:', response);
+          return response;
+        }),
+        catchError(this.handleError)
+      );
   }
 
   // Role management - matching exact API endpoints
