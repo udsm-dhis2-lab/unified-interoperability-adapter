@@ -29,3 +29,159 @@ nz-content {
     background-color: #fff;
     max-height: calc(100vh - 100px);
 }
+
+/* User form styles */
+.user-form {
+    padding: 16px 0;
+}
+
+.user-form .ant-form-item {
+    margin-bottom: 16px;
+}
+
+.user-form .ant-form-item-label {
+    font-weight: 500;
+    color: #1f2937;
+}
+
+.user-form .ant-input,
+.user-form .ant-select-selector {
+    border-radius: 6px;
+}
+
+.user-form .ant-btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* User details modal styles */
+.user-details-content {
+    padding: 16px 0;
+}
+
+.user-details-content p {
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.user-details-content strong {
+    color: #374151;
+    font-weight: 600;
+    min-width: 100px;
+    display: inline-block;
+}
+
+/* Form validation styles */
+.ant-form-item-has-error .ant-input {
+    border-color: #ff4d4f;
+}
+
+.ant-form-item-has-error .ant-form-item-explain {
+    color: #ff4d4f;
+}
+
+/* Button styles */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+/* Table action buttons */
+.table-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.table-actions .ant-btn-link {
+    padding: 4px 8px;
+    height: auto;
+}
+
+/* Modal enhancements */
+.ant-modal-body {
+    padding: 24px;
+}
+
+.ant-modal-header {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 24px;
+}
+
+.ant-modal-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Enhanced User Details Modal Styles */
+.user-basic-info,
+.user-roles-info,
+.user-groups-info,
+.user-authorities-info,
+.user-meta-info {
+    margin-bottom: 16px;
+}
+
+.user-details-content h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+.tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.authorities-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 8px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.authority-tag {
+    font-size: 11px;
+    margin: 2px;
+}
+
+.user-details-content code {
+    background-color: #f5f5f5;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    color: #d63384;
+}
+
+.user-details-content .ant-divider {
+    margin: 16px 0;
+}
+
+.user-details-content .ant-tag {
+    margin: 2px;
+    border-radius: 4px;
+}
+
+/* Loading states */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}

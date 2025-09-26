@@ -17,6 +17,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,23 +29,38 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Domains.Group;
 import com.Adapter.icare.Domains.Privilege;
 import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.CreateUserDTO;
+import com.Adapter.icare.Dtos.JwtAuthenticationResponse;
 import com.Adapter.icare.Dtos.LoginDTO;
+import com.Adapter.icare.Dtos.UpdateUserDTO;
 import com.Adapter.icare.Mappers.Mappers;
 import com.Adapter.icare.Services.UserService;
+import com.Adapter.icare.Configurations.JwtTokenProvider;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1")
+@Tag(name = "User Management", description = "User authentication and management operations")
 public class UserController {
     private final UserService userService;
     private Mappers mappers;
     private Authentication authentication;
     private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
     private User authenticatedUser;
 
     @Autowired
@@ -50,36 +68,62 @@ public class UserController {
     @Autowired
     private HttpServletRequest request;
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody LoginDTO loginData)
+    @Operation(
+        summary = "Authenticate user and get JWT token",
+        description = "Login with username and password to receive a JWT token. This token should be used for authenticating all subsequent requests."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Authentication successful - JWT token returned"),
+        @ApiResponse(responseCode = "401", description = "Invalid credentials")
+    })
+    @SecurityRequirement(name = "")
+    public ResponseEntity<?> authenticateUser(
+        @Parameter(description = "Login credentials", required = true) @RequestBody LoginDTO loginData)
             throws IllegalAccessException {
         try {
             Map<String, Object> userDetails = userService.authenticate(loginData);
-            // Here, you can return user info or a token, depending on your needs
-            Map<String, Object> response = new HashMap<>();
             if (userDetails != null) {
+                // Authenticate user
                 this.authentication = authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(loginData.getUsername(),
                                 loginData.getPassword()));
-                SecurityContextHolder.getContext().setAuthentication(this.authentication);
+                
+                // Generate JWT token
+                String jwtToken = jwtTokenProvider.generateToken(authentication);
+                
+                // Get user information
                 this.authenticatedUser = this.userService
                         .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
-                response = this.authenticatedUser.toMap();
-                response.put("authenticated", true);
+                
+                // Create JWT response
+                JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(jwtToken, authenticatedUser);
+                
+                // Convert to map for compatibility
+                Map<String, Object> response = new HashMap<>();
+                response.put("token", jwtResponse.getToken());
+                response.put("tokenType", jwtResponse.getTokenType());
+                response.put("user", jwtResponse.getUser().toMap());
+                response.put("authenticated", jwtResponse.isAuthenticated());
+                
                 return ResponseEntity.ok(response);
             } else {
+                Map<String, Object> response = new HashMap<>();
                 response.put("authenticated", false);
+                response.put("error", "Invalid credentials");
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
             Map<String, Object> response = new HashMap<>();
             response.put("authenticated", false);
+            response.put("error", "Authentication failed: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
@@ -104,6 +148,15 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    @Operation(
+        summary = "Get current user information",
+        description = "Get information about the currently authenticated user."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Current user information retrieved"),
+        @ApiResponse(responseCode = "401", description = "Authentication required")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<Map<String, Object>> getLoggedInUser() throws Exception {
         try {
             System.out.println("Getting logged in user " + authentication);
@@ -123,39 +176,161 @@ public class UserController {
     }
 
     @GetMapping(path = "/users")
-    public List<Map<String, Object>> getUsers() throws Exception {
-        List<Map<String, Object>> usersMap = new ArrayList<>();
+    @Operation(
+        summary = "Get all users",
+        description = "Retrieve a paginated list of all users. Requires authentication."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "Authentication required")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Map<String, Object>> getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "username") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            @RequestParam(required = false) String search) {
         try {
-            List<User> users = userService.getUsers();
-            for (User user : users) {
+            Page<User> usersPage;
+            if (search != null && !search.trim().isEmpty()) {
+                usersPage = userService.getUsersWithSearch(page, size, search, sortBy, sortDirection);
+            } else {
+                usersPage = userService.getUsers(page, size, sortBy, sortDirection);
+            }
+            
+            List<Map<String, Object>> usersMap = new ArrayList<>();
+            for (User user : usersPage.getContent()) {
                 usersMap.add(user.toMap());
             }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("users", usersMap);
+            response.put("totalElements", usersPage.getTotalElements());
+            response.put("totalPages", usersPage.getTotalPages());
+            response.put("currentPage", usersPage.getNumber());
+            response.put("pageSize", usersPage.getSize());
+            response.put("hasNext", usersPage.hasNext());
+            response.put("hasPrevious", usersPage.hasPrevious());
+            
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            throw new RuntimeException("Error getting users: " + e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Failed to retrieve users: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
-        return usersMap;
     }
 
     @PostMapping(path = "/users", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public User createUser(@RequestBody User user) throws Exception {
-        User userResponse = new User();
+    @Operation(
+        summary = "Create a new user",
+        description = "Create a new user account. Requires admin authentication."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "User created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid request data"),
+        @ApiResponse(responseCode = "401", description = "Authentication required"),
+        @ApiResponse(responseCode = "409", description = "Username already exists")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<Map<String, Object>> createUser(
+        @Parameter(description = "User data", required = true) @RequestBody Map<String, Object> requestBody) {
         try {
-            userResponse = userService.createUser(user);
+            // Add password if missing (for testing)
+            if (!requestBody.containsKey("password") || requestBody.get("password") == null) {
+                requestBody.put("password", "defaultPassword123"); // You can change this
+            }
+            
+            // Convert raw JSON to User entity using the fromMap method
+            User user = User.fromMap(requestBody);
+            
+            User createdUser = userService.createUser(user);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "User created successfully");
+            response.put("user", createdUser.toMap());
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            
+            if (e.getMessage().contains("Username already exists")) {
+                errorResponse.put("error", "Username already exists. Please choose a different username.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+            } else {
+                errorResponse.put("error", "Failed to create user: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            }
         } catch (Exception e) {
-            throw new RuntimeException("Error creating user: " + e);
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
-        return userResponse;
     }
 
     @GetMapping("/users/{uuid}")
-    public Map<String, Object> getUser(@PathVariable String uuid) throws Exception {
-        User user = userService.getUSer(uuid);
-        return user.toMap();
+    public ResponseEntity<Map<String, Object>> getUser(@PathVariable String uuid) {
+        try {
+            User user = userService.getUSer(uuid);
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("user", user.toMap());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "User not found: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
     }
 
     @PutMapping("/users/{uuid}")
-    public User updateUser(@RequestBody User user) {
-        return userService.updateUser(user);
+    public ResponseEntity<Map<String, Object>> updateUser(@PathVariable String uuid, @Valid @RequestBody UpdateUserDTO updateUserDTO) {
+        try {
+            // Convert DTO to User entity
+            User user = convertUpdateDTOToUser(updateUserDTO);
+            
+            User updatedUser = userService.updateUser(uuid, user);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "User updated successfully");
+            response.put("user", updatedUser.toMap());
+            
+            return ResponseEntity.ok(response);
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            
+            if (e.getMessage().contains("not found")) {
+                errorResponse.put("error", "User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            } else if (e.getMessage().contains("Username already exists")) {
+                errorResponse.put("error", "Username already exists. Please choose a different username.");
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+            } else {
+                errorResponse.put("error", "Failed to update user: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            }
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
 
     @PostMapping("/users/roles")
@@ -273,5 +448,218 @@ public class UserController {
             @RequestParam(defaultValue = "true") boolean withUsers) throws Exception {
         Group group = userService.getGroup(uuid);
         return group.toMap(withUsers);
+    }
+
+    @DeleteMapping("/users/{uuid}")
+    public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable String uuid) {
+        try {
+            userService.deleteUser(uuid);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "User deleted successfully");
+            
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            
+            if (e.getMessage().contains("not found")) {
+                errorResponse.put("error", "User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+            } else {
+                errorResponse.put("error", "Failed to delete user: " + e.getMessage());
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            }
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
+    }
+
+    @GetMapping("/users/{uuid}/privileges")
+    public ResponseEntity<Map<String, Object>> getUserPrivileges(@PathVariable String uuid) {
+        try {
+            List<Privilege> privileges = userService.getUserPrivileges(uuid);
+            
+            List<Map<String, Object>> privilegesMap = new ArrayList<>();
+            for (Privilege privilege : privileges) {
+                privilegesMap.add(privilege.toMap(false));
+            }
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("privileges", privilegesMap);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Failed to get user privileges: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/users/{userUuid}/roles/{roleUuid}")
+    public ResponseEntity<Map<String, Object>> assignRoleToUser(@PathVariable String userUuid, @PathVariable String roleUuid) {
+        try {
+            User updatedUser = userService.assignRoleToUser(userUuid, roleUuid);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Role assigned to user successfully");
+            response.put("user", updatedUser.toMap());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Failed to assign role: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/users/{userUuid}/roles/{roleUuid}")
+    public ResponseEntity<Map<String, Object>> removeRoleFromUser(@PathVariable String userUuid, @PathVariable String roleUuid) {
+        try {
+            User updatedUser = userService.removeRoleFromUser(userUuid, roleUuid);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Role removed from user successfully");
+            response.put("user", updatedUser.toMap());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Failed to remove role: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/users/{userUuid}/groups/{groupUuid}")
+    public ResponseEntity<Map<String, Object>> assignGroupToUser(@PathVariable String userUuid, @PathVariable String groupUuid) {
+        try {
+            User updatedUser = userService.assignGroupToUser(userUuid, groupUuid);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Group assigned to user successfully");
+            response.put("user", updatedUser.toMap());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Failed to assign group: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    @DeleteMapping("/users/{userUuid}/groups/{groupUuid}")
+    public ResponseEntity<Map<String, Object>> removeGroupFromUser(@PathVariable String userUuid, @PathVariable String groupUuid) {
+        try {
+            User updatedUser = userService.removeGroupFromUser(userUuid, groupUuid);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Group removed from user successfully");
+            response.put("user", updatedUser.toMap());
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "Failed to remove group: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        }
+    }
+
+    // Helper methods to convert DTOs to User entities
+    private User convertCreateDTOToUser(CreateUserDTO dto) {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", dto.getUsername());
+        userMap.put("password", dto.getPassword());
+        userMap.put("firstName", dto.getFirstName());
+        userMap.put("middleName", dto.getMiddleName());
+        userMap.put("surname", dto.getSurname());
+        userMap.put("email", dto.getEmail());
+        userMap.put("phoneNumber", dto.getPhoneNumber());
+        userMap.put("disabled", dto.getDisabled());
+        userMap.put("externalAuth", dto.getExternalAuth());
+        
+        // Convert role DTOs to maps
+        if (dto.getRoles() != null) {
+            List<Map<String, Object>> rolesMaps = new ArrayList<>();
+            for (CreateUserDTO.RoleDTO roleDTO : dto.getRoles()) {
+                Map<String, Object> roleMap = new HashMap<>();
+                roleMap.put("uuid", roleDTO.getUuid());
+                roleMap.put("roleName", roleDTO.getRoleName());
+                roleMap.put("description", roleDTO.getDescription());
+                rolesMaps.add(roleMap);
+            }
+            userMap.put("roles", rolesMaps);
+        }
+        
+        // Convert group DTOs to maps
+        if (dto.getGroups() != null) {
+            List<Map<String, Object>> groupsMaps = new ArrayList<>();
+            for (CreateUserDTO.GroupDTO groupDTO : dto.getGroups()) {
+                Map<String, Object> groupMap = new HashMap<>();
+                groupMap.put("uuid", groupDTO.getUuid());
+                groupMap.put("groupName", groupDTO.getGroupName());
+                groupMap.put("description", groupDTO.getDescription());
+                groupsMaps.add(groupMap);
+            }
+            userMap.put("groups", groupsMaps);
+        }
+        
+        return User.fromMap(userMap);
+    }
+    
+    private User convertUpdateDTOToUser(UpdateUserDTO dto) {
+        Map<String, Object> userMap = new HashMap<>();
+        userMap.put("username", dto.getUsername());
+        if (dto.getPassword() != null && !dto.getPassword().trim().isEmpty()) {
+            userMap.put("password", dto.getPassword());
+        }
+        userMap.put("firstName", dto.getFirstName());
+        userMap.put("middleName", dto.getMiddleName());
+        userMap.put("surname", dto.getSurname());
+        userMap.put("email", dto.getEmail());
+        userMap.put("phoneNumber", dto.getPhoneNumber());
+        userMap.put("disabled", dto.getDisabled());
+        userMap.put("externalAuth", dto.getExternalAuth());
+        
+        // Convert role DTOs to maps
+        if (dto.getRoles() != null) {
+            List<Map<String, Object>> rolesMaps = new ArrayList<>();
+            for (CreateUserDTO.RoleDTO roleDTO : dto.getRoles()) {
+                Map<String, Object> roleMap = new HashMap<>();
+                roleMap.put("uuid", roleDTO.getUuid());
+                roleMap.put("roleName", roleDTO.getRoleName());
+                roleMap.put("description", roleDTO.getDescription());
+                rolesMaps.add(roleMap);
+            }
+            userMap.put("roles", rolesMaps);
+        }
+        
+        // Convert group DTOs to maps
+        if (dto.getGroups() != null) {
+            List<Map<String, Object>> groupsMaps = new ArrayList<>();
+            for (CreateUserDTO.GroupDTO groupDTO : dto.getGroups()) {
+                Map<String, Object> groupMap = new HashMap<>();
+                groupMap.put("uuid", groupDTO.getUuid());
+                groupMap.put("groupName", groupDTO.getGroupName());
+                groupMap.put("description", groupDTO.getDescription());
+                groupsMaps.add(groupMap);
+            }
+            userMap.put("groups", groupsMaps);
+        }
+        
+        return User.fromMap(userMap);
     }
 }

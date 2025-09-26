@@ -10,109 +10,14 @@
     </nz-breadcrumb>
 
     <div class="inner-content">
-      <!-- Filter Row -->
-      <!-- Filter Row -->
-      <div nz-row [nzGutter]="16" style="padding: 16px">
-        <!-- First Name Input -->
-        <div nz-col [nzSpan]="4">
-          <input
-            nz-input
-            placeholder="First Name"
-            [(ngModel)]="firstName"
-            class="sexy-input"
-            (ngModelChange)="filterData($event, 'firstName')"
-          />
+      <div nz-row style="padding: 16px" nzJustify="space-between" nzAlign="middle">
+        <div nz-col>
+          <h2>Users</h2>
         </div>
-
-        <!-- Facility Search Inputs -->
-        <div nz-col [nzSpan]="4">
-          <input
-            nz-input
-            placeholder="Facility"
-            [(ngModel)]="facilityFrom"
-            (ngModelChange)="filterData($event, 'referringFacility')"
-            class="sexy-input"
-          />
-        </div>
-
-        <!-- Client ID Input -->
-        <div nz-col [nzSpan]="4">
-          <input
-            nz-input
-            placeholder="Referral Number"
-            [(ngModel)]="referralNumber"
-            (ngModelChange)="filterData($event, 'referralNumber')"
-            class="sexy-input"
-          />
-        </div>
-
-        <!-- Client ID Input -->
-        <div nz-col [nzSpan]="4">
-          <input
-            nz-input
-            placeholder="Client ID"
-            [(ngModel)]="clientId"
-            (ngModelChange)="filterData($event, 'clientId')"
-            class="sexy-input"
-          />
-        </div>
-
-        <!-- Date Filters -->
-        <div nz-col [nzSpan]="4">
-          <nz-date-picker
-            style="width: 100%; width: 100% !important"
-            nzPlaceHolder="Start Date"
-            [(ngModel)]="startDate"
-            (ngModelChange)="filterData($event, 'startDate')"
-            class="sexy-input"
-          ></nz-date-picker>
-        </div>
-        <div nz-col [nzSpan]="4">
-          <nz-date-picker
-            style="width: 100%; width: 100% !important"
-            nzPlaceHolder="End Date"
-            [(ngModel)]="endDate"
-            (ngModelChange)="filterData($event, 'endDate')"
-            class="sexy-input"
-          ></nz-date-picker>
-        </div>
-
-        <div nz-col [nzSpan]="4">
-          <br />
-
-          <nz-select
-            ngModel="gender"
-            style="width: 100%"
-            nzAllowClear
-            nzPlaceHolder="Select a gender"
-            (ngModelChange)="filterData($event, 'gender')"
-          >
-            <nz-option nzValue="male" nzLabel="Male"></nz-option>
-            <nz-option nzValue="female" nzLabel="Female"></nz-option>
-          </nz-select>
-        </div>
-
-        <!-- Apply Filters Button -->
-        <div nz-col [nzSpan]="1.5">
-          <br />
-          <button
-            nz-button
-            nzType="primary"
-            (click)="applyFilters()"
-            class="apply-button"
-          >
-            Search
-          </button>
-        </div>
-
-        <div nz-col [nzSpan]="1">
-          <br />
-          <button
-            nz-button
-            nzType="default"
-            (click)="resetFilters()"
-          >
-            Reset
+        <div nz-col>
+          <button nz-button nzType="primary" (click)="showCreateModal()">
+            <i nz-icon nzType="plus"></i>
+            Create User
           </button>
         </div>
       </div>
@@ -121,52 +26,51 @@
       <div nz-row>
         <div style="padding: 0 16px 16px; width: 100%">
           <nz-table
-            nzShowSizeChanger
-            [nzData]="referrals"
-            [nzFrontPagination]="false"
+            [nzData]="users"
             [nzLoading]="loading"
-            [nzTotal]="total"
-            [nzPageSize]="pageSize"
-            [nzPageIndex]="pageIndex"
-            (nzQueryParams)="onQueryParamsChange($event)"
+            [nzFrontPagination]="false"
+            [nzShowPagination]="false"
           >
             <thead>
               <tr>
                 <th>SN</th>
-                <th>Client ID</th>
-                <th>First name</th>
-                <th>Middle name</th>
-                <th>Last name</th>
-                <th>Gender</th>
-                <th>National ID</th>
-                <th>Action</th>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Roles</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              @for (referral of referrals; track referral.client_id; let i =
-              $index) {
+              @for (user of users; track user.uuid; let i = $index) {
               <tr>
+                <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.firstName }} {{ user.middleName }} {{ user.surname }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.phoneNumber }}</td>
                 <td>
-                  {{
-                    pageIndex === 1 ? i + 1 : (pageIndex - 1) * pageSize + i + 1
-                  }}
+                  <span *ngFor="let role of user.roles; let isLast = last">
+                    {{ role.roleName }}{{ !isLast ? ', ' : '' }}
+                  </span>
                 </td>
                 <td>
-                  <span style="color: #1890ff">{{ referral.client_id }}</span>
+                  <nz-tag [nzColor]="user.disabled ? 'red' : 'green'">
+                    {{ user.disabled ? 'Disabled' : 'Active' }}
+                  </nz-tag>
                 </td>
-                <td>{{ referral.first_name }}</td>
-                <td> {{ referral.mname }}</td>
-                <td>{{ referral.surname }}</td>
-                <td>{{ referral.gender | titlecase }}</td>
-                <td>{{ referral.nida | titlecase }}</td>
                 <td>
-                  <button
-                    nz-button
-                    nzType="text"
-                    class="view-button"
-                    (click)="viewClientDetails(referral.client_id)"
-                  >
-                    View
+                  <button nz-button nzType="link" (click)="viewUserDetails(user)" [disabled]="loading">
+                    <i nz-icon nzType="eye"></i> View
+                  </button>
+                  <button nz-button nzType="link" (click)="editUser(user)" [disabled]="loading">
+                    <i nz-icon nzType="edit"></i> Edit
+                  </button>
+                  <button nz-button nzType="link" nzDanger 
+                          (click)="deleteUser(user)" [disabled]="loading">
+                    <i nz-icon nzType="delete"></i> Delete
                   </button>
                 </td>
               </tr>
@@ -175,6 +79,285 @@
           </nz-table>
         </div>
       </div>
+
+      <!-- Pagination -->
+      <div nz-row style="padding: 0 16px 16px">
+        <div nz-col [nzSpan]="24" style="text-align: center">
+          <nz-pagination
+            [nzPageIndex]="pageIndex"
+            [nzPageSize]="pageSize"
+            [nzTotal]="total"
+            [nzShowSizeChanger]="true"
+            [nzPageSizeOptions]="[10, 20, 50, 100]"
+            (nzPageIndexChange)="onPageChange($event)"
+            (nzPageSizeChange)="onPageSizeChange($event)">
+          </nz-pagination>
+        </div>
+      </div>
     </div>
+
+    <!-- Create User Modal -->
+    <nz-modal
+      [(nzVisible)]="isCreateModalVisible"
+      nzTitle="Create New User"
+      (nzOnCancel)="handleCancel()"
+      [nzFooter]="null"
+      nzWidth="600px">
+      <ng-container *nzModalContent>
+        <form nz-form [formGroup]="createUserForm" (ngSubmit)="createUser()" nzLayout="vertical" class="user-form">
+        <nz-form-item>
+          <nz-form-label nzRequired>Username</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a username (minimum 3 characters)">
+            <input nz-input formControlName="username" placeholder="Enter username (min 3 characters)" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>First Name</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter first name (minimum 2 characters)">
+            <input nz-input formControlName="firstName" placeholder="Enter first name" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Middle Name</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="middleName" placeholder="Enter middle name" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>Surname</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter surname (minimum 2 characters)">
+            <input nz-input formControlName="surname" placeholder="Enter surname" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Email</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a valid email">
+            <input nz-input formControlName="email" placeholder="Enter email" type="email" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Phone Number</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a valid phone number (e.g., +255712345678)">
+            <input nz-input formControlName="phoneNumber" placeholder="Enter phone number (e.g., +255712345678)" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>Password</nz-form-label>
+          <nz-form-control nzErrorTip="Password must be at least 6 characters long">
+            <input nz-input type="password" formControlName="password" placeholder="Enter password (min 6 characters)" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Roles</nz-form-label>
+          <nz-form-control>
+            <nz-select nzMode="multiple" formControlName="roles" placeholder="Select roles">
+              <nz-option *ngFor="let role of availableRoles" [nzValue]="role.uuid" [nzLabel]="role.roleName"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Privileges</nz-form-label>
+          <nz-form-control>
+            <nz-select nzMode="multiple" formControlName="privileges" placeholder="Select privileges">
+              <nz-option *ngFor="let privilege of availablePrivileges" [nzValue]="privilege.uuid" [nzLabel]="privilege.name"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Groups</nz-form-label>
+          <nz-form-control>
+            <nz-select nzMode="multiple" formControlName="groups" placeholder="Select groups">
+              <nz-option *ngFor="let group of availableGroups" [nzValue]="group.uuid" [nzLabel]="group.name"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control>
+            <label nz-checkbox formControlName="disabled">Disabled</label>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control>
+            <div class="action-buttons">
+              <button nz-button (click)="handleCancel()" [disabled]="loading">Cancel</button>
+              <button nz-button nzType="primary" [nzLoading]="loading" [disabled]="!createUserForm.valid || loading">Create User</button>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+        </form>
+      </ng-container>
+    </nz-modal>
+
+    <!-- Edit User Modal -->
+    <nz-modal
+      [(nzVisible)]="isEditModalVisible"
+      nzTitle="Edit User"
+      (nzOnCancel)="handleCancel()"
+      [nzFooter]="null"
+      nzWidth="600px">
+      <ng-container *nzModalContent>
+        <form nz-form [formGroup]="editUserForm" (ngSubmit)="updateUser()" nzLayout="vertical" class="user-form">
+        <nz-form-item>
+          <nz-form-label nzRequired>Username</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a username (minimum 3 characters)">
+            <input nz-input formControlName="username" placeholder="Enter username (min 3 characters)" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>First Name</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter first name (minimum 2 characters)">
+            <input nz-input formControlName="firstName" placeholder="Enter first name" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Middle Name</nz-form-label>
+          <nz-form-control>
+            <input nz-input formControlName="middleName" placeholder="Enter middle name" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label nzRequired>Surname</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter surname (minimum 2 characters)">
+            <input nz-input formControlName="surname" placeholder="Enter surname" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Email</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a valid email">
+            <input nz-input formControlName="email" placeholder="Enter email" type="email" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Phone Number</nz-form-label>
+          <nz-form-control nzErrorTip="Please enter a valid phone number (e.g., +255712345678)">
+            <input nz-input formControlName="phoneNumber" placeholder="Enter phone number (e.g., +255712345678)" />
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Roles</nz-form-label>
+          <nz-form-control>
+            <nz-select nzMode="multiple" formControlName="roles" placeholder="Select roles">
+              <nz-option *ngFor="let role of availableRoles" [nzValue]="role.uuid" [nzLabel]="role.roleName"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Privileges</nz-form-label>
+          <nz-form-control>
+            <nz-select nzMode="multiple" formControlName="privileges" placeholder="Select privileges">
+              <nz-option *ngFor="let privilege of availablePrivileges" [nzValue]="privilege.uuid" [nzLabel]="privilege.name"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-label>Groups</nz-form-label>
+          <nz-form-control>
+            <nz-select nzMode="multiple" formControlName="groups" placeholder="Select groups">
+              <nz-option *ngFor="let group of availableGroups" [nzValue]="group.uuid" [nzLabel]="group.name"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control>
+            <label nz-checkbox formControlName="disabled">Disabled</label>
+          </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+          <nz-form-control>
+            <div class="action-buttons">
+              <button nz-button (click)="handleCancel()" [disabled]="loading">Cancel</button>
+              <button nz-button nzType="primary" [nzLoading]="loading" [disabled]="!editUserForm.valid || loading">Update User</button>
+            </div>
+          </nz-form-control>
+        </nz-form-item>
+        </form>
+      </ng-container>
+    </nz-modal>
+
+    <!-- User Details Modal -->
+    <nz-modal
+      [(nzVisible)]="isDetailModalVisible"
+      nzTitle="User Details"
+      (nzOnCancel)="handleCancel()"
+      [nzFooter]="null"
+      nzWidth="500px">
+      <ng-container *nzModalContent>
+        <div *ngIf="selectedUser" class="user-details-content">
+          <div class="user-basic-info">
+            <h4>Basic Information</h4>
+            <p><strong>Username:</strong> {{ selectedUser.username }}</p>
+            <p><strong>Full Name:</strong> {{ selectedUser.firstName }} {{ selectedUser.middleName || '' }} {{ selectedUser.surname }}</p>
+            <p><strong>Email:</strong> {{ selectedUser.email || 'Not provided' }}</p>
+            <p><strong>Phone:</strong> {{ selectedUser.phoneNumber || 'Not provided' }}</p>
+            <p><strong>Status:</strong> 
+              <nz-tag [nzColor]="selectedUser.disabled ? 'red' : 'green'">
+                {{ selectedUser.disabled ? 'Disabled' : 'Active' }}
+              </nz-tag>
+            </p>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div class="user-roles-info" *ngIf="selectedUser.roles && selectedUser.roles.length > 0">
+            <h4>Roles</h4>
+            <div class="tags-container">
+              <nz-tag *ngFor="let role of selectedUser.roles" nzColor="blue">
+                {{ role.roleName }}
+              </nz-tag>
+            </div>
+          </div>
+
+          <div class="user-groups-info" *ngIf="selectedUser.groups && selectedUser.groups.length > 0">
+            <h4>Groups</h4>
+            <div class="tags-container">
+              <nz-tag *ngFor="let group of selectedUser.groups" nzColor="green">
+                {{ group.name }}
+              </nz-tag>
+            </div>
+          </div>
+
+          <div class="user-authorities-info" *ngIf="selectedUser.authorities && selectedUser.authorities.length > 0">
+            <h4>Authorities</h4>
+            <div class="authorities-list">
+              <nz-tag *ngFor="let authority of selectedUser.authorities.slice(0, 10)" nzColor="orange" class="authority-tag">
+                {{ authority }}
+              </nz-tag>
+              <nz-tag *ngIf="selectedUser.authorities.length > 10" nzColor="default">
+                +{{ selectedUser.authorities.length - 10 }} more
+              </nz-tag>
+            </div>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div class="user-meta-info">
+            <h4>System Information</h4>
+            <p><strong>UUID:</strong> <code>{{ selectedUser.uuid }}</code></p>
+            <p *ngIf="selectedUser.externalAuth"><strong>External Auth:</strong> {{ selectedUser.externalAuth ? 'Yes' : 'No' }}</p>
+          </div>
+        </div>
+      </ng-container>
+    </nz-modal>
   </nz-content>
 </nz-layout>

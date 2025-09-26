@@ -5,7 +5,6 @@ import { HDUAPIClientDetails } from '../../models';
 import { ClientManagementService } from '../../services/client-management.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 import { debounceTime, Subject, Subscription, switchMap } from 'rxjs';
-import { SearchBarComponent } from '../../../../../../../../libs/search-bar/src/lib/search-bar/search-bar.component';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
@@ -19,9 +18,6 @@ import { FormsModule } from '@angular/forms';
   imports: [
     SharedModule,
     RouterModule,
-    SearchBarComponent,
-    RouterModule,
-    SearchBarComponent,
     NzInputModule,
     FormsModule,
     NzSelectModule,

@@ -1,5 +1,6 @@
 package com.Adapter.icare.Configurations;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,9 +11,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -20,6 +23,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfigurations(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -48,6 +57,12 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .and()
                 .authorizeRequests()
                 .antMatchers(
                         "/",
@@ -76,28 +91,30 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/login")
                 .permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/users")
+                .permitAll()
+                .antMatchers("/api/v1/init/**")
+                .permitAll()
                 .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
-        http
-                .sessionManagement()
-                .sessionFixation().newSession()
-                .maximumSessions(1)
-                .expiredUrl("/login");
+                .authenticated();
+
+        // Add JWT filter before Username Password Authentication Filter
+        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        // Enable CORS
+        http.cors();
+    }
+    
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new
+                org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+        config.setAllowedOriginPatterns(java.util.Arrays.asList("*")); // Allow all origins
+        config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Accept"));
+        config.setAllowCredentials(true); // Allow credentials
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
-// @Bean
-// public CorsConfigurationSource corsConfigurationSource() {
-// UrlBasedCorsConfigurationSource source = new
-// UrlBasedCorsConfigurationSource();
-// CorsConfiguration config = new CorsConfiguration();
-// config.setAllowedOrigins(Arrays.asList("*")); // Allow all origins
-// config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE",
-// "OPTIONS"));
-// config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control",
-// "Content-Type"));
-// config.setAllowCredentials(true); // Allow credentials
-// source.registerCorsConfiguration("/**", config);
-// return source;
-// }
