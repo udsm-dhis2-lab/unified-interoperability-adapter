@@ -1,30 +1,135 @@
-.logo {
-  margin: 3vw;
-  height: 100px;
-  width: 120px;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-.login-form {
-  width: 300px;
-}
-
-.login-form-margin {
-  margin-bottom: 16px;
-}
-
-.full-height {
-  height: 100%;
-}
-
-.login-form-button {
+/* Full height container - ensure it works in apps shell */
+:host {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  margin-bottom: 16px;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+/* Main login container */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  box-sizing: border-box;
+  max-width: 400px;
+  width: 100%;
+}
+
+/* Logo section */
+.logo {
+  margin-bottom: 32px;
+  text-align: center;
+  height: 80px;
+  width: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #1890ff;
+  border-radius: 8px;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* Form title */
+.form-title {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.form-title h2 {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+/* Login form styling */
+.login-form {
+  width: 100%;
+  max-width: 320px;
+  background: #fff;
+  padding: 32px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Form items spacing */
+.login-form .ant-form-item {
+  margin-bottom: 24px;
+}
+
+.login-form .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Input styling */
+.login-form .ant-input {
+  height: 40px;
+  border-radius: 6px;
+}
+
+.login-form .ant-input-affix-wrapper {
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+
+/* Button styling */
+.login-form-button {
+  width: 100%;
+  height: 40px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+}
+
+/* Alert styling */
+.login-form .ant-alert {
+  border-radius: 6px;
+  margin-top: 16px;
+}
+
+/* Responsive design */
+@media (max-width: 576px) {
+  .login-container {
+    padding: 16px;
+  }
+  
+  .login-form {
+    max-width: 100%;
+    padding: 24px;
+  }
+  
+  .logo {
+    height: 64px;
+    width: 64px;
+    font-size: 20px;
+  }
+  
+  .form-title h2 {
+    font-size: 20px;
+  }
+}
+
+/* Loading state */
+.login-form .ant-spin-container {
+  width: 100%;
 }

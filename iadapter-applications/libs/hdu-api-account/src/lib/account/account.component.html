@@ -1,0 +1,170 @@
+<div class="account-container">
+  <nz-card class="account-card" nzTitle="Account Settings">
+    <div class="account-header">
+      <nz-avatar
+        [nzSize]="80"
+        [nzText]="userInitials"
+        class="user-avatar"
+        [style.background]="'#1890ff'"
+      ></nz-avatar>
+      <div class="user-info">
+        <h2>{{ currentUser?.displayName }}</h2>
+        <p class="username">@{{ currentUser?.username }}</p>
+        <div class="user-roles" *ngIf="currentUser?.roles?.length">
+          <nz-tag 
+            *ngFor="let role of currentUser?.roles" 
+            [nzColor]="'blue'"
+          >
+            {{ role.name || role.rolename }}
+          </nz-tag>
+        </div>
+      </div>
+    </div>
+
+    <nz-divider></nz-divider>
+
+    <!-- Profile Information -->
+    <div class="profile-section">
+      <div class="section-header">
+        <h3>Profile Information</h3>
+        <button 
+          *ngIf="!isEditing"
+          nz-button
+          nzType="default" 
+          nzSize="small"
+          (click)="toggleEdit()"
+        >
+          <span nz-icon nzType="edit"></span>
+          Edit Profile
+        </button>
+      </div>
+
+      <form nz-form [formGroup]="accountForm" *ngIf="currentUser">
+        <div nz-row [nzGutter]="16">
+          <div nz-col [nzSpan]="12">
+            <nz-form-item>
+              <nz-form-label nzRequired>First Name</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter your first name">
+                <input 
+                  nz-input 
+                  formControlName="firstName"
+                  [readonly]="!isEditing"
+                  placeholder="Enter first name"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          
+          <div nz-col [nzSpan]="12">
+            <nz-form-item>
+              <nz-form-label nzRequired>Last Name</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter your last name">
+                <input 
+                  nz-input 
+                  formControlName="lastName"
+                  [readonly]="!isEditing"
+                  placeholder="Enter last name"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+
+        <div nz-row [nzGutter]="16">
+          <div nz-col [nzSpan]="12">
+            <nz-form-item>
+              <nz-form-label>Username</nz-form-label>
+              <nz-form-control>
+                <input 
+                  nz-input 
+                  formControlName="username"
+                  readonly
+                  placeholder="Username"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+          
+          <div nz-col [nzSpan]="12">
+            <nz-form-item>
+              <nz-form-label nzRequired>Email</nz-form-label>
+              <nz-form-control nzErrorTip="Please enter a valid email address">
+                <input 
+                  nz-input 
+                  formControlName="email"
+                  [readonly]="!isEditing"
+                  placeholder="Enter email address"
+                  type="email"
+                />
+              </nz-form-control>
+            </nz-form-item>
+          </div>
+        </div>
+
+        <div class="form-actions" *ngIf="isEditing">
+          <button nz-button nzType="default" (click)="toggleEdit()">
+            Cancel
+          </button>
+          <button 
+            nz-button
+            nzType="primary" 
+            (click)="saveProfile()"
+            [nzLoading]="false"
+          >
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <nz-divider></nz-divider>
+
+    <!-- Security Section -->
+    <div class="security-section">
+      <h3>Security</h3>
+      <div class="security-item">
+        <div class="security-info">
+          <h4>Password</h4>
+          <p>Change your password to keep your account secure</p>
+        </div>
+        <button nz-button nzType="default" (click)="changePassword()">
+          <span nz-icon nzType="lock"></span>
+          Change Password
+        </button>
+      </div>
+    </div>
+
+    <!-- User Details Section -->
+    <nz-divider></nz-divider>
+    
+    <div class="details-section">
+      <h3>Account Details</h3>
+      <div class="detail-row">
+        <span class="detail-label">User ID:</span>
+        <span class="detail-value">{{ currentUser?.uuid }}</span>
+      </div>
+      <div class="detail-row" *ngIf="currentUser?.groups?.length">
+        <span class="detail-label">Groups:</span>
+        <div class="detail-value">
+          <nz-tag 
+            *ngFor="let group of currentUser?.groups" 
+            [nzColor]="'green'"
+          >
+            {{ group.name }}
+          </nz-tag>
+        </div>
+      </div>
+      <div class="detail-row" *ngIf="currentUser?.authorities?.length">
+        <span class="detail-label">Authorities:</span>
+        <div class="detail-value authorities-list">
+          <nz-tag 
+            *ngFor="let authority of currentUser?.authorities" 
+            [nzColor]="'purple'"
+          >
+            {{ authority }}
+          </nz-tag>
+        </div>
+      </div>
+    </div>
+  </nz-card>
+</div>

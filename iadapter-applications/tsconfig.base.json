@@ -19,6 +19,9 @@
     "baseUrl": ".",
     "typeRoots": ["node_modules/@types", "index.d.ts"],
     "paths": {
+      "@iadapter-applications/hdu-api-account": [
+        "libs/hdu-api-account/src/index.ts"
+      ],
       "@iadapter-applications/hdu-api-http-client": [
         "libs/hdu-api-http-client/src/index.ts"
       ],

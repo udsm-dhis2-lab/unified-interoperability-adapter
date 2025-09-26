@@ -1,5 +1,6 @@
 import { Route } from '@angular/router';
 import { AuthGuard } from '../../../../libs/shared/guards/auth.guard';
+import { AccountComponent } from '../../../../libs/hdu-api-account/src/lib/account/account.component';
 
 export const appRoutes: Route[] = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -7,6 +8,11 @@ export const appRoutes: Route[] = [
     path: 'login',
     loadChildren: () =>
       import('../../../login/src/app/modules/home/home.module').then((m) => m.HomeModule),
+  },
+  {
+    path: 'account',
+    component: AccountComponent,
+    canActivate: [AuthGuard],
   },
   {
     path: 'dashboard',

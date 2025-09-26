@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { HduHttpService } from '../../../../hdu-api-http-client/src/index';
+import { HduHttpService } from '@iadapter-applications/hdu-api-http-client';
 import { User } from './models/user.model';
 
 @Injectable({
@@ -20,7 +20,7 @@ export class AuthService {
   login(credentials: { username: string; password: string }): Observable<User> {
     return this.hduHttpService
       .post<User>('login', credentials)
-      .pipe(tap((user) => this.currentUserSubject.next(user)));
+      .pipe(tap((user: User) => this.currentUserSubject.next(user)));
   }
 
   logout(): Observable<unknown> {
@@ -35,6 +35,6 @@ export class AuthService {
   fetchCurrentUser(): Observable<User> {
     return this.hduHttpService
       .get<User>('me')
-      .pipe(tap((user) => this.currentUserSubject.next(user)));
+      .pipe(tap((user: User) => this.currentUserSubject.next(user)));
   }
 }

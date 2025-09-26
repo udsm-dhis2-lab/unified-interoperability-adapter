@@ -93,14 +93,14 @@
                 {{ data?.nextRun | date : 'medium' }}
             </td>
             <td>
-                <nz-button-group>
+                <nz-space-compact>
                     <button [disabled]="data && !data.task" nz-button (click)="onViewLogs(data)">
                         View Logs
                     </button>
                     <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
                         <span nz-icon nzType="ellipsis"></span>
                     </button>
-                </nz-button-group>
+                </nz-space-compact>
                 <nz-dropdown-menu #menu1="nzDropdownMenu">
                     <ul nz-menu>
                         <li (click)="onEditSchedule(data)" nz-menu-item>

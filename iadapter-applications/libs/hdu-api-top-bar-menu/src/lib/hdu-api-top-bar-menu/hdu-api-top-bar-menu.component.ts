@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
@@ -33,7 +34,8 @@ export class HduApiTopBarMenuComponent implements OnInit {
 
   constructor(
     private sideMenuService: SideMenuService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   applicationIcon = 'assets/images/logo.png';
@@ -53,12 +55,26 @@ export class HduApiTopBarMenuComponent implements OnInit {
     });
   }
 
+  goToAccount() {
+    this.router.navigate(['/account']);
+  }
+
   logOut() {
     this.authService.logout().subscribe({
       next: () => {
+        // Clear any stored tokens/data
+        localStorage.clear();
+        sessionStorage.clear();
+        // Redirect to login
         window.location.href = '/login';
       },
-      error: (error) => {},
+      error: (error) => {
+        console.error('Logout error:', error);
+        // Even if logout API fails, clear local data and redirect
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = '/login';
+      },
     });
   }
 }

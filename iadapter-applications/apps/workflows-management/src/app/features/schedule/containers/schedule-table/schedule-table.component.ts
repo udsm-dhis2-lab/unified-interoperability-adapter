@@ -25,6 +25,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { select, Store } from '@ngrx/store';
@@ -91,6 +92,7 @@ interface Setting {
     NzModalModule,
     NzCollapseModule,
     NzDropDownModule,
+    NzSpaceModule,
     NzTagModule,
     NzGridModule,
     ScheduleRunLoggingComponent,
