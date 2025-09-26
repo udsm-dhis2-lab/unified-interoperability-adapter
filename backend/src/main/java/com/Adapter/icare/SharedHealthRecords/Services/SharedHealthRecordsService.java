@@ -8,6 +8,7 @@ import ca.uhn.fhir.rest.api.SortSpec;
 import ca.uhn.fhir.rest.api.SummaryEnum;
 import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
+import ca.uhn.fhir.rest.gclient.StringClientParam;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
 
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
@@ -119,7 +120,7 @@ public class SharedHealthRecordsService {
         Bundle clientTotalBundle = new Bundle();
         List<Encounter> encounters = new ArrayList<>();
         var searchRecords = fhirClient.search().forResource(Patient.class);
-
+        searchRecords.where(new StringClientParam("_has:Encounter:patient:status").matches().value("planned,in-progress,onleave,finished,cancelled,entered-in-error,unknown"));
         searchRecords.sort().descending("_lastUpdated");
 
         try {
@@ -215,30 +216,96 @@ public class SharedHealthRecordsService {
             }
 
             if (!response.getEntry().isEmpty()) {
+                Organization organization = new Organization();
+                if (hfrCode != null) {
+                    try {
+                        Bundle bundle = new Bundle();
+                        bundle = fhirClient.search()
+                                .forResource(Organization.class)
+                                .where(Organization.IDENTIFIER.exactly()
+                                        .identifier(hfrCode))
+                                .returnBundle(Bundle.class).execute();
+                        for (Bundle.BundleEntryComponent bundleEntryComponent : bundle
+                                .getEntry()) {
+                            if (bundleEntryComponent
+                                    .getResource() instanceof Organization) {
+                                organization = (Organization) bundleEntryComponent
+                                        .getResource();
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
                 for (Bundle.BundleEntryComponent entry : response.getEntry()) {
                     if (entry.getResource() instanceof Patient) {
                         Patient patient = (Patient) entry.getResource();
-                        Organization organization = new Organization();
-                        if (hfrCode != null) {
-                            try {
-                                Bundle bundle = new Bundle();
-                                bundle = fhirClient.search()
-                                        .forResource(Organization.class)
-                                        .where(Organization.IDENTIFIER.exactly()
-                                                .identifier(hfrCode))
-                                        .returnBundle(Bundle.class).execute();
-                                for (Bundle.BundleEntryComponent bundleEntryComponent : bundle
-                                        .getEntry()) {
-                                    if (bundleEntryComponent
-                                            .getResource() instanceof Organization) {
-                                        organization = (Organization) bundleEntryComponent
-                                                .getResource();
-                                    }
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+
+                        PatientDTO patientDTO = this.clientRegistryService
+                                .mapToPatientDTO(patient);
+
+                        List<Coverage> coverages = this.clientRegistryService
+                                .getCoveragesByPatientIdAndOrDependent(patient.getIdElement()
+                                        .getIdPart(), null);;
+
+                        patientDTO = this.clientRegistryService
+                                .mapToPatientDTO(patient);
+
+                        // TODO: Add payment details for patient
+                        // List<PaymentDetailsDTO> paymentDetailsDTOs = new
+                        // ArrayList<>();
+                        // if (coverages.size() > 0) {
+                        // paymentDetailsDTOs = coverages.stream().map(coverage
+                        // ->
+                        // this.clientRegistryService.mapToPaymentDetails(coverage)).collect(Collectors.toList());
+                        // }
+                        List<VisitMainPaymentDetailsDTO> visitMainPaymentDetailsDTOS = new ArrayList<>();
+                        if (!coverages.isEmpty()) {
+                            visitMainPaymentDetailsDTOS = coverages.stream()
+                                    .map(this.clientRegistryService::mapToMainVisitPaymentDetails)
+                                    .collect(Collectors.toList());
                         }
+                        // patientDTO.setPaymentDetails(paymentDetailsDTOs);
+                        String nationality = getNestedExtensionValueString(
+                                patient,
+                                "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions",
+                                "nationality");
+                        String occupation = getNestedExtensionValueString(
+                                patient,
+                                "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions",
+                                "occupation");
+                        patientDTO.setOccupation(occupation);
+                        patientDTO.setNationality(nationality);
+
+                        List<PaymentDetailsDTO> paymentDetailsDTOList = new ArrayList<>();
+                        var paymentDetailsCoverages = this.clientRegistryService
+                                .getCoveragesByPatientIdAndOrDependent(patient.getIdElement()
+                                        .getIdPart(), "demographicPayment");
+
+                        for(Coverage coverage: paymentDetailsCoverages){
+                            PaymentDetailsDTO paymentDetailsDTO = new PaymentDetailsDTO();
+
+                            paymentDetailsDTO.setName(coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasName() ? coverage.getClass_().get(0).getName() : null);
+
+                            paymentDetailsDTO.setType(coverage.hasType() && coverage.getType().hasCoding() && !coverage.getType().getCoding().isEmpty() ? coverage.getType().getCoding().get(0).getCode() : null);
+
+                            paymentDetailsDTO.setShortName(
+                                    coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasValue() ? coverage.getClass_().get(0).getValue() : null
+                            );
+                            paymentDetailsDTO.setInsuranceId(coverage.hasSubscriberId() ? coverage.getSubscriberId() : null);
+
+                            paymentDetailsDTO.setInsuranceCode(coverage.hasPayor() && !coverage.getPayor().isEmpty() && coverage.getPayor().get(0).hasIdentifier() && coverage.getPayor().get(0).getIdentifier().hasValue() ? coverage.getPayor().get(0).getIdentifier().getValue() : null);
+
+                            paymentDetailsDTO.setPolicyNumber(getNestedExtensionValueString(coverage, "http://fhir.moh.go.tz/fhir/StructureDefinition/coverage-extension", "policyNumber"));
+                            paymentDetailsDTO.setGroupNumber(getNestedExtensionValueString(coverage, "http://fhir.moh.go.tz/fhir/StructureDefinition/coverage-extension", "groupNumber"));
+
+                            paymentDetailsDTOList.add(paymentDetailsDTO);
+                        }
+
+                        patientDTO.setPaymentDetails(paymentDetailsDTOList);
+
+
 
                         // TODO: Add logic to handle number of visits. Latest visit is primary
                         // and the
@@ -254,14 +321,16 @@ public class SharedHealthRecordsService {
                                 // Get encounter organisation
 
                                 // if organisation is null then do this
-                                IIdType organisationReference = encounter
-                                        .getServiceProvider()
-                                        .getReferenceElement();
-                                organization = fhirClient.read()
-                                        .resource(Organization.class)
-                                        .withId(organisationReference
-                                                .getIdPart())
-                                        .execute();
+                                if(organization == null){
+                                    IIdType organisationReference = encounter
+                                            .getServiceProvider()
+                                            .getReferenceElement();
+                                    organization = fhirClient.read()
+                                            .resource(Organization.class)
+                                            .withId(organisationReference
+                                                    .getIdPart())
+                                            .execute();
+                                }
                                 // Bundle ouBundle =
                                 // fhirClient.search().forResource(Organization.class).where(Organization.IDENTIFIER.exactly().code(organisationReference.getIdPart())).returnBundle(Bundle.class).execute();
                                 // if (ouBundle.hasEntry()) {
@@ -277,41 +346,12 @@ public class SharedHealthRecordsService {
                                 // }
                                 // }
                                 // }
-                                PatientDTO patientDTO = this.clientRegistryService
-                                        .mapToPatientDTO(patient);
-                                List<Coverage> coverages = this.clientRegistryService
-                                        .getCoveragesByPatientIdAndOrDependent(patient.getIdElement()
-                                                .getIdPart(), null);
-                                // TODO: Add payment details for patient
-                                // List<PaymentDetailsDTO> paymentDetailsDTOs = new
-                                // ArrayList<>();
-                                // if (coverages.size() > 0) {
-                                // paymentDetailsDTOs = coverages.stream().map(coverage
-                                // ->
-                                // this.clientRegistryService.mapToPaymentDetails(coverage)).collect(Collectors.toList());
-                                // }
-                                List<VisitMainPaymentDetailsDTO> visitMainPaymentDetailsDTOS = new ArrayList<>();
-                                if (!coverages.isEmpty()) {
-                                    visitMainPaymentDetailsDTOS = coverages.stream()
-                                            .map(this.clientRegistryService::mapToMainVisitPaymentDetails)
-                                            .collect(Collectors.toList());
-                                }
-                                // patientDTO.setPaymentDetails(paymentDetailsDTOs);
                                 templateData.setVisitMainPaymentDetails(
                                         !visitMainPaymentDetailsDTOS.isEmpty()
                                                 ? visitMainPaymentDetailsDTOS
                                                 .get(0)
                                                 : null);
-                                String nationality = getNestedExtensionValueString(
-                                        patient,
-                                        "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions",
-                                        "nationality");
-                                String occupation = getNestedExtensionValueString(
-                                        patient,
-                                        "http://fhir.moh.go.tz/fhir/StructureDefinition/patient-extensions",
-                                        "occupation");
-                                patientDTO.setOccupation(occupation);
-                                patientDTO.setNationality(nationality);
+
                                 String mrn = patientDTO.getMRN(organization
                                         .getIdElement().getIdPart());
                                 templateData.setMrn(mrn);
@@ -320,32 +360,6 @@ public class SharedHealthRecordsService {
                                         .getIdPart()
                                         : null;
 
-                                List<PaymentDetailsDTO> paymentDetailsDTOList = new ArrayList<>();
-                                var paymentDetailsCoverages = this.clientRegistryService
-                                        .getCoveragesByPatientIdAndOrDependent(patient.getIdElement()
-                                                .getIdPart(), "demographicPayment");
-
-                                for(Coverage coverage: paymentDetailsCoverages){
-                                    PaymentDetailsDTO paymentDetailsDTO = new PaymentDetailsDTO();
-
-                                    paymentDetailsDTO.setName(coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasName() ? coverage.getClass_().get(0).getName() : null);
-
-                                    paymentDetailsDTO.setType(coverage.hasType() && coverage.getType().hasCoding() && !coverage.getType().getCoding().isEmpty() ? coverage.getType().getCoding().get(0).getCode() : null);
-
-                                    paymentDetailsDTO.setShortName(
-                                            coverage.hasClass_() && !coverage.getClass_().isEmpty() && coverage.getClass_().get(0).hasValue() ? coverage.getClass_().get(0).getValue() : null
-                                    );
-                                    paymentDetailsDTO.setInsuranceId(coverage.hasSubscriberId() ? coverage.getSubscriberId() : null);
-
-                                    paymentDetailsDTO.setInsuranceCode(coverage.hasPayor() && !coverage.getPayor().isEmpty() && coverage.getPayor().get(0).hasIdentifier() && coverage.getPayor().get(0).getIdentifier().hasValue() ? coverage.getPayor().get(0).getIdentifier().getValue() : null);
-
-                                    paymentDetailsDTO.setPolicyNumber(getNestedExtensionValueString(coverage, "http://fhir.moh.go.tz/fhir/StructureDefinition/coverage-extension", "policyNumber"));
-                                    paymentDetailsDTO.setGroupNumber(getNestedExtensionValueString(coverage, "http://fhir.moh.go.tz/fhir/StructureDefinition/coverage-extension", "groupNumber"));
-
-                                    paymentDetailsDTOList.add(paymentDetailsDTO);
-                                }
-
-                                patientDTO.setPaymentDetails(paymentDetailsDTOList);
 
                                 templateData.setDemographicDetails(patientDTO.toMap());
                                 templateData.setPaymentDetails(this
@@ -398,11 +412,19 @@ public class SharedHealthRecordsService {
                                                 ? encounter.getPeriod()
                                                 .getEnd()
                                                 : null);
+
+                                VisitType visitType;
+                                try {
+                                    visitType = VisitType.fromString(encounter.getType()
+                                            .get(0)
+                                            .getText());
+                                } catch (Exception e){
+                                    visitType = null;
+                                }
+
                                 visitDetails.setVisitType(encounter.hasType()
                                         && !encounter.getType().isEmpty()
-                                        ? VisitType.fromString(encounter.getType()
-                                        .get(0)
-                                        .getText())
+                                        ? visitType
                                         : null);
 
                                 visitDetails.setReferredIn(
