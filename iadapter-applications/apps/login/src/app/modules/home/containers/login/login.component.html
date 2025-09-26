@@ -1,64 +1,66 @@
-<div class="login-container">
+<div class="login-page">
+<div nz-row nzJustify="space-between">
   <div class="logo">
-    <!-- Placeholder for logo - you can replace this with an image when available -->
-    HDU
+    <img src="images/court-of-arms.png" alt="logo" />
   </div>
+</div>
 
-  <div class="form-title">
-    <h2>HDU API</h2>
+  <div class="login-container">
+    <h1 class="title">HDU API</h1>
+
+    <form
+      nz-form
+      [formGroup]="validateForm"
+      class="login-form"
+      (ngSubmit)="submitForm()"
+    >
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Please input your username!">
+          <nz-input-group [nzPrefix]="prefixTemplateUser">
+            <input
+              type="text"
+              nz-input
+              formControlName="userName"
+              placeholder="Username"
+            />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Please input your Password!">
+          <nz-input-group [nzPrefix]="prefixTemplateLock">
+            <input
+              type="password"
+              nz-input
+              formControlName="password"
+              placeholder="Password"
+            />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-spin [nzSpinning]="isLoading">
+        <button
+          nz-button
+          [nzType]="'primary'"
+          class="login-form-button"
+          [disabled]="!validateForm.valid"
+        >
+          Log in
+        </button>
+      </nz-spin>
+
+      <nz-alert
+        nzCloseable
+        *ngIf="alert.show"
+        [nzType]="alert.type === 'success' ? 'success' : 'error'"
+        [nzMessage]="alert.message"
+        (nzOnClose)="onCloseAlert()"
+        nzShowIcon
+      ></nz-alert>
+    </form>
   </div>
-
-  <form
-    nz-form
-    [formGroup]="validateForm"
-    class="login-form"
-    (ngSubmit)="submitForm()"
-  >
-    <nz-form-item>
-      <nz-form-control nzErrorTip="Please input your username!">
-        <nz-input-group [nzPrefix]="prefixTemplateUser">
-          <input
-            type="text"
-            nz-input
-            formControlName="userName"
-            placeholder="Username"
-          />
-        </nz-input-group>
-      </nz-form-control>
-    </nz-form-item>
-
-    <nz-form-item>
-      <nz-form-control nzErrorTip="Please input your Password!">
-        <nz-input-group [nzPrefix]="prefixTemplateLock">
-          <input
-            type="password"
-            nz-input
-            formControlName="password"
-            placeholder="Password"
-          />
-        </nz-input-group>
-      </nz-form-control>
-    </nz-form-item>
-    <nz-spin [nzSpinning]="isLoading">
-      <button
-        nz-button
-        [nzType]="'primary'"
-        class="login-form-button"
-        [disabled]="!validateForm.valid"
-      >
-        Log in
-      </button>
-    </nz-spin>
-
-    <nz-alert
-      nzCloseable
-      *ngIf="alert.show"
-      [nzType]="alert.type === 'success' ? 'success' : 'error'"
-      [nzMessage]="alert.message"
-      (nzOnClose)="onCloseAlert()"
-      nzShowIcon
-    ></nz-alert>
-  </form>
 </div>
 
 <ng-template #prefixTemplateUser>
