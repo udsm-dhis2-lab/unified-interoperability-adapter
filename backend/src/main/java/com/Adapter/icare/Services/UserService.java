@@ -388,22 +388,8 @@ public class UserService implements UserDetailsService {
                 throw new RuntimeException("User with UUID " + uuid + " not found");
             }
 
-            // Set retired by current authenticated user
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-                String username = ((CustomUserDetails) authentication.getPrincipal()).getUsername();
-                User authenticatedUser = this.getUserByUsername(username);
-                if (authenticatedUser != null) {
-                    user.setRetiredBy(authenticatedUser);
-                }
-            }
-
-            // Mark as retired instead of hard delete
-            user.setRetired(true);
-            userRepository.save(user);
-
-            // Alternative: Hard delete if preferred
-            // userRepository.delete(user);
+            // Hard delete - permanently remove user from database
+            userRepository.delete(user);
 
         } catch (RuntimeException e) {
             throw e;

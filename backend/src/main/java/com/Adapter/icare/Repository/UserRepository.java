@@ -17,12 +17,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT * FROM users u WHERE u.uuid =:uuid ", nativeQuery = true)
     User findByUuid(String uuid);
     
-    // Methods to find non-retired users only
-    @Query(value = "SELECT * FROM users u WHERE u.retired IS NULL OR u.retired = false", nativeQuery = true)
+    // Methods to find all users (no soft delete filtering needed)
+    @Query(value = "SELECT * FROM users u", nativeQuery = true)
     List<User> findAllActiveUsers();
     
-    @Query(value = "SELECT * FROM users u WHERE (u.retired IS NULL OR u.retired = false)", 
-           countQuery = "SELECT count(*) FROM users u WHERE (u.retired IS NULL OR u.retired = false)",
+    @Query(value = "SELECT * FROM users u", 
+           countQuery = "SELECT count(*) FROM users u",
            nativeQuery = true)
     Page<User> findAllActiveUsers(Pageable pageable);
 }
