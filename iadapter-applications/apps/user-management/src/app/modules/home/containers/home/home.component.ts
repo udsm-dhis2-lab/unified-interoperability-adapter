@@ -412,26 +412,33 @@ export class HomeComponent implements OnInit {
   }
 
   viewUserDetails(user: User): void {
+    console.log('ViewUserDetails - Input user:', user);
     this.loading = true;
     
-    // Fetch complete user details from the API
+    // First, set the selected user to the current user data as fallback
+    this.selectedUser = user;
+    
+    // Try to fetch complete user details from the API
     this.userManagementService.getUserById(user.uuid).subscribe({
       next: (detailedUser) => {
+        console.log('ViewUserDetails - Detailed user from API:', detailedUser);
         this.selectedUser = detailedUser;
         this.isDetailModalVisible = true;
         this.loading = false;
       },
       error: (error) => {
         console.error('Error fetching user details:', error);
+        console.log('ViewUserDetails - Using fallback user data:', user);
         this.loading = false;
         
+        // Use the user data from the list as fallback
+        this.selectedUser = user;
+        this.isDetailModalVisible = true;
+        
         if (error.status === 404) {
-          this.messageService.error('User not found.');
+          this.messageService.warning('User details not found via API, showing basic information.');
         } else {
-          this.messageService.error('Failed to load user details.');
-          // Fallback to basic user data if API fails
-          this.selectedUser = user;
-          this.isDetailModalVisible = true;
+          this.messageService.warning('Could not load extended user details, showing basic information.');
         }
       }
     });

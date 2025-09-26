@@ -394,10 +394,15 @@
       nzWidth="500px">
       <ng-container *nzModalContent>
         <div *ngIf="selectedUser" class="user-details-content">
+          <!-- Debug Info (remove in production) -->
+          <div style="background: #f0f0f0; padding: 8px; margin-bottom: 16px; font-size: 12px;">
+            <strong>Debug Info:</strong> {{ selectedUser | json }}
+          </div>
+          
           <div class="user-basic-info">
             <h4>Basic Information</h4>
-            <p><strong>Username:</strong> {{ selectedUser.username }}</p>
-            <p><strong>Full Name:</strong> {{ selectedUser.firstName }} {{ selectedUser.middleName || '' }} {{ selectedUser.surname }}</p>
+            <p><strong>Username:</strong> {{ selectedUser.username || 'N/A' }}</p>
+            <p><strong>Full Name:</strong> {{ (selectedUser.firstName || '') + ' ' + (selectedUser.middleName || '') + ' ' + (selectedUser.surname || '') }}</p>
             <p><strong>Email:</strong> {{ selectedUser.email || 'Not provided' }}</p>
             <p><strong>Phone:</strong> {{ selectedUser.phoneNumber || 'Not provided' }}</p>
             <p><strong>Status:</strong> 
@@ -446,6 +451,10 @@
             <p><strong>UUID:</strong> <code>{{ selectedUser.uuid }}</code></p>
             <p *ngIf="selectedUser.externalAuth"><strong>External Auth:</strong> {{ selectedUser.externalAuth ? 'Yes' : 'No' }}</p>
           </div>
+        </div>
+        <div *ngIf="!selectedUser" class="no-user-selected">
+          <p>No user selected or user data not available.</p>
+          <p>Debug: selectedUser = {{ selectedUser | json }}</p>
         </div>
       </ng-container>
     </nz-modal>

@@ -14,6 +14,12 @@ export interface ApiUserPageResponse {
   hasNext: boolean;
 }
 
+// API Response Interface for getUserById - matches the actual backend response
+export interface ApiUserDetailResponse {
+  success: boolean;
+  user: User;
+}
+
 // Frontend Interface - matches the component expectations
 export interface UserPage {
   content: User[];
@@ -117,8 +123,21 @@ export class UserManagementService {
    * GET /api/v1/users/{uuid} - Get specific user by ID
    */
   getUserById(uuid: string): Observable<User> {
-    return this.httpClient.get<User>(`${this.baseUrl}/users/${uuid}`)
-      .pipe(catchError(this.handleError));
+    return this.httpClient.get<ApiUserDetailResponse>(`${this.baseUrl}/users/${uuid}`)
+      .pipe(
+        map(apiResponse => {
+          console.log('UserManagementService - getUserById API Response:', apiResponse);
+          // Extract user from the wrapped response
+          if (apiResponse.success && apiResponse.user) {
+            console.log('UserManagementService - Extracted user:', apiResponse.user);
+            return apiResponse.user;
+          } else {
+            console.error('UserManagementService - Invalid API response format:', apiResponse);
+            throw new Error('Invalid user data received from API');
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
   /**
