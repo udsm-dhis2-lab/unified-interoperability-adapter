@@ -1,0 +1,121 @@
+#!/bin/bash
+
+# Secure Deployment Script Template
+# This template uses environment variables instead of hardcoded credentials
+
+set -e  # Exit on any error
+
+echo "🚀 Starting secure deployment..."
+
+# Check if config file exists
+CONFIG_FILE="./deploy-config.env"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "❌ Error: deploy-config.env not found!"
+    echo "📋 Please copy deploy-config.env.template to deploy-config.env and update with your credentials"
+    echo "   cp deploy-config.env.template deploy-config.env"
+    echo "   # Then edit deploy-config.env with your actual credentials"
+    exit 1
+fi
+
+# Load configuration
+source "$CONFIG_FILE"
+
+# Validate required variables
+if [ -z "$DEPLOY_USERNAME" ] || [ -z "$DEPLOY_PASSWORD" ]; then
+    echo "❌ Error: DEPLOY_USERNAME and DEPLOY_PASSWORD must be set in deploy-config.env"
+    exit 1
+fi
+
+if [ "$DEPLOY_USERNAME" = "your_username_here" ] || [ "$DEPLOY_PASSWORD" = "your_password_here" ]; then
+    echo "❌ Error: Please update the credentials in deploy-config.env with actual values"
+    exit 1
+fi
+
+# Get build target from command line or use default
+BUILD_TARGET=${1:-$BUILD_TARGET}
+if [ -z "$BUILD_TARGET" ]; then
+    echo "❌ Error: Build target not specified. Usage: ./deploy.sh <app_name>"
+    echo "   Example: ./deploy.sh apps"
+    exit 1
+fi
+
+echo "📦 Build target: $BUILD_TARGET"
+echo "👤 Username: $DEPLOY_USERNAME"
+echo "🔐 Password: [HIDDEN]"
+echo ""
+
+# Generate Basic Auth header (encode credentials)
+BASIC_AUTH_CREDENTIALS=$(echo -n "$DEPLOY_USERNAME:$DEPLOY_PASSWORD" | base64)
+AUTH_HEADER="Authorization: Basic $BASIC_AUTH_CREDENTIALS"
+
+echo "🏗️  Building application..."
+cd "$APPS_PATH"
+npx nx reset
+npm run build:$BUILD_TARGET
+
+# Check if build was successful
+if [ $? -ne 0 ]; then
+    echo "❌ Build failed!"
+    exit 1
+fi
+
+# Create zip file path
+ZIP_FILE="$APPS_PATH/dist/apps/$BUILD_TARGET/browser/$BUILD_TARGET.zip"
+
+# Check if zip file exists
+if [ ! -f "$ZIP_FILE" ]; then
+    echo "❌ Error: Zip file not found at $ZIP_FILE"
+    echo "   Make sure the build completed successfully"
+    exit 1
+fi
+
+echo "📤 Deploying to servers..."
+
+# Function to deploy to a URL
+deploy_to_url() {
+    local url=$1
+    local attempt=$2
+    
+    echo "🎯 Deploying to $url (attempt $attempt)..."
+    
+    response=$(curl --request POST \
+        --url "$url" \
+        --header "$AUTH_HEADER" \
+        --header 'content-type: multipart/form-data' \
+        --form "file=@$ZIP_FILE" \
+        --write-out "HTTP_CODE:%{http_code}" \
+        --silent \
+        --show-error)
+    
+    # Extract HTTP status code
+    http_code=$(echo "$response" | grep -o "HTTP_CODE:[0-9]*" | cut -d: -f2)
+    response_body=$(echo "$response" | sed 's/HTTP_CODE:[0-9]*$//')
+    
+    if [ "$http_code" -eq 200 ] || [ "$http_code" -eq 201 ]; then
+        echo "✅ Successfully deployed to $url"
+        echo "   Response: $response_body"
+    else
+        echo "❌ Failed to deploy to $url (HTTP $http_code)"
+        echo "   Response: $response_body"
+    fi
+    
+    echo ""
+}
+
+# Deploy to all configured URLs
+if [ -n "$DEPLOY_URL_1" ]; then
+    deploy_to_url "$DEPLOY_URL_1" 1
+fi
+
+if [ -n "$DEPLOY_URL_2" ]; then
+    deploy_to_url "$DEPLOY_URL_2" 2
+fi
+
+if [ -n "$DEPLOY_URL_3" ]; then
+    deploy_to_url "$DEPLOY_URL_3" 3
+fi
+
+echo "🏁 Deployment process completed!"
+echo ""
+echo "🔒 Security Note: Credentials are loaded from deploy-config.env (not in version control)"
+echo "📋 To update credentials, edit: deploy-config.env"

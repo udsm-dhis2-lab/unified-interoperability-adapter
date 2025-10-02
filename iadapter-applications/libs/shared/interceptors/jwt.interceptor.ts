@@ -4,6 +4,7 @@ import { Observable, throwError, BehaviorSubject, EMPTY } from 'rxjs';
 import { catchError, filter, take, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { JwtTokenService } from '../services/jwt-token.service';
+import { BasicAuthService } from '../services/basic-auth.service';
 
 @Injectable()
 export class JwtInterceptor implements HttpInterceptor {
@@ -12,6 +13,7 @@ export class JwtInterceptor implements HttpInterceptor {
 
   constructor(
     private jwtTokenService: JwtTokenService,
+    private basicAuthService: BasicAuthService,
     private router: Router
   ) {}
 
@@ -28,18 +30,29 @@ export class JwtInterceptor implements HttpInterceptor {
       return next.handle(request);
     }
 
-    // Add JWT token to headers if available and not expired
+    // Try to add authentication headers in order of preference:
+    // 1. JWT token (if available and not expired)
+    // 2. Basic Auth credentials (if available)
+    // 3. No authentication header
+    
     const token = this.jwtTokenService.getToken();
     const tokenType = this.jwtTokenService.getTokenType();
+    const hasBasicAuth = this.basicAuthService.hasBasicAuthCredentials();
 
     console.log('JWT Interceptor - Token available:', !!token);
     console.log('JWT Interceptor - Token expired:', token ? this.jwtTokenService.isTokenExpired() : 'No token');
+    console.log('JWT Interceptor - Basic Auth available:', hasBasicAuth);
 
     if (token && !this.jwtTokenService.isTokenExpired()) {
-      request = this.addTokenHeader(request, token, tokenType);
-      console.log('JWT Interceptor - Added Authorization header');
+      // Use JWT token (highest priority)
+      request = this.addJwtTokenHeader(request, token, tokenType);
+      console.log('JWT Interceptor - Added JWT Authorization header');
+    } else if (hasBasicAuth) {
+      // Fallback to Basic Auth if JWT is not available/expired
+      request = this.addBasicAuthHeader(request);
+      console.log('JWT Interceptor - Added Basic Auth Authorization header');
     } else {
-      console.log('JWT Interceptor - No valid token, proceeding without Authorization header');
+      console.log('JWT Interceptor - No authentication credentials available');
     }
 
     return next.handle(request).pipe(
@@ -54,12 +67,28 @@ export class JwtInterceptor implements HttpInterceptor {
     );
   }
 
-  private addTokenHeader(request: HttpRequest<any>, token: string, tokenType: string | null): HttpRequest<any> {
+  private addJwtTokenHeader(request: HttpRequest<any>, token: string, tokenType: string | null): HttpRequest<any> {
     return request.clone({
       setHeaders: {
         'Authorization': `${tokenType || 'Bearer'} ${token}`
       }
     });
+  }
+
+  private addBasicAuthHeader(request: HttpRequest<any>): HttpRequest<any> {
+    try {
+      const basicAuthCredentials = this.basicAuthService.getBasicAuthCredentials();
+      if (basicAuthCredentials) {
+        return request.clone({
+          setHeaders: {
+            'Authorization': `Basic ${basicAuthCredentials}`
+          }
+        });
+      }
+    } catch (error) {
+      console.warn('JWT Interceptor - Failed to add Basic Auth header:', error);
+    }
+    return request;
   }
 
   private handle401Error(): Observable<HttpEvent<any>> {
@@ -72,50 +101,88 @@ export class JwtInterceptor implements HttpInterceptor {
     this.isRedirecting = true;
     console.log('JWT Interceptor - Starting 401 error handling');
     
-    // Clear tokens immediately
-    this.jwtTokenService.clearTokens();
-    console.log('JWT Interceptor - Cleared tokens');
+    // Check if we should try Basic Auth popup before redirecting to login
+    const shouldTryBasicAuth = this.shouldTriggerBasicAuthPopup();
     
-    // Clear any cached user data
-    sessionStorage.clear();
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('userPermissions');
-    console.log('JWT Interceptor - Cleared cached user data');
-    
-    // Immediate redirect to login - no delays, no retries, no user interaction required
-    console.warn('JWT Interceptor - 401 Unauthorized detected - redirecting to login immediately');
-    
-    // Use setTimeout to avoid navigation during HTTP request
-    setTimeout(() => {
-      try {
-        // Try Angular router first
-        console.log('JWT Interceptor - Attempting Angular router navigation to /login');
-        this.router.navigate(['/login'], { 
-          replaceUrl: true,
-          queryParams: { returnUrl: this.router.url }
-        }).then(success => {
-          if (success) {
-            console.log('JWT Interceptor - Angular router navigation successful');
-          } else {
-            console.warn('JWT Interceptor - Angular router navigation failed, using window.location');
+    if (shouldTryBasicAuth) {
+      console.log('JWT Interceptor - Browser environment detected, allowing Basic Auth popup');
+      
+      // Clear only JWT tokens, but keep Basic Auth credentials
+      this.jwtTokenService.clearTokens();
+      
+      // Don't redirect immediately - let the browser handle the Basic Auth popup
+      // The DualAuthenticationEntryPoint will trigger the popup
+      this.isRedirecting = false;
+      return EMPTY;
+    } else {
+      // Standard JWT error handling - clear everything and redirect
+      this.jwtTokenService.clearTokens();
+      this.basicAuthService.clearBasicAuthCredentials();
+      console.log('JWT Interceptor - Cleared all authentication credentials');
+      
+      // Clear any cached user data
+      sessionStorage.clear();
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('userPermissions');
+      console.log('JWT Interceptor - Cleared cached user data');
+      
+      // Immediate redirect to login
+      console.warn('JWT Interceptor - 401 Unauthorized detected - redirecting to login immediately');
+      
+      // Use setTimeout to avoid navigation during HTTP request
+      setTimeout(() => {
+        try {
+          // Try Angular router first
+          console.log('JWT Interceptor - Attempting Angular router navigation to /login');
+          this.router.navigate(['/login'], { 
+            replaceUrl: true,
+            queryParams: { returnUrl: this.router.url }
+          }).then(success => {
+            if (success) {
+              console.log('JWT Interceptor - Angular router navigation successful');
+            } else {
+              console.warn('JWT Interceptor - Angular router navigation failed, using window.location');
+              window.location.href = '/login';
+            }
+            this.isRedirecting = false;
+          }).catch(error => {
+            console.error('JWT Interceptor - Angular router navigation error:', error);
+            console.log('JWT Interceptor - Falling back to window.location');
             window.location.href = '/login';
-          }
-          this.isRedirecting = false;
-        }).catch(error => {
-          console.error('JWT Interceptor - Angular router navigation error:', error);
-          console.log('JWT Interceptor - Falling back to window.location');
+            this.isRedirecting = false;
+          });
+        } catch (error) {
+          console.error('JWT Interceptor - Error during navigation:', error);
+          console.log('JWT Interceptor - Using window.location as fallback');
           window.location.href = '/login';
           this.isRedirecting = false;
-        });
-      } catch (error) {
-        console.error('JWT Interceptor - Error during navigation:', error);
-        console.log('JWT Interceptor - Using window.location as fallback');
-        window.location.href = '/login';
-        this.isRedirecting = false;
-      }
-    }, 0);
+        }
+      }, 0);
+      
+      return EMPTY;
+    }
+  }
+
+  private shouldTriggerBasicAuthPopup(): boolean {
+    // Check if we're in a browser environment
+    if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+      return false;
+    }
+
+    // Check user agent to see if it's a browser that supports Basic Auth popup
+    const userAgent = navigator.userAgent;
+    const isBrowser = userAgent && 
+      (userAgent.includes('Mozilla') || 
+       userAgent.includes('Chrome') || 
+       userAgent.includes('Safari') || 
+       userAgent.includes('Edge'));
+
+    // Check if the current page is not already the login page
+    const isNotLoginPage = !window.location.pathname.includes('/login');
     
-    // Return empty to prevent further processing
-    return EMPTY;
+    // Check if there are no existing auth credentials (to avoid infinite popups)
+    const hasNoAuth = !this.jwtTokenService.getToken() && !this.basicAuthService.hasBasicAuthCredentials();
+
+    return isBrowser && isNotLoginPage && hasNoAuth;
   }
 }

@@ -20,10 +20,24 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+/**
+ * Security configuration that supports both JWT authentication and Basic Auth.
+ * - JWT tokens are checked first (Bearer token)
+ * - If no valid JWT, falls back to Basic Auth
+ * - Browser requests without auth trigger Basic Auth popup
+ * - API requests get JSON error responses
+ */
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
 
+    @Autowired
+    private DualAuthenticationEntryPoint dualAuthenticationEntryPoint;
+    
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    
+    // Keep the original JWT components for backward compatibility
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -53,6 +67,13 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public DualAuthenticationFilter dualAuthenticationFilter(JwtTokenProvider jwtTokenProvider, 
+                                                            UserDetailsService userDetailsService, 
+                                                            PasswordEncoder passwordEncoder) {
+        return new DualAuthenticationFilter(jwtTokenProvider, userDetailsService, passwordEncoder);
+    }
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
@@ -61,7 +82,7 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .authenticationEntryPoint(dualAuthenticationEntryPoint)
                 .and()
                 .authorizeRequests()
                 .antMatchers(
@@ -98,8 +119,9 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated();
 
-        // Add JWT filter before Username Password Authentication Filter
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // Add Dual Authentication filter before Username Password Authentication Filter
+        // This filter handles both JWT tokens and Basic Auth
+        http.addFilterBefore(dualAuthenticationFilter(jwtTokenProvider, userDetailsService, passwordEncoder()), UsernamePasswordAuthenticationFilter.class);
         
         // Enable CORS
         http.cors();
