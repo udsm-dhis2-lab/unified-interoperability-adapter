@@ -1,0 +1,371 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, catchError, throwError, map } from 'rxjs';
+import { User, Role, Privilege, Group } from '../models';
+
+// API Response Interface - matches the actual backend response
+export interface ApiUserPageResponse {
+  users: User[];
+  totalElements: number;
+  totalPages: number;
+  pageSize: number;
+  currentPage: number;
+  hasPrevious: boolean;
+  hasNext: boolean;
+}
+
+// API Response Interface for getUserById - matches the actual backend response
+export interface ApiUserDetailResponse {
+  success: boolean;
+  user: User;
+}
+
+// Frontend Interface - matches the component expectations
+export interface UserPage {
+  content: User[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  numberOfElements: number;
+  empty: boolean;
+}
+
+export interface CreateUserRequest {
+  username: string;
+  firstName: string;
+  middleName?: string;
+  surname: string;
+  email?: string;
+  phoneNumber?: string;
+  disabled?: boolean;
+  password?: string;
+  roles?: string[];
+  privileges?: string[];
+  groups?: string[];
+}
+
+export interface UpdateUserRequest {
+  username?: string;
+  firstName?: string;
+  middleName?: string;
+  surname?: string;
+  email?: string;
+  phoneNumber?: string;
+  disabled?: boolean;
+  roles?: string[];
+  privileges?: string[];
+  groups?: string[];
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface AuthResponse {
+  token?: string;
+  user?: User;
+  message?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserManagementService {
+  private readonly baseUrl = '/api/v1';
+
+  constructor(private httpClient: HttpClient) { }
+
+  private handleError(error: any): Observable<never> {
+    console.error('UserManagementService error:', error);
+    return throwError(() => error);
+  }
+
+  // User CRUD operations - matching the exact API endpoints
+  
+  /**
+   * GET /api/v1/users - Get all users with pagination
+   */
+  getUsers(page?: number, pageSize?: number): Observable<UserPage> {
+    let params = new HttpParams();
+    if (page !== undefined) params = params.set('page', page.toString());
+    if (pageSize !== undefined) params = params.set('size', pageSize.toString());
+
+    return this.httpClient.get<ApiUserPageResponse>(`${this.baseUrl}/users`, { params })
+      .pipe(
+        map(apiResponse => {
+          // Map API response to frontend expected format
+          const userPage: UserPage = {
+            content: apiResponse.users || [],
+            totalElements: apiResponse.totalElements || 0,
+            totalPages: apiResponse.totalPages || 1,
+            size: apiResponse.pageSize || 10,
+            number: apiResponse.currentPage || 0,
+            first: !apiResponse.hasPrevious,
+            last: !apiResponse.hasNext,
+            numberOfElements: apiResponse.users?.length || 0,
+            empty: !apiResponse.users || apiResponse.users.length === 0
+          };
+          
+          console.log('UserManagementService - API Response:', apiResponse);
+          console.log('UserManagementService - Mapped UserPage:', userPage);
+          
+          return userPage;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * GET /api/v1/users/{uuid} - Get specific user by ID
+   */
+  getUserById(uuid: string): Observable<User> {
+    return this.httpClient.get<ApiUserDetailResponse>(`${this.baseUrl}/users/${uuid}`)
+      .pipe(
+        map(apiResponse => {
+          console.log('UserManagementService - getUserById API Response:', apiResponse);
+          // Extract user from the wrapped response
+          if (apiResponse.success && apiResponse.user) {
+            console.log('UserManagementService - Extracted user:', apiResponse.user);
+            return apiResponse.user;
+          } else {
+            console.error('UserManagementService - Invalid API response format:', apiResponse);
+            throw new Error('Invalid user data received from API');
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * POST /api/v1/users - Create new user
+   */
+  createUser(user: CreateUserRequest): Observable<User> {
+    return this.httpClient.post<User>(`${this.baseUrl}/users`, user)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * PUT /api/v1/users/{uuid} - Update existing user
+   */
+  updateUser(uuid: string, user: UpdateUserRequest): Observable<User> {
+    return this.httpClient.put<User>(`${this.baseUrl}/users/${uuid}`, user)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * DELETE /api/v1/users/{uuid} - Delete user (This endpoint might need to be added to backend)
+   */
+  deleteUser(uuid: string): Observable<any> {
+    console.log('UserManagementService - Deleting user:', uuid);
+    return this.httpClient.delete<any>(`${this.baseUrl}/users/${uuid}`)
+      .pipe(
+        map(response => {
+          console.log('UserManagementService - Delete response:', response);
+          return response;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  // Role management - matching exact API endpoints
+  
+  /**
+   * GET /api/v1/users/roles/{uuid} - Get user roles
+   */
+  getUserRoles(uuid: string): Observable<Role[]> {
+    return this.httpClient.get<Role[]>(`${this.baseUrl}/users/roles/${uuid}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * PUT /api/v1/users/roles/{uuid} - Update user roles
+   */
+  updateUserRoles(uuid: string, roles: string[]): Observable<void> {
+    return this.httpClient.put<void>(`${this.baseUrl}/users/roles/${uuid}`, { roles })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * GET /api/v1/users/roles - Get all roles
+   */
+  getAllRoles(): Observable<Role[]> {
+    return this.httpClient.get<Role[]>(`${this.baseUrl}/users/roles`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * POST /api/v1/users/roles - Create new role
+   */
+  createRole(role: { roleName: string; description?: string }): Observable<Role> {
+    return this.httpClient.post<Role>(`${this.baseUrl}/users/roles`, role)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Privilege management - matching exact API endpoints
+  
+  /**
+   * GET /api/v1/users/privileges/{uuid} - Get user privileges
+   */
+  getUserPrivileges(uuid: string): Observable<Privilege[]> {
+    return this.httpClient.get<Privilege[]>(`${this.baseUrl}/users/privileges/${uuid}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * PUT /api/v1/user/privileges/{uuid} - Update user privileges
+   */
+  updateUserPrivileges(uuid: string, privileges: string[]): Observable<void> {
+    return this.httpClient.put<void>(`${this.baseUrl}/user/privileges/${uuid}`, { privileges })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * GET /api/v1/users/privileges - Get all privileges
+   */
+  getAllPrivileges(): Observable<Privilege[]> {
+    return this.httpClient.get<Privilege[]>(`${this.baseUrl}/users/privileges`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * POST /api/v1/users/privileges - Create new privilege
+   */
+  createPrivilege(privilege: { name: string; description?: string }): Observable<Privilege> {
+    return this.httpClient.post<Privilege>(`${this.baseUrl}/users/privileges`, privilege)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Group management - matching exact API endpoints
+  
+  /**
+   * GET /api/v1/users/group/{uuid} - Get user group
+   */
+  getUserGroups(uuid: string): Observable<Group[]> {
+    return this.httpClient.get<Group[]>(`${this.baseUrl}/users/group/${uuid}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * GET /api/v1/users/groups - Get all groups
+   */
+  getAllGroups(): Observable<Group[]> {
+    return this.httpClient.get<Group[]>(`${this.baseUrl}/users/groups`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * POST /api/v1/users/groups - Create new group
+   */
+  createGroup(group: { name: string; description?: string }): Observable<Group> {
+    return this.httpClient.post<Group>(`${this.baseUrl}/users/groups`, group)
+      .pipe(catchError(this.handleError));
+  }
+
+  // Authentication - matching exact API endpoints
+  
+  /**
+   * POST /api/v1/login - User authentication
+   */
+  login(credentials: LoginRequest): Observable<AuthResponse> {
+    return this.httpClient.post<AuthResponse>(`${this.baseUrl}/login`, credentials)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * GET /api/v1/logout - User logout
+   */
+  logout(): Observable<void> {
+    return this.httpClient.get<void>(`${this.baseUrl}/logout`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * GET /api/v1/me - Get current user profile
+   */
+  getCurrentUser(): Observable<User> {
+    return this.httpClient.get<User>(`${this.baseUrl}/me`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Search users by username or email
+   */
+  searchUsers(query: string, page?: number, pageSize?: number): Observable<UserPage> {
+    let params = new HttpParams().set('search', query);
+    if (page !== undefined) params = params.set('page', page.toString());
+    if (pageSize !== undefined) params = params.set('size', pageSize.toString());
+
+    return this.httpClient.get<ApiUserPageResponse>(`${this.baseUrl}/users/search`, { params })
+      .pipe(
+        map(apiResponse => {
+          // Map API response to frontend expected format
+          const userPage: UserPage = {
+            content: apiResponse.users || [],
+            totalElements: apiResponse.totalElements || 0,
+            totalPages: apiResponse.totalPages || 1,
+            size: apiResponse.pageSize || 10,
+            number: apiResponse.currentPage || 0,
+            first: !apiResponse.hasPrevious,
+            last: !apiResponse.hasNext,
+            numberOfElements: apiResponse.users?.length || 0,
+            empty: !apiResponse.users || apiResponse.users.length === 0
+          };
+          
+          console.log('UserManagementService - Search API Response:', apiResponse);
+          console.log('UserManagementService - Search Mapped UserPage:', userPage);
+          
+          return userPage;
+        }),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Check if username is available
+   */
+  checkUsernameAvailability(username: string): Observable<{ available: boolean }> {
+    return this.httpClient.get<{ available: boolean }>(`${this.baseUrl}/users/check-username/${username}`)
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Reset user password (admin function)
+   */
+  resetUserPassword(uuid: string, newPassword: string): Observable<void> {
+    return this.httpClient.put<void>(`${this.baseUrl}/users/${uuid}/reset-password`, { password: newPassword })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Disable/Enable user account
+   */
+  toggleUserStatus(uuid: string, disabled: boolean): Observable<User> {
+    return this.httpClient.patch<User>(`${this.baseUrl}/users/${uuid}/status`, { disabled })
+      .pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Bulk delete users
+   */
+  bulkDeleteUsers(userUuids: string[]): Observable<void> {
+    return this.httpClient.delete<void>(`${this.baseUrl}/users/bulk`, { 
+      body: { userUuids } 
+    }).pipe(catchError(this.handleError));
+  }
+
+  /**
+   * Get user activity/audit log
+   */
+  getUserActivity(uuid: string, page?: number, pageSize?: number): Observable<any> {
+    let params = new HttpParams();
+    if (page !== undefined) params = params.set('page', page.toString());
+    if (pageSize !== undefined) params = params.set('size', pageSize.toString());
+
+    return this.httpClient.get<any>(`${this.baseUrl}/users/${uuid}/activity`, { params })
+      .pipe(catchError(this.handleError));
+  }
+}

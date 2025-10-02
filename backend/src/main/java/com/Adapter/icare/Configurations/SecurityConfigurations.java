@@ -1,5 +1,6 @@
 package com.Adapter.icare.Configurations;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,16 +11,38 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
+/**
+ * Security configuration that supports both JWT authentication and Basic Auth.
+ * - JWT tokens are checked first (Bearer token)
+ * - If no valid JWT, falls back to Basic Auth
+ * - Browser requests without auth trigger Basic Auth popup
+ * - API requests get JSON error responses
+ */
 public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
+
+    @Autowired
+    private DualAuthenticationEntryPoint dualAuthenticationEntryPoint;
+    
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+    
+    // Keep the original JWT components for backward compatibility
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfigurations(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -44,10 +67,23 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public DualAuthenticationFilter dualAuthenticationFilter(JwtTokenProvider jwtTokenProvider, 
+                                                            UserDetailsService userDetailsService, 
+                                                            PasswordEncoder passwordEncoder) {
+        return new DualAuthenticationFilter(jwtTokenProvider, userDetailsService, passwordEncoder);
+    }
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(dualAuthenticationEntryPoint)
+                .and()
                 .authorizeRequests()
                 .antMatchers(
                         "/",
@@ -76,28 +112,31 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/login")
                 .permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/users")
+                .permitAll()
+                .antMatchers("/api/v1/init/**")
+                .permitAll()
                 .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic();
-        http
-                .sessionManagement()
-                .sessionFixation().newSession()
-                .maximumSessions(1)
-                .expiredUrl("/login");
+                .authenticated();
+
+        // Add Dual Authentication filter before Username Password Authentication Filter
+        // This filter handles both JWT tokens and Basic Auth
+        http.addFilterBefore(dualAuthenticationFilter(jwtTokenProvider, userDetailsService, passwordEncoder()), UsernamePasswordAuthenticationFilter.class);
+        
+        // Enable CORS
+        http.cors();
+    }
+    
+    @Bean
+    public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
+        org.springframework.web.cors.UrlBasedCorsConfigurationSource source = new
+                org.springframework.web.cors.UrlBasedCorsConfigurationSource();
+        org.springframework.web.cors.CorsConfiguration config = new org.springframework.web.cors.CorsConfiguration();
+        config.setAllowedOriginPatterns(java.util.Arrays.asList("*")); // Allow all origins
+        config.setAllowedMethods(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(java.util.Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Accept"));
+        config.setAllowCredentials(true); // Allow credentials
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
-// @Bean
-// public CorsConfigurationSource corsConfigurationSource() {
-// UrlBasedCorsConfigurationSource source = new
-// UrlBasedCorsConfigurationSource();
-// CorsConfiguration config = new CorsConfiguration();
-// config.setAllowedOrigins(Arrays.asList("*")); // Allow all origins
-// config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE",
-// "OPTIONS"));
-// config.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control",
-// "Content-Type"));
-// config.setAllowCredentials(true); // Allow credentials
-// source.registerCorsConfiguration("/**", config);
-// return source;
-// }

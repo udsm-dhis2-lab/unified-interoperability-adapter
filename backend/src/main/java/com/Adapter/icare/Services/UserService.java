@@ -1,11 +1,18 @@
 package com.Adapter.icare.Services;
 
 import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,19 +76,60 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllActiveUsers();
+    }
+
+    public Page<User> getUsers(int page, int size, String sortBy, String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return userRepository.findAllActiveUsers(pageable);
+    }
+
+    public Page<User> getUsersWithSearch(int page, int size, String search, String sortBy, String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        // This would require a custom repository method for search
+        // For now, return all active users - implement search later if needed
+        return userRepository.findAllActiveUsers(pageable);
     }
 
     @Transactional
     public User createUser(User user) throws Exception {
         try {
+            // Validate required fields
+            if (user.getUsername() == null || user.getUsername().trim().isEmpty()) {
+                throw new IllegalArgumentException("Username is required");
+            }
+            if (user.getPassword() == null || user.getPassword().trim().isEmpty()) {
+                throw new IllegalArgumentException("Password is required");
+            }
+            if (user.getFirstName() == null || user.getFirstName().trim().isEmpty()) {
+                throw new IllegalArgumentException("First name is required");
+            }
+            if (user.getSurname() == null || user.getSurname().trim().isEmpty()) {
+                throw new IllegalArgumentException("Surname is required");
+            }
+
+            // Check if username already exists
+            User existingUser = userRepository.findByUsername(user.getUsername());
+            if (existingUser != null) {
+                throw new RuntimeException("Username already exists");
+            }
+
             // Generate UUID for the new user
             UUID uuid = UUID.randomUUID();
             user.setUuid(uuid.toString());
 
             // Encode the user's password
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+            // Set default values
+            if (user.getDisabled() == null) {
+                user.setDisabled(false);
+            }
+            if (user.getExternalAuth() == null) {
+                user.setExternalAuth(false);
+            }
 
             // Get the currently authenticated user to set as the creator
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -92,38 +140,141 @@ public class UserService implements UserDetailsService {
                     user.setCreatedBy(authenticatedUser);
                 }
             }
-            // Handle roles: either fetch existing roles or create new ones if needed
+
+            // Handle roles: fetch existing roles by UUID
             Set<Role> attachedRoles = new HashSet<>();
             if (user.getRoles() != null) {
                 for (Role role : user.getRoles()) {
-                    Role existingRole = roleRepository.findByUuid(role.getUuid());
-                    if (existingRole == null) {
-                        // If role does not exist, create a new one
-                        if (role.getRoleName() != null) {
-                            role.setUuid(UUID.randomUUID().toString());
-                            attachedRoles.add(roleRepository.save(role));
+                    if (role.getUuid() != null) {
+                        Role existingRole = roleRepository.findByUuid(role.getUuid());
+                        if (existingRole != null) {
+                            attachedRoles.add(existingRole);
+                        } else {
+                            System.out.println("WARNING: Role with UUID " + role.getUuid() + " not found, skipping...");
                         }
-                    } else {
-                        attachedRoles.add(existingRole);
                     }
                 }
             }
             user.setRoles(attachedRoles);
 
-            // Save the user with the associated roles
+            // Handle groups: fetch existing groups by UUID
+            Set<Group> attachedGroups = new HashSet<>();
+            if (user.getGroups() != null) {
+                for (Group group : user.getGroups()) {
+                    if (group.getUuid() != null) {
+                        Group existingGroup = groupRepository.findByUuid(group.getUuid());
+                        if (existingGroup != null) {
+                            attachedGroups.add(existingGroup);
+                        } else {
+                            System.out.println("WARNING: Group with UUID " + group.getUuid() + " not found, skipping...");
+                        }
+                    }
+                }
+            }
+            user.setGroups(attachedGroups);
+
+            // Save the user with the associated roles and groups
             User createdUser = userRepository.save(user);
 
             return createdUser;
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
-            // Log and rethrow the exception
             System.err.println("Error while creating user: " + e.getMessage());
-            throw new Exception("Failed to create user", e);
+            throw new RuntimeException("Failed to create user: " + e.getMessage(), e);
         }
     }
 
-    public User updateUser(User user) {
-        return userRepository.save(user);
+    @Transactional
+    public User updateUser(String uuid, User updatedUser) throws Exception {
+        try {
+            // Find existing user
+            User existingUser = userRepository.findByUuid(uuid);
+            if (existingUser == null) {
+                throw new RuntimeException("User with UUID " + uuid + " not found");
+            }
+
+            // Validate required fields
+            if (updatedUser.getUsername() == null || updatedUser.getUsername().trim().isEmpty()) {
+                throw new IllegalArgumentException("Username is required");
+            }
+            if (updatedUser.getFirstName() == null || updatedUser.getFirstName().trim().isEmpty()) {
+                throw new IllegalArgumentException("First name is required");
+            }
+            if (updatedUser.getSurname() == null || updatedUser.getSurname().trim().isEmpty()) {
+                throw new IllegalArgumentException("Surname is required");
+            }
+
+            // Check if username is being changed and if new username already exists
+            if (!existingUser.getUsername().equals(updatedUser.getUsername())) {
+                User userWithNewUsername = userRepository.findByUsername(updatedUser.getUsername());
+                if (userWithNewUsername != null) {
+                    throw new RuntimeException("Username already exists");
+                }
+            }
+
+            // Update user fields
+            existingUser.setUsername(updatedUser.getUsername());
+            existingUser.setFirstName(updatedUser.getFirstName());
+            existingUser.setMiddleName(updatedUser.getMiddleName());
+            existingUser.setSurname(updatedUser.getSurname());
+            existingUser.setEmail(updatedUser.getEmail());
+            existingUser.setPhoneNumber(updatedUser.getPhoneNumber());
+            existingUser.setDisabled(updatedUser.getDisabled());
+            existingUser.setExternalAuth(updatedUser.getExternalAuth());
+
+            // Update password if provided
+            if (updatedUser.getPassword() != null && !updatedUser.getPassword().trim().isEmpty()) {
+                existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
+            }
+
+            // Set last updated by
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                String username = ((CustomUserDetails) authentication.getPrincipal()).getUsername();
+                User authenticatedUser = this.getUserByUsername(username);
+                if (authenticatedUser != null) {
+                    existingUser.setLastUpdatedBy(authenticatedUser);
+                }
+            }
+
+            // Handle roles update
+            if (updatedUser.getRoles() != null) {
+                Set<Role> attachedRoles = new HashSet<>();
+                for (Role role : updatedUser.getRoles()) {
+                    if (role.getUuid() != null) {
+                        Role existingRole = roleRepository.findByUuid(role.getUuid());
+                        if (existingRole != null) {
+                            attachedRoles.add(existingRole);
+                        }
+                    }
+                }
+                existingUser.setRoles(attachedRoles);
+            }
+
+            // Handle groups update
+            if (updatedUser.getGroups() != null) {
+                Set<Group> attachedGroups = new HashSet<>();
+                for (Group group : updatedUser.getGroups()) {
+                    if (group.getUuid() != null) {
+                        Group existingGroup = groupRepository.findByUuid(group.getUuid());
+                        if (existingGroup != null) {
+                            attachedGroups.add(existingGroup);
+                        }
+                    }
+                }
+                existingUser.setGroups(attachedGroups);
+            }
+
+            return userRepository.save(existingUser);
+
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Error while updating user: " + e.getMessage());
+            throw new RuntimeException("Failed to update user: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -227,5 +378,91 @@ public class UserService implements UserDetailsService {
             throw new Exception("The group with uuid " + uuid + " does not exist");
         }
         return group;
+    }
+
+    @Transactional
+    public void deleteUser(String uuid) throws Exception {
+        try {
+            User user = userRepository.findByUuid(uuid);
+            if (user == null) {
+                throw new RuntimeException("User with UUID " + uuid + " not found");
+            }
+
+            // Hard delete - permanently remove user from database
+            userRepository.delete(user);
+
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            System.err.println("Error while deleting user: " + e.getMessage());
+            throw new RuntimeException("Failed to delete user: " + e.getMessage(), e);
+        }
+    }
+
+    public List<Privilege> getUserPrivileges(String userUuid) throws Exception {
+        User user = this.getUSer(userUuid);
+        Set<Privilege> privileges = new HashSet<>();
+        
+        if (user.getRoles() != null) {
+            for (Role role : user.getRoles()) {
+                if (role.getPrivileges() != null) {
+                    privileges.addAll(role.getPrivileges());
+                }
+            }
+        }
+        
+        return new ArrayList<>(privileges);
+    }
+
+    @Transactional
+    public User assignRoleToUser(String userUuid, String roleUuid) throws Exception {
+        User user = this.getUSer(userUuid);
+        Role role = this.getRole(roleUuid);
+        
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+        
+        user.getRoles().add(role);
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User removeRoleFromUser(String userUuid, String roleUuid) throws Exception {
+        User user = this.getUSer(userUuid);
+        Role role = this.getRole(roleUuid);
+        
+        if (user.getRoles() != null) {
+            user.getRoles().remove(role);
+            return userRepository.save(user);
+        }
+        
+        return user;
+    }
+
+    @Transactional
+    public User assignGroupToUser(String userUuid, String groupUuid) throws Exception {
+        User user = this.getUSer(userUuid);
+        Group group = this.getGroup(groupUuid);
+        
+        if (user.getGroups() == null) {
+            user.setGroups(new HashSet<>());
+        }
+        
+        user.getGroups().add(group);
+        return userRepository.save(user);
+    }
+
+    @Transactional
+    public User removeGroupFromUser(String userUuid, String groupUuid) throws Exception {
+        User user = this.getUSer(userUuid);
+        Group group = this.getGroup(groupUuid);
+        
+        if (user.getGroups() != null) {
+            user.getGroups().remove(group);
+            return userRepository.save(user);
+        }
+        
+        return user;
     }
 }

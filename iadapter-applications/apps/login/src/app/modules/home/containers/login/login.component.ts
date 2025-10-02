@@ -14,6 +14,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { antDesignModules } from '../../../../shared/ant-design-modules';
 import { LoginService } from '../../services/login.service';
@@ -44,10 +45,14 @@ export class LoginComponent implements OnDestroy, AfterViewInit, OnInit {
   }>;
 
   loginSubcription!: Subscription;
+  returnUrl: string = '';
+  
   constructor(
     private fb: NonNullableFormBuilder,
     private loginService: LoginService,
-    private zone: NgZone
+    private zone: NgZone,
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.validateForm = this.fb.group({
       userName: ['', [Validators.required]],
@@ -60,6 +65,15 @@ export class LoginComponent implements OnDestroy, AfterViewInit, OnInit {
       userName: ['', [Validators.required]],
       password: ['', [Validators.required]],
     });
+    
+    // Get return URL from route parameters or default to '/apps'
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/apps';
+    
+    // Check if user is already authenticated
+    if (this.loginService.isAuthenticated()) {
+      this.router.navigate([this.returnUrl]);
+    }
+    
     this.zone.runOutsideAngular(() => {
       setTimeout(() => {
         window.dispatchEvent(new Event('resize'));
@@ -104,19 +118,31 @@ export class LoginComponent implements OnDestroy, AfterViewInit, OnInit {
       .subscribe({
         next: (response: any) => {
           this.isLoading = false;
-          this.alert = {
-            show: true,
-            type: 'success',
-            message: 'Login Successful',
-          };
-          window.open('../../../apps', '_self');
+          if (response.authenticated && response.token) {
+            this.alert = {
+              show: true,
+              type: 'success',
+              message: 'Login Successful',
+            };
+            
+            // Redirect to return URL or default route after successful login
+            setTimeout(() => {
+              this.router.navigate([this.returnUrl]);
+            }, 1000);
+          } else {
+            this.alert = {
+              show: true,
+              type: 'error',
+              message: 'Authentication failed. Please try again.',
+            };
+          }
         },
         error: (error) => {
           this.isLoading = false;
           this.alert = {
             show: true,
             type: 'error',
-            message: error.message,
+            message: error.message || 'Login failed. Please try again.',
           };
         },
       });

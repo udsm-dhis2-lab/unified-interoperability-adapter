@@ -55,7 +55,7 @@ public class UserInitializer implements ApplicationRunner {
         User user = userRepository.findByUsername("admin");
         if(user == null){
             User userCreate = new User();
-            userCreate.setPassword("AdminUser");
+            userCreate.setPassword("password123");
             userCreate.setUsername("admin");
             userCreate.setFirstName("Admin");
             userCreate.setMiddleName("HDU");
@@ -64,7 +64,8 @@ public class UserInitializer implements ApplicationRunner {
             userService.createUser(userCreate);
         } else {
             user.setRoles(roles);
-            userService.updateUser(user);
+            user.setPassword("password123");
+            userService.updateUser(user.getUuid(), user);
         }
     }
 }

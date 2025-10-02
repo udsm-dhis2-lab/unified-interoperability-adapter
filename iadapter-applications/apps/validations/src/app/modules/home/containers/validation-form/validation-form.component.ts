@@ -16,7 +16,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
-import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzRadioModule } from 'ng-zorro-antd/radio'; // <-- ADD THIS
 
@@ -39,7 +39,6 @@ import { ValidationService } from '../../services/client-management.service';
     NzButtonModule,
     NzLayoutModule,
     NzBreadCrumbModule,
-    NzMessageModule,
     NzSpinModule,
     RuleBuilderComponent,
     NzRadioModule,

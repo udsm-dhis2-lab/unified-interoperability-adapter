@@ -1,14 +1,28 @@
 import { Route } from '@angular/router';
+import { AuthGuard } from '../../../../libs/shared/guards/auth.guard';
+import { AccountComponent } from '../../../../libs/hdu-api-account/src/lib/account/account.component';
 
 export const appRoutes: Route[] = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   {
-    path: 'dashboard',
+    path: 'login',
     loadChildren: () =>
-      import('@iapps/d2-dashboard').then((m) => m.D2DashboardModule),
+      import('../../../login/src/app/modules/home/home.module').then((m) => m.HomeModule),
+  },
+  {
+    path: 'account',
+    component: AccountComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'dashboard',
+    canActivate: [AuthGuard],
+    loadChildren: () =>
+      import('../../../dashboard/src/app/modules/home/home.module').then((m) => m.DashboardModule),
   },
   {
     path: 'client-management',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './../../../../apps/client-management/src/app/client-management/client-management.module'
@@ -16,6 +30,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'mapping-and-data-extraction',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './../../../../apps/mapping-and-data-extraction/src/app/mapping-and-data-extraction/mapping-and-data-extraction.module'
@@ -23,6 +38,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'workflows-management',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './../../../../apps/workflows-management/src/app/workflows-management/workflows-management.module'
@@ -30,6 +46,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'shr-management',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './../../../../apps/referral-management/src/app/referral-management/referral-management.module'
@@ -37,6 +54,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'user-management',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './../../../../apps/user-management/src/app/user-management/user-management.module'
@@ -44,6 +62,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'validations',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './../../../../apps/validations/src/app/validations/validation.module'
@@ -52,6 +71,7 @@ export const appRoutes: Route[] = [
 
   {
     path: 'appointment-management',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         '../../../appointment-management/src/app/appointment-management/appointment-management.module'
@@ -59,6 +79,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'settings',
+    canActivate: [AuthGuard],
     loadChildren: () =>
       import(
         './../../../../apps/settings/src/app/settings/settings.module'

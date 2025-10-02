@@ -21,7 +21,7 @@ public class Role extends BaseEntity{
     private String roleName;
     private String description;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_privilege",
     joinColumns = {
             @JoinColumn(name = "role_name", referencedColumnName = "role_name")

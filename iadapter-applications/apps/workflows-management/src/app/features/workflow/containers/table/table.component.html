@@ -78,14 +78,14 @@
                 <nz-divider nzType="vertical"></nz-divider>
             </td>
             <td>
-                <nz-button-group>
+                <nz-space-compact>
                     <button nz-button (click)="onRunWorkflow(data)">
                         Run
                     </button>
                     <button nz-button nz-dropdown [nzDropdownMenu]="menu1" nzPlacement="bottomRight">
                         <span nz-icon nzType="ellipsis"></span>
                     </button>
-                </nz-button-group>
+                </nz-space-compact>
                 <nz-dropdown-menu #menu1="nzDropdownMenu">
                     <ul nz-menu>
                         <li (click)="onEditWorkflow(data)" nz-menu-item>

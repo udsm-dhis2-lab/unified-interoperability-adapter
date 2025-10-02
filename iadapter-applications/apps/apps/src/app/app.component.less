@@ -1,7 +1,43 @@
+/* Styles for authenticated layout with navigation */
+:host {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
 .app-container {
   background-color: #fff !important;
+  min-height: calc(100vh - 64px); /* Account for top bar height */
 }
 
 .inner-content {
   margin-top: 55px;
+  padding: 16px;
+}
+
+/* Ensure the authenticated layout takes full height */
+nz-layout {
+  height: calc(100vh - 64px); /* Subtract top bar height */
+}
+
+nz-sider {
+  background: #fff !important;
+}
+
+nz-content {
+  background: #f0f2f5;
+}
+
+/* Full-screen layout for login and auth pages - no interfering styles */
+:host > ng-container:last-child {
+  display: block;
+  width: 100%;
+  height: 100vh;
+}
+
+/* Router outlet in full-screen mode should not have forced dimensions */
+:host > ng-container:last-child router-outlet {
+  display: block;
+  width: 100%;
+  /* Remove height: 100% to avoid conflicts with login centering */
 }

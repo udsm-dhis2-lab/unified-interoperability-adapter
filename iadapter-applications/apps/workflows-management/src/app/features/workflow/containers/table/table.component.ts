@@ -25,6 +25,7 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 
 import { NzModalModule, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { WorkflowState } from '../../state/workflow/workflow.state';
@@ -85,6 +86,7 @@ interface Setting {
     NzIconModule,
     NzModalModule,
     NzDropDownModule,
+    NzSpaceModule,
     NzTagModule,
     WorkflowRunLoggingComponent,
   ],

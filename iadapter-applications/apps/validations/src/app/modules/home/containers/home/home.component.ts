@@ -15,7 +15,7 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { NzBreadCrumbModule } from 'ng-zorro-antd/breadcrumb';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal'; // For delete confirmation
-import { NzMessageModule, NzMessageService } from 'ng-zorro-antd/message'; // For feedback
+import { NzMessageService } from 'ng-zorro-antd/message'; // For feedback
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 
 // Import your service and models
@@ -42,7 +42,6 @@ import {
     NzIconModule,
     NzAlertModule,
     NzModalModule, // Add NzModalModule
-    NzMessageModule, // Add NzMessageModule
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],

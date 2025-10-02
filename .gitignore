@@ -93,7 +93,16 @@ backend/.mvn
 
 backup
 
+# Deployment and security files
 deploy.sh
+deploy-config.env
+.env.local
+.env.production
+auth-config.json
+credentials.json
+*.credentials
+*.key
+*.pem
 
 files
 
