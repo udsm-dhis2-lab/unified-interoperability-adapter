@@ -58,10 +58,15 @@ public class UserService implements UserDetailsService {
         try {
             user = userRepository.findByUsername(username);
         } catch (UsernameNotFoundException e) {
-            throw new Exception("User not found");
+            throw new Exception("Invalid credentials");
         }
+
+        if(user == null){
+            throw new Exception("Invalid credentials");
+        }
+
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new Exception("Invalid password");
+            throw new Exception("Invalid credentials");
         }
 
         return user.toMap();
