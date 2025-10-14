@@ -36,7 +36,7 @@ public class LabObservationDTO {
     public Map<String, Object> toMap(){
         Map<String, Object> labObservationMap = new HashMap<>();
         labObservationMap.put("parameter", this.getParameter());
-        labObservationMap.put("releaseDate", this.getReleaseDate().toString());
+        labObservationMap.put("releaseDate", this.getReleaseDate() != null ? this.getReleaseDate().toString() : null);
         labObservationMap.put("resultStatus", this.getResultStatus());
         labObservationMap.put("obrSetId", this.getObrSetId());
         labObservationMap.put("obxSetId", this.getObxSetId());
