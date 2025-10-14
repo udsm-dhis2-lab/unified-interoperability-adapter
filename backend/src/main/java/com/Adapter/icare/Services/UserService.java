@@ -211,7 +211,6 @@ public class UserService implements UserDetailsService {
                 throw new IllegalArgumentException("Surname is required");
             }
 
-            // Check if username is being changed and if new username already exists
             if (!existingUser.getUsername().equals(updatedUser.getUsername())) {
                 User userWithNewUsername = userRepository.findByUsername(updatedUser.getUsername());
                 if (userWithNewUsername != null) {

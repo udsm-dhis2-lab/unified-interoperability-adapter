@@ -5,6 +5,7 @@ import com.Adapter.icare.Domains.Role;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Repository.UserRepository;
 import com.Adapter.icare.Services.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,12 @@ public class UserInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
     private final UserService userService;
 
+    @Value("${default.user.username}")
+    private String defaultUsername;
+
+    @Value("${default.user.password}")
+    private String defaultPassword;
+
     public UserInitializer(UserRepository userRepository, UserService userService){
         this.userRepository = userRepository;
         this.userService = userService;
@@ -27,7 +34,9 @@ public class UserInitializer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        System.out.println(args.getOptionNames());
+        if(defaultPassword == null || defaultPassword.isEmpty()){
+            throw new Exception("Default Password for default user should be set in environment variables.");
+        }
         // 1. Save privilege
         Privilege existingPrivilege = userService.getPrivilegeByName("ALL");
         if (existingPrivilege == null) {
@@ -52,20 +61,25 @@ public class UserInitializer implements ApplicationRunner {
         }
         Set<Role> roles = new HashSet<>();
         roles.add(existingRole);
-        User user = userRepository.findByUsername("admin");
+        User user = userRepository.findByUsername(defaultUsername);
         if(user == null){
-            User userCreate = new User();
-            userCreate.setPassword("password123");
-            userCreate.setUsername("admin");
-            userCreate.setFirstName("Admin");
-            userCreate.setMiddleName("HDU");
-            userCreate.setSurname("API");
-            userCreate.setRoles(roles);
-            userService.createUser(userCreate);
-        } else {
+            user = new User();
+            user.setUsername(defaultUsername);
+            user.setPassword(defaultPassword);
+            user.setFirstName("Admin");
+            user.setMiddleName("HDU");
+            user.setSurname("API");
             user.setRoles(roles);
-            user.setPassword("password123");
-            userService.updateUser(user.getUuid(), user);
+            userService.createUser(user);
+            System.out.println("No user was Found");
+        } else {
+            User userUpdates = new User();
+            userUpdates.setUsername(user.getUsername());
+            userUpdates.setFirstName(user.getFirstName());
+            userUpdates.setMiddleName(user.getMiddleName());
+            userUpdates.setSurname(user.getSurname());
+            userUpdates.setRoles(roles);
+            userService.updateUser(user.getUuid(), userUpdates);
         }
     }
 }

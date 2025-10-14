@@ -3,6 +3,7 @@ package com.Adapter.icare.Controllers;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +13,16 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/init")
-public class InitController {
+class InitController {
 
     @Autowired
     private UserService userService;
+
+    @Value("${default.user.username}")
+    private String defaultUsername;
+
+    @Value("${default.user.password}")
+    private String defaultPassword;
 
     @PostMapping("/create-test-user")
     public ResponseEntity<Map<String, Object>> createTestUser(@RequestBody Map<String, Object> userData) {
@@ -48,15 +55,15 @@ public class InitController {
     @PostMapping("/reset-admin-password")
     public ResponseEntity<Map<String, Object>> resetAdminPassword() {
         try {
-            // Find admin user and reset password
-            User adminUser = userService.getUserByUsername("admin");
+            User adminUser = userService.getUserByUsername(defaultUsername);
+            System.out.println("Update Admin User");
             if (adminUser != null) {
-                adminUser.setPassword("password123");
+                adminUser.setPassword(defaultPassword);
                 userService.updateUser(adminUser.getUuid(), adminUser);
                 
                 Map<String, Object> response = new HashMap<>();
                 response.put("success", true);
-                response.put("message", "Admin password reset to 'password123'");
+                response.put("message", "Admin password reset to successfully");
                 
                 return ResponseEntity.ok(response);
             } else {
