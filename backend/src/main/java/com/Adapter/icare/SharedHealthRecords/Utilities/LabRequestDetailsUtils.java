@@ -139,6 +139,11 @@ public class LabRequestDetailsUtils {
                         .returnBundle(Bundle.class)
                         .execute();
 
+                ReceivingFacilityDTO receivingFacilityDTO = new ReceivingFacilityDTO();
+                receivingFacilityDTO.setCode(getExtensionValueString(specimen, "http://fhir.moh.go.tz/fhir/lab-request/receivingFacility/code"));
+                receivingFacilityDTO.setSection(getExtensionValueString(specimen, "http://fhir.moh.go.tz/fhir/lab-request/receivingFacility/section"));
+                labRequestDetailsDTO.setReceivingFacility(receivingFacilityDTO);
+
                 List<LabTestResultsFinalDTO> labResults = new ArrayList<LabTestResultsFinalDTO>();
                 for (Bundle.BundleEntryComponent entry : responseLabResultsObservations.getEntry()) {
                     if (entry.getResource() instanceof Observation) {

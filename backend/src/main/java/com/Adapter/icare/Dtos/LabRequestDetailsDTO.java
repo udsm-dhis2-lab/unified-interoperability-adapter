@@ -64,6 +64,7 @@ public class LabRequestDetailsDTO {
         labRequestMap.put("requestTypeCode", this.getRequestTypeCode());
         labRequestMap.put("referringSpecimenId", this.getReferringSpecimenId());
         labRequestMap.put("clinicalCodes", this.getClinicalCodes());
+        labRequestMap.put("receivingFacility", this.getReceivingFacility() != null ? this.getReceivingFacility().toMap() : null);
         labRequestMap.put("requestedLabTests", this.getRequestedLabTests() == null || this.getRequestedLabTests().isEmpty() ? this.getRequestedLabTests() : this.getRequestedLabTests().stream().map(LabTestsDTO::toMap).collect(Collectors.toList()));
         labRequestMap.put("labTestResults", this.getLabTestResults() != null && !this.getLabTestResults().isEmpty() ? this.getLabTestResults().stream().map(LabTestResultsFinalDTO::toMap).collect(Collectors.toList()) : this.getLabTestResults());
         labRequestMap.put("postLabTestResults", this.getPostLabTestResults() == null || this.getPostLabTestResults().isEmpty() ? this.getPostLabTestResults() : this.getPostLabTestResults().stream().map(PostLabTestResultsDTO::toMap).collect(Collectors.toList()));
