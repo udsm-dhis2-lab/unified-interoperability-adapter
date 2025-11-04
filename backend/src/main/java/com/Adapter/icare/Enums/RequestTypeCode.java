@@ -42,6 +42,14 @@ public enum RequestTypeCode {
                 if (requestTypeCodeValue.requestTypeCode.equalsIgnoreCase(requestTypeCode)) {
                     return requestTypeCodeValue;
                 }
+
+                if (requestTypeCode.equalsIgnoreCase("nd")) {
+                    return RequestTypeCode.NON_DIAGNOSTIC;
+                }
+
+                if (requestTypeCode.equalsIgnoreCase("d")) {
+                    return RequestTypeCode.DIAGNOSTIC;
+                }
             }
             return null;
         } catch (IllegalArgumentException ex) {
