@@ -10,7 +10,9 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
+import ca.uhn.fhir.rest.gclient.IQuery;
 
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
@@ -124,7 +126,24 @@ public class SharedHealthRecordsService {
         searchRecords.sort().descending("_lastUpdated");
 
         try {
-            if (referralNumber == null) {
+            if (identifier != null && !identifier.trim().isEmpty()) {
+                try {
+                    Patient patient = fhirClient.read()
+                            .resource(Patient.class)
+                            .withId(identifier)
+                            .execute();
+                    response = new Bundle();
+                    response.addEntry().setResource(patient);
+                } catch (ResourceNotFoundException e) {
+                    response = fhirClient.search()
+                            .forResource(Patient.class)
+                            .where(Patient.IDENTIFIER.exactly().code(identifier))
+                            .returnBundle(Bundle.class)
+                            .execute();
+                }
+                clientTotalBundle = new Bundle();
+                clientTotalBundle.setTotal(response.getEntry().size());
+            } else if (referralNumber == null) {
                 if (onlyLinkedClients) {
                     // TODO replace hardcoded ids with dynamic ones
                     searchRecords.where(Patient.LINK.hasAnyOfIds("299", "152"));
@@ -137,10 +156,6 @@ public class SharedHealthRecordsService {
                 // TODO: Review the deceased concept
                 if (!includeDeceased) {
                     // searchRecords.where(Patient.DECEASED.isMissing(true));
-                }
-                // .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
-                if (identifier != null) {
-                    searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
                 }
 
                 if (hfrCode != null) {
