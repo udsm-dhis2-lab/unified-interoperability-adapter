@@ -14,7 +14,7 @@ export interface BasicAuthCredentials {
 export class BasicAuthService {
   private readonly BASIC_AUTH_CREDENTIALS_KEY = 'basicAuthCredentials';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   /**
    * Store Basic Auth credentials for use in requests
@@ -42,8 +42,8 @@ export class BasicAuthService {
    * Create HTTP headers with Basic Auth
    */
   getBasicAuthHeaders(credentials?: BasicAuthCredentials): HttpHeaders {
-    let encodedCredentials: string;
-    
+    let encodedCredentials: string | null;
+
     if (credentials) {
       encodedCredentials = btoa(`${credentials.username}:${credentials.password}`);
     } else {
@@ -64,7 +64,7 @@ export class BasicAuthService {
    */
   testBasicAuthCredentials(credentials: BasicAuthCredentials, testUrl: string = '/api/v1/me'): Observable<any> {
     const headers = this.getBasicAuthHeaders(credentials);
-    
+
     return this.http.get(testUrl, { headers }).pipe(
       catchError(error => {
         if (error.status === 401) {
@@ -85,7 +85,7 @@ export class BasicAuthService {
       'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
     });
 
-    return this.http.get(`${url}?basicAuth=true`, { 
+    return this.http.get(`${url}?basicAuth=true`, {
       headers,
       observe: 'response',
       responseType: 'text'
@@ -111,13 +111,13 @@ export class BasicAuthService {
    * Make an authenticated request with Basic Auth
    */
   makeBasicAuthRequest<T>(
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
-    url: string, 
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    url: string,
     credentials?: BasicAuthCredentials,
     body?: any
   ): Observable<T> {
     const headers = this.getBasicAuthHeaders(credentials);
-    
+
     switch (method) {
       case 'GET':
         return this.http.get<T>(url, { headers });
