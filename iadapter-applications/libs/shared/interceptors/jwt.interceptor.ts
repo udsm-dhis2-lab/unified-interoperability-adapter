@@ -15,17 +15,17 @@ export class JwtInterceptor implements HttpInterceptor {
     private jwtTokenService: JwtTokenService,
     private basicAuthService: BasicAuthService,
     private router: Router
-  ) {}
+  ) { }
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     console.log('JWT Interceptor - Processing request:', request.url);
-    
+
     // Skip interceptor for login requests and static assets
-    if (request.url.includes('/api/v1/login') || 
-        request.url.includes('/assets/') ||
-        request.url.includes('.js') ||
-        request.url.includes('.css') ||
-        request.url.includes('.html')) {
+    if (request.url.includes('/api/v1/login') ||
+      request.url.includes('/assets/') ||
+      request.url.includes('.js') ||
+      request.url.includes('.css') ||
+      request.url.includes('.html')) {
       console.log('JWT Interceptor - Skipping request:', request.url);
       return next.handle(request);
     }
@@ -34,7 +34,7 @@ export class JwtInterceptor implements HttpInterceptor {
     // 1. JWT token (if available and not expired)
     // 2. Basic Auth credentials (if available)
     // 3. No authentication header
-    
+
     const token = this.jwtTokenService.getToken();
     const tokenType = this.jwtTokenService.getTokenType();
     const hasBasicAuth = this.basicAuthService.hasBasicAuthCredentials();
@@ -97,19 +97,19 @@ export class JwtInterceptor implements HttpInterceptor {
       console.log('JWT Interceptor - Already redirecting, skipping');
       return EMPTY;
     }
-    
+
     this.isRedirecting = true;
     console.log('JWT Interceptor - Starting 401 error handling');
-    
+
     // Check if we should try Basic Auth popup before redirecting to login
     const shouldTryBasicAuth = this.shouldTriggerBasicAuthPopup();
-    
+
     if (shouldTryBasicAuth) {
       console.log('JWT Interceptor - Browser environment detected, allowing Basic Auth popup');
-      
+
       // Clear only JWT tokens, but keep Basic Auth credentials
       this.jwtTokenService.clearTokens();
-      
+
       // Don't redirect immediately - let the browser handle the Basic Auth popup
       // The DualAuthenticationEntryPoint will trigger the popup
       this.isRedirecting = false;
@@ -119,22 +119,22 @@ export class JwtInterceptor implements HttpInterceptor {
       this.jwtTokenService.clearTokens();
       this.basicAuthService.clearBasicAuthCredentials();
       console.log('JWT Interceptor - Cleared all authentication credentials');
-      
+
       // Clear any cached user data
       sessionStorage.clear();
       localStorage.removeItem('currentUser');
       localStorage.removeItem('userPermissions');
       console.log('JWT Interceptor - Cleared cached user data');
-      
+
       // Immediate redirect to login
       console.warn('JWT Interceptor - 401 Unauthorized detected - redirecting to login immediately');
-      
+
       // Use setTimeout to avoid navigation during HTTP request
       setTimeout(() => {
         try {
           // Try Angular router first
           console.log('JWT Interceptor - Attempting Angular router navigation to /login');
-          this.router.navigate(['/login'], { 
+          this.router.navigate(['/login'], {
             replaceUrl: true,
             queryParams: { returnUrl: this.router.url }
           }).then(success => {
@@ -158,7 +158,7 @@ export class JwtInterceptor implements HttpInterceptor {
           this.isRedirecting = false;
         }
       }, 0);
-      
+
       return EMPTY;
     }
   }
@@ -171,15 +171,15 @@ export class JwtInterceptor implements HttpInterceptor {
 
     // Check user agent to see if it's a browser that supports Basic Auth popup
     const userAgent = navigator.userAgent;
-    const isBrowser = userAgent && 
-      (userAgent.includes('Mozilla') || 
-       userAgent.includes('Chrome') || 
-       userAgent.includes('Safari') || 
-       userAgent.includes('Edge'));
+    const isBrowser: boolean = !!(userAgent &&
+      (userAgent.includes('Mozilla') ||
+        userAgent.includes('Chrome') ||
+        userAgent.includes('Safari') ||
+        userAgent.includes('Edge')));
 
     // Check if the current page is not already the login page
     const isNotLoginPage = !window.location.pathname.includes('/login');
-    
+
     // Check if there are no existing auth credentials (to avoid infinite popups)
     const hasNoAuth = !this.jwtTokenService.getToken() && !this.basicAuthService.hasBasicAuthCredentials();
 
