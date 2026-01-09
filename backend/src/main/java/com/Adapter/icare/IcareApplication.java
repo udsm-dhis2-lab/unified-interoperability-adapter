@@ -35,8 +35,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 // Force reload for JWT testing and Swagger auth
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 @SpringBootApplication(scanBasePackages = "com.Adapter.icare")
+@EnableAsync
 public class IcareApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
