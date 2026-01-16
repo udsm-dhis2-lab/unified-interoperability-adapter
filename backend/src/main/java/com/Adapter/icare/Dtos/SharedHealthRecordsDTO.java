@@ -102,7 +102,7 @@ public class SharedHealthRecordsDTO {
 
     private OtherInformationDTO otherInformation;
 
-    private DeathRegistryDTO deathRegistry;
+    private DeathRegistryDetailsDTO deathRegistryDetails;
 
     public Map<String,Object> toMap() {
         Map<String,Object> sharedRecordMap = new LinkedHashMap<>();
@@ -140,7 +140,7 @@ public class SharedHealthRecordsDTO {
         sharedRecordMap.put("billingsDetails", this.getBillingsDetails() == null || this.getBillingsDetails().isEmpty() ? this.getBillingsDetails() : this.getBillingsDetails().stream().map(BillingsDetailsDTO::toMap).collect(Collectors.toList()));
         sharedRecordMap.put("visitMainPaymentDetails", this.getVisitMainPaymentDetails());
         sharedRecordMap.put("selfMonitoringClinicalInformation", this.getSelfMonitoringClinicalInformation());
-        sharedRecordMap.put("deathRegistry", this.getDeathRegistry());
+        sharedRecordMap.put("deathRegistryDetails", this.getDeathRegistryDetails());
         sharedRecordMap.put("referralDetails", this.getReferralDetails());
         sharedRecordMap.put("otherInformation", this.getOtherInformation());
         sharedRecordMap.put("appointment", this.getAppointment() == null || this.getAppointment().isEmpty() ? this.getAppointment() : this.getAppointment().stream().map(AppointmentDetailsDTO::toMap).collect(Collectors.toList()));

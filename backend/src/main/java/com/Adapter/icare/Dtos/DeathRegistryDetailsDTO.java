@@ -11,7 +11,7 @@ import com.Adapter.icare.Enums.PlaceOfDeath;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DeathRegistryDTO {
+public class DeathRegistryDetailsDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String dateOfDeath;
     private String lineA;
