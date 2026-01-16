@@ -10,7 +10,9 @@ import ca.uhn.fhir.rest.client.api.IGenericClient;
 import ca.uhn.fhir.rest.gclient.ReferenceClientParam;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import ca.uhn.fhir.rest.gclient.TokenClientParam;
+import ca.uhn.fhir.rest.gclient.IQuery;
 
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.Adapter.icare.ClientRegistry.Services.ClientRegistryService;
 import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
@@ -124,7 +126,24 @@ public class SharedHealthRecordsService {
         searchRecords.sort().descending("_lastUpdated");
 
         try {
-            if (referralNumber == null) {
+            if (identifier != null && !identifier.trim().isEmpty()) {
+                try {
+                    Patient patient = fhirClient.read()
+                            .resource(Patient.class)
+                            .withId(identifier)
+                            .execute();
+                    response = new Bundle();
+                    response.addEntry().setResource(patient);
+                } catch (ResourceNotFoundException e) {
+                    response = fhirClient.search()
+                            .forResource(Patient.class)
+                            .where(Patient.IDENTIFIER.exactly().code(identifier))
+                            .returnBundle(Bundle.class)
+                            .execute();
+                }
+                clientTotalBundle = new Bundle();
+                clientTotalBundle.setTotal(response.getEntry().size());
+            } else if (referralNumber == null) {
                 if (onlyLinkedClients) {
                     // TODO replace hardcoded ids with dynamic ones
                     searchRecords.where(Patient.LINK.hasAnyOfIds("299", "152"));
@@ -137,10 +156,6 @@ public class SharedHealthRecordsService {
                 // TODO: Review the deceased concept
                 if (!includeDeceased) {
                     // searchRecords.where(Patient.DECEASED.isMissing(true));
-                }
-                // .where(new StringClientParam("linkType").matchesExactly().value("replaces"));
-                if (identifier != null) {
-                    searchRecords.where(Patient.IDENTIFIER.exactly().identifier(identifier));
                 }
 
                 if (hfrCode != null) {
@@ -216,7 +231,7 @@ public class SharedHealthRecordsService {
             }
 
             if (!response.getEntry().isEmpty()) {
-                Organization organization = new Organization();
+                Organization organization = null;
                 if (hfrCode != null) {
                     try {
                         Bundle bundle = new Bundle();
@@ -1124,7 +1139,7 @@ public class SharedHealthRecordsService {
 
                                 // Death Registry
                                 try {
-                                    DeathRegistryDTO deathRegistryDTO = new DeathRegistryDTO();
+                                    DeathRegistryDetailsDTO deathRegistryDTO = new DeathRegistryDetailsDTO();
                                     Observation deathObservation = fhirClient.read()
                                             .resource(Observation.class)
                                             .withId("DEATH-"+patient.getIdElement().getIdPart())
@@ -1166,32 +1181,43 @@ public class SharedHealthRecordsService {
                                         }
 
 
-                                        List<Observation.ObservationComponentComponent> otherCauseComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause%20of%20death/causeOfDeathOther", "other-cause-of-death");
-
+                                        List<Observation.ObservationComponentComponent> otherCauseComponent= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/causeOfDeathOther", "other-cause-of-death");
                                         if(!otherCauseComponent.isEmpty()){
                                             var component = otherCauseComponent.get(0);
                                             deathRegistryDTO.setCauseOfDeathOther(component.hasValueStringType() && component.getValueStringType().hasValue() ? component.getValueStringType().getValue() : null);
                                         }
 
-                                        List<Observation.ObservationComponentComponent> mannerOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "69449-7");
+                                        List<Observation.ObservationComponentComponent> mannerOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org", "69449-7");
 
                                         if(!mannerOfDeathComponents.isEmpty()){
                                             var component = mannerOfDeathComponents.get(0);
                                             deathRegistryDTO.setMannerOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? MannerOfDeath.fromString(component.getValueStringType().getValue()) : null);
                                         }
 
-                                        List<Observation.ObservationComponentComponent> placeOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "80931-1");
+                                        List<Observation.ObservationComponentComponent> placeOfDeathComponents= getComponentsByCode(deathObservation, "http://loinc.org", "80931-1");
 
                                         if(!placeOfDeathComponents.isEmpty()){
                                             var component = placeOfDeathComponents.get(0);
                                             deathRegistryDTO.setPlaceOfDeath(component.hasValueStringType() && component.getValueStringType().hasValue() ? PlaceOfDeath.fromString(component.getValueStringType().getValue()) : null);
                                         }
 
+                                        List<Observation.ObservationComponentComponent> periodTypePatientWasSickDeathComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/periodTypePatientWasSick", "period-type-patient-was-sick");
+                                        if(!periodTypePatientWasSickDeathComponents.isEmpty()){
+                                            var component = periodTypePatientWasSickDeathComponents.get(0);
+                                            deathRegistryDTO.setPeriodTypePatientWasSick(component.hasValueStringType() && component.getValueStringType().hasValue() ? PeriodType.fromString(component.getValueStringType().getValue()) : null);
+                                        }
+
+                                        List<Observation.ObservationComponentComponent> timeInNumbersCauseOfDeathComponents= getComponentsByCode(deathObservation, "http://fhir.moh.go.tz/fhir/cause-of-death/timeInNumbersPatientWasSick", "time-in-numbers-patient-was-sick");
+                                        if(!timeInNumbersCauseOfDeathComponents.isEmpty()){
+                                            var component = timeInNumbersCauseOfDeathComponents.get(0);
+                                            deathRegistryDTO.setTimeInNumbersPatientWasSick(component.hasValueIntegerType() && component.getValueIntegerType().hasValue() ? component.getValueIntegerType().getValue(): null);
+                                        }
+
                                         DROtherDeathDetails otherDeathDetails = new DROtherDeathDetails();
 
                                         otherDeathDetails.setWasSurgeryPerformedInTheLast4Weeks(YesNoUnknown.fromString(getExtensionValueString(deathObservation, "http://fhir.moh.go.tz/StructureDefinition/death-details-wasSurgeryPerformedInLast4Weeks")));
 
-                                        List<Observation.ObservationComponentComponent> dateOfSurgeryComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "45079-9");
+                                        List<Observation.ObservationComponentComponent> dateOfSurgeryComponents= getComponentsByCode(deathObservation, "http://loinc.org", "45079-9");
 
                                         if(!dateOfSurgeryComponents.isEmpty()){
                                             var component = dateOfSurgeryComponents.get(0);
@@ -1209,7 +1235,7 @@ public class SharedHealthRecordsService {
 
                                         PostmortemDetails postmortemDetails = new PostmortemDetails();
 
-                                        List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org/", "85699-7");
+                                        List<Observation.ObservationComponentComponent> autopsyPerformedComponents= getComponentsByCode(deathObservation, "http://loinc.org", "85699-7");
 
                                         if(!autopsyPerformedComponents.isEmpty()){
                                             var component = autopsyPerformedComponents.get(0);
@@ -1285,7 +1311,7 @@ public class SharedHealthRecordsService {
 
                                     }
 
-                                    templateData.setDeathRegistry(deathRegistryDTO);
+                                    templateData.setDeathRegistryDetails(deathRegistryDTO);
                                 } catch (Exception e ) {
                                 }
                                 // End of Death Registry

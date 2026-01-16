@@ -5,14 +5,17 @@ import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Constants.SharedRecordsConstants;
+import com.Adapter.icare.Domains.ApiLogger;
 import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Services.ApiLoggerService;
 import com.Adapter.icare.Services.DatastoreService;
 import com.Adapter.icare.Services.MediatorsService;
 import com.Adapter.icare.Services.UserService;
 import com.Adapter.icare.SharedHealthRecords.Services.SharedHealthRecordsService;
+import com.Adapter.icare.Utils.ApiLoggerUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -41,6 +44,7 @@ public class SharedHealthRecordsController {
     private boolean shouldUseWorkflowEngine = false;
     private String defaultWorkflowEngineCode = null;
     private Mediator workflowEngine = null;
+    private final ApiLoggerService apiLoggerService;
 
     public SharedHealthRecordsController(
             DatastoreConstants datastoreConstants,
@@ -50,7 +54,8 @@ public class SharedHealthRecordsController {
             DatastoreService datastoreService,
             ClientRegistryService clientRegistryService,
             MediatorsService mediatorsService,
-            SharedRecordsConstants sharedRecordsConstants) throws Exception {
+            SharedRecordsConstants sharedRecordsConstants,
+            ApiLoggerService apiLoggerService) throws Exception {
         this.sharedHealthRecordsService = sharedHealthRecordsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryConstants = clientRegistryConstants;
@@ -59,6 +64,7 @@ public class SharedHealthRecordsController {
         this.clientRegistryService = clientRegistryService;
         this.mediatorsService = mediatorsService;
         this.sharedRecordsConstants =  sharedRecordsConstants;
+        this.apiLoggerService = apiLoggerService;
         try {
             Datastore configs = this.datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.MandatoryClientRegistryIdTypes);
             if (configs!= null) {
@@ -168,6 +174,7 @@ public class SharedHealthRecordsController {
     public ResponseEntity<Map<String,Object>> addSharedRecords(@Valid @RequestBody DataTemplateDTO dataTemplateDTO) {
         try {
             Map <String,Object> payload = new HashMap<>();
+            Integer responseCode = null;
             DataTemplateDataDTO dataTemplateDataDTO = new DataTemplateDataDTO();
             dataTemplateDataDTO.setClientIdentifiersPool(null);
             FacilityDetailsDTO facilityDetailsDTO = dataTemplateDTO.getData().getFacilityDetails();
@@ -179,7 +186,15 @@ public class SharedHealthRecordsController {
             dataTemplateDataDTO.setClientIdentifiersPool(clientIds);
             payload.put("code","dataTemplates");
             payload.put("payload", dataTemplateDataDTO.toMap());
-            return ResponseEntity.ok(this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true"));
+
+            Map<String, Object> workflowResponse = this.mediatorsService.processWorkflowInAWorkflowEngine(this.workflowEngine, payload, "processes/execute?async=true");
+            if(workflowResponse.containsKey("statusCode")){
+                responseCode = (Integer) workflowResponse.get("statusCode");
+            }
+
+            ApiLoggerUtils.saveApiLogger(apiLoggerService, dataTemplateDTO, workflowResponse, new ArrayList<>(), responseCode, ApiLogger.RequestType.POST);
+
+            return ResponseEntity.status(responseCode != null ? responseCode : HttpStatus.OK.value()).body(workflowResponse);
         } catch (Exception e) {
             e.printStackTrace();
             Map<String,Object> response = new HashMap<>();

@@ -74,12 +74,12 @@ public class LabDataTemplateService {
             searchedSpecimenId = facilityCode != null && specimenId.contains(facilityCode) ? specimenId : facilityCode != null ? facilityCode + "-" + specimenId : specimenId;
         }
 
-        records.where(Specimen.IDENTIFIER.exactly().systemAndCode("urn:sys:lab-request:specimen-id", ""));
+        records.where(Specimen.IDENTIFIER.exactly().systemAndCode(
+                "urn:sys:lab-request:specimen-id", specimenId != null
+                        && facilityCode == null ? specimenId :
+                        specimenId != null && specimenId.contains(facilityCode) ? "" :
+                                specimenId != null && !specimenId.contains(facilityCode) ? specimenId : ""));
         records.and(Specimen.SUBJECT.isMissing(true));
-
-        if(searchedSpecimenId != null){
-            records.and(Specimen.IDENTIFIER.exactly().identifier(searchedSpecimenId));
-        }
 
         if(facilityCode != null && searchedSpecimenId == null){
             String hasParameterName = "_has:ServiceRequest:specimen:performer";

@@ -61,7 +61,7 @@ public class UserService implements UserDetailsService {
             throw new Exception("Invalid credentials");
         }
 
-        if(user == null){
+        if (user == null) {
             throw new Exception("Invalid credentials");
         }
 
@@ -171,7 +171,8 @@ public class UserService implements UserDetailsService {
                         if (existingGroup != null) {
                             attachedGroups.add(existingGroup);
                         } else {
-                            System.out.println("WARNING: Group with UUID " + group.getUuid() + " not found, skipping...");
+                            System.out
+                                    .println("WARNING: Group with UUID " + group.getUuid() + " not found, skipping...");
                         }
                     }
                 }
@@ -406,7 +407,7 @@ public class UserService implements UserDetailsService {
     public List<Privilege> getUserPrivileges(String userUuid) throws Exception {
         User user = this.getUSer(userUuid);
         Set<Privilege> privileges = new HashSet<>();
-        
+
         if (user.getRoles() != null) {
             for (Role role : user.getRoles()) {
                 if (role.getPrivileges() != null) {
@@ -414,7 +415,7 @@ public class UserService implements UserDetailsService {
                 }
             }
         }
-        
+
         return new ArrayList<>(privileges);
     }
 
@@ -422,11 +423,11 @@ public class UserService implements UserDetailsService {
     public User assignRoleToUser(String userUuid, String roleUuid) throws Exception {
         User user = this.getUSer(userUuid);
         Role role = this.getRole(roleUuid);
-        
+
         if (user.getRoles() == null) {
             user.setRoles(new HashSet<>());
         }
-        
+
         user.getRoles().add(role);
         return userRepository.save(user);
     }
@@ -435,12 +436,12 @@ public class UserService implements UserDetailsService {
     public User removeRoleFromUser(String userUuid, String roleUuid) throws Exception {
         User user = this.getUSer(userUuid);
         Role role = this.getRole(roleUuid);
-        
+
         if (user.getRoles() != null) {
             user.getRoles().remove(role);
             return userRepository.save(user);
         }
-        
+
         return user;
     }
 
@@ -448,11 +449,11 @@ public class UserService implements UserDetailsService {
     public User assignGroupToUser(String userUuid, String groupUuid) throws Exception {
         User user = this.getUSer(userUuid);
         Group group = this.getGroup(groupUuid);
-        
+
         if (user.getGroups() == null) {
             user.setGroups(new HashSet<>());
         }
-        
+
         user.getGroups().add(group);
         return userRepository.save(user);
     }
@@ -461,12 +462,12 @@ public class UserService implements UserDetailsService {
     public User removeGroupFromUser(String userUuid, String groupUuid) throws Exception {
         User user = this.getUSer(userUuid);
         Group group = this.getGroup(groupUuid);
-        
+
         if (user.getGroups() != null) {
             user.getGroups().remove(group);
             return userRepository.save(user);
         }
-        
+
         return user;
     }
 }

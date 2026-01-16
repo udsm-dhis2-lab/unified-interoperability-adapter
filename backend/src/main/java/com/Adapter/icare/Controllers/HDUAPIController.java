@@ -12,9 +12,10 @@ import java.util.stream.Stream;
 
 import javax.validation.Valid;
 
-import com.Adapter.icare.Domains.DynamicValidator;
+import com.Adapter.icare.Domains.*;
 import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.*;
+import com.Adapter.icare.Utils.ApiLoggerUtils;
 import com.Adapter.icare.validators.SharedHealthRecordValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
@@ -48,9 +49,6 @@ import com.Adapter.icare.Configurations.CustomUserDetails;
 import com.Adapter.icare.Constants.ClientRegistryConstants;
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Constants.FHIRConstants;
-import com.Adapter.icare.Domains.Datastore;
-import com.Adapter.icare.Domains.Mediator;
-import com.Adapter.icare.Domains.User;
 import com.google.common.collect.Maps;
 
 import ca.uhn.fhir.context.FhirContext;
@@ -78,6 +76,7 @@ public class HDUAPIController {
     private final ClientRegistryConstants clientRegistryConstants;
     private final IGenericClient fhirClient;
     private final FHIRConstants fhirConstants;
+    private final ApiLoggerService apiLoggerService;
 
     private static final Logger log = LoggerFactory.getLogger(HDUAPIController.class);
 
@@ -95,6 +94,7 @@ public class HDUAPIController {
             ClientRegistryConstants clientRegistryConstants,
             LabDataTemplateService labDataTemplateService,
             ValidatorService validatorService,
+            ApiLoggerService apiLoggerService,
             FHIRConstants fhirConstants) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
@@ -103,6 +103,7 @@ public class HDUAPIController {
         this.userService = userService;
         this.labDataTemplateService = labDataTemplateService;
         this.validatorService = validatorService;
+        this.apiLoggerService = apiLoggerService;
         this.clientRegistryConstants = clientRegistryConstants;
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirConstants = fhirConstants;
@@ -357,6 +358,8 @@ public class HDUAPIController {
                 }
                 workflowResponse.put("invalidClients", recordsWithIssues.size());
                 workflowResponse.put("invalidClientsSummary", recordsWithIssues);
+
+                ApiLoggerUtils.saveApiLogger(apiLoggerService, dataTemplate, workflowResponse, recordsWithIssues, responseCode, ApiLogger.RequestType.POST);
 
                 return ResponseEntity.status(responseCode != null ? responseCode : HttpStatus.OK.value()).body(workflowResponse);
             } else if (!shouldUseWorkflowEngine) {
