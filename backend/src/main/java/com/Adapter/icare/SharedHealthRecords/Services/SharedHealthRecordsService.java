@@ -231,7 +231,7 @@ public class SharedHealthRecordsService {
             }
 
             if (!response.getEntry().isEmpty()) {
-                Organization organization = new Organization();
+                Organization organization = null;
                 if (hfrCode != null) {
                     try {
                         Bundle bundle = new Bundle();
