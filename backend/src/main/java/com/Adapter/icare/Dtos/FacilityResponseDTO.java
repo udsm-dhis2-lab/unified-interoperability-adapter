@@ -105,6 +105,7 @@ public class FacilityResponseDTO {
             dto.setParams(system.getParams());
             dto.setCreated(system.getCreated());
             dto.setUpdated(system.getUpdated());
+            dto.setMediatorConfigured(system.getMediatorConfigured() != null ? system.getMediatorConfigured() : false);
         }
 
         if (mediator != null) {

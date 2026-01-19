@@ -16,6 +16,7 @@ public class SystemDTO {
     private String code;
     private String name;
     private Boolean allowed;
+    private Boolean mediatorConfigured; 
     private Object params;
     private String created;
     private String updated;
@@ -30,6 +31,7 @@ public class SystemDTO {
         map.put("code", code);
         map.put("name", name);
         map.put("allowed", allowed != null ? allowed : true);
+        map.put("mediatorConfigured", mediatorConfigured != null ? mediatorConfigured : false);
         if (params != null)
             map.put("params", params);
         return map;
@@ -44,6 +46,8 @@ public class SystemDTO {
         dto.setCode(map.get("code") != null ? map.get("code").toString() : null);
         dto.setName(map.get("name") != null ? map.get("name").toString() : null);
         dto.setAllowed(map.get("allowed") != null ? (Boolean) map.get("allowed") : true);
+        dto.setMediatorConfigured(
+                map.get("mediatorConfigured") != null ? (Boolean) map.get("mediatorConfigured") : false);
         dto.setParams(map.get("params"));
         dto.setCreated(map.get("created") != null ? map.get("created").toString() : null);
         dto.setUpdated(map.get("updated") != null ? map.get("updated").toString() : null);
