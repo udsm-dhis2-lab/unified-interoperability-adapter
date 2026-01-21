@@ -84,7 +84,7 @@ public class FacilityManagementService {
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "engine/systems?" + queryString,
+                "systems?" + queryString,
                 "GET",
                 null);
 
@@ -118,7 +118,7 @@ public class FacilityManagementService {
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "engine/systems/" + code,
+                "systems/" + code,
                 "GET",
                 null);
 
@@ -190,7 +190,7 @@ public class FacilityManagementService {
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "engine/systems",
+                "systems",
                 "POST",
                 systemPayload);
 
@@ -215,6 +215,15 @@ public class FacilityManagementService {
                 createdMediator = mediatorsService.saveMediatorConfigs(
                         new Mediator().fromMap(mediatorDTO));
                 log.info("Created mediator for facility: {}", registrationDTO.getCode());
+
+                // Update mediatorConfigured flag in integrations
+                Map<String, Object> updateFlag = new HashMap<>();
+                updateFlag.put("mediatorConfigured", true);
+                mediatorsService.routeToMediator(
+                        workflowEngine,
+                        "systems/" + registrationDTO.getCode(),
+                        "PUT",
+                        updateFlag);
             } catch (Exception e) {
                 log.error("Failed to create mediator for facility {}: {}",
                         registrationDTO.getCode(), e.getMessage());
@@ -227,8 +236,8 @@ public class FacilityManagementService {
     /**
      * Update facility access (whitelist/blacklist)
      */
-    public FacilityResponseDTO updateFacilityAccess(String code, Boolean allowed) throws Exception {
-        log.info("Updating facility access - code: {}, allowed: {}", code, allowed);
+    public FacilityResponseDTO updateFacilityAccess(String id, Boolean allowed) throws Exception {
+        log.info("Updating facility access - id: {}, allowed: {}", id, allowed);
 
         if (!shouldUseWorkflowEngine || workflowEngine == null) {
             throw new Exception("Workflow engine not configured. Cannot update facility access.");
@@ -239,14 +248,13 @@ public class FacilityManagementService {
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "engine/systems/" + code,
+                "systems/" + id,
                 "PUT",
                 updatePayload);
 
         SystemDTO updatedSystem = null;
-        if (integrationResponse.containsKey("system")) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> systemMap = (Map<String, Object>) integrationResponse.get("system");
+        if (integrationResponse.containsKey("updated")) {
+            Map<String, Object> systemMap = (Map<String, Object>) integrationResponse;
             updatedSystem = SystemDTO.fromMap(systemMap);
         } else if (integrationResponse.containsKey("error")) {
             throw new Exception("Failed to update facility access: " + integrationResponse.get("error"));
@@ -258,9 +266,10 @@ public class FacilityManagementService {
 
         Mediator mediator = null;
         try {
-            mediator = mediatorsService.getMediatorByCode(code);
+            // Use code to fetch mediator, not id
+            mediator = mediatorsService.getMediatorByCode(updatedSystem.getCode());
         } catch (Exception e) {
-            log.info("No mediator configured for facility: {}", code);
+            log.info("No mediator configured for facility: {}", updatedSystem.getCode());
         }
 
         return FacilityResponseDTO.from(updatedSystem, mediator);
@@ -312,6 +321,15 @@ public class FacilityManagementService {
 
             mediator = mediatorsService.saveMediatorConfigs(new Mediator().fromMap(mediatorDTO));
             log.info("Created mediator for facility: {}", code);
+
+            // Update mediatorConfigured flag in integrations
+            Map<String, Object> updateFlag = new HashMap<>();
+            updateFlag.put("mediatorConfigured", true);
+            mediatorsService.routeToMediator(
+                    workflowEngine,
+                    "systems/" + code,
+                    "PUT",
+                    updateFlag);
         }
 
         SystemDTO system = new SystemDTO();
@@ -342,6 +360,15 @@ public class FacilityManagementService {
             if (mediator != null) {
                 mediatorsService.deleteMediator(mediator.getUuid());
                 log.info("Deleted mediator for facility: {}", code);
+
+                // Update mediatorConfigured flag in integrations before deleting system
+                Map<String, Object> updateFlag = new HashMap<>();
+                updateFlag.put("mediatorConfigured", false);
+                mediatorsService.routeToMediator(
+                        workflowEngine,
+                        "systems/" + code,
+                        "PUT",
+                        updateFlag);
             }
         } catch (Exception e) {
             log.warn("No mediator to delete for facility: {}", code);
@@ -349,7 +376,7 @@ public class FacilityManagementService {
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "engine/systems/" + code,
+                "systems/" + code,
                 "DELETE",
                 null);
 

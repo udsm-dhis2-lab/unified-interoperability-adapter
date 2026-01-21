@@ -1,0 +1,92 @@
+<div nz-row [nzGutter]="[16, 16]" nzJustify="space-between" style="margin-bottom: 16px;">
+    <div nz-col [nzSpan]="12">
+        <h2>Facility Management</h2>
+    </div>
+    <div nz-col [nzSpan]="12" style="text-align: right;">
+        <button nz-button nzType="primary" [routerLink]="['register']">
+            <i nz-icon nzType="plus"></i>
+            Register Facility
+        </button>
+    </div>
+</div>
+
+<div nz-row style="margin-bottom: 16px;">
+    <div nz-col [nzSpan]="24">
+        <nz-input-group [nzPrefix]="prefixIconSearch">
+            <input type="text" nz-input placeholder="Search by name or code..." [(ngModel)]="searchTerm" />
+        </nz-input-group>
+        <ng-template #prefixIconSearch>
+            <i nz-icon nzType="search"></i>
+        </ng-template>
+    </div>
+</div>
+
+<nz-table #facilitiesTable [nzData]="filteredFacilities" [nzLoading]="loading" [nzPageSize]="pageSize"
+    [nzPageIndex]="pageIndex" [nzTotal]="total" [nzFrontPagination]="false" [nzShowSizeChanger]="true"
+    [nzPageSizeOptions]="[20, 50, 100]" (nzPageIndexChange)="onPageIndexChange($event)"
+    (nzPageSizeChange)="onPageSizeChange($event)" [nzScroll]="{ x: '1000px' }">
+    <thead>
+        <tr>
+            <th nzWidth="50px">#</th>
+            <th nzWidth="150px">Code</th>
+            <th nzWidth="200px">Name</th>
+            <th nzWidth="100px" nzAlign="center">Status</th>
+            <th nzWidth="120px" nzAlign="center">Referral Config</th>
+            <th nzWidth="100px" nzAlign="center">Access Control</th>
+            <th nzWidth="150px" nzAlign="center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let facility of facilitiesTable.data; let i = index">
+            <td>{{ (pageIndex - 1) * pageSize + i + 1 }}</td>
+            <td>
+                <strong>{{ facility.code }}</strong>
+            </td>
+            <td>{{ facility.name }}</td>
+            <td nzAlign="center">
+                <nz-tag [nzColor]="facility.allowed ? 'green' : 'red'">
+                    {{ facility.allowed ? 'Allowed' : 'Blocked' }}
+                </nz-tag>
+            </td>
+            <td nzAlign="center">
+                <nz-tag *ngIf="facility.mediatorConfigured" nzColor="blue">
+                    <i nz-icon nzType="check-circle"></i> Configured
+                </nz-tag>
+                <nz-tag *ngIf="!facility.mediatorConfigured" nzColor="default">
+                    <i nz-icon nzType="close-circle"></i> Not Configured
+                </nz-tag>
+            </td>
+            <td nzAlign="center">
+                <nz-switch [ngModel]="facility.allowed" (ngModelChange)="onSwitchToggle($event, facility)"
+                    [nzCheckedChildren]="checkedTemplate" [nzUnCheckedChildren]="unCheckedTemplate"
+                    nz-tooltip="Toggle Access"></nz-switch>
+                <ng-template #checkedTemplate><i nz-icon nzType="check"></i></ng-template>
+                <ng-template #unCheckedTemplate><i nz-icon nzType="close"></i></ng-template>
+            </td>
+            <td nzAlign="center">
+                <button nz-button nzType="link" nzSize="small" nz-dropdown [nzDropdownMenu]="actionMenu"
+                    nzPlacement="bottomRight">
+                    <i nz-icon nzType="more"></i>
+                    Actions
+                </button>
+                <nz-dropdown-menu #actionMenu="nzDropdownMenu">
+                    <ul nz-menu>
+                        <li nz-menu-item (click)="viewDetails(facility)">
+                            <i nz-icon nzType="eye"></i>
+                            View Details
+                        </li>
+                        <li nz-menu-item (click)="configureMediator(facility)">
+                            <i nz-icon [nzType]="facility.mediatorConfigured ? 'edit' : 'plus-circle'"></i>
+                            {{ facility.mediatorConfigured ? 'Edit Referral Config' : 'Configure Referral' }}
+                        </li>
+                        <li nz-menu-divider></li>
+                        <li nz-menu-item (click)="deleteFacility(facility)" class="delete-item">
+                            <i nz-icon nzType="delete" nzTheme="outline"></i>
+                            Delete Facility
+                        </li>
+                    </ul>
+                </nz-dropdown-menu>
+            </td>
+        </tr>
+    </tbody>
+</nz-table>

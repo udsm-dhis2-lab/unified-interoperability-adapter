@@ -87,22 +87,21 @@ public class FacilityController {
     /**
      * Update facility access (whitelist/blacklist)
      */
-    @PutMapping("/{code}/access")
+    @PatchMapping("/{id}/access")
     @Operation(summary = "Update facility access", description = "Whitelist or blacklist a facility")
     public ResponseEntity<Map<String, Object>> updateFacilityAccess(
-            @Parameter(description = "Facility HFR code") @PathVariable String code,
-            @Parameter(description = "Access allowed (true = whitelist, false = blacklist)") @RequestBody Map<String, Boolean> accessUpdate) {
+            @Parameter(description = "Facility ID (UUID)") @PathVariable String id,
+            @Parameter(description = "Access allowed (true = whitelist, false = blacklist)") @RequestParam Boolean allowed) {
         try {
-            Boolean allowed = accessUpdate.get("allowed");
             if (allowed == null) {
-                Map<String, Object> error = createErrorResponse("Invalid request", "'allowed' field is required");
+                Map<String, Object> error = createErrorResponse("Invalid request", "'allowed' parameter is required");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
 
-            FacilityResponseDTO facility = facilityManagementService.updateFacilityAccess(code, allowed);
+            FacilityResponseDTO facility = facilityManagementService.updateFacilityAccess(id, allowed);
             return ResponseEntity.ok(facility.toMap());
         } catch (Exception e) {
-            log.error("Error updating facility access: {}", code, e);
+            log.error("Error updating facility access: {}", id, e);
             Map<String, Object> error = createErrorResponse("Failed to update access", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
