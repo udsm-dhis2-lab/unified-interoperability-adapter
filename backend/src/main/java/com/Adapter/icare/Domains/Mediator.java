@@ -16,14 +16,14 @@ import java.util.*;
 @Setter
 @Entity
 @Table(name = "mediator")
-public class Mediator  extends BaseEntity implements Serializable {
+public class Mediator extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String baseUrl;
     private String path;
 
-    @Column(name="code", nullable = true)
+    @Column(name = "code", nullable = true)
     private String code;
 
     @Column(name = "auth_token", nullable = true)
@@ -32,25 +32,28 @@ public class Mediator  extends BaseEntity implements Serializable {
     @Column(name = "auth_type", nullable = true)
     private String authType;
 
-    @Column(name="category", nullable = true)
+    @Column(name = "category", nullable = true)
     private String category;
 
     @OneToMany(mappedBy = "mediator", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<MediatorApiPath> apis = new HashSet<>();
 
-    public enum AuthType{
+    public enum AuthType {
         BASIC("BASIC"),
         TOKEN("TOKEN");
+
         final String value;
-        AuthType(String value){
+
+        AuthType(String value) {
             this.value = value;
         }
-        public String getValue(){
+
+        public String getValue() {
             return value;
         }
     }
 
-    public enum Category{
+    public enum Category {
         DATA_TEMPLATE_METADATA("DATA_TEMPLATE_METADATA"),
         DATA_TEMPLATE("DATA_TEMPLATE"),
         FHIR("FHIR"),
@@ -60,10 +63,12 @@ public class Mediator  extends BaseEntity implements Serializable {
         OPENMRS("OPENMRS");
 
         final String value;
-        Category(String value){
+
+        Category(String value) {
             this.value = value;
         }
-        public String getValue(){
+
+        public String getValue() {
             return value;
         }
     }
@@ -76,19 +81,20 @@ public class Mediator  extends BaseEntity implements Serializable {
         mediator.setCategory(mediatorDTO.getCategory());
         mediator.setAuthToken(mediatorDTO.getAuthToken());
         mediator.setAuthType(mediatorDTO.getAuthType());
-        mediator.setApis(mediatorDTO.getApis());
+        // Initialize apis as empty set if null
+        mediator.setApis(mediatorDTO.getApis() != null ? mediatorDTO.getApis() : new HashSet<>());
         return mediator;
     }
 
-    public Map<String,Object> toMap() {
-        Map<String,Object> mappedMediator = new HashMap<>();
+    public Map<String, Object> toMap() {
+        Map<String, Object> mappedMediator = new HashMap<>();
         mappedMediator.put("uuid", this.getUuid());
         mappedMediator.put("code", this.getCode());
         mappedMediator.put("baseUrl", this.getBaseUrl());
         mappedMediator.put("path", this.getPath());
-        mappedMediator.put("authType",this.authType);
-        mappedMediator.put("category",this.getCategory());
-        mappedMediator.put("authToken",this.getAuthToken());
+        mappedMediator.put("authType", this.authType);
+        mappedMediator.put("category", this.getCategory());
+        mappedMediator.put("authToken", this.getAuthToken());
         mappedMediator.put("createdOn", this.getCreatedOn());
         Map<String, Object> createdBy = new HashMap<>();
         if (this.getCreatedBy() != null) {
@@ -98,23 +104,24 @@ public class Mediator  extends BaseEntity implements Serializable {
         } else {
             createdBy = null;
         }
-        mappedMediator.put("createdBy",createdBy);
+        mappedMediator.put("createdBy", createdBy);
 
         Map<String, Object> lastUpdatedBy = new HashMap<>();
         if (this.getLastUpdatedBy() != null) {
             lastUpdatedBy.put("uuid", this.getLastUpdatedBy().getUuid());
             lastUpdatedBy.put("username", this.getLastUpdatedBy().getUsername());
-            lastUpdatedBy.put("names", this.getLastUpdatedBy().getFirstName() + " " + this.getLastUpdatedBy().getSurname());
+            lastUpdatedBy.put("names",
+                    this.getLastUpdatedBy().getFirstName() + " " + this.getLastUpdatedBy().getSurname());
         } else {
             lastUpdatedBy = null;
         }
-        List<Map<String,Object>> apis = new ArrayList<>();
-        for (MediatorApiPath mediatorApiPath: this.getApis()) {
+        List<Map<String, Object>> apis = new ArrayList<>();
+        for (MediatorApiPath mediatorApiPath : this.getApis()) {
             apis.add(mediatorApiPath.toMap());
         }
-        mappedMediator.put("apis",apis);
+        mappedMediator.put("apis", apis);
         mappedMediator.put("lastUpdatedOn", this.getLastUpdatedOn());
-        mappedMediator.put("lastUpdatedBy",lastUpdatedBy);
+        mappedMediator.put("lastUpdatedBy", lastUpdatedBy);
         return mappedMediator;
     }
 }

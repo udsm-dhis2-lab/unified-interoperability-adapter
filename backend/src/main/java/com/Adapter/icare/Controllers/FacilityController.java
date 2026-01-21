@@ -146,18 +146,18 @@ public class FacilityController {
     /**
      * Delete a facility and its mediator configuration
      */
-    @DeleteMapping("/{code}")
+    @DeleteMapping("/{id}")
     @Operation(summary = "Delete facility", description = "Delete a facility and its mediator configuration")
     public ResponseEntity<Map<String, Object>> deleteFacility(
-            @Parameter(description = "Facility HFR code") @PathVariable String code) {
+            @Parameter(description = "Facility ID (UUID)") @PathVariable String id) {
         try {
-            facilityManagementService.deleteFacility(code);
+            facilityManagementService.deleteFacility(id);
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Facility deleted successfully");
-            response.put("code", code);
+            response.put("id", id);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            log.error("Error deleting facility: {}", code, e);
+            log.error("Error deleting facility: {}", id, e);
             Map<String, Object> error = createErrorResponse("Failed to delete facility", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }

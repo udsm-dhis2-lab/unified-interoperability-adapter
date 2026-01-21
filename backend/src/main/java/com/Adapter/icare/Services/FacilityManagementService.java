@@ -195,10 +195,9 @@ public class FacilityManagementService {
                 systemPayload);
 
         SystemDTO createdSystem = null;
-        if (integrationResponse.containsKey("system")) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> systemMap = (Map<String, Object>) integrationResponse.get("system");
-            createdSystem = SystemDTO.fromMap(systemMap);
+        // TODO: Add a proper check here based on actual response structure
+        if (integrationResponse.containsKey("created")) {
+            createdSystem = SystemDTO.fromMap((Map<String, Object>) integrationResponse);
             log.info("Created system in integrations: {}", createdSystem.getId());
         } else if (integrationResponse.containsKey("error")) {
             throw new Exception("Failed to create facility: " + integrationResponse.get("error"));
@@ -216,14 +215,15 @@ public class FacilityManagementService {
                         new Mediator().fromMap(mediatorDTO));
                 log.info("Created mediator for facility: {}", registrationDTO.getCode());
 
-                // Update mediatorConfigured flag in integrations
+                // Update mediatorConfigured flag in integrations using the system ID
                 Map<String, Object> updateFlag = new HashMap<>();
                 updateFlag.put("mediatorConfigured", true);
                 mediatorsService.routeToMediator(
                         workflowEngine,
-                        "systems/" + registrationDTO.getCode(),
+                        "systems/" + createdSystem.getId(),
                         "PUT",
                         updateFlag);
+                log.info("Updated mediatorConfigured flag for system: {}", createdSystem.getId());
             } catch (Exception e) {
                 log.error("Failed to create mediator for facility {}: {}",
                         registrationDTO.getCode(), e.getMessage());
@@ -348,12 +348,15 @@ public class FacilityManagementService {
      * Delete a facility
      */
     @Transactional
-    public void deleteFacility(String code) throws Exception {
-        log.info("Deleting facility: {}", code);
+    public void deleteFacility(String id) throws Exception {
+        log.info("Deleting facility with id: {}", id);
 
         if (!shouldUseWorkflowEngine || workflowEngine == null) {
             throw new Exception("Workflow engine not configured. Cannot delete facility.");
         }
+
+        SystemDTO system = getFacilityById(id);
+        String code = system.getCode();
 
         try {
             Mediator mediator = mediatorsService.getMediatorByCode(code);
@@ -366,7 +369,7 @@ public class FacilityManagementService {
                 updateFlag.put("mediatorConfigured", false);
                 mediatorsService.routeToMediator(
                         workflowEngine,
-                        "systems/" + code,
+                        "systems/" + id,
                         "PUT",
                         updateFlag);
             }
@@ -376,7 +379,7 @@ public class FacilityManagementService {
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "systems/" + code,
+                "systems/" + id,
                 "DELETE",
                 null);
 
@@ -384,7 +387,27 @@ public class FacilityManagementService {
             throw new Exception("Failed to delete facility: " + integrationResponse.get("error"));
         }
 
-        log.info("Deleted facility from integrations: {}", code);
+        log.info("Deleted facility from integrations: {}", id);
+    }
+
+    /**
+     * Helper method to get facility by ID
+     */
+    private SystemDTO getFacilityById(String id) throws Exception {
+        Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
+                workflowEngine,
+                "systems/" + id,
+                "GET",
+                null);
+
+//        TODO: Add a proper check here based on actual response structure
+        if (integrationResponse.containsKey("id")) {
+            return SystemDTO.fromMap((Map<String, Object>) integrationResponse);
+        } else if (integrationResponse.containsKey("error")) {
+            throw new Exception("Failed to fetch facility: " + integrationResponse.get("error"));
+        }
+
+        throw new Exception("Failed to fetch facility - no response from integrations");
     }
 
     /**
