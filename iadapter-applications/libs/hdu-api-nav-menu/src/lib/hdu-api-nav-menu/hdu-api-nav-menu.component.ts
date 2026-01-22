@@ -187,6 +187,13 @@ export class HduApiNavMenuComponent implements OnInit {
           subMenus: [],
         },
         {
+          name: 'Facility Management',
+          id: 'facilities',
+          routeUrl: '/settings/facilities',
+          icon: 'tool',
+          subMenus: [],
+        },
+        {
           name: 'instances',
           id: 'settings',
           routeUrl: '/settings/instances',

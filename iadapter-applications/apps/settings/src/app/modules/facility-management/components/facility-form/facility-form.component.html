@@ -1,0 +1,110 @@
+<nz-card>
+    <div nz-row style="margin-bottom: 24px;">
+        <div nz-col [nzSpan]="24">
+            <h2>{{ isMediatorOnlyMode ? 'Configure Referral Endpoint' : (isEditMode ? 'Edit Facility' : 'Register New Facility') }}</h2>
+        </div>
+    </div>
+
+    <form nz-form [formGroup]="facilityForm" (ngSubmit)="submitForm()" [nzLayout]="'vertical'">
+        <!-- System Information Section -->
+        <nz-divider *ngIf="!isMediatorOnlyMode" nzText="Facility Information" nzOrientation="left"></nz-divider>
+
+        <div *ngIf="!isMediatorOnlyMode">
+        <nz-form-item>
+            <nz-form-label nzRequired>Facility Code</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter a valid facility code">
+                <input nz-input formControlName="code" placeholder="e.g., FAC001" [disabled]="isEditMode" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label nzRequired>Facility Name</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter facility name">
+                <input nz-input formControlName="name" placeholder="Enter facility name" />
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-label>Additional Parameters (JSON)</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter valid JSON">
+                <textarea nz-input formControlName="params" [nzAutosize]="{ minRows: 3, maxRows: 6 }"
+                    placeholder='{"key": "value"}'></textarea>
+                <nz-form-text>Optional: Additional configuration parameters in JSON format</nz-form-text>
+            </nz-form-control>
+        </nz-form-item>
+
+        <nz-form-item>
+            <nz-form-control>
+                <label nz-checkbox formControlName="allowed">
+                    <strong>Allow facility access</strong>
+                </label>
+                <nz-form-text>If unchecked, this facility will be blocked from the system</nz-form-text>
+            </nz-form-control>
+        </nz-form-item>
+        </div>
+
+        <!-- Mediator Configuration Section -->
+        <nz-divider [nzText]="isMediatorOnlyMode ? 'Referral Configuration' : 'Referral Configuration (Optional)'" nzOrientation="left"></nz-divider>
+
+        <!-- Show facility context in mediator-only mode -->
+        <div *ngIf="isMediatorOnlyMode" style="margin-bottom: 24px; padding: 16px; background: #fafafa; border-radius: 4px;">
+            <p><strong>Facility:</strong> {{ facilityForm.get('name')?.value }} ({{ facilityForm.get('code')?.value }})</p>
+        </div>
+
+        <nz-form-item *ngIf="!isMediatorOnlyMode">
+            <nz-form-control>
+                <label nz-checkbox formControlName="configureMediatorNow">
+                    <strong>Configure referral endpoint now</strong>
+                </label>
+                <nz-form-text>You can configure this later if needed</nz-form-text>
+            </nz-form-control>
+        </nz-form-item>
+
+        <div *ngIf="configureMediatorEnabled">
+            <nz-form-item>
+                <nz-form-label nzRequired>Mediator Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter mediator name">
+                    <input nz-input formControlName="mediatorName" placeholder="e.g., Hospital Referral System" />
+                </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item>
+                <nz-form-label nzRequired>Base URL</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter a valid URL (http:// or https://)">
+                    <input nz-input formControlName="baseUrl" placeholder="https://api.example.com" />
+                </nz-form-control>
+            </nz-form-item>
+
+            <div nz-row [nzGutter]="16">
+                <div nz-col [nzSpan]="12">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Username</nz-form-label>
+                        <nz-form-control nzErrorTip="Please enter username">
+                            <input nz-input formControlName="username" placeholder="API username" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+                <div nz-col [nzSpan]="12">
+                    <nz-form-item>
+                        <nz-form-label nzRequired>Password</nz-form-label>
+                        <nz-form-control nzErrorTip="Please enter password">
+                            <input nz-input type="password" formControlName="password" placeholder="API password" />
+                        </nz-form-control>
+                    </nz-form-item>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <nz-form-item>
+            <nz-form-control>
+                <button nz-button nzType="primary" [nzLoading]="loading" type="submit">
+                    {{ isMediatorOnlyMode ? 'Save Configuration' : (isEditMode ? 'Update Facility' : 'Register Facility') }}
+                </button>
+                <button nz-button type="button" (click)="cancel()" style="margin-left: 8px;">
+                    Cancel
+                </button>
+            </nz-form-control>
+        </nz-form-item>
+    </form>
+</nz-card>

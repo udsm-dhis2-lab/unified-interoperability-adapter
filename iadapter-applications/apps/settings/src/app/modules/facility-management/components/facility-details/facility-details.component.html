@@ -1,0 +1,98 @@
+<div *ngIf="loading" style="text-align: center; padding: 100px;">
+    <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+</div>
+
+<nz-card *ngIf="!loading && facilityData">
+    <div nz-row [nzGutter]="[16, 16]" nzJustify="space-between" style="margin-bottom: 24px;">
+        <div nz-col [nzSpan]="12">
+            <h2>Facility Details</h2>
+        </div>
+        <div nz-col [nzSpan]="12" style="text-align: right;">
+            <button nz-button (click)="goBack()">
+                <i nz-icon nzType="arrow-left"></i>
+                Back to List
+            </button>
+            <button nz-button nzType="primary" (click)="configureMediator()" style="margin-left: 8px;">
+                <i nz-icon [nzType]="facilityData.mediatorConfigured ? 'edit' : 'plus'"></i>
+                {{ facilityData.mediatorConfigured ? 'Edit' : 'Configure' }} Referral
+            </button>
+        </div>
+    </div>
+
+    <!-- System Information -->
+    <nz-divider nzText="Facility Information" nzOrientation="left"></nz-divider>
+
+    <nz-descriptions nzBordered [nzColumn]="2">
+        <nz-descriptions-item nzTitle="Facility Code">
+            <strong>{{ facilityData.code }}</strong>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Facility Name">
+            {{ facilityData.name }}
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Access Status">
+            <nz-tag [nzColor]="facilityData.allowed ? 'green' : 'red'">
+                {{ facilityData.allowed ? 'Allowed' : 'Blocked' }}
+            </nz-tag>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Referral Configured">
+            <nz-tag *ngIf="facilityData.mediatorConfigured" nzColor="blue">
+                <i nz-icon nzType="check-circle"></i> Yes
+            </nz-tag>
+            <nz-tag *ngIf="!facilityData.mediatorConfigured" nzColor="default">
+                <i nz-icon nzType="close-circle"></i> No
+            </nz-tag>
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Created At">
+            {{ formatDate(facilityData.created) }}
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Updated At">
+            {{ formatDate(facilityData.updated) }}
+        </nz-descriptions-item>
+        <nz-descriptions-item nzTitle="Additional Parameters" [nzSpan]="2">
+            <pre *ngIf="facilityData.params"
+                style="margin: 0; background: #f5f5f5; padding: 8px; border-radius: 4px;">{{ formatParams(facilityData.params) }}</pre>
+            <span *ngIf="!facilityData.params" style="color: #999;">None</span>
+        </nz-descriptions-item>
+    </nz-descriptions>
+
+    <!-- Mediator Configuration -->
+    <div *ngIf="facilityData.mediatorConfigured">
+        <nz-divider nzText="Referral Configuration" nzOrientation="left"></nz-divider>
+
+        <nz-descriptions nzBordered [nzColumn]="2">
+            <nz-descriptions-item nzTitle="Mediator UUID" [nzSpan]="2">
+                <code>{{ facilityData.mediatorUuid || 'N/A' }}</code>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Category" [nzSpan]="2">
+                <nz-tag nzColor="purple">{{ facilityData.mediatorCategory || 'REFERRAL' }}</nz-tag>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Base URL" [nzSpan]="2">
+                <code>{{ facilityData.mediatorBaseUrl }}</code>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Path">
+                <code>{{ facilityData.mediatorPath || '/' }}</code>
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Auth Type">
+                {{ facilityData.mediatorAuthType || 'N/A' }}
+            </nz-descriptions-item>
+            <nz-descriptions-item nzTitle="Referral Enabled" [nzSpan]="2">
+                <nz-tag [nzColor]="facilityData.referralEnabled ? 'green' : 'default'">
+                    {{ facilityData.referralEnabled ? 'Yes' : 'No' }}
+                </nz-tag>
+            </nz-descriptions-item>
+        </nz-descriptions>
+    </div>
+
+    <!-- No Mediator Configuration Message -->
+    <div *ngIf="!facilityData.mediatorConfigured" style="margin-top: 32px;">
+        <nz-divider nzText="Referral Configuration" nzOrientation="left"></nz-divider>
+        <div style="text-align: center; padding: 40px; background: #fafafa; border-radius: 4px;">
+            <i nz-icon nzType="info-circle" style="font-size: 48px; color: #1890ff; margin-bottom: 16px;"></i>
+            <p style="font-size: 16px; color: #666;">No referral endpoint configured for this facility.</p>
+            <button nz-button nzType="primary" (click)="configureMediator()">
+                <i nz-icon nzType="plus"></i>
+                Configure Now
+            </button>
+        </div>
+    </div>
+</nz-card>
