@@ -73,13 +73,11 @@ public class FacilityResponseDTO {
         // Mediator info
         map.put("mediatorConfigured", mediatorConfigured);
         if (mediatorConfigured) {
-            Map<String, Object> mediatorInfo = new HashMap<>();
-            mediatorInfo.put("uuid", mediatorUuid);
-            mediatorInfo.put("baseUrl", mediatorBaseUrl);
-            mediatorInfo.put("path", mediatorPath);
-            mediatorInfo.put("authType", mediatorAuthType);
-            mediatorInfo.put("category", mediatorCategory);
-            map.put("mediator", mediatorInfo);
+            map.put("mediatorUuid", mediatorUuid);
+            map.put("mediatorBaseUrl", mediatorBaseUrl);
+            map.put("mediatorPath", mediatorPath);
+            map.put("mediatorAuthType", mediatorAuthType);
+            map.put("mediatorCategory", mediatorCategory);
         }
 
         // Referral info

@@ -50,17 +50,17 @@ public class FacilityController {
     }
 
     /**
-     * Get a specific facility by code
+     * Get a specific facility by ID
      */
-    @GetMapping("/{code}")
-    @Operation(summary = "Get facility by code", description = "Retrieve complete facility details including mediator configuration")
-    public ResponseEntity<Map<String, Object>> getFacilityByCode(
-            @Parameter(description = "Facility HFR code") @PathVariable String code) {
+    @GetMapping("/{id}")
+    @Operation(summary = "Get facility by ID", description = "Retrieve complete facility details including mediator configuration")
+    public ResponseEntity<Map<String, Object>> getFacilityById(
+            @Parameter(description = "Facility ID (UUID)") @PathVariable String id) {
         try {
-            FacilityResponseDTO facility = facilityManagementService.getFacilityByCode(code);
+            FacilityResponseDTO facility = facilityManagementService.getFacilityById(id);
             return ResponseEntity.ok(facility.toMap());
         } catch (Exception e) {
-            log.error("Error fetching facility: {}", code, e);
+            log.error("Error fetching facility: {}", id, e);
             Map<String, Object> error = createErrorResponse("Facility not found", e.getMessage());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
@@ -110,16 +110,16 @@ public class FacilityController {
     /**
      * Configure or update mediator for a facility
      */
-    @PostMapping("/{code}/mediator")
+    @PostMapping("/{id}/mediator")
     @Operation(summary = "Configure facility mediator", description = "Configure or update mediator settings for a facility")
     public ResponseEntity<Map<String, Object>> configureFacilityMediator(
-            @Parameter(description = "Facility HFR code") @PathVariable String code,
+            @Parameter(description = "Facility ID (UUID)") @PathVariable String id,
             @Valid @RequestBody MediatorDTO mediatorConfig) {
         try {
-            FacilityResponseDTO facility = facilityManagementService.configureFacilityMediator(code, mediatorConfig);
+            FacilityResponseDTO facility = facilityManagementService.configureFacilityMediator(id, mediatorConfig);
             return ResponseEntity.ok(facility.toMap());
         } catch (Exception e) {
-            log.error("Error configuring mediator for facility: {}", code, e);
+            log.error("Error configuring mediator for facility: {}", id, e);
             Map<String, Object> error = createErrorResponse("Failed to configure mediator", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
@@ -128,16 +128,16 @@ public class FacilityController {
     /**
      * Update mediator configuration for a facility (PUT method)
      */
-    @PutMapping("/{code}/mediator")
+    @PutMapping("/{id}/mediator")
     @Operation(summary = "Update facility mediator", description = "Update mediator settings for a facility")
     public ResponseEntity<Map<String, Object>> updateFacilityMediator(
-            @Parameter(description = "Facility HFR code") @PathVariable String code,
+            @Parameter(description = "Facility ID (UUID)") @PathVariable String id,
             @Valid @RequestBody MediatorDTO mediatorConfig) {
         try {
-            FacilityResponseDTO facility = facilityManagementService.configureFacilityMediator(code, mediatorConfig);
+            FacilityResponseDTO facility = facilityManagementService.configureFacilityMediator(id, mediatorConfig);
             return ResponseEntity.ok(facility.toMap());
         } catch (Exception e) {
-            log.error("Error updating mediator for facility: {}", code, e);
+            log.error("Error updating mediator for facility: {}", id, e);
             Map<String, Object> error = createErrorResponse("Failed to update mediator", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }

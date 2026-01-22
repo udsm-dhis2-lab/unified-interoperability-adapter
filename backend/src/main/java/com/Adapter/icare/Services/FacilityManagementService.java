@@ -27,8 +27,6 @@ import java.util.Map;
 public class FacilityManagementService {
 
     private final MediatorsService mediatorsService;
-    private final DatastoreService datastoreService;
-    private final DatastoreConstants datastoreConstants;
 
     private boolean shouldUseWorkflowEngine = false;
     private Mediator workflowEngine = null;
@@ -39,8 +37,6 @@ public class FacilityManagementService {
             DatastoreService datastoreService,
             DatastoreConstants datastoreConstants) {
         this.mediatorsService = mediatorsService;
-        this.datastoreService = datastoreService;
-        this.datastoreConstants = datastoreConstants;
 
         // Initialize workflow engine from datastore
         try {
@@ -109,8 +105,8 @@ public class FacilityManagementService {
     /**
      * Get a specific facility with complete configuration
      */
-    public FacilityResponseDTO getFacilityByCode(String code) throws Exception {
-        log.info("Fetching facility details for code: {}", code);
+    public FacilityResponseDTO getFacilityById(String id) throws Exception {
+        log.info("Fetching facility details for id: {}", id);
 
         if (!shouldUseWorkflowEngine || workflowEngine == null) {
             throw new Exception("Workflow engine not configured. Cannot fetch facility.");
@@ -118,32 +114,70 @@ public class FacilityManagementService {
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "systems/" + code,
+                "systems/" + id,
                 "GET",
                 null);
 
         SystemDTO system = null;
-        if (integrationResponse.containsKey("system")) {
-            @SuppressWarnings("unchecked")
-            Map<String, Object> systemMap = (Map<String, Object>) integrationResponse.get("system");
-            system = SystemDTO.fromMap(systemMap);
+        // TODO: Handle response structure properly based on actual response
+        if (integrationResponse.containsKey("id")) {
+            system = SystemDTO.fromMap((Map<String, Object>) integrationResponse);
         } else if (integrationResponse.containsKey("error")) {
             throw new Exception("Failed to fetch facility: " + integrationResponse.get("error"));
         }
 
         if (system == null) {
-            throw new Exception("Facility with code " + code + " not found");
+            throw new Exception("Facility with id " + id + " not found");
         }
 
         Mediator mediator = null;
         try {
-            mediator = mediatorsService.getMediatorByCode(code);
+            mediator = mediatorsService.getMediatorByCode(system.getCode());
         } catch (Exception e) {
-            log.info("No mediator configured for facility: {}", code);
+            log.info("No mediator configured for facility: {}", system.getCode());
         }
 
         return FacilityResponseDTO.from(system, mediator);
     }
+
+    /**
+     * Get a specific facility by code
+     */
+//    public FacilityResponseDTO getFacilityByCode(String code) throws Exception {
+//        log.info("Fetching facility details for code: {}", code);
+//
+//        if (!shouldUseWorkflowEngine || workflowEngine == null) {
+//            throw new Exception("Workflow engine not configured. Cannot fetch facility.");
+//        }
+//
+//        Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
+//                workflowEngine,
+//                "systems/" + code,
+//                "GET",
+//                null);
+//
+//        SystemDTO system = null;
+//        if (integrationResponse.containsKey("system")) {
+//            @SuppressWarnings("unchecked")
+//            Map<String, Object> systemMap = (Map<String, Object>) integrationResponse.get("system");
+//            system = SystemDTO.fromMap(systemMap);
+//        } else if (integrationResponse.containsKey("error")) {
+//            throw new Exception("Failed to fetch facility: " + integrationResponse.get("error"));
+//        }
+//
+//        if (system == null) {
+//            throw new Exception("Facility with code " + code + " not found");
+//        }
+//
+//        Mediator mediator = null;
+//        try {
+//            mediator = mediatorsService.getMediatorByCode(code);
+//        } catch (Exception e) {
+//            log.info("No mediator configured for facility: {}", code);
+//        }
+//
+//        return FacilityResponseDTO.from(system, mediator);
+//    }
 
     /**
      * Register a new facility with optional mediator configuration
@@ -156,14 +190,15 @@ public class FacilityManagementService {
             throw new Exception("Workflow engine not configured. Cannot register facility.");
         }
 
-        try {
-            getFacilityByCode(registrationDTO.getCode());
-            throw new Exception("Facility with code " + registrationDTO.getCode() + " already exists");
-        } catch (Exception e) {
-            if (e.getMessage().contains("already exists")) {
-                throw e;
-            }
-        }
+//       Unnessary code to check for existing facility - integrations will handle duplicates
+//        try {
+//            getFacilityByCode(registrationDTO.getCode());
+//            throw new Exception("Facility with code " + registrationDTO.getCode() + " already exists");
+//        } catch (Exception e) {
+//            if (e.getMessage().contains("already exists")) {
+//                throw e;
+//            }
+//        }
 
         Map<String, Object> systemPayload = new HashMap<>();
         systemPayload.put("code", registrationDTO.getCode());
@@ -279,14 +314,17 @@ public class FacilityManagementService {
      * Configure or update mediator for a facility
      */
     @Transactional
-    public FacilityResponseDTO configureFacilityMediator(String code, MediatorDTO mediatorConfig)
+    public FacilityResponseDTO configureFacilityMediator(String id, MediatorDTO mediatorConfig)
             throws Exception {
-        log.info("Configuring mediator for facility: {}", code);
+        log.info("Configuring mediator for facility with id: {}", id);
 
-        FacilityResponseDTO existingFacility = getFacilityByCode(code);
+        // First get the facility by ID to obtain the code
+        FacilityResponseDTO existingFacility = getFacilityById(id);
         if (existingFacility == null) {
-            throw new Exception("Facility with code " + code + " not found");
+            throw new Exception("Facility with id " + id + " not found");
         }
+
+        String code = existingFacility.getCode();
 
         Mediator existingMediator = null;
         try {
@@ -322,12 +360,12 @@ public class FacilityManagementService {
             mediator = mediatorsService.saveMediatorConfigs(new Mediator().fromMap(mediatorDTO));
             log.info("Created mediator for facility: {}", code);
 
-            // Update mediatorConfigured flag in integrations
+            // Update mediatorConfigured flag in integrations using ID
             Map<String, Object> updateFlag = new HashMap<>();
             updateFlag.put("mediatorConfigured", true);
             mediatorsService.routeToMediator(
                     workflowEngine,
-                    "systems/" + code,
+                    "systems/" + id,
                     "PUT",
                     updateFlag);
         }
@@ -340,6 +378,7 @@ public class FacilityManagementService {
         system.setParams(existingFacility.getParams());
         system.setCreated(existingFacility.getCreated());
         system.setUpdated(existingFacility.getUpdated());
+        system.setMediatorConfigured(true);
 
         return FacilityResponseDTO.from(system, mediator);
     }
@@ -355,7 +394,7 @@ public class FacilityManagementService {
             throw new Exception("Workflow engine not configured. Cannot delete facility.");
         }
 
-        SystemDTO system = getFacilityById(id);
+        SystemDTO system = fetchSystemById(id);
         String code = system.getCode();
 
         try {
@@ -391,16 +430,16 @@ public class FacilityManagementService {
     }
 
     /**
-     * Helper method to get facility by ID
+     * Helper method to fetch system by ID
      */
-    private SystemDTO getFacilityById(String id) throws Exception {
+    private SystemDTO fetchSystemById(String id) throws Exception {
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
                 "systems/" + id,
                 "GET",
                 null);
 
-//        TODO: Add a proper check here based on actual response structure
+        // TODO: Add a proper check here based on actual response structure
         if (integrationResponse.containsKey("id")) {
             return SystemDTO.fromMap((Map<String, Object>) integrationResponse);
         } else if (integrationResponse.containsKey("error")) {
