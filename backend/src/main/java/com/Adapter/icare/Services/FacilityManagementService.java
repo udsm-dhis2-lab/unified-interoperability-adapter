@@ -143,41 +143,44 @@ public class FacilityManagementService {
     /**
      * Get a specific facility by code
      */
-//    public FacilityResponseDTO getFacilityByCode(String code) throws Exception {
-//        log.info("Fetching facility details for code: {}", code);
-//
-//        if (!shouldUseWorkflowEngine || workflowEngine == null) {
-//            throw new Exception("Workflow engine not configured. Cannot fetch facility.");
-//        }
-//
-//        Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
-//                workflowEngine,
-//                "systems/" + code,
-//                "GET",
-//                null);
-//
-//        SystemDTO system = null;
-//        if (integrationResponse.containsKey("system")) {
-//            @SuppressWarnings("unchecked")
-//            Map<String, Object> systemMap = (Map<String, Object>) integrationResponse.get("system");
-//            system = SystemDTO.fromMap(systemMap);
-//        } else if (integrationResponse.containsKey("error")) {
-//            throw new Exception("Failed to fetch facility: " + integrationResponse.get("error"));
-//        }
-//
-//        if (system == null) {
-//            throw new Exception("Facility with code " + code + " not found");
-//        }
-//
-//        Mediator mediator = null;
-//        try {
-//            mediator = mediatorsService.getMediatorByCode(code);
-//        } catch (Exception e) {
-//            log.info("No mediator configured for facility: {}", code);
-//        }
-//
-//        return FacilityResponseDTO.from(system, mediator);
-//    }
+    // public FacilityResponseDTO getFacilityByCode(String code) throws Exception {
+    // log.info("Fetching facility details for code: {}", code);
+    //
+    // if (!shouldUseWorkflowEngine || workflowEngine == null) {
+    // throw new Exception("Workflow engine not configured. Cannot fetch
+    // facility.");
+    // }
+    //
+    // Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
+    // workflowEngine,
+    // "systems/" + code,
+    // "GET",
+    // null);
+    //
+    // SystemDTO system = null;
+    // if (integrationResponse.containsKey("system")) {
+    // @SuppressWarnings("unchecked")
+    // Map<String, Object> systemMap = (Map<String, Object>)
+    // integrationResponse.get("system");
+    // system = SystemDTO.fromMap(systemMap);
+    // } else if (integrationResponse.containsKey("error")) {
+    // throw new Exception("Failed to fetch facility: " +
+    // integrationResponse.get("error"));
+    // }
+    //
+    // if (system == null) {
+    // throw new Exception("Facility with code " + code + " not found");
+    // }
+    //
+    // Mediator mediator = null;
+    // try {
+    // mediator = mediatorsService.getMediatorByCode(code);
+    // } catch (Exception e) {
+    // log.info("No mediator configured for facility: {}", code);
+    // }
+    //
+    // return FacilityResponseDTO.from(system, mediator);
+    // }
 
     /**
      * Register a new facility with optional mediator configuration
@@ -189,16 +192,6 @@ public class FacilityManagementService {
         if (!shouldUseWorkflowEngine || workflowEngine == null) {
             throw new Exception("Workflow engine not configured. Cannot register facility.");
         }
-
-//       Unnessary code to check for existing facility - integrations will handle duplicates
-//        try {
-//            getFacilityByCode(registrationDTO.getCode());
-//            throw new Exception("Facility with code " + registrationDTO.getCode() + " already exists");
-//        } catch (Exception e) {
-//            if (e.getMessage().contains("already exists")) {
-//                throw e;
-//            }
-//        }
 
         Map<String, Object> systemPayload = new HashMap<>();
         systemPayload.put("code", registrationDTO.getCode());
@@ -289,8 +282,7 @@ public class FacilityManagementService {
 
         SystemDTO updatedSystem = null;
         if (integrationResponse.containsKey("updated")) {
-            Map<String, Object> systemMap = (Map<String, Object>) integrationResponse;
-            updatedSystem = SystemDTO.fromMap(systemMap);
+            updatedSystem = SystemDTO.fromMap((Map<String, Object>) integrationResponse);
         } else if (integrationResponse.containsKey("error")) {
             throw new Exception("Failed to update facility access: " + integrationResponse.get("error"));
         }
@@ -299,15 +291,7 @@ public class FacilityManagementService {
             throw new Exception("Failed to update facility access - no response from integrations");
         }
 
-        Mediator mediator = null;
-        try {
-            // Use code to fetch mediator, not id
-            mediator = mediatorsService.getMediatorByCode(updatedSystem.getCode());
-        } catch (Exception e) {
-            log.info("No mediator configured for facility: {}", updatedSystem.getCode());
-        }
-
-        return FacilityResponseDTO.from(updatedSystem, mediator);
+        return FacilityResponseDTO.from(updatedSystem, null);
     }
 
     /**
@@ -402,15 +386,6 @@ public class FacilityManagementService {
             if (mediator != null) {
                 mediatorsService.deleteMediator(mediator.getUuid());
                 log.info("Deleted mediator for facility: {}", code);
-
-                // Update mediatorConfigured flag in integrations before deleting system
-                Map<String, Object> updateFlag = new HashMap<>();
-                updateFlag.put("mediatorConfigured", false);
-                mediatorsService.routeToMediator(
-                        workflowEngine,
-                        "systems/" + id,
-                        "PUT",
-                        updateFlag);
             }
         } catch (Exception e) {
             log.warn("No mediator to delete for facility: {}", code);
