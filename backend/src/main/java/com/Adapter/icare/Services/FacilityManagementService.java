@@ -67,20 +67,28 @@ public class FacilityManagementService {
     /**
      * Get all facilities with their complete configuration
      */
-    public Map<String, Object> getFacilities(Integer page, Integer pageSize) throws Exception {
-        log.info("Fetching facilities - page: {}, pageSize: {}", page, pageSize);
+    public Map<String, Object> getFacilities(Integer page, Integer pageSize, String search) throws Exception {
+        log.info("Fetching facilities - page: {}, pageSize: {}, search: {}", page, pageSize, search);
 
         if (!shouldUseWorkflowEngine || workflowEngine == null) {
             throw new Exception("Workflow engine not configured. Cannot fetch facilities.");
         }
 
-        String queryString = String.format("page=%d&pageSize=%d",
+        StringBuilder queryString = new StringBuilder(String.format("page=%d&pageSize=%d",
                 page != null ? page : 1,
-                pageSize != null ? pageSize : 50);
+                pageSize != null ? pageSize : 50));
+
+  
+        if (search != null && !search.trim().isEmpty()) {
+            String searchTerm = search.trim();
+            queryString.append("&filter=name:ilike:").append(searchTerm);
+            queryString.append("&filter=code:ilike:").append(searchTerm);
+            queryString.append("&rootJoin=OR");
+        }
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
-                "systems?" + queryString,
+                "systems?" + queryString.toString(),
                 "GET",
                 null);
 

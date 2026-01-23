@@ -38,9 +38,10 @@ public class FacilityController {
     @Operation(summary = "Get all facilities", description = "Retrieve all facilities with their whitelist status and mediator configuration")
     public ResponseEntity<Map<String, Object>> getFacilities(
             @Parameter(description = "Page number (1-based)") @RequestParam(value = "page", defaultValue = "1") Integer page,
-            @Parameter(description = "Number of items per page") @RequestParam(value = "pageSize", defaultValue = "50") Integer pageSize) {
+            @Parameter(description = "Number of items per page") @RequestParam(value = "pageSize", defaultValue = "50") Integer pageSize,
+            @Parameter(description = "Search term for filtering by name or code") @RequestParam(value = "search", required = false) String search) {
         try {
-            Map<String, Object> response = facilityManagementService.getFacilities(page, pageSize);
+            Map<String, Object> response = facilityManagementService.getFacilities(page, pageSize, search);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("Error fetching facilities", e);
