@@ -20,6 +20,7 @@ import lombok.Setter;
 @Setter
 public class DemographicDetailsDTO {
     private String id;
+    private String mrn;
     @NotBlank(message = "firstName cannot be blank")
     private String firstName;
     private String middleName;
@@ -49,6 +50,7 @@ public class DemographicDetailsDTO {
     public Map<String, Object> toMap() {
         Map<String, Object> demographicDetails = new LinkedHashMap<>();
         demographicDetails.put("id", this.getId());
+        demographicDetails.put("mrn", this.getMrn());
         demographicDetails.put("firstName", this.getFirstName());
         demographicDetails.put("middleName", this.getMiddleName());
         demographicDetails.put("lastName", this.getLastName());
