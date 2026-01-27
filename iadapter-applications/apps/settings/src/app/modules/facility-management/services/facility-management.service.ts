@@ -16,16 +16,20 @@ export class FacilityManagementService {
 
     constructor(private http: HttpClient) { }
 
-    getFacilities(page: number = 1, pageSize: number = 50): Observable<FacilityListResponse> {
-        const params = new HttpParams()
+    getFacilities(page: number = 1, pageSize: number = 50, search: string = ''): Observable<FacilityListResponse> {
+        let params = new HttpParams()
             .set('page', page.toString())
             .set('pageSize', pageSize.toString());
+
+        if (search && search.trim()) {
+            params = params.set('search', search.trim());
+        }
 
         return this.http.get<FacilityListResponse>(this.baseUrl, { params });
     }
 
-    getFacilityByCode(code: string): Observable<FacilityResponse> {
-        return this.http.get<FacilityResponse>(`${this.baseUrl}/${code}`);
+    getFacilityById(id: string): Observable<FacilityResponse> {
+        return this.http.get<FacilityResponse>(`${this.baseUrl}/${id}`);
     }
 
     registerFacility(facility: FacilityRegistration): Observable<FacilityResponse> {
@@ -37,11 +41,11 @@ export class FacilityManagementService {
         return this.http.patch<FacilityResponse>(`${this.baseUrl}/${id}/access`, null, { params });
     }
 
-    configureMediator(code: string, config: MediatorConfig): Observable<FacilityResponse> {
-        return this.http.put<FacilityResponse>(`${this.baseUrl}/${code}/mediator`, config);
+    configureMediator(id: string, config: MediatorConfig): Observable<FacilityResponse> {
+        return this.http.put<FacilityResponse>(`${this.baseUrl}/${id}/mediator`, config);
     }
 
-    deleteFacility(code: string): Observable<{ message: string }> {
-        return this.http.delete<{ message: string }>(`${this.baseUrl}/${code}`);
+    deleteFacility(id: string): Observable<{ message: string }> {
+        return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`);
     }
 }

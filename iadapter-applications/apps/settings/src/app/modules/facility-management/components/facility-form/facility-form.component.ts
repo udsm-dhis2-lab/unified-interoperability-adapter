@@ -5,7 +5,6 @@ import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
 import { NzMessageService } from 'ng-zorro-antd/message';
@@ -26,7 +25,6 @@ import { FacilityRegistration } from '../../models/facility.model';
         NzFormModule,
         NzInputModule,
         NzButtonModule,
-        NzCardModule,
         NzGridModule,
         NzSwitchModule,
         NzCheckboxModule,
@@ -41,7 +39,7 @@ export class FacilityFormComponent implements OnInit {
     loading = false;
     isEditMode = false;
     isMediatorOnlyMode = false;
-    facilityCode?: string;
+    facilityId?: string;
     configureMediatorEnabled = false;
 
     constructor(
@@ -55,8 +53,16 @@ export class FacilityFormComponent implements OnInit {
     ngOnInit(): void {
         this.initializeForm();
 
-        this.facilityCode = this.route.snapshot.paramMap.get('code') || undefined;
-        if (this.facilityCode) {
+        // Check if we're in mediator-only mode (URL ends with /mediator)
+        this.isMediatorOnlyMode = this.route.snapshot.url.some(segment => segment.path === 'mediator');
+
+        // In mediator-only mode, automatically enable mediator configuration
+        if (this.isMediatorOnlyMode) {
+            this.configureMediatorEnabled = true;
+        }
+
+        this.facilityId = this.route.snapshot.paramMap.get('id') || undefined;
+        if (this.facilityId) {
             this.isEditMode = true;
             this.loadFacility();
         }
@@ -72,6 +78,7 @@ export class FacilityFormComponent implements OnInit {
             configureMediatorNow: [false],
             mediatorName: [''],
             baseUrl: [''],
+            path: [''],
             username: [''],
             password: ['']
         });
@@ -85,17 +92,20 @@ export class FacilityFormComponent implements OnInit {
     updateMediatorValidators(): void {
         const mediatorName = this.facilityForm.get('mediatorName');
         const baseUrl = this.facilityForm.get('baseUrl');
+        const path = this.facilityForm.get('path');
         const username = this.facilityForm.get('username');
         const password = this.facilityForm.get('password');
 
         if (this.configureMediatorEnabled) {
             mediatorName?.setValidators([Validators.required]);
             baseUrl?.setValidators([Validators.required, Validators.pattern('https?://.+')]);
+            path?.setValidators([Validators.required]);
             username?.setValidators([Validators.required]);
             password?.setValidators([Validators.required]);
         } else {
             mediatorName?.clearValidators();
             baseUrl?.clearValidators();
+            path?.clearValidators();
             username?.clearValidators();
             password?.clearValidators();
         }
@@ -107,10 +117,10 @@ export class FacilityFormComponent implements OnInit {
     }
 
     loadFacility(): void {
-        if (!this.facilityCode) return;
+        if (!this.facilityId) return;
 
         this.loading = true;
-        this.facilityService.getFacilityByCode(this.facilityCode).subscribe({
+        this.facilityService.getFacilityById(this.facilityId).subscribe({
             next: (response) => {
                 this.facilityForm.patchValue({
                     code: response.code,
@@ -118,6 +128,15 @@ export class FacilityFormComponent implements OnInit {
                     allowed: response.allowed,
                     params: response.params || ''
                 });
+
+                // Load mediator configuration if it exists
+                if (response.mediatorConfigured && (this.isMediatorOnlyMode || this.configureMediatorEnabled)) {
+                    this.facilityForm.patchValue({
+                        mediatorName: response.name,
+                        baseUrl: response.mediatorBaseUrl || '',
+                        path: response.mediatorPath || ''
+                    });
+                }
 
                 this.facilityForm.get('code')?.disable();
 
@@ -162,6 +181,7 @@ export class FacilityFormComponent implements OnInit {
         if (this.configureMediatorEnabled) {
             registration.mediatorConfig = {
                 baseUrl: formValue.baseUrl,
+                path: formValue.path,
                 authType: 'BASIC',
                 authToken: btoa(`${formValue.username}:${formValue.password}`),
                 category: 'REFERRAL'
@@ -183,18 +203,19 @@ export class FacilityFormComponent implements OnInit {
     }
 
     configureMediatorOnly(): void {
-        if (!this.facilityCode) return;
+        if (!this.facilityId) return;
 
         const formValue = this.facilityForm.value;
         const mediatorConfig = {
             baseUrl: formValue.baseUrl,
+            path: formValue.path,
             authType: 'BASIC',
             authToken: btoa(`${formValue.username}:${formValue.password}`),
             category: 'REFERRAL'
         };
 
         this.loading = true;
-        this.facilityService.configureMediator(this.facilityCode, mediatorConfig).subscribe({
+        this.facilityService.configureMediator(this.facilityId!, mediatorConfig).subscribe({
             next: () => {
                 this.message.success('Referral configuration updated successfully');
                 this.router.navigate(['../../'], { relativeTo: this.route });
