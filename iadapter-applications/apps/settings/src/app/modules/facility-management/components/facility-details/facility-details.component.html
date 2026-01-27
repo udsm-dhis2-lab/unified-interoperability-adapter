@@ -2,7 +2,8 @@
     <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
 </div>
 
-<nz-card *ngIf="!loading && facilityData">
+<!-- <nz-card *ngIf="!loading && facilityData"> -->
+<div *ngIf="!loading && facilityData">
     <div nz-row [nzGutter]="[16, 16]" nzJustify="space-between" style="margin-bottom: 24px;">
         <div nz-col [nzSpan]="12">
             <h2>Facility Details</h2>
@@ -60,9 +61,6 @@
         <nz-divider nzText="Referral Configuration" nzOrientation="left"></nz-divider>
 
         <nz-descriptions nzBordered [nzColumn]="2">
-            <nz-descriptions-item nzTitle="Mediator UUID" [nzSpan]="2">
-                <code>{{ facilityData.mediatorUuid || 'N/A' }}</code>
-            </nz-descriptions-item>
             <nz-descriptions-item nzTitle="Category" [nzSpan]="2">
                 <nz-tag nzColor="purple">{{ facilityData.mediatorCategory || 'REFERRAL' }}</nz-tag>
             </nz-descriptions-item>
@@ -75,11 +73,11 @@
             <nz-descriptions-item nzTitle="Auth Type">
                 {{ facilityData.mediatorAuthType || 'N/A' }}
             </nz-descriptions-item>
-            <nz-descriptions-item nzTitle="Referral Enabled" [nzSpan]="2">
+            <!-- <nz-descriptions-item nzTitle="Referral Enabled" [nzSpan]="2">
                 <nz-tag [nzColor]="facilityData.referralEnabled ? 'green' : 'default'">
                     {{ facilityData.referralEnabled ? 'Yes' : 'No' }}
                 </nz-tag>
-            </nz-descriptions-item>
+            </nz-descriptions-item> -->
         </nz-descriptions>
     </div>
 
@@ -95,4 +93,5 @@
             </button>
         </div>
     </div>
-</nz-card>
+</div>
+<!-- </nz-card> -->

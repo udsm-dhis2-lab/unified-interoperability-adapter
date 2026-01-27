@@ -78,7 +78,6 @@ public class FacilityManagementService {
                 page != null ? page : 1,
                 pageSize != null ? pageSize : 50));
 
-  
         if (search != null && !search.trim().isEmpty()) {
             String searchTerm = search.trim();
             queryString.append("&filter=name:ilike:").append(searchTerm);
@@ -93,11 +92,19 @@ public class FacilityManagementService {
                 null);
 
         List<SystemDTO> systems = new ArrayList<>();
+        int total = 0;
+
         if (integrationResponse.containsKey("systems")) {
             @SuppressWarnings("unchecked")
             List<Map<String, Object>> systemMaps = (List<Map<String, Object>>) integrationResponse.get("systems");
             for (Map<String, Object> systemMap : systemMaps) {
                 systems.add(SystemDTO.fromMap(systemMap));
+            }
+
+            if (integrationResponse.containsKey("total")) {
+                total = ((Number) integrationResponse.get("total")).intValue();
+            } else {
+                total = systems.size();
             }
         } else if (integrationResponse.containsKey("error")) {
             throw new Exception("Failed to fetch facilities: " + integrationResponse.get("error"));
@@ -105,7 +112,7 @@ public class FacilityManagementService {
 
         Map<String, Object> response = new HashMap<>();
         response.put("facilities", systems);
-        response.put("pager", createPager(page, pageSize, systems.size()));
+        response.put("pager", createPager(page, pageSize, total));
 
         return response;
     }

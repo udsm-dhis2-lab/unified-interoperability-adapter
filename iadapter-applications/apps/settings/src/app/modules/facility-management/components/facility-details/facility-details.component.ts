@@ -35,7 +35,7 @@ import { FacilityResponse } from '../../models/facility.model';
 })
 export class FacilityDetailsComponent implements OnInit {
     loading = false;
-    facilityCode!: string;
+    facilityId!: string;
     facilityData?: FacilityResponse;
 
     constructor(
@@ -46,10 +46,10 @@ export class FacilityDetailsComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.facilityCode = this.route.snapshot.paramMap.get('code') || '';
+        this.facilityId = this.route.snapshot.paramMap.get('id') || '';
 
-        if (!this.facilityCode) {
-            this.message.error('Facility code is required');
+        if (!this.facilityId) {
+            this.message.error('Facility ID is required');
             this.router.navigate(['/facilities']);
             return;
         }
@@ -59,7 +59,7 @@ export class FacilityDetailsComponent implements OnInit {
 
     loadFacility(): void {
         this.loading = true;
-        this.facilityService.getFacilityByCode(this.facilityCode).subscribe({
+        this.facilityService.getFacilityById(this.facilityId).subscribe({
             next: (response) => {
                 this.facilityData = response;
                 this.loading = false;
@@ -74,7 +74,7 @@ export class FacilityDetailsComponent implements OnInit {
     }
 
     configureMediator(): void {
-        this.router.navigate([this.facilityCode, 'mediator'], { relativeTo: this.route.parent });
+        this.router.navigate([this.facilityId, 'mediator'], { relativeTo: this.route.parent });
     }
 
     goBack(): void {

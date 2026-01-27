@@ -13,7 +13,8 @@
 <div nz-row style="margin-bottom: 16px;">
     <div nz-col [nzSpan]="24">
         <nz-input-group [nzPrefix]="prefixIconSearch">
-            <input type="text" nz-input placeholder="Search by name or code..." [(ngModel)]="searchTerm" />
+            <input type="text" nz-input placeholder="Search by name or code..." [(ngModel)]="searchTerm"
+                (ngModelChange)="onSearch()" />
         </nz-input-group>
         <ng-template #prefixIconSearch>
             <i nz-icon nzType="search"></i>
@@ -21,10 +22,10 @@
     </div>
 </div>
 
-<nz-table #facilitiesTable [nzData]="filteredFacilities" [nzLoading]="loading" [nzPageSize]="pageSize"
-    [nzPageIndex]="pageIndex" [nzTotal]="total" [nzFrontPagination]="false" [nzShowSizeChanger]="true"
-    [nzPageSizeOptions]="[20, 50, 100]" (nzPageIndexChange)="onPageIndexChange($event)"
-    (nzPageSizeChange)="onPageSizeChange($event)" [nzScroll]="{ x: '1000px' }">
+<nz-table #facilitiesTable [nzData]="facilities" [nzLoading]="loading" [nzPageSize]="pageSize" [nzPageIndex]="pageIndex"
+    [nzTotal]="total" [nzFrontPagination]="false" [nzShowSizeChanger]="true" [nzPageSizeOptions]="[10, 20, 50, 100]"
+    (nzPageIndexChange)="onPageIndexChange($event)" (nzPageSizeChange)="onPageSizeChange($event)"
+    [nzScroll]="{ x: '1000px' }">
     <thead>
         <tr>
             <th nzWidth="50px">#</th>

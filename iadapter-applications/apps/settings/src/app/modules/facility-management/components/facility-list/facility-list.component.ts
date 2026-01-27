@@ -65,7 +65,7 @@ export class FacilityListComponent implements OnInit {
 
     loadFacilities(): void {
         this.loading = true;
-        this.facilityService.getFacilities(this.pageIndex, this.pageSize).subscribe({
+        this.facilityService.getFacilities(this.pageIndex, this.pageSize, this.searchTerm).subscribe({
             next: (response) => {
                 this.facilities = response.facilities;
                 this.total = response.pager.total;
@@ -86,6 +86,11 @@ export class FacilityListComponent implements OnInit {
 
     onPageSizeChange(pageSize: number): void {
         this.pageSize = pageSize;
+        this.pageIndex = 1;
+        this.loadFacilities();
+    }
+
+    onSearch(): void {
         this.pageIndex = 1;
         this.loadFacilities();
     }
@@ -123,11 +128,11 @@ export class FacilityListComponent implements OnInit {
     }
 
     viewDetails(facility: System): void {
-        this.router.navigate(['facilities', facility.code], { relativeTo: this.route.parent });
+        this.router.navigate([facility.id], { relativeTo: this.route });
     }
 
     configureMediator(facility: System): void {
-        this.router.navigate(['facilities', facility.code, 'mediator'], { relativeTo: this.route.parent });
+        this.router.navigate([facility.id, 'mediator'], { relativeTo: this.route });
     }
 
     deleteFacility(facility: System): void {
@@ -137,7 +142,7 @@ export class FacilityListComponent implements OnInit {
             nzOkText: 'Delete',
             nzOkDanger: true,
             nzOnOk: () => {
-                return this.facilityService.deleteFacility(facility.code).subscribe({
+                return this.facilityService.deleteFacility(facility.id!).subscribe({
                     next: () => {
                         this.message.success('Facility deleted successfully');
                         this.loadFacilities();
@@ -151,15 +156,4 @@ export class FacilityListComponent implements OnInit {
         });
     }
 
-    get filteredFacilities(): System[] {
-        if (!this.searchTerm) {
-            return this.facilities;
-        }
-        const term = this.searchTerm.toLowerCase();
-        return this.facilities.filter(
-            (f) =>
-                f.name?.toLowerCase().includes(term) ||
-                f.code?.toLowerCase().includes(term)
-        );
-    }
 }

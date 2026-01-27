@@ -32,14 +32,14 @@ const routes: Routes = [
           ),
       },
       {
-        path: ':code',
+        path: ':id',
         loadComponent: () =>
           import('../modules/facility-management/components/facility-details/facility-details.component').then(
             (m) => m.FacilityDetailsComponent
           ),
       },
       {
-        path: ':code/mediator',
+        path: ':id/mediator',
         loadComponent: () =>
           import('../modules/facility-management/components/facility-form/facility-form.component').then(
             (m) => m.FacilityFormComponent
