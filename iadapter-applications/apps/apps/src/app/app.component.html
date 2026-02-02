@@ -1,7 +1,5 @@
-<!-- Navigation layout for authenticated pages -->
 <ng-container *ngIf="showNavigation$ | async">
   <lib-hdu-api-top-bar-menu [appName]="appName"></lib-hdu-api-top-bar-menu>
-  
   <nz-layout>
     <nz-sider nzTheme="light" nzCollapsible nzWidth="15vw">
       <lib-hdu-api-nav-menu
@@ -18,7 +16,6 @@
   </nz-layout>
 </ng-container>
 
-<!-- Full-screen layout for login and other auth pages -->
 <ng-container *ngIf="!(showNavigation$ | async)">
   <router-outlet />
 </ng-container>

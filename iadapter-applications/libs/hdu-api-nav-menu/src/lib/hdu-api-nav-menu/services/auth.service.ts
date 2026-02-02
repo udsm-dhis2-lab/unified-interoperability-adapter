@@ -14,7 +14,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {
     // Fetch the current user on service initialization
-    this.fetchCurrentUser().subscribe(); // This can be modified based on your app structure
+    // this.fetchCurrentUser().subscribe(); // This can be modified based on your app structure
   }
 
   login(credentials: { username: string; password: string }): Observable<User> {

@@ -47,11 +47,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Initialize the appName based on the current route when the component loads
     this.updateAppNameFromRoute(this.router.url);
     this.updateBodyClass(this.router.url);
 
-    // Subscribe to router events to update appName when navigation occurs
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -62,7 +60,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.updateBodyClass(event.url);
       });
 
-    // Subscribe to navigation visibility changes
     this.showNavigation$
       .pipe(takeUntil(this.destroy$))
       .subscribe((showNav) => {
@@ -82,7 +79,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   updateAppNameFromRoute(url: string) {
-    // Extract the first segment of the URL path
     const mainPath = url.split('/')[1] || 'dashboard';
 
     // Map paths to their corresponding display names
@@ -98,7 +94,6 @@ export class AppComponent implements OnInit, OnDestroy {
       settings: 'Settings',
     };
 
-    // Update appName based on the current path
     this.appName = pathToNameMap[mainPath] || 'Dashboard';
   }
 
