@@ -48,12 +48,16 @@ public class HfrFacilityController {
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
             @RequestParam(value = "paging", defaultValue = "true") Boolean paging,
-            @RequestParam(value = "search", required = false, defaultValue = "false") String search
+            @RequestParam(value = "code", required = false) String code,
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "region", required = false) String region,
+            @RequestParam(value = "district", required = false) String district,
+            @RequestParam(value = "council", required = false) String council
     ) throws Exception {
         try {
             List<Map<String, Object>> hfrFacilitiesList = new ArrayList<>();
-            Page<HfrFacility> hfrFacilityData = hfrFacilityService.getHfrFacilityListByPagination(page, pageSize, paging, search,
-                    search, search, search, search);
+            Page<HfrFacility> hfrFacilityData = hfrFacilityService.getHfrFacilityListByPagination(page, pageSize, paging, code,
+                    name, region, district, council);
             for (HfrFacility facility : hfrFacilityData.getContent()) {
                 hfrFacilitiesList.add(facility.toMap());
             }

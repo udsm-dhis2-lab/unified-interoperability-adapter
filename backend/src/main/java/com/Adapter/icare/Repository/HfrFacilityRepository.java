@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface HfrFacilityRepository extends JpaRepository<HfrFacility, Long> {
+public interface HfrFacilityRepository extends JpaRepository<HfrFacility, String> {
     @Query(value = "SELECT * FROM hfr_facility f WHERE f.fac_id_number=:facIdNumber", nativeQuery = true)
     HfrFacility findByFacIdNumber(String facIdNumber);
 
