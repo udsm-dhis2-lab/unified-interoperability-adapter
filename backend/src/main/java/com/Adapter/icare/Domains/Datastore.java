@@ -17,7 +17,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Entity
-@Table(name="datastore",uniqueConstraints = { @UniqueConstraint( name = "namespace_and_data_key_unique_constraint", columnNames = { "namespace", "data_key" } ) })
+@Table(name="datastore", uniqueConstraints = { @UniqueConstraint( name = "namespace_and_data_key_unique_constraint", columnNames = { "namespace", "data_key" } ) })
 public class Datastore  extends BaseEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
