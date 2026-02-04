@@ -3,7 +3,11 @@ import { AuthGuard } from '../../../../libs/shared/guards/auth.guard';
 import { AccountComponent } from '../../../../libs/hdu-api-account/src/lib/account/account.component';
 
 export const appRoutes: Route[] = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { 
+    path: '',
+    redirectTo: 'dashboard', 
+    pathMatch: 'full' 
+  },
   {
     path: 'login',
     loadChildren: () =>
@@ -85,4 +89,8 @@ export const appRoutes: Route[] = [
         './../../../../apps/settings/src/app/settings/settings.module'
       ).then((m) => m.SettingsModule),
   },
+  {
+    path: "**",
+    redirectTo: 'dashboard'
+  }
 ];

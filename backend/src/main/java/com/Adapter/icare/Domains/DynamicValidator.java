@@ -16,7 +16,7 @@ import java.util.zip.DataFormatException;
 @Setter
 @Entity
 @Table(name = "validators")
-public class DynamicValidator extends BaseEntity{
+public class DynamicValidator extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name="validator_id")

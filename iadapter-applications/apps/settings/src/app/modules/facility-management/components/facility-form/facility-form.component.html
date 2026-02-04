@@ -1,34 +1,61 @@
 <div class="form-container">
     <div nz-row style="margin-bottom: 24px;">
         <div nz-col [nzSpan]="24">
-            <h2>{{ isMediatorOnlyMode ? 'Configure Referral Endpoint' : (isEditMode ? 'Edit Facility' : 'Register New
-                Facility') }}</h2>
+            <h2>{{ isMediatorOnlyMode ? 'Configure Referral Endpoint' : (isEditMode ? 'Edit Facility' : 'Register New Facility') }}</h2>
         </div>
     </div>
 
     <form nz-form [formGroup]="facilityForm" (ngSubmit)="submitForm()" [nzLayout]="'vertical'">
-        <!-- System Information Section -->
-        <nz-divider *ngIf="!isMediatorOnlyMode" nzText="Facility Information" nzOrientation="left"></nz-divider>
 
-        <div *ngIf="!isMediatorOnlyMode">
-            <div nz-row [nzGutter]="16">
-                <div nz-col [nzSpan]="12">
-                    <nz-form-item>
-                        <nz-form-label nzRequired>Facility Code</nz-form-label>
-                        <nz-form-control nzErrorTip="Please enter a valid facility code">
-                            <input nz-input formControlName="code" placeholder="e.g., FAC001" [disabled]="isEditMode" />
-                        </nz-form-control>
-                    </nz-form-item>
+        @if(!isMediatorOnlyMode){
+        <nz-divider nzText="Facility Information" nzOrientation="left"></nz-divider>
+
+        <div>
+            <nz-form-item>
+                <nz-form-label>Search HFR Registry</nz-form-label>
+                <nz-form-control>
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+
+                        <nz-select style="flex: 1;" nzPlaceHolder="Search facilities by Name or Code to auto-fill"
+                            [(ngModel)]="selectedHfrFacility" [ngModelOptions]="{standalone: true}"
+                            (ngModelChange)="onSelectFacility($event)" [nzDropdownRender]="renderTemplate"
+                            (nzScrollToBottom)="loadMore()" nzShowSearch [nzServerSearch]="true"
+                            [nzNotFoundContent]="'No records found'" (nzOnSearch)="onSearch($event)">
+
+                            @for (facility of hfrFacilityList; track facility?.Fac_IDNumber) {
+                            <nz-option [nzValue]="facility"
+                                [nzLabel]="facility?.Fac_IDNumber + ' - ' + facility?.Name + ' ' + facility?.FacilityType">
+                            </nz-option>
+                            }
+
+                            @if (isLoading) {
+                            <nz-option nzDisabled nzCustomContent>
+                                <span nz-icon nzType="loading" style="margin-right: 8px;"></span> Loading...
+                            </nz-option>
+                            }
+                        </nz-select>
+
+                        <button nz-button nzType="primary" type="button" (click)="syncFacilities()"
+                            [nzLoading]="isSyncing" nz-tooltip nzTooltipTitle="Force Sync Facilities from HFR">
+                            <span nz-icon nzType="sync">Sync Facilities</span>
+                        </button>
+                    </div>
+                </nz-form-control>
+            </nz-form-item>
+
+            <ng-template #renderTemplate>
+                <div class="custom-search-panel" style="min-height: 80px; padding: 8px; background: #fff;">
+                    <div class="search-row" style="display: flex; gap: 8px;">
+                        <input nz-input placeholder="Facility Name" [(ngModel)]="filters.name"
+                            [ngModelOptions]="{standalone: true}" (input)="triggerSearch()"
+                            (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
+                        <input nz-input placeholder="Facility Code" [(ngModel)]="filters.code"
+                            [ngModelOptions]="{standalone: true}" (input)="triggerSearch()"
+                            (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
+                    </div>
+                    <nz-divider style="margin: 4px 0;"></nz-divider>
                 </div>
-                <div nz-col [nzSpan]="12">
-                    <nz-form-item>
-                        <nz-form-label nzRequired>Facility Name</nz-form-label>
-                        <nz-form-control nzErrorTip="Please enter facility name">
-                            <input nz-input formControlName="name" placeholder="Enter facility name" />
-                        </nz-form-control>
-                    </nz-form-item>
-                </div>
-            </div>
+            </ng-template>
 
             <nz-form-item>
                 <nz-form-label>Additional Parameters (JSON)</nz-form-label>
@@ -48,28 +75,28 @@
                 </nz-form-control>
             </nz-form-item>
         </div>
+        }
 
-        <!-- Mediator Configuration Section -->
         <nz-divider [nzText]="isMediatorOnlyMode ? 'Referral Configuration' : 'Referral Configuration (Optional)'"
             nzOrientation="left"></nz-divider>
 
-        <!-- Show facility context in mediator-only mode -->
-        <div *ngIf="isMediatorOnlyMode"
-            style="margin-bottom: 24px; padding: 16px; background: #fafafa; border-radius: 4px;">
-            <p><strong>Facility:</strong> {{ facilityForm.get('name')?.value }} ({{ facilityForm.get('code')?.value }})
-            </p>
-        </div>
+        @if(!isMediatorOnlyMode){
+            <div style="margin-bottom: 24px; padding: 16px; background: #fafafa; border-radius: 4px;">
+                <p><strong>Facility:</strong> {{ facilityForm.get('name')?.value }} ({{ facilityForm.get('code')?.value }})
+                </p>
+            </div>
+            <nz-form-item>
+                <nz-form-control>
+                    <label nz-checkbox formControlName="configureMediatorNow">
+                        <strong>Configure referral endpoint now</strong>
+                    </label>
+                    <nz-form-text>You can configure this later if needed</nz-form-text>
+                </nz-form-control>
+            </nz-form-item>
+        }
 
-        <nz-form-item *ngIf="!isMediatorOnlyMode">
-            <nz-form-control>
-                <label nz-checkbox formControlName="configureMediatorNow">
-                    <strong>Configure referral endpoint now</strong>
-                </label>
-                <nz-form-text>You can configure this later if needed</nz-form-text>
-            </nz-form-control>
-        </nz-form-item>
-
-        <div *ngIf="configureMediatorEnabled">
+        @if(configureMediatorEnabled){
+        <div>
             <div nz-row [nzGutter]="16">
                 <div nz-col [nzSpan]="12">
                     <nz-form-item>
@@ -117,14 +144,12 @@
                 </div>
             </div>
         </div>
+        }
 
-        <!-- Form Actions -->
         <nz-form-item>
             <nz-form-control>
                 <button nz-button nzType="primary" [nzLoading]="loading" type="submit">
-                    {{ isMediatorOnlyMode ? 'Save Configuration' : (isEditMode ? 'Update Facility' : 'Register
-                    Facility')
-                    }}
+                    {{ isMediatorOnlyMode ? 'Save Configuration' : (isEditMode ? 'Update Facility' : 'Register Facility') }}
                 </button>
                 <button nz-button type="button" (click)="cancel()" style="margin-left: 8px;">
                     Cancel

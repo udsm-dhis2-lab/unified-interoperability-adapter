@@ -10,6 +10,7 @@ import { HduApiTopBarMenuComponent } from '../../../../libs/hdu-api-top-bar-menu
 import { HduApiNavMenuComponent } from '../../../../libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { LayoutService } from '../../../../libs/shared/services/layout.service';
+import { LoginService } from 'apps/login/src/app/modules/home/services/login.service';
 
 @Component({
   providers: [],
@@ -32,6 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private loginService: LoginService,
     private httpClient: NgxDhis2HttpClientService,
     private layoutService: LayoutService,
     @Inject(DOCUMENT) private document: Document
@@ -47,11 +49,9 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Initialize the appName based on the current route when the component loads
     this.updateAppNameFromRoute(this.router.url);
     this.updateBodyClass(this.router.url);
 
-    // Subscribe to router events to update appName when navigation occurs
     this.router.events
       .pipe(
         filter((event) => event instanceof NavigationEnd),
@@ -62,7 +62,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.updateBodyClass(event.url);
       });
 
-    // Subscribe to navigation visibility changes
     this.showNavigation$
       .pipe(takeUntil(this.destroy$))
       .subscribe((showNav) => {
@@ -72,6 +71,10 @@ export class AppComponent implements OnInit, OnDestroy {
           this.document.body.classList.add('login-page');
         }
       });
+    
+      if(!this.loginService.isAuthenticated()){
+        this.router.navigate(['login'])
+      }
   }
 
   ngOnDestroy() {
@@ -82,7 +85,6 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   updateAppNameFromRoute(url: string) {
-    // Extract the first segment of the URL path
     const mainPath = url.split('/')[1] || 'dashboard';
 
     // Map paths to their corresponding display names
@@ -98,7 +100,6 @@ export class AppComponent implements OnInit, OnDestroy {
       settings: 'Settings',
     };
 
-    // Update appName based on the current path
     this.appName = pathToNameMap[mainPath] || 'Dashboard';
   }
 

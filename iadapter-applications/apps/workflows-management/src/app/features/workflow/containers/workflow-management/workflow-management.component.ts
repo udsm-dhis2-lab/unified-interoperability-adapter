@@ -66,8 +66,6 @@ import { WorkflowRunLoggingComponent } from '../workflow-run-logging/workflow-ru
     AddComponent,
     ParametersComponent,
     EditorComponent,
-    FlowchartComponent,
-    ProcessSummaryComponent,
     WorkflowRunLoggingComponent,
     EditComponent,
   ],

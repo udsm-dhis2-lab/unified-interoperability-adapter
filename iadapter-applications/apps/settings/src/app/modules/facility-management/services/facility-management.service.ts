@@ -28,6 +28,18 @@ export class FacilityManagementService {
         return this.http.get<FacilityListResponse>(this.baseUrl, { params });
     }
 
+    getHfrFacilities(name?: string, code?: string, pageNo?: number): Observable<any>{
+        let params = '';
+        params = !params?.length && name ? `?name=${name}` : name ? `${params}&name=${name}` : params;
+        params = !params?.length && code ? `?code=${code}` : code ? `${params}&code=${code}` : params;
+        params = !params?.length && pageNo ? `?page=${pageNo}` : pageNo ? `${params}&page=${pageNo}` : params;
+        return this.http.get(`/api/v1/hfr-facilities${params}`)
+    }
+
+    syncHfrFacilities(){
+        return this.http.post(`/api/v1/hfr-synchronize?page=1&pageSize=1000`, {})
+    }
+
     getFacilityById(id: string): Observable<FacilityResponse> {
         return this.http.get<FacilityResponse>(`${this.baseUrl}/${id}`);
     }
