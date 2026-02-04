@@ -10,6 +10,7 @@ import { HduApiTopBarMenuComponent } from '../../../../libs/hdu-api-top-bar-menu
 import { HduApiNavMenuComponent } from '../../../../libs/hdu-api-nav-menu/src/lib/hdu-api-nav-menu/hdu-api-nav-menu.component';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { LayoutService } from '../../../../libs/shared/services/layout.service';
+import { LoginService } from 'apps/login/src/app/modules/home/services/login.service';
 
 @Component({
   providers: [],
@@ -32,6 +33,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
+    private loginService: LoginService,
     private httpClient: NgxDhis2HttpClientService,
     private layoutService: LayoutService,
     @Inject(DOCUMENT) private document: Document
@@ -69,6 +71,10 @@ export class AppComponent implements OnInit, OnDestroy {
           this.document.body.classList.add('login-page');
         }
       });
+    
+      if(!this.loginService.isAuthenticated()){
+        this.router.navigate(['login'])
+      }
   }
 
   ngOnDestroy() {
