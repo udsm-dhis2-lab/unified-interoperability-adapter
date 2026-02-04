@@ -100,6 +100,7 @@ export class JwtInterceptor implements HttpInterceptor {
             replaceUrl: true,
             queryParams: { returnUrl: this.router.url }
           }).then(success => {
+            console.log("Tried to take user to login route and failed.")
             if (!success) {
               window.location.href = '/login';
             }

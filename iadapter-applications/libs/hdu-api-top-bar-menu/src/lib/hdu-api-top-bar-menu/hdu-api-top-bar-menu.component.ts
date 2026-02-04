@@ -66,14 +66,16 @@ export class HduApiTopBarMenuComponent implements OnInit {
         localStorage.clear();
         sessionStorage.clear();
         // Redirect to login
-        window.location.href = '/login';
+        // window.location.href = '/login';
+        this.router.navigate(['/account']);
       },
       error: (error) => {
         console.error('Logout error:', error);
         // Even if logout API fails, clear local data and redirect
         localStorage.clear();
         sessionStorage.clear();
-        window.location.href = '/login';
+        // window.location.href = '/login';
+        this.router.navigate(['/account']);
       },
     });
   }

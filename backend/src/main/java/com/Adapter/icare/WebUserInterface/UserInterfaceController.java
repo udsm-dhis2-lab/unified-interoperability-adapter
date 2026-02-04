@@ -50,7 +50,7 @@ public class UserInterfaceController {
 
     @GetMapping
     public RedirectView redirectToLogin() {
-        return new RedirectView("/login");
+        return new RedirectView("/apps");
     }
 
     @GetMapping("{appRoute}")
