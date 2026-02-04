@@ -82,22 +82,35 @@ public class HfrFacilityService {
         return this.hfrFacilityRepository.save(hfrFacility);
     }
 
-    public Boolean synchronizeHfrFacilities(Integer pageNo, Integer pageSize){
+    public Boolean synchronizeHfrFacilities(Integer pageNo, Integer pageSize, Boolean forceSync){
 
         try {
 
             String baseUrl = this.HFR_URL + "/get-health-facilities-from-hfr";
             UriComponentsBuilder url = UriComponentsBuilder.fromHttpUrl(baseUrl).queryParam("search_query", "operating")
-                    .queryParam("r", "api/health-facility/health-facility-list").queryParam("pageSize", pageSize);
+                    .queryParam("r", "api/health-facility/health-facility-list");
 
             if(pageNo == null){
                 pageNo = 1;
             }
 
             int totalPages = 1;
+            int totalRecords = 0;
+            if(!forceSync){
+
+                String finalUrl = url.queryParam("pageSize", 1).toUriString();
+                HfrApiResponseDTO response = restTemplate.getForObject(finalUrl, HfrApiResponseDTO.class);
+
+                if (response != null && response.getMetaData() != null) {
+                    HfrMetaData metadata = response.getMetaData();
+                    totalRecords = metadata.getTotalCount();
+                }
+                var existingTotalRecords = this.hfrFacilityRepository.count();
+                if ( existingTotalRecords == totalRecords) return true;
+            }
 
             do {
-                String finalUrl = url.queryParam("page", pageNo).toUriString();
+                String finalUrl = url.queryParam("page", pageNo).queryParam("pageSize", pageSize).toUriString();
                 HfrApiResponseDTO response = restTemplate.getForObject(finalUrl, HfrApiResponseDTO.class);
 
                 if (response != null && response.getMetaData() != null) {

@@ -102,9 +102,6 @@ public class HfrFacilityController {
     public ResponseEntity<Map<String, Object>> addValidator(@Valid @RequestBody Map<String, Object> hfrFacilityDTO) {
         try {
             HfrFacility hfrFacilityObject = HfrFacility.fromMap(hfrFacilityDTO);
-            if (this.authentication != null && this.authenticatedUser != null) {
-                hfrFacilityObject.setCreatedBy(this.authenticatedUser);
-            }
             HfrFacility createdFacility = hfrFacilityService.updateOrCreateHfrFacility(hfrFacilityObject);
             if (createdFacility == null){
                 throw new Exception("Failed to save this facility information");
@@ -127,10 +124,12 @@ public class HfrFacilityController {
     @PostMapping("hfr-synchronize")
     public ResponseEntity<Map<String, Object>> updateValidator(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
-            @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize
+            @RequestParam(value = "pageSize", defaultValue = "100") Integer pageSize,
+            @RequestParam(value = "forceSync", required = false) Boolean forceSync
     ) {
         try {
-            boolean  completeSync = this.hfrFacilityService.synchronizeHfrFacilities(page, pageSize);
+            forceSync = forceSync != null && forceSync;
+            boolean  completeSync = this.hfrFacilityService.synchronizeHfrFacilities(page, pageSize, forceSync);
             Map<String, Object> returnObject = new HashMap<>();
             if(completeSync){
                 returnObject.put("status", 200);
@@ -142,10 +141,10 @@ public class HfrFacilityController {
             }
             return ResponseEntity.ok(returnObject);
         } catch (Exception e) {
-            System.out.println("SYNC FALICITIES FAILED: "+ e);
+            System.out.println("SYNC FACILITIES FAILED: "+ e);
             Map<String, Object> error = new HashMap<>();
             error.put("message", e.getMessage());
-            error.put("error", "Failed to update validator");
+            error.put("error", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
     }

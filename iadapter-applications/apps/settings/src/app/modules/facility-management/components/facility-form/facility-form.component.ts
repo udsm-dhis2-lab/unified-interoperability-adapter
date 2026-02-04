@@ -51,6 +51,8 @@ export class FacilityFormComponent implements OnInit {
     selectedHfrFacility: any;
     isLoading = false;
     totalPages = 1;
+    pageSize = 20;
+    isSyncing = false;
 
     filters = { name: '', code: '', page: 1 };
     private searchSubject$ = new BehaviorSubject(this.filters);
@@ -118,6 +120,21 @@ export class FacilityFormComponent implements OnInit {
             this.searchSubject$.next({ ...this.filters });
         }
     }
+
+    syncFacilities() {
+    this.isSyncing = true;
+    this.facilityService.syncHfrFacilities().subscribe({
+        next: () => {
+            this.message.success('Facilities synced successfully');
+            this.triggerSearch();
+            this.isSyncing = false;
+        },
+        error: () => {
+            this.message.error('Sync failed');
+            this.isSyncing = false;
+        }
+    });
+}
 
     onSelectFacility(id: string) {
         const selectedFacility = this.hfrFacilityList.find(f => f.id === id);

@@ -14,33 +14,44 @@
             <nz-form-item>
                 <nz-form-label>Search HFR Registry</nz-form-label>
                 <nz-form-control>
-                    <nz-select style="width: 100%;" nzPlaceHolder="Search facilities by Name or Code to auto-fill"
-                        [(ngModel)]="selectedHfrFacility" [ngModelOptions]="{standalone: true}" (ngModelChange)="onSelectFacility($event)"
-                        [nzDropdownRender]="renderTemplate" (nzScrollToBottom)="loadMore()" nzShowSearch [nzServerSearch]="true"
-                        [nzNotFoundContent]="'No records found'" (nzOnSearch)="onSearch($event)">
-            
-                        @for (facility of hfrFacilityList; track facility?.Fac_IDNumber) {
-                        <nz-option [nzValue]="facility"
-                            [nzLabel]="facility?.Fac_IDNumber + ' - ' + facility?.Name + ' ' + facility?.FacilityType">
-                        </nz-option>
-                        }
-            
-                        @if (isLoading) {
-                        <nz-option nzDisabled nzCustomContent>
-                            <span nz-icon nzType="loading" style="margin-right: 8px;"></span> Loading...
-                        </nz-option>
-                        }
-                    </nz-select>
+                    <div style="display: flex; gap: 8px; align-items: flex-start;">
+
+                        <nz-select style="flex: 1;" nzPlaceHolder="Search facilities by Name or Code to auto-fill"
+                            [(ngModel)]="selectedHfrFacility" [ngModelOptions]="{standalone: true}"
+                            (ngModelChange)="onSelectFacility($event)" [nzDropdownRender]="renderTemplate"
+                            (nzScrollToBottom)="loadMore()" nzShowSearch [nzServerSearch]="true"
+                            [nzNotFoundContent]="'No records found'" (nzOnSearch)="onSearch($event)">
+
+                            @for (facility of hfrFacilityList; track facility?.Fac_IDNumber) {
+                            <nz-option [nzValue]="facility"
+                                [nzLabel]="facility?.Fac_IDNumber + ' - ' + facility?.Name + ' ' + facility?.FacilityType">
+                            </nz-option>
+                            }
+
+                            @if (isLoading) {
+                            <nz-option nzDisabled nzCustomContent>
+                                <span nz-icon nzType="loading" style="margin-right: 8px;"></span> Loading...
+                            </nz-option>
+                            }
+                        </nz-select>
+
+                        <button nz-button nzType="primary" type="button" (click)="syncFacilities()"
+                            [nzLoading]="isSyncing" nz-tooltip nzTooltipTitle="Force Sync Facilities from HFR">
+                            <span nz-icon nzType="sync">Sync Facilities</span>
+                        </button>
+                    </div>
                 </nz-form-control>
             </nz-form-item>
-            
+
             <ng-template #renderTemplate>
                 <div class="custom-search-panel" style="min-height: 80px; padding: 8px; background: #fff;">
                     <div class="search-row" style="display: flex; gap: 8px;">
-                        <input nz-input placeholder="Facility Name" [(ngModel)]="filters.name" [ngModelOptions]="{standalone: true}"
-                            (input)="triggerSearch()" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
-                        <input nz-input placeholder="Facility Code" [(ngModel)]="filters.code" [ngModelOptions]="{standalone: true}"
-                            (input)="triggerSearch()" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
+                        <input nz-input placeholder="Facility Name" [(ngModel)]="filters.name"
+                            [ngModelOptions]="{standalone: true}" (input)="triggerSearch()"
+                            (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
+                        <input nz-input placeholder="Facility Code" [(ngModel)]="filters.code"
+                            [ngModelOptions]="{standalone: true}" (input)="triggerSearch()"
+                            (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()" />
                     </div>
                     <nz-divider style="margin: 4px 0;"></nz-divider>
                 </div>
@@ -66,23 +77,22 @@
         </div>
         }
 
-        <!-- Mediator Configuration Section -->
         <nz-divider [nzText]="isMediatorOnlyMode ? 'Referral Configuration' : 'Referral Configuration (Optional)'"
             nzOrientation="left"></nz-divider>
 
         @if(!isMediatorOnlyMode){
-        <div style="margin-bottom: 24px; padding: 16px; background: #fafafa; border-radius: 4px;">
-            <p><strong>Facility:</strong> {{ facilityForm.get('name')?.value }} ({{ facilityForm.get('code')?.value }})
-            </p>
-        </div>
-        <nz-form-item>
-            <nz-form-control>
-                <label nz-checkbox formControlName="configureMediatorNow">
-                    <strong>Configure referral endpoint now</strong>
-                </label>
-                <nz-form-text>You can configure this later if needed</nz-form-text>
-            </nz-form-control>
-        </nz-form-item>
+            <div style="margin-bottom: 24px; padding: 16px; background: #fafafa; border-radius: 4px;">
+                <p><strong>Facility:</strong> {{ facilityForm.get('name')?.value }} ({{ facilityForm.get('code')?.value }})
+                </p>
+            </div>
+            <nz-form-item>
+                <nz-form-control>
+                    <label nz-checkbox formControlName="configureMediatorNow">
+                        <strong>Configure referral endpoint now</strong>
+                    </label>
+                    <nz-form-text>You can configure this later if needed</nz-form-text>
+                </nz-form-control>
+            </nz-form-item>
         }
 
         @if(configureMediatorEnabled){
