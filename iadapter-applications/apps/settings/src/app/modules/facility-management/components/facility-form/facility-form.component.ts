@@ -13,6 +13,9 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzInputNumberModule } from 'ng-zorro-antd/input-number';
 import { FacilityManagementService } from '../../services/facility-management.service';
 import { FacilityRegistration } from '../../models/facility.model';
+import { BehaviorSubject, catchError, debounceTime, of, switchMap, tap } from 'rxjs';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 
 @Component({
     selector: 'app-facility-form',
@@ -29,7 +32,9 @@ import { FacilityRegistration } from '../../models/facility.model';
         NzSwitchModule,
         NzCheckboxModule,
         NzDividerModule,
-        NzInputNumberModule
+        NzInputNumberModule,
+        NzSelectModule,
+        NzIconModule
     ],
     templateUrl: './facility-form.component.html',
     styleUrls: ['./facility-form.component.less']
@@ -42,6 +47,14 @@ export class FacilityFormComponent implements OnInit {
     facilityId?: string;
     configureMediatorEnabled = false;
 
+    hfrFacilityList: any[] = [];
+    selectedHfrFacility: any;
+    isLoading = false;
+    totalPages = 1;
+
+    filters = { name: '', code: '', page: 1 };
+    private searchSubject$ = new BehaviorSubject(this.filters);
+
     constructor(
         private fb: FormBuilder,
         private facilityService: FacilityManagementService,
@@ -53,10 +66,8 @@ export class FacilityFormComponent implements OnInit {
     ngOnInit(): void {
         this.initializeForm();
 
-        // Check if we're in mediator-only mode (URL ends with /mediator)
         this.isMediatorOnlyMode = this.route.snapshot.url.some(segment => segment.path === 'mediator');
 
-        // In mediator-only mode, automatically enable mediator configuration
         if (this.isMediatorOnlyMode) {
             this.configureMediatorEnabled = true;
         }
@@ -66,12 +77,60 @@ export class FacilityFormComponent implements OnInit {
             this.isEditMode = true;
             this.loadFacility();
         }
+
+        this.searchSubject$.pipe(
+            debounceTime(400),
+            tap(() => this.isLoading = true),
+            switchMap((filters) => 
+                this.facilityService.getHfrFacilities(filters.name, filters.code, this.filters.page).pipe(
+                    catchError(err => {
+                        console.error('Search failed', err);
+                        return of({ items: [] });
+                    })
+                )
+            )
+        ).subscribe((res: any) => {
+            const newItems = res.results || [];
+            
+            if (this.filters.page === 1) {
+                this.hfrFacilityList = newItems;
+            } else {
+                this.hfrFacilityList = [...this.hfrFacilityList, ...newItems];
+            }
+            this.totalPages = res?.pager?.totalPages;
+            this.isLoading = false;
+        });
+    }
+
+    triggerSearch() {
+        this.filters.page = 1;
+        this.searchSubject$.next({ ...this.filters });
+    }
+
+    onSearch(val: string) {
+        this.filters.name = val;
+        this.triggerSearch();
+    }
+
+    loadMore() {
+        if (!this.isLoading && this.totalPages > this.filters.page) {
+            this.filters.page++;
+            this.searchSubject$.next({ ...this.filters });
+        }
+    }
+
+    onSelectFacility(id: string) {
+        const selectedFacility = this.hfrFacilityList.find(f => f.id === id);
+        if (selectedFacility) {
+            this.facilityForm.patchValue({
+                code: selectedFacility.code || selectedFacility.id,
+                name: selectedFacility.name
+            });
+        }
     }
 
     initializeForm(): void {
         this.facilityForm = this.fb.group({
-            code: ['', [Validators.required, Validators.maxLength(50)]],
-            name: ['', [Validators.required, Validators.maxLength(255)]],
             allowed: [true],
             params: [''],
 
@@ -152,6 +211,10 @@ export class FacilityFormComponent implements OnInit {
     }
 
     submitForm(): void {
+        if(!this.selectedHfrFacility){
+            return;
+        }
+
         if (this.facilityForm.invalid) {
             Object.values(this.facilityForm.controls).forEach(control => {
                 if (control.invalid) {
@@ -162,7 +225,6 @@ export class FacilityFormComponent implements OnInit {
             return;
         }
 
-        // If mediator-only mode, only update mediator configuration
         if (this.isMediatorOnlyMode) {
             this.configureMediatorOnly();
             return;
@@ -171,13 +233,12 @@ export class FacilityFormComponent implements OnInit {
         const formValue = this.facilityForm.getRawValue();
 
         const registration: FacilityRegistration = {
-            code: formValue.code,
-            name: formValue.name,
+            code: this.selectedHfrFacility?.Fac_IDNumber,
+            name: `${this.selectedHfrFacility?.Name} ${this.selectedHfrFacility?.FacilityType}`,
             allowed: formValue.allowed,
             params: formValue.params || null
         };
 
-        // Add mediator configuration if enabled
         if (this.configureMediatorEnabled) {
             registration.mediatorConfig = {
                 baseUrl: formValue.baseUrl,

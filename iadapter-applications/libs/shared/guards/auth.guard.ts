@@ -13,7 +13,6 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
-    console.log("Auth Guard is called")
     if (this.jwtTokenService.isAuthenticated()) {
       return true;
     } else {

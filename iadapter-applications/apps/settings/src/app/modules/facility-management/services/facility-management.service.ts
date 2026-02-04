@@ -13,6 +13,7 @@ import {
 })
 export class FacilityManagementService {
     private readonly baseUrl = '/api/v1/facilities';
+    private readonly hfr_url = '/api/v1/hfr-facilities';
 
     constructor(private http: HttpClient) { }
 
@@ -26,6 +27,14 @@ export class FacilityManagementService {
         }
 
         return this.http.get<FacilityListResponse>(this.baseUrl, { params });
+    }
+
+    getHfrFacilities(name?: string, code?: string, pageNo?: number): Observable<any>{
+        let params = '';
+        params = !params?.length && name ? `?name=${name}` : name ? `${params}&name=${name}` : params;
+        params = !params?.length && code ? `?code=${code}` : code ? `${params}&code=${code}` : params;
+        params = !params?.length && pageNo ? `?page=${pageNo}` : pageNo ? `${params}&page=${pageNo}` : params;
+        return this.http.get(`${this.hfr_url}${params}`)
     }
 
     getFacilityById(id: string): Observable<FacilityResponse> {
