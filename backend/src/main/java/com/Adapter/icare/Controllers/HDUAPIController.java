@@ -77,6 +77,7 @@ public class HDUAPIController {
     private final IGenericClient fhirClient;
     private final FHIRConstants fhirConstants;
     private final ApiLoggerService apiLoggerService;
+    private final HfrFacilityService hfrFacilityService;
 
     private static final Logger log = LoggerFactory.getLogger(HDUAPIController.class);
 
@@ -95,7 +96,9 @@ public class HDUAPIController {
             LabDataTemplateService labDataTemplateService,
             ValidatorService validatorService,
             ApiLoggerService apiLoggerService,
-            FHIRConstants fhirConstants) throws Exception {
+            FHIRConstants fhirConstants,
+            HfrFacilityService hfrFacilityService
+    ) throws Exception {
         this.datastoreService = datastoreService;
         this.mediatorsService = mediatorsService;
         this.datastoreConstants = datastoreConstants;
@@ -108,6 +111,7 @@ public class HDUAPIController {
         FhirContext fhirContext = FhirContext.forR4();
         this.fhirConstants = fhirConstants;
         this.fhirClient = fhirContext.newRestfulGenericClient(this.fhirConstants.FHIRServerUrl);
+        this.hfrFacilityService = hfrFacilityService;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             this.authenticatedUser = this.userService
@@ -359,7 +363,7 @@ public class HDUAPIController {
                 workflowResponse.put("invalidClients", recordsWithIssues.size());
                 workflowResponse.put("invalidClientsSummary", recordsWithIssues);
 
-                ApiLoggerUtils.saveApiLogger(apiLoggerService, dataTemplate, workflowResponse, recordsWithIssues, responseCode, ApiLogger.RequestType.POST);
+                ApiLoggerUtils.saveApiLogger(apiLoggerService, dataTemplate, workflowResponse, recordsWithIssues, responseCode, ApiLogger.RequestType.POST, hfrFacilityService);
 
                 return ResponseEntity.status(responseCode != null ? responseCode : HttpStatus.OK.value()).body(workflowResponse);
             } else if (!shouldUseWorkflowEngine) {

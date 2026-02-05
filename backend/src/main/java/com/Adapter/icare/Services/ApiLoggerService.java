@@ -46,6 +46,19 @@ public class ApiLoggerService {
         return this.apiLoggerRepository.getApiLogsListByPagination(pageable);
     }
 
+    public ApiLogger updateApiLoggerByReferralDetails(String referringFacilityCode, String referredFacilityCode, String referralNumber, Integer statusCode) throws Exception {
+        List<ApiLogger> apiLoggers = this.apiLoggerRepository.getApiLogsListByReferralDetails(referringFacilityCode, referredFacilityCode, referralNumber);
+        if (apiLoggers != null && apiLoggers.size() == 1) {
+            ApiLogger existingApiLogger = apiLoggers.get(0);
+            existingApiLogger.setStatus(statusCode < 400 && statusCode >= 200 ? ApiLogger.Status.SUCCESS : ApiLogger.Status.ERROR);
+            existingApiLogger.setStatusCode(statusCode);
+            return this.apiLoggerRepository.save(existingApiLogger);
+        } else if (apiLoggers != null && apiLoggers.size() > 1) {
+            throw new Exception("More than one transaction is found, failed to update.");
+        }
+        return null;
+    }
+
     public ApiLogger getApiLogsByUuid(String uuid) {
         return apiLoggerRepository.findByUuid(uuid);
     }
