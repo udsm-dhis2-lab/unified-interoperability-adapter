@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -80,8 +81,23 @@ public class ApiLogger extends BaseEntity{
     @Column(length = 100)
     private String facilityName;
 
-    public Map<String, String> toMap() {
-        Map<String, String> map = new HashMap<>();
+    @Column(length = 100)
+    private String referralNumber;
+
+    @Column
+    private LocalDate referralDate;
+
+    @Column(length = 50)
+    private String referredFacilityCode;
+
+    @Column(length = 100)
+    private String referredFacilityName;
+
+    @Column
+    private Boolean referredToOtherCountry;
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> map = new HashMap<>();
         map.put("uuid",                   getUuid());
         map.put("requestType",           requestType == null ? null : requestType.name());
         map.put("transactionType",       transactionType == null ? null : transactionType.name());
@@ -96,6 +112,11 @@ public class ApiLogger extends BaseEntity{
         map.put("systemName",            systemName);
         map.put("facilityCode",          facilityCode);
         map.put("facilityName",          facilityName);
+        map.put("referralNumber",         referralNumber);
+        map.put("referralDate",           referralDate == null ? null : referralDate.toString());
+        map.put("referredFacilityCode",   referredFacilityCode);
+        map.put("referredFacilityName",   referredFacilityName);
+        map.put("referredToOtherCountry", referredToOtherCountry == null ? null : referredToOtherCountry.toString());
         return map;
     }
 
@@ -120,6 +141,16 @@ public class ApiLogger extends BaseEntity{
         log.setSystemName(map.get("systemName"));
         log.setFacilityCode(map.get("facilityCode"));
         log.setFacilityName(map.get("facilityName"));
+
+        log.setReferralNumber      (map.get("referralNumber"));
+        log.setReferredFacilityCode  (map.get("referredFacilityCode"));
+        log.setReferredFacilityName  (map.get("referredFacilityName"));
+
+        String rd = map.get("referralDate");
+        if (rd != null && !rd.isBlank()) log.setReferralDate(java.time.LocalDate.parse(rd));
+
+        String roc = map.get("referredToOtherCountry");
+        if (roc != null) log.setReferredToOtherCountry(Boolean.valueOf(roc));
         return log;
     }
 

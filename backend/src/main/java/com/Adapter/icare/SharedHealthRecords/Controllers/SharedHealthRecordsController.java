@@ -10,10 +10,7 @@ import com.Adapter.icare.Domains.Datastore;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Domains.User;
 import com.Adapter.icare.Dtos.*;
-import com.Adapter.icare.Services.ApiLoggerService;
-import com.Adapter.icare.Services.DatastoreService;
-import com.Adapter.icare.Services.MediatorsService;
-import com.Adapter.icare.Services.UserService;
+import com.Adapter.icare.Services.*;
 import com.Adapter.icare.SharedHealthRecords.Services.SharedHealthRecordsService;
 import com.Adapter.icare.Utils.ApiLoggerUtils;
 import org.springframework.http.HttpStatus;
@@ -45,6 +42,7 @@ public class SharedHealthRecordsController {
     private String defaultWorkflowEngineCode = null;
     private Mediator workflowEngine = null;
     private final ApiLoggerService apiLoggerService;
+    private final HfrFacilityService hfrFacilityService;
 
     public SharedHealthRecordsController(
             DatastoreConstants datastoreConstants,
@@ -55,7 +53,8 @@ public class SharedHealthRecordsController {
             ClientRegistryService clientRegistryService,
             MediatorsService mediatorsService,
             SharedRecordsConstants sharedRecordsConstants,
-            ApiLoggerService apiLoggerService) throws Exception {
+            ApiLoggerService apiLoggerService,
+            HfrFacilityService hfrFacilityService) throws Exception {
         this.sharedHealthRecordsService = sharedHealthRecordsService;
         this.datastoreConstants = datastoreConstants;
         this.clientRegistryConstants = clientRegistryConstants;
@@ -65,6 +64,7 @@ public class SharedHealthRecordsController {
         this.mediatorsService = mediatorsService;
         this.sharedRecordsConstants =  sharedRecordsConstants;
         this.apiLoggerService = apiLoggerService;
+        this.hfrFacilityService = hfrFacilityService;
         try {
             Datastore configs = this.datastoreService.getDatastoreByNamespaceAndKey(datastoreConstants.ConfigurationsNamespace, datastoreConstants.MandatoryClientRegistryIdTypes);
             if (configs!= null) {
@@ -192,7 +192,7 @@ public class SharedHealthRecordsController {
                 responseCode = (Integer) workflowResponse.get("statusCode");
             }
 
-            ApiLoggerUtils.saveApiLogger(apiLoggerService, dataTemplateDTO, workflowResponse, new ArrayList<>(), responseCode, ApiLogger.RequestType.POST);
+            ApiLoggerUtils.saveApiLogger(apiLoggerService, dataTemplateDTO, workflowResponse, new ArrayList<>(), responseCode, ApiLogger.RequestType.POST, this.hfrFacilityService);
 
             return ResponseEntity.status(responseCode != null ? responseCode : HttpStatus.OK.value()).body(workflowResponse);
         } catch (Exception e) {
