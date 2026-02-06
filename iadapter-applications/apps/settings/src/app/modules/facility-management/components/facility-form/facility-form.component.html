@@ -35,10 +35,9 @@
                             }
                         </nz-select>
 
-                        <button nz-button nzType="primary" type="button" (click)="syncFacilities()"
-                            [nzLoading]="isSyncing" nz-tooltip nzTooltipTitle="Force Sync Facilities from HFR">
-                            <span nz-icon nzType="sync">Sync Facilities</span>
-                        </button>
+                        <a nz-button nzType="link" nzSize="small" (click)="syncFacilities()" [nzLoading]="isSyncing">
+                            <span nz-icon nzType="sync"></span> Refresh/Sync Data
+                        </a>
                     </div>
                 </nz-form-control>
             </nz-form-item>

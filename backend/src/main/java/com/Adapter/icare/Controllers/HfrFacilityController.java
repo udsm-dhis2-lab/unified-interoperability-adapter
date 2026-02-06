@@ -59,7 +59,7 @@ public class HfrFacilityController {
         try {
             List<Map<String, Object>> hfrFacilitiesList = new ArrayList<>();
             Page<HfrFacility> hfrFacilityData = hfrFacilityService.getHfrFacilityListByPagination(page, pageSize, paging, code,
-                    name, region, district, council);
+                    name, region, district, council, "Operating");
             for (HfrFacility facility : hfrFacilityData.getContent()) {
                 hfrFacilitiesList.add(facility.toMap());
             }

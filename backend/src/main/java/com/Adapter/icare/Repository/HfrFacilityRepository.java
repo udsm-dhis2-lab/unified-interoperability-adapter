@@ -24,18 +24,22 @@ public interface HfrFacilityRepository extends JpaRepository<HfrFacility, String
             "AND (:name IS NULL OR name LIKE CONCAT('%', :name, '%')) " +
             "AND (:region IS NULL OR fac_region LIKE CONCAT('%', :region, '%')) " +
             "AND (:district IS NULL OR district LIKE CONCAT('%', :district, '%')) " +
-            "AND (:council IS NULL OR council LIKE CONCAT('%', :council, '%'))",
+            "AND (:council IS NULL OR council LIKE CONCAT('%', :council, '%'))" +
+            "AND (:operating_status IS NULL OR operating_status LIKE CONCAT('%', :operating_status, '%'))",
             countQuery = "SELECT COUNT(*) FROM hfr_facility " +
                     "WHERE (:facIdNumber IS NULL OR fac_id_number LIKE CONCAT('%', :facIdNumber, '%')) " +
                     "AND (:name IS NULL OR name LIKE CONCAT('%', :name, '%')) " +
                     "AND (:region IS NULL OR fac_region LIKE CONCAT('%', :region, '%')) " +
                     "AND (:district IS NULL OR district LIKE CONCAT('%', :district, '%')) " +
-                    "AND (:council IS NULL OR council LIKE CONCAT('%', :council, '%'))",
+                    "AND (:council IS NULL OR council LIKE CONCAT('%', :council, '%'))" +
+                    "AND (:operating_status IS NULL OR operating_status LIKE CONCAT('%', :operating_status, '%'))",
             nativeQuery = true)
     Page<HfrFacility> getHfrFacilityListByPagination(Pageable pageable,
                                                      @Param("facIdNumber") String facIdNumber,
                                                      @Param("name") String name,
                                                      @Param("region") String region,
                                                      @Param("district") String district,
-                                                     @Param("council") String council);
+                                                     @Param("council") String council,
+                                                     @Param("operating_status") String operating_status
+    );
 }
