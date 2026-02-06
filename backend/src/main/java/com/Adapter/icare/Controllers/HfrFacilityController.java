@@ -1,12 +1,12 @@
 package com.Adapter.icare.Controllers;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.DynamicValidator;
 import com.Adapter.icare.Domains.HfrFacility;
 import com.Adapter.icare.Domains.User;
+import com.Adapter.icare.Dtos.SystemDTO;
+import com.Adapter.icare.Services.FacilityManagementService;
 import com.Adapter.icare.Services.HfrFacilityService;
 import com.Adapter.icare.Services.UserService;
-import com.Adapter.icare.Services.ValidatorService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,21 +16,23 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
-import java.util.zip.DataFormatException;
 
 @RestController
 @RequestMapping("/api/v1")
 public class HfrFacilityController {
 
     private final HfrFacilityService hfrFacilityService;
+    private final FacilityManagementService facilityManagementService;
     private final UserService userService;
     private final Authentication authentication;
     private final User authenticatedUser;
 
     public HfrFacilityController(
             HfrFacilityService hfrFacilityService,
+            FacilityManagementService facilityManagementService,
             UserService userService) {
      this.hfrFacilityService = hfrFacilityService;
+     this.facilityManagementService = facilityManagementService;
      this.userService = userService;
 
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -76,7 +78,7 @@ public class HfrFacilityController {
     }
 
     @GetMapping("hfr-facility/{uuid}")
-    public ResponseEntity<Map<String, Object>> getValidator(
+    public ResponseEntity<Map<String, Object>> getHfrFacility(
             @PathVariable("uuid") String uuid) throws Exception {
         try {
             HfrFacility hfrFacility = hfrFacilityService.getHfrFacilityByUuid(uuid);
@@ -99,13 +101,17 @@ public class HfrFacilityController {
     }
 
     @PostMapping("hfr-facility")
-    public ResponseEntity<Map<String, Object>> addValidator(@Valid @RequestBody Map<String, Object> hfrFacilityDTO) {
+    public ResponseEntity<Map<String, Object>> addHfrFacility(@Valid @RequestBody Map<String, Object> hfrFacilityDTO) {
         try {
             HfrFacility hfrFacilityObject = HfrFacility.fromMap(hfrFacilityDTO);
             HfrFacility createdFacility = hfrFacilityService.updateOrCreateHfrFacility(hfrFacilityObject);
             if (createdFacility == null){
                 throw new Exception("Failed to save this facility information");
             }
+
+
+           this.facilityManagementService.updateFacilityNameAndAccessAsync(createdFacility);
+
             Map<String, Object> returnObject = new HashMap<>();
             returnObject.put("Status", 200);
             returnObject.put("Message", "Success");

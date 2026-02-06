@@ -24,7 +24,7 @@
 
                             @for (facility of hfrFacilityList; track facility?.Fac_IDNumber) {
                             <nz-option [nzValue]="facility"
-                                [nzLabel]="facility?.Fac_IDNumber + ' - ' + facility?.Name + ' ' + facility?.FacilityType">
+                                [nzLabel]="(facility?.Fac_IDNumber + ' - ' + facility?.Name + ' ' + facility?.FacilityType) |  uppercase">
                             </nz-option>
                             }
 

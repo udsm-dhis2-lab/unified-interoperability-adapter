@@ -97,7 +97,6 @@ public class HfrFacilityService {
             int totalPages = 1;
             int totalRecords = 0;
             if(!forceSync){
-
                 String finalUrl = url.queryParam("pageSize", 1).toUriString();
                 HfrApiResponseDTO response = restTemplate.getForObject(finalUrl, HfrApiResponseDTO.class);
 

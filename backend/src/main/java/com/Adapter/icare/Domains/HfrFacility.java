@@ -1,5 +1,6 @@
 package com.Adapter.icare.Domains;
 
+import com.Adapter.icare.CustomDeserializers.CustomLocalDateTimeDeserializer;
 import com.Adapter.icare.CustomDeserializers.DirtyBigDecimalDeserializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,7 +15,6 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -140,23 +140,27 @@ public class HfrFacility extends  BaseEntity{
 
     @Column(name = "opened_date")
     @JsonProperty("OpenedDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate openedDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    private LocalDateTime openedDate;
 
     @Column(name = "created_at", updatable = false)
     @JsonProperty("CreatedAt")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     @JsonProperty("UpdatedAt")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
     private LocalDateTime updatedAt;
 
     @Column(name = "closed_date")
     @JsonProperty("ClosedDate")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private LocalDate closedDate;
+    @JsonDeserialize(using = CustomLocalDateTimeDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime closedDate;
 
     @Column(name = "os_change_opened_to_close", length = 1)
     @JsonProperty("OSchangeOpenedtoClose")
@@ -215,6 +219,8 @@ public class HfrFacility extends  BaseEntity{
     }
 
     public static HfrFacility fromMap(Map<String, Object> map) {
+        java.time.format.DateTimeFormatter formatter =
+                java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         HfrFacility f = new HfrFacility();
         f.setFacIdNumber((String) map.get("Fac_IDNumber"));
         f.setName((String) map.get("Name"));
@@ -241,32 +247,38 @@ public class HfrFacility extends  BaseEntity{
         f.setOwnership((String) map.get("Ownership"));
         f.setOperatingStatus((String) map.get("OperatingStatus"));
 
-        String lat = (String) map.get("Latitude");
-        if (lat != null) f.setLatitude(new java.math.BigDecimal(lat));
+        Object lat = map.get("Latitude");
+        if (lat != null) f.setLatitude(new java.math.BigDecimal(String.valueOf(lat)));
 
-        String lon = (String) map.get("Longitude");
-        if (lon != null) f.setLongitude(new java.math.BigDecimal(lon));
+        Object lon = map.get("Longitude");
+        if (lon != null) f.setLongitude(new java.math.BigDecimal(String.valueOf(lon)));
+
 
         f.setRegistrationStatus((String) map.get("RegistrationStatus"));
 
         String od = (String) map.get("OpenedDate");
-        if (od != null && !od.isBlank()) f.setOpenedDate(java.time.LocalDate.parse(od));
+        if (od != null && !od.isBlank()) f.setOpenedDate(java.time.LocalDateTime.parse(od, formatter));
 
         String cd = (String) map.get("ClosedDate");
-        if (cd != null && !cd.isBlank()) f.setClosedDate(java.time.LocalDate.parse(cd));
+        if (cd != null && !cd.isBlank()) f.setClosedDate(java.time.LocalDateTime.parse(cd, formatter));
 
         String cat = (String) map.get("CreatedAt");
-        if (cat != null && !cat.isBlank()) f.setCreatedAt(java.time.LocalDateTime.parse(cat));
+        if (cat != null && !cat.isBlank()) f.setCreatedAt(java.time.LocalDateTime.parse(cat, formatter));
 
         String uat = (String) map.get("UpdatedAt");
-        if (uat != null && !uat.isBlank()) f.setUpdatedAt(java.time.LocalDateTime.parse(uat));
+        if (uat != null && !uat.isBlank()) f.setUpdatedAt(java.time.LocalDateTime.parse(uat, formatter));
 
         f.setOsChangeOpenedToClose((String) map.get("OSchangeOpenedtoClose"));
         f.setOsChangeClosedToOperational((String) map.get("OSchangeClosedtoOperational"));
         f.setPostOrUpdate((String) map.get("PostorUpdate"));
 
-        String des = (String) map.get("IsDesignated");
-        if (des != null) f.setIsDesignated(Boolean.valueOf(des));
+        Object desObj = map.get("IsDesignated");
+        if (desObj != null) {
+            String desStr = desObj.toString();
+            f.setIsDesignated("1".equals(desStr) || "true".equalsIgnoreCase(desStr));
+        } else {
+            f.setIsDesignated(false);
+        }
 
         return f;
     }

@@ -251,7 +251,7 @@ export class FacilityFormComponent implements OnInit {
 
         const registration: FacilityRegistration = {
             code: this.selectedHfrFacility?.Fac_IDNumber,
-            name: `${this.selectedHfrFacility?.Name} ${this.selectedHfrFacility?.FacilityType}`,
+            name: `${this.selectedHfrFacility?.Name} ${this.selectedHfrFacility?.FacilityType}`.toUpperCase(),
             allowed: formValue.allowed,
             params: formValue.params || null
         };

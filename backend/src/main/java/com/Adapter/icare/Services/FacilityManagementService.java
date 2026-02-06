@@ -2,6 +2,7 @@ package com.Adapter.icare.Services;
 
 import com.Adapter.icare.Constants.DatastoreConstants;
 import com.Adapter.icare.Domains.Datastore;
+import com.Adapter.icare.Domains.HfrFacility;
 import com.Adapter.icare.Domains.Mediator;
 import com.Adapter.icare.Dtos.FacilityRegistrationDTO;
 import com.Adapter.icare.Dtos.FacilityResponseDTO;
@@ -9,6 +10,7 @@ import com.Adapter.icare.Dtos.MediatorDTO;
 import com.Adapter.icare.Dtos.SystemDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,6 +117,29 @@ public class FacilityManagementService {
         response.put("pager", createPager(page, pageSize, total));
 
         return response;
+    }
+
+    /*
+    * Update HFR Facility Details to the Workflow Engine Systems ensuring names and access are in sync
+    * */
+    @Async
+    public void updateFacilityNameAndAccessAsync(HfrFacility facility){
+        try{
+            log.info("ATTEMPTING TO UPDATE " + (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
+            var getAllowedFacility = this.getFacilities(1, 10, facility.getFacIdNumber());
+            if ((getAllowedFacility != null) && getAllowedFacility.containsKey("pager") && ((Map<String, Object>) getAllowedFacility.get("pager")).containsKey("total") && (Integer) ((Map<String, Object>) getAllowedFacility.get("pager")).get("total") == 1) {
+                SystemDTO allowedFacility = SystemDTO.fromMap(getAllowedFacility.containsKey("facilities") ? (Map<String, Object>) getAllowedFacility.get("facilities") : new HashMap<>());
+                log.info("UPDATING " + (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
+                if(!facility.getOperatingStatus().equalsIgnoreCase("operating")){
+                    allowedFacility.setAllowed(false);
+                }
+
+                this.updateFacilityAccess(allowedFacility.getId(), allowedFacility.getAllowed(), (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to update facility name and access: {} from HFR", e.getMessage());
+        }
+
     }
 
     /**
@@ -279,7 +304,7 @@ public class FacilityManagementService {
     /**
      * Update facility access (whitelist/blacklist)
      */
-    public FacilityResponseDTO updateFacilityAccess(String id, Boolean allowed) throws Exception {
+    public FacilityResponseDTO updateFacilityAccess(String id, Boolean allowed, String name) throws Exception {
         log.info("Updating facility access - id: {}, allowed: {}", id, allowed);
 
         if (!shouldUseWorkflowEngine || workflowEngine == null) {
@@ -288,6 +313,8 @@ public class FacilityManagementService {
 
         Map<String, Object> updatePayload = new HashMap<>();
         updatePayload.put("allowed", allowed);
+
+        if(name != null && !name.isBlank()) updatePayload.put("name", name);
 
         Map<String, Object> integrationResponse = mediatorsService.routeToMediator(
                 workflowEngine,
