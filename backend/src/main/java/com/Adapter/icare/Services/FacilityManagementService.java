@@ -130,7 +130,9 @@ public class FacilityManagementService {
             if ((getAllowedFacility != null) && getAllowedFacility.containsKey("pager") && ((Map<String, Object>) getAllowedFacility.get("pager")).containsKey("total") && (Integer) ((Map<String, Object>) getAllowedFacility.get("pager")).get("total") == 1) {
                 List<SystemDTO> facilities = (List<SystemDTO>) getAllowedFacility.get("facilities");
                 SystemDTO allowedFacility = getAllowedFacility.containsKey("facilities") ? facilities.get(0) : new SystemDTO();
-                if(!facility.getOperatingStatus().equalsIgnoreCase("operating")){
+                if(facility.getOperatingStatus().equalsIgnoreCase("operating")){
+                    allowedFacility.setAllowed(true);
+                } else {
                     allowedFacility.setAllowed(false);
                 }
 
