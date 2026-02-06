@@ -125,16 +125,19 @@ public class FacilityManagementService {
     @Async
     public void updateFacilityNameAndAccessAsync(HfrFacility facility){
         try{
-            log.info("ATTEMPTING TO UPDATE " + (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
+            log.info("ATTEMPTING TO UPDATE FACILITY " + (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
             var getAllowedFacility = this.getFacilities(1, 10, facility.getFacIdNumber());
             if ((getAllowedFacility != null) && getAllowedFacility.containsKey("pager") && ((Map<String, Object>) getAllowedFacility.get("pager")).containsKey("total") && (Integer) ((Map<String, Object>) getAllowedFacility.get("pager")).get("total") == 1) {
-                SystemDTO allowedFacility = SystemDTO.fromMap(getAllowedFacility.containsKey("facilities") ? (Map<String, Object>) getAllowedFacility.get("facilities") : new HashMap<>());
-                log.info("UPDATING " + (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
+                List<SystemDTO> facilities = (List<SystemDTO>) getAllowedFacility.get("facilities");
+                SystemDTO allowedFacility = getAllowedFacility.containsKey("facilities") ? facilities.get(0) : new SystemDTO();
                 if(!facility.getOperatingStatus().equalsIgnoreCase("operating")){
                     allowedFacility.setAllowed(false);
                 }
 
                 this.updateFacilityAccess(allowedFacility.getId(), allowedFacility.getAllowed(), (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
+                log.info("HFR CALL UPDATED FACILITY " + (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
+            } else {
+                log.warn("HFR CALL DID NOT UPDATE FACILITY " + (facility.getName() + " " + facility.getFacilityType()).toUpperCase());
             }
         } catch (Exception e) {
             log.warn("Failed to update facility name and access: {} from HFR", e.getMessage());

@@ -105,7 +105,6 @@ public class HfrFacilityService {
                     totalRecords = metadata.getTotalCount();
                 }
                 var existingTotalRecords = this.hfrFacilityRepository.count();
-                System.out.println("Sync decision: " + existingTotalRecords + " " + totalRecords);
                 if ( existingTotalRecords >= totalRecords) return true;
             }
 
