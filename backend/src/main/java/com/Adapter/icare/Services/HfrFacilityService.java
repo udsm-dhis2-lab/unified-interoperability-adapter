@@ -50,9 +50,9 @@ public class HfrFacilityService {
         return hfrFacilityRepository.findAll();
     }
 
-    public Page<HfrFacility> getHfrFacilityListByPagination(Integer page, Integer pageSize, boolean paging, String fac_id_number, String name, String region, String district, String council) throws Exception {
+    public Page<HfrFacility> getHfrFacilityListByPagination(Integer page, Integer pageSize, boolean paging, String fac_id_number, String name, String region, String district, String council, String operating_status) throws Exception {
         Pageable pageable = paging ? createPageable(page, pageSize): null;
-        return this.hfrFacilityRepository.getHfrFacilityListByPagination(pageable, fac_id_number, name, region, district, council);
+        return this.hfrFacilityRepository.getHfrFacilityListByPagination(pageable, fac_id_number, name, region, district, council, operating_status);
     }
 
     public HfrFacility getHfrFacilityByUuid(String uuid) {
@@ -97,7 +97,6 @@ public class HfrFacilityService {
             int totalPages = 1;
             int totalRecords = 0;
             if(!forceSync){
-
                 String finalUrl = url.queryParam("pageSize", 1).toUriString();
                 HfrApiResponseDTO response = restTemplate.getForObject(finalUrl, HfrApiResponseDTO.class);
 
@@ -106,7 +105,8 @@ public class HfrFacilityService {
                     totalRecords = metadata.getTotalCount();
                 }
                 var existingTotalRecords = this.hfrFacilityRepository.count();
-                if ( existingTotalRecords == totalRecords) return true;
+                System.out.println("Sync decision: " + existingTotalRecords + " " + totalRecords);
+                if ( existingTotalRecords >= totalRecords) return true;
             }
 
             do {

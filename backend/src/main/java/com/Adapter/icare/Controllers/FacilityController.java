@@ -99,7 +99,7 @@ public class FacilityController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
 
-            FacilityResponseDTO facility = facilityManagementService.updateFacilityAccess(id, allowed);
+            FacilityResponseDTO facility = facilityManagementService.updateFacilityAccess(id, allowed, null);
             return ResponseEntity.ok(facility.toMap());
         } catch (Exception e) {
             log.error("Error updating facility access: {}", id, e);
