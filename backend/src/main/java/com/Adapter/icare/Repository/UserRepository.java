@@ -9,7 +9,7 @@ import com.Adapter.icare.Domains.User;
 import java.util.List;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "SELECT * FROM users u WHERE u.username=:username", nativeQuery = true)
     User findByUsername(String username);

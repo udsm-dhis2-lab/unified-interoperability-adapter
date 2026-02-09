@@ -78,6 +78,10 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
+                .authorizeHttpRequests(auth -> auth
+                        .antMatchers("/api/v1/login", "/api/v1/refresh").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
