@@ -1,0 +1,40 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.title {
+  margin-bottom: 24px;
+}
+
+.alert {
+  margin-bottom: 24px;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+.avatar-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.avatar {
+  background-color: #1e3a8a;
+}
+
+.muted {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.sub-alert {
+  margin-bottom: 16px;
+}
+
+.sticky {
+  position: sticky;
+  top: 24px;
+}

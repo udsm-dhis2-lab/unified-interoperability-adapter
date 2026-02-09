@@ -1,0 +1,44 @@
+<div>
+  <div class="page-header">
+    <div>
+      <h4 nz-typography nzTitle>Connection Configurations</h4>
+      <span nz-typography nzType="secondary">Manage System connections</span>
+    </div>
+    <button nz-button nzType="primary">
+      <span nz-icon nzType="plus"></span>
+      Add System
+    </button>
+  </div>
+
+  <nz-card>
+    <nz-table [nzData]="instances" [nzPageSize]="10">
+      <thead>
+        <tr>
+          <th>SN</th>
+          <th>Name</th>
+          <th>Url</th>
+          <th>Code</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let instance of instances">
+          <td>{{ instance.sn }}</td>
+          <td>{{ instance.name }}</td>
+          <td>{{ instance.url }}</td>
+          <td>{{ instance.code }}</td>
+          <td>
+            <nz-space nzSize="small">
+              <button nz-button nzType="text" nzSize="small" style="color: #1890ff">
+                <span nz-icon nzType="edit"></span>
+              </button>
+              <button nz-button nzType="text" nzSize="small" nzDanger>
+                <span nz-icon nzType="delete"></span>
+              </button>
+            </nz-space>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>

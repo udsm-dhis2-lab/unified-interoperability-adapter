@@ -1,0 +1,200 @@
+<nz-layout class="app-layout">
+  <nz-sider
+    class="menu-sidebar"
+    nzCollapsible
+    nzWidth="256px"
+    nzTheme="light"
+    nzBreakpoint="md"
+    [(nzCollapsed)]="isCollapsed"
+    [nzTrigger]="null"
+  >
+    <div class="brand">
+      <div class="brand-top">
+        <div class="brand-logo">
+          <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+            <path
+              d="M24 4L6 14V22C6 32.5 13.5 42.4 24 44C34.5 42.4 42 32.5 42 22V14L24 4Z"
+              fill="#1e3a8a"
+              fill-opacity="0.9"
+            />
+            <path
+              d="M24 12C19.6 12 16 15.6 16 20C16 24.4 24 34 24 34C24 34 32 24.4 32 20C32 15.6 28.4 12 24 12ZM24 22C22.9 22 22 21.1 22 20C22 18.9 22.9 18 24 18C25.1 18 26 18.9 26 20C26 21.1 25.1 22 24 22Z"
+              fill="#10b981"
+            />
+          </svg>
+        </div>
+        @if (!isCollapsed) {
+          <div class="brand-text">
+            <span class="brand-title">Ministry of Health</span>
+            <span class="brand-subtitle">Health Data Universal API</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <ul nz-menu nzMode="inline" nzTheme="light" class="menu">
+      <li nz-menu-item (click)="navigateTo('/dashboards')">
+        <span nz-icon nzType="dashboard"></span>
+        <span>Dashboard</span>
+      </li>
+
+      <li nz-submenu nzKey="client-registry" nzTitle="Client Registry" nzIcon="team">
+        <ul>
+          <li nz-menu-item nzKey="clients" (click)="navigateTo('/clients')">Clients</li>
+          <li nz-menu-item nzKey="deduplication" (click)="navigateTo('/clients/deduplication')">
+            Deduplication
+          </li>
+        </ul>
+      </li>
+
+      <li nz-submenu nzKey="shr" nzTitle="Shared Health Records" nzIcon="merge-cells">
+        <ul>
+          <li nz-menu-item nzKey="shr-dashboard" (click)="navigateTo('/shared-health-records')">
+            Health Records
+          </li>
+          <li
+            nz-menu-item
+            nzKey="referrals"
+            (click)="navigateTo('/shared-health-records/referrals')"
+          >
+            Referrals
+          </li>
+        </ul>
+      </li>
+
+      <li nz-menu-item nzKey="appointments" (click)="navigateTo('/appointments')">
+        <span nz-icon nzType="calendar"></span>
+        <span>Appointments</span>
+      </li>
+
+      <li nz-submenu nzKey="mapping-extraction" nzTitle="Configuration" nzIcon="setting">
+        <ul>
+          <li nz-menu-item nzKey="facility-management" (click)="navigateTo('/facility-management')">
+            <span nz-icon nzType="bank"></span>
+            <span>Facilities</span>
+          </li>
+          <li nz-menu-item nzKey="connections" (click)="navigateTo('/system-connections')">
+            <span nz-icon nzType="link"></span>
+            Connections
+          </li>
+          <li
+            nz-menu-item
+            nzKey="terminology-services"
+            (click)="navigateTo('/terminology-services')"
+          >
+            <span nz-icon nzType="read"></span>
+            Terminology Services
+          </li>
+          <li nz-menu-item nzKey="workflow-config" (click)="navigateTo('/workflow-config')">
+            <span nz-icon nzType="tool"></span>
+            Mappings
+          </li>
+          <li nz-menu-item nzKey="datasets" (click)="navigateTo('/data-sets')">
+            <span nz-icon nzType="database"></span>
+            Datasets
+          </li>
+          <li nz-menu-item nzKey="validation" (click)="navigateTo('/validations')">
+            <span nz-icon nzType="check-circle"></span>
+            Validation
+          </li>
+          <li nz-menu-item nzKey="workflows" (click)="navigateTo('/workflows')">
+            <span nz-icon nzType="partition"></span>
+            Workflows
+          </li>
+        </ul>
+      </li>
+
+      <!-- <li nz-menu-item nzKey="api-management" (click)="navigateTo('/api-management')">
+        <span nz-icon nzType="api"></span>
+        <span>API Management</span>
+      </li> -->
+      <!-- <li nz-menu-item nzKey="audit-logs" (click)="navigateTo('/audit-logs')">
+        <span nz-icon nzType="safety"></span>
+        <span>Audit Logs</span>
+      </li> -->
+
+      <li nz-submenu nzKey="access-management" nzTitle="Access Control" nzIcon="lock">
+        <ul>
+          <li nz-menu-item nzKey="users-list" (click)="navigateTo('/access-control/users')">
+            Users
+          </li>
+          <li nz-menu-item nzKey="user-roles" (click)="navigateTo('/access-control/user-roles')">
+            Roles
+          </li>
+          <li
+            nz-menu-item
+            nzKey="user-authorities"
+            (click)="navigateTo('/access-control/user-authorities')"
+          >
+            Authorities
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </nz-sider>
+  <nz-layout>
+    <nz-header>
+      <div class="flex items-center">
+        <span class="header-trigger" (click)="isCollapsed = !isCollapsed">
+          <nz-icon class="trigger" [nzType]="isCollapsed ? 'menu-unfold' : 'menu-fold'" />
+        </span>
+
+        <div class="header-text">
+          <span class="header-title">Ministry of Health - United Republic of Tanzania</span>
+          <span class="header-subtitle">Health Data Interoperability Platform</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <ng-container *ngIf="userInfo() as user">
+          <nz-tag nzColor="green" class="role-tag">{{ user.role }}</nz-tag>
+
+          <div
+            nz-dropdown
+            [nzDropdownMenu]="menu"
+            [nzPlacement]="'bottomCenter'"
+            nzTrigger="click"
+            class="user-card"
+          >
+            <div class="user-meta">
+              <div class="user-name">{{ user.name }}</div>
+              <div class="user-email">{{ user.email }}</div>
+            </div>
+            <nz-avatar [nzSize]="42" nzIcon="user" class="user-avatar"></nz-avatar>
+            <span nz-icon nzType="down" class="dropdown-icon"></span>
+
+            <nz-dropdown-menu #menu="nzDropdownMenu">
+              <ul nz-menu>
+                <li
+                  nz-menu-item
+                  class="profile-menu-item"
+                  (click)="navigateTo('/user-account/profile')"
+                >
+                  <span nz-icon nzType="user"></span>
+                  <span class="ml-2">Profile</span>
+                </li>
+                <li
+                  nz-menu-item
+                  class="profile-menu-item"
+                  (click)="navigateTo('/user-account/settings')"
+                >
+                  <span nz-icon nzType="setting"></span>
+                  <span class="ml-2">Settings</span>
+                </li>
+                <li nz-menu-divider></li>
+                <li nz-menu-item class="profile-menu-item" (click)="logout()">
+                  <span nz-icon nzType="logout"></span>
+                  <span class="ml-2">Logout</span>
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+          </div>
+        </ng-container>
+      </div>
+    </nz-header>
+    <nz-content>
+      <div class="inner-content">
+        <ng-content />
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>

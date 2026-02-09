@@ -1,0 +1,94 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.title-row {
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tag {
+  font-size: 14px;
+  padding: 4px 12px;
+}
+
+.overview {
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  color: white;
+}
+
+.overview .label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  display: block;
+}
+
+.overview .value {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.location {
+  margin-top: 16px;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+.provider {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.avatar {
+  background-color: #1e3a8a;
+}
+
+.block {
+  margin-bottom: 16px;
+}
+
+.block-box {
+  margin-top: 8px;
+  padding: 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.instruction {
+  display: flex;
+  gap: 8px;
+}
+
+.check {
+  color: #52c41a;
+  margin-top: 4px;
+}
+
+.muted {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.big {
+  font-size: 16px;
+}
+
+.big.blue { color: #1e3a8a; }
+
+.link {
+  padding: 0;
+}

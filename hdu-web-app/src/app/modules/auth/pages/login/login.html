@@ -1,0 +1,72 @@
+<div class="login-wrap">
+  <nz-card class="login-card">
+    <div class="login-header">
+      <div class="logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <path
+            d="M24 4L6 14V22C6 32.5 13.5 42.4 24 44C34.5 42.4 42 32.5 42 22V14L24 4Z"
+            fill="white"
+            fill-opacity="0.9"
+          />
+          <path
+            d="M24 12C19.6 12 16 15.6 16 20C16 24.4 24 34 24 34C24 34 32 24.4 32 20C32 15.6 28.4 12 24 12ZM24 22C22.9 22 22 21.1 22 20C22 18.9 22.9 18 24 18C25.1 18 26 18.9 26 20C26 21.1 25.1 22 24 22Z"
+            fill="#10b981"
+          />
+        </svg>
+      </div>
+      <h2 nz-typography nzTitle>Tanzania Health Data API</h2>
+      <span class="subtitle">Ministry of Health - United Republic of Tanzania</span>
+      <nz-divider></nz-divider>
+      <span class="caption">Client Registry & Shared Health Records Management System</span>
+    </div>
+
+    <form nz-form [formGroup]="form" (ngSubmit)="submit()" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label>Email Address</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter a valid email">
+          <nz-input-group nzPrefixIcon="mail">
+            <input nz-input formControlName="email" placeholder="Enter your email" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label>Password</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter your password">
+          <nz-input-group nzPrefixIcon="lock">
+            <input nz-input type="password" formControlName="password" placeholder="Enter your password" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="form-row">
+        <label nz-checkbox>Remember me</label>
+        <button nz-button nzType="link" type="button">Forgot password?</button>
+      </div>
+
+      <button nz-button nzType="primary" nzBlock [nzLoading]="loading" class="submit" type="submit">
+        Sign In
+      </button>
+    </form>
+
+    <nz-alert
+      nzType="info"
+      nzShowIcon
+      nzMessage="Demo Credentials"
+      [nzDescription]="demoTpl"
+      class="demo"
+    ></nz-alert>
+    <ng-template #demoTpl>
+      <div class="demo-content">
+        <div>Email: <strong>admin@health.go.tz</strong></div>
+        <div>Password: <strong>demo123</strong></div>
+      </div>
+    </ng-template>
+
+    <div class="login-footer">
+      <span>© 2026 Ministry of Health, Tanzania. All rights reserved.</span>
+      <br />
+      <span>Powered by Health Data Universal API</span>
+    </div>
+  </nz-card>
+</div>

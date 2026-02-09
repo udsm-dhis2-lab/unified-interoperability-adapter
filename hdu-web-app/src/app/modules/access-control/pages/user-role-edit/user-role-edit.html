@@ -1,0 +1,143 @@
+<div>
+  <div class="page-header">
+    <nz-space>
+      <button nz-button (click)="cancel()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back to Roles
+      </button>
+    </nz-space>
+  </div>
+
+  <div class="title-row">
+    <div>
+      <h2 nz-typography nzTitle>Edit Role</h2>
+      <span nz-typography nzType="secondary">Update role information and permissions</span>
+    </div>
+    <nz-tag nzColor="blue" class="tag">{{ role.userCount }} users assigned</nz-tag>
+  </div>
+
+  <nz-alert
+    nzType="warning"
+    nzShowIcon
+    nzMessage="Important"
+    nzDescription="Changing role permissions will affect all users assigned to this role. Review changes carefully before saving."
+    class="alert"
+  ></nz-alert>
+
+  <form nz-form [formGroup]="form" nzLayout="vertical">
+    <nz-row nzGutter="16">
+      <nz-col nzSpan="16">
+        <nz-card nzTitle="Basic Information" class="card">
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Role Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter role name">
+                  <input nz-input formControlName="roleName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label>Role ID</nz-form-label>
+                <nz-form-control>
+                  <input nz-input formControlName="roleId" [disabled]="true" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <nz-form-item>
+            <nz-form-label nzRequired>Description</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter description">
+              <textarea nz-input rows="3" formControlName="description"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Status</nz-form-label>
+            <nz-form-control>
+              <nz-switch
+                formControlName="status"
+                nzCheckedChildren="Active"
+                nzUnCheckedChildren="Inactive"
+              ></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-card>
+
+        <nz-card nzTitle="Permissions & Authorities" class="card">
+          <p nz-typography nzType="secondary">
+            Select the permissions that users with this role should have. Permissions are grouped by
+            category.
+          </p>
+          <nz-form-item>
+            <nz-checkbox-group formControlName="authorities">
+              <div *ngFor="let group of allAuthorities" class="group">
+                <nz-divider nzOrientation="left">
+                  <span class="group-title">
+                    <span nz-icon nzType="team"></span>
+                    {{ group.category }}
+                  </span>
+                </nz-divider>
+                <div class="group-body">
+                  <div *ngFor="let permission of group.permissions" class="permission">
+                    <label nz-checkbox [nzValue]="permission.code">
+                      <nz-space>
+                        <strong>{{ permission.name }}</strong>
+                        <nz-tag [nzColor]="riskColor(permission.risk)">{{
+                          permission.risk
+                        }}</nz-tag>
+                      </nz-space>
+                      <div class="muted">{{ permission.description }}</div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </nz-checkbox-group>
+          </nz-form-item>
+        </nz-card>
+      </nz-col>
+
+      <nz-col nzSpan="8">
+        <nz-card nzTitle="Role Summary" class="card sticky">
+          <nz-space nzDirection="vertical" style="width: 100%">
+            <div>
+              <span nz-typography nzType="secondary">Role Name:</span>
+              <br />
+              <strong>{{ role.roleName }}</strong>
+            </div>
+            <nz-divider></nz-divider>
+            <div>
+              <span nz-typography nzType="secondary">Users Assigned:</span>
+              <br />
+              <strong class="blue">{{ role.userCount }}</strong>
+            </div>
+            <nz-divider></nz-divider>
+            <div>
+              <span nz-typography nzType="secondary">Permissions:</span>
+              <br />
+              <strong class="green">{{ role.authorities.length }}</strong>
+            </div>
+            <nz-divider></nz-divider>
+            <div>
+              <span nz-typography nzType="secondary">Status:</span>
+              <br />
+              <nz-tag nzColor="green">ACTIVE</nz-tag>
+            </div>
+          </nz-space>
+        </nz-card>
+
+        <nz-card nzTitle="Actions">
+          <nz-space nzDirection="vertical" style="width: 100%">
+            <button nz-button nzType="primary" (click)="save()" block>
+              <span nz-icon nzType="save"></span>
+              Save Changes
+            </button>
+            <button nz-button block (click)="cancel()">Cancel</button>
+            <nz-divider></nz-divider>
+            <button nz-button nzDanger block>Delete Role</button>
+          </nz-space>
+        </nz-card>
+      </nz-col>
+    </nz-row>
+  </form>
+</div>

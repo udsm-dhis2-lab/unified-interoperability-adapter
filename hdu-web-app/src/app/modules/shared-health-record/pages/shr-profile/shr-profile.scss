@@ -1,0 +1,41 @@
+.page-header {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.alert {
+  margin-bottom: 16px;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.muted {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.mt-8 {
+  margin-top: 8px;
+}
+
+.mt-16 {
+  margin-top: 16px;
+}
+
+.section-alert {
+  margin-bottom: 16px;
+}

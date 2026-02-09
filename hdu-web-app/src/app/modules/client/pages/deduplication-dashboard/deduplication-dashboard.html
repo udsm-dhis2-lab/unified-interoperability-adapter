@@ -1,0 +1,119 @@
+<div>
+  <div class="page-header">
+    <h4 nz-typography nzTitle>Deduplication Dashboard</h4>
+    <span nz-typography nzType="secondary">Monitor and resolve potential duplicate client records to maintain data integrity</span>
+  </div>
+
+  <nz-row nzGutter="16" class="stats">
+    <nz-col nzSpan="8">
+      <nz-card>
+        <ng-template #dupPrefix><span nz-icon nzType="warning"></span></ng-template>
+        <nz-statistic
+          nzTitle="Total Potential Duplicates"
+          [nzValue]="totalDuplicates"
+          [nzPrefix]="dupPrefix"
+          [nzValueStyle]="{ color: '#fa8c16' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="8">
+      <nz-card>
+        <ng-template #pendingPrefix><span nz-icon nzType="warning"></span></ng-template>
+        <nz-statistic
+          nzTitle="Pending Review"
+          [nzValue]="pendingDuplicates"
+          [nzPrefix]="pendingPrefix"
+          [nzValueStyle]="{ color: '#ff4d4f' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="8">
+      <nz-card>
+        <ng-template #resolvedPrefix><span nz-icon nzType="check-circle"></span></ng-template>
+        <nz-statistic
+          nzTitle="Resolved"
+          [nzValue]="resolvedDuplicates"
+          [nzPrefix]="resolvedPrefix"
+          [nzValueStyle]="{ color: '#52c41a' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+
+  <nz-card nzTitle="Potential Duplicate Groups" [nzExtra]="extraTpl">
+    <ng-template #extraTpl>
+      <span nz-typography nzType="secondary">Click "Review" to resolve duplicates</span>
+    </ng-template>
+    <nz-table [nzData]="duplicateGroups" [nzPageSize]="10" [nzShowSizeChanger]="true">
+      <thead>
+        <tr>
+          <th>Group ID</th>
+          <th>Potential Duplicates</th>
+          <th>Match Score</th>
+          <th>Matching Fields</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let group of duplicateGroups">
+          <td><nz-tag nzColor="orange">{{ group.id }}</nz-tag></td>
+          <td>
+            <div *ngFor="let client of group.clients; let i = index" class="client-line">
+              <strong>{{ i + 1 }}.</strong>
+              <span>{{ client.firstName }} {{ client.lastName }}</span>
+              <span class="muted">({{ client.clientId }})</span>
+            </div>
+          </td>
+          <td>
+            <nz-progress
+              [nzPercent]="group.matchScore"
+              nzSize="small"
+              [nzStatus]="progressStatus(group.matchScore)"
+            ></nz-progress>
+          </td>
+          <td>
+            <nz-space nzWrap>
+              <nz-tag *ngFor="let field of group.matchFields" nzColor="blue">{{ field }}</nz-tag>
+            </nz-space>
+          </td>
+          <td>
+            <nz-tag [nzColor]="statusTag(group.status).color">{{ statusTag(group.status).text }}</nz-tag>
+          </td>
+          <td>
+            <button nz-button nzType="primary" nzSize="small" (click)="review(group.id)">
+              <span nz-icon nzType="eye"></span>
+              Review
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+
+  <nz-card nzTitle="Deduplication Configuration" class="config-card">
+    <nz-row nzGutter="16">
+      <nz-col nzSpan="12">
+        <div class="config-block">
+          <strong>Matching Criteria:</strong>
+          <ul>
+            <li>First Name + Last Name + Date of Birth (95% match)</li>
+            <li>National ID (100% match)</li>
+            <li>Phone Number + Date of Birth (85% match)</li>
+            <li>Email + Last Name (80% match)</li>
+          </ul>
+        </div>
+      </nz-col>
+      <nz-col nzSpan="12">
+        <div class="config-block">
+          <strong>Auto-Detection Rules:</strong>
+          <ul>
+            <li>Scan for duplicates daily at 2:00 AM</li>
+            <li>Alert when match score &gt; 90%</li>
+            <li>Require manual review for all matches</li>
+          </ul>
+        </div>
+      </nz-col>
+    </nz-row>
+  </nz-card>
+</div>

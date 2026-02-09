@@ -1,0 +1,244 @@
+<div>
+  <div class="page-header">
+    <nz-space>
+      <button nz-button (click)="cancel()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back to Users
+      </button>
+    </nz-space>
+  </div>
+
+  <div class="title-row">
+    <div>
+      <h2 nz-typography nzTitle>Edit User</h2>
+      <span nz-typography nzType="secondary">Update user information, role, and permissions</span>
+    </div>
+  </div>
+
+  <nz-row nzGutter="16">
+    <nz-col nzSpan="16">
+      <form nz-form [formGroup]="form" nzLayout="vertical">
+        <nz-card nzTitle="Basic Information" class="card">
+          <div class="avatar-row">
+            <nz-avatar [nzSize]="80" nzIcon="user" class="avatar"></nz-avatar>
+            <div>
+              <button nz-button nzType="link">Change Photo</button>
+              <div class="muted">JPG or PNG. Max size 2MB.</div>
+            </div>
+          </div>
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>First Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter first name">
+                  <input nz-input formControlName="firstName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Last Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter last name">
+                  <input nz-input formControlName="lastName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Email Address</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter valid email">
+                  <input nz-input formControlName="email" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Phone Number</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter phone number">
+                  <input nz-input formControlName="phoneNumber" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <nz-form-item>
+            <nz-form-label>User ID</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="userId" [disabled]="true" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-card>
+
+        <nz-card nzTitle="Role and Facility" class="card">
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>User Role</nz-form-label>
+                <nz-form-control nzErrorTip="Please select role">
+                  <nz-select formControlName="role" nzPlaceHolder="Select role">
+                    <nz-option
+                      nzValue="System Administrator"
+                      nzLabel="System Administrator"
+                    ></nz-option>
+                    <nz-option
+                      nzValue="Health Professional"
+                      nzLabel="Health Professional"
+                    ></nz-option>
+                    <nz-option nzValue="Data Analyst" nzLabel="Data Analyst"></nz-option>
+                    <nz-option nzValue="Receptionist" nzLabel="Receptionist"></nz-option>
+                    <nz-option
+                      nzValue="Laboratory Technician"
+                      nzLabel="Laboratory Technician"
+                    ></nz-option>
+                    <nz-option nzValue="Pharmacist" nzLabel="Pharmacist"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Department</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter department">
+                  <input nz-input formControlName="department" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Facility</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter facility">
+                  <input nz-input formControlName="facility" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Region</nz-form-label>
+                <nz-form-control nzErrorTip="Please select region">
+                  <nz-select formControlName="region" nzPlaceHolder="Select region">
+                    <nz-option nzValue="Dar es Salaam" nzLabel="Dar es Salaam"></nz-option>
+                    <nz-option nzValue="Arusha" nzLabel="Arusha"></nz-option>
+                    <nz-option nzValue="Kilimanjaro" nzLabel="Kilimanjaro"></nz-option>
+                    <nz-option nzValue="Mwanza" nzLabel="Mwanza"></nz-option>
+                    <nz-option nzValue="Dodoma" nzLabel="Dodoma"></nz-option>
+                    <nz-option nzValue="Mbeya" nzLabel="Mbeya"></nz-option>
+                    <nz-option nzValue="Morogoro" nzLabel="Morogoro"></nz-option>
+                    <nz-option nzValue="Tanga" nzLabel="Tanga"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+
+        <nz-card nzTitle="User Permissions" class="card">
+          <span nz-typography nzType="secondary" class="block"
+            >Select the authorities this user should have access to</span
+          >
+          <nz-form-item>
+            <nz-checkbox-group
+              [nzOptions]="allAuthorities"
+              formControlName="authorities"
+            ></nz-checkbox-group>
+          </nz-form-item>
+        </nz-card>
+
+        <nz-card nzTitle="Account Status" class="card">
+          <nz-form-item>
+            <nz-form-label>Account Status</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="status">
+                <nz-option nzValue="active" nzLabel="Active"></nz-option>
+                <nz-option nzValue="inactive" nzLabel="Inactive"></nz-option>
+                <nz-option nzValue="suspended" nzLabel="Suspended"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-divider></nz-divider>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Two-Factor Authentication</strong>
+              <div class="muted">Add an extra layer of security to user account</div>
+            </div>
+            <nz-switch></nz-switch>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div class="toggle-row">
+            <div>
+              <strong>Email Notifications</strong>
+              <div class="muted">Send email notifications for important events</div>
+            </div>
+            <nz-switch [ngModel]="true"></nz-switch>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <div class="toggle-row">
+            <div>
+              <strong>SMS Notifications</strong>
+              <div class="muted">Send SMS notifications for urgent alerts</div>
+            </div>
+            <!-- <nz-switch [ngModel]="true"></nz-switch> -->
+          </div>
+        </nz-card>
+
+        <nz-card>
+          <nz-space>
+            <button nz-button nzType="primary" (click)="save()">
+              <span nz-icon nzType="save"></span>
+              Save Changes
+            </button>
+            <button nz-button (click)="cancel()">Cancel</button>
+            <button nz-button nzDanger>Delete User</button>
+          </nz-space>
+        </nz-card>
+      </form>
+    </nz-col>
+
+    <nz-col nzSpan="8">
+      <nz-card nzTitle="User Summary" class="card">
+        <nz-space nzDirection="vertical" style="width: 100%">
+          <div>
+            <span nz-typography nzType="secondary">User ID:</span>
+            <br />
+            <strong>{{ user.userId }}</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span nz-typography nzType="secondary">Created:</span>
+            <br />
+            <strong>{{ user.createdDate }}</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span nz-typography nzType="secondary">Last Login:</span>
+            <br />
+            <strong>{{ user.lastLogin }}</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span nz-typography nzType="secondary">Current Status:</span>
+            <br />
+            <nz-tag nzColor="green">{{ user.status.toUpperCase() }}</nz-tag>
+          </div>
+        </nz-space>
+      </nz-card>
+
+      <nz-card nzTitle="Quick Actions">
+        <nz-space nzDirection="vertical" style="width: 100%">
+          <button nz-button block>Reset Password</button>
+          <button nz-button block>View Activity Log</button>
+          <button nz-button block>Send Email</button>
+          <button nz-button nzDanger block>Suspend Account</button>
+        </nz-space>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+</div>

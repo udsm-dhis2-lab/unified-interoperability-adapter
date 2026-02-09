@@ -1,0 +1,108 @@
+<div>
+  <div class="page-header">
+    <h2 nz-typography nzTitle>Referral Management</h2>
+    <span nz-typography nzType="secondary">Track and manage patient referrals across health facilities</span>
+  </div>
+
+  <nz-row nzGutter="16" class="stats">
+    <nz-col nzSpan="4">
+      <nz-card>
+        <ng-template #totalPrefix><span nz-icon nzType="sync"></span></ng-template>
+        <nz-statistic nzTitle="Total Referrals" [nzValue]="stats.total" [nzPrefix]="totalPrefix"></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="5">
+      <nz-card>
+        <nz-statistic nzTitle="Pending" [nzValue]="stats.pending" [nzValueStyle]="{ color: '#faad14' }"></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="5">
+      <nz-card>
+        <nz-statistic nzTitle="Accepted" [nzValue]="stats.accepted" [nzValueStyle]="{ color: '#1890ff' }"></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="5">
+      <nz-card>
+        <nz-statistic nzTitle="Completed" [nzValue]="stats.completed" [nzValueStyle]="{ color: '#52c41a' }"></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="5">
+      <nz-card>
+        <nz-statistic nzTitle="Urgent Cases" [nzValue]="stats.urgent" [nzValueStyle]="{ color: '#ff4d4f' }"></nz-statistic>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+
+  <nz-card class="filters">
+    <nz-space nzSize="middle" style="width: 100%; justify-content: space-between;">
+      <nz-space>
+        <nz-input-group nzPrefixIcon="search">
+          <input nz-input placeholder="Search referrals..." [(ngModel)]="searchText" style="width: 300px" />
+        </nz-input-group>
+        <nz-select [(ngModel)]="statusFilter" style="width: 150px">
+          <nz-option nzValue="all" nzLabel="All Statuses"></nz-option>
+          <nz-option nzValue="pending" nzLabel="Pending"></nz-option>
+          <nz-option nzValue="accepted" nzLabel="Accepted"></nz-option>
+          <nz-option nzValue="completed" nzLabel="Completed"></nz-option>
+          <nz-option nzValue="rejected" nzLabel="Rejected"></nz-option>
+        </nz-select>
+        <nz-select [(ngModel)]="priorityFilter" style="width: 150px">
+          <nz-option nzValue="all" nzLabel="All Priorities"></nz-option>
+          <nz-option nzValue="urgent" nzLabel="Urgent"></nz-option>
+          <nz-option nzValue="high" nzLabel="High"></nz-option>
+          <nz-option nzValue="normal" nzLabel="Normal"></nz-option>
+          <nz-option nzValue="low" nzLabel="Low"></nz-option>
+        </nz-select>
+      </nz-space>
+      <button nz-button>
+        <span nz-icon nzType="filter"></span>
+        Advanced Filters
+      </button>
+    </nz-space>
+  </nz-card>
+
+  <nz-card>
+    <nz-table [nzData]="filteredReferrals" [nzPageSize]="10" [nzShowSizeChanger]="true">
+      <thead>
+        <tr>
+          <th>Referral ID</th>
+          <th>Patient</th>
+          <th>From</th>
+          <th>To</th>
+          <th>Specialty</th>
+          <th>Referral Date</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let referral of filteredReferrals">
+          <td><strong class="id">{{ referral.referralId }}</strong></td>
+          <td>
+            <div><strong>{{ referral.patientName }}</strong></div>
+            <div class="muted">{{ referral.patientId }}</div>
+          </td>
+          <td>
+            <div>{{ referral.referringFacility }}</div>
+            <div class="muted">{{ referral.referringDoctor }}</div>
+          </td>
+          <td>
+            <div>{{ referral.receivingFacility }}</div>
+            <div class="muted" *ngIf="referral.receivingDoctor">{{ referral.receivingDoctor }}</div>
+          </td>
+          <td>{{ referral.specialty }}</td>
+          <td>{{ referral.referralDate }}</td>
+          <td><nz-tag [nzColor]="priorityColor(referral.priority)">{{ referral.priority.toUpperCase() }}</nz-tag></td>
+          <td><nz-tag [nzColor]="statusColor(referral.status)">{{ referral.status.toUpperCase() }}</nz-tag></td>
+          <td>
+            <button nz-button nzType="link" (click)="view(referral.id)">
+              <span nz-icon nzType="eye"></span>
+              View
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>

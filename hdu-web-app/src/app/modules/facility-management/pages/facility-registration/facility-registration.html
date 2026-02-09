@@ -1,0 +1,113 @@
+<div>
+  <div class="page-header">
+    <h3 nz-typography nzTitle>Register New Facility</h3>
+  </div>
+
+  <nz-card>
+    <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
+      <h4 nz-typography nzTitle>Facility Information</h4>
+
+      <nz-form-item>
+        <nz-form-label>Search HFR Registry</nz-form-label>
+        <nz-form-control nzExtra="Search facilities by Name or Code to auto-fill">
+          <nz-input-group nzCompact>
+            <input nz-input formControlName="hfrSearch" placeholder="Search facilities by Name or Code to auto-fill" />
+            <button nz-button nzType="primary" (click)="syncFacility()" [nzLoading]="syncLoading">
+              <span nz-icon nzType="sync"></span>
+              Sync Facilities
+            </button>
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-row nzGutter="16">
+        <nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>Facility Code</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter facility code">
+              <input nz-input formControlName="facilityCode" placeholder="e.g., 111841-3" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>Facility Name</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter facility name">
+              <input nz-input formControlName="facilityName" placeholder="e.g., BENJAMIN MKAPA HOSPITAL" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row>
+
+      <nz-form-item>
+        <nz-form-label>Additional Parameters (JSON)</nz-form-label>
+        <nz-form-control nzExtra="Optional: Additional configuration parameters in JSON format">
+          <textarea nz-input rows="6" formControlName="additionalParameters" placeholder='{"key": "value"}'></textarea>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-control>
+          <label nz-checkbox formControlName="allowAccess">
+            <strong>Allow facility access</strong>
+            <div class="muted">If unchecked, this facility will be blocked from the system</div>
+          </label>
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-divider></nz-divider>
+
+      <h4 nz-typography nzTitle>Referral Configuration (Optional)</h4>
+
+      <nz-alert
+        nzType="info"
+        nzShowIcon
+        nzMessage="Configure referral endpoint now. You can configure this later if needed."
+        class="alert"
+      ></nz-alert>
+
+      <nz-row nzGutter="16">
+        <nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label>Category</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="category" placeholder="e.g., REFERRAL" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label>Auth Type</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="authType" placeholder="e.g., BASIC" />
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row>
+
+      <nz-form-item>
+        <nz-form-label>Base URL</nz-form-label>
+        <nz-form-control>
+          <input nz-input formControlName="baseUrl" placeholder="e.g., https://136.182.78.163:8888" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label>Path</nz-form-label>
+        <nz-form-control>
+          <input nz-input formControlName="path" placeholder="e.g., /MappingTestHIS/referralsWebhook" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="actions">
+        <nz-space>
+          <button nz-button nzType="primary" [nzLoading]="loading" type="submit">
+            <span nz-icon nzType="save"></span>
+            Register Facility
+          </button>
+          <button nz-button type="button" (click)="cancel()">Cancel</button>
+        </nz-space>
+      </div>
+    </form>
+  </nz-card>
+</div>

@@ -1,0 +1,26 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.search {
+  margin-bottom: 24px;
+}
+
+.link {
+  padding: 0;
+}
+
+.muted {
+  color: #8c8c8c;
+}
+
+.danger {
+  color: #ff4d4f;
+}
+
+.card {
+  margin-bottom: 16px;
+}

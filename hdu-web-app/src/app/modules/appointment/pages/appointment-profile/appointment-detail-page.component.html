@@ -1,0 +1,210 @@
+<div>
+  <div class="page-header">
+    <nz-space>
+      <button nz-button (click)="back()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back to Appointments
+      </button>
+    </nz-space>
+  </div>
+
+  <div class="title-row">
+    <div>
+      <h2 nz-typography nzTitle>Appointment Details</h2>
+      <span nz-typography nzType="secondary">{{ appointment.appointmentId }}</span>
+    </div>
+    <nz-space>
+      <nz-tag [nzColor]="statusColor(appointment.status)" class="tag">{{
+        appointment.status.toUpperCase()
+      }}</nz-tag>
+    </nz-space>
+  </div>
+
+  <nz-row nzGutter="16">
+    <nz-col nzSpan="16">
+      <nz-card class="overview">
+        <nz-row nzGutter="16">
+          <nz-col nzSpan="12">
+            <nz-space nzDirection="vertical" nzSize="small">
+              <div class="info-row">
+                <span nz-icon nzType="calendar"></span>
+                <div>
+                  <span class="label">Date</span>
+                  <div class="value">{{ appointment.date }}</div>
+                </div>
+              </div>
+            </nz-space>
+          </nz-col>
+          <nz-col nzSpan="12">
+            <nz-space nzDirection="vertical" nzSize="small">
+              <div class="info-row">
+                <span nz-icon nzType="clock-circle"></span>
+                <div>
+                  <span class="label">Time</span>
+                  <div class="value">{{ appointment.time }}</div>
+                </div>
+              </div>
+            </nz-space>
+          </nz-col>
+          <nz-col nzSpan="24" class="location">
+            <div class="info-row">
+              <span nz-icon nzType="environment"></span>
+              <div>
+                <span class="label">Location</span>
+                <div class="value">{{ appointment.facility }} - {{ appointment.room }}</div>
+              </div>
+            </div>
+          </nz-col>
+        </nz-row>
+      </nz-card>
+
+      <nz-card nzTitle="Patient Information" class="card">
+        <nz-descriptions [nzColumn]="2" nzBordered nzSize="small">
+          <nz-descriptions-item nzTitle="Patient Name">{{
+            appointment.patientName
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Patient ID">{{
+            appointment.patientId
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Age">{{ appointment.age }} years</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Gender">{{ appointment.gender }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Phone Number">{{
+            appointment.phoneNumber
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Email">{{ appointment.email }}</nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Appointment Information" class="card">
+        <nz-descriptions [nzColumn]="2" nzBordered nzSize="small">
+          <nz-descriptions-item nzTitle="Date & Time">{{
+            appointment.dateTime
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Duration">{{ appointment.duration }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Appointment Type">{{
+            appointment.appointmentType
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Department">{{
+            appointment.department
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Facility" [nzSpan]="2">{{
+            appointment.facility
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Location" [nzSpan]="2">{{
+            appointment.room
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Referral ID" [nzSpan]="2">
+            <button nz-button nzType="link" class="link" (click)="toReferral()">
+              {{ appointment.referralId }}
+            </button>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Previous Visit">{{
+            appointment.previousVisit
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Status">
+            <nz-tag [nzColor]="statusColor(appointment.status)">{{
+              appointment.status.toUpperCase()
+            }}</nz-tag>
+          </nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Healthcare Provider" class="card">
+        <div class="provider">
+          <nz-avatar [nzSize]="64" nzIcon="user" class="avatar"></nz-avatar>
+          <div>
+            <h4 nz-typography nzTitle>{{ appointment.doctor }}</h4>
+            <span nz-typography nzType="secondary">{{ appointment.doctorSpecialty }}</span>
+            <br />
+            <span nz-typography nzType="secondary">{{ appointment.doctorContact }}</span>
+          </div>
+        </div>
+        <nz-descriptions [nzColumn]="1" nzBordered nzSize="small">
+          <nz-descriptions-item nzTitle="Department">{{
+            appointment.department
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Facility">{{ appointment.facility }}</nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Appointment Details" class="card">
+        <div class="block">
+          <strong>Reason for Visit:</strong>
+          <div class="block-box">{{ appointment.reason }}</div>
+        </div>
+        <div>
+          <strong>Special Instructions:</strong>
+          <div class="block-box">{{ appointment.notes }}</div>
+        </div>
+      </nz-card>
+
+      <nz-card nzTitle="Actions">
+        <nz-space>
+          <button nz-button nzType="primary">
+            <span nz-icon nzType="check-circle"></span>
+            Mark as Completed
+          </button>
+          <button nz-button>
+            <span nz-icon nzType="calendar"></span>
+            Reschedule
+          </button>
+          <button nz-button nzDanger>
+            <span nz-icon nzType="close-circle"></span>
+            Cancel Appointment
+          </button>
+        </nz-space>
+      </nz-card>
+    </nz-col>
+
+    <nz-col nzSpan="8">
+      <nz-card nzTitle="Appointment Timeline" class="card">
+        <nz-timeline>
+          <nz-timeline-item *ngFor="let item of appointment.timeline" [nzColor]="item.color">
+            <strong>{{ item.description }}</strong>
+            <br />
+            <span class="muted">{{ item.date }}</span>
+          </nz-timeline-item>
+        </nz-timeline>
+      </nz-card>
+
+      <nz-card nzTitle="Patient Instructions" class="card">
+        <nz-space nzDirection="vertical" style="width: 100%">
+          <div *ngFor="let instruction of appointment.instructions" class="instruction">
+            <span nz-icon nzType="check-circle" class="check"></span>
+            <span>{{ instruction }}</span>
+          </div>
+        </nz-space>
+      </nz-card>
+
+      <nz-alert
+        nzType="success"
+        nzShowIcon
+        nzMessage="Reminder Sent"
+        nzDescription="SMS and email reminders have been sent to the patient."
+        class="card"
+      ></nz-alert>
+
+      <nz-card nzTitle="Quick Information">
+        <nz-space nzDirection="vertical" style="width: 100%">
+          <div>
+            <span class="muted">Days Until Appointment:</span>
+            <br />
+            <strong class="big blue">6 days</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span class="muted">Estimated Wait Time:</span>
+            <br />
+            <strong class="big">15-20 minutes</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span class="muted">Confirmation Status:</span>
+            <br />
+            <nz-tag nzColor="green" class="tag">CONFIRMED</nz-tag>
+          </div>
+        </nz-space>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+</div>
