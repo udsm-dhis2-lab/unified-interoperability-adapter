@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, lastValueFrom, map, mergeMap, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, lastValueFrom, map, mergeMap, of, switchMap, tap, throwError } from 'rxjs';
 import { API_URLS } from '../../shared';
 import { UserInfo } from '../models';
 
@@ -11,7 +11,6 @@ import { UserInfo } from '../models';
 })
 export class AuthService {
   error?: string;
-  success?: boolean;
   cacheKey: string = "privileges"
   cachedPrivileges: string[] = [];
 
@@ -23,9 +22,17 @@ export class AuthService {
   }
 
   logout() {
+    this.http!.post(`${API_URLS.LOGOUT}`, {}, { withCredentials: true }).pipe(
+      tap(() => {
+        this.router!.navigate(['/login']);
+      }),
+      catchError((error: any) => {
+        console.log("Error during logout: ", error);
+        this.router!.navigate(['/login']);
+        return throwError(() => error);
+      })
+    ).subscribe();
     this.clearUserData();
-    localStorage.setItem("latest_route", this.router!.url);
-    this.router!.navigate(['/login']);
   }
 
   login(username: string, password: string): Observable<any> {
@@ -37,15 +44,14 @@ export class AuthService {
       password: password
     };
     return this.http!.post(`${API_URLS.LOGIN}`, body, { headers: headers, withCredentials: true }).pipe(
-      map(async (response: any) => {
-        if (this.success) {
-          this.saveUserData(response)
-          await lastValueFrom(this.get_user())
-        }
-        return response
+      switchMap((response: any) => {
+        this.saveUserData(response);
+        return this.get_user().pipe(
+          map(() => response)
+        );
       }),
       catchError((error: any) => {
-        console.log("Error: ", error)
+        console.log("Error: ", error);
         return throwError(() => error);
       })
     )
@@ -80,7 +86,7 @@ export class AuthService {
     let user = JSON.parse(localStorage.getItem("current_user") || "{}");
     return {
       email: user?.email,
-      role: user?.roles[0]?.roleName,
+      role: user?.roles?.[0]?.roleName,
       name: user?.username
     }
   }
@@ -88,15 +94,11 @@ export class AuthService {
   saveUserData(response: any) {
     this.clearUserData()
 
-    localStorage.setItem("access_token", response?.accessToken)
-    localStorage.setItem("refresh_token", response?.refreshToken)
+    localStorage.setItem("access_token", response?.accessToken);
+    localStorage.setItem("refresh_token", response?.refreshToken);
 
-    const expiry_timestamp_string = this.calculateExpiryTime(response?.accessTokenExpiry);
-
-    const refresh_timestamp_string = this.calculateExpiryTime(response?.refreshTokenExpiry);
-
-    localStorage.setItem("access_token_expiry", expiry_timestamp_string);
-    localStorage.setItem("refresh_token_expiry", refresh_timestamp_string);
+    localStorage.setItem("access_token_expiry", new Date(response?.accessTokenExpiry).getTime().toString());
+    localStorage.setItem("refresh_token_expiry", new Date(response?.refreshTokenExpiry).getTime().toString());
   }
 
   private autoLogout(seconds: number) {
