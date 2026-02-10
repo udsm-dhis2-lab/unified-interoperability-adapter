@@ -35,7 +35,10 @@
                 "output": "/assets/"
               }
             ],
-            "styles": ["src/theme.less", "src/styles.scss"]
+            "styles": [
+              "src/theme.less",
+              "src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {
@@ -68,7 +71,8 @@
               "buildTarget": "hdu-web:build:production"
             },
             "development": {
-              "buildTarget": "hdu-web:build:development"
+              "buildTarget": "hdu-web:build:development",
+              "proxyConfig": "proxy.conf.json"
             }
           },
           "defaultConfiguration": "development"

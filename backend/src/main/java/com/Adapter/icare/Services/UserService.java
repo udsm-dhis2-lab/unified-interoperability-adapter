@@ -202,15 +202,15 @@ public class UserService implements UserDetailsService {
             }
 
             // Validate required fields
-            if (updatedUser.getUsername() == null || updatedUser.getUsername().trim().isEmpty()) {
-                throw new IllegalArgumentException("Username is required");
-            }
-            if (updatedUser.getFirstName() == null || updatedUser.getFirstName().trim().isEmpty()) {
-                throw new IllegalArgumentException("First name is required");
-            }
-            if (updatedUser.getSurname() == null || updatedUser.getSurname().trim().isEmpty()) {
-                throw new IllegalArgumentException("Surname is required");
-            }
+//            if (updatedUser.getUsername() == null || updatedUser.getUsername().trim().isEmpty()) {
+//                throw new IllegalArgumentException("Username is required");
+//            }
+//            if (updatedUser.getFirstName() == null || updatedUser.getFirstName().trim().isEmpty()) {
+//                throw new IllegalArgumentException("First name is required");
+//            }
+//            if (updatedUser.getSurname() == null || updatedUser.getSurname().trim().isEmpty()) {
+//                throw new IllegalArgumentException("Surname is required");
+//            }
 
             if (!existingUser.getUsername().equals(updatedUser.getUsername())) {
                 User userWithNewUsername = userRepository.findByUsername(updatedUser.getUsername());

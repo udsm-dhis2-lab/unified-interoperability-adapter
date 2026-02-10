@@ -1,36 +1,121 @@
-import { computed, Injectable, signal } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
+import { Observable, catchError, lastValueFrom, map, mergeMap, of, tap } from 'rxjs';
+import { API_URLS } from '../../shared';
 
-export interface UserInfo {
-  name: string;
-  email: string;
-  role: string;
-}
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  #isAuthenticated = signal(false);
-  #userInfo = signal<UserInfo | null>(null);
+  error?: string;
+  success?: boolean;
+  cacheKey: string = "privileges"
+  cachedPrivileges: string[] = [];
 
-  isAuthenticated = computed(() => {
-    return this.#isAuthenticated();
-  });
+  constructor(
+    private http?: HttpClient,
+    private router?: Router
+  ) {
 
-  userInfo = computed(() => {
-    return this.#userInfo();
-  });
-
-  login(email: string): void {
-    this.#isAuthenticated.set(true);
-    this.#userInfo.set({
-      name: 'Dr. Amina Mwakasege',
-      email,
-      role: 'Health Professional',
-    });
   }
 
-  logout(): void {
-    this.#isAuthenticated.set(false);
-    this.#userInfo.set(null);
+  logout() {
+    this.clearUserData();
+    localStorage.setItem("latest_route", this.router!.url);
+    this.router!.navigate(['/login']);
+  }
+
+  login(username: string, password: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    const body = {
+      username: username,
+      password: password
+    };
+    return this.http!.post(`${API_URLS.LOGIN}`, body, { headers: headers, withCredentials: true }).pipe(
+      map((response: any) => {
+        if (this.success) {
+          this.saveUserData(response)
+        }
+        return response
+      }),
+      catchError((error: any) => {
+        console.log("Error: ", error)
+        return of(error);
+      })
+    )
+  }
+
+
+  refresh_token(): Observable<any> {
+    const refresh_token = localStorage.getItem("refresh_token")!
+
+    const headers = new HttpHeaders({
+      'refresh-token': refresh_token
+    });
+
+    return this.http!.post(
+      `${API_URLS.REFRESH_TOKEN}`, null, { headers }
+    )
+  }
+
+  get_user(): Observable<any> {
+    return this.http!.get(`${API_URLS.GET_USER}`).pipe(
+      mergeMap((response: any) => {
+        localStorage.setItem("current_user", JSON.stringify(response))
+        return of(response)
+      }),
+      catchError((error: any) => {
+        return of(error)
+      })
+    )
+  }
+
+  saveUserData(response: any) {
+    this.clearUserData()
+
+    localStorage.setItem("access_token", response?.accessToken)
+    localStorage.setItem("refresh_token", response?.refreshToken)
+
+    const expiry_timestamp_string = this.calculateExpiryTime(response?.accessTokenExpiry);
+
+    const refresh_timestamp_string = this.calculateExpiryTime(response?.refreshTokenExpiry);
+
+    localStorage.setItem("access_token_expiry", expiry_timestamp_string);
+    localStorage.setItem("refresh_token_expiry", refresh_timestamp_string);
+  }
+
+  private autoLogout(seconds: number) {
+    setTimeout(() => {
+      this.logout()
+    }, seconds * 1000)
+  }
+
+  private autoRefresh(seconds: number) {
+    setTimeout(async () => {
+      const response = await lastValueFrom(this.refresh_token())
+      this.saveUserData(response)
+    }, (seconds - 30) * 1000)
+  }
+
+  clearUserData() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("access_token_expiry");
+    localStorage.removeItem("refresh_token_expiry")
+    localStorage.removeItem("current_user");
+  }
+
+  private calculateExpiryTime(seconds: string) {
+
+    const now = new Date().getTime() / 1000;
+    let expiry_timestamp_array = (now + Number(seconds)).toString()?.split(".");
+
+    expiry_timestamp_array[1] = expiry_timestamp_array[1]?.length === 2 ? expiry_timestamp_array[1] + "0" : expiry_timestamp_array[1]?.length === 1 ? expiry_timestamp_array[1] + "00" : expiry_timestamp_array[1];
+
+    return expiry_timestamp_array.join(".");
   }
 }
