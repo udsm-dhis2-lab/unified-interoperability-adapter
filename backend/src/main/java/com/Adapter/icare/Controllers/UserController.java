@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.data.domain.Page;
@@ -202,12 +203,12 @@ public class UserController {
         @ApiResponse(responseCode = "401", description = "Authentication required")
     })
     @SecurityRequirement(name = "bearerAuth")
-    public ResponseEntity<Map<String, Object>> getLoggedInUser() throws Exception {
+    public ResponseEntity<Map<String, Object>> getLoggedInUser(
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws Exception {
         try {
-            System.out.println("Getting logged in user " + authentication);
-            if (authentication != null) {
+            if (userDetails.getUsername() != null) {
                 User authenticatedUser = this.userService
-                        .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+                        .getUserByUsername(userDetails.getUsername());
                 return ResponseEntity.ok(authenticatedUser.toMap());
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);

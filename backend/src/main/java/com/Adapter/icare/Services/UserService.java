@@ -44,33 +44,8 @@ public class UserService implements UserDetailsService {
 
     private final GroupRepository groupRepository;
 
+
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    public Map<String, Object> authenticate(LoginDTO loginDTO) throws Exception {
-        if (loginDTO.getPassword() == null || loginDTO.getUsername() == null) {
-            throw new Exception("Credentials not well defined");
-        }
-
-        String username = loginDTO.getUsername();
-        String password = loginDTO.getPassword();
-        // Load user from database or other source
-        User user;
-        try {
-            user = userRepository.findByUsername(username);
-        } catch (UsernameNotFoundException e) {
-            throw new Exception("Invalid credentials");
-        }
-
-        if (user == null) {
-            throw new Exception("Invalid credentials");
-        }
-
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new Exception("Invalid credentials");
-        }
-
-        return user.toMap();
-    }
 
     public UserService(UserRepository userRepository, RoleRepository roleRepository,
             PrivilegeRepository privilegeRepository, GroupRepository groupRepository) {
@@ -87,15 +62,13 @@ public class UserService implements UserDetailsService {
     public Page<User> getUsers(int page, int size, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        return userRepository.findAllActiveUsers(pageable);
+        return userRepository.findAllActiveUsers(pageable, null);
     }
 
     public Page<User> getUsersWithSearch(int page, int size, String search, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
-        // This would require a custom repository method for search
-        // For now, return all active users - implement search later if needed
-        return userRepository.findAllActiveUsers(pageable);
+        return userRepository.findAllActiveUsers(pageable, search);
     }
 
     @Transactional
