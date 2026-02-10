@@ -1,0 +1,137 @@
+<div>
+  <nz-row nzGutter="16" class="stats">
+    <nz-col nzSpan="6">
+      <nz-card>
+        <ng-template #recordsPrefix><span nz-icon nzType="file-text"></span></ng-template>
+        <nz-statistic
+          nzTitle="Total Health Records"
+          [nzValue]="filteredClients.length * 2"
+          [nzPrefix]="recordsPrefix"
+          [nzValueStyle]="{ color: '#1890ff' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <nz-card>
+        <ng-template #facilityPrefix><span nz-icon nzType="database"></span></ng-template>
+        <nz-statistic
+          nzTitle="Connected Facilities"
+          [nzValue]="uniqueFacilities.length"
+          [nzPrefix]="facilityPrefix"
+          [nzValueStyle]="{ color: '#52c41a' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <nz-card>
+        <ng-template #syncPrefix><span nz-icon nzType="sync"></span></ng-template>
+        <nz-statistic
+          nzTitle="Records Synced Today"
+          [nzValue]="48"
+          [nzPrefix]="syncPrefix"
+          [nzValueStyle]="{ color: '#fa8c16' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <nz-card>
+        <ng-template #fhirPrefix><span nz-icon nzType="check-circle"></span></ng-template>
+        <nz-statistic
+          nzTitle="FHIR Compliant"
+          nzValue="98%"
+          [nzPrefix]="fhirPrefix"
+          [nzValueStyle]="{ color: '#13c2c2' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+
+  <div class="page-header">
+    <h4 nz-typography nzTitle>Shared Health Records</h4>
+    <button nz-button nzType="primary" (click)="openIntegration()">
+      <span nz-icon nzType="database"></span>
+      Integration Status
+    </button>
+  </div>
+
+  <nz-alert
+    nzType="info"
+    nzShowIcon
+    nzMessage="Shared Health Record System"
+    nzDescription="Consolidated patient health information from multiple healthcare facilities across Tanzania. All records are synchronized in real-time and comply with HL7 and FHIR standards for interoperability."
+    class="page-alert"
+  ></nz-alert>
+
+  <nz-row nzGutter="16" class="filters">
+    <nz-col nzSpan="8">
+      <nz-input-group nzPrefixIcon="search">
+        <input
+          nz-input
+          placeholder="Search by name, ID, DOB, facility..."
+          [ngModel]="searchText"
+          (ngModelChange)="handleSearch($event)"
+        />
+      </nz-input-group>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <nz-select
+        nzPlaceHolder="Filter by facility"
+        [ngModel]="selectedFacility || null"
+        (ngModelChange)="handleFacilityFilter($event)"
+        nzAllowClear
+        style="width: 100%"
+      >
+        <nz-option *ngFor="let facility of uniqueFacilities" [nzValue]="facility.facilityId" [nzLabel]="facility.name"></nz-option>
+      </nz-select>
+    </nz-col>
+    <nz-col nzSpan="4">
+      <button nz-button (click)="reset()">Reset</button>
+    </nz-col>
+  </nz-row>
+
+  <nz-table [nzData]="filteredClients" [nzPageSize]="10" [nzShowSizeChanger]="true" nzTableLayout="fixed">
+    <thead>
+      <tr>
+        <th>SN</th>
+        <th>Client ID</th>
+        <th>Patient Name</th>
+        <th>Gender</th>
+        <th>Date of Birth</th>
+        <th>Origin Facility</th>
+        <th>Sync Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let client of filteredClients; let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>
+          <button nz-button nzType="link" (click)="viewRecords(client.id)">{{ client.clientId }}</button>
+        </td>
+        <td>
+          <div class="name">{{ client.firstName }} {{ client.middleName }} {{ client.lastName }}</div>
+          <div class="muted">{{ client.nationalId }}</div>
+        </td>
+        <td>
+          <nz-tag [nzColor]="genderColor(client.gender)">{{ client.gender }}</nz-tag>
+        </td>
+        <td>{{ client.dateOfBirth }}</td>
+        <td>
+          <ng-container *ngIf="client.originFacility; else noFacility">
+            <div class="name">{{ client.originFacility.name }}</div>
+            <div class="muted">{{ client.originFacility.region }}</div>
+          </ng-container>
+          <ng-template #noFacility>
+            <span class="muted">-</span>
+          </ng-template>
+        </td>
+        <td>
+          <nz-badge nzStatus="success" nzText="Synced"></nz-badge>
+        </td>
+        <td>
+          <button nz-button nzType="link" nzSize="small" (click)="viewRecords(client.id)">View Records</button>
+        </td>
+      </tr>
+    </tbody>
+  </nz-table>
+</div>

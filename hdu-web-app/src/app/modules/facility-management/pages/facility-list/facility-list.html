@@ -1,0 +1,95 @@
+<div>
+  <nz-card class="card">
+    <div class="page-header">
+      <h3 nz-typography nzTitle>Facility Management</h3>
+      <button nz-button nzType="primary" nzSize="large" (click)="registerFacility()">
+        <span nz-icon nzType="plus"></span>
+        Register Facility
+      </button>
+    </div>
+
+    <div class="search">
+      <nz-input-wrapper nzPrefixIcon="search" style="max-width: 400px">
+        <input nz-input placeholder="Search by name or code..." [(ngModel)]="searchText" />
+      </nz-input-wrapper>
+    </div>
+
+    <nz-table [nzData]="filteredFacilities" [nzPageSize]="10" [nzShowSizeChanger]="true">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Referral Config</th>
+          <th>Access Control</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let facility of filteredFacilities; index as idx">
+          <td>{{ idx + 1 }}</td>
+          <td>{{ facility.code }}</td>
+          <td>{{ facility.name }}</td>
+          <td>
+            <nz-tag nzColor="green">Allowed</nz-tag>
+          </td>
+          <td>
+            <button nz-button nzType="link" class="link" *ngIf="facility.referralConfigured">
+              <span nz-icon nzType="check-circle"></span>
+              Configured
+            </button>
+            <span *ngIf="!facility.referralConfigured" class="muted">Not Configured</span>
+          </td>
+          <td>
+            <nz-switch
+              [ngModel]="facility.accessControl"
+              (ngModelChange)="handleAccessControlChange(facility, $event)"
+            ></nz-switch>
+          </td>
+          <td>
+            <div nz-dropdown nzTrigger="click">
+              <button nz-button nzType="link" class="link" nz-dropdown [nzDropdownMenu]="menu">
+                Actions
+                <span nz-icon nzType="down"></span>
+              </button>
+              <nz-dropdown-menu #menu="nzDropdownMenu">
+                <ul nz-menu>
+                  <li nz-menu-item (click)="viewFacility(facility)">
+                    <span nz-icon nzType="eye"></span>
+                    View Details
+                  </li>
+                  <li nz-menu-item (click)="configureReferral(facility)">
+                    <span nz-icon nzType="edit"></span>
+                    Edit Referral
+                  </li>
+                  <li nz-menu-item nzDanger (click)="openDeleteModal(facility)">
+                    <span nz-icon nzType="delete"></span>
+                    Delete Facility
+                  </li>
+                </ul>
+              </nz-dropdown-menu>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+
+  <nz-modal
+    nzTitle="Delete Facility"
+    [(nzVisible)]="deleteModalVisible"
+    (nzOnOk)="confirmDelete()"
+    (nzOnCancel)="closeDeleteModal()"
+    nzOkText="Delete"
+    [nzOkDanger]="true"
+  >
+    <ng-container *nzModalContent>
+      <p>
+        Are you sure you want to delete facility <strong>{{ selectedFacility?.name }}</strong
+        >?
+      </p>
+      <p class="danger">This action cannot be undone.</p>
+    </ng-container>
+  </nz-modal>
+</div>

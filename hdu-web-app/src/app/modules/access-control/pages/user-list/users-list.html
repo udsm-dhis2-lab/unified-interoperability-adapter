@@ -1,0 +1,149 @@
+<div>
+  <div class="page-header">
+    <div>
+      <h2 nz-typography nzTitle>User Management</h2>
+      <span nz-typography nzType="secondary">Manage system users, roles, and permissions</span>
+    </div>
+    <nz-space>
+      <button nz-button (click)="goRoles()">
+        <span nz-icon nzType="team"></span>
+        Manage Roles
+      </button>
+      <button nz-button (click)="goAuthorities()">
+        <span nz-icon nzType="lock"></span>
+        Manage Authorities
+      </button>
+      <button nz-button nzType="primary" (click)="createUser()">
+        <span nz-icon nzType="plus"></span>
+        Add New User
+      </button>
+    </nz-space>
+  </div>
+
+  <nz-row nzGutter="16" class="stats">
+    <nz-col nzSpan="6">
+      <nz-card>
+        <ng-template #totalPrefix><span nz-icon nzType="user"></span></ng-template>
+        <nz-statistic
+          nzTitle="Total Users"
+          [nzValue]="stats.total"
+          [nzPrefix]="totalPrefix"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Active Users"
+          [nzValue]="stats.active"
+          [nzValueStyle]="{ color: '#52c41a' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Inactive Users"
+          [nzValue]="stats.inactive"
+          [nzValueStyle]="{ color: '#8c8c8c' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+    <nz-col nzSpan="6">
+      <nz-card>
+        <nz-statistic
+          nzTitle="Suspended Users"
+          [nzValue]="stats.suspended"
+          [nzValueStyle]="{ color: '#ff4d4f' }"
+        ></nz-statistic>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+
+  <nz-card class="filters">
+    <nz-space nzSize="middle">
+      <nz-input-wrapper nzPrefixIcon="search">
+        <input
+          nz-input
+          placeholder="Search users..."
+          [(ngModel)]="searchText"
+          style="width: 300px"
+        />
+      </nz-input-wrapper>
+      <nz-select [(ngModel)]="roleFilter" style="width: 200px">
+        <nz-option nzValue="all" nzLabel="All Roles"></nz-option>
+        <nz-option nzValue="System Administrator" nzLabel="System Administrator"></nz-option>
+        <nz-option nzValue="Health Professional" nzLabel="Health Professional"></nz-option>
+        <nz-option nzValue="Data Analyst" nzLabel="Data Analyst"></nz-option>
+        <nz-option nzValue="Receptionist" nzLabel="Receptionist"></nz-option>
+      </nz-select>
+      <nz-select [(ngModel)]="statusFilter" style="width: 150px">
+        <nz-option nzValue="all" nzLabel="All Statuses"></nz-option>
+        <nz-option nzValue="active" nzLabel="Active"></nz-option>
+        <nz-option nzValue="inactive" nzLabel="Inactive"></nz-option>
+        <nz-option nzValue="suspended" nzLabel="Suspended"></nz-option>
+      </nz-select>
+    </nz-space>
+  </nz-card>
+
+  <nz-card>
+    <nz-table [nzData]="filteredUsers" [nzPageSize]="10" [nzShowSizeChanger]="true">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Contact</th>
+          <th>Role</th>
+          <th>Facility</th>
+          <th>Last Login</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td>
+            <div class="user-cell">
+              <nz-avatar [nzSize]="40" nzIcon="user" class="avatar"></nz-avatar>
+              <div>
+                <div>
+                  <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+                </div>
+                <div class="muted">{{ user.userId }}</div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div>{{ user.email }}</div>
+            <div class="muted">{{ user.phoneNumber }}</div>
+          </td>
+          <td>
+            <nz-tag [nzColor]="roleColor(user.role)">{{ user.role }}</nz-tag>
+          </td>
+          <td>
+            <div>{{ user.facility }}</div>
+            <div class="muted">{{ user.department }}</div>
+          </td>
+          <td>{{ user.lastLogin }}</td>
+          <td>
+            <nz-badge
+              [nzStatus]="
+                user.status === 'active'
+                  ? 'success'
+                  : user.status === 'suspended'
+                    ? 'error'
+                    : 'default'
+              "
+              [nzText]="user.status.toUpperCase()"
+            ></nz-badge>
+          </td>
+          <td>
+            <button nz-button nzType="link" (click)="editUser(user.id)">
+              <span nz-icon nzType="edit"></span>
+              Edit
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>

@@ -1,0 +1,189 @@
+<div>
+  <div class="page-header">
+    <nz-space>
+      <button nz-button (click)="cancel()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back to Authorities
+      </button>
+    </nz-space>
+  </div>
+
+  <div class="title">
+    <h2 nz-typography nzTitle>Create New Authority</h2>
+    <span nz-typography nzType="secondary">Define a new system permission/authority</span>
+  </div>
+
+  <nz-alert
+    nzType="info"
+    nzShowIcon
+    nzMessage="Authority Creation"
+    nzDescription="Authorities define specific system permissions. Once created, authorities can be assigned to roles, which are then assigned to users."
+    class="alert"
+  ></nz-alert>
+
+  <form nz-form [formGroup]="form" nzLayout="vertical">
+    <nz-row nzGutter="16">
+      <nz-col nzSpan="16">
+        <nz-card nzTitle="Basic Information" class="card">
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Authority Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter authority name">
+                  <input nz-input formControlName="authorityName" placeholder="e.g., View Patients" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Authority Code</nz-form-label>
+                <nz-form-control nzErrorTip="Use uppercase letters and underscores only">
+                  <input nz-input formControlName="authorityCode" placeholder="e.g., VIEW_PATIENTS" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+          <nz-form-item>
+            <nz-form-label nzRequired>Description</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter description">
+              <textarea nz-input rows="3" formControlName="description"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Category</nz-form-label>
+                <nz-form-control nzErrorTip="Please select category">
+                  <nz-select formControlName="category" nzPlaceHolder="Select category">
+                    <nz-option nzValue="Patient Management" nzLabel="Patient Management"></nz-option>
+                    <nz-option nzValue="Health Records" nzLabel="Health Records"></nz-option>
+                    <nz-option nzValue="Appointments" nzLabel="Appointments"></nz-option>
+                    <nz-option nzValue="Analytics" nzLabel="Analytics"></nz-option>
+                    <nz-option nzValue="System Administration" nzLabel="System Administration"></nz-option>
+                    <nz-option nzValue="API & Integration" nzLabel="API & Integration"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Risk Level</nz-form-label>
+                <nz-form-control nzErrorTip="Please select risk level">
+                  <nz-select formControlName="riskLevel">
+                    <nz-option nzValue="low" nzLabel="Low"></nz-option>
+                    <nz-option nzValue="medium" nzLabel="Medium"></nz-option>
+                    <nz-option nzValue="high" nzLabel="High"></nz-option>
+                    <nz-option nzValue="critical" nzLabel="Critical"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+        </nz-card>
+
+        <nz-card nzTitle="Technical Details" class="card">
+          <nz-alert
+            nzType="info"
+            nzShowIcon
+            nzMessage="Technical Information"
+            nzDescription="These fields help developers integrate this permission into the application code and API endpoints."
+            class="sub-alert"
+          ></nz-alert>
+          <nz-form-item>
+            <nz-form-label>Resource Type</nz-form-label>
+            <nz-form-control>
+              <input nz-input formControlName="resourceType" placeholder="e.g., Patient, HealthRecord, Appointment" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Operation Type</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="operationType" nzMode="multiple">
+                <nz-option nzValue="READ" nzLabel="READ"></nz-option>
+                <nz-option nzValue="WRITE" nzLabel="WRITE"></nz-option>
+                <nz-option nzValue="UPDATE" nzLabel="UPDATE"></nz-option>
+                <nz-option nzValue="DELETE" nzLabel="DELETE"></nz-option>
+                <nz-option nzValue="EXECUTE" nzLabel="EXECUTE"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>API Endpoints</nz-form-label>
+            <nz-form-control>
+              <textarea nz-input rows="2" formControlName="apiEndpoints" placeholder="e.g., /api/patients/*, /api/records/view/*"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-card>
+
+        <nz-card nzTitle="Authority Settings" class="card">
+          <nz-form-item>
+            <nz-form-label>Status</nz-form-label>
+            <nz-form-control>
+              <nz-switch formControlName="status" nzCheckedChildren="Active" nzUnCheckedChildren="Inactive"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Requires Two-Factor Authentication</nz-form-label>
+            <nz-form-control>
+              <nz-switch formControlName="requiresTwoFactor"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Audit All Actions</nz-form-label>
+            <nz-form-control>
+              <nz-switch formControlName="auditActions"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-divider></nz-divider>
+          <nz-space>
+            <button nz-button nzType="primary" (click)="save()">
+              <span nz-icon nzType="save"></span>
+              Create Authority
+            </button>
+            <button nz-button (click)="cancel()">Cancel</button>
+          </nz-space>
+        </nz-card>
+      </nz-col>
+
+      <nz-col nzSpan="8">
+        <nz-card nzTitle="Authority Guidelines" class="card sticky">
+          <nz-space nzDirection="vertical" style="width: 100%">
+            <div>
+              <strong class="title">Naming Convention</strong>
+              <ul>
+                <li>Use descriptive names</li>
+                <li>Codes: UPPERCASE_WITH_UNDERSCORES</li>
+                <li>Start with action verb (VIEW, EDIT, DELETE)</li>
+              </ul>
+            </div>
+            <nz-divider></nz-divider>
+            <div>
+              <strong class="title">Security Best Practices</strong>
+              <ul>
+                <li>Keep permissions granular</li>
+                <li>Avoid overly broad permissions</li>
+                <li>Document the purpose clearly</li>
+                <li>Set appropriate risk levels</li>
+              </ul>
+            </div>
+            <nz-divider></nz-divider>
+            <nz-alert
+              nzType="info"
+              nzShowIcon
+              nzMessage="Examples"
+              [nzDescription]="examplesTpl"
+            ></nz-alert>
+            <ng-template #examplesTpl>
+              <div>
+                <nz-tag>VIEW_PATIENTS</nz-tag>
+                <nz-tag>EDIT_HEALTH_RECORDS</nz-tag>
+                <nz-tag>EXPORT_ANALYTICS_DATA</nz-tag>
+                <nz-tag>MANAGE_SYSTEM_USERS</nz-tag>
+              </div>
+            </ng-template>
+          </nz-space>
+        </nz-card>
+      </nz-col>
+    </nz-row>
+  </form>
+</div>

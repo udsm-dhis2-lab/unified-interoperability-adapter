@@ -1,0 +1,143 @@
+<nz-row nzGutter="16" class="stats">
+  <nz-col nzSpan="6">
+    <nz-card>
+      <ng-template #totalPrefix><span nz-icon nzType="team"></span></ng-template>
+      <nz-statistic
+        nzTitle="Total Clients"
+        [nzValue]="totalClients"
+        [nzPrefix]="totalPrefix"
+        [nzValueStyle]="{ color: '#1890ff' }"
+      ></nz-statistic>
+    </nz-card>
+  </nz-col>
+  <nz-col nzSpan="6">
+    <nz-card>
+      <ng-template #activePrefix><span nz-icon nzType="user"></span></ng-template>
+      <nz-statistic
+        nzTitle="Active Today"
+        [nzValue]="15"
+        [nzPrefix]="activePrefix"
+        [nzValueStyle]="{ color: '#52c41a' }"
+      ></nz-statistic>
+    </nz-card>
+  </nz-col>
+  <nz-col nzSpan="6">
+    <nz-card>
+      <ng-template #newPrefix><span nz-icon nzType="plus"></span></ng-template>
+      <nz-statistic
+        nzTitle="New This Week"
+        [nzValue]="7"
+        [nzPrefix]="newPrefix"
+        [nzValueStyle]="{ color: '#fa8c16' }"
+      ></nz-statistic>
+    </nz-card>
+  </nz-col>
+  <nz-col nzSpan="6">
+    <nz-card>
+      <ng-template #verifiedPrefix><span nz-icon nzType="check-circle"></span></ng-template>
+      <nz-statistic
+        nzTitle="Verified"
+        [nzValue]="verifiedClients"
+        [nzPrefix]="verifiedPrefix"
+        [nzValueStyle]="{ color: '#13c2c2' }"
+      ></nz-statistic>
+    </nz-card>
+  </nz-col>
+</nz-row>
+
+<div class="page-header">
+  <h4 nz-typography nzTitle>Client Management / Clients</h4>
+</div>
+
+<nz-alert
+  nzType="info"
+  nzShowIcon
+  nzMessage="Read-Only Client Registry"
+  nzDescription="This registry receives client data from health facility EHR/EMR systems across Tanzania. Client information is managed at the source facility level and synced to this central registry for viewing and cross-facility reference."
+  class="page-alert"
+></nz-alert>
+
+<nz-row nzGutter="16" class="filters">
+  <nz-col nzSpan="8">
+    <nz-input-wrapper nzPrefixIcon="search">
+      <input
+        nz-input
+        placeholder="Search by name, ID, phone..."
+        [ngModel]="searchText"
+        (ngModelChange)="handleSearch($event)"
+      />
+    </nz-input-wrapper>
+  </nz-col>
+  <nz-col nzSpan="4">
+    <nz-select
+      nzPlaceHolder="Select gender"
+      [ngModel]="selectedGender || null"
+      (ngModelChange)="handleGenderFilter($event)"
+      nzAllowClear
+      style="width: 100%"
+    >
+      <nz-option nzValue="male" nzLabel="Male"></nz-option>
+      <nz-option nzValue="female" nzLabel="Female"></nz-option>
+      <nz-option nzValue="other" nzLabel="Other"></nz-option>
+    </nz-select>
+  </nz-col>
+  <nz-col nzSpan="4">
+    <button nz-button (click)="reset()">Reset</button>
+  </nz-col>
+</nz-row>
+
+<nz-table
+  [nzData]="filteredClients"
+  nzTableLayout="fixed"
+  [nzPageSize]="10"
+  [nzShowSizeChanger]="true"
+>
+  <thead>
+    <tr>
+      <th>SN</th>
+      <th>Client ID</th>
+      <th>First Name</th>
+      <th>Middle Name</th>
+      <th>Surname</th>
+      <th>Gender</th>
+      <th>National ID</th>
+      <th>ID Number (others)</th>
+      <th>ID Type</th>
+      <th>Origin Facility</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let client of filteredClients; let i = index">
+      <td>{{ i + 1 }}</td>
+      <td>
+        <button nz-button nzType="link" (click)="goToClientDetail(client.id)">
+          {{ client.clientId }}
+        </button>
+      </td>
+      <td>{{ client.firstName }}</td>
+      <td>{{ client.middleName || '-' }}</td>
+      <td>{{ client.lastName }}</td>
+      <td>
+        <nz-tag [nzColor]="genderColor(client.gender)">{{ client.gender }}</nz-tag>
+      </td>
+      <td>{{ client.nationalId }}</td>
+      <td>{{ client.alternateId || '-' }}</td>
+      <td>{{ client.idType }}</td>
+      <td>
+        <ng-container *ngIf="client.originFacility; else noFacility">
+          <div class="origin-name">{{ client.originFacility.name }}</div>
+          <div class="origin-region">{{ client.originFacility.region }}</div>
+        </ng-container>
+        <ng-template #noFacility>
+          <span class="muted">-</span>
+        </ng-template>
+      </td>
+      <td>
+        <button nz-button nzType="link" nzSize="small" (click)="goToClientDetail(client.id)">
+          View
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>

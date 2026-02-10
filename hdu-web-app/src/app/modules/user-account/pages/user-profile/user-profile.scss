@@ -1,0 +1,45 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+.profile-header {
+  display: flex;
+  gap: 24px;
+  align-items: center;
+}
+
+.avatar {
+  background-color: #1e3a8a;
+}
+
+.profile-meta h3 {
+  margin-bottom: 8px;
+}
+
+.profile-contact {
+  margin-top: 12px;
+  color: #8c8c8c;
+  display: grid;
+  gap: 4px;
+}
+
+.block {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.activity {
+  font-weight: 600;
+}
+
+.muted {
+  color: #8c8c8c;
+  font-size: 12px;
+}

@@ -1,0 +1,38 @@
+.page-header {
+  margin-bottom: 24px;
+}
+
+.title-row {
+  margin-bottom: 24px;
+}
+
+.card {
+  margin-bottom: 16px;
+}
+
+.avatar-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+}
+
+.avatar {
+  background-color: #1e3a8a;
+}
+
+.muted {
+  font-size: 12px;
+  color: #8c8c8c;
+}
+
+.block {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.toggle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}

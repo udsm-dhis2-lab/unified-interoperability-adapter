@@ -1,0 +1,229 @@
+<ng-container *ngIf="client; else missing">
+  <div class="page-header">
+    <div class="header-left">
+      <button nz-button (click)="back()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back
+      </button>
+      <h4 nz-typography nzTitle>Shared Health Record</h4>
+    </div>
+    <nz-space>
+      <nz-badge nzStatus="success" nzText="All Systems Synced"></nz-badge>
+    </nz-space>
+  </div>
+
+  <nz-alert nzType="success" nzShowIcon nzMessage="Data Integrity Protected"
+    nzDescription="This is a read-only view of consolidated health records. All data is synchronized from source health systems and protected from unauthorized modifications."
+    class="alert"></nz-alert>
+
+  <nz-card nzTitle="Patient Information" class="card">
+    <nz-descriptions [nzColumn]="2" nzBordered>
+      <nz-descriptions-item nzTitle="Client ID">{{ client.clientId }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="National ID">{{ client.nationalId }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Full Name">{{ client.firstName }} {{ client.middleName }} {{ client.lastName
+        }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Gender">
+        <nz-tag [nzColor]="client.gender === 'male' ? 'blue' : 'pink'">{{ client.gender }}</nz-tag>
+      </nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Date of Birth">{{ client.dateOfBirth }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Phone">{{ client.phoneNumber }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Email">{{ client.email || '-' }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Address">{{ client.address }}, {{ client.city }}</nz-descriptions-item>
+      <ng-container *ngIf="client.originFacility">
+        <nz-descriptions-item nzTitle="Origin Facility">
+          <div class="name">{{ client.originFacility.name }}</div>
+          <div class="muted">
+            {{ client.originFacility.facilityId }} - {{ client.originFacility.region }}
+          </div>
+        </nz-descriptions-item>
+      </ng-container>
+      <nz-descriptions-item nzTitle="SHR ID Sync Status">
+        <nz-badge nzStatus="success" nzText="Synchronized"></nz-badge>
+      </nz-descriptions-item>
+    </nz-descriptions>
+  </nz-card>
+
+  <nz-card>
+    <nz-tabs [nzSelectedIndex]="0">
+      <nz-tab nzTitle="Health Encounters ({{ clientEncounters.length }})">
+        <nz-table [nzData]="clientEncounters" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th>Encounter ID</th>
+              <th>Type</th>
+              <th>Date</th>
+              <th>Facility</th>
+              <th>Provider</th>
+              <th>Sync Status</th>
+              <th>Standards</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let encounter of clientEncounters">
+              <td>
+                <strong>{{ encounter.encounterId }}</strong>
+              </td>
+              <td>
+                <nz-tag nzColor="blue">{{ encounter.encounterType }}</nz-tag>
+              </td>
+              <td>{{ encounter.encounterDate | date: 'short' }}</td>
+              <td>
+                <div class="name">{{ encounter.facility.name }}</div>
+                <div class="muted">{{ encounter.facility.region }}</div>
+              </td>
+              <td>
+                <div>{{ encounter.provider.name }}</div>
+                <div class="muted">{{ encounter.provider.role }}</div>
+              </td>
+              <td>
+                <nz-badge [nzStatus]="syncStatusColor(encounter.syncStatus)" [nzText]="encounter.syncStatus"></nz-badge>
+              </td>
+              <td>
+                <nz-space [nzSize]="4">
+                  <nz-tag *ngIf="encounter.fhirCompliant" nzColor="green">FHIR</nz-tag>
+                  <nz-tag *ngIf="encounter.hl7Compliant" nzColor="cyan">HL7</nz-tag>
+                </nz-space>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+
+      <nz-tab nzTitle="Diagnoses ({{ allDiagnoses.length }})">
+        <nz-alert nzType="info" nzShowIcon nzMessage="ICD-10 & SNOMED CT Compliant"
+          nzDescription="All diagnoses are coded using international standards for consistency across healthcare facilities."
+          class="section-alert"></nz-alert>
+        <nz-table [nzData]="allDiagnoses" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Description</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let diag of allDiagnoses">
+              <td>
+                <strong>{{ diag.code }}</strong>
+                <div>
+                  <nz-tag nzColor="purple">{{ diag.codeSystem }}</nz-tag>
+                </div>
+              </td>
+              <td>{{ diag.description }}</td>
+              <td>{{ diag.diagnosisDate }}</td>
+              <td>
+                <nz-tag [nzColor]="diagnosisStatusColor(diag.status)">{{ diag.status }}</nz-tag>
+              </td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+
+      <nz-tab nzTitle="Medications ({{ allMedications.length }})">
+        <nz-alert nzType="info" nzShowIcon nzMessage="Pharmacy System Integration"
+          nzDescription="Medication data is synchronized with pharmacy management systems across connected healthcare facilities."
+          class="section-alert"></nz-alert>
+        <nz-table [nzData]="allMedications" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th>Medication</th>
+              <th>Dosage</th>
+              <th>Frequency</th>
+              <th>Period</th>
+              <th>Prescribed By</th>
+              <th>Status</th>
+              <th>Pharmacy System</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let med of allMedications">
+              <td>
+                <strong>{{ med.name }}</strong>
+              </td>
+              <td>{{ med.dosage }}</td>
+              <td>{{ med.frequency }}</td>
+              <td>
+                <div>{{ med.startDate }}</div>
+                <div class="muted" *ngIf="med.endDate">to {{ med.endDate }}</div>
+              </td>
+              <td>{{ med.prescribedBy }}</td>
+              <td>
+                <nz-tag [nzColor]="medicationStatusColor(med.status)">{{ med.status }}</nz-tag>
+              </td>
+              <td>{{ med.pharmacySystem || '-' }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+
+      <nz-tab nzTitle="Laboratory Results ({{ allLabResults.length }})">
+        <nz-alert nzType="info" nzShowIcon nzMessage="Laboratory Information System Integration"
+          nzDescription="Lab results are integrated from laboratory information systems with real-time synchronization."
+          class="section-alert"></nz-alert>
+        <nz-table [nzData]="allLabResults" [nzShowPagination]="false">
+          <thead>
+            <tr>
+              <th>Test Name</th>
+              <th>Result</th>
+              <th>Reference Range</th>
+              <th>Status</th>
+              <th>Test Date</th>
+              <th>Lab System</th>
+              <th>Technician</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lab of allLabResults">
+              <td>
+                <div class="name">{{ lab.testName }}</div>
+                <div class="muted">{{ lab.testCode }}</div>
+              </td>
+              <td>
+                <strong>{{ lab.result }} {{ lab.unit }}</strong>
+              </td>
+              <td>{{ lab.referenceRange }}</td>
+              <td>
+                <nz-badge [nzStatus]="labStatusColor(lab.status)" [nzText]="lab.status"></nz-badge>
+              </td>
+              <td>{{ lab.testDate | date: 'short' }}</td>
+              <td>{{ lab.labSystem }}</td>
+              <td>{{ lab.technician }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+
+      <nz-tab nzTitle="Sync History">
+        <nz-card nzTitle="Synchronization Timeline">
+          <nz-timeline>
+            <nz-timeline-item *ngFor="let encounter of clientEncounters" [nzColor]="
+                encounter.syncStatus === 'synced'
+                  ? 'green'
+                  : encounter.syncStatus === 'pending'
+                    ? 'blue'
+                    : 'red'
+              ">
+              <div class="name">{{ encounter.facility.name }} - {{ encounter.encounterType }}</div>
+              <div class="muted">Encounter: {{ encounter.encounterDate | date: 'short' }}</div>
+              <div class="muted">Synced: {{ encounter.lastSyncTime | date: 'short' }}</div>
+              <nz-space class="mt-8">
+                <nz-tag *ngIf="encounter.fhirCompliant" nzColor="green">FHIR</nz-tag>
+                <nz-tag *ngIf="encounter.hl7Compliant" nzColor="cyan">HL7</nz-tag>
+                <nz-badge [nzStatus]="encounter.syncStatus === 'synced' ? 'success' : 'processing'"
+                  [nzText]="encounter.syncStatus"></nz-badge>
+              </nz-space>
+            </nz-timeline-item>
+          </nz-timeline>
+        </nz-card>
+      </nz-tab>
+    </nz-tabs>
+  </nz-card>
+</ng-container>
+
+<ng-template #missing>
+  <div>
+    <nz-alert nzType="error" nzShowIcon nzMessage="Client not found"></nz-alert>
+    <button nz-button (click)="back()" class="mt-16">Back to SHR Dashboard</button>
+  </div>
+</ng-template>

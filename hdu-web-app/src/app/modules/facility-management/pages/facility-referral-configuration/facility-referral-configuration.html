@@ -1,0 +1,81 @@
+<div *ngIf="facility; else notFound">
+  <div class="page-header">
+    <h3 nz-typography nzTitle>Edit Referral Configuration</h3>
+    <span nz-typography nzType="secondary">{{ facility.name }} ({{ facility.code }})</span>
+  </div>
+
+  <nz-card>
+    <nz-alert
+      nzType="info"
+      nzShowIcon
+      nzMessage="Update the referral endpoint configuration for this facility"
+      class="alert"
+    ></nz-alert>
+
+    <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
+      <nz-row nzGutter="16">
+        <nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>Category</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter category">
+              <nz-select formControlName="category" nzPlaceHolder="Select category">
+                <nz-option nzValue="REFERRAL" nzLabel="REFERRAL"></nz-option>
+                <nz-option nzValue="LAB" nzLabel="LAB"></nz-option>
+                <nz-option nzValue="PHARMACY" nzLabel="PHARMACY"></nz-option>
+                <nz-option nzValue="RADIOLOGY" nzLabel="RADIOLOGY"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+        <nz-col nzSpan="12">
+          <nz-form-item>
+            <nz-form-label nzRequired>Auth Type</nz-form-label>
+            <nz-form-control nzErrorTip="Please select auth type">
+              <nz-select formControlName="authType" nzPlaceHolder="Select auth type">
+                <nz-option nzValue="BASIC" nzLabel="BASIC"></nz-option>
+                <nz-option nzValue="BEARER" nzLabel="BEARER"></nz-option>
+                <nz-option nzValue="API_KEY" nzLabel="API KEY"></nz-option>
+                <nz-option nzValue="NONE" nzLabel="NONE"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-col>
+      </nz-row>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Base URL</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter a valid URL">
+          <input nz-input formControlName="baseUrl" placeholder="e.g., https://136.182.78.163:8888" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <nz-form-item>
+        <nz-form-label nzRequired>Path</nz-form-label>
+        <nz-form-control nzErrorTip="Please enter path">
+          <input nz-input formControlName="path" placeholder="e.g., /MappingTestHIS/referralsWebhook" />
+        </nz-form-control>
+      </nz-form-item>
+
+      <div class="actions">
+        <nz-space>
+          <button nz-button nzType="primary" [nzLoading]="loading" type="submit">
+            <span nz-icon nzType="save"></span>
+            Save Changes
+          </button>
+          <button nz-button type="button" (click)="cancel()">
+            <span nz-icon nzType="arrow-left"></span>
+            Cancel
+          </button>
+        </nz-space>
+      </div>
+    </form>
+  </nz-card>
+</div>
+
+<ng-template #notFound>
+  <nz-card>
+    <span>Facility not found</span>
+    <br />
+    <button nz-button (click)="cancel()">Back to List</button>
+  </nz-card>
+</ng-template>

@@ -1,0 +1,114 @@
+<div class="min-h-screen flex">
+  <!-- Left Side - Branding -->
+  <div class="lg-flex lg-w-1-2 bg-[#008080] relative overflow-hidden" [class.hidden]="true" [class.lg-hidden]="false">
+    <div class="absolute inset-0 opacity-20">
+      <img [src]="'assets/doctor-patient-img.webp'" alt="Healthcare" class="w-full h-full object-cover" />
+    </div>
+
+    <div class="relative flex flex-col items-center justify-center w-full p-12 text-white" style="z-index: 10;">
+      <div class="text-center space-y-6">
+        <!-- Logo -->
+        <div class="inline-flex items-center justify-center w-24 h-24 bg-white/10 backdrop-blur-sm rounded-2xl mb-4">
+          <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 8L12 18V28C12 42 21 54 30 56C39 54 48 42 48 28V18L30 8Z" fill="white" />
+            <path
+              d="M30 18C24 18 20 22 20 28C20 34 30 46 30 46C30 46 40 34 40 28C40 22 36 18 30 18ZM30 32C28 32 27 31 27 30C27 29 28 28 30 28C32 28 33 29 33 30C33 31 32 32 30 32Z"
+              fill="#008080" />
+          </svg>
+        </div>
+
+        <h1 class="text-4xl font-bold text-white mb-0">HDU Health</h1>
+        <h3 class="text-xl text-white font-normal mb-6">Universal Data API</h3>
+
+        <div class="w-16 h-1 bg-white/30 mx-auto rounded-full mb-6"></div>
+
+        <p class="text-white/80 text-lg block max-w-md">
+          Unified health data management system for healthcare providers across Tanzania
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Side - Login Form -->
+  <div class="flex-1 flex items-center justify-center bg-gray-50 p-6 lg-p-12">
+    <div class="w-full max-w-md">
+
+      <!-- Mobile Header -->
+      <div class="lg-hidden text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-[#008080] rounded-xl mb-4">
+          <svg width="36" height="36" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M30 8L12 18V28C12 42 21 54 30 56C39 54 48 42 48 28V18L30 8Z" fill="white" />
+            <path
+              d="M30 18C24 18 20 22 20 28C20 34 30 46 30 46C30 46 40 34 40 28C40 22 36 18 30 18ZM30 32C28 32 27 31 27 30C27 29 28 28 30 28C32 28 33 29 33 30C33 31 32 32 30 32Z"
+              fill="#008080" />
+          </svg>
+        </div>
+        <h2 class="text-2xl font-bold mb-1">HDU Health</h2>
+        <p class="text-gray-600">Universal Data API</p>
+      </div>
+
+      <div class="mb-8 welcome-header">
+        <div class="flex items-center justify-center gap-4">
+          <!-- Coat of Arms -->
+          <div class="coat-of-arms-container">
+            <img src="assets/coat-of-arms.png" alt="Coat of Arms" class="coat-of-arms" />
+          </div>
+          
+          <!-- Vertical Divider -->
+          <div class="divider-vertical"></div>
+          
+          <!-- Welcome Text -->
+          <div class="welcome-text space-y-2">
+            <h2 class="text-2xl font-bold mb-0">Welcome Back</h2>
+            <p class="text-gray-600">Sign in to access your dashboard</p>
+          </div>
+        </div>
+      </div>
+
+      <form nz-form [formGroup]="form" (ngSubmit)="submit()" nzLayout="vertical" [nzNoColon]="true">
+        <!-- Username -->
+        <nz-form-item>
+          <nz-form-label>Username</nz-form-label>
+          <nz-form-control [nzErrorTip]="'Please enter your username'">
+            <nz-input-group nzPrefixIcon="user">
+              <input nz-input formControlName="username" placeholder="Enter your username" class="!text-base" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Password -->
+        <nz-form-item>
+          <nz-form-label>Password</nz-form-label>
+          <nz-form-control [nzErrorTip]="'Please enter your password'">
+            <nz-input-group nzPrefixIcon="lock">
+              <input nz-input type="password" formControlName="password" placeholder="Enter your password"
+                class="!text-base" />
+            </nz-input-group>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Submit Button -->
+        <nz-form-item class="!mb-4">
+          <button nz-button nzType="primary" nzBlock [nzLoading]="loading" htmlType="submit" class="!text-base"
+            [style.background-color]="'#008080'">
+            Sign In
+          </button>
+        </nz-form-item>
+
+        <!-- Support Link -->
+        <div class="text-center pt-4 border-t border-gray-200">
+          <span class="text-gray-600 text-sm">
+            Need help accessing your account?
+            <a href="#" class="font-semibold text-[#008080] hover:text-[#006666]">Contact Support</a>
+          </span>
+        </div>
+      </form>
+
+      <!-- Footer -->
+      <div class="text-center mt-8">
+        <p class="text-gray-500 text-xs block">© 2026 Ministry of Health, Tanzania</p>
+        <p class="text-gray-500 text-xs block mt-1">All rights reserved</p>
+      </div>
+    </div>
+  </div>
+</div>

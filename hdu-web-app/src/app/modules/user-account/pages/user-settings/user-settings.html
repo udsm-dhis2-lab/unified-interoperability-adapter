@@ -1,0 +1,300 @@
+<div>
+  <div class="page-header">
+    <div>
+      <h2 nz-typography nzTitle>Account Settings</h2>
+      <span nz-typography nzType="secondary"
+        >Manage your account preferences and security settings</span
+      >
+    </div>
+  </div>
+
+  <nz-tabs nzType="card">
+    <nz-tab [nzTitle]="profileTitleTemplate">
+      <ng-template #profileTitleTemplate>
+        <span nz-icon nzType="user"></span>
+        Profile
+      </ng-template>
+      <nz-card>
+        <form nz-form [formGroup]="profileForm" nzLayout="vertical" (ngSubmit)="saveProfile()">
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>First Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter first name">
+                  <input nz-input formControlName="firstName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Last Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter last name">
+                  <input nz-input formControlName="lastName" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Email Address</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter valid email">
+                  <input nz-input formControlName="email" [disabled]="true" />
+                </nz-form-control>
+              </nz-form-item>
+              <div class="help">Contact your administrator to change your email address</div>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Phone Number</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter phone number">
+                  <input nz-input formControlName="phoneNumber" />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+
+          <nz-divider></nz-divider>
+
+          <button nz-button nzType="primary" type="submit">
+            <span nz-icon nzType="save"></span>
+            Save Profile Changes
+          </button>
+        </form>
+      </nz-card>
+    </nz-tab>
+
+    <nz-tab [nzTitle]="passwordTitleTemplate">
+      <ng-template #passwordTitleTemplate>
+        <span nz-icon nzType="lock"></span>
+        Password
+      </ng-template>
+      <nz-card>
+        <nz-alert
+          nzType="info"
+          nzShowIcon
+          nzMessage="Password Requirements"
+          nzDescription="Your password must be at least 8 characters long and contain uppercase, lowercase, numbers, and special characters."
+          class="alert"
+        ></nz-alert>
+
+        <form nz-form [formGroup]="passwordForm" nzLayout="vertical" (ngSubmit)="changePassword()">
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Current Password</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter current password">
+                  <input nz-input type="password" formControlName="currentPassword" />
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label nzRequired>New Password</nz-form-label>
+                <nz-form-control nzErrorTip="Password must be at least 8 characters">
+                  <input nz-input type="password" formControlName="newPassword" />
+                </nz-form-control>
+              </nz-form-item>
+
+              <nz-form-item>
+                <nz-form-label nzRequired>Confirm New Password</nz-form-label>
+                <nz-form-control nzErrorTip="Passwords do not match">
+                  <input nz-input type="password" formControlName="confirmPassword" />
+                </nz-form-control>
+              </nz-form-item>
+
+              <button nz-button nzType="primary" type="submit">
+                <span nz-icon nzType="lock"></span>
+                Change Password
+              </button>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-card class="tip-card">
+                <strong>Password Tips:</strong>
+                <ul class="tips">
+                  <li>Use at least 8 characters</li>
+                  <li>Include uppercase and lowercase letters</li>
+                  <li>Include numbers</li>
+                  <li>Include special characters (!@#$%)</li>
+                  <li>Don't use personal information</li>
+                  <li>Use a unique password</li>
+                </ul>
+              </nz-card>
+            </nz-col>
+          </nz-row>
+        </form>
+      </nz-card>
+    </nz-tab>
+
+    <nz-tab [nzTitle]="notificationTitleTemplate">
+      <ng-template #notificationTitleTemplate>
+        <span nz-icon nzType="mail"></span>
+        Notifications
+      </ng-template>
+      <nz-card>
+        <form
+          nz-form
+          [formGroup]="notificationsForm"
+          nzLayout="vertical"
+          (ngSubmit)="saveNotifications()"
+        >
+          <h4 nz-typography nzTitle>Email Notifications</h4>
+          <div class="setting-group">
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">Email Notifications</div>
+                <div class="muted">Receive email notifications for important updates</div>
+              </div>
+              <nz-switch formControlName="emailNotifications"></nz-switch>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">Appointment Reminders</div>
+                <div class="muted">Get reminders about upcoming appointments</div>
+              </div>
+              <nz-switch formControlName="appointmentReminders"></nz-switch>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">System Alerts</div>
+                <div class="muted">Receive alerts about system maintenance and updates</div>
+              </div>
+              <nz-switch formControlName="systemAlerts"></nz-switch>
+            </div>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <h4 nz-typography nzTitle>SMS Notifications</h4>
+          <div class="setting-group">
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">SMS Notifications</div>
+                <div class="muted">Receive SMS notifications for critical updates</div>
+              </div>
+              <nz-switch formControlName="smsNotifications"></nz-switch>
+            </div>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <button nz-button nzType="primary" type="submit">
+            <span nz-icon nzType="save"></span>
+            Save Notification Preferences
+          </button>
+        </form>
+      </nz-card>
+    </nz-tab>
+
+    <nz-tab [nzTitle]="securityTitleTemplate">
+      <ng-template #securityTitleTemplate>
+        <span nz-icon nzType="safety"></span>
+        Security
+      </ng-template>
+      <nz-card>
+        <form nz-form [formGroup]="securityForm" nzLayout="vertical" (ngSubmit)="saveSecurity()">
+          <nz-alert
+            nzType="warning"
+            nzShowIcon
+            nzMessage="Enhanced Security"
+            nzDescription="Enable two-factor authentication for additional account protection."
+            class="alert"
+          ></nz-alert>
+
+          <div class="setting-group">
+            <div class="setting-row">
+              <div>
+                <div class="setting-title">Two-Factor Authentication</div>
+                <div class="muted">Add an extra layer of security to your account</div>
+              </div>
+              <nz-switch formControlName="twoFactorEnabled"></nz-switch>
+            </div>
+          </div>
+
+          <nz-divider></nz-divider>
+
+          <nz-form-item>
+            <nz-form-label>Session Timeout</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="sessionTimeout" style="width: 200px">
+                <nz-option nzValue="15" nzLabel="15 minutes"></nz-option>
+                <nz-option nzValue="30" nzLabel="30 minutes"></nz-option>
+                <nz-option nzValue="60" nzLabel="1 hour"></nz-option>
+                <nz-option nzValue="120" nzLabel="2 hours"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+          <div class="help">Automatically log out after period of inactivity</div>
+
+          <nz-divider></nz-divider>
+
+          <button nz-button nzType="primary" type="submit">
+            <span nz-icon nzType="save"></span>
+            Save Security Settings
+          </button>
+        </form>
+      </nz-card>
+    </nz-tab>
+
+    <nz-tab [nzTitle]="preferenceTitleTemplate">
+      <ng-template #preferenceTitleTemplate>
+        <span nz-icon nzType="global"></span>
+        Preferences
+      </ng-template>
+      <nz-card>
+        <form
+          nz-form
+          [formGroup]="preferencesForm"
+          nzLayout="vertical"
+          (ngSubmit)="savePreferences()"
+        >
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label>Language</nz-form-label>
+                <nz-form-control>
+                  <nz-select formControlName="language">
+                    <nz-option nzValue="en" nzLabel="English"></nz-option>
+                    <nz-option nzValue="sw" nzLabel="Swahili"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label>Timezone</nz-form-label>
+                <nz-form-control>
+                  <nz-select formControlName="timezone">
+                    <nz-option
+                      nzValue="Africa/Dar_es_Salaam"
+                      nzLabel="East Africa Time (EAT)"
+                    ></nz-option>
+                    <nz-option nzValue="UTC" nzLabel="UTC"></nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+          </nz-row>
+
+          <nz-form-item>
+            <nz-form-label>Date Format</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="dateFormat">
+                <nz-option nzValue="DD/MM/YYYY" nzLabel="DD/MM/YYYY"></nz-option>
+                <nz-option nzValue="MM/DD/YYYY" nzLabel="MM/DD/YYYY"></nz-option>
+                <nz-option nzValue="YYYY-MM-DD" nzLabel="YYYY-MM-DD"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-divider></nz-divider>
+
+          <button nz-button nzType="primary" type="submit">
+            <span nz-icon nzType="save"></span>
+            Save Preferences
+          </button>
+        </form>
+      </nz-card>
+    </nz-tab>
+  </nz-tabs>
+</div>

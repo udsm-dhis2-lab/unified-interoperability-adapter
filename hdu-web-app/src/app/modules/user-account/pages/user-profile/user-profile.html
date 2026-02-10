@@ -1,0 +1,121 @@
+<div>
+  <div class="page-header">
+    <div>
+      <h2 nz-typography nzTitle>My Profile</h2>
+      <span nz-typography nzType="secondary">View your account information and activity</span>
+    </div>
+    <button nz-button nzType="primary" (click)="goSettings()">
+      <span nz-icon nzType="edit"></span>
+      Edit Profile
+    </button>
+  </div>
+
+  <nz-row nzGutter="16">
+    <nz-col nzSpan="16">
+      <nz-card class="card">
+        <div class="profile-header">
+          <nz-avatar [nzSize]="100" nzIcon="user" class="avatar"></nz-avatar>
+          <div class="profile-meta">
+            <h3 nz-typography nzTitle>{{ profile.firstName }} {{ profile.lastName }}</h3>
+            <nz-space>
+              <nz-tag nzColor="blue">{{ profile.role }}</nz-tag>
+              <nz-tag [nzColor]="statusColor(profile.status)">{{
+                profile.status.toUpperCase()
+              }}</nz-tag>
+            </nz-space>
+            <div class="profile-contact">
+              <div><span nz-icon nzType="mail"></span> {{ profile.email }}</div>
+              <div><span nz-icon nzType="phone"></span> {{ profile.phoneNumber }}</div>
+              <div>
+                <span nz-icon nzType="environment"></span> {{ profile.facility }},
+                {{ profile.region }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </nz-card>
+
+      <nz-card nzTitle="Personal Information" class="card">
+        <nz-descriptions [nzColumn]="2" nzBordered nzSize="small">
+          <nz-descriptions-item nzTitle="User ID">{{ profile.userId }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Status">
+            <nz-tag [nzColor]="statusColor(profile.status)">{{
+              profile.status.toUpperCase()
+            }}</nz-tag>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="First Name">{{ profile.firstName }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Last Name">{{ profile.lastName }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Email Address" [nzSpan]="2">{{
+            profile.email
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Phone Number" [nzSpan]="2">{{
+            profile.phoneNumber
+          }}</nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Work Information" class="card">
+        <nz-descriptions [nzColumn]="2" nzBordered nzSize="small">
+          <nz-descriptions-item nzTitle="Role">{{ profile.role }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Department">{{ profile.department }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Facility" [nzSpan]="2">{{
+            profile.facility
+          }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Region">{{ profile.region }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Join Date">{{ profile.joinDate }}</nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Assigned Permissions" class="card">
+        <span nz-typography nzType="secondary" class="block"
+          >You have the following permissions based on your role:</span
+        >
+        <nz-space nzWrap>
+          <nz-tag *ngFor="let authority of profile.authorities" nzColor="blue">
+            <span nz-icon nzType="safety"></span>
+            {{ authority.replace('_', ' ') }}
+          </nz-tag>
+        </nz-space>
+      </nz-card>
+    </nz-col>
+
+    <nz-col nzSpan="8">
+      <nz-card nzTitle="Account Summary" class="card">
+        <nz-space nzDirection="vertical" style="width: 100%">
+          <div>
+            <span nz-typography nzType="secondary">Member Since:</span>
+            <br />
+            <strong>{{ profile.joinDate }}</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span nz-typography nzType="secondary">Last Login:</span>
+            <br />
+            <strong>{{ profile.lastLogin }}</strong>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span nz-typography nzType="secondary">Account Status:</span>
+            <br />
+            <nz-tag nzColor="green">ACTIVE</nz-tag>
+          </div>
+        </nz-space>
+      </nz-card>
+
+      <nz-card nzTitle="Recent Activity">
+        <nz-timeline>
+          <nz-timeline-item
+            *ngFor="let activity of profile.recentActivity"
+            [nzColor]="
+              activity.type === 'login' ? 'green' : activity.type === 'logout' ? 'gray' : 'blue'
+            "
+          >
+            <span class="activity">{{ activity.action }}</span>
+            <br />
+            <span class="muted">{{ activity.date }}</span>
+          </nz-timeline-item>
+        </nz-timeline>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+</div>

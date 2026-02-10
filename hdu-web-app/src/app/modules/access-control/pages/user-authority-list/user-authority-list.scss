@@ -1,0 +1,29 @@
+.page-header {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.stats {
+  margin-bottom: 24px;
+}
+
+.filters {
+  margin-bottom: 16px;
+}
+
+.name {
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.code {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.muted {
+  font-size: 12px;
+  color: #8c8c8c;
+}

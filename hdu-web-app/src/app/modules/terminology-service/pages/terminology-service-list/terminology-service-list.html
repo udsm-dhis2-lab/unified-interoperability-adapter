@@ -1,0 +1,52 @@
+<div>
+  <div class="page-header">
+    <div>
+      <h4 nz-typography nzTitle>Terminology Services</h4>
+      <span nz-typography nzType="secondary">Manage medical coding standards (ICD-10, SNOMED CT, LOINC)</span>
+    </div>
+    <button nz-button nzType="primary">
+      <span nz-icon nzType="plus"></span>
+      Add Code
+    </button>
+  </div>
+
+  <nz-card>
+    <nz-tabs>
+      <nz-tab nzTitle="ICD Codes">
+        <nz-table [nzData]="icd10Codes" [nzPageSize]="10" [nzShowSizeChanger]="true">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Code</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let code of icd10Codes">
+              <td>{{ code.name }}</td>
+              <td>{{ code.code }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+      <nz-tab nzTitle="SNOMED CT">
+        <nz-table [nzData]="snomedCodes" [nzPageSize]="10">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Code</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let code of snomedCodes">
+              <td>{{ code.name }}</td>
+              <td>{{ code.code }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-tab>
+      <nz-tab nzTitle="LOINC">
+        <div class="empty">No LOINC codes configured</div>
+      </nz-tab>
+    </nz-tabs>
+  </nz-card>
+</div>

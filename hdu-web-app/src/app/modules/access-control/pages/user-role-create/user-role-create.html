@@ -1,0 +1,136 @@
+<div>
+  <div class="page-header">
+    <nz-space>
+      <button nz-button (click)="cancel()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back to Roles
+      </button>
+    </nz-space>
+  </div>
+
+  <div class="title">
+    <h2 nz-typography nzTitle>Create New Role</h2>
+    <span nz-typography nzType="secondary">Define a new user role with specific permissions</span>
+  </div>
+
+  <nz-alert
+    nzType="info"
+    nzShowIcon
+    nzMessage="Role Creation"
+    nzDescription="Define the role name, description, and assign appropriate permissions. Users assigned to this role will inherit all selected permissions."
+    class="alert"
+  ></nz-alert>
+
+  <form nz-form [formGroup]="form" nzLayout="vertical">
+    <nz-row nzGutter="16">
+      <nz-col nzSpan="16">
+        <nz-card nzTitle="Basic Information" class="card">
+          <nz-form-item>
+            <nz-form-label nzRequired>Role Name</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter role name">
+              <input nz-input formControlName="roleName" placeholder="Enter role name (e.g., Health Professional)" />
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>Description</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter description">
+              <textarea nz-input rows="3" formControlName="description" placeholder="Enter a detailed description of this role and its responsibilities"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Role Category</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="category" nzPlaceHolder="Select category (optional)">
+                <nz-option nzValue="Clinical" nzLabel="Clinical Staff"></nz-option>
+                <nz-option nzValue="Administrative" nzLabel="Administrative"></nz-option>
+                <nz-option nzValue="Technical" nzLabel="Technical"></nz-option>
+                <nz-option nzValue="Management" nzLabel="Management"></nz-option>
+              </nz-select>
+            </nz-form-control>
+          </nz-form-item>
+          <nz-form-item>
+            <nz-form-label>Status</nz-form-label>
+            <nz-form-control>
+              <nz-switch formControlName="status" nzCheckedChildren="Active" nzUnCheckedChildren="Inactive"></nz-switch>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-card>
+
+        <nz-card nzTitle="Permissions & Authorities" class="card">
+          <nz-alert
+            nzType="warning"
+            nzShowIcon
+            nzMessage="Permission Guidelines"
+            nzDescription="Select all permissions that users with this role should have. Be cautious with high-risk and critical permissions."
+            class="sub-alert"
+          ></nz-alert>
+          <p nz-typography nzType="secondary">Select the permissions that users with this role should have. Permissions are grouped by category.</p>
+          <nz-form-item>
+            <nz-checkbox-group formControlName="authorities">
+              <div *ngFor="let group of allAuthorities" class="group">
+                <nz-divider nzOrientation="left">
+                  <span class="group-title">
+                    <span nz-icon nzType="team"></span>
+                    {{ group.category }}
+                  </span>
+                </nz-divider>
+                <div class="group-body">
+                  <div *ngFor="let permission of group.permissions" class="permission">
+                    <label nz-checkbox [nzValue]="permission.code">
+                      <nz-space>
+                        <strong>{{ permission.name }}</strong>
+                        <nz-tag [nzColor]="riskColor(permission.risk)">{{ permission.risk }}</nz-tag>
+                      </nz-space>
+                      <div class="muted">{{ permission.description }}</div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </nz-checkbox-group>
+          </nz-form-item>
+          <nz-divider></nz-divider>
+          <nz-space>
+            <button nz-button nzType="primary" (click)="save()">
+              <span nz-icon nzType="save"></span>
+              Create Role
+            </button>
+            <button nz-button (click)="cancel()">Cancel</button>
+          </nz-space>
+        </nz-card>
+      </nz-col>
+
+      <nz-col nzSpan="8">
+        <nz-card nzTitle="Role Information" class="card sticky">
+          <nz-space nzDirection="vertical" style="width: 100%">
+            <nz-alert
+              nzType="success"
+              nzShowIcon
+              nzMessage="Best Practices"
+              nzDescription="Follow the principle of least privilege - only assign permissions necessary for the role."
+            ></nz-alert>
+            <nz-divider></nz-divider>
+            <div>
+              <strong>Permission Risk Levels:</strong>
+              <ul>
+                <li><nz-tag nzColor="green">Low</nz-tag> Basic operations</li>
+                <li><nz-tag nzColor="blue">Medium</nz-tag> Modify data</li>
+                <li><nz-tag nzColor="orange">High</nz-tag> Sensitive access</li>
+                <li><nz-tag nzColor="red">Critical</nz-tag> Admin level</li>
+              </ul>
+            </div>
+            <nz-divider></nz-divider>
+            <div>
+              <strong>Common Roles:</strong>
+              <ul>
+                <li>Health Professional</li>
+                <li>Data Analyst</li>
+                <li>Receptionist</li>
+                <li>System Administrator</li>
+              </ul>
+            </div>
+          </nz-space>
+        </nz-card>
+      </nz-col>
+    </nz-row>
+  </form>
+</div>

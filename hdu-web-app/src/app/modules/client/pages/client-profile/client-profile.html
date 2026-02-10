@@ -1,0 +1,169 @@
+<ng-container *ngIf="client; else missing">
+  <div class="page-header">
+    <div class="header-left">
+      <button nz-button (click)="back()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back
+      </button>
+      <h4 nz-typography nzTitle>Client Details</h4>
+    </div>
+  </div>
+
+  <nz-row nzGutter="16">
+    <nz-col nzSpan="16">
+      <nz-card nzTitle="Personal Information" class="card">
+        <nz-descriptions nzBordered [nzColumn]="2">
+          <nz-descriptions-item nzTitle="Client ID" [nzSpan]="2">
+            <nz-tag nzColor="blue">{{ client.clientId }}</nz-tag>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Full Name" [nzSpan]="2">
+            <strong>{{ client.firstName }} {{ client.middleName || '' }} {{ client.lastName }}</strong>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Date of Birth">
+            {{ formatDate(client.dateOfBirth) }}
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Age">
+            {{ ageFromDob(client.dateOfBirth) }} years
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Gender">
+            <nz-tag [nzColor]="client.gender === 'male' ? 'blue' : 'pink'">
+              {{ client.gender.toUpperCase() }}
+            </nz-tag>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="National ID">{{ client.nationalId }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="ID Type">{{ client.idType }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Alternate ID">{{ client.alternateId || 'N/A' }}</nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Contact Information" class="card">
+        <nz-descriptions nzBordered [nzColumn]="2">
+          <nz-descriptions-item nzTitle="Phone Number" [nzSpan]="2">
+            <span nz-typography nzCopyable>{{ client.phoneNumber }}</span>
+          </nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Email" [nzSpan]="2">
+            <ng-container *ngIf="client.email; else noEmail">
+              <span nz-typography nzCopyable>{{ client.email }}</span>
+            </ng-container>
+            <ng-template #noEmail>N/A</ng-template>
+          </nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Address Information" class="card">
+        <nz-descriptions nzBordered [nzColumn]="1">
+          <nz-descriptions-item nzTitle="Street Address">{{ client.address }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="City">{{ client.city }}</nz-descriptions-item>
+          <nz-descriptions-item nzTitle="Country">{{ client.country }}</nz-descriptions-item>
+        </nz-descriptions>
+      </nz-card>
+
+      <nz-card nzTitle="Visit History">
+        <nz-table [nzData]="visitHistory" [nzShowPagination]="false" nzSize="small">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Facility</th>
+              <th>Reason</th>
+              <th>Doctor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let visit of visitHistory">
+              <td>{{ visit.date }}</td>
+              <td>{{ visit.facility }}</td>
+              <td>{{ visit.reason }}</td>
+              <td>{{ visit.doctor }}</td>
+            </tr>
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </nz-col>
+
+    <nz-col nzSpan="8">
+      <nz-card nzTitle="Registration Details" class="card">
+        <nz-space nzDirection="vertical" style="width: 100%">
+          <div>
+            <span class="muted">Created At:</span>
+            <br />
+            <span>{{ formatDateTime(client.createdAt) }}</span>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span class="muted">Last Updated:</span>
+            <br />
+            <span>{{ formatDateTime(client.updatedAt) }}</span>
+          </div>
+          <nz-divider></nz-divider>
+          <div>
+            <span class="muted">Status:</span>
+            <br />
+            <nz-tag nzColor="green">ACTIVE</nz-tag>
+          </div>
+          <ng-container *ngIf="client.originFacility">
+            <nz-divider></nz-divider>
+            <div class="origin-block">
+              <nz-space nzDirection="vertical" style="width: 100%">
+                <nz-space>
+                  <span nz-icon nzType="bank" style="color: #1890ff"></span>
+                  <span class="muted">Origin Facility:</span>
+                </nz-space>
+                <strong>{{ client.originFacility.name }}</strong>
+                <span class="origin-meta">ID: {{ client.originFacility.facilityId }}</span>
+                <nz-tag nzColor="blue">{{ client.originFacility.region }}</nz-tag>
+              </nz-space>
+            </div>
+          </ng-container>
+        </nz-space>
+      </nz-card>
+
+      <ng-container *ngIf="client.possibleDuplicates?.length">
+        <nz-card nzTitle="Possible Duplicates" class="card">
+          <nz-alert nzType="warning" nzMessage="Potential duplicate records detected"
+            nzDescription="Review these records to determine if they should be merged or marked as unique."></nz-alert>
+          <nz-space nzDirection="vertical" style="width: 100%">
+            <nz-card *ngFor="let duplicate of client.possibleDuplicates" nzSize="small" class="duplicate-card">
+              <nz-space nzDirection="vertical" style="width: 100%">
+                <div>
+                  <strong>Client ID:</strong> <nz-tag>{{ duplicate.clientId }}</nz-tag>
+                </div>
+                <div>
+                  <strong>Match Score:</strong>
+                  <nz-tag [nzColor]="duplicate.matchScore >= 90 ? 'red' : 'orange'">
+                    {{ duplicate.matchScore }}%
+                  </nz-tag>
+                </div>
+                <div>
+                  <strong>Matched Fields:</strong>
+                  <div class="match-fields">
+                    <nz-tag *ngFor="let field of duplicate.matchFields" nzColor="gold">{{ field }}</nz-tag>
+                  </div>
+                </div>
+              </nz-space>
+            </nz-card>
+          </nz-space>
+          <nz-divider></nz-divider>
+          <button nz-button nzType="link" (click)="goToDeduplication()" class="link">
+            Review in Deduplication Dashboard →
+          </button>
+        </nz-card>
+      </ng-container>
+
+      <nz-card nzTitle="Activity Log">
+        <nz-timeline>
+          <nz-timeline-item *ngFor="let log of activityLog">
+            <div>
+              <strong>{{ log.action }}</strong>
+              <br />
+              <span class="muted">{{ log.time }} by {{ log.user }}</span>
+            </div>
+          </nz-timeline-item>
+        </nz-timeline>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+</ng-container>
+
+<ng-template #missing>
+  <div>Client not found</div>
+</ng-template>
