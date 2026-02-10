@@ -48,3 +48,5 @@ public class JwtAuthenticationResponse {
         this.authenticated = authenticated;
     }
 }
+
+

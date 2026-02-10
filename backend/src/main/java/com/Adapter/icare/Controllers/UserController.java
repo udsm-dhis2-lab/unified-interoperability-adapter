@@ -1,13 +1,16 @@
 package com.Adapter.icare.Controllers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Instant;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.Adapter.icare.Domains.*;
+import com.Adapter.icare.Dtos.*;
+import com.Adapter.icare.Services.AuthService;
+import com.Adapter.icare.Services.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,14 +35,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 import com.Adapter.icare.Configurations.CustomUserDetails;
-import com.Adapter.icare.Domains.Group;
-import com.Adapter.icare.Domains.Privilege;
-import com.Adapter.icare.Domains.Role;
-import com.Adapter.icare.Domains.User;
-import com.Adapter.icare.Dtos.CreateUserDTO;
-import com.Adapter.icare.Dtos.JwtAuthenticationResponse;
-import com.Adapter.icare.Dtos.LoginDTO;
-import com.Adapter.icare.Dtos.UpdateUserDTO;
 import com.Adapter.icare.Mappers.Mappers;
 import com.Adapter.icare.Services.UserService;
 import com.Adapter.icare.Configurations.JwtTokenProvider;
@@ -62,6 +57,8 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private User authenticatedUser;
+    @Autowired private AuthService authService;
+    @Autowired private RefreshTokenService refreshTokenService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -75,77 +72,124 @@ public class UserController {
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
     }
 
-    @PostMapping(path = "/login")
-    @Operation(
-        summary = "Authenticate user and get JWT token",
-        description = "Login with username and password to receive a JWT token. This token should be used for authenticating all subsequent requests."
-    )
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Authentication successful - JWT token returned"),
-        @ApiResponse(responseCode = "401", description = "Invalid credentials")
-    })
-    @SecurityRequirement(name = "")
-    public ResponseEntity<?> authenticateUser(
-        @Parameter(description = "Login credentials", required = true) @RequestBody LoginDTO loginData)
-            throws IllegalAccessException {
-        try {
-            Map<String, Object> userDetails = userService.authenticate(loginData);
-            if (userDetails != null) {
-                // Authenticate user
-                this.authentication = authenticationManager.authenticate(
-                        new UsernamePasswordAuthenticationToken(loginData.getUsername(),
-                                loginData.getPassword()));
-                
-                // Generate JWT token
-                String jwtToken = jwtTokenProvider.generateToken(authentication);
-                
-                // Get user information
-                this.authenticatedUser = this.userService
-                        .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
-                
-                // Create JWT response
-                JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(jwtToken, authenticatedUser);
-                
-                // Convert to map for compatibility
-                Map<String, Object> response = new HashMap<>();
-                response.put("token", jwtResponse.getToken());
-                response.put("tokenType", jwtResponse.getTokenType());
-                response.put("user", jwtResponse.getUser().toMap());
-                response.put("authenticated", jwtResponse.isAuthenticated());
-                
-                return ResponseEntity.ok(response);
-            } else {
-                Map<String, Object> response = new HashMap<>();
-                response.put("authenticated", false);
-                response.put("error", "Invalid credentials");
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-            }
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("authenticated", false);
-            response.put("error", "Authentication failed: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
-        }
+//    @PostMapping(path = "/login")
+//    @Operation(
+//        summary = "Authenticate user and get JWT token",
+//        description = "Login with username and password to receive a JWT token. This token should be used for authenticating all subsequent requests."
+//    )
+//    @ApiResponses(value = {
+//        @ApiResponse(responseCode = "200", description = "Authentication successful - JWT token returned"),
+//        @ApiResponse(responseCode = "401", description = "Invalid credentials")
+//    })
+//    @SecurityRequirement(name = "")
+//    public ResponseEntity<?> authenticateUser(
+//        @Parameter(description = "Login credentials", required = true) @RequestBody LoginDTO loginData)
+//            throws IllegalAccessException {
+//        try {
+//            Map<String, Object> userDetails = userService.authenticate(loginData);
+//            if (userDetails != null) {
+//                // Authenticate user
+//                this.authentication = authenticationManager.authenticate(
+//                        new UsernamePasswordAuthenticationToken(loginData.getUsername(),
+//                                loginData.getPassword()));
+//
+//                // Generate JWT token
+//                String jwtToken = jwtTokenProvider.generateAccessToken(authentication);
+//
+//                // Get user information
+//                this.authenticatedUser = this.userService
+//                        .getUserByUsername(((CustomUserDetails) authentication.getPrincipal()).getUsername());
+//
+//                // Create JWT response
+//                JwtAuthenticationResponse jwtResponse = new JwtAuthenticationResponse(jwtToken, authenticatedUser);
+//
+//                // Convert to map for compatibility
+//                Map<String, Object> response = new HashMap<>();
+//                response.put("token", jwtResponse.getToken());
+//                response.put("tokenType", jwtResponse.getTokenType());
+//                response.put("user", jwtResponse.getUser().toMap());
+//                response.put("authenticated", jwtResponse.isAuthenticated());
+//
+//                return ResponseEntity.ok(response);
+//            } else {
+//                Map<String, Object> response = new HashMap<>();
+//                response.put("authenticated", false);
+//                response.put("error", "Invalid credentials");
+//                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+//            }
+//        } catch (Exception e) {
+//            Map<String, Object> response = new HashMap<>();
+//            response.put("authenticated", false);
+//            response.put("error", "Authentication failed: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+//        }
+//    }
+
+    @PostMapping("/login")
+    @Operation(summary = "Login user", description = "Returns Access Token and Refresh Token")
+    public ResponseEntity<JwtAuthResponse> authenticateUser(@RequestBody LoginDTO loginDto) {
+        return ResponseEntity.ok(authService.login(loginDto));
     }
 
-    @GetMapping("/logout")
-    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            new SecurityContextLogoutHandler().logout(request, response, authentication);
-        }
+    @PostMapping("/refresh")
+    @Operation(summary = "Refresh Token", description = "Uses Refresh Token to get a new Access Token. Rotates the Refresh Token.")
+    public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
+        String requestRefreshToken = request.getRefreshToken();
 
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("loggedOut", true);
-        responseBody.put("redirectUrl", "/");
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(refreshToken -> {
+                    User user = refreshToken.getUser();
 
-        return ResponseEntity.ok()
-                .header("Cache-Control", "no-cache, no-store, must-revalidate")
-                .header("Pragma", "no-cache")
-                .header("Expires", "0")
-                .body(responseBody);
+                    Set<String> roleNames = user.getRoles().stream()
+                            .map(Role::getRoleName)
+                            .collect(Collectors.toSet());
+
+                    String newAccessToken = jwtTokenProvider.generateAccessTokenFromUsername(user.getUsername(), roleNames);
+
+
+                    refreshTokenService.deleteByToken(requestRefreshToken);
+                    RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user.getId());
+
+                    return ResponseEntity.ok(JwtAuthResponse.builder()
+                            .accessToken(newAccessToken)
+                            .refreshToken(newRefreshToken.getToken())
+                            .tokenType("Bearer")
+                            .accessTokenExpiry(Instant.now().plusMillis(jwtTokenProvider.getExpirationTime()))
+                            .build());
+                })
+                .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof CustomUserDetails) {
+            Integer userId = ((CustomUserDetails) principal).getId();
+            refreshTokenService.deleteByUserId(userId);
+            return ResponseEntity.ok("Log out successful. All sessions revoked.");
+        }
+        return ResponseEntity.badRequest().body("User not found");
+    }
+
+//    @GetMapping("/logout")
+//    public ResponseEntity<Map<String, Object>> logout(HttpServletRequest request,
+//            HttpServletResponse response) throws Exception {
+//        var authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null) {
+//            new SecurityContextLogoutHandler().logout(request, response, authentication);
+//        }
+//
+//        Map<String, Object> responseBody = new HashMap<>();
+//        responseBody.put("loggedOut", true);
+//        responseBody.put("redirectUrl", "/");
+//
+//        return ResponseEntity.ok()
+//                .header("Cache-Control", "no-cache, no-store, must-revalidate")
+//                .header("Pragma", "no-cache")
+//                .header("Expires", "0")
+//                .body(responseBody);
+//    }
 
     @GetMapping("/me")
     @Operation(
