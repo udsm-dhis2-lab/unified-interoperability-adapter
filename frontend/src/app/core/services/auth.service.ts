@@ -1,9 +1,8 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, catchError, lastValueFrom, map, mergeMap, of, tap } from 'rxjs';
+import { Observable, catchError, lastValueFrom, map, mergeMap, of, tap, throwError } from 'rxjs';
 import { API_URLS } from '../../shared';
-import { User } from '../../../../../iadapter-applications/libs/hdu-api-top-bar-menu/src';
 import { UserInfo } from '../models';
 
 
@@ -47,7 +46,7 @@ export class AuthService {
       }),
       catchError((error: any) => {
         console.log("Error: ", error)
-        return of(error);
+        return throwError(() => error);
       })
     )
   }
