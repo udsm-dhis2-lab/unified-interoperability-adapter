@@ -78,10 +78,6 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
     public void configure(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .authorizeHttpRequests(auth -> auth
-                        .antMatchers("/api/v1/login", "/api/v1/refresh").permitAll()
-                        .anyRequest().authenticated()
-                )
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -114,6 +110,8 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/login")
                 .permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/refresh")
+                .permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/login")
                 .permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/users")
@@ -124,10 +122,8 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .authenticated();
 
         // Add Dual Authentication filter before Username Password Authentication Filter
-        // This filter handles both JWT tokens and Basic Auth
         http.addFilterBefore(dualAuthenticationFilter(jwtTokenProvider, userDetailsService, passwordEncoder()), UsernamePasswordAuthenticationFilter.class);
         
-        // Enable CORS
         http.cors();
     }
     

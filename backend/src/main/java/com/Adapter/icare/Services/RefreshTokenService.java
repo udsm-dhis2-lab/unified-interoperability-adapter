@@ -23,9 +23,9 @@ public class RefreshTokenService {
     @Autowired
     private UserRepository userRepository;
 
-    public RefreshToken createRefreshToken(Integer userId) {
+    public RefreshToken createRefreshToken(Long userId) {
 
-        // Uncomment if you want ONE active session per user
+        // Uncomment this line of code if you want ONE active session per user (CONSIDER MOH STAFF BEHAVIOUR ON THIS - They tend to share account)
         // deleteByUserId(userId);
 
         RefreshToken refreshToken = new RefreshToken();
@@ -48,7 +48,7 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public void deleteByUserId(Integer userId) {
+    public void deleteByUserId(Long userId) {
         userRepository.findById(userId).ifPresent(refreshTokenRepository::deleteByUser);
     }
 

@@ -10,6 +10,7 @@ import java.time.Instant;
 public class JwtAuthResponse {
     private String accessToken;
     private String refreshToken;
-    private String tokenType; // "Bearer"
-    private Instant accessTokenExpiry; // helpful for frontend to know when to refresh
+    private String tokenType;
+    private Instant accessTokenExpiry;
+    private Instant refreshTokenExpiry;
 }

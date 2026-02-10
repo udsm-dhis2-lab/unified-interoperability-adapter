@@ -40,6 +40,7 @@ public class AuthService {
                 .refreshToken(refreshToken.getToken())
                 .tokenType("Bearer")
                 .accessTokenExpiry(Instant.now().plusMillis(jwtTokenProvider.getExpirationTime()))
+                .refreshTokenExpiry(refreshToken.getExpiryDate())
                 .build();
     }
 }

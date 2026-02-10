@@ -156,6 +156,7 @@ public class UserController {
                             .refreshToken(newRefreshToken.getToken())
                             .tokenType("Bearer")
                             .accessTokenExpiry(Instant.now().plusMillis(jwtTokenProvider.getExpirationTime()))
+                            .refreshTokenExpiry(newRefreshToken.getExpiryDate())
                             .build());
                 })
                 .orElseThrow(() -> new RuntimeException("Refresh token is not in database!"));
@@ -165,7 +166,7 @@ public class UserController {
     public ResponseEntity<?> logoutUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (principal instanceof CustomUserDetails) {
-            Integer userId = ((CustomUserDetails) principal).getId();
+            Long userId = ((CustomUserDetails) principal).getId();
             refreshTokenService.deleteByUserId(userId);
             return ResponseEntity.ok("Log out successful. All sessions revoked.");
         }
