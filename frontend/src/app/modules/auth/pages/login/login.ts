@@ -35,12 +35,20 @@ export class Login {
     }
 
     this.loading = true;
-    const { username } = this.form.getRawValue();
-    setTimeout(() => {
-      this.auth.login(username ?? '');
-      this.loading = false;
-      this.message.success('Login successful!');
-      this.router.navigateByUrl('/clients');
-    }, 1000);
+    const { username, password } = this.form.getRawValue();
+
+    this.auth.login(username ?? '', password ?? '').subscribe({
+      next: (response) => {
+        this.loading = false;
+        this.message.success('Login successful!');
+        this.router.navigateByUrl('/clients');
+      },
+      error: (error) => {
+        this.loading = false;
+        const errorMessage = error?.error?.message || error?.message || 'Login failed. Please check your credentials.';
+        this.message.error(errorMessage);
+        console.error('Login error:', error);
+      }
+    });
   }
 }

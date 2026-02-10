@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, catchError, lastValueFrom, map, mergeMap, of, tap } from 'rxjs';
 import { API_URLS } from '../../shared';
+import { User } from '../../../../../iadapter-applications/libs/hdu-api-top-bar-menu/src';
+import { UserInfo } from '../models';
 
 
 @Injectable({
@@ -36,9 +38,10 @@ export class AuthService {
       password: password
     };
     return this.http!.post(`${API_URLS.LOGIN}`, body, { headers: headers, withCredentials: true }).pipe(
-      map((response: any) => {
+      map(async (response: any) => {
         if (this.success) {
           this.saveUserData(response)
+          await lastValueFrom(this.get_user())
         }
         return response
       }),
@@ -74,6 +77,15 @@ export class AuthService {
     )
   }
 
+  userInfo(): UserInfo | null {
+    let user = JSON.parse(localStorage.getItem("current_user") || "{}");
+    return {
+      email: user?.email,
+      role: user?.roles[0]?.roleName,
+      name: user?.username
+    }
+  }
+
   saveUserData(response: any) {
     this.clearUserData()
 
@@ -99,6 +111,30 @@ export class AuthService {
       const response = await lastValueFrom(this.refresh_token())
       this.saveUserData(response)
     }, (seconds - 30) * 1000)
+  }
+
+  isAuthenticated(): boolean {
+    const access_token = localStorage.getItem("access_token");
+    const refresh_token = localStorage.getItem("refresh_token");
+    const access_token_expiry = localStorage.getItem("access_token_expiry");
+    const refresh_token_expiry = localStorage.getItem("refresh_token_expiry");
+
+    if (!access_token || !refresh_token || !access_token_expiry || !refresh_token_expiry) {
+      return false;
+    }
+
+    const now = new Date().getTime() / 1000;
+
+    if (now > Number(refresh_token_expiry)) {
+      this.logout();
+      return false;
+    }
+
+    if (now > Number(access_token_expiry)) {
+      this.autoRefresh(30);
+      return true;
+    }
+    return true;
   }
 
   clearUserData() {

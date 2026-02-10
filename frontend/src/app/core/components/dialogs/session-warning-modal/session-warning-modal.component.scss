@@ -1,0 +1,40 @@
+.session-warning-content {
+    text-align: center;
+    padding: 1rem 0;
+
+    .warning-icon {
+        font-size: 48px;
+        color: #faad14;
+        margin-bottom: 1.5rem;
+
+        span {
+            font-size: inherit;
+        }
+    }
+
+    .warning-message {
+        font-size: 15px;
+        color: rgba(0, 0, 0, 0.85);
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .countdown-timer {
+        font-size: 48px;
+        font-weight: 600;
+        color: #ff4d4f;
+        margin-bottom: 1.5rem;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.05em;
+    }
+
+    nz-progress {
+        margin-bottom: 1.5rem;
+    }
+
+    .help-text {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.45);
+        margin-bottom: 0;
+    }
+}

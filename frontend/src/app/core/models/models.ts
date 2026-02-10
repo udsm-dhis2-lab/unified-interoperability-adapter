@@ -208,3 +208,9 @@ export interface DashboardMetrics {
   registrationTrend: { date: string; count: number }[];
   systemAccessLog: { system: string; accessCount: number }[];
 }
+
+export interface UserInfo {
+  email: string;
+  role: string;
+  name: string;
+}

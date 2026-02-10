@@ -9,7 +9,8 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { UserInfo } from '../../services';
+import { UserInfo } from '../../models';
+import { UserActivityService } from '../../services';
 
 @Component({
   selector: 'app-layout',
@@ -32,6 +33,12 @@ import { UserInfo } from '../../services';
 })
 export class Layout {
   private readonly router = inject(Router);
+
+  private readonly userActivityService = inject(UserActivityService);
+
+  onInit(): void {
+    this.userActivityService.startIdleTimer();
+  }
 
   isCollapsed = false;
   userInfo = input.required<UserInfo>();

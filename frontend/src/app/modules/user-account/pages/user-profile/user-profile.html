@@ -21,7 +21,7 @@
               <nz-tag nzColor="blue">{{ profile.role }}</nz-tag>
               <nz-tag [nzColor]="statusColor(profile.status)">{{
                 profile.status.toUpperCase()
-              }}</nz-tag>
+                }}</nz-tag>
             </nz-space>
             <div class="profile-contact">
               <div><span nz-icon nzType="mail"></span> {{ profile.email }}</div>
@@ -41,16 +41,16 @@
           <nz-descriptions-item nzTitle="Status">
             <nz-tag [nzColor]="statusColor(profile.status)">{{
               profile.status.toUpperCase()
-            }}</nz-tag>
+              }}</nz-tag>
           </nz-descriptions-item>
           <nz-descriptions-item nzTitle="First Name">{{ profile.firstName }}</nz-descriptions-item>
           <nz-descriptions-item nzTitle="Last Name">{{ profile.lastName }}</nz-descriptions-item>
           <nz-descriptions-item nzTitle="Email Address" [nzSpan]="2">{{
             profile.email
-          }}</nz-descriptions-item>
+            }}</nz-descriptions-item>
           <nz-descriptions-item nzTitle="Phone Number" [nzSpan]="2">{{
             profile.phoneNumber
-          }}</nz-descriptions-item>
+            }}</nz-descriptions-item>
         </nz-descriptions>
       </nz-card>
 
@@ -60,16 +60,15 @@
           <nz-descriptions-item nzTitle="Department">{{ profile.department }}</nz-descriptions-item>
           <nz-descriptions-item nzTitle="Facility" [nzSpan]="2">{{
             profile.facility
-          }}</nz-descriptions-item>
+            }}</nz-descriptions-item>
           <nz-descriptions-item nzTitle="Region">{{ profile.region }}</nz-descriptions-item>
           <nz-descriptions-item nzTitle="Join Date">{{ profile.joinDate }}</nz-descriptions-item>
         </nz-descriptions>
       </nz-card>
 
       <nz-card nzTitle="Assigned Permissions" class="card">
-        <span nz-typography nzType="secondary" class="block"
-          >You have the following permissions based on your role:</span
-        >
+        <span nz-typography nzType="secondary" class="block">You have the following permissions based on your
+          role:</span>
         <nz-space nzWrap>
           <nz-tag *ngFor="let authority of profile.authorities" nzColor="blue">
             <span nz-icon nzType="safety"></span>
@@ -104,12 +103,9 @@
 
       <nz-card nzTitle="Recent Activity">
         <nz-timeline>
-          <nz-timeline-item
-            *ngFor="let activity of profile.recentActivity"
-            [nzColor]="
+          <nz-timeline-item *ngFor="let activity of profile.recentActivity" [nzColor]="
               activity.type === 'login' ? 'green' : activity.type === 'logout' ? 'gray' : 'blue'
-            "
-          >
+            ">
             <span class="activity">{{ activity.action }}</span>
             <br />
             <span class="muted">{{ activity.date }}</span>
