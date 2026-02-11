@@ -38,3 +38,14 @@
         margin-bottom: 0;
     }
 }
+
+
+::ng-deep .ant-modal-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+
+    button {
+        flex: 1;
+    }
+}

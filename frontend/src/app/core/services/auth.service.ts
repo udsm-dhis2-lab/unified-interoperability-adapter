@@ -70,7 +70,7 @@ export class AuthService {
     });
 
     return this.http!.post(
-      `${API_URLS.REFRESH_TOKEN}`, null, { headers }
+      `${API_URLS.REFRESH_TOKEN}`, {}, { headers }
     )
   }
 
@@ -111,14 +111,14 @@ export class AuthService {
     }, seconds * 1000)
   }
 
-  private autoRefresh(seconds: number) {
+  autoRefresh = (seconds: number) => {
     setTimeout(async () => {
       const response = await lastValueFrom(this.refresh_token())
       this.saveUserData(response)
     }, (seconds - 30) * 1000)
   }
 
-  isAuthenticated(): boolean {
+  isAuthenticated = (): boolean => {
     const access_token = localStorage.getItem("access_token");
     const refresh_token = localStorage.getItem("refresh_token");
     const access_token_expiry = localStorage.getItem("access_token_expiry");
