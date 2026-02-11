@@ -103,7 +103,7 @@ export class UserActivityService implements OnDestroy {
         console.log("==> Expiry Time: ", expiryTime)
         if (expiryTime) {
             const expiryTimestamp = parseFloat(expiryTime);
-            const currentTime = Date.now() / 1000;
+            const currentTime = Date.now();
             return Math.max(0, ((expiryTimestamp - currentTime)));
         }
         return 0;

@@ -36,7 +36,7 @@ export class Layout {
 
   private readonly userActivityService = inject(UserActivityService);
 
-  onInit(): void {
+  ngOnInit(): void {
     this.userActivityService.startIdleTimer();
   }
 
