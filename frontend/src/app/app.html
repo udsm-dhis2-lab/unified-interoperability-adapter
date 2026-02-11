@@ -1,10 +1,1 @@
-@if (isAuthenticated()) {
-  <app-session-warning-modal></app-session-warning-modal>
-  <app-layout class="app-container" [userInfo]="userInfo()!" (onLogout)="logout()">
-    <router-outlet></router-outlet>
-  </app-layout>
-} @else {
-  <div class="app-container">
-    <router-outlet></router-outlet>
-  </div>
-}
+<router-outlet></router-outlet>

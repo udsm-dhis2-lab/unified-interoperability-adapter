@@ -65,12 +65,8 @@ export class AuthService {
   refresh_token(): Observable<any> {
     const refresh_token = localStorage.getItem("refresh_token")!
 
-    const headers = new HttpHeaders({
-      'refresh-token': refresh_token
-    });
-
     return this.http!.post(
-      `${API_URLS.REFRESH_TOKEN}`, {}, { headers }
+      `${API_URLS.REFRESH_TOKEN}`, { refreshToken: refresh_token }
     )
   }
 
