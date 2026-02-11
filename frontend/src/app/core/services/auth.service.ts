@@ -49,7 +49,7 @@ export class AuthService {
     };
     return this.http!.post(`${API_URLS.LOGIN}`, body, { headers: headers, withCredentials: true }).pipe(
       switchMap((response: any) => {
-        this.saveUserData(response);
+        this.saveAuthData(response);
         return this.get_user().pipe(
           map(() => response)
         );
@@ -67,6 +67,11 @@ export class AuthService {
 
     return this.http!.post(
       `${API_URLS.REFRESH_TOKEN}`, { refreshToken: refresh_token }
+    ).pipe(
+      tap((response) => {
+        this.saveAuthData(response)
+      }),
+      catchError((error) => throwError(() => error) )
     )
   }
 
@@ -76,9 +81,7 @@ export class AuthService {
         localStorage.setItem("current_user", JSON.stringify(response))
         return of(response)
       }),
-      catchError((error: any) => {
-        return of(error)
-      })
+      catchError((error: any) => throwError(() => error))
     )
   }
 
@@ -91,8 +94,8 @@ export class AuthService {
     }
   }
 
-  saveUserData(response: any) {
-    this.clearUserData()
+  saveAuthData(response: any) {
+    this.clearAuthData()
 
     localStorage.setItem("access_token", response?.accessToken);
     localStorage.setItem("refresh_token", response?.refreshToken);
@@ -101,16 +104,10 @@ export class AuthService {
     localStorage.setItem("refresh_token_expiry", new Date(response?.refreshTokenExpiry).getTime().toString());
   }
 
-  private autoLogout(seconds: number) {
-    setTimeout(() => {
-      this.logout()
-    }, seconds * 1000)
-  }
-
   autoRefresh = (seconds: number) => {
     setTimeout(async () => {
       const response = await lastValueFrom(this.refresh_token())
-      this.saveUserData(response)
+      this.saveAuthData(response)
     }, (seconds - 30) * 1000)
   }
 
@@ -146,13 +143,10 @@ export class AuthService {
     localStorage.removeItem("current_user");
   }
 
-  private calculateExpiryTime(seconds: string) {
-
-    const now = new Date().getTime() / 1000;
-    let expiry_timestamp_array = (now + Number(seconds)).toString()?.split(".");
-
-    expiry_timestamp_array[1] = expiry_timestamp_array[1]?.length === 2 ? expiry_timestamp_array[1] + "0" : expiry_timestamp_array[1]?.length === 1 ? expiry_timestamp_array[1] + "00" : expiry_timestamp_array[1];
-
-    return expiry_timestamp_array.join(".");
+  clearAuthData() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("access_token_expiry");
+    localStorage.removeItem("refresh_token_expiry");
   }
 }

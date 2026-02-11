@@ -116,8 +116,8 @@ export class UserActivityService implements OnDestroy {
 
         this.authService.refresh_token().subscribe({
             next: (response) => {
-                if (this.authService.saveUserData) {
-                    this.authService.saveUserData(response);
+                if (this.authService.saveAuthData) {
+                    this.authService.saveAuthData(response);
                 }
                 this.isRefreshing = false;
                 this.lastActivityTimestamp = Date.now();
