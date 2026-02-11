@@ -72,4 +72,9 @@ public class UserInterfaceController {
     public String dashboard() {
         return "forward:/apps/dashboard/index.html";
     }
+
+    @GetMapping("/**/{path:^(?!.*\\..*$).*}")
+    public String forwardToFrontend() {
+        return "forward:/index.html";
+    }
 }

@@ -100,6 +100,7 @@ export class UserActivityService implements OnDestroy {
 
     private calculateTokenTimeLeft(): number {
         const expiryTime = localStorage.getItem("refresh_token_expiry");
+        console.log("==> Expiry Time: ", expiryTime)
         if (expiryTime) {
             const expiryTimestamp = parseFloat(expiryTime);
             const currentTime = Date.now() / 1000;

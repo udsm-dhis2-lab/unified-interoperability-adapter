@@ -18,6 +18,6 @@ export class App {
 
   logout(): void {
     this.auth.logout();
-    this.router.navigateByUrl('/auth/login');
+    this.router.navigateByUrl('/login');
   }
 }
