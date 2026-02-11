@@ -88,7 +88,6 @@ export class UserActivityService implements OnDestroy {
     }
 
     extendSession(): void {
-        /* User clicked "Extend Session" button on warning modal */
         this.showWarningModal.set(false);
         this.refreshToken();
     }
@@ -100,11 +99,11 @@ export class UserActivityService implements OnDestroy {
 
     private calculateTokenTimeLeft(): number {
         const expiryTime = localStorage.getItem("refresh_token_expiry");
-        console.log("==> Expiry Time: ", expiryTime)
         if (expiryTime) {
             const expiryTimestamp = parseFloat(expiryTime);
-            const currentTime = Date.now();
-            return Math.max(0, ((expiryTimestamp - currentTime)));
+            const currentTime = new Date().getTime();
+            const diffInSeconds = Math.max(0, (expiryTimestamp - currentTime)/1000)
+            return Math.abs(diffInSeconds);
         }
         return 0;
     }

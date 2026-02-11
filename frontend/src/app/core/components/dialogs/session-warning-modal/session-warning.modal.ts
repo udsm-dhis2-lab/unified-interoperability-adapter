@@ -14,7 +14,10 @@ import { ZORRO_MODULES } from "@hdu/shared";
 export class SessionWarningModalComponent {
     private userActivityService = inject(UserActivityService);
 
-    showModal = this.userActivityService.showWarningModal;
+    showModal = computed(() => {
+        return this.userActivityService.showWarningModal;
+    });
+
     secondsRemaining = this.userActivityService.secondsRemaining;
 
     formattedTime = computed(() => {
