@@ -21,17 +21,21 @@ export class AuthService {
 
   }
 
-  logout() {
-    this.http!.post(`${API_URLS.LOGOUT}`, {}, { withCredentials: true }).pipe(
-      tap(() => {
-        this.router!.navigate(['/login']);
-      }),
-      catchError((error: any) => {
-        console.log("Error during logout: ", error);
-        this.router!.navigate(['/login']);
-        return throwError(() => error);
-      })
-    ).subscribe();
+  logout(shouldLogoutFromServer: boolean = true) {
+    if (shouldLogoutFromServer) {
+      this.http!.post(`${API_URLS.LOGOUT}`, {}, { withCredentials: true }).pipe(
+        tap(() => {
+          this.router!.navigate(['/login']);
+        }),
+        catchError((error: any) => {
+          console.log("Error during logout: ", error);
+          this.router!.navigate(['/login']);
+          return throwError(() => error);
+        })
+      ).subscribe();
+    } else {
+      this.router!.navigate(['/login']);
+    }
     this.clearUserData();
   }
 
@@ -124,7 +128,7 @@ export class AuthService {
       return false;
     }
 
-    const now = new Date().getTime() / 1000;
+    const now = new Date().getTime();
 
     if (now > Number(refresh_token_expiry)) {
       this.logout();

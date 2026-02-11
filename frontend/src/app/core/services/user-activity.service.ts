@@ -1,5 +1,4 @@
 import { inject, Injectable, OnDestroy, signal } from "@angular/core";
-import { Router } from "@angular/router";
 import { AuthService } from "./auth.service";
 import { debounceTime, fromEvent, interval, merge, Subject, Subscription, takeUntil } from "rxjs";
 
