@@ -124,7 +124,7 @@ export class AuthService {
     const now = new Date().getTime();
 
     if (now > Number(refresh_token_expiry)) {
-      this.logout();
+      this.logout(false);
       return false;
     }
 

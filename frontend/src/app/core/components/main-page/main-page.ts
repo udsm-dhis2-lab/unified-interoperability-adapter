@@ -18,6 +18,5 @@ export class MainPage {
 
   logout(): void {
     this.auth.logout();
-    this.router.navigateByUrl('/login');
   }
 }

@@ -166,12 +166,17 @@ public class UserController {
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Map<String, Object> response = new HashMap<>();
         if (principal instanceof CustomUserDetails) {
             Long userId = ((CustomUserDetails) principal).getId();
             refreshTokenService.deleteByUserId(userId);
-            return ResponseEntity.ok("Log out successful. All sessions revoked.");
+            response.put("success", true);
+            response.put("message", "Log out successful. All sessions revoked.");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
-        return ResponseEntity.badRequest().body("User not found");
+        response.put("success", false);
+        response.put("message", "User not found");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
 //    @GetMapping("/logout")
