@@ -130,7 +130,7 @@ export class UserActivityService implements OnDestroy {
 
     private forceLogout(reason: 'idle' | 'token' | 'manual'): void {
         this.stopIdleTimer();
-        this.authService.logout();
+        this.authService.logout(false);
     }
 
     stopIdleTimer(): void {

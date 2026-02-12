@@ -118,6 +118,8 @@ public class SecurityConfigurations extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/api/v1/init/**")
                 .permitAll()
+                .antMatchers("/api/**").authenticated()
+                .regexMatchers("^(?!.*\\..*$).*$").permitAll()
                 .anyRequest()
                 .authenticated();
 
