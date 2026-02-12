@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -63,18 +64,30 @@ public class UserInterfaceController {
         }
     }
 
-    @GetMapping("apps/{path:^(?!.*\\..*$).*}")
-    public String forwardToAngular() {
+    @GetMapping("apps/**")
+    public String forwardToAngular(HttpServletRequest request) {
+        if (shouldNotForward(request)) return "forward:/";
         return "forward:/apps/index.html";
     }
 
-    @GetMapping("dashboard/{path:^(?!.*\\..*$).*}")
-    public String dashboard() {
+    @GetMapping("dashboard/**")
+    public String dashboard(HttpServletRequest request) {
+        if (shouldNotForward(request)) return "forward:/";
         return "forward:/apps/dashboard/index.html";
     }
 
-    @GetMapping("/**/{path:^(?!.*\\..*$).*}")
-    public String forwardToFrontend() {
+    @GetMapping("/**")
+    public String forwardToFrontend(HttpServletRequest request) {
+        if (shouldNotForward(request)) return "forward:/";
         return "forward:/index.html";
+    }
+
+    /**
+     * Helper to determine if a request looks like a static resource (has a dot)
+     * or is an API call.
+     */
+    private boolean shouldNotForward(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.contains(".") || uri.startsWith("/api/");
     }
 }
