@@ -8,6 +8,8 @@ export const clientRoutes = [
     loadComponent: () =>
       import('./pages/client-profile/client-profile').then((m) => m.ClientProfile),
   }
+  //TODO: Add deduplication routes back when the feature flow and requirements are established
+  // ,
   // {
   //   path: 'deduplication',
   //   loadComponent: () =>

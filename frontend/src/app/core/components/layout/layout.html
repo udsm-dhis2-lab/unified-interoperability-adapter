@@ -30,9 +30,10 @@
       <li nz-submenu nzKey="client-registry" nzTitle="Client Registry" nzIcon="team">
         <ul>
           <li nz-menu-item nzKey="clients" (click)="navigateTo('/clients')">Clients</li>
-          <li nz-menu-item nzKey="deduplication" (click)="navigateTo('/clients/deduplication')">
+          <!-- TODO: Add deduplication page, when the requirement and flow are clear  -->
+          <!-- <li nz-menu-item nzKey="deduplication" (click)="navigateTo('/clients/deduplication')">
             Deduplication
-          </li>
+          </li> -->
         </ul>
       </li>
 
@@ -123,34 +124,34 @@
       </div>
       <div class="flex items-center gap-4">
         <ng-container *ngIf="userInfo() as user">
-        <nz-tag nzColor="green" class="role-tag">{{ user.role }}</nz-tag>
+          <nz-tag nzColor="green" class="role-tag">{{ user.role }}</nz-tag>
 
-        <div nz-dropdown [nzDropdownMenu]="menu" [nzPlacement]="'bottomCenter'" nzTrigger="click" class="user-card">
-          <div class="user-meta">
-            <div class="user-name">{{ user.name }}</div>
-            <div class="user-email">{{ user.email }}</div>
+          <div nz-dropdown [nzDropdownMenu]="menu" [nzPlacement]="'bottomCenter'" nzTrigger="click" class="user-card">
+            <div class="user-meta">
+              <div class="user-name">{{ user.name }}</div>
+              <div class="user-email">{{ user.email }}</div>
+            </div>
+            <nz-avatar [nzSize]="42" nzIcon="user" class="user-avatar"></nz-avatar>
+            <span nz-icon nzType="down" class="dropdown-icon"></span>
+
+            <nz-dropdown-menu #menu="nzDropdownMenu">
+              <ul nz-menu>
+                <li nz-menu-item class="profile-menu-item" (click)="navigateTo('/user-account/profile')">
+                  <span nz-icon nzType="user"></span>
+                  <span class="ml-2">Profile</span>
+                </li>
+                <li nz-menu-item class="profile-menu-item" (click)="navigateTo('/user-account/settings')">
+                  <span nz-icon nzType="setting"></span>
+                  <span class="ml-2">Settings</span>
+                </li>
+                <li nz-menu-divider></li>
+                <li nz-menu-item class="profile-menu-item" (click)="logout()">
+                  <span nz-icon nzType="logout"></span>
+                  <span class="ml-2">Logout</span>
+                </li>
+              </ul>
+            </nz-dropdown-menu>
           </div>
-          <nz-avatar [nzSize]="42" nzIcon="user" class="user-avatar"></nz-avatar>
-          <span nz-icon nzType="down" class="dropdown-icon"></span>
-
-          <nz-dropdown-menu #menu="nzDropdownMenu">
-            <ul nz-menu>
-              <li nz-menu-item class="profile-menu-item" (click)="navigateTo('/user-account/profile')">
-                <span nz-icon nzType="user"></span>
-                <span class="ml-2">Profile</span>
-              </li>
-              <li nz-menu-item class="profile-menu-item" (click)="navigateTo('/user-account/settings')">
-                <span nz-icon nzType="setting"></span>
-                <span class="ml-2">Settings</span>
-              </li>
-              <li nz-menu-divider></li>
-              <li nz-menu-item class="profile-menu-item" (click)="logout()">
-                <span nz-icon nzType="logout"></span>
-                <span class="ml-2">Logout</span>
-              </li>
-            </ul>
-          </nz-dropdown-menu>
-        </div>
         </ng-container>
       </div>
     </nz-header>
