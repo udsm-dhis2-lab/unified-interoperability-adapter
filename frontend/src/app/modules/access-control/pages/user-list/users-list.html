@@ -19,9 +19,8 @@
       </button>
     </nz-space>
   </div>
-
-  <nz-row nzGutter="16" class="stats">
-    <nz-col nzSpan="6">
+  <nz-row nzGutter="20" class="stats">
+    <nz-col nzSpan="8">
       <nz-card>
         <ng-template #totalPrefix><span nz-icon nzType="user"></span></ng-template>
         <nz-statistic
@@ -31,7 +30,7 @@
         ></nz-statistic>
       </nz-card>
     </nz-col>
-    <nz-col nzSpan="6">
+    <nz-col nzSpan="8">
       <nz-card>
         <nz-statistic
           nzTitle="Active Users"
@@ -40,21 +39,12 @@
         ></nz-statistic>
       </nz-card>
     </nz-col>
-    <nz-col nzSpan="6">
+    <nz-col nzSpan="8">
       <nz-card>
         <nz-statistic
           nzTitle="Inactive Users"
           [nzValue]="stats.inactive"
           [nzValueStyle]="{ color: '#8c8c8c' }"
-        ></nz-statistic>
-      </nz-card>
-    </nz-col>
-    <nz-col nzSpan="6">
-      <nz-card>
-        <nz-statistic
-          nzTitle="Suspended Users"
-          [nzValue]="stats.suspended"
-          [nzValueStyle]="{ color: '#ff4d4f' }"
         ></nz-statistic>
       </nz-card>
     </nz-col>
@@ -87,62 +77,56 @@
   </nz-card>
 
   <nz-card>
-    <nz-table [nzData]="filteredUsers" [nzPageSize]="10" [nzShowSizeChanger]="true">
+    <nz-table [nzData]="filteredUsers" [nzPageSize]="10" [nzShowSizeChanger]="true" [nzLoading]="loadingUsers()">
       <thead>
         <tr>
           <th>User</th>
+          <th>Username</th>
           <th>Contact</th>
-          <th>Role</th>
-          <th>Facility</th>
           <th>Last Login</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of filteredUsers">
-          <td>
-            <div class="user-cell">
-              <nz-avatar [nzSize]="40" nzIcon="user" class="avatar"></nz-avatar>
-              <div>
+        @for(user of filteredUsers; track user.uuid;){
+          <tr>
+            <td>
+              <div class="user-cell">
+                <nz-avatar [nzSize]="40" nzIcon="user" class="avatar"></nz-avatar>
                 <div>
-                  <strong>{{ user.firstName }} {{ user.lastName }}</strong>
+                  <div>
+                    <strong>{{ user.firstName }} {{ user.surname }}</strong>
+                  </div>
                 </div>
-                <div class="muted">{{ user.userId }}</div>
               </div>
-            </div>
-          </td>
-          <td>
-            <div>{{ user.email }}</div>
-            <div class="muted">{{ user.phoneNumber }}</div>
-          </td>
-          <td>
-            <nz-tag [nzColor]="roleColor(user.role)">{{ user.role }}</nz-tag>
-          </td>
-          <td>
-            <div>{{ user.facility }}</div>
-            <div class="muted">{{ user.department }}</div>
-          </td>
-          <td>{{ user.lastLogin }}</td>
-          <td>
-            <nz-badge
-              [nzStatus]="
-                user.status === 'active'
-                  ? 'success'
-                  : user.status === 'suspended'
-                    ? 'error'
-                    : 'default'
-              "
-              [nzText]="user.status.toUpperCase()"
-            ></nz-badge>
-          </td>
-          <td>
-            <button nz-button nzType="link" (click)="editUser(user.id)">
-              <span nz-icon nzType="edit"></span>
-              Edit
-            </button>
-          </td>
-        </tr>
+            </td>
+            <td>
+              <div>{{ user.username }}</div>
+            </td>
+            <td>
+              <div>{{ user.email }}</div>
+              <div class="muted">{{ user.phoneNumber }}</div>
+            </td>
+            <td>{{ user.lastLogin }}</td>
+            <td>
+              <nz-badge
+                [nzStatus]="
+                  !user.disabled
+                    ? 'success'
+                    : 'error'
+                "
+                [nzText]="user.disabled ? 'Inactive' : 'Active'"
+              ></nz-badge>
+            </td>
+            <td>
+              <button nz-button nzType="link" (click)="editUser(user.uuid)">
+                <span nz-icon nzType="edit"></span>
+                Edit
+              </button>
+            </td>
+          </tr>
+        }
       </tbody>
     </nz-table>
   </nz-card>

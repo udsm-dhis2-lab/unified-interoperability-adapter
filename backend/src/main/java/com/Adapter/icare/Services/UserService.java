@@ -202,6 +202,10 @@ public class UserService implements UserDetailsService {
             existingUser.setDisabled(updatedUser.getDisabled());
             existingUser.setExternalAuth(updatedUser.getExternalAuth());
 
+            if(updatedUser.getLastLogin() != null) {
+                existingUser.setLastLogin(updatedUser.getLastLogin());
+            }
+
             // Update password if provided
             if (updatedUser.getPassword() != null && !updatedUser.getPassword().trim().isEmpty()) {
                 existingUser.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
