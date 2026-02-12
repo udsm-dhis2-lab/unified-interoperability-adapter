@@ -5,11 +5,11 @@ import { Router } from '@angular/router';
 import { ZORRO_MODULES } from '@hdu/shared';
 
 @Component({
-  selector: 'app-user-authority-create-page',
+  selector: 'app-user-permissions-create-page',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, ...ZORRO_MODULES],
-  templateUrl: './user-authority-create.html',
-  styleUrls: ['./user-authority-create.scss'],
+  templateUrl: './user-permissions-create.html',
+  styleUrls: ['./user-permissions-create.scss'],
 })
 export class UserAuthorityCreate {
   private readonly fb: FormBuilder = inject(FormBuilder);

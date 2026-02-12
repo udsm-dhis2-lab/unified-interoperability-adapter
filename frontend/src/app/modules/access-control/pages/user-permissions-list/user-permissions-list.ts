@@ -223,11 +223,11 @@ const mockAuthorities: Authority[] = [
 ];
 
 @Component({
-  selector: 'app-user-authorities-page',
+  selector: 'app-user-permissions-page',
   standalone: true,
   imports: [CommonModule, FormsModule, ...ZORRO_MODULES],
-  templateUrl: './user-authority-list.html',
-  styleUrls: ['./user-authority-list.scss'],
+  templateUrl: './user-permissions-list.html',
+  styleUrls: ['./user-permissions-list.scss'],
 })
 export class UserAuthorityList {
   private readonly router: Router = inject(Router);

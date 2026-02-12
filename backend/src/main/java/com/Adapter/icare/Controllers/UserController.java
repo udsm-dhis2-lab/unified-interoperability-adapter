@@ -11,6 +11,9 @@ import com.Adapter.icare.Domains.*;
 import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.AuthService;
 import com.Adapter.icare.Services.RefreshTokenService;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,6 +51,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "User Management", description = "User authentication and management operations")
@@ -65,6 +69,8 @@ public class UserController {
     private ObjectMapper objectMapper;
     @Autowired
     private HttpServletRequest request;
+
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     public UserController(UserService userService, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
@@ -129,6 +135,14 @@ public class UserController {
     @PostMapping("/login")
     @Operation(summary = "Login user", description = "Returns Access Token and Refresh Token")
     public ResponseEntity<JwtAuthResponse> authenticateUser(@RequestBody LoginDTO loginDto) {
+        try{
+            User loggedInUser = userService.getUserByUsername(loginDto.getUsername());
+            loggedInUser.setLastLogin(new Date());
+            loggedInUser.setPassword(null);
+            userService.updateUser(loggedInUser.getUuid(), loggedInUser);
+        } catch (Exception e) {
+            log.warn("FAILED TO UPDATE USER LAST LOGIN" + e);
+        }
         return ResponseEntity.ok(authService.login(loginDto));
     }
 

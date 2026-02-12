@@ -29,12 +29,12 @@ export const accessControlRoutes = [
   {
     path: 'user-authorities',
     loadComponent: () =>
-      import('./pages/user-authority-list/user-authority-list').then((m) => m.UserAuthorityList),
+      import('./pages/user-permissions-list/user-permissions-list').then((m) => m.UserAuthorityList),
   },
   {
     path: 'user-authorities/create',
     loadComponent: () =>
-      import('./pages/user-authority-create/user-authority-create').then(
+      import('./pages/user-permissions-create/user-permissions-create').then(
         (m) => m.UserAuthorityCreate,
       ),
   },
