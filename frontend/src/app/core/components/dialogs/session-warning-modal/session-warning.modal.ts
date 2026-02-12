@@ -16,7 +16,6 @@ export class SessionWarningModalComponent {
 
     showModal = this.userActivityService.showWarningModal;
 
-
     secondsRemaining = this.userActivityService.secondsRemaining;
 
     formattedTime = computed(() => {
