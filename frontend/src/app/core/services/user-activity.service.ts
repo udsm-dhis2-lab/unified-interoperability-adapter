@@ -37,14 +37,11 @@ export class UserActivityService implements OnDestroy {
 
                 const tokenTimeLeft = Math.floor(this.calculateTokenTimeLeft());
                 const idleTime = Date.now() - this.lastActivityTimestamp;
-                console.log(`Idle time: ${idleTime} ms, Token time left: ${tokenTimeLeft} seconds`);
                 const isIdle = idleTime >= this.IDLE_TIMEOUT_MS;
-
                 this.secondsRemaining.set(tokenTimeLeft);
 
                 if (tokenTimeLeft <= this.TOKEN_REFRESH_THRESHOLD && tokenTimeLeft > 0) {
                     if (isIdle) {
-                        console.log('User is idle and token is about to expire. Showing warning modal. =======');
                         this.showWarningModal.set(true);
                     } else {
                         this.refreshToken();
