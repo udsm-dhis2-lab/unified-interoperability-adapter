@@ -30,6 +30,7 @@ import { NzTagModule } from "ng-zorro-antd/tag";
 import { NzTimelineModule } from "ng-zorro-antd/timeline";
 import { NzTooltipModule } from "ng-zorro-antd/tooltip";
 import { NzTypographyModule } from "ng-zorro-antd/typography";
+import { NzEmptyModule } from "ng-zorro-antd/empty";
 
 export const ZORRO_MODULES = [
   NzAlertModule,
@@ -64,4 +65,5 @@ export const ZORRO_MODULES = [
   NzTimelineModule,
   NzTooltipModule,
   NzTypographyModule,
+  NzEmptyModule
 ];

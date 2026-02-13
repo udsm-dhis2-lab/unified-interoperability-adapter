@@ -86,7 +86,6 @@ export class ClientListPage {
           this.total.set(data?.pager?.total || 0);
           this.pageIndex.set(data?.pager?.page || 1);
           this.listOfHduPatients.set(data?.results || []);
-          console.log('Fetched clients:', data?.results?.length);
         },
         error: (error) => {
           throwError(() => error);
@@ -108,7 +107,6 @@ export class ClientListPage {
 
 
   addFilter(event: any, type?: string): void {
-    console.log(`Filter change - Type: ${type}, Value: ${event} ============`);
     if (type === 'gender') {
       this.gender = event;
     } else if (type === 'clientID') {
