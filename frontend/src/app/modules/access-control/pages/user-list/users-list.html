@@ -60,18 +60,17 @@
           style="width: 300px"
         />
       </nz-input-wrapper>
-      <nz-select [(ngModel)]="roleFilter" style="width: 200px">
+      <!-- <nz-select [(ngModel)]="roleFilter" style="width: 200px">
         <nz-option nzValue="all" nzLabel="All Roles"></nz-option>
         <nz-option nzValue="System Administrator" nzLabel="System Administrator"></nz-option>
         <nz-option nzValue="Health Professional" nzLabel="Health Professional"></nz-option>
         <nz-option nzValue="Data Analyst" nzLabel="Data Analyst"></nz-option>
         <nz-option nzValue="Receptionist" nzLabel="Receptionist"></nz-option>
-      </nz-select>
+      </nz-select> -->
       <nz-select [(ngModel)]="statusFilter" style="width: 150px">
         <nz-option nzValue="all" nzLabel="All Statuses"></nz-option>
-        <nz-option nzValue="active" nzLabel="Active"></nz-option>
-        <nz-option nzValue="inactive" nzLabel="Inactive"></nz-option>
-        <nz-option nzValue="suspended" nzLabel="Suspended"></nz-option>
+        <nz-option nzValue="false" nzLabel="Active"></nz-option>
+        <nz-option nzValue="true" nzLabel="Inactive"></nz-option>
       </nz-select>
     </nz-space>
   </nz-card>

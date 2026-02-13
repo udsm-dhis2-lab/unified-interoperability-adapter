@@ -43,7 +43,6 @@ export class UsersList {
   constructor(private readonly router: Router) {}
 
   ngOnInit(){
-    console.log("Calling users")
     this.getUsers();
   }
 
@@ -67,8 +66,8 @@ export class UsersList {
         user?.email?.toLowerCase().includes(this.searchText.toLowerCase()) ||
         user?.username?.toLowerCase().includes(this.searchText.toLowerCase());
       // const matchesRole = this.roleFilter === 'all' || user.role === this.roleFilter;
-      // const matchesStatus = this.statusFilter === 'all' || user.disabled === this.statusFilter;
-      return matchesSearch // && matchesRole && matchesStatus;
+      const matchesStatus = this.statusFilter === 'all' || (this.statusFilter === 'true' ? user.disabled : !user.disabled);
+      return matchesSearch && matchesStatus // && matchesRole ;
     });
   }
 
@@ -94,20 +93,5 @@ export class UsersList {
 
   createUser(): void {
     this.router.navigate(['/access-control/users/create']);
-  }
-
-  roleColor(role: string): string {
-    switch (role) {
-      case 'System Administrator':
-        return 'purple';
-      case 'Health Professional':
-        return 'blue';
-      case 'Data Analyst':
-        return 'cyan';
-      case 'Receptionist':
-        return 'orange';
-      default:
-        return 'default';
-    }
   }
 }

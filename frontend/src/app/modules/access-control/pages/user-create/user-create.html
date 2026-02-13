@@ -9,231 +9,160 @@
   </div>
 
   <div class="title">
-    <h2 nz-typography nzTitle>Create New User</h2>
-    <span nz-typography nzType="secondary">Add a new user to the healthcare system</span>
+    <h2 nz-typography nzTitle>{{ userUuid ? 'Update Existing User' : 'Create New User' }}</h2>
+    <span nz-typography nzType="secondary">{{ userUuid ? 'Update existing' : 'Add a new'}} user to the healthcare system</span>
   </div>
 
-  <nz-alert
+  <!-- <nz-alert
     nzType="info"
     nzShowIcon
     nzMessage="Account Creation"
     nzDescription="A temporary password will be generated and sent to the user's email address. The user will be required to change their password on first login."
     class="alert"
-  ></nz-alert>
+  ></nz-alert> -->
 
-  <nz-row nzGutter="16">
-    <nz-col nzSpan="16">
-      <form nz-form [formGroup]="form" nzLayout="vertical">
-        <nz-card nzTitle="Basic Information" class="card">
-          <div class="avatar-row">
-            <nz-avatar [nzSize]="80" nzIcon="user" class="avatar"></nz-avatar>
+  <nz-spin [nzSpinning]="isInitialLoading()">
+    <nz-row nzGutter="16">
+      <nz-col nzSpan="16">
+        <form nz-form #userForm="ngForm" (ngSubmit)="save()" nzLayout="vertical"> 
+          <nz-card nzTitle="Basic Information" class="card">
+            <nz-row nzGutter="16">
+              <nz-col nzSpan="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired>First Name</nz-form-label>
+                  <nz-form-control nzErrorTip="Please enter first name">
+                    <input nz-input [(ngModel)]="user.firstName" name="firstName" required placeholder="Enter first name" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+        
+              <nz-col nzSpan="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired>Surname</nz-form-label>
+                  <nz-form-control nzErrorTip="Please enter surname">
+                    <input nz-input [(ngModel)]="user.surname" name="surname" required placeholder="Enter surname" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+            </nz-row>
+        
+            <nz-row nzGutter="16">
+              <nz-col nzSpan="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired>Email Address</nz-form-label>
+                  <nz-form-control nzErrorTip="Please enter a valid email">
+                    <input nz-input type="email" [(ngModel)]="user.email" name="email" required email
+                      placeholder="user@moh.go.tz" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired>Phone Number</nz-form-label>
+                  <nz-form-control nzErrorTip="Please enter phone number">
+                    <input nz-input [(ngModel)]="user.phoneNumber" name="phoneNumber" required placeholder="+255 712 345 678" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+            </nz-row>
+          </nz-card>
+        
+          <nz-card nzTitle="Work Information" class="card">
+            <nz-row nzGutter="16">
+              <nz-col nzSpan="24">
+                <nz-form-item>
+                  <nz-form-label nzRequired>Username *</nz-form-label>
+                  <nz-form-control nzErrorTip="Please enter phone number">
+                    <input nz-input [(ngModel)]="user.username" name="username" required />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired>Password *</nz-form-label>
+                  <nz-form-control nzErrorTip="Please enter phone number">
+                    <input nz-input [(ngModel)]="user.password" name="password" required type="password" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="12">
+                <nz-form-item>
+                  <nz-form-label nzRequired>Confirm Password *</nz-form-label>
+                  <nz-form-control>
+                    <input nz-input [(ngModel)]="confirmPassword" name="confirm-password" required type="password" />
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+              <nz-col nzSpan="24">
+                <nz-form-item>
+                  <nz-form-label nzRequired>Role</nz-form-label>
+                  <nz-form-control nzErrorTip="Please select role">
+                    <nz-select 
+                      name="userRole" nzMode="multiple" 
+                      [(ngModel)]="roles" 
+                      nzPlaceHolder="Select role" required>
+                      @for(r of roles; track $index){
+                      <nz-option [nzValue]="r" [nzLabel]="r.roleName || ''">
+                      </nz-option>
+                      }
+                    </nz-select>
+                  </nz-form-control>
+                </nz-form-item>
+              </nz-col>
+            </nz-row>
+          </nz-card>
+        
+          <nz-card nzTitle="Account Settings" class="card">
+            <nz-form-item>
+              <nz-form-label>Account Status</nz-form-label>
+              <nz-form-control>
+                <nz-switch name="disabledStatus" [(ngModel)]="user.disabled" nzCheckedChildren="Disabled"
+                  nzUnCheckedChildren="Enabled">
+                </nz-switch>
+              </nz-form-control>
+            </nz-form-item>
+            <nz-divider></nz-divider>
+            <nz-space>
+              <button nz-button nzType="primary" type="submit" [nzLoading]="isSaving()">
+                @if(!isSaving()){
+                  <span nz-icon nzType="save"></span>
+                }
+                {{ userUuid ? 'Update User' : 'Create User' }}
+              </button>
+              <button nz-button type="button" (click)="cancel()">Cancel</button>
+            </nz-space>
+          </nz-card>
+        </form>
+      </nz-col>
+  
+      <nz-col nzSpan="8">
+        <nz-card nzTitle="User Creation Info" class="card sticky">
+          <nz-space nzDirection="vertical" style="width: 100%">
+            <nz-alert
+              nzType="success"
+              nzShowIcon
+              nzMessage="Security"
+              nzDescription="Strong password policies are enforced. Users must change their password on first login."
+            ></nz-alert>
+            <nz-divider></nz-divider>
             <div>
-              <button nz-button nzType="link">Upload Photo</button>
-              <div class="muted">JPG or PNG. Max size 2MB.</div>
+              <strong>Required Fields:</strong>
+              <ul>
+                <li>Full Name</li>
+                <li>Email Address</li>
+              </ul>
             </div>
-          </div>
-          <nz-row nzGutter="16">
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>First Name</nz-form-label>
-                <nz-form-control nzErrorTip="Please enter first name">
-                  <input nz-input formControlName="firstName" placeholder="Enter first name" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>Last Name</nz-form-label>
-                <nz-form-control nzErrorTip="Please enter last name">
-                  <input nz-input formControlName="lastName" placeholder="Enter last name" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-          </nz-row>
-          <nz-row nzGutter="16">
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>Email Address</nz-form-label>
-                <nz-form-control nzErrorTip="Please enter a valid email">
-                  <input nz-input formControlName="email" placeholder="user@health.go.tz" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>Phone Number</nz-form-label>
-                <nz-form-control nzErrorTip="Please enter phone number">
-                  <input nz-input formControlName="phoneNumber" placeholder="+255 712 345 678" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-          </nz-row>
-        </nz-card>
-
-        <nz-card nzTitle="Work Information" class="card">
-          <nz-row nzGutter="16">
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>Role</nz-form-label>
-                <nz-form-control nzErrorTip="Please select role">
-                  <nz-select formControlName="role" nzPlaceHolder="Select role">
-                    <nz-option
-                      nzValue="System Administrator"
-                      nzLabel="System Administrator"
-                    ></nz-option>
-                    <nz-option
-                      nzValue="Health Professional"
-                      nzLabel="Health Professional"
-                    ></nz-option>
-                    <nz-option nzValue="Data Analyst" nzLabel="Data Analyst"></nz-option>
-                    <nz-option nzValue="Receptionist" nzLabel="Receptionist"></nz-option>
-                    <nz-option
-                      nzValue="Laboratory Technician"
-                      nzLabel="Laboratory Technician"
-                    ></nz-option>
-                    <nz-option nzValue="Pharmacist" nzLabel="Pharmacist"></nz-option>
-                  </nz-select>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>Department</nz-form-label>
-                <nz-form-control nzErrorTip="Please enter department">
-                  <input nz-input formControlName="department" placeholder="Enter department" />
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-          </nz-row>
-          <nz-row nzGutter="16">
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>Facility</nz-form-label>
-                <nz-form-control nzErrorTip="Please select facility">
-                  <nz-select
-                    formControlName="facility"
-                    nzPlaceHolder="Select facility"
-                    nzShowSearch
-                  >
-                    <nz-option
-                      nzValue="Muhimbili National Hospital"
-                      nzLabel="Muhimbili National Hospital"
-                    ></nz-option>
-                    <nz-option
-                      nzValue="Mwananyamala Hospital"
-                      nzLabel="Mwananyamala Hospital"
-                    ></nz-option>
-                    <nz-option
-                      nzValue="Temeke Regional Hospital"
-                      nzLabel="Temeke Regional Hospital"
-                    ></nz-option>
-                    <nz-option
-                      nzValue="Amana Regional Hospital"
-                      nzLabel="Amana Regional Hospital"
-                    ></nz-option>
-                    <nz-option
-                      nzValue="Kilimanjaro Christian Medical Centre"
-                      nzLabel="Kilimanjaro Christian Medical Centre"
-                    ></nz-option>
-                    <nz-option
-                      nzValue="Ministry of Health"
-                      nzLabel="Ministry of Health"
-                    ></nz-option>
-                  </nz-select>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-            <nz-col nzSpan="12">
-              <nz-form-item>
-                <nz-form-label nzRequired>Region</nz-form-label>
-                <nz-form-control nzErrorTip="Please select region">
-                  <nz-select formControlName="region" nzPlaceHolder="Select region" nzShowSearch>
-                    <nz-option nzValue="Dar es Salaam" nzLabel="Dar es Salaam"></nz-option>
-                    <nz-option nzValue="Kilimanjaro" nzLabel="Kilimanjaro"></nz-option>
-                    <nz-option nzValue="Mwanza" nzLabel="Mwanza"></nz-option>
-                    <nz-option nzValue="Arusha" nzLabel="Arusha"></nz-option>
-                    <nz-option nzValue="Mbeya" nzLabel="Mbeya"></nz-option>
-                    <nz-option nzValue="Dodoma" nzLabel="Dodoma"></nz-option>
-                  </nz-select>
-                </nz-form-control>
-              </nz-form-item>
-            </nz-col>
-          </nz-row>
-        </nz-card>
-
-        <nz-card nzTitle="Permissions & Authorities" class="card">
-          <nz-alert
-            nzType="info"
-            nzShowIcon
-            nzMessage="Role-Based Permissions"
-            nzDescription="The selected role will automatically assign default permissions. You can add additional permissions below."
-            class="sub-alert"
-          ></nz-alert>
-          <nz-form-item>
-            <nz-form-label>Additional Authorities</nz-form-label>
-            <nz-form-control>
-              <nz-checkbox-group
-                [nzOptions]="allAuthorities"
-                formControlName="authorities"
-              ></nz-checkbox-group>
-            </nz-form-control>
-          </nz-form-item>
-        </nz-card>
-
-        <nz-card nzTitle="Account Settings" class="card">
-          <nz-form-item>
-            <nz-form-label>Account Status</nz-form-label>
-            <nz-form-control>
-              <nz-switch
-                formControlName="status"
-                nzCheckedChildren="Active"
-                nzUnCheckedChildren="Inactive"
-              ></nz-switch>
-            </nz-form-control>
-          </nz-form-item>
-          <nz-divider></nz-divider>
-          <nz-space>
-            <button nz-button nzType="primary" (click)="save()">
-              <span nz-icon nzType="save"></span>
-              Create User
-            </button>
-            <button nz-button (click)="cancel()">Cancel</button>
+            <nz-divider></nz-divider>
+            <!-- <div>
+              <strong>Next Steps:</strong>
+              <ul>
+                <li>User logs in and changes password</li>
+                <li>User profile becomes active</li>
+              </ul>
+            </div> -->
           </nz-space>
         </nz-card>
-      </form>
-    </nz-col>
-
-    <nz-col nzSpan="8">
-      <nz-card nzTitle="User Creation Info" class="card sticky">
-        <nz-space nzDirection="vertical" style="width: 100%">
-          <nz-alert
-            nzType="success"
-            nzShowIcon
-            nzMessage="Security"
-            nzDescription="Strong password policies are enforced. Users must change their password on first login."
-          ></nz-alert>
-          <nz-divider></nz-divider>
-          <div>
-            <strong>Required Fields:</strong>
-            <ul>
-              <li>Full Name</li>
-              <li>Email Address</li>
-              <li>Phone Number</li>
-              <li>Role</li>
-              <li>Facility</li>
-            </ul>
-          </div>
-          <nz-divider></nz-divider>
-          <div>
-            <strong>Next Steps:</strong>
-            <ul>
-              <li>User receives email with temporary password</li>
-              <li>User logs in and changes password</li>
-              <li>User profile becomes active</li>
-            </ul>
-          </div>
-        </nz-space>
-      </nz-card>
-    </nz-col>
-  </nz-row>
+      </nz-col>
+    </nz-row>
+  </nz-spin>
 </div>
