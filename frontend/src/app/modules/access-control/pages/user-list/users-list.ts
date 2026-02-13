@@ -1,9 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ZORRO_MODULES } from '@hdu/shared';
 import { UsersService } from '../../services/users.service';
+import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { debounceTime, Observable, Subject, switchMap } from 'rxjs';
 
 interface User {
   uuid: string;
@@ -31,24 +33,55 @@ interface UserRole {
   templateUrl: './users-list.html',
   styleUrls: ['./users-list.scss'],
 })
-export class UsersList {
+export class UsersList implements OnDestroy{
   usersService = inject(UsersService);
   users: User[] = []
   loadingUsers = signal(false);
+  total = signal(0);
+  pageSize = signal(10);
+  pageIndex = signal(0);
+  filterKey = [{}];
+  isFirstLoad = true;
 
   searchText = '';
   roleFilter = 'all';
   statusFilter = 'all';
 
+  searchSubject = new Subject<void>();
+
   constructor(private readonly router: Router) {}
 
   ngOnInit(){
     this.getUsers();
+
+    this.searchSubject.pipe(
+      debounceTime(500),
+      switchMap(() => {
+        this.loadingUsers.set(true);
+        return this.usersService.getUsers(undefined,{
+          page: this.pageIndex(),
+          pageSize: this.pageSize(),
+          search: this.searchText
+        });
+      })
+    ).subscribe({
+      next: (response: any) => {
+        this.users = response?.users;
+        this.loadingUsers.set(false);
+      },
+      error: () => {
+        this.loadingUsers.set(false)
+      }
+    })
   }
 
   getUsers(){
     this.loadingUsers.set(true);
-    this.usersService.getUsers().subscribe({
+    this.usersService.getUsers(undefined, {
+      page: this.pageIndex(),
+      pageSize: this.pageSize(),
+      search: this.searchText
+    }).subscribe({
       next: (response: any) => {
         this.users = response?.users;
       },
@@ -58,17 +91,24 @@ export class UsersList {
     })
   }
 
-  get filteredUsers(): User[] {
-    return this.users.filter((user) => {
-      const matchesSearch =
-        user?.firstName?.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        user?.surname?.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        user?.email?.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        user?.username?.toLowerCase().includes(this.searchText.toLowerCase());
-      // const matchesRole = this.roleFilter === 'all' || user.role === this.roleFilter;
-      const matchesStatus = this.statusFilter === 'all' || (this.statusFilter === 'true' ? user.disabled : !user.disabled);
-      return matchesSearch && matchesStatus // && matchesRole ;
-    });
+  onQueryParamsChange(params: NzTableQueryParams): void {
+    if (this.isFirstLoad) {
+      this.isFirstLoad = false;
+      return;
+    }
+    const { pageSize, pageIndex } = params;
+    this.pageIndex.set(pageIndex);
+    this.pageSize.set(pageSize);
+
+    this.getUsers();
+  }
+
+  onSearchUser(e: any){
+    e?.stopPropagation();
+
+    this.searchText = e?.target?.value;
+
+    this.searchSubject.next();
   }
 
   get stats() {
@@ -93,5 +133,9 @@ export class UsersList {
 
   createUser(): void {
     this.router.navigate(['/access-control/users/create']);
+  }
+
+  ngOnDestroy(){
+    this.searchSubject.unsubscribe();
   }
 }

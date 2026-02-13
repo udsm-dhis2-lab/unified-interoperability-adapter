@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 
 @Injectable({
@@ -9,8 +9,21 @@ export class UsersService {
   
 
 
-  getUsers(userUuid?: string){
-    return this.http.get(`/api/v1/users/${userUuid ? userUuid : ''}`, )
+  getUsers(uuid?: string, params?: {
+    page?: number,
+    pageSize?: number,
+    search?: string
+  }){
+    let parameters = new HttpParams();
+    
+    if(params){
+      Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+              parameters = parameters.set(key, value.toString());
+          }
+      });
+    }
+    return this.http.get(`/api/v1/users${uuid ? '/'+uuid : ''}`, { params: parameters})
   }
 
   saveUser(user: any){

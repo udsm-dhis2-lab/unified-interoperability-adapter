@@ -56,7 +56,7 @@
         <input
           nz-input
           placeholder="Search users..."
-          [(ngModel)]="searchText"
+          (input)="onSearchUser($event)"
           style="width: 300px"
         />
       </nz-input-wrapper>
@@ -67,16 +67,18 @@
         <nz-option nzValue="Data Analyst" nzLabel="Data Analyst"></nz-option>
         <nz-option nzValue="Receptionist" nzLabel="Receptionist"></nz-option>
       </nz-select> -->
-      <nz-select [(ngModel)]="statusFilter" style="width: 150px">
+      <!-- <nz-select [(ngModel)]="statusFilter" style="width: 150px">
         <nz-option nzValue="all" nzLabel="All Statuses"></nz-option>
         <nz-option nzValue="false" nzLabel="Active"></nz-option>
         <nz-option nzValue="true" nzLabel="Inactive"></nz-option>
-      </nz-select>
+      </nz-select> -->
     </nz-space>
   </nz-card>
-
+  
   <nz-card>
-    <nz-table [nzData]="filteredUsers" [nzPageSize]="10" [nzShowSizeChanger]="true" [nzLoading]="loadingUsers()">
+    <nz-table [nzData]="users"
+    [nzTotal]="total()" [nzPageSize]="pageSize()" [nzPageIndex]="pageIndex()"
+  (nzQueryParams)="onQueryParamsChange($event)" [nzShowSizeChanger]="true" [nzLoading]="loadingUsers()">
       <thead>
         <tr>
           <th>User</th>
@@ -88,7 +90,7 @@
         </tr>
       </thead>
       <tbody>
-        @for(user of filteredUsers; track user.uuid;){
+        @for(user of users; track user.uuid;){
           <tr>
             <td>
               <div class="user-cell">
