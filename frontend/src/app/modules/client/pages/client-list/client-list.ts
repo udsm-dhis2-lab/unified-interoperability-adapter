@@ -15,12 +15,6 @@ import { NzTableQueryParams } from 'ng-zorro-antd/table';
   styleUrls: ['./client-list.scss'],
 })
 export class ClientListPage {
-  //TODO: Implement these when analytical data is available from the backend
-
-  // get verifiedClients(): number {
-  //   return mockClients.length - 2;
-  // }
-
   total = signal(0);
   listOfHduPatients = signal<any[]>([]);
   loading = signal(false);
@@ -28,8 +22,6 @@ export class ClientListPage {
   pageIndex = signal(1);
   filterKey = [{}];
 
-  startDate: any = null;
-  endDate: any = null;
   gender: string = '';
   clientId: string = '';
   firstName: string = '';
@@ -37,8 +29,6 @@ export class ClientListPage {
   idNumber?: string;
 
   isFirstLoad = true;
-  // dataSetSeachQuery: string = '';
-
   private filterSubject = new Subject<void>();
 
   constructor(
@@ -58,8 +48,9 @@ export class ClientListPage {
 
     this.filterSubject
       .pipe(
-        debounceTime(300),
+        debounceTime(1000),
         switchMap(() => {
+          this.loading.set(true);
           const filters = this.buildFilters();
           return this.clientManagementService.getHduClients(
             this.pageIndex(),
@@ -103,17 +94,6 @@ export class ClientListPage {
       });
   }
 
-  // onDatasetsSearchInputTyping(value: string) {
-  //   this.dataSetSeachQuery = value;
-  //   if (value.length >= 3 || value === '') {
-  //     this.loadHduClientsFromServer(1, 10, [
-  //       value !== ''
-  //         ? { key: 'firstName', value: [value] }
-  //         : { key: '', value: [] },
-  //     ]);
-  //   }
-  // }
-
   onQueryParamsChange(params: NzTableQueryParams): void {
     if (this.isFirstLoad) {
       this.isFirstLoad = false;
@@ -122,42 +102,29 @@ export class ClientListPage {
     const { pageSize, pageIndex, filter } = params;
     const queryFilter = [
       ...filter,
-      // this.dataSetSeachQuery !== ''
-      //   ? { key: 'firstName', value: [this.dataSetSeachQuery] }
-      //   : { key: '', value: [] },
     ];
     this.loadHduClientsFromServer(pageIndex, pageSize, queryFilter);
   }
 
 
   addFilter(event: any, type?: string): void {
-    switch (type) {
-      case 'gender':
-        this.gender = event;
-        break;
-      case 'clientID':
-        this.clientId = event;
-        break;
-      case 'firstName':
-        this.firstName = event;
-        break;
-      case 'surname':
-        this.surname = event;
-        break;
-      case 'idNumber':
-        this.idNumber = event;
-        break;
-
-      case 'startDate':
-        this.startDate = event;
-        break;
-      case 'endDate':
-        this.endDate = event;
-        break;
-
-      default:
-        break;
+    console.log(`Filter change - Type: ${type}, Value: ${event} ============`);
+    if (type === 'gender') {
+      this.gender = event;
+    } else if (type === 'clientID') {
+      this.clientId = event;
+    } else if (type === 'firstName') {
+      this.firstName = event;
+    } else if (type === 'surname') {
+      this.surname = event;
+    } else if (type === 'idNumber') {
+      this.idNumber = event;
     }
+    this.applyFilters();
+  }
+
+  applyFilters() {
+    this.filterSubject.next();
   }
 
   private buildFilters(): Array<{ key: string; value: string[] }> {
@@ -178,19 +145,7 @@ export class ClientListPage {
     if (this.idNumber) {
       filters.push({ key: 'id', value: [this.idNumber] });
     }
-    if (this.startDate) {
-      filters.push({ key: 'startDate', value: [this.startDate] });
-    }
-    if (this.endDate) {
-      filters.push({ key: 'endDate', value: [this.endDate] });
-    }
-
     return filters;
-  }
-
-  applyFilters() {
-    this.loading.set(true);
-    this.filterSubject.next();
   }
 
   resetFilters() {
@@ -199,8 +154,6 @@ export class ClientListPage {
     this.firstName = '';
     this.surname = '';
     this.idNumber = '';
-    this.startDate = null;
-    this.endDate = null;
     this.applyFilters();
   }
 

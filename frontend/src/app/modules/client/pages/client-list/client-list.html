@@ -67,10 +67,6 @@
       (ngModelChange)="addFilter($event, 'surname')" />
   </div>
 
-  <div nz-col [nzSpan]="4">
-    <input nz-input placeholder="ID Number" [(ngModel)]="idNumber" class="sexy-input"
-      (ngModelChange)="addFilter($event, 'lastName')" />
-  </div>
   <nz-col nzSpan="4">
     <nz-select nzPlaceHolder="Select gender" [ngModel]="gender || null" (ngModelChange)="addFilter($event, 'gender')"
       nzAllowClear style="width: 100%">
@@ -78,7 +74,7 @@
       <nz-option nzValue="female" nzLabel="Female"></nz-option>
     </nz-select>
   </nz-col>
-  <nz-col nzSpan="4">
+  <nz-col nzSpan="1.5">
     <button nz-button (click)="resetFilters()">Reset</button>
   </nz-col>
 </nz-row>
