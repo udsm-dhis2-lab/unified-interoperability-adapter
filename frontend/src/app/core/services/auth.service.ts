@@ -71,7 +71,7 @@ export class AuthService {
       tap((response) => {
         this.saveAuthData(response)
       }),
-      catchError((error) => throwError(() => error) )
+      catchError((error) => throwError(() => error))
     )
   }
 
@@ -136,10 +136,7 @@ export class AuthService {
   }
 
   clearUserData() {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("access_token_expiry");
-    localStorage.removeItem("refresh_token_expiry")
+    this.clearAuthData()
     localStorage.removeItem("current_user");
   }
 
