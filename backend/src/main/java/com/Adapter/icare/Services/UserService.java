@@ -288,6 +288,11 @@ public class UserService implements UserDetailsService {
         return roleRepository.findAll();
     }
 
+    public Page<Role> getRoles(Integer page, Integer pageSize, String search) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return roleRepository.findAllRoles(pageable, search);
+    }
+
     public Role getRoleByName(String name) {
         return roleRepository.findByName(name);
     }

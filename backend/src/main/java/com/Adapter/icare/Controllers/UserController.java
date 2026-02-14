@@ -413,14 +413,45 @@ public class UserController {
     }
 
     @GetMapping("/users/roles")
-    public List<Map<String, Object>> getRoles(@RequestParam(defaultValue = "false") boolean withPrivileges) {
-        List<Map<String, Object>> savedRoles = new ArrayList<>();
-        List<Role> roles = userService.getRoles();
+    public ResponseEntity<?> getRoles(
+            @RequestParam(defaultValue = "false") boolean withPrivileges,
+            @RequestParam(defaultValue = "false") Boolean paging,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false) String search
+    ) {
+        try {
+            if(paging){
+                Page<Role> rolesPage = userService.getRoles(page, pageSize, search);
+                List<Map<String, Object>> rolesMapList = new ArrayList<>();
+                for (Role role : rolesPage.getContent()) {
+                    rolesMapList.add(role.toMap(withPrivileges));
+                }
+                Map<String, Object> response = new HashMap<>();
+                response.put("roles", rolesMapList);
+                response.put("totalElements", rolesPage.getTotalElements());
+                response.put("totalPages", rolesPage.getTotalPages());
+                response.put("currentPage", rolesPage.getNumber());
+                response.put("pageSize", rolesPage.getSize());
+                response.put("hasNext", rolesPage.hasNext());
+                response.put("hasPrevious", rolesPage.hasPrevious());
 
-        for (Role role : roles) {
-            savedRoles.add(role.toMap(withPrivileges));
+                return ResponseEntity.ok(response);
+            } else {
+                List<Map<String, Object>> savedRoles = new ArrayList<>();
+                List<Role> roles = userService.getRoles();
+
+                for (Role role : roles) {
+                    savedRoles.add(role.toMap(withPrivileges));
+                }
+                return ResponseEntity.ok(savedRoles);
+            }
+        } catch (Exception e){
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
-        return savedRoles;
     }
 
     @GetMapping("/users/roles/{uuid}")
