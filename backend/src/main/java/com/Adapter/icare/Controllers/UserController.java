@@ -406,7 +406,7 @@ public class UserController {
             if (this.authenticatedUser != null) {
                 role.setCreatedBy(this.authenticatedUser);
             }
-            Role createdRole = userService.saveRole(role);
+            Role createdRole = userService.saveOrUpdateRole(role);
             createdRoles.add(createdRole.toMap(false));
         }
         return createdRoles;

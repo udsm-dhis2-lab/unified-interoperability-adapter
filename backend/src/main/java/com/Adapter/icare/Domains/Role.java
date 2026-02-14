@@ -36,6 +36,7 @@ public class Role extends BaseEntity{
 
     public static Role fromMap(Map<String,Object> roleMap){
         Role role = new Role();
+
         if(roleMap.get("roleName") != null){
             role.setRoleName(roleMap.get("roleName").toString());
         }
@@ -43,9 +44,36 @@ public class Role extends BaseEntity{
         if(roleMap.get("description") != null){
             role.setDescription(roleMap.get("description").toString());
         }
+
         if(roleMap.get("sharing") != null){
             role.setSharing(roleMap.get("sharing").toString());
         }
+
+        if (roleMap.get("privileges") != null && roleMap.get("privileges") instanceof List) {
+            List<?> rawList = (List<?>) roleMap.get("privileges");
+            Set<Privilege> privilegeSet = new HashSet<>();
+
+            for (Object item : rawList) {
+                Privilege privilege = new Privilege();
+
+                if (item instanceof Map) {
+                    Map<?, ?> pMap = (Map<?, ?>) item;
+                    if (pMap.get("privilegeName") != null) {
+                        privilege.setPrivilegeName(pMap.get("privilegeName").toString());
+                        if (pMap.get("description") != null) {
+                            privilege.setDescription(pMap.get("description").toString());
+                        }
+                        privilegeSet.add(privilege);
+                    }
+                }
+                else if (item instanceof String) {
+                    privilege.setPrivilegeName((String) item);
+                    privilegeSet.add(privilege);
+                }
+            }
+            role.setPrivileges(privilegeSet);
+        }
+
         return role;
     }
 
