@@ -21,6 +21,7 @@ import { NzProgressModule } from "ng-zorro-antd/progress";
 import { NzRadioModule } from "ng-zorro-antd/radio";
 import { NzSelectModule } from "ng-zorro-antd/select";
 import { NzSpaceModule } from "ng-zorro-antd/space";
+import { NzSpinComponent } from "ng-zorro-antd/spin";
 import { NzStatisticModule } from "ng-zorro-antd/statistic";
 import { NzStepsModule } from "ng-zorro-antd/steps";
 import { NzSwitchModule } from "ng-zorro-antd/switch";
@@ -66,6 +67,7 @@ export const ZORRO_MODULES = [
   NzTimelineModule,
   NzTooltipModule,
   NzTypographyModule,
-  NzEmptyModule,
-  NzSpinModule
+  NzSpinComponent,
+  NzSelectModule,
+  NzEmptyModule
 ];

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ZORRO_MODULES } from '@hdu/shared';
-import { ClientManagementService } from '../services/client-management.service';
+import { ClientManagementService } from '../../services/client-management.service';
 import { debounceTime, Subject, Subscription, switchMap, throwError } from 'rxjs';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
 

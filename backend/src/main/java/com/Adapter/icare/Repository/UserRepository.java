@@ -21,15 +21,18 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // Methods to find all users (no soft delete filtering needed)
     @Query(value = "SELECT * FROM users u", nativeQuery = true)
     List<User> findAllActiveUsers();
-    
+
     @Query(value = "SELECT * FROM users u " +
-            "WHERE (:search IS NULL OR first_name LIKE CONCAT('%', :search, '%'))" +
-            "AND (:search IS NULL OR middle_name LIKE CONCAT('%', :search, '%'))" +
-            "AND (:search IS NULL OR surname LIKE CONCAT('%', :search, '%'))",
-           countQuery =  "SELECT COUNT(*) FROM users u " +
-                   "WHERE (:search IS NULL OR first_name LIKE CONCAT('%', :search, '%'))" +
-                   "AND (:search IS NULL OR middle_name LIKE CONCAT('%', :search, '%'))" +
-                   "AND (:search IS NULL OR surname LIKE CONCAT('%', :search, '%'))",
-           nativeQuery = true)
+            "WHERE :search IS NULL OR (" +
+            "first_name LIKE CONCAT('%', :search, '%') " +
+            "OR middle_name LIKE CONCAT('%', :search, '%') " +
+            "OR surname LIKE CONCAT('%', :search, '%'))",
+
+            countQuery = "SELECT COUNT(*) FROM users u " +
+                    "WHERE :search IS NULL OR (" +
+                    "first_name LIKE CONCAT('%', :search, '%') " +
+                    "OR middle_name LIKE CONCAT('%', :search, '%') " +
+                    "OR surname LIKE CONCAT('%', :search, '%'))",
+            nativeQuery = true)
     Page<User> findAllActiveUsers(Pageable pageable, @Param("search") String search);
 }

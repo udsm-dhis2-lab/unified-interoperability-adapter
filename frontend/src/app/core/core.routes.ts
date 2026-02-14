@@ -4,14 +4,14 @@ import { Login } from "./components/login/login";
 import { MainPage } from "./components/main-page/main-page";
 
 export const coreRoutes: Routes = [
-    { 
+    {
         path: '',
         component: MainPage,
         children: [
             {
                 path: 'dashboards',
                 loadChildren: () =>
-                import('../modules/dashboard/dashboard.routes').then((m) => m.dashboardRoutes),
+                    import('../modules/dashboard/dashboard.routes').then((m) => m.dashboardRoutes),
                 canActivate: [authGuard],
             },
             {
@@ -22,51 +22,51 @@ export const coreRoutes: Routes = [
             {
                 path: 'shared-health-records',
                 loadChildren: () =>
-                import('../modules/shared-health-record/shared-health-record.routes').then(
-                    (m) => m.sharedHealthRecordRoutes,
-                ),
+                    import('../modules/shared-health-record/shared-health-record.routes').then(
+                        (m) => m.sharedHealthRecordRoutes,
+                    ),
                 canActivate: [authGuard],
             },
-            {
-                path: 'appointments',
-                loadChildren: () =>
-                import('../modules/appointment/appointment.routes').then((m) => m.appointmentRoutes),
-                canActivate: [authGuard],
-            },
+            // {
+            //     path: 'appointments',
+            //     loadChildren: () =>
+            //     import('../modules/appointment/appointment.routes').then((m) => m.appointmentRoutes),
+            //     canActivate: [authGuard],
+            // },
             {
                 path: 'access-control',
                 loadChildren: () =>
-                import('../modules/access-control/access-control.routes').then((m) => m.accessControlRoutes),
+                    import('../modules/access-control/access-control.routes').then((m) => m.accessControlRoutes),
                 canActivate: [authGuard],
             },
             {
                 path: 'facility-management',
                 loadChildren: () =>
-                import('../modules/facility-management/facility-management.routes').then(
-                    (m) => m.facilityManagementRoutes,
-                ),
+                    import('../modules/facility-management/facility-management.routes').then(
+                        (m) => m.facilityManagementRoutes,
+                    ),
                 canActivate: [authGuard],
             },
             {
                 path: 'system-connections',
                 loadChildren: () =>
-                import('../modules/system-connection/system-connection.routes').then(
-                    (m) => m.systemConnectionRoutes,
-                ),
+                    import('../modules/system-connection/system-connection.routes').then(
+                        (m) => m.systemConnectionRoutes,
+                    ),
                 canActivate: [authGuard],
             },
             {
                 path: 'terminology-services',
                 loadChildren: () =>
-                import('../modules/terminology-service/terminology-service.routes').then(
-                    (m) => m.terminologyServiceRoutes,
-                ),
+                    import('../modules/terminology-service/terminology-service.routes').then(
+                        (m) => m.terminologyServiceRoutes,
+                    ),
                 canActivate: [authGuard],
             },
             {
                 path: 'validations',
                 loadChildren: () =>
-                import('../modules/validation/validation.routes').then((m) => m.validationRoutes),
+                    import('../modules/validation/validation.routes').then((m) => m.validationRoutes),
                 canActivate: [authGuard],
             },
             {
@@ -77,7 +77,7 @@ export const coreRoutes: Routes = [
             {
                 path: 'user-account',
                 loadChildren: () =>
-                import('../modules/user-account/user-account.routes').then((m) => m.userAccountRoutes),
+                    import('../modules/user-account/user-account.routes').then((m) => m.userAccountRoutes),
                 canActivate: [authGuard],
             },
         ]
@@ -86,5 +86,5 @@ export const coreRoutes: Routes = [
         path: 'login',
         component: Login,
     },
-    
+
 ]

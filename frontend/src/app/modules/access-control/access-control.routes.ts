@@ -9,8 +9,9 @@ export const accessControlRoutes = [
   },
   {
     path: 'users/:userId/edit',
-    loadComponent: () => import('./pages/user-edit/user-edit').then((m) => m.UserEdit),
+    loadComponent: () => import('./pages/user-create/user-create').then((m) => m.UserCreate),
   },
+  
   {
     path: 'user-roles',
     loadComponent: () =>

@@ -68,6 +68,7 @@ public class UserService implements UserDetailsService {
     public Page<User> getUsersWithSearch(int page, int size, String search, String sortBy, String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
+        System.out.println("SEARCH: " + search);
         return userRepository.findAllActiveUsers(pageable, search);
     }
 

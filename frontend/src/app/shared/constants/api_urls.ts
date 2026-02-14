@@ -4,4 +4,5 @@ export const API_URLS = {
     GET_USER: '/api/v1/me',
     LOGOUT: '/api/v1/logout',
     GET_CLIENTS: '/api/v1/hduApi/cr/clients',
+    FACILITTIES: '/api/v1/facilities',
 }

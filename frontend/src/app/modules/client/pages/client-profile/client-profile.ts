@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ZORRO_MODULES } from '@hdu/shared';
 import { format } from 'date-fns';
-import { ClientManagementService } from '../services/client-management.service';
+import { ClientManagementService } from '../../services/client-management.service';
 import { throwError } from 'rxjs';
 
 @Component({
