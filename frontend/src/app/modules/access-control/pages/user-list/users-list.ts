@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ZORRO_MODULES } from '@hdu/shared';
 import { UsersService } from '../../services/users.service';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
-import { debounceTime, Observable, Subject, switchMap } from 'rxjs';
+import { debounceTime, Observable, Subject, switchMap, tap } from 'rxjs';
 
 interface User {
   uuid: string;
@@ -41,7 +41,6 @@ export class UsersList implements OnDestroy{
   pageSize = signal(10);
   pageIndex = signal(0);
   filterKey = [{}];
-  isFirstLoad = true;
 
   searchText = '';
   roleFilter = 'all';
@@ -56,23 +55,10 @@ export class UsersList implements OnDestroy{
 
     this.searchSubject.pipe(
       debounceTime(500),
-      switchMap(() => {
-        this.loadingUsers.set(true);
-        return this.usersService.getUsers(undefined,{
-          page: this.pageIndex(),
-          pageSize: this.pageSize(),
-          search: this.searchText
-        });
+      tap(() => {
+        this.getUsers();
       })
-    ).subscribe({
-      next: (response: any) => {
-        this.users = response?.users;
-        this.loadingUsers.set(false);
-      },
-      error: () => {
-        this.loadingUsers.set(false)
-      }
-    })
+    ).subscribe();
   }
 
   getUsers(){
@@ -92,10 +78,6 @@ export class UsersList implements OnDestroy{
   }
 
   onQueryParamsChange(params: NzTableQueryParams): void {
-    if (this.isFirstLoad) {
-      this.isFirstLoad = false;
-      return;
-    }
     const { pageSize, pageIndex } = params;
     this.pageIndex.set(pageIndex);
     this.pageSize.set(pageSize);

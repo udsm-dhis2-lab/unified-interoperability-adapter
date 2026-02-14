@@ -20,68 +20,54 @@
     <nz-col nzSpan="6">
       <nz-card>
         <ng-template #rolePrefix><span nz-icon nzType="team"></span></ng-template>
-        <nz-statistic nzTitle="Total Roles" [nzValue]="stats.total" [nzPrefix]="rolePrefix"></nz-statistic>
-      </nz-card>
-    </nz-col>
-    <nz-col nzSpan="6">
-      <nz-card>
-        <nz-statistic nzTitle="Active Roles" [nzValue]="stats.active" [nzValueStyle]="{ color: '#52c41a' }"></nz-statistic>
-      </nz-card>
-    </nz-col>
-    <nz-col nzSpan="6">
-      <nz-card>
-        <nz-statistic nzTitle="Inactive Roles" [nzValue]="stats.inactive" [nzValueStyle]="{ color: '#8c8c8c' }"></nz-statistic>
-      </nz-card>
-    </nz-col>
-    <nz-col nzSpan="6">
-      <nz-card>
-        <nz-statistic nzTitle="Total Users" [nzValue]="stats.totalUsers" [nzValueStyle]="{ color: '#1e3a8a' }"></nz-statistic>
+        <nz-statistic nzTitle="Total Roles" [nzValue]="roles.length" [nzPrefix]="rolePrefix"></nz-statistic>
       </nz-card>
     </nz-col>
   </nz-row>
 
   <nz-card class="filters">
     <nz-space nzSize="middle">
+      <nz-input-wrapper nzPrefixIcon="search">
+        <input nz-input placeholder="Search users..." (input)="onSearchRole($event)" style="width: 300px" />
+      </nz-input-wrapper>
+    </nz-space>
+    <!-- <nz-space nzSize="middle">
       <nz-input-group nzPrefixIcon="search">
         <input nz-input placeholder="Search roles..." [(ngModel)]="searchText" style="width: 300px" />
       </nz-input-group>
       <button nz-button [nzType]="statusFilter === 'all' ? 'default' : 'primary'" (click)="statusFilter = 'all'">All</button>
       <button nz-button [nzType]="statusFilter === 'active' ? 'primary' : 'default'" (click)="statusFilter = 'active'">Active</button>
       <button nz-button [nzType]="statusFilter === 'inactive' ? 'primary' : 'default'" (click)="statusFilter = 'inactive'">Inactive</button>
-    </nz-space>
+    </nz-space> -->
   </nz-card>
 
   <nz-card>
-    <nz-table [nzData]="filteredRoles" [nzPageSize]="10" [nzShowSizeChanger]="true">
+    <nz-table [nzData]="roles" [nzTotal]="total()" [nzPageSize]="pageSize()" [nzPageIndex]="pageIndex()"
+  (nzQueryParams)="onQueryParamsChange($event)" [nzShowSizeChanger]="true" [nzLoading]="loadingRoles()">
       <thead>
         <tr>
           <th>Role Name</th>
           <th>Description</th>
-          <th>Users</th>
-          <th>Authorities</th>
-          <th>Status</th>
-          <th>Last Modified</th>
+          <th>Privileges</th>
           <th>Action</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let role of filteredRoles">
-          <td>
-            <div><strong class="role">{{ role.roleName }}</strong></div>
-            <div class="muted">{{ role.roleId }}</div>
-          </td>
-          <td>{{ role.description }}</td>
-          <td><nz-badge [nzCount]="role.userCount" class="badge"></nz-badge></td>
-          <td><nz-tag nzColor="blue">{{ role.authorities.length }} permissions</nz-tag></td>
-          <td><nz-badge [nzStatus]="role.status === 'active' ? 'success' : 'default'" [nzText]="role.status.toUpperCase()"></nz-badge></td>
-          <td>{{ role.modifiedDate }}</td>
-          <td>
-            <button nz-button nzType="link" (click)="editRole(role.id)">
-              <span nz-icon nzType="edit"></span>
-              Edit
-            </button>
-          </td>
-        </tr>
+        @for(role of roles; track role.uuid){
+          <tr>
+            <td>
+              <div><strong class="role">{{ role.roleName }}</strong></div>
+            </td>
+            <td>{{ role.description }}</td>
+            <td><nz-tag nzColor="blue">{{ role.privileges.length }} permissions</nz-tag></td>
+            <td>
+              <button nz-button nzType="link" (click)="editRole(role.uuid)">
+                <span nz-icon nzType="edit"></span>
+                Edit
+              </button>
+            </td>
+          </tr>
+        }
       </tbody>
     </nz-table>
   </nz-card>
