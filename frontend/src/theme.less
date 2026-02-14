@@ -1,4 +1,3 @@
-
 // Custom Theming for NG-ZORRO
 // For more information: https://ng.ant.design/docs/customize-theme/en
 @import "../node_modules/ng-zorro-antd/ng-zorro-antd.less";
@@ -7,14 +6,14 @@
 // View all variables: https://github.com/NG-ZORRO/ng-zorro-antd/blob/master/components/style/themes/default.less
 
 
-@primary-color: #243E8D;   
-@info-color: #326CD6;        
+@primary-color: #008080;
+@info-color: #326CD6;
 @success-color: #16A34A;
 @warning-color: #F97316;
 @error-color: #E11D48;
 
 
-@body-background: #F4F4F4;   
+@body-background: #F4F4F4;
 @component-background: #FFFFFF;
 
 
@@ -43,14 +42,15 @@
 }
 
 .ant-btn-primary {
-  background: #243E8D;
-  border-color: #243E8D;
-  box-shadow: 0 6px 14px rgba(36, 62, 141, .22);
+  background: #008080;
+  border-color: #008080;
+  box-shadow: 0 6px 14px rgba(0, 128, 128, .22);
 }
+
 .ant-btn-primary:hover,
 .ant-btn-primary:focus {
-  background: #2B4AA7;
-  border-color: #2B4AA7;
+  background: #009999;
+  border-color: #009999;
 }
 
 /* Inputs / Selects */
@@ -62,18 +62,21 @@
   border-color: #E3EAF5 !important;
   background: #fff;
 }
+
 .ant-input:hover,
 .ant-input-affix-wrapper:hover,
 .ant-picker:hover,
 .ant-select:not(.ant-select-customize-input) .ant-select-selector:hover {
   border-color: #9DB3F5 !important;
 }
+
 .ant-input:focus,
 .ant-input-affix-wrapper-focused,
 .ant-picker-focused,
 .ant-select-focused .ant-select-selector {
-  border-color: #326CD6 !important;
-  box-shadow: 0 0 0 3px rgba(50, 108, 214, .15) !important; /* focus ring */
+  border-color: #008080 !important;
+  box-shadow: 0 0 0 3px rgba(0, 128, 128, .15) !important;
+  /* focus ring */
 }
 
 /* Cards / panels feel */
@@ -87,30 +90,48 @@
 .ant-table {
   border-radius: 12px;
 }
-.ant-table-thead > tr > th {
+
+.ant-table-thead>tr>th {
   background: #F8FAFF;
   color: #334155;
   font-weight: 600;
 }
 
-/* “Pill” status tags like CONFIRMED / SCHEDULED */
+/* "Pill" status tags like CONFIRMED / SCHEDULED */
 .ant-tag {
   border: 0;
   border-radius: 999px;
   padding: 2px 10px;
   font-weight: 700;
 }
-.ant-tag-success { background: #E8F7EE; color: #15803D; }
-.ant-tag-processing { background: #EAF2FF; color: #1D4ED8; }
-.ant-tag-warning { background: #FFF7ED; color: #C2410C; }
-.ant-tag-error { background: #FFF1F2; color: #BE123C; }
+
+.ant-tag-success {
+  background: #E8F7EE;
+  color: #15803D;
+}
+
+.ant-tag-processing {
+  background: #EAF2FF;
+  color: #1D4ED8;
+}
+
+.ant-tag-warning {
+  background: #FFF7ED;
+  color: #C2410C;
+}
+
+.ant-tag-error {
+  background: #FFF1F2;
+  color: #BE123C;
+}
 
 /* Menu (left sidebar selected item highlight) */
 .ant-menu {
   background: #fff;
 }
+
 .ant-menu-item-selected {
-  background: #EAF2FF !important;
-  color: #1D4ED8 !important;
+  background: #E6F5F5 !important;
+  color: #008080 !important;
   border-radius: 10px;
 }

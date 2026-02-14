@@ -90,3 +90,15 @@ body {
         font-family: 'Poppins', sans-serif;
     }
 }
+
+
+.ant-modal-confirm .ant-modal-confirm-btns {
+    display: flex !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 16px !important;
+}
+
+.ant-modal-confirm .ant-modal-confirm-btns button {
+    flex: 0 0 auto !important;
+}

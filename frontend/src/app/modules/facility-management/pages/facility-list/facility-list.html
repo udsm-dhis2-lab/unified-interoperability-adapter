@@ -10,11 +10,13 @@
 
     <div class="search">
       <nz-input-wrapper nzPrefixIcon="search" style="max-width: 400px">
-        <input nz-input placeholder="Search by name or code..." [(ngModel)]="searchText" />
+        <input nz-input placeholder="Search by name or code..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" />
       </nz-input-wrapper>
     </div>
 
-    <nz-table [nzData]="filteredFacilities" [nzPageSize]="10" [nzShowSizeChanger]="true">
+    <nz-table [nzData]="facilities()" [nzLoading]="loading()" [nzPageSize]="pageSize" [nzPageIndex]="pageIndex"
+      [nzTotal]="total" [nzFrontPagination]="false" [nzShowSizeChanger]="true" [nzPageSizeOptions]="[10, 20, 50, 100]"
+      (nzPageIndexChange)="onPageIndexChange($event)" (nzPageSizeChange)="onPageSizeChange($event)">
       <thead>
         <tr>
           <th>#</th>
@@ -27,7 +29,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let facility of filteredFacilities; index as idx">
+        <tr *ngFor="let facility of facilities(); index as idx">
           <td>{{ idx + 1 }}</td>
           <td>{{ facility.code }}</td>
           <td>{{ facility.name }}</td>
@@ -35,17 +37,14 @@
             <nz-tag nzColor="green">Allowed</nz-tag>
           </td>
           <td>
-            <button nz-button nzType="link" class="link" *ngIf="facility.referralConfigured">
+            <button nz-button nzType="link" class="link" *ngIf="facility.mediatorConfigured">
               <span nz-icon nzType="check-circle"></span>
               Configured
             </button>
-            <span *ngIf="!facility.referralConfigured" class="muted">Not Configured</span>
+            <span *ngIf="!facility.mediatorConfigured" class="muted">Not Configured</span>
           </td>
           <td>
-            <nz-switch
-              [ngModel]="facility.accessControl"
-              (ngModelChange)="handleAccessControlChange(facility, $event)"
-            ></nz-switch>
+            <nz-switch [ngModel]="facility.allowed" (ngModelChange)="onSwitchToggle($event, facility)"></nz-switch>
           </td>
           <td>
             <div nz-dropdown nzTrigger="click">
@@ -55,15 +54,15 @@
               </button>
               <nz-dropdown-menu #menu="nzDropdownMenu">
                 <ul nz-menu>
-                  <li nz-menu-item (click)="viewFacility(facility)">
+                  <li nz-menu-item (click)="viewDetails(facility)">
                     <span nz-icon nzType="eye"></span>
                     View Details
                   </li>
-                  <li nz-menu-item (click)="configureReferral(facility)">
+                  <li nz-menu-item (click)="configureMediator(facility)">
                     <span nz-icon nzType="edit"></span>
                     Edit Referral
                   </li>
-                  <li nz-menu-item nzDanger (click)="openDeleteModal(facility)">
+                  <li nz-menu-item nzDanger (click)="deleteFacility(facility)">
                     <span nz-icon nzType="delete"></span>
                     Delete Facility
                   </li>
@@ -76,20 +75,13 @@
     </nz-table>
   </nz-card>
 
-  <nz-modal
-    nzTitle="Delete Facility"
-    [(nzVisible)]="deleteModalVisible"
-    (nzOnOk)="confirmDelete()"
-    (nzOnCancel)="closeDeleteModal()"
-    nzOkText="Delete"
-    [nzOkDanger]="true"
-  >
+  <!-- <nz-modal nzTitle="Delete Facility" [(nzVisible)]="deleteModalVisible" (nzOnOk)="confirmDelete()"
+    (nzOnCancel)="closeDeleteModal()" nzOkText="Delete" [nzOkDanger]="true">
     <ng-container *nzModalContent>
       <p>
-        Are you sure you want to delete facility <strong>{{ selectedFacility?.name }}</strong
-        >?
+        Are you sure you want to delete facility <strong>{{ selectedFacility?.name }}</strong>?
       </p>
       <p class="danger">This action cannot be undone.</p>
     </ng-container>
-  </nz-modal>
+  </nz-modal> -->
 </div>
