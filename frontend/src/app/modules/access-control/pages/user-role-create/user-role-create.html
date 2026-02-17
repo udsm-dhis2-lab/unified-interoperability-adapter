@@ -21,7 +21,7 @@
     class="alert"
   ></nz-alert>
 
-  <form nz-form [formGroup]="form" nzLayout="vertical">
+  <form nz-form nzLayout="vertical">
     <nz-row nzGutter="16">
       <nz-col nzSpan="16">
         <nz-card nzTitle="Basic Information" class="card">
@@ -37,7 +37,7 @@
               <textarea nz-input rows="3" formControlName="description" placeholder="Enter a detailed description of this role and its responsibilities"></textarea>
             </nz-form-control>
           </nz-form-item>
-          <nz-form-item>
+          <!-- <nz-form-item>
             <nz-form-label>Role Category</nz-form-label>
             <nz-form-control>
               <nz-select formControlName="category" nzPlaceHolder="Select category (optional)">
@@ -47,14 +47,14 @@
                 <nz-option nzValue="Management" nzLabel="Management"></nz-option>
               </nz-select>
             </nz-form-control>
-          </nz-form-item>
-          <nz-form-item>
+          </nz-form-item> -->
+          <!-- <nz-form-item>
             <nz-form-label>Status</nz-form-label>
             <nz-form-control>
               <nz-switch formControlName="status" nzCheckedChildren="Active" nzUnCheckedChildren="Inactive"></nz-switch>
             </nz-form-control>
-          </nz-form-item>
-        </nz-card>
+          </nz-form-item> -->
+        </nz-card> 
 
         <nz-card nzTitle="Permissions & Authorities" class="card">
           <nz-alert
@@ -67,7 +67,7 @@
           <p nz-typography nzType="secondary">Select the permissions that users with this role should have. Permissions are grouped by category.</p>
           <nz-form-item>
             <nz-checkbox-group formControlName="authorities">
-              <div *ngFor="let group of allAuthorities" class="group">
+              <div *ngFor="let group of privileges" class="group">
                 <nz-divider nzOrientation="left">
                   <span class="group-title">
                     <span nz-icon nzType="team"></span>
@@ -79,7 +79,7 @@
                     <label nz-checkbox [nzValue]="permission.code">
                       <nz-space>
                         <strong>{{ permission.name }}</strong>
-                        <nz-tag [nzColor]="riskColor(permission.risk)">{{ permission.risk }}</nz-tag>
+                        <nz-tag>{{ permission.risk }}</nz-tag>
                       </nz-space>
                       <div class="muted">{{ permission.description }}</div>
                     </label>

@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -282,6 +283,35 @@ public class UserService implements UserDetailsService {
         UUID uuid = UUID.randomUUID();
         role.setUuid(uuid.toString());
         return roleRepository.save(role);
+    }
+
+    public Role saveOrUpdateRole(Role incomingRole) {
+
+        Role roleToSave;
+
+        Optional<Role> existingRoleOpt = roleRepository.findById(incomingRole.getRoleName());
+        if (existingRoleOpt.isPresent()) {
+            roleToSave = existingRoleOpt.get();
+            roleToSave.setDescription(incomingRole.getDescription());
+            roleToSave.setSharing(incomingRole.getSharing());
+        } else {
+            roleToSave = incomingRole;
+        }
+
+        if (incomingRole.getPrivileges() != null && !incomingRole.getPrivileges().isEmpty()) {
+
+            Set<String> privilegeNames = incomingRole.getPrivileges().stream()
+                    .map(Privilege::getPrivilegeName)
+                    .collect(Collectors.toSet());
+
+            List<Privilege> realPrivileges = privilegeRepository.findAllById(privilegeNames);
+
+            roleToSave.setPrivileges(new HashSet<>(realPrivileges));
+        } else {
+            roleToSave.setPrivileges(new HashSet<>());
+        }
+
+        return roleRepository.save(roleToSave);
     }
 
     public List<Role> getRoles() {

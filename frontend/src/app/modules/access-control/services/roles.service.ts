@@ -31,4 +31,8 @@ export class RolesService {
 
     return this.http.get("/api/v1/users/roles", { params: parameters })
   }
+
+  getPrivileges(){
+    return this.http.get("/api/v1/users/privileges")
+  }
 }
