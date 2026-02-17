@@ -12,7 +12,7 @@ export const facilityManagementRoutes = [
     path: 'register',
     loadComponent: () =>
       import('./pages/facility-registration/facility-registration').then(
-        (m) => m.FacilityRegistration,
+        (m) => m.FacilityFormComponent,
       ),
   },
   {
