@@ -147,7 +147,6 @@
 
       @if (configureMediatorEnabled) {
         <div>
-          <h5 nz-typography nzTitle>{{ isMediatorOnlyMode ? 'Referral Configuration' : '' }}</h5>
           <div nz-row [nzGutter]="16">
             <div nz-col [nzSpan]="12">
               <nz-form-item>
@@ -209,7 +208,7 @@
         <nz-form-control>
           <div class="actions">
             <nz-space>
-              <button nz-button nzType="primary" [nzLoading]="loading" type="submit">
+              <button nz-button nzType="primary" [nzLoading]="isSubmitting" type="submit">
                 <span nz-icon nzType="save"></span>
                 {{
                   isMediatorOnlyMode

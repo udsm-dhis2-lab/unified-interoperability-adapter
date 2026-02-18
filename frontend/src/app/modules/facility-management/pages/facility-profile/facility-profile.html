@@ -1,40 +1,44 @@
-<div *ngIf="facility; else notFound">
+<div *ngIf="loading()" style="text-align: center; padding: 100px">
+  <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
+</div>
+
+<div *ngIf="!loading() && facilityData; else notFound">
   <div class="page-header">
-    <h3 nz-typography nzTitle>Facility Details</h3>
+    <h3 nz-typography nzTitle>facilityData Details</h3>
     <nz-space>
       <button nz-button (click)="backToList()">
         <span nz-icon nzType="arrow-left"></span>
         Back to List
       </button>
-      <button nz-button nzType="primary" (click)="editReferral()">
+      <button nz-button nzType="primary" (click)="configureMediator()">
         <span nz-icon nzType="edit"></span>
         Edit Referral
       </button>
     </nz-space>
   </div>
 
-  <nz-card nzTitle="Facility Information" class="card">
+  <nz-card nzTitle="facilityData Information" class="card">
     <nz-descriptions nzBordered [nzColumn]="2" nzSize="small">
-      <nz-descriptions-item nzTitle="Facility Code">
-        <strong>{{ facility.code }}</strong>
+      <nz-descriptions-item nzTitle="facilityData Code">
+        <strong>{{ facilityData.code }}</strong>
       </nz-descriptions-item>
-      <nz-descriptions-item nzTitle="Facility Name">
-        <strong>{{ facility.name }}</strong>
+      <nz-descriptions-item nzTitle="facilityData Name">
+        <strong>{{ facilityData.name }}</strong>
       </nz-descriptions-item>
       <nz-descriptions-item nzTitle="Access Status">
-        <nz-tag nzColor="green">{{ facility.accessStatus }}</nz-tag>
+        <nz-tag nzColor="green">{{ facilityData.allowed }}</nz-tag>
       </nz-descriptions-item>
       <nz-descriptions-item nzTitle="Referral Configured">
-        <nz-tag *ngIf="facility.referralConfigured" nzColor="blue">
+        <nz-tag *ngIf="facilityData.mediatorConfigured" nzColor="blue">
           <span nz-icon nzType="edit"></span>
           Yes
         </nz-tag>
-        <span *ngIf="!facility.referralConfigured" class="muted">No</span>
+        <span *ngIf="!facilityData.mediatorConfigured" class="muted">No</span>
       </nz-descriptions-item>
-      <nz-descriptions-item nzTitle="Created At">{{ facility.createdAt }}</nz-descriptions-item>
-      <nz-descriptions-item nzTitle="Updated At">{{ facility.updatedAt }}</nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Created At"> {{ facilityData.created }} </nz-descriptions-item>
+      <nz-descriptions-item nzTitle="Updated At">{{ facilityData.updated }}</nz-descriptions-item>
       <nz-descriptions-item nzTitle="Additional Parameters" [nzSpan]="2">
-        <span *ngIf="facility.additionalParameters; else noParams">{{ facility.additionalParameters }}</span>
+        {{ facilityData.params }}
       </nz-descriptions-item>
     </nz-descriptions>
     <ng-template #noParams>
@@ -42,28 +46,24 @@
     </ng-template>
   </nz-card>
 
-  <nz-card *ngIf="facility.referralConfig" nzTitle="Referral Configuration">
+  <nz-card *ngIf="facilityData.mediatorConfigured" nzTitle="Referral Configuration">
     <nz-descriptions nzBordered [nzColumn]="2" nzSize="small">
       <nz-descriptions-item nzTitle="Category" [nzSpan]="2">
-        <nz-tag nzColor="purple">{{ facility.referralConfig.category }}</nz-tag>
+        <nz-tag nzColor="purple">{{ facilityData.mediatorCategory || 'REFERRAL' }}</nz-tag>
       </nz-descriptions-item>
       <nz-descriptions-item nzTitle="Base URL" [nzSpan]="2">
-        <span class="code">{{ facility.referralConfig.baseUrl }}</span>
+        <span class="code">{{ facilityData.mediatorBaseUrl }}</span>
       </nz-descriptions-item>
       <nz-descriptions-item nzTitle="Path">
-        <span class="code">{{ facility.referralConfig.path }}</span>
+        <span class="code">{{ facilityData.mediatorPath }}</span>
       </nz-descriptions-item>
       <nz-descriptions-item nzTitle="Auth Type">
-        <nz-tag nzColor="cyan">{{ facility.referralConfig.authType }}</nz-tag>
+        <nz-tag nzColor="cyan">{{ facilityData.mediatorAuthType }}</nz-tag>
       </nz-descriptions-item>
     </nz-descriptions>
   </nz-card>
 </div>
 
 <ng-template #notFound>
-  <nz-card>
-    <span>Facility not found</span>
-    <br />
-    <button nz-button (click)="backToList()">Back to List</button>
-  </nz-card>
+  <nz-empty> </nz-empty>
 </ng-template>

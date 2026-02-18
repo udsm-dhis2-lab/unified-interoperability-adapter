@@ -35,6 +35,7 @@ export class FacilityFormComponent implements OnInit {
   totalPages = 1;
   pageSize = 10;
   isSyncing = false;
+  isSubmitting = false;
 
   filters = { name: '', code: '', page: 1 };
   private searchSubject$ = new BehaviorSubject(this.filters);
@@ -254,16 +255,17 @@ export class FacilityFormComponent implements OnInit {
       };
     }
 
-    this.loading = true;
+    this.isSubmitting = true;
     this.facilityService.registerFacility(registration).subscribe({
       next: () => {
+        this.isSubmitting = false;
         this.message.success('Facility registered successfully');
         this.router.navigate(['../'], { relativeTo: this.route });
       },
       error: (error) => {
         this.message.error('Failed to register facility');
         console.error('Registration error:', error);
-        this.loading = false;
+        this.isSubmitting = false;
       },
     });
   }
