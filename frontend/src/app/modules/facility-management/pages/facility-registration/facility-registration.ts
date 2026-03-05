@@ -1,72 +1,302 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import {
+  FormsModule,
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
+import { FacilityManagementService } from '../../services/facility-management.service';
+import { FacilityRegistration } from '../../models/facility.models';
+import { BehaviorSubject, catchError, debounceTime, of, switchMap, tap } from 'rxjs';
 import { ZORRO_MODULES } from '@hdu/shared';
 
 @Component({
-  selector: 'app-facility-registration',
+  selector: 'app-facility-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ...ZORRO_MODULES],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, ...ZORRO_MODULES],
   templateUrl: './facility-registration.html',
   styleUrls: ['./facility-registration.scss'],
 })
-export class FacilityRegistration {
-  private readonly fb: FormBuilder = inject(FormBuilder);
-  private readonly router: Router = inject(Router);
-  private readonly message: NzMessageService = inject(NzMessageService);
+export class FacilityFormComponent implements OnInit {
+  facilityForm!: FormGroup;
   loading = false;
-  syncLoading = false;
+  isEditMode = false;
+  isMediatorOnlyMode = false;
+  facilityId?: string;
+  configureMediatorEnabled = false;
 
-  form = this.fb.group({
-    hfrSearch: [''],
-    facilityCode: ['', [Validators.required]],
-    facilityName: ['', [Validators.required]],
-    additionalParameters: [''],
-    allowAccess: [true],
-    category: [''],
-    authType: [''],
-    baseUrl: [''],
-    path: [''],
-  });
+  hfrFacilityList: any[] = [];
+  selectedHfrFacility: any;
+  isLoading = signal(false);
+  totalPages = 1;
+  pageSize = 10;
+  isSyncing = false;
+  isSubmitting = false;
 
-  constructor() {}
+  filters = { name: '', code: '', page: 1 };
+  private searchSubject$ = new BehaviorSubject(this.filters);
 
-  syncFacility(): void {
-    const searchValue = this.form.get('hfrSearch')?.value;
-    if (!searchValue) {
-      this.message.warning('Please enter facility name or code to sync');
-      return;
+  constructor(
+    private fb: FormBuilder,
+    private facilityService: FacilityManagementService,
+    private message: NzMessageService,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
+
+  ngOnInit(): void {
+    this.initializeForm();
+
+    this.isMediatorOnlyMode = this.route.snapshot.url.some(
+      (segment) => segment.path === 'mediator',
+    );
+
+    if (this.isMediatorOnlyMode) {
+      this.configureMediatorEnabled = true;
     }
 
-    this.syncLoading = true;
-    setTimeout(() => {
-      this.message.success('Facility synced from HFR Registry');
-      this.form.patchValue({
-        facilityCode: '115842-9',
-        facilityName: 'DODOMA REGIONAL REFERRAL HOSPITAL',
+    this.facilityId = this.route.snapshot.paramMap.get('id') || undefined;
+    if (this.facilityId) {
+      this.isEditMode = true;
+      this.loadFacility();
+    }
+
+    this.searchSubject$
+      .pipe(
+        debounceTime(400),
+        tap(() => this.isLoading.set(true)),
+        switchMap((filters) =>
+          this.facilityService.getHfrFacilities(filters.name, filters.code, this.filters.page).pipe(
+            catchError((err) => {
+              console.error('Search failed', err);
+              return of({ items: [] });
+            }),
+          ),
+        ),
+      )
+      .subscribe((res: any) => {
+        const newItems = res.results || [];
+
+        if (this.filters.page === 1) {
+          this.hfrFacilityList = newItems;
+        } else {
+          this.hfrFacilityList = [...this.hfrFacilityList, ...newItems];
+        }
+        this.totalPages = res?.pager?.totalPages;
+        this.isLoading.set(false);
       });
-      this.syncLoading = false;
-    }, 1500);
   }
 
-  submit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
+  triggerSearch() {
+    this.filters.page = 1;
+    this.searchSubject$.next({ ...this.filters });
+  }
+
+  onSearch(val: string) {
+    this.filters.name = val;
+    this.triggerSearch();
+  }
+
+  loadMore() {
+    if (!this.isLoading && this.totalPages > this.filters.page) {
+      this.filters.page++;
+      this.searchSubject$.next({ ...this.filters });
+    }
+  }
+
+  syncFacilities() {
+    this.isSyncing = true;
+    this.facilityService.syncHfrFacilities().subscribe({
+      next: () => {
+        this.message.success('Facilities synced successfully');
+        this.triggerSearch();
+        this.isSyncing = false;
+      },
+      error: () => {
+        this.message.error('Sync failed');
+        this.isSyncing = false;
+      },
+    });
+  }
+
+  onSelectFacility(id: string) {
+    const selectedFacility = this.hfrFacilityList.find((f) => f.id === id);
+    if (selectedFacility) {
+      this.facilityForm.patchValue({
+        code: selectedFacility.code || selectedFacility.id,
+        name: selectedFacility.name,
+      });
+    }
+  }
+
+  initializeForm(): void {
+    this.facilityForm = this.fb.group({
+      allowed: [true],
+      params: [''],
+
+      configureMediatorNow: [false],
+      mediatorName: [''],
+      baseUrl: [''],
+      path: [''],
+      username: [''],
+      password: [''],
+    });
+
+    this.facilityForm.get('configureMediatorNow')?.valueChanges.subscribe((enabled) => {
+      this.configureMediatorEnabled = enabled;
+      this.updateMediatorValidators();
+    });
+  }
+
+  updateMediatorValidators(): void {
+    const mediatorName = this.facilityForm.get('mediatorName');
+    const baseUrl = this.facilityForm.get('baseUrl');
+    const path = this.facilityForm.get('path');
+    const username = this.facilityForm.get('username');
+    const password = this.facilityForm.get('password');
+
+    if (this.configureMediatorEnabled) {
+      mediatorName?.setValidators([Validators.required]);
+      baseUrl?.setValidators([Validators.required, Validators.pattern('https?://.+')]);
+      path?.setValidators([Validators.required]);
+      username?.setValidators([Validators.required]);
+      password?.setValidators([Validators.required]);
+    } else {
+      mediatorName?.clearValidators();
+      baseUrl?.clearValidators();
+      path?.clearValidators();
+      username?.clearValidators();
+      password?.clearValidators();
+    }
+
+    mediatorName?.updateValueAndValidity();
+    baseUrl?.updateValueAndValidity();
+    username?.updateValueAndValidity();
+    password?.updateValueAndValidity();
+  }
+
+  loadFacility(): void {
+    if (!this.facilityId) return;
+
+    this.loading = true;
+    this.facilityService.getFacilityById(this.facilityId).subscribe({
+      next: (response) => {
+        this.facilityForm.patchValue({
+          code: response.code,
+          name: response.name,
+          allowed: response.allowed,
+          params: response.params || '',
+        });
+
+        if (
+          response.mediatorConfigured &&
+          (this.isMediatorOnlyMode || this.configureMediatorEnabled)
+        ) {
+          this.facilityForm.patchValue({
+            mediatorName: response.name,
+            baseUrl: response.mediatorBaseUrl || '',
+            path: response.mediatorPath || '',
+          });
+        }
+
+        this.facilityForm.get('code')?.disable();
+
+        this.loading = false;
+      },
+      error: (error) => {
+        this.message.error('Failed to load facility details');
+        console.error('Load facility error:', error);
+        this.loading = false;
+        this.router.navigate(['../'], { relativeTo: this.route });
+      },
+    });
+  }
+
+  submitForm(): void {
+    if (!this.selectedHfrFacility) {
       return;
     }
 
+    if (this.facilityForm.invalid) {
+      Object.values(this.facilityForm.controls).forEach((control) => {
+        if (control.invalid) {
+          control.markAsDirty();
+          control.updateValueAndValidity({ onlySelf: true });
+        }
+      });
+      return;
+    }
+
+    if (this.isMediatorOnlyMode) {
+      this.configureMediatorOnly();
+      return;
+    }
+
+    const formValue = this.facilityForm.getRawValue();
+
+    const registration: FacilityRegistration = {
+      code: this.selectedHfrFacility?.Fac_IDNumber,
+      name: `${this.selectedHfrFacility?.Name} ${this.selectedHfrFacility?.FacilityType}`.toUpperCase(),
+      allowed: formValue.allowed,
+      params: formValue.params || null,
+    };
+
+    if (this.configureMediatorEnabled) {
+      registration.mediatorConfig = {
+        baseUrl: formValue.baseUrl,
+        path: formValue.path,
+        authType: 'BASIC',
+        authToken: btoa(`${formValue.username}:${formValue.password}`),
+        category: 'REFERRAL',
+      };
+    }
+
+    this.isSubmitting = true;
+    this.facilityService.registerFacility(registration).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.message.success('Facility registered successfully');
+        this.router.navigate(['../'], { relativeTo: this.route });
+      },
+      error: (error) => {
+        this.message.error('Failed to register facility');
+        console.error('Registration error:', error);
+        this.isSubmitting = false;
+      },
+    });
+  }
+
+  configureMediatorOnly(): void {
+    if (!this.facilityId) return;
+
+    const formValue = this.facilityForm.value;
+    const mediatorConfig = {
+      baseUrl: formValue.baseUrl,
+      path: formValue.path,
+      authType: 'BASIC',
+      authToken: btoa(`${formValue.username}:${formValue.password}`),
+      category: 'REFERRAL',
+    };
+
     this.loading = true;
-    setTimeout(() => {
-      this.message.success('Facility registered successfully');
-      this.loading = false;
-      this.router.navigate(['/facility-management']);
-    }, 1000);
+    this.facilityService.configureMediator(this.facilityId!, mediatorConfig).subscribe({
+      next: () => {
+        this.message.success('Referral configuration updated successfully');
+        this.router.navigate(['../../'], { relativeTo: this.route });
+      },
+      error: (error) => {
+        this.message.error('Failed to configure referral endpoint');
+        console.error('Configuration error:', error);
+        this.loading = false;
+      },
+    });
   }
 
   cancel(): void {
-    this.form.reset();
-    this.router.navigate(['/facility-management']);
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 }

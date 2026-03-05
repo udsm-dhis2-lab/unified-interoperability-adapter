@@ -3579,12 +3579,19 @@ public class SharedHealthRecordsService {
                                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details",
                                                         "motherAgeInYears"));
                                         // TODO: Add Mother HIV status
-                                        // birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueString(observation,
-                                        // "://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details",
-                                        // "motherHivStatus"));
+                                         birthDetailsDTO.setMotherHivStatus(getNestedExtensionValueBoolean(observation,
+                                         "http://fhir.moh.go.tz/fhir/StructureDefinition/maternal-details",
+                                         "motherHivStatus"));
 
                                         birthDetailsDTO.setMacerated(
                                                 getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-macerated")
+                                        );
+
+                                        birthDetailsDTO.setGender(
+                                                GENDER.fromString(
+                                                        getExtensionValueString(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-gender")
+
+                                                )
                                         );
 
                                         birthDetailsDTO.setFresh(getExtensionValueBoolean(observation, "http://fhir.moh.go.tz/fhir/StructureDefinition/ld-birthDetails-fresh"));

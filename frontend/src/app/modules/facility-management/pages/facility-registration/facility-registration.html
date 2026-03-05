@@ -1,113 +1,228 @@
 <div>
-  <div class="page-header">
-    <h3 nz-typography nzTitle>Register New Facility</h3>
-  </div>
-
   <nz-card>
-    <form nz-form [formGroup]="form" nzLayout="vertical" (ngSubmit)="submit()">
-      <h4 nz-typography nzTitle>Facility Information</h4>
+    <div class="page-header">
+      <h3 nz-typography nzTitle>
+        {{
+          isMediatorOnlyMode
+            ? 'Configure Referral Endpoint'
+            : isEditMode
+              ? 'Edit Facility'
+              : 'Register New Facility'
+        }}
+      </h3>
+    </div>
 
-      <nz-form-item>
-        <nz-form-label>Search HFR Registry</nz-form-label>
-        <nz-form-control nzExtra="Search facilities by Name or Code to auto-fill">
-          <nz-input-group nzCompact>
-            <input nz-input formControlName="hfrSearch" placeholder="Search facilities by Name or Code to auto-fill" />
-            <button nz-button nzType="primary" (click)="syncFacility()" [nzLoading]="syncLoading">
-              <span nz-icon nzType="sync"></span>
-              Sync Facilities
-            </button>
-          </nz-input-group>
-        </nz-form-control>
-      </nz-form-item>
+    <form nz-form [formGroup]="facilityForm" (ngSubmit)="submitForm()" [nzLayout]="'vertical'">
+      @if (!isMediatorOnlyMode) {
+        <h5 nz-typography nzTitle>Facility Information</h5>
 
-      <nz-row nzGutter="16">
-        <nz-col nzSpan="12">
+        <div>
           <nz-form-item>
-            <nz-form-label nzRequired>Facility Code</nz-form-label>
-            <nz-form-control nzErrorTip="Please enter facility code">
-              <input nz-input formControlName="facilityCode" placeholder="e.g., 111841-3" />
-            </nz-form-control>
-          </nz-form-item>
-        </nz-col>
-        <nz-col nzSpan="12">
-          <nz-form-item>
-            <nz-form-label nzRequired>Facility Name</nz-form-label>
-            <nz-form-control nzErrorTip="Please enter facility name">
-              <input nz-input formControlName="facilityName" placeholder="e.g., BENJAMIN MKAPA HOSPITAL" />
-            </nz-form-control>
-          </nz-form-item>
-        </nz-col>
-      </nz-row>
-
-      <nz-form-item>
-        <nz-form-label>Additional Parameters (JSON)</nz-form-label>
-        <nz-form-control nzExtra="Optional: Additional configuration parameters in JSON format">
-          <textarea nz-input rows="6" formControlName="additionalParameters" placeholder='{"key": "value"}'></textarea>
-        </nz-form-control>
-      </nz-form-item>
-
-      <nz-form-item>
-        <nz-form-control>
-          <label nz-checkbox formControlName="allowAccess">
-            <strong>Allow facility access</strong>
-            <div class="muted">If unchecked, this facility will be blocked from the system</div>
-          </label>
-        </nz-form-control>
-      </nz-form-item>
-
-      <nz-divider></nz-divider>
-
-      <h4 nz-typography nzTitle>Referral Configuration (Optional)</h4>
-
-      <nz-alert
-        nzType="info"
-        nzShowIcon
-        nzMessage="Configure referral endpoint now. You can configure this later if needed."
-        class="alert"
-      ></nz-alert>
-
-      <nz-row nzGutter="16">
-        <nz-col nzSpan="12">
-          <nz-form-item>
-            <nz-form-label>Category</nz-form-label>
+            <nz-form-label>Search HFR Registry</nz-form-label>
             <nz-form-control>
-              <input nz-input formControlName="category" placeholder="e.g., REFERRAL" />
+              <div style="display: flex; gap: 8px; align-items: flex-start">
+                <nz-select
+                  style="flex: 1"
+                  nzPlaceHolder="Search facilities by Name or Code to auto-fill"
+                  [(ngModel)]="selectedHfrFacility"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="onSelectFacility($event)"
+                  [nzDropdownRender]="renderTemplate"
+                  (nzScrollToBottom)="loadMore()"
+                  nzShowSearch
+                  [nzServerSearch]="true"
+                  [nzNotFoundContent]="'No records found'"
+                  (nzOnSearch)="onSearch($event)"
+                >
+                  @for (facility of hfrFacilityList; track facility?.Fac_IDNumber) {
+                    <nz-option
+                      [nzValue]="facility"
+                      [nzLabel]="
+                        facility?.Fac_IDNumber +
+                          ' - ' +
+                          facility?.Name +
+                          ' ' +
+                          facility?.FacilityType | uppercase
+                      "
+                    >
+                    </nz-option>
+                  }
+
+                  @if (isLoading()) {
+                    <nz-option nzDisabled nzCustomContent>
+                      <span nz-icon nzType="loading" style="margin-right: 8px"></span> Loading...
+                    </nz-option>
+                  }
+                </nz-select>
+
+                <a
+                  nz-button
+                  nzType="link"
+                  nzSize="small"
+                  (click)="syncFacilities()"
+                  [nzLoading]="isSyncing"
+                >
+                  <span nz-icon nzType="sync"></span> Refresh/Sync Data
+                </a>
+              </div>
             </nz-form-control>
           </nz-form-item>
-        </nz-col>
-        <nz-col nzSpan="12">
+
+          <ng-template #renderTemplate>
+            <div
+              class="custom-search-panel"
+              style="min-height: 80px; padding: 8px; background: #fff"
+            >
+              <div class="search-row" style="display: flex; gap: 8px">
+                <input
+                  nz-input
+                  placeholder="Facility Name"
+                  [(ngModel)]="filters.name"
+                  [ngModelOptions]="{ standalone: true }"
+                  (input)="triggerSearch()"
+                  (click)="$event.stopPropagation()"
+                  (keydown)="$event.stopPropagation()"
+                />
+                <input
+                  nz-input
+                  placeholder="Facility Code"
+                  [(ngModel)]="filters.code"
+                  [ngModelOptions]="{ standalone: true }"
+                  (input)="triggerSearch()"
+                  (click)="$event.stopPropagation()"
+                  (keydown)="$event.stopPropagation()"
+                />
+              </div>
+              <nz-divider style="margin: 4px 0"></nz-divider>
+            </div>
+          </ng-template>
+
           <nz-form-item>
-            <nz-form-label>Auth Type</nz-form-label>
-            <nz-form-control>
-              <input nz-input formControlName="authType" placeholder="e.g., BASIC" />
+            <nz-form-label>Additional Parameters (JSON)</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter valid JSON">
+              <textarea
+                nz-input
+                formControlName="params"
+                [nzAutosize]="{ minRows: 3, maxRows: 6 }"
+                placeholder='{"key": "value"}'
+              ></textarea>
+              <nz-form-text
+                >Optional: Additional configuration parameters in JSON format</nz-form-text
+              >
             </nz-form-control>
           </nz-form-item>
-        </nz-col>
-      </nz-row>
+
+          <nz-form-item>
+            <nz-form-control>
+              <label nz-checkbox formControlName="allowed">
+                <strong>Allow facility access</strong>
+              </label>
+              <nz-form-text
+                >If unchecked, this facility will be blocked from the system</nz-form-text
+              >
+            </nz-form-control>
+          </nz-form-item>
+        </div>
+      }
+
+      @if (!isMediatorOnlyMode) {
+        @if (facilityForm.get('name')?.value) {
+          <div style="margin-bottom: 24px; padding: 16px; background: #fafafa; border-radius: 4px">
+            <p>
+              <strong>Facility:</strong> {{ facilityForm.get('name')?.value }} ({{
+                facilityForm.get('code')?.value
+              }})
+            </p>
+          </div>
+        }
+        <nz-form-item>
+          <nz-form-control>
+            <label nz-checkbox formControlName="configureMediatorNow">
+              <strong>Configure referral endpoint now</strong>
+            </label>
+            <nz-form-text>You can configure this later if needed</nz-form-text>
+          </nz-form-control>
+        </nz-form-item>
+      }
+
+      @if (configureMediatorEnabled) {
+        <div>
+          <div nz-row [nzGutter]="16">
+            <div nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Mediator Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter mediator name">
+                  <input
+                    nz-input
+                    formControlName="mediatorName"
+                    placeholder="e.g., Hospital Referral System"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Base URL</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter a valid URL (http:// or https://)">
+                  <input nz-input formControlName="baseUrl" placeholder="https://api.example.com" />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+
+          <nz-form-item>
+            <nz-form-label [nzRequired]="configureMediatorEnabled">Endpoint Path</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter endpoint path">
+              <input nz-input formControlName="path" placeholder="/api/v1/referrals" />
+              <nz-form-text>API endpoint path (e.g., /api/v1/referrals)</nz-form-text>
+            </nz-form-control>
+          </nz-form-item>
+
+          <div nz-row [nzGutter]="16">
+            <div nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Username</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter username">
+                  <input nz-input formControlName="username" placeholder="API username" />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+            <div nz-col [nzSpan]="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Password</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter password">
+                  <input
+                    nz-input
+                    type="password"
+                    formControlName="password"
+                    placeholder="API password"
+                  />
+                </nz-form-control>
+              </nz-form-item>
+            </div>
+          </div>
+        </div>
+      }
 
       <nz-form-item>
-        <nz-form-label>Base URL</nz-form-label>
         <nz-form-control>
-          <input nz-input formControlName="baseUrl" placeholder="e.g., https://136.182.78.163:8888" />
+          <div class="actions">
+            <nz-space>
+              <button nz-button nzType="primary" [nzLoading]="isSubmitting" type="submit">
+                <span nz-icon nzType="save"></span>
+                {{
+                  isMediatorOnlyMode
+                    ? 'Save Configuration'
+                    : isEditMode
+                      ? 'Update Facility'
+                      : 'Register Facility'
+                }}
+              </button>
+              <button nz-button type="button" (click)="cancel()">Cancel</button>
+            </nz-space>
+          </div>
         </nz-form-control>
       </nz-form-item>
-
-      <nz-form-item>
-        <nz-form-label>Path</nz-form-label>
-        <nz-form-control>
-          <input nz-input formControlName="path" placeholder="e.g., /MappingTestHIS/referralsWebhook" />
-        </nz-form-control>
-      </nz-form-item>
-
-      <div class="actions">
-        <nz-space>
-          <button nz-button nzType="primary" [nzLoading]="loading" type="submit">
-            <span nz-icon nzType="save"></span>
-            Register Facility
-          </button>
-          <button nz-button type="button" (click)="cancel()">Cancel</button>
-        </nz-space>
-      </div>
     </form>
   </nz-card>
 </div>
