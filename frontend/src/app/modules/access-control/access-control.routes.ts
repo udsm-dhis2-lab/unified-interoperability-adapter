@@ -25,7 +25,7 @@ export const accessControlRoutes = [
   {
     path: 'user-roles/:roleId/edit',
     loadComponent: () =>
-      import('./pages/user-role-edit/user-role-edit').then((m) => m.UserRoleEdit),
+      import('./pages/user-role-create/user-role-create').then((m) => m.UserRoleCreate),
   },
   {
     path: 'user-authorities',

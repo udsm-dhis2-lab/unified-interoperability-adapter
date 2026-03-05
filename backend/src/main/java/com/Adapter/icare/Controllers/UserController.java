@@ -11,6 +11,7 @@ import com.Adapter.icare.Domains.*;
 import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.AuthService;
 import com.Adapter.icare.Services.RefreshTokenService;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -472,6 +473,27 @@ public class UserController {
         }
         Role updateRole = userService.updateRole(role, uuid);
         return updateRole.toMap(true);
+    }
+
+    @DeleteMapping("/users/roles/{uuid}")
+    public Map<String, Object> deleteRole(@PathVariable String uuid) throws Exception {
+        try {
+            userService.deleteRole(uuid);
+            Map <String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Role deleted successfully");
+            return response;
+        } catch (NotFoundException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            return errorResponse;
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "An unexpected error occurred: " + e.getMessage());
+            return errorResponse;
+        }
     }
 
     @PostMapping("/users/privileges")

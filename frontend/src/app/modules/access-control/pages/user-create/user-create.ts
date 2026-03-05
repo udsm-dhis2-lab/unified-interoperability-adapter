@@ -64,8 +64,8 @@ export class UserCreate {
         this.selectedRoles = this.user.roles;
       },
       error: (error) => {
-        this.message.error("Failed to update this user. Upon saving you will be creating the new one.")
-        console.log(error)
+        this.message.error("Failed to update this user. Upon saving you will be creating the new one.");
+        console.log(error);
       },
       complete: () => {
         this.isInitialLoading.set(false);

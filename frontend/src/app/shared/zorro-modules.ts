@@ -32,7 +32,7 @@ import { NzTimelineModule } from "ng-zorro-antd/timeline";
 import { NzTooltipModule } from "ng-zorro-antd/tooltip";
 import { NzTypographyModule } from "ng-zorro-antd/typography";
 import { NzEmptyModule } from "ng-zorro-antd/empty";
-import { NzSpinModule } from "ng-zorro-antd/spin";
+import { NzTransferModule } from "ng-zorro-antd/transfer";
 
 export const ZORRO_MODULES = [
   NzAlertModule,
@@ -69,5 +69,6 @@ export const ZORRO_MODULES = [
   NzTypographyModule,
   NzSpinComponent,
   NzSelectModule,
-  NzEmptyModule
+  NzEmptyModule,
+  NzTransferModule
 ];

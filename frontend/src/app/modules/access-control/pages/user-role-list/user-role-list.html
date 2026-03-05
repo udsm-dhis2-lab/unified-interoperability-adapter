@@ -61,10 +61,17 @@
             <td>{{ role.description }}</td>
             <td><nz-tag nzColor="blue">{{ role.privileges.length }} permissions</nz-tag></td>
             <td>
-              <button nz-button nzType="link" (click)="editRole(role.uuid)">
-                <span nz-icon nzType="edit"></span>
-                Edit
-              </button>
+              <nz-space>
+                <button *nzSpaceItem nz-button nzType="link" (click)="editRole(role.uuid)">
+                  <span nz-icon nzType="edit"></span>
+                  Edit
+                </button>
+            
+                <button *nzSpaceItem nz-button nzType="link" nzDanger (click)="deleteRole(role)">
+                  <span nz-icon nzType="delete"></span>
+                  Delete
+                </button>
+              </nz-space>
             </td>
           </tr>
         }

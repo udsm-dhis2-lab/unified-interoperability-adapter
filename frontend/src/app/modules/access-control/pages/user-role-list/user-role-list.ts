@@ -6,6 +6,8 @@ import { ZORRO_MODULES } from '@hdu/shared';
 import { RolesService } from '../../services/roles.service';
 import { debounceTime, Subject, switchMap, tap } from 'rxjs';
 import { NzTableQueryParams } from 'ng-zorro-antd/table';
+import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 interface Role {
   uuid: string;
@@ -23,6 +25,8 @@ interface Role {
 })
 export class UserRoleList {
   rolesService = inject(RolesService);
+  modal = inject(NzModalService);
+  message = inject(NzMessageService);
   searchText = '';
   statusFilter: 'all' | 'active' | 'inactive' = 'all';
   
@@ -87,7 +91,35 @@ export class UserRoleList {
     this.router.navigate(['/access-control/user-roles/create']);
   }
 
-  editRole(roleId: string): void {
-    this.router.navigate(['/access-control/user-roles', roleId, 'edit']);
+  editRole(roleUuid: string): void {
+    this.router.navigate(['/access-control/user-roles', roleUuid, 'edit']);
+  }
+
+  deleteRole(role: any){
+    if(!role?.uuid){
+      this.message.error("Invalid role selected for deletion.");
+      return;
+    }
+
+    this.modal.confirm({
+      nzTitle: 'Are you sure you want to delete this role?',
+      nzContent: `<b style="color: red;">${role?.roleName}</b> will be permanently removed. This action cannot be undone.`,
+      nzOkText: 'Yes, Delete',
+      nzOkType: 'primary',
+      nzOkDanger: true,
+      nzOnOk: () => {
+        this.rolesService.deleteRole(role?.uuid).subscribe({
+          next: () => {
+            this.message.success("Role deleted successfully.");
+            this.getRoles();
+          },
+          error: (error) => {
+            console.log(error);
+            this.message.error("Failed to delete role.");
+          }
+        });
+      },
+      nzCancelText: 'No, Cancel',
+    });
   }
 }
