@@ -32,8 +32,12 @@ export class RolesService {
     return this.http.get("/api/v1/users/roles", { params: parameters })
   }
 
-  getPrivileges(){
-    return this.http.get("/api/v1/users/privileges")
+  getPrivileges(uuid?: string){
+    return this.http.get(`/api/v1/users/privileges${uuid ? `/${uuid}` : ''}`)
+  }
+
+  updatePrivileges(privilegeUuid: string, privilege: any){
+    return this.http.put(`/api/v1/users/privileges/${privilegeUuid}`, privilege);
   }
 
   createRole(roleData: any){
