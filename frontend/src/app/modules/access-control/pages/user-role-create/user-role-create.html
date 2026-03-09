@@ -9,8 +9,8 @@
   </div>
 
   <div class="title">
-    <h2 nz-typography nzTitle>Create New Role</h2>
-    <span nz-typography nzType="secondary">Define a new user role with specific permissions</span>
+    <h2 nz-typography nzTitle>{{ roleUuid ? "Edit Role" : "Create New Role" }}</h2>
+    <span nz-typography nzType="secondary">Define a user role with specific permissions</span>
   </div>
 
   <nz-alert
@@ -28,13 +28,13 @@
           <nz-form-item>
             <nz-form-label nzRequired>Role Name</nz-form-label>
             <nz-form-control nzErrorTip="Please enter role name">
-              <input nz-input formControlName="roleName" placeholder="Enter role name (e.g., Health Professional)" />
+              <input nz-input placeholder="Enter role name (e.g., Health Professional)" [(ngModel)]="roleName" name="roleName"/>
             </nz-form-control>
           </nz-form-item>
           <nz-form-item>
             <nz-form-label nzRequired>Description</nz-form-label>
             <nz-form-control nzErrorTip="Please enter description">
-              <textarea nz-input rows="3" formControlName="description" placeholder="Enter a detailed description of this role and its responsibilities"></textarea>
+              <textarea nz-input rows="3" [(ngModel)]="description" name="description" placeholder="Enter a detailed description of this role and its responsibilities"></textarea>
             </nz-form-control>
           </nz-form-item>
           <!-- <nz-form-item>
@@ -54,49 +54,39 @@
               <nz-switch formControlName="status" nzCheckedChildren="Active" nzUnCheckedChildren="Inactive"></nz-switch>
             </nz-form-control>
           </nz-form-item> -->
-        </nz-card> 
-
-        <nz-card nzTitle="Permissions & Authorities" class="card">
-          <nz-alert
-            nzType="warning"
-            nzShowIcon
-            nzMessage="Permission Guidelines"
-            nzDescription="Select all permissions that users with this role should have. Be cautious with high-risk and critical permissions."
-            class="sub-alert"
-          ></nz-alert>
-          <p nz-typography nzType="secondary">Select the permissions that users with this role should have. Permissions are grouped by category.</p>
-          <nz-form-item>
-            <nz-checkbox-group formControlName="authorities">
-              <div *ngFor="let group of privileges" class="group">
-                <nz-divider nzOrientation="left">
-                  <span class="group-title">
-                    <span nz-icon nzType="team"></span>
-                    {{ group.category }}
-                  </span>
-                </nz-divider>
-                <div class="group-body">
-                  <div *ngFor="let permission of group.permissions" class="permission">
-                    <label nz-checkbox [nzValue]="permission.code">
-                      <nz-space>
-                        <strong>{{ permission.name }}</strong>
-                        <nz-tag>{{ permission.risk }}</nz-tag>
-                      </nz-space>
-                      <div class="muted">{{ permission.description }}</div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </nz-checkbox-group>
-          </nz-form-item>
-          <nz-divider></nz-divider>
-          <nz-space>
-            <button nz-button nzType="primary" (click)="save()">
-              <span nz-icon nzType="save"></span>
-              Create Role
-            </button>
-            <button nz-button (click)="cancel()">Cancel</button>
-          </nz-space>
         </nz-card>
+        @if(privileges().length){
+          <nz-card nzTitle="Permissions" class="card">
+            <nz-alert nzType="warning" nzShowIcon nzMessage="Permission Guidelines"
+              nzDescription="Select permissions from the left list to move them to the assigned list on the right."
+              class="sub-alert" style="margin-bottom: 20px;"></nz-alert>
+
+            
+            <nz-form-item>
+              <nz-form-control nzErrorTip="Please select at least one permission">
+            
+                <app-dual-list-select
+                  name="privileges"
+                  [dataSource]="privileges()" 
+                  labelKey="privilegeName"
+                  valueKey="privilegeName" 
+                  [titles]="['Available Permissions', 'Assigned Permissions']"
+                  [(ngModel)]="selectedPriviledges"
+                >
+                </app-dual-list-select>
+            
+              </nz-form-control>
+            </nz-form-item>
+            <nz-divider></nz-divider>
+            <nz-space>
+              <button nz-button nzType="primary" (click)="save()">
+                <span nz-icon nzType="save"></span>
+                  {{ roleUuid ? "Update" : "Create" }} Role
+              </button>
+              <button nz-button (click)="cancel()">Cancel</button>
+            </nz-space>
+          </nz-card>
+        }
       </nz-col>
 
       <nz-col nzSpan="8">

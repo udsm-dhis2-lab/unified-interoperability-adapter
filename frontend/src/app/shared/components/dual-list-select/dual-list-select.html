@@ -1,0 +1,28 @@
+<nz-transfer class="custom-transfer" [nzDataSource]="transferData" [nzTitles]="titles"
+    [nzRenderList]="[renderList, renderList]" (nzChange)="onTransferChange($event)">
+
+    <!-- Custom Template (Same as before) -->
+    <ng-template #renderList let-items let-direction="direction" let-stat="stat" let-onItemSelectAll="onItemSelectAll"
+        let-onItemSelect="onItemSelect">
+        <div class="list-container">
+            <div class="list-header">
+                <label nz-checkbox [nzChecked]="stat.checkAll" [nzIndeterminate]="stat.checkHalf"
+                    (nzCheckedChange)="onItemSelectAll($event)">
+                    {{ direction === 'left' ? titles[0] : titles[1] }}
+                </label>
+                <span class="count">{{ stat?.shownCount }}/{{ stat?.data?.length }}</span>
+            </div>
+            <div class="list-body">
+                @for(item of items; track $index){
+                    <div class="list-item" (click)="onItemSelect(item)"
+                        (dblclick)="handleDblClick(item)">
+                        <label nz-checkbox [nzChecked]="item?.checked" (nzCheckedChange)="onItemSelect(item)">
+                            {{ item?.title }}
+                        </label>
+                    </div>
+                }
+                <nz-empty *ngIf="items.length === 0" nzNotFoundImage="simple"></nz-empty>
+            </div>
+        </div>
+    </ng-template>
+</nz-transfer>

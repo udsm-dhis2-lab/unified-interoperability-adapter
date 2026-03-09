@@ -11,6 +11,7 @@ import com.Adapter.icare.Domains.*;
 import com.Adapter.icare.Dtos.*;
 import com.Adapter.icare.Services.AuthService;
 import com.Adapter.icare.Services.RefreshTokenService;
+import javassist.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.data.domain.Page;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -474,6 +476,27 @@ public class UserController {
         return updateRole.toMap(true);
     }
 
+    @DeleteMapping("/users/roles/{uuid}")
+    public Map<String, Object> deleteRole(@PathVariable String uuid) throws Exception {
+        try {
+            userService.deleteRole(uuid);
+            Map <String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Role deleted successfully");
+            return response;
+        } catch (NotFoundException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            return errorResponse;
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "An unexpected error occurred: " + e.getMessage());
+            return errorResponse;
+        }
+    }
+
     @PostMapping("/users/privileges")
     public List<Map<String, Object>> createPrivileges(@RequestBody List<Map<String, Object>> privilegesMap) {
         List<Map<String, Object>> createdPrivileges = new ArrayList<>();
@@ -489,25 +512,34 @@ public class UserController {
     }
 
     @GetMapping("/users/privileges")
+    @Transactional(readOnly = true)
     public List<Map<String, Object>> getPrivileges() {
         List<Map<String, Object>> privilegesMap = new ArrayList<>();
         List<Privilege> privileges = userService.getPrivileges();
 
         for (Privilege privilege : privileges) {
-            privilegesMap.add(privilege.toMap(false));
+            privilegesMap.add(privilege.toMap(true));
         }
 
         return privilegesMap;
     }
 
     @GetMapping("/users/privileges/{uuid}")
-    public Map<String, Object> getPrivilege(@PathVariable String uuid,
+    @Transactional(readOnly = true)
+    public ResponseEntity<Map<String, Object>> getPrivilege(@PathVariable String uuid,
             @RequestParam(defaultValue = "true") boolean withRoles) throws Exception {
-        Privilege privilege = userService.getPrivilege(uuid);
-        return privilege.toMap(withRoles);
+        try{
+            Privilege privilege = userService.getPrivilege(uuid);
+            return ResponseEntity.ok().body(privilege.toMap(withRoles));
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", "An unexpected error occurred: " + e.getMessage());
+            return  ResponseEntity.internalServerError().body(errorResponse);
+        }
     }
 
-    @PutMapping("/user/privileges/{uuid}")
+    @PutMapping("/users/privileges/{uuid}")
     public Map<String, Object> updatePrivilege(@RequestBody Map<String, Object> privilegeMap, @PathVariable String uuid)
             throws Exception {
         Privilege privilege = Privilege.fromMap(privilegeMap);

@@ -1,0 +1,61 @@
+<div>
+  <div class="page-header">
+    <div>
+      <h2 nz-typography nzTitle>User Privileges</h2>
+      <span nz-typography nzType="secondary">Manage system privileges and access controls</span>
+    </div>
+    <nz-space>
+      <button nz-button (click)="backToUsers()">
+        <span nz-icon nzType="lock"></span>
+        Back to Users
+      </button>
+    </nz-space>
+  </div>
+
+  <nz-row nzGutter="16" class="stats">
+    <nz-col nzSpan="6">
+      <nz-card>
+        <ng-template #authPrefix><span nz-icon nzType="safety"></span></ng-template>
+        <nz-statistic nzTitle="Total privileges" [nzValue]="privileges().length" [nzPrefix]="authPrefix"></nz-statistic>
+      </nz-card>
+    </nz-col>
+  </nz-row>
+
+  <nz-card>
+    <nz-table [nzData]="privileges()" [nzPageSize]="10" [nzShowSizeChanger]="true">
+      <thead>
+        <tr>
+          <th>Privilege Name</th>
+          <th>Description</th>
+          <th>Roles using this privilege</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(privilege of privileges(); track $index){
+          <tr>
+            <td>
+              <div class="name">{{ privilege?.privilegeName }}</div>
+            </td>
+            <td>{{ privilege?.description }}</td>
+            <td>
+              <nz-space>
+                @for(role of privilege.roles; track $index){
+                  <nz-tag nzColor="blue">{{ role?.roleName }}</nz-tag>
+                }
+              </nz-space>
+            </td>
+            <td>
+              <nz-space>
+                <button *nzSpaceItem nz-button nzType="link" (click)="editPrivilege(privilege)">
+                  <span nz-icon nzType="edit"></span>
+                  Edit
+                </button>
+              </nz-space>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>

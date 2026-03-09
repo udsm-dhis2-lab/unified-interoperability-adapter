@@ -1,0 +1,96 @@
+<div>
+  <div class="page-header">
+    <nz-space>
+      <button nz-button (click)="cancel()">
+        <span nz-icon nzType="arrow-left"></span>
+        Back to privileges
+      </button>
+    </nz-space>
+  </div>
+
+  <div class="title">
+    <h2 nz-typography nzTitle>Edit Privilege</h2>
+    <span nz-typography nzType="secondary">Define a new system permission/privilege</span>
+  </div>
+
+  <nz-alert
+    nzType="info"
+    nzShowIcon
+    nzMessage="Privilege Creation"
+    nzDescription="Privileges define specific system permissions. Once created, privileges can be assigned to roles, which are then assigned to users."
+    class="alert"
+  ></nz-alert>
+ 
+  <form nz-form nzLayout="vertical" (ngSubmit)="save()">
+    <nz-row nzGutter="16">
+      <nz-col nzSpan="16">
+        <nz-card nzTitle="Basic Information" class="card">
+          <nz-row nzGutter="16">
+            <nz-col nzSpan="12">
+              <nz-form-item>
+                <nz-form-label nzRequired>Privilege Name</nz-form-label>
+                <nz-form-control nzErrorTip="Please enter privilege name">
+                  <input nz-input name="privilegeName" [(ngModel)]="privilegeName" placeholder="e.g., View Patients" disabled />
+                </nz-form-control>
+              </nz-form-item>
+            </nz-col>
+            
+          </nz-row>
+          <nz-form-item>
+            <nz-form-label nzRequired>Description</nz-form-label>
+            <nz-form-control nzErrorTip="Please enter description">
+              <textarea nz-input rows="3" [(ngModel)]="description" name="description"></textarea>
+            </nz-form-control>
+          </nz-form-item>
+        </nz-card>
+        <nz-card nzTitle="Privilege Settings" class="card">
+          <nz-space>
+            <button nz-button nzType="primary">
+              <span nz-icon nzType="save"></span>
+              Save Privilege
+            </button>
+            <button nz-button (click)="cancel()">Cancel</button>
+          </nz-space>
+        </nz-card>
+      </nz-col>
+
+      <nz-col nzSpan="8">
+        <nz-card nzTitle="Privileges Guidelines" class="card sticky">
+          <nz-space nzDirection="vertical" style="width: 100%">
+            <div>
+              <strong class="title">Naming Convention</strong>
+              <ul>
+                <li>Use descriptive names can be UPPERCASE_WITH_UNDERSCORES</li>
+                <li>Start with action verb (VIEW, EDIT, DELETE)</li>
+              </ul>
+            </div>
+            <nz-divider></nz-divider>
+            <div>
+              <strong class="title">Security Best Practices</strong>
+              <ul>
+                <li>Keep permissions granular</li>
+                <li>Avoid overly broad permissions</li>
+                <li>Document the purpose clearly in the description field</li>
+              </ul>
+            </div>
+            <nz-divider></nz-divider>
+            <nz-alert
+              nzType="info"
+              nzShowIcon
+              nzMessage="Examples"
+              [nzDescription]="examplesTpl"
+            ></nz-alert>
+            <ng-template #examplesTpl>
+              <div>
+                <nz-tag>VIEW_PATIENTS</nz-tag>
+                <nz-tag>EDIT_HEALTH_RECORDS</nz-tag>
+                <nz-tag>EXPORT_ANALYTICS_DATA</nz-tag>
+                <nz-tag>MANAGE_SYSTEM_USERS</nz-tag>
+              </div>
+            </ng-template>
+          </nz-space>
+        </nz-card>
+      </nz-col>
+    </nz-row>
+  </form>
+</div>

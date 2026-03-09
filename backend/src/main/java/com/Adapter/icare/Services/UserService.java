@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import javassist.NotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -296,7 +297,9 @@ public class UserService implements UserDetailsService {
             roleToSave.setSharing(incomingRole.getSharing());
         } else {
             roleToSave = incomingRole;
+            roleToSave.setUuid(UUID.randomUUID().toString());
         }
+
 
         if (incomingRole.getPrivileges() != null && !incomingRole.getPrivileges().isEmpty()) {
 
@@ -312,6 +315,16 @@ public class UserService implements UserDetailsService {
         }
 
         return roleRepository.save(roleToSave);
+    }
+
+    public void deleteRole(String roleUuid) throws NotFoundException {
+        Role role = this.roleRepository.findByUuid(roleUuid);
+        if (role != null) {
+            roleRepository.delete(role);
+        } else {
+            throw new NotFoundException("Role with UUID " + roleUuid + " not found");
+        }
+
     }
 
     public List<Role> getRoles() {

@@ -32,7 +32,27 @@ export class RolesService {
     return this.http.get("/api/v1/users/roles", { params: parameters })
   }
 
-  getPrivileges(){
-    return this.http.get("/api/v1/users/privileges")
+  getPrivileges(uuid?: string){
+    return this.http.get(`/api/v1/users/privileges${uuid ? `/${uuid}` : ''}`)
+  }
+
+  updatePrivileges(privilegeUuid: string, privilege: any){
+    return this.http.put(`/api/v1/users/privileges/${privilegeUuid}`, privilege);
+  }
+
+  createRole(roleData: any){
+    return this.http.post("/api/v1/users/roles", roleData);
+  }
+
+  getRole(roleUuid: string){
+    return this.http.get(`/api/v1/users/roles/${roleUuid}`);
+  }
+
+  updateRole(roleUuid: string, roleData: any){
+    return this.http.put(`/api/v1/users/roles/${roleUuid}`, roleData);
+  }
+
+  deleteRole(roleUuid: string){
+    return this.http.delete(`/api/v1/users/roles/${roleUuid}`);
   }
 }

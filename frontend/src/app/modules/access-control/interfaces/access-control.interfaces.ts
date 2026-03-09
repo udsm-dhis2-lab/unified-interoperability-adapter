@@ -16,3 +16,11 @@ export interface User {
   disabled?: boolean;
   roles: Role[];
 }
+
+export interface Privilege {
+  uuid?: string;
+  privilegeName: string;
+  description?: string;
+  roles?: Role[];
+  sharing?: string;
+}

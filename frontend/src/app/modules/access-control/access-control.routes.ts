@@ -25,18 +25,18 @@ export const accessControlRoutes = [
   {
     path: 'user-roles/:roleId/edit',
     loadComponent: () =>
-      import('./pages/user-role-edit/user-role-edit').then((m) => m.UserRoleEdit),
+      import('./pages/user-role-create/user-role-create').then((m) => m.UserRoleCreate),
   },
   {
-    path: 'user-authorities',
+    path: 'user-privileges',
     loadComponent: () =>
-      import('./pages/user-permissions-list/user-permissions-list').then((m) => m.UserAuthorityList),
+      import('./pages/user-privileges-list/user-privileges-list').then((m) => m.UserPrivilegesList),
   },
   {
-    path: 'user-authorities/create',
+    path: 'user-privileges/:privilegeId/edit',
     loadComponent: () =>
-      import('./pages/user-permissions-create/user-permissions-create').then(
-        (m) => m.UserAuthorityCreate,
+      import('./pages/user-privilege-edit/user-privilege-edit').then(
+        (m) => m.UserPriviledgeEdit,
       ),
   },
 ];
