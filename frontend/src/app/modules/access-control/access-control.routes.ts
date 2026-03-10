@@ -1,3 +1,5 @@
+import { hasPrivilegesGuard } from 'src/app/shared/guards/has-privileges-guard';
+
 export const accessControlRoutes = [
   {
     path: 'users',
@@ -21,6 +23,10 @@ export const accessControlRoutes = [
     path: 'user-roles/create',
     loadComponent: () =>
       import('./pages/user-role-create/user-role-create').then((m) => m.UserRoleCreate),
+    canActivate: [hasPrivilegesGuard],
+    data: {
+      privileges: ['ALL', 'CREATE_USER_ROLE'],
+    },
   },
   {
     path: 'user-roles/:roleId/edit',

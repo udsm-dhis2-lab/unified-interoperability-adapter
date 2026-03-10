@@ -265,11 +265,7 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User Not found");
         }
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                getUserPrivileges(user.getRoles())
-        );
+        return new CustomUserDetails(user);
     }
 
     public User getUserByUsername(String username) throws UsernameNotFoundException {
@@ -360,17 +356,6 @@ public class UserService implements UserDetailsService {
             throw new Exception("User with uuid " + uuid + " does not exist");
         }
         return user;
-    }
-
-
-    private Collection<? extends GrantedAuthority> getUserPrivileges(Collection<Role> roles) {
-        List<GrantedAuthority> privileges = new ArrayList<>();
-        for (Role role : roles) {
-            for (Privilege privilege : role.getPrivileges()) {
-                privileges.add(new SimpleGrantedAuthority(privilege.getPrivilegeName()));
-            }
-        }
-        return privileges;
     }
 
     public Role getRole(String uuid) throws Exception {
