@@ -1,13 +1,7 @@
 package com.Adapter.icare.Services;
 
+import java.util.*;
 import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javassist.NotFoundException;
@@ -16,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -269,7 +265,11 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User Not found");
         }
-        return new CustomUserDetails(user);
+        return new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                getUserPrivileges(user.getRoles())
+        );
     }
 
     public User getUserByUsername(String username) throws UsernameNotFoundException {
@@ -360,6 +360,17 @@ public class UserService implements UserDetailsService {
             throw new Exception("User with uuid " + uuid + " does not exist");
         }
         return user;
+    }
+
+
+    private Collection<? extends GrantedAuthority> getUserPrivileges(Collection<Role> roles) {
+        List<GrantedAuthority> privileges = new ArrayList<>();
+        for (Role role : roles) {
+            for (Privilege privilege : role.getPrivileges()) {
+                privileges.add(new SimpleGrantedAuthority(privilege.getPrivilegeName()));
+            }
+        }
+        return privileges;
     }
 
     public Role getRole(String uuid) throws Exception {
